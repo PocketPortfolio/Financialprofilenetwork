@@ -1,0 +1,7 @@
+Commands
+npm install
+brew install
+pip install
+python3 NNPC.py
+node app.js
+source /Users/abbalawal/Documents/NNPC1/myenv/bin/activate
