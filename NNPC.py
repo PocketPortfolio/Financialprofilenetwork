@@ -7,6 +7,21 @@ from sklearn.metrics import f1_score, recall_score, precision_score, accuracy_sc
 from torch.utils.data import DataLoader, Dataset
 from sklearn.model_selection import KFold
 
+
+import subprocess
+
+# Spawn a new Node.js process
+#node_process = subprocess.Popen(['node', './app.js'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+# Send a message to the Node.js process
+message = 'Hello from Python!'
+node_process.stdin.write(message.encode('utf-8'))
+
+# Read the response from the Node.js process
+#response = node_process.stdout.readline().decode('utf-8')
+#print(response)
+
+
 # Define dataset class
 class TransactionDataset(Dataset):
     def __init__(self, data):
@@ -20,7 +35,7 @@ class TransactionDataset(Dataset):
         return len(self.inputs)
 
 # Load the CSV file using pandas
-data = pd.read_csv("customer_transactions_train.csv")
+data = pd.read_csv("/Users/abbalawal/Documents/NNPC1/myenv/Financialprofilenetwork/customer_transactions_train.csv")
 
 # Convert customer names to numerical values using one-hot encoding
 data = pd.get_dummies(data, columns=["customer_name"])
