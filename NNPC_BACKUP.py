@@ -7,6 +7,21 @@ from sklearn.metrics import f1_score, recall_score, precision_score, accuracy_sc
 from torch.utils.data import DataLoader, Dataset
 from sklearn.model_selection import KFold
 
+
+#import subprocess
+
+# Spawn a new Node.js process
+#node_process = subprocess.Popen(['node', './app.js'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+# Send a message to the Node.js process
+#message = 'Hello from Python!'
+#node_process.stdin.write(message.encode('utf-8'))
+
+# Read the response from the Node.js process
+#response = node_process.stdout.readline().decode('utf-8')
+#print(response)
+
+
 # Define dataset class
 class TransactionDataset(Dataset):
     def __init__(self, data):
@@ -20,7 +35,7 @@ class TransactionDataset(Dataset):
         return len(self.inputs)
 
 # Load the CSV file using pandas
-data = pd.read_csv("customer_transactions_train.csv")
+data = pd.read_csv("/Users/abbalawal/Documents/NNPC1/myenv/Financialprofilenetwork/customer_transactions_train.csv")
 
 # Convert customer names to numerical values using one-hot encoding
 data = pd.get_dummies(data, columns=["customer_name"])
@@ -32,7 +47,8 @@ data = data.fillna(0)
 # Define hyperparameters
 learning_rate = 0.001
 hidden_size = 64
-num_epochs = 1000
+# num_epochs = 1000
+num_epochs = 10
 batch_size = 32
 n_splits = 5
 reg_lambda = 0.01
@@ -124,4 +140,23 @@ print(f"Test F1 score: {test_f1:.4f}")
 print(f"Test recall score: {test_recall:.4f}")
 print(f"Test precision score: {test_precision:.4f}")
 print(f"Test accuracy score: {test_accuracy:.4f}")
+
+# Check the test output 
+test_outputs = model(test_dataset.inputs)
+test_preds = (test_outputs > 0).float()
+test_data['future_transaction'] = np.where(test_preds.numpy() == 1, 'positive', 'negative')
+print(test_data)
+
+def make_prediction(model, test_loader):
+    model.eval()
+    predictions = []
+    with torch.no_grad():
+        for i, (inputs, _) in enumerate(test_loader):
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs.data, 1)
+            predictions.append(predicted.numpy())
+    predictions = np.concatenate(predictions)
+    print("Predicted transactions:", predictions)
+    return predictions
+
 

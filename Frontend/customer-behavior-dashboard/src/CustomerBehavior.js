@@ -1,38 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-function CustomerBehavior() {
-  const [customerData, setCustomerData] = useState([]);
+class CustomerList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      customers: []
+    };
+  }
 
-  useEffect(() => {
-    fetch('/api/customer-behavior')
-      .then(res => res.json())
-      .then(data => setCustomerData(data))
-      .catch(err => console.log(err));
-  }, []);
+  componentDidMount() {
+    fetch('http://localhost:8081/api/customer-behavior')
+      .then(response => response.json())
+      .then(data => this.setState({ customers: data }))
+      .catch(error => console.error(error));
+  }
 
-  return (
-    <div>
-      <h1>Customer Behavior Dashboard</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Customer ID</th>
-            <th>Behavior Score</th>
-            <th>Last Interaction</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customerData.map(customer => (
-            <tr key={customer.id}>
-              <td>{customer.id}</td>
-              <td>{customer.behaviorScore}</td>
-              <td>{customer.lastInteraction}</td>
+  render() {
+    const { customers } = this.state;
+
+    return (
+      <div>
+        <h1>Customer List</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Future Transaction</th>
+              <th>Behavior</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+          </thead>
+          <tbody>
+            {customers.map(customer => (
+              <tr key={customer.id}>
+                <td>{customer.name}</td>
+                <td>{customer.futureTransaction}</td>
+                <td>{customer.behavior}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <h2>Change Over Time</h2>
+        <LineChart width={800} height={400} data={customers}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="Excellent" stroke="#8884d8" />
+          <Line type="monotone" dataKey="Low Risk" stroke="#82ca9d" />
+          <Line type="monotone" dataKey="High Risk" stroke="#ffc658" />
+        </LineChart>
+      </div>
+    );
+  }
 }
 
-export default CustomerBehavior;
+export default CustomerList;
