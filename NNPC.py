@@ -21,7 +21,8 @@ class TransactionDataset(Dataset):
         return len(self.inputs)
 
 
-data = pd.read_csv("/Users/abbalawal/Documents/NNPC1/myenv/Financialprofilenetwork/customer_transactions_train.csv")
+# data = pd.read_csv("/Users/abbalawal/Documents/NNPC1/myenv/Financialprofilenetwork/customer_transactions_train.csv")
+data = pd.read_csv("customer_transactions_train.csv")
 data = pd.get_dummies(data, columns=["customer_name"])
 data = data.apply(pd.to_numeric, errors='coerce')
 data = data.fillna(0)
