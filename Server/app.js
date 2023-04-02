@@ -9,8 +9,8 @@ app.get('/api/customer-behavior', (req, res) => {
   // Create a new Python shell instance and run the Python code
   let options = {
     mode: 'json', // Change the mode to 'json' to automatically parse JSON output
-    pythonPath: '/Users/abbalawal/Documents/NNPC1/myenv/bin/python3',
-    scriptPath: '/Users/abbalawal/Documents/NNPC1/myenv/Financialprofilenetwork/',
+    pythonPath: '/home/ec2-user/miniconda3/bin/python3',
+    scriptPath: '/home/ec2-user/Financialprofilenetwork/',
   };
   PythonShell.run('NNPC.py', options, function (err, results) {
     if (err) {
