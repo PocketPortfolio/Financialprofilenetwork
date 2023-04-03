@@ -10,7 +10,7 @@ class CustomerList extends Component {
   }
 
   componentDidMount() {
-    fetch('http://44.212.63.66:8081/api/customer-behavior')
+    fetch('http://54.196.160.42:8081/api/customer-behavior')
       .then(response => response.json())
       .then(data => this.setState({ customers: data }))
       .catch(error => console.error(error));
