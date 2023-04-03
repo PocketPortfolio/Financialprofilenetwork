@@ -28,5 +28,5 @@ app.get('/api/customer-behavior', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://44.212.63.66:${port}`);
 });
