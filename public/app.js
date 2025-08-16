@@ -1,3 +1,21 @@
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
+import Papa from 'papaparse';
+
 // Firebase configuration loaded from environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -9,9 +27,9 @@ if (!firebaseConfig.apiKey) {
   console.warn('Firebase config missing. Set VITE_FIREBASE_* variables in .env');
 }
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const trades = [];
 
@@ -36,7 +54,7 @@ function addTrade(trade) {
   trades.push(trade);
   renderTrades();
   if (auth.currentUser) {
-    db.collection('trades').add({ ...trade, uid: auth.currentUser.uid });
+    addDoc(collection(db, 'trades'), { ...trade, uid: auth.currentUser.uid });
   }
 }
 
@@ -113,23 +131,20 @@ const signInBtn = document.getElementById('sign-in');
 const signOutBtn = document.getElementById('sign-out');
 
 signInBtn.addEventListener('click', () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+  const provider = new GoogleAuthProvider();
+  signInWithPopup(auth, provider);
 });
 
-signOutBtn.addEventListener('click', () => auth.signOut());
+signOutBtn.addEventListener('click', () => signOut(auth));
 
-auth.onAuthStateChanged((user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     signInBtn.style.display = 'none';
     signOutBtn.style.display = 'inline-block';
-    db.collection('trades')
-      .where('uid', '==', user.uid)
-      .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => trades.push(doc.data()));
-        renderTrades();
-      });
+    const q = query(collection(db, 'trades'), where('uid', '==', user.uid));
+    const snapshot = await getDocs(q);
+    snapshot.forEach((doc) => trades.push(doc.data()));
+    renderTrades();
   } else {
     signInBtn.style.display = 'inline-block';
     signOutBtn.style.display = 'none';
