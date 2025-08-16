@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pocket Portfolio</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <header
+      class="bg-white shadow p-4 flex justify-between items-center mb-6"
+    >
+      <h1 class="text-xl font-bold">Pocket Portfolio</h1>
+      <div id="auth" class="space-x-2">
+        <button
+          id="sign-in"
+          class="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Sign in with Google
+        </button>
+        <button
+          id="sign-out"
+          style="display: none"
+          class="px-4 py-2 bg-gray-300 text-black rounded"
+        >
+          Sign out
+        </button>
+      </div>
+    </header>
+
+    <main class="p-4 space-y-6">
+      <section id="metrics" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded shadow">
+          <p class="text-sm text-gray-500">Total Invested</p>
+          <p class="text-xl font-bold">
+            £<span id="invested">0.00</span>
+          </p>
+        </div>
+        <div class="bg-white p-4 rounded shadow">
+          <p class="text-sm text-gray-500">Positions</p>
+          <p class="text-xl font-bold" id="positions">0</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow">
+          <p class="text-sm text-gray-500">Trades</p>
+          <p class="text-xl font-bold" id="trade-count">0</p>
+        </div>
+      </section>
+
+      <section
+        id="quick-actions"
+        class="bg-white p-4 rounded shadow space-y-2"
+      >
+        <h2 class="text-lg font-semibold">Quick actions</h2>
+        <div class="space-x-2">
+          <button
+            id="export-json"
+            class="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Export JSON
+          </button>
+          <label
+            for="import-json"
+            class="px-4 py-2 bg-blue-600 text-white rounded cursor-pointer"
+          >
+            Import JSON
+          </label>
+          <input type="file" id="import-json" accept=".json" class="hidden" />
+        </div>
+        <p class="text-xs text-gray-500">
+          Informational only. See
+          <a href="#" class="text-blue-500">Terms &amp; Privacy</a>.
+        </p>
+      </section>
+
+      <section id="trade-input" class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold mb-4">Add trade</h2>
+        <form
+          id="trade-form"
+          class="grid grid-cols-2 md:grid-cols-6 gap-2 items-end"
+        >
+          <input
+            type="date"
+            id="date"
+            required
+            class="border p-2 rounded"
+          />
+          <input
+            type="text"
+            id="ticker"
+            placeholder="Ticker"
+            required
+            class="border p-2 rounded"
+          />
+          <input
+            type="number"
+            id="quantity"
+            placeholder="Qty"
+            step="any"
+            required
+            class="border p-2 rounded"
+          />
+          <input
+            type="number"
+            id="price"
+            placeholder="Price"
+            step="any"
+            required
+            class="border p-2 rounded"
+          />
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="mock" class="mr-2" />
+            <span>Mock trade</span>
+          </label>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Add Trade
+          </button>
+        </form>
+
+        <h3 class="text-md font-semibold mt-4">Upload Trade Confirmations</h3>
+        <input type="file" id="csv-file" accept=".csv" class="mt-2" />
+        <p class="text-xs text-gray-500">
+          CSV preferred for accuracy, PDF parsing is best-effort.
+        </p>
+      </section>
+
+      <section class="bg-white p-4 rounded shadow">
+        <h2 class="text-lg font-semibold">Trades</h2>
+        <table
+          id="trades-table"
+          class="min-w-full divide-y divide-gray-200 mt-2"
+        >
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-2 py-1 text-left text-xs font-medium text-gray-500">Date</th>
+              <th class="px-2 py-1 text-left text-xs font-medium text-gray-500">Ticker</th>
+              <th class="px-2 py-1 text-left text-xs font-medium text-gray-500">Qty</th>
+              <th class="px-2 py-1 text-left text-xs font-medium text-gray-500">Price</th>
+              <th class="px-2 py-1 text-left text-xs font-medium text-gray-500">Mock</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
