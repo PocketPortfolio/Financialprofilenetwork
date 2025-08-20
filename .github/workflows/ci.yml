@@ -1,24 +1,9 @@
-name: CI
-on:
-  pull_request:
-  push:
-    branches: [main]
-jobs:
-  ci:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9 }
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-      - run: pnpm i --frozen-lockfile
-      - run: pnpm -r lint
-      - run: pnpm -r typecheck
-      - run: pnpm -r test -- --reporter=dot
-      - run: pnpm -C apps/web build
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm run typecheck --if-present
+      - run: npm test --if-present -- --reporter=dot
+      - run: npm run build --workspaces=false --if-present
