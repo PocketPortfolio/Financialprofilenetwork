@@ -1,9 +1,0 @@
-{
-  "name": "Pocket Portfolio",
-  "short_name": "Portfolio",
-  "start_url": "/index.html",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "description": "Track investments with CSV uploads and mock trades",
-  "icons": []
-}
