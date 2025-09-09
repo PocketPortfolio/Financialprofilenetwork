@@ -1,5 +1,15 @@
-node_modules
-.vscode
-.vercel
+# dependencies & builds
+node_modules/
+dist/
+.vite/
+.vercel/
+
+# local env files (never commit)
 .env
-dist
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
