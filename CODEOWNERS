@@ -1,0 +1,3 @@
+# Replace @eng-lead-handle with your engineering lead's GitHub handle
+/apps/web/ @eng-lead-handle
+/packages/ui-components/ @eng-lead-handle

@@ -1,0 +1,9 @@
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm run typecheck --if-present
+      - run: npm test --if-present -- --reporter=dot
+      - run: npm run build --workspaces=false --if-present
