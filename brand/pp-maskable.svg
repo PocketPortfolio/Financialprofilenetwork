@@ -1,0 +1,23 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="120" fill="#0b1220"/>
+  <g filter="url(#blur)">
+    <circle cx="160" cy="160" r="140" fill="#0ea5e9" opacity=".22"/>
+    <circle cx="380" cy="360" r="160" fill="#34d399" opacity=".18"/>
+  </g>
+  <g transform="translate(56,60) scale(1.05)">
+    <rect x="40" y="40" width="320" height="320" rx="72" fill="#0b1220" stroke="#0ea5e9" stroke-opacity=".25"/>
+    <g fill="url(#grad)">
+      <defs>
+        <linearGradient id="grad" x1="0" x2="1">
+          <stop offset="0" stop-color="#34d399"/>
+          <stop offset="1" stop-color="#2563eb"/>
+        </linearGradient>
+      </defs>
+      <path d="M90 120a26 26 0 0 1 26-26h70c45 0 72 24 72 60s-27 60-72 60h-28v40a26 26 0 0 1-26 26h-16a26 26 0 0 1-26-26V120zm52 26v20h50c12 0 18-6 18-10s-6-10-18-10h-50z"/>
+      <rect x="230" y="220" width="52" height="52" rx="12"/>
+    </g>
+  </g>
+  <defs>
+    <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+</svg>

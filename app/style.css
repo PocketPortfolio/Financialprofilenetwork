@@ -1,0 +1,178 @@
+/* === Pocket Portfolio App (themeable, matches landing) ================== */
+
+/* ==== Theme tokens ==== */
+:root{
+  /* Dark (default) — unchanged */
+  --bg:#0b1220; --chrome:#0b1220; --text:#fff; --muted:#9aa4b3;
+  --card:#0f172a; --card-border:#1f2937;
+  --brand:#2563eb; --pos:#10b981; --neg:#ef4444;
+  --table-zebra: color-mix(in srgb, var(--text) 3%, transparent);
+  --base-fs: 100%;
+}
+
+/* ✅ Light: higher contrast & clearer separation */
+[data-theme="light"]{
+  --bg:#f5f7fb;              /* not pure white → helps separation */
+  --chrome:#f5f7fb;
+  --text:#0b1220;            /* very dark text */
+  --muted:#334155;           /* darker muted for ≥4.5:1 on #fff/#f5f7fb */
+  --card:#ffffff;            /* true white cards on soft bg */
+  --card-border:#cbd5e1;     /* stronger borders */
+  --brand:#2563eb;
+  --pos:#10b981; --neg:#ef4444;
+  --table-zebra:#eef2f7;     /* clearer zebra */
+}
+
+/* High contrast — unchanged */
+[data-theme="contrast"]{
+  --bg:#000; --chrome:#000; --text:#fff; --muted:#fff;
+  --card:#000; --card-border:#fff; --brand:#ffd000; --pos:#00ff6a; --neg:#ff3b30;
+  --table-zebra:#111;
+}
+
+/* System theme follows the same improved light tokens */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme]){
+    --bg:#f5f7fb; --chrome:#f5f7fb; --text:#0b1220; --muted:#334155;
+    --card:#ffffff; --card-border:#cbd5e1; --table-zebra:#eef2f7; --brand:#2563eb;
+  }
+}
+
+/* ==== Globals ==== */
+html{ font-size:var(--base-fs); }
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background:var(--bg); color:var(--text);
+}
+*{ box-sizing:border-box; }
+a{ color:var(--brand); }
+.muted{ color:var(--muted); }
+:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce){ *{ animation:none!important; transition:none!important; } }
+
+/* ==== Visibility util ==== */
+.hidden { display: none !important; }
+
+/* ==== Nav ==== */
+.pp-nav{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:saturate(1.1) blur(8px);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  border-bottom:1px solid var(--card-border);
+}
+[data-theme="light"] .pp-nav,
+:root:not([data-theme]) .pp-nav{   /* system light */
+  background:#ffffffcc;            /* solid-ish for readability over hero */
+  box-shadow:0 1px 0 rgba(0,0,0,.06);
+}
+
+.pp-nav-inner{
+  max-width:1200px; margin:0 auto; height:64px;
+  padding:0 16px; display:flex; align-items:center; justify-content:space-between;
+}
+.pp-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+.pp-logo{ width:32px; height:32px; display:block; border-radius:6px; }
+.pp-wordmark{ height:20px; display:block; }
+@media (max-width:520px){ .pp-wordmark{ display:none; } }
+
+.pp-links{ display:flex; gap:8px; align-items:center; }
+.pp-tab{
+  appearance:none; border:1px solid var(--card-border);
+  background:var(--card); color:var(--text);
+  padding:8px 12px; border-radius:12px; cursor:pointer; font-weight:600;
+}
+.pp-tab.active{ background:var(--brand); border-color:transparent; color:#fff; }
+
+.pp-actions{ display:flex; align-items:center; gap:10px; }
+.btn{
+  border-radius:12px; font-weight:600; padding:8px 12px; cursor:pointer;
+  border:1px solid var(--card-border); background:var(--card); color:var(--text);
+}
+.btn.primary{ background:var(--brand); border-color:transparent; color:#fff; }
+.btn.danger{ background:var(--neg); border-color:transparent; color:#fff; }
+
+/* ==== Layout / cards ==== */
+.pp-main{ max-width:1200px; margin:24px auto; padding:0 16px; }
+.card{
+  background:var(--card); border:1px solid var(--card-border);
+  border-radius:14px; padding:16px; margin:14px 0;
+}
+.card-title{ margin:0 0 12px; font-size:1.05rem; font-weight:700; }
+
+/* ==== Metrics ==== */
+.metrics{ display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:12px; }
+.metric-card{
+  background:var(--card); border:1px solid var(--card-border);
+  border-radius:14px; padding:16px; text-align:center; font-size:1.05rem;
+}
+
+/* ==== Forms ==== */
+#trade-form{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+#trade-form input[type="text"],
+#trade-form input[type="date"],
+#trade-form input[type="number"],
+#trade-form select{
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  color:var(--text); border:1px solid var(--card-border); border-radius:10px; padding:8px 10px;
+}
+[data-theme="light"] #trade-form input[type="text"],
+[data-theme="light"] #trade-form input[type="date"],
+[data-theme="light"] #trade-form input[type="number"],
+[data-theme="light"] #trade-form select,
+:root:not([data-theme]) #trade-form input[type="text"],
+:root:not([data-theme]) #trade-form input[type="date"],
+:root:not([data-theme]) #trade-form input[type="number"],
+:root:not([data-theme]) #trade-form select{
+  background:#fff;                 /* solid controls on light */
+  border-color:#cbd5e1;
+}
+#trade-form input::placeholder{ color:var(--muted); }
+#trade-form .inline{ display:inline-flex; align-items:center; gap:6px; }
+#trade-form .csv{ margin-left:auto; display:flex; gap:10px; align-items:center; }
+
+/* ==== Tables ==== */
+.table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:8px; }
+.data-table{ width:100%; border-collapse:separate; border-spacing:0; min-width:640px; }
+.data-table thead th{
+  text-align:left; font-weight:600; font-size:.9rem; color:var(--muted);
+  background:var(--card); border-bottom:1px solid var(--card-border); padding:10px 12px;
+}
+.data-table tbody td{ padding:10px 12px; border-bottom:1px solid var(--card-border); }
+.data-table tbody tr:nth-child(odd){ background:var(--table-zebra); }
+
+/* ==== Chart ==== */
+#asset-chart{ max-width:100%; display:block; margin:12px auto; }
+
+/* ==== News grid ==== */
+.news-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+.news-card{ display:flex; gap:12px; background:var(--card); border:1px solid var(--card-border); padding:10px; border-radius:12px; }
+.news-card__img{ width:96px; height:96px; object-fit:cover; border-radius:8px; flex:0 0 auto; }
+.news-card__title{ margin:0 0 6px; font-size:.95rem; line-height:1.25; }
+.news-card__meta{ color:var(--muted); font-size:.85rem; margin-bottom:4px; }
+.news-card__link{ font-size:.9rem; color:var(--brand); text-decoration:none; }
+.news-card__link:hover{ text-decoration:underline; }
+
+/* ==== Responsive ==== */
+@media (max-width: 900px){ .metrics{ grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 520px){
+  .metrics{ grid-template-columns:1fr; }
+  #trade-form{ flex-direction:column; align-items:stretch; }
+  #trade-form .csv{ margin-left:0; justify-content:space-between; width:100%; }
+}
+
+/* Email aesthetics (profile) */
+#user-email { color: var(--muted); font-size: .9rem; }
+
+.chg-pos{ color:var(--pos); }
+.chg-neg{ color:var(--neg); }
+
+
+/* optional: use inside the app if a dark visual appears in light mode */
+.on-dark{
+  color:#fff;
+  --text:#fff;
+  --muted:#cbd5e1;
+  --card: color-mix(in srgb, #0b1220 75%, transparent);
+  --card-border: color-mix(in srgb, #ffffff 20%, transparent);
+}

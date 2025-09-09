@@ -1,0 +1,150 @@
+<!-- /public/brand/preview-live.svg -->
+<svg width="1440" height="540" viewBox="0 0 1440 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1930"/>
+      <stop offset="1" stop-color="#0b1220"/>
+    </linearGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+    <style>
+      .t { font: 600 18px/1.1 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+      .mono { font: 600 16px/1 "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .price { font: 700 22px/1 "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <!-- background -->
+  <rect width="1440" height="540" fill="url(#bg)"/>
+  <ellipse cx="360" cy="80" rx="300" ry="80" fill="#3b82f6" opacity=".25" filter="url(#soft)"/>
+  <ellipse cx="1120" cy="480" rx="320" ry="120" fill="#10b981" opacity=".18" filter="url(#soft)"/>
+
+  <!-- panel -->
+  <g>
+    <rect x="120" y="80" width="1200" height="380" rx="16" fill="#0f1a2a" stroke="#1a2b45"/>
+    <rect x="140" y="100" width="1160" height="48" rx="10" fill="#0d1726" stroke="#13233a"/>
+    <circle cx="166" cy="124" r="8" fill="#ef4444"/>
+    <circle cx="188" cy="124" r="8" fill="#f59e0b"/>
+    <circle cx="210" cy="124" r="8" fill="#10b981"/>
+    <text x="250" y="130" class="t" fill="#94a3b8">Live Prices &amp; P/L</text>
+
+    <!-- LIVE badge -->
+    <g transform="translate(1120,110)">
+      <rect x="0" y="-16" width="120" height="28" rx="14" fill="#122034" stroke="#1e3351"/>
+      <circle id="pulse" cx="16" cy="-2" r="6" fill="#10b981">
+        <animate attributeName="r" values="6;10;6" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.4;1" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <text x="30" y="-2" class="t" fill="#e5f2ff">LIVE</text>
+    </g>
+
+    <!-- left: ticker table -->
+    <g transform="translate(160,170)">
+      <text x="0" y="0" class="t" fill="#e5f2ff">Most Active</text>
+      <g transform="translate(0,20)">
+        <rect x="0"  y="8" width="520" height="48" rx="10" fill="#101b2b"/>
+        <rect x="0"  y="64" width="520" height="48" rx="10" fill="#101b2b"/>
+        <rect x="0"  y="120" width="520" height="48" rx="10" fill="#101b2b"/>
+        <rect x="0"  y="176" width="520" height="48" rx="10" fill="#101b2b"/>
+
+        <!-- Row content (two alternating states for prices) -->
+        <g class="mono">
+          <!-- static tickers -->
+          <text x="20"  y="36"  fill="#e5f2ff">AAPL</text>
+          <text x="20"  y="92"  fill="#e5f2ff">NVDA</text>
+          <text x="20"  y="148" fill="#e5f2ff">BTC</text>
+          <text x="20"  y="204" fill="#e5f2ff">TSLA</text>
+          <text x="100" y="36"  fill="#94a3b8">Apple Inc.</text>
+          <text x="100" y="92"  fill="#94a3b8">NVIDIA Corp.</text>
+          <text x="100" y="148" fill="#94a3b8">Bitcoin</text>
+          <text x="100" y="204" fill="#94a3b8">Tesla</text>
+        </g>
+
+        <!-- state A -->
+        <g id="stateA">
+          <text x="360" y="36"  class="price" fill="#e5f2ff">$215.22</text>
+          <text x="460" y="36"  class="mono" fill="#10b981">+1.1%</text>
+
+          <text x="360" y="92"  class="price" fill="#e5f2ff">$124.80</text>
+          <text x="460" y="92"  class="mono" fill="#10b981">+2.7%</text>
+
+          <text x="360" y="148" class="price" fill="#e5f2ff">$68,245</text>
+          <text x="460" y="148" class="mono" fill="#10b981">+2.4%</text>
+
+          <text x="360" y="204" class="price" fill="#e5f2ff">$239.14</text>
+          <text x="460" y="204" class="mono" fill="#ef4444">-0.6%</text>
+
+          <animate attributeName="opacity" values="1;0;0;1" dur="6s" repeatCount="indefinite"/>
+        </g>
+
+        <!-- state B -->
+        <g id="stateB" opacity="0">
+          <text x="360" y="36"  class="price" fill="#e5f2ff">$216.04</text>
+          <text x="460" y="36"  class="mono" fill="#10b981">+1.5%</text>
+
+          <text x="360" y="92"  class="price" fill="#e5f2ff">$123.70</text>
+          <text x="460" y="92"  class="mono" fill="#ef4444">-0.9%</text>
+
+          <text x="360" y="148" class="price" fill="#e5f2ff">$68,620</text>
+          <text x="460" y="148" class="mono" fill="#10b981">+3.0%</text>
+
+          <text x="360" y="204" class="price" fill="#e5f2ff">$237.88</text>
+          <text x="460" y="204" class="mono" fill="#ef4444">-1.2%</text>
+
+          <animate attributeName="opacity" values="0;1;1;0" dur="6s" repeatCount="indefinite"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- right: animated sparkline & P/L -->
+    <g transform="translate(740,170)">
+      <text x="0" y="0" class="t" fill="#e5f2ff">Portfolio – last 60s</text>
+      <rect x="0" y="20" width="520" height="280" rx="12" fill="#101b2b" stroke="#1a2b45"/>
+      <!-- grid -->
+      <g stroke="#182a45">
+        <line x1="20" y1="70"  x2="500" y2="70"/>
+        <line x1="20" y1="130" x2="500" y2="130"/>
+        <line x1="20" y1="190" x2="500" y2="190"/>
+        <line x1="20" y1="250" x2="500" y2="250"/>
+      </g>
+
+      <!-- scrolling sparkline -->
+      <path id="spark" d="M 20 200
+            C 80 160, 120 220, 180 190
+            S 260 150, 320 190
+            S 400 230, 460 180
+            S 520 140, 580 200"
+            fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
+      <use href="#spark" stroke="#60a5fa" stroke-width="6" stroke-opacity=".25"/>
+      <!-- dash animation -->
+      <path d="M 20 200
+            C 80 160, 120 220, 180 190
+            S 260 150, 320 190
+            S 400 230, 460 180
+            S 520 140, 580 200"
+            fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"
+            stroke-dasharray="420 820" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" values="0;1240" dur="7s" repeatCount="indefinite"/>
+      </path>
+
+      <!-- P/L box -->
+      <g transform="translate(24,236)">
+        <rect x="0" y="0" width="210" height="48" rx="10" fill="#0f1a2a" stroke="#1a2b45"/>
+        <text x="12" y="30" class="t" fill="#94a3b8">Unrealised P/L</text>
+        <text x="150" y="30" class="t mono" fill="#10b981">+5.8%</text>
+      </g>
+      <!-- flow bars -->
+      <g transform="translate(260,238)">
+        <rect x="0" y="0" width="220" height="10" rx="5" fill="#142132"/>
+        <rect x="0" y="0" width="140" height="10" rx="5" fill="#10b981">
+          <animate attributeName="width" values="120;180;120" dur="4s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="0" y="18" width="220" height="10" rx="5" fill="#142132"/>
+        <rect x="0" y="18" width="90"  height="10" rx="5" fill="#2563eb">
+          <animate attributeName="width" values="80;130;80" dur="4s" repeatCount="indefinite"/>
+        </rect>
+      </g>
+    </g>
+  </g>
+</svg>
