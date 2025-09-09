@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pocket Portfolio</title>
+  <link rel="manifest" href="/manifest.json" />
+</head>
+<body>
+  <h1>Pocket Portfolio</h1>
+  <div id="auth">
+    <button id="sign-in">Sign in with Google</button>
+    <button id="sign-out" style="display:none">Sign out</button>
+  </div>
+
+  <section id="metrics">
+    <p>Total Invested: <span id="invested">0</span></p>
+    <p>Trades: <span id="trade-count">0</span></p>
+    <p>Positions: <span id="positions">0</span></p>
+  </section>
+
+  <section id="trade-input">
+    <h2>Add Trade</h2>
+    <form id="trade-form">
+      <input type="date" id="date" required />
+      <input type="text" id="ticker" placeholder="Ticker" required />
+      <input type="number" id="quantity" placeholder="Qty" step="any" required />
+      <input type="number" id="price" placeholder="Price" step="any" required />
+      <label><input type="checkbox" id="mock" /> Mock Trade</label>
+      <button type="submit">Add</button>
+    </form>
+
+    <h3>Import CSV</h3>
+    <input type="file" id="csv-file" accept=".csv" />
+  </section>
+
+  <section>
+    <h2>Trades</h2>
+    <table id="trades-table" border="1">
+      <thead>
+        <tr><th>Date</th><th>Ticker</th><th>Qty</th><th>Price</th><th>Mock</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <script type="module" src="app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</body>
+</html>

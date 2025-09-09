@@ -1,0 +1,31 @@
+name: "🐛 Bug report"
+description: Report something that looks broken.
+title: "[Bug]: "
+labels: [type/bug, status/needs-triage]
+body:
+  - type: input
+    id: route
+    attributes:
+      label: Page/route
+      placeholder: /dashboard or /positions
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+  - type: input
+    id: env
+    attributes:
+      label: Browser & OS
+      placeholder: Chrome 127 on macOS 14
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console/network logs (if any)
