@@ -1,7 +1,12 @@
-// /api/quote.js — Edge runtime, robust change% computation
+// /api/quote.js — Edge runtime, robust change% computation + rate-limit + CORS allowlist
 export const config = { runtime: 'edge' };
 
+import { rateLimit } from './_rate-limit-edge.js';
+
 const JUA = { 'User-Agent': 'Mozilla/5.0 (PocketPortfolio)', 'Accept': 'application/json' };
+const ALLOWED = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+const DEV_DEFAULTS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'];
+const ALLOWLIST = new Set([...DEV_DEFAULTS, ...ALLOWED]);
 
 // ---- Yahoo batch (fast path) ----
 async function yahooBatch(symbols) {
@@ -14,67 +19,69 @@ async function yahooBatch(symbols) {
   return rows.map(x => ({
     symbol: (x.symbol || '').toUpperCase(),
     name: x.shortName || x.longName || x.symbol || '',
-    currency: x.currency || null,
-    price: x.regularMarketPrice ?? x.postMarketPrice ?? x.preMarketPrice ?? null,
-    change: x.regularMarketChange ?? x.postMarketChange ?? x.preMarketChange ?? null,
-    changePct: x.regularMarketChangePercent ?? x.postMarketChangePercent ?? x.preMarketChangePercent ?? null,
+    price: typeof x.regularMarketPrice === 'number' ? x.regularMarketPrice : null,
+    change: typeof x.regularMarketChange === 'number' ? x.regularMarketChange : null,
+    changePct: typeof x.regularMarketChangePercent === 'number' ? x.regularMarketChangePercent : null,
+    currency: x.currency || '',
     source: 'yahoo'
   }));
 }
 
-// ---- Yahoo chart (get last & previous close) ----
+// ---- Yahoo chart (compute change%) ----
 async function yahooChart(sym) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=5d&interval=1d`;
-  const r = await fetch(url, { headers: JUA });
-  if (!r.ok) throw new Error(`yahoo_chart_${r.status}`);
+  const u = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=1d&interval=1m`;
+  const r = await fetch(u, { headers: JUA });
+  if (!r.ok) throw new Error(`chart_${r.status}`);
   const j = await r.json();
   const res = j?.chart?.result?.[0];
-  if (!res) throw new Error('yahoo_chart_empty');
-
-  const closes = res?.indicators?.quote?.[0]?.close || [];
-  const last = closes.filter(v => v != null).slice(-1)[0];
-  const prev = closes.filter(v => v != null).slice(-2, -1)[0];
-  const currency = res?.meta?.currency || null;
-
-  let change = null, changePct = null, price = null;
-  if (last != null) price = Number(last);
-  if (price != null && prev != null && prev !== 0) {
-    change = price - prev;
-    changePct = (change / prev) * 100;
-  }
-  return { price, currency, change, changePct };
+  const px = (res?.indicators?.quote?.[0]?.close || []).filter(n => typeof n === 'number');
+  if (!px.length) throw new Error('no_px');
+  const last = px[px.length - 1];
+  const first = px.find(n => typeof n === 'number');
+  const change = last - first;
+  const changePct = first ? (change / first) * 100 : null;
+  return {
+    price: last ?? null,
+    change: Number.isFinite(change) ? change : null,
+    changePct: Number.isFinite(changePct) ? changePct : null,
+    currency: res?.meta?.currency || ''
+  };
 }
 
-// ---- Stooq multi-day (get last & previous close) ----
+// ---- Stooq fallback ----
 async function stooqTwo(sym) {
-  const candidates = [sym.toLowerCase(), `${sym.toLowerCase()}.us`];
-  for (const s of candidates) {
-    const url = `https://stooq.com/q/d/l/?s=${encodeURIComponent(s)}&i=d`;
-    const r = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (PocketPortfolio)' } });
-    if (!r.ok) continue;
-    const lines = (await r.text()).trim().split(/\r?\n/).filter(Boolean);
-    if (lines.length < 3) continue;
-    const head = lines[0].split(',').map(x => x.toLowerCase());
-    const idx = Object.fromEntries(head.map((h, i) => [h, i]));
-    const last = lines[lines.length - 1].split(',');
-    const prev = lines[lines.length - 2].split(',');
-    const c1 = last[idx.close], c0 = prev[idx.close];
-    if (c1 && c1 !== 'N/D' && c0 && c0 !== 'N/D') {
-      const p1 = Number(c1), p0 = Number(c0);
-      const change = p1 - p0;
-      const changePct = p0 ? (change / p0) * 100 : null;
-      return { price: p1, currency: null, change, changePct };
-    }
-  }
-  return { price: null, currency: null, change: null, changePct: null };
+  const u = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
+  const r = await fetch(u, { headers: { 'User-Agent': JUA['User-Agent'], 'Accept': 'text/csv' } });
+  if (!r.ok) throw new Error(`stooq_${r.status}`);
+  const t = await r.text();
+  const [_, ...rows] = t.trim().split(/\r?\n/);
+  if (!rows.length) throw new Error('stooq_empty');
+  const cols = rows[0].split(',');
+  const close = parseFloat(cols[6]); // Close
+  const open  = parseFloat(cols[3]); // Open
+  const change = Number.isFinite(close) && Number.isFinite(open) ? (close - open) : null;
+  const changePct = (Number.isFinite(change) && open) ? (change / open) * 100 : null;
+  return { price: Number.isFinite(close) ? close : null, change, changePct, currency: '' };
 }
 
 export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
-  const raw = (searchParams.get('symbols') || searchParams.get('s') || '').trim();
-  const symbols = [...new Set(raw.split(/[,\s]+/).map(s => s.trim().toUpperCase()).filter(Boolean))];
+  const url = new URL(req.url);
+  const origin = req.headers.get('origin');
+  const originOk = origin && ALLOWLIST.has(origin);
+  const headers = {
+    ...(originOk ? { 'Access-Control-Allow-Origin': origin, 'Vary': 'Origin' } : {}),
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 's-maxage=20, stale-while-revalidate=60'
+  };
 
-  const headers = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json', 'Cache-Control': 's-maxage=20, stale-while-revalidate=60' };
+  const rl = rateLimit(req, 'quote');
+  headers['X-RateLimit-Limit'] = String(rl.limit);
+  headers['X-RateLimit-Remaining'] = String(rl.remaining);
+  headers['X-RateLimit-Reset'] = String(Math.floor(rl.reset / 1000));
+  if (rl.limited) return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers });
+
+  const raw = (url.searchParams.get('symbols') || '').trim();
+  const symbols = [...new Set(raw.split(/[,\s]+/).map(s => s.trim().toUpperCase()).filter(Boolean))].slice(0, 30);
   if (!symbols.length) return new Response('[]', { headers });
 
   // 1) Try Yahoo batch
@@ -84,19 +91,19 @@ export default async function handler(req) {
   const by = new Map(batch.map(r => [r.symbol, r]));
   const out = [];
 
-  // 2) Per symbol, ensure change% exists; otherwise compute via chart or stooq
+  // 2) Per symbol ensure we have price/change/changePct; compute via chart or stooq if missing
   for (const sym of symbols) {
     let rec = by.get(sym);
-    if (!rec) rec = { symbol: sym, name: sym, currency: 'USD', price: null, change: null, changePct: null, source: 'none' };
+    if (!rec) rec = { symbol: sym, name: sym, price: null, change: null, changePct: null, currency: '', source: 'none' };
 
     if (rec.changePct == null || rec.price == null) {
       try {
-        const y = await yahooChart(sym);
-        rec.price = rec.price ?? y.price;
-        rec.currency = rec.currency ?? y.currency;
-        rec.change = rec.change ?? y.change;
-        rec.changePct = rec.changePct ?? y.changePct;
-        rec.source = rec.source === 'yahoo' ? 'yahoo' : 'yahoo_chart';
+        const c = await yahooChart(sym);
+        rec.price = rec.price ?? c.price;
+        rec.change = rec.change ?? c.change;
+        rec.changePct = rec.changePct ?? c.changePct;
+        if (!rec.currency) rec.currency = c.currency;
+        if (rec.source === 'none') rec.source = 'yahoo_chart';
       } catch {
         try {
           const s = await stooqTwo(sym);

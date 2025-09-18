@@ -6,13 +6,16 @@
   <title>Pocket Portfolio</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
+  <link rel="manifest" href="/app/manifest.webmanifest">
   <link rel="icon" href="/icon-192.png">
   <link rel="apple-touch-icon" href="/icon-192.png">
   <meta name="theme-color" content="#0b1220">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="/app/style.css" />
+
+  <!-- (Optional) Tailwind for the app shell only if you really need it here -->
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 </head>
 <body>
   <!-- ===== Nav ===== -->
@@ -181,6 +184,13 @@
   </script>
 
   <!-- App logic -->
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="/app/app.js"></script>
+
+  <!-- SW register (prod only) -->
+  <script>
+    if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      navigator.serviceWorker.register('/app/service-worker.js?sw=8').catch(()=>{});
+    }
+  </script>
 </body>
 </html>
