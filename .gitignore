@@ -11,3 +11,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# stray files from earlier SSH tests
+1234567890*
