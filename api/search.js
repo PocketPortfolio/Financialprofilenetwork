@@ -1,3 +1,4 @@
+// /api/search.js
 import { withCors } from './_cors.js';
 
 export default withCors(async (req, res) => {
@@ -5,9 +6,13 @@ export default withCors(async (req, res) => {
   const q = (url.searchParams.get('q') || '').trim();
   if (!q) return res.status(200).json([]);
 
-  const r = await fetch(`https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=8&newsCount=0`);
-  const j = await r.json();
+  const r = await fetch(
+    `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=8&newsCount=0`,
+    { headers: { 'User-Agent': 'Mozilla/5.0 (PocketPortfolio)', 'Accept': 'application/json' } }
+  );
+  if (!r.ok) return res.status(200).json([]);
 
+  const j = await r.json();
   const results = (j?.quotes || [])
     .filter(q => q.symbol)
     .map(q => ({
