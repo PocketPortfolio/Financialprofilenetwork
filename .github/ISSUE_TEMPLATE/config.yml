@@ -1,5 +1,9 @@
 blank_issues_enabled: false
+
 contact_links:
-  - name: 📣 Discussions — Ideas & Q&A
-    url: https://github.com/hakeem22s/Financialprofilenetwork/discussions
-    about: Ask questions or share ideas in Discussions.
+  - name: 💬 Discussions — Ideas & Q&A
+    url: https://github.com/PocketPortfolio/Financialprofilenetwork/discussions
+    about: Ask questions, propose larger ideas, or share feedback that isn’t a specific bug/feature.
+
+# Optional: default labels when users open from templates above
+# (Handled via each template's front matter.)
