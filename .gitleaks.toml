@@ -1,0 +1,13 @@
+title = "Pocket Portfolio – Gitleaks config"
+
+[allowlist]
+paths = [
+  '''^docs/''',
+  '''^fixtures/''',
+  '''^fixture/'''     # old path, in case it appears in history
+]
+
+# Firebase Web API keys are public; they often trigger false positives
+regexes = [
+  '''AIza[0-9A-Za-z\-_]{35}'''
+]
