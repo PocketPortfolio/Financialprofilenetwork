@@ -6,6 +6,7 @@ const ALLOWED = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
+
 // always include same-origin dev URLs to keep DX smooth
 const DEV_DEFAULTS = ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'];
 const ALLOWLIST = new Set([...DEV_DEFAULTS, ...ALLOWED]);
@@ -23,12 +24,19 @@ function pickOrigin(req) {
 }
 
 function checkRate(req) {
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '0.0.0.0';
+  const ip =
+    (req.headers['x-forwarded-for'] || '')
+      .split(',')[0]
+      .trim() ||
+    req.socket?.remoteAddress ||
+    '0.0.0.0';
+
   const now = Date.now();
   const b = BUCKETS.get(ip) || { start: now, count: 0 };
   if (now - b.start > WINDOW_MS) { b.start = now; b.count = 0; }
   b.count += 1;
   BUCKETS.set(ip, b);
+
   const limited = b.count > MAX_REQS;
   const reset = b.start + WINDOW_MS;
   return { limited, remaining: Math.max(0, MAX_REQS - b.count), reset };
