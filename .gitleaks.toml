@@ -1,41 +1,21 @@
+Set-Content -Path .gitleaks.toml -NoNewline -Value @"
 title = "Pocket Portfolio – Gitleaks config"
 
-###############################################################################
-# Global allowlist: ONLY safe, non-secret content
-###############################################################################
 [allowlist]
-# Paths that only contain docs/fixtures (no real secrets should live here)
+# Only allow docs/fixtures; source code keeps scanning strict
 paths = [
   '''^docs/''',
   '''^fixtures/''',
-  '''^fixture/''',         # in case old path shows up in history
+  '''^fixture/'''   # legacy path in history
 ]
 
-# Regexes for well-known public/benign tokens (scoped to file content, not history)
-# Keep these TIGHT. Avoid broad patterns.
+# Benign/public tokens that often cause false positives
 regexes = [
-  # Firebase Web API keys are NOT secrets. They often match "AIza..." and trigger default rules.
+  # Firebase Web API keys are public identifiers
   '''AIza[0-9A-Za-z\-_]{35}''',
 
-  # Obvious placeholders that sometimes trigger generic rules
+  # Obvious placeholders
   '''<YOUR_[A-Z0-9_]+>''',
-  '''YOUR_[A-Z0-9_]+''',
+  '''YOUR_[A-Z0-9_]+'''
 ]
-
-###############################################################################
-# Rule tuning (optional): example of narrowing noisy generic matchers
-###############################################################################
-# Example: if logs show "Generic Credential" hitting on obvious test strings,
-# you can uncomment and narrow the rule. Leave commented until needed.
-
-# [[rules]]
-# description = "Generic Credential (narrowed)"
-# id = "generic-credential-narrow"
-# regex = '''(?i)(token|apikey|secret|passwd)\s*[:=]\s*(['"])?[A-Za-z0-9_\-]{16,}(['"])?
-# '''
-# tags = ["key", "API", "generic"]
-# [rules.allowlist]
-# files = [
-#   '''^docs/''',
-#   '''^fixtures/''',
-# ]
+"@
