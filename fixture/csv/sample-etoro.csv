@@ -1,0 +1,4 @@
+broker,trade_id,timestamp,symbol,side,quantity,price,fee,trade_currency,settlement_currency,fx_rate
+etoro,ET123,2025-08-01T10:15:00Z,AAPL,BUY,3,207.45,0,USD,USD,1
+etoro,ET124,2025-08-05T11:30:00Z,MSFT,BUY,2,424.10,0,USD,USD,1
+etoro,ET125,2025-08-10T09:05:10Z,AAPL,SELL,1,215.00,0,USD,USD,1

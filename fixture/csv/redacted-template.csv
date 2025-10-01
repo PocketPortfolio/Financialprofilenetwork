@@ -1,0 +1,2 @@
+broker,trade_id,timestamp,symbol,side,quantity,price,fee,trade_currency,settlement_currency,fx_rate
+<broker>,<id>,2025-01-01T00:00:00Z,TICKER,BUY,1,100,0,USD,USD,1
