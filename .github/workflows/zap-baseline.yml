@@ -1,0 +1,16 @@
+name: OWASP ZAP Baseline
+on:
+  schedule:
+    - cron: "0 7 * * 1"   # Weekly, Monday 07:00 UTC
+  workflow_dispatch: {}
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Target
+        id: t
+        run: echo "url=${{ secrets.ZAP_TARGET_URL || 'https://pocketportfolio.app' }}" >> $GITHUB_OUTPUT
+      - uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ steps.t.outputs.url }}
+          cmd_options: "-a -m 5"
