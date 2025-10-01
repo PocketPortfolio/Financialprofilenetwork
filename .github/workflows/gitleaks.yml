@@ -1,10 +1,14 @@
 name: Secret scan (Gitleaks)
 on: [push, pull_request]
+
 jobs:
   gitleaks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # scan history on PRs if you want; leave 0 for thorough scan
       - uses: gitleaks/gitleaks-action@v2
         with:
-          args: detect --source=. --no-git -v
+          # Use our config and redact secrets in logs
+          args: detect --config=.gitleaks.toml --redact
