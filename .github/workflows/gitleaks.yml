@@ -1,3 +1,5 @@
+New-Item -ItemType Directory -Force -Path .github/workflows | Out-Null
+Set-Content -Path .github/workflows/gitleaks.yml -NoNewline -Value @"
 name: Secret scan (Gitleaks)
 on: [push, pull_request]
 
@@ -7,8 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # scan history on PRs if you want; leave 0 for thorough scan
+          fetch-depth: 0
       - uses: gitleaks/gitleaks-action@v2
         with:
-          # Use our config and redact secrets in logs
           args: detect --config=.gitleaks.toml --redact
+"@
