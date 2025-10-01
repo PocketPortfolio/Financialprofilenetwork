@@ -1,5 +1,7 @@
 name: Secret scan (Gitleaks)
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   gitleaks:
@@ -7,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # scan history on PRs; set to 1 to scan only HEAD
+          fetch-depth: 0   # scan full history on PRs; set to 1 to scan only HEAD
       - name: Run Gitleaks
         uses: zricethezav/gitleaks-action@v1.6.0
         with:
