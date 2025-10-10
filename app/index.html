@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pocket Portfolio</title>
+  <meta name="description" content="Pocket Portfolio — import broker CSVs, see live prices, and track P/L across stocks and crypto. Supports OpenBrokerCSV standard.">
+  <link rel="canonical" href="/app/">
 
   <!-- PWA -->
   <link rel="manifest" href="/app/manifest.webmanifest">
@@ -12,7 +14,9 @@
   <meta name="theme-color" content="#0b1220">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/app/style.css" />
+  <!-- index.html (in /app) -->
+<link rel="stylesheet" href="/app/style.css?v=2025-10-09-1">
+
 
   <!-- (Optional) Tailwind for the app shell only if you really need it here -->
   <!-- <script src="https://cdn.tailwindcss.com"></script> -->
@@ -66,6 +70,14 @@
     </section>
 
     <div id="dashboard">
+      <!-- ===== Price Pipeline Health (NEW) ===== -->
+      <section class="card" id="health-card" aria-live="polite">
+        <h2 class="card-title">Price Pipeline Health</h2>
+        <div id="health-body">
+          <span class="muted">Loading…</span>
+        </div>
+      </section>
+
       <section class="card">
         <h2 class="card-title">Add trade</h2>
         <form id="trade-form" autocomplete="off" spellcheck="false">
@@ -149,6 +161,18 @@
     </section>
   </main>
 
+  <!-- ===== Footer (internal SEO links) ===== -->
+  <footer class="pp-footer" style="margin:40px 0 20px;">
+    <div class="pp-nav-inner" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;">
+      <nav aria-label="Helpful links" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <!-- Default to static pages; script below upgrades to pretty URLs if available -->
+        <a id="link-openbrokercsv" class="btn" href="/app/static/openbrokercsv" aria-label="OpenBrokerCSV">OpenBrokerCSV</a>
+        <a id="link-tracker" class="btn" href="/app/static/portfolio-tracker" aria-label="Portfolio Tracker">Portfolio Tracker</a>
+        <a id="link-etoro" class="btn" href="/app/static/csv-etoro-to-openbrokercsv" aria-label="eToro to OpenBrokerCSV Converter">eToro → OpenBrokerCSV</a>
+      </nav>
+    </div>
+  </footer>
+
   <!-- Firebase (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" crossorigin="anonymous"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" crossorigin="anonymous"></script>
@@ -184,13 +208,34 @@
   </script>
 
   <!-- App logic -->
-  <script type="module" src="/app/app.js"></script>
+  <script type="module" src="/app/app.js?v=9"></script>
+
+  <!-- Upgrade footer links to pretty URLs if rewrites exist -->
+  <script>
+    (function(){
+      const upgrades = [
+        { id: 'link-openbrokercsv', pretty: '/openbrokercsv' },
+        { id: 'link-tracker',       pretty: '/portfolio-tracker' },
+        { id: 'link-etoro',         pretty: '/csv/etoro-to-openbrokercsv' }
+      ];
+      upgrades.forEach(async ({id, pretty}) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        try {
+          const res = await fetch(pretty, { method: 'HEAD' });
+          if (res.ok) el.href = pretty;
+        } catch { /* keep fallback href */ }
+      });
+    })();
+  </script>
 
   <!-- SW register (prod only) -->
-  <script>
-    if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-      navigator.serviceWorker.register('/app/service-worker.js?sw=8').catch(()=>{});
-    }
-  </script>
+<script>
+  if ('serviceWorker' in navigator &&
+      location.hostname !== 'localhost' &&
+      location.hostname !== '127.0.0.1') {
+    navigator.serviceWorker.register('/app/service-worker.js?sw=9').catch(()=>{});
+  }
+</script>
 </body>
 </html>
