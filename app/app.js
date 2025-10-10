@@ -69,6 +69,9 @@ const els = {
   profile: $('#profile'),
   authContainer: $('#auth'),
   userEmail: $('#user-email'),
+  // Health card (NEW)
+  healthCard: $('#health-card'),
+  healthBody: $('#health-body'),
 };
 const money = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" });
 
@@ -557,6 +560,136 @@ async function renderNews(){
   }
 }
 
+// ===== Price Pipeline Health =====
+(function mountPriceHealth(){
+  const wrap = document.getElementById('health-card');
+  const body = document.getElementById('health-body');
+  if (!wrap || !body) return;
+
+  // --- UI bits we add once and reuse ---
+  const titleEl = wrap.querySelector('.card-title') || wrap.querySelector('h2');
+  const spinner = document.createElement('span');
+  spinner.className = 'health-spinner';
+  spinner.setAttribute('aria-hidden', 'true');
+  // don’t add twice if HMR/soft-reloads
+  if (titleEl && !titleEl.querySelector('.health-spinner')) titleEl.appendChild(spinner);
+
+  const updated = document.createElement('div');
+  updated.id = 'health-updated';
+  updated.className = 'health-updated muted';
+  updated.setAttribute('aria-live', 'polite');
+  if (!wrap.querySelector('#health-updated')) wrap.appendChild(updated);
+
+  // --- Options / helpers ---
+  const FRESH_MS = 5 * 60 * 1000; // 5 minutes
+
+  const fmtTime = (ts) => {
+    if (!ts) return '—';
+    const d = new Date(Number(ts));
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleTimeString([], { hour12:false });
+  };
+  const nowFresh = (ts) => !!ts && (Date.now() - Number(ts)) < FRESH_MS;
+
+  function badge(kind, label, meta){
+    const span = document.createElement('span');
+    span.className = `badge ${kind}`;       // success | warn | danger
+    span.textContent = label;               // Fresh | Fallback | Unhealthy
+    // Accessibility + hover details
+    const aria = `${meta.provider.toUpperCase()} status: ${label}`;
+    span.setAttribute('aria-label', aria);
+    const tt = [
+      `Provider: ${meta.provider.toUpperCase()}`,
+      `Last success: ${fmtTime(meta.lastSuccess)}`,
+      `Last failure: ${fmtTime(meta.lastFailure)}`,
+      `Active fallback: ${meta.activeFallback ? 'Yes' : 'No'}`,
+      `Failures (window): ${meta.failureCount ?? 0}`
+    ].join('\n');
+    span.title = tt;
+    return span;
+  }
+
+  function row(providerLabel, stateMeta){
+    const row = document.createElement('div');
+    row.className = 'health-row';
+    const name = document.createElement('strong');
+    name.textContent = providerLabel;
+    name.style.minWidth = '6rem';
+    name.style.display = 'inline-block';
+    row.appendChild(name);
+
+    // decide chip style/label
+    let kind = 'danger', label = 'Unhealthy';
+    if (stateMeta.fresh)     { kind = 'success'; label = 'Fresh'; }
+    if (stateMeta.fallback)  { kind = 'warn';    label = 'Fallback'; }
+
+    row.appendChild(badge(kind, label, stateMeta));
+    return row;
+  }
+
+  async function refresh(){
+    try{
+      spinner.classList.add('on');
+
+      const res = await fetch('/api/health-price', { cache: 'no-store' });
+      if (!res.ok) throw new Error('health_http_'+res.status);
+      const j = await res.json();
+
+      // shape map: { yahoo: {...}, chart: {...}, stooq: {...} }
+      const map = Object.fromEntries((j.providers || []).map(p => [p.provider, p]));
+
+      // Provider freshness (within window)
+      const yahooFresh = nowFresh(map.yahoo?.lastSuccess) || nowFresh(map.chart?.lastSuccess);
+      const chartFresh = nowFresh(map.chart?.lastSuccess);
+      const stooqFresh = nowFresh(map.stooq?.lastSuccess);
+
+      // Degraded state: show AMBER when fallback is actively used
+      const chartFallback = !!map.chart?.activeFallback && chartFresh;
+      const stooqFallback = !!map.stooq?.activeFallback && stooqFresh;
+
+      // Build rows
+      body.innerHTML = '';
+      body.appendChild(row('YAHOO', {
+        provider: 'yahoo',
+        fresh: yahooFresh,
+        // we do not mark Yahoo as fallback unless you want to—spec requested CHART/STOOQ
+        fallback: false,
+        ...map.yahoo
+      }));
+      body.appendChild(row('CHART', {
+        provider: 'chart',
+        fresh: chartFresh,
+        fallback: chartFallback,
+        ...map.chart
+      }));
+      body.appendChild(row('STOOQ', {
+        provider: 'stooq',
+        fresh: stooqFresh,
+        fallback: stooqFallback,
+        ...map.stooq
+      }));
+
+      updated.textContent = `Updated ${new Date().toLocaleTimeString([], { hour12: false })}`;
+    } catch (e){
+      body.innerHTML = '';
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.textContent = 'Health unavailable';
+      body.appendChild(p);
+      updated.textContent = `Updated ${new Date().toLocaleTimeString([], { hour12: false })}`;
+      console.warn('health refresh failed', e);
+    } finally {
+      spinner.classList.remove('on');
+    }
+  }
+
+  // initial + polling
+  refresh();
+  setInterval(refresh, 15_000);
+})();
+
+
+
 /* --------------------------- Mutations --------------------------- */
 async function addTrade(trade){
   trade.kind = trade.kind || els.kind?.value || "stock";
@@ -690,9 +823,10 @@ function wireAuthHandlers(){
 
 /* ------------------------------ PWA ------------------------------ */
 if ("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./service-worker.js?sw=6").catch(()=>{});
+  navigator.serviceWorker.register("./service-worker.js?sw=13").catch(()=>{});
 }
 
+/* ------------------------------ Bootstrap ------------------------------ */
 /* ------------------------------ Bootstrap ------------------------------ */
 (async function bootstrap(){
   try {
@@ -709,9 +843,7 @@ if ("serviceWorker" in navigator){
     cloudEnabled = false; console.info("Local mode (Firebase init failed).", e);
   }
 
-  // UI events that don't depend on auth
-  els.chartType?.addEventListener("change", () => { chartType = els.chartType.value; renderChart(); });
-
+  // Initial renders
   renderTrades();
   refreshMostTraded();
   refreshLivePrices();
@@ -720,3 +852,4 @@ if ("serviceWorker" in navigator){
   // Auth (only when available)
   wireAuthHandlers();
 })();
+

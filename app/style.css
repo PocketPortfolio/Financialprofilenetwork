@@ -176,3 +176,28 @@ a{ color:var(--brand); }
   --card: color-mix(in srgb, #0b1220 75%, transparent);
   --card-border: color-mix(in srgb, #ffffff 20%, transparent);
 }
+/* --- Health widget --- */
+.health-row { display:flex; align-items:center; gap:.75rem; margin:.35rem 0; }
+.health-updated { margin-top:.25rem; font-size:.85rem; }
+
+/* Chips */
+.badge { display:inline-flex; align-items:center; gap:.35rem; padding:.15rem .5rem; border-radius:.5rem; font-size:.8rem; font-weight:600; }
+.badge.success { background:#0d6b3b; color:#fff; }    /* green */
+.badge.warn    { background:#a36400; color:#fff; }    /* amber */
+.badge.danger  { background:#8a1c1c; color:#fff; }    /* red */
+
+/* Tiny spinner dot next to the title while refreshing */
+.health-spinner {
+  width:.55rem; height:.55rem; margin-left:.5rem; border-radius:50%;
+  background: currentColor; opacity:0; transform:scale(.6);
+}
+.health-spinner.on {
+  animation: healthPulse 1.2s ease-in-out infinite;
+  opacity:.7;
+}
+@keyframes healthPulse {
+  0%   { transform: scale(.6);   opacity:.3; }
+  50%  { transform: scale(1.0);  opacity: .9; }
+  100% { transform: scale(.6);   opacity:.3; }
+}
+
