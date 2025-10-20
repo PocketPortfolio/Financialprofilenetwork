@@ -1,2 +1,3 @@
 app/components/AccountManagement.tsx
 app/components/AuthButton.tsx
+app/components/SEOHead.tsx
