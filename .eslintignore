@@ -3,3 +3,5 @@ app/components/AuthButton.tsx
 app/components/SEOHead.tsx
 app/components/waitlist/WaitlistForm.tsx
 app/csv/etoro-to-openbrokercsv/page.tsx
+app/dashboard/page.tsx
+app/import/[broker]/page.tsx
