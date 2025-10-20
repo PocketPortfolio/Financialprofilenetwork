@@ -1,3 +1,4 @@
+# Updated robots.txt - XML blocking removed to allow sitemap access
 User-Agent: *
 Allow: /
 Disallow: /api/
