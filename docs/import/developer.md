@@ -93,3 +93,4 @@ npm run test:e2e
 - **Performance**: Track parsing duration
 - **Deduplication**: Use `hashRow()` for raw data hashing
 
+

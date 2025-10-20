@@ -9,3 +9,4 @@ test('IBKR Flex → successful import', async ({ page }) => {
   await expect(page.getByText(/Imported \d+ trades from ibkr_flex/i)).toBeVisible();
 });
 
+

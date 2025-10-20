@@ -233,6 +233,21 @@ export default function TabBar({ className = '' }: TabBarProps) {
         const handleTabClick = (e: React.MouseEvent, href: string) => {
           e.preventDefault();
           
+          // Special handling for Dashboard button
+          if (tab.id === 'dashboard') {
+            if (pathname === '/dashboard') {
+              // If we're already on the dashboard, scroll to top
+              window.scrollTo({ 
+                top: 0, 
+                behavior: 'smooth' 
+              });
+            } else {
+              // Navigate to dashboard
+              router.push('/dashboard');
+            }
+            return;
+          }
+          
           // Handle hash links for scrolling to sections
           if (href.includes('#')) {
             const [path, hash] = href.split('#');
@@ -332,6 +347,7 @@ export default function TabBar({ className = '' }: TabBarProps) {
     </nav>
   );
 }
+
 
 
 
