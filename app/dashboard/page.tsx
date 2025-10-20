@@ -1309,7 +1309,7 @@ export default function Dashboard() {
             }}>
               OpenBrokerCSV
             </Link>
-            <Link href="/app/static/portfolio-tracker" style={{ 
+            <Link href="/static/portfolio-tracker" style={{ 
               padding: '12px 24px', 
               border: '1px solid var(--card-border)', 
               borderRadius: '8px', 
