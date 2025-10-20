@@ -1,4 +1,4 @@
-# Updated robots.txt - XML blocking removed to allow sitemap access - 2025-10-20-11:15
+# Pocket Portfolio Robots.txt - Updated 2025-10-20
 User-Agent: *
 Allow: /
 Disallow: /api/
