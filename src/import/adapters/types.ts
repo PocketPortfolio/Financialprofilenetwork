@@ -37,3 +37,4 @@ export interface BrokerAdapter {
   parse: (file: RawFile, locale?: string) => Promise<ParseResult>;
 }
 
+

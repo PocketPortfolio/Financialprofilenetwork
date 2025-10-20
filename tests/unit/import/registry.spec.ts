@@ -30,3 +30,4 @@ test('detectBroker returns unknown for unrecognized format', () => {
   expect(detectBroker(sample)).toBe('unknown');
 });
 
+

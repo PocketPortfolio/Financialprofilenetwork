@@ -172,3 +172,4 @@ Current fixed rates (can be made dynamic):
 **Test Status**: All tests passing ✅  
 **Coverage**: 91% of calculation code
 
+

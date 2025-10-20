@@ -145,3 +145,4 @@ export default function SymbolPage({ params }: SymbolPageProps) {
 // ISR configuration
 export const revalidate = 300; // 5 minutes
 
+

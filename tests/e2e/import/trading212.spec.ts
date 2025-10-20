@@ -9,3 +9,4 @@ test('Trading212 → successful import', async ({ page }) => {
   await expect(page.getByText(/Imported \d+ trades from trading212/i)).toBeVisible();
 });
 
+

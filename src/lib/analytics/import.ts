@@ -9,3 +9,4 @@ function send(eventType: string, properties: Record<string,any>) {
   }
 }
 
+

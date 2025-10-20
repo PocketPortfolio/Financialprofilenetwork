@@ -43,3 +43,4 @@ export const degiro: BrokerAdapter = {
   }
 };
 
+

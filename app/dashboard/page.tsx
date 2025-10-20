@@ -706,12 +706,13 @@ export default function Dashboard() {
               </div>
 
           {/* CSV Import */}
-            <div className="mobile-card brand-card brand-grid" style={{ 
+            <div id="import" className="mobile-card brand-card brand-grid" style={{ 
               marginBottom: '12px',
               padding: '12px',
               background: 'var(--surface)',
               borderRadius: '8px',
-              border: '1px solid var(--border)'
+              border: '1px solid var(--border)',
+              scrollMarginTop: '80px'
             }}>
                 <CSVImporter onImport={handleCSVImport} />
             </div>
@@ -779,9 +780,10 @@ export default function Dashboard() {
 
         {/* Portfolio Holdings - Full Width Layout */}
         {trades.length > 0 && (
-          <div style={{ 
+          <div id="positions" style={{ 
             marginTop: '32px',
-            marginBottom: '32px'
+            marginBottom: '32px',
+            scrollMarginTop: '80px'
           }}>
             <div style={{ marginBottom: '32px' }}>
               <div style={{ 
@@ -1244,25 +1246,53 @@ export default function Dashboard() {
             </div>
             
           {/* Settings */}
-          {isAuthenticated && user && (
-            <div className="mobile-card brand-card brand-grid" style={{ 
-              marginBottom: '12px',
-              padding: '12px',
-              background: 'var(--surface)',
-              borderRadius: '8px',
-              border: '1px solid var(--border)'
-            }}>
+          <div id="settings" className="mobile-card brand-card brand-grid" style={{ 
+            marginBottom: '12px',
+            padding: '12px',
+            background: 'var(--surface)',
+            borderRadius: '8px',
+            border: '1px solid var(--border)',
+            scrollMarginTop: '80px'
+          }}>
+            {isAuthenticated && user ? (
+              <>
               <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'var(--text)' }}>
                 Settings
               </div>
-              <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                Signed in as: {user.displayName || user.email}
-            </div>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>
-                Portfolio: {trades.length} trades
+                <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                  Signed in as: {user.displayName || user.email}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>
+                  Portfolio: {trades.length} trades
+                </div>
+              </>
+            ) : (
+              <div style={{ 
+                textAlign: 'center', 
+                padding: '20px',
+                background: 'var(--bg)',
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle)'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚙️</div>
+                <h3 style={{ 
+                  fontSize: '16px', 
+                  fontWeight: '600', 
+                  color: 'var(--text)', 
+                  margin: '0 0 8px 0' 
+                }}>
+                  Sign In Required
+                </h3>
+                <p style={{ 
+                  color: 'var(--muted)', 
+                  fontSize: '14px',
+                  margin: '0'
+                }}>
+                  Sign in to access your account settings
+                </p>
+              </div>
+            )}
           </div>
-        </div>
-          )}
       </main>
 
 
