@@ -1,4 +1,4 @@
-# Pocket Portfolio Robots.txt - Updated 2025-10-20
+# Pocket Portfolio Robots.txt - Updated 2025-10-20-11:30
 User-Agent: *
 Allow: /
 Disallow: /api/
