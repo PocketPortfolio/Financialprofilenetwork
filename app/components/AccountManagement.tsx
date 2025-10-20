@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable indent */
 import React, { useState } from 'react';
 import { User } from 'firebase/auth';
 import { AccountService, UserData } from '../services/accountService';
