@@ -4,7 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://pocketportfolio.app';
   
   // Ensure we have a valid base URL
-  if (!baseUrl || baseUrl === 'undefined') {
+  if (!baseUrl) {
     console.error('Invalid base URL for sitemap generation');
     return [];
   }
