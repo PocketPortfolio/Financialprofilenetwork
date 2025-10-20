@@ -118,8 +118,7 @@ export function useErrorHandler() {
     
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'exception', {
-        description: `useErrorHandler: ${error.message}`,
-        fatal: false
+        custom_parameter_error: `useErrorHandler: ${error.message}`
       });
     }
   };
