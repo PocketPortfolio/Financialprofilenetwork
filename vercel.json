@@ -1,8 +1,7 @@
 {
-  "version": 2,
+  "buildCommand": "SKIP_ENV_VALIDATION=true next build",
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
   "installCommand": "npm install",
-  "devCommand": "npm run dev"
+  "devCommand": "next dev",
+  "outputDirectory": ".next"
 }
