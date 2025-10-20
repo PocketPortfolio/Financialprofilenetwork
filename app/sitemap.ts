@@ -75,27 +75,34 @@ const STATIC_ROUTES = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const sitemap: MetadataRoute.Sitemap = [...STATIC_ROUTES];
+  try {
+    const sitemap: MetadataRoute.Sitemap = [...STATIC_ROUTES];
 
-  // Add ticker pages
-  POPULAR_TICKERS.forEach((ticker) => {
-    sitemap.push({
-      url: `https://pocketportfolio.app/s/${ticker.toLowerCase()}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
+    // Add ticker pages
+    POPULAR_TICKERS.forEach((ticker) => {
+      sitemap.push({
+        url: `https://pocketportfolio.app/s/${ticker.toLowerCase()}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.6,
+      });
     });
-  });
 
-  // Add broker import pages
-  SUPPORTED_BROKERS.forEach((broker) => {
-    sitemap.push({
-      url: `https://pocketportfolio.app/import/${broker}`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
+    // Add broker import pages
+    SUPPORTED_BROKERS.forEach((broker) => {
+      sitemap.push({
+        url: `https://pocketportfolio.app/import/${broker}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.5,
+      });
     });
-  });
 
-  return sitemap;
+    console.log('Sitemap generated with', sitemap.length, 'entries');
+    return sitemap;
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    // Return at least the static routes if there's an error
+    return STATIC_ROUTES;
+  }
 }
