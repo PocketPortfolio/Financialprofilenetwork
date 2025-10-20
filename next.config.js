@@ -21,7 +21,7 @@ const nextConfig = {
     return [
       {
         source: '/portfolio-tracker',
-        destination: '/dashboard',
+        destination: '/static/portfolio-tracker',
         permanent: true,
       },
       {
