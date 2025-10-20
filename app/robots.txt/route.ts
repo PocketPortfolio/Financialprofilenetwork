@@ -45,7 +45,9 @@ Sitemap: https://pocketportfolio.app/sitemap.xml`;
   return new NextResponse(robotsTxt, {
     headers: {
       'Content-Type': 'text/plain',
-      'Cache-Control': 'public, max-age=3600',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
     },
   });
 }
