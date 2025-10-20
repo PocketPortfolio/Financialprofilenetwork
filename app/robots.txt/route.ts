@@ -8,9 +8,6 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /_next/
 Disallow: *.json
-# Allow sitemap.xml but block other XML files
-Disallow: /*.xml
-Allow: /sitemap.xml
 
 User-Agent: GPTBot
 Allow: /
