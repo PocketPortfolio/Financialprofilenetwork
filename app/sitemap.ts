@@ -1,57 +1,59 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://pocketportfolio.app';
+  
   return [
     {
-      url: 'https://pocketportfolio.app',
+      url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
-      url: 'https://pocketportfolio.app/landing',
+      url: `${baseUrl}/landing`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: 'https://pocketportfolio.app/dashboard',
+      url: `${baseUrl}/dashboard`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
-      url: 'https://pocketportfolio.app/live',
+      url: `${baseUrl}/live`,
       lastModified: new Date(),
       changeFrequency: 'hourly',
       priority: 0.7,
     },
     {
-      url: 'https://pocketportfolio.app/join',
+      url: `${baseUrl}/join`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
-      url: 'https://pocketportfolio.app/static/portfolio-tracker',
+      url: `${baseUrl}/static/portfolio-tracker`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: 'https://pocketportfolio.app/csv-portfolio-tracker',
+      url: `${baseUrl}/csv-portfolio-tracker`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: 'https://pocketportfolio.app/reliable-stock-prices',
+      url: `${baseUrl}/reliable-stock-prices`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
-      url: 'https://pocketportfolio.app/investment-tracking-guide',
+      url: `${baseUrl}/investment-tracking-guide`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
