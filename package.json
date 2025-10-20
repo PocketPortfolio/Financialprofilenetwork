@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "SKIP_ENV_VALIDATION=true next build",
+    "build": "next build",
     "start": "next start",
     "preview": "next start -p 3001",
     "typecheck": "tsc --noEmit",
