@@ -1,3 +1,4 @@
 app/components/AccountManagement.tsx
 app/components/AuthButton.tsx
 app/components/SEOHead.tsx
+app/components/waitlist/WaitlistForm.tsx
