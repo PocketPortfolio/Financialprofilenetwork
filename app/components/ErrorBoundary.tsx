@@ -31,7 +31,6 @@ export class ErrorBoundary extends Component<Props, State> {
     // Log to analytics if available
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'exception', {
-        fatal: false,
         custom_parameter_error: `ErrorBoundary: ${error.message}`,
         custom_parameter_scope: this.props.scope || 'unknown'
       });
