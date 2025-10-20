@@ -10,7 +10,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/admin/',
           '/_next/',
-          '/static/',
           '*.json',
           '*.xml',
         ],
@@ -22,7 +21,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/admin/',
           '/_next/',
-          '/static/',
         ],
       },
       {
@@ -32,7 +30,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/admin/',
           '/_next/',
-          '/static/',
         ],
       },
       {
@@ -42,7 +39,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/admin/',
           '/_next/',
-          '/static/',
         ],
       },
       {
@@ -53,7 +49,6 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',
           '/_next/',
           '/_next/',
-          '/static/',
         ],
       },
       {
@@ -63,7 +58,6 @@ export default function robots(): MetadataRoute.Robots {
           '/api/',
           '/admin/',
           '/_next/',
-          '/static/',
         ],
       },
     ],
@@ -71,6 +65,7 @@ export default function robots(): MetadataRoute.Robots {
     host: 'https://pocketportfolio.app',
   };
 }
+
 
 
 
