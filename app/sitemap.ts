@@ -55,6 +55,12 @@ const STATIC_ROUTES = [
     priority: 0.8,
   },
   {
+    url: 'https://pocketportfolio.app/static/portfolio-tracker',
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  },
+  {
     url: 'https://pocketportfolio.app/reliable-stock-prices',
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
