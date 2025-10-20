@@ -1,0 +1,272 @@
+/* Pocket Portfolio - Mobile-Optimized Print Styles */
+
+@media print {
+  /* === GLOBAL PRINT RESET === */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+
+  /* === MOBILE-SPECIFIC PRINT LAYOUT === */
+  .mobile-container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Hide mobile-specific elements */
+  .mobile-header,
+  .mobile-tab-bar,
+  .mobile-menu-button,
+  .mobile-nav,
+  .mobile-sheet,
+  .mobile-modal {
+    display: none !important;
+  }
+
+  /* === HEADER === */
+  header {
+    background: white !important;
+    border-bottom: 2px solid #000 !important;
+    padding: 20pt 0 !important;
+    margin-bottom: 20pt !important;
+    page-break-inside: avoid;
+  }
+
+  /* === CARDS → PRINT-FRIENDLY SECTIONS === */
+  .mobile-card-row,
+  .glass,
+  .shadow-soft,
+  .shadow-medium {
+    background: white !important;
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 15pt !important;
+    padding: 15pt !important;
+    page-break-inside: avoid;
+  }
+
+  /* === TYPOGRAPHY === */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+    margin: 10pt 0 5pt 0 !important;
+    page-break-after: avoid;
+  }
+
+  h1 { font-size: 18pt !important; }
+  h2 { font-size: 16pt !important; }
+  h3 { font-size: 14pt !important; }
+  h4 { font-size: 12pt !important; }
+
+  p, div, span {
+    color: #000 !important;
+    margin: 5pt 0 !important;
+  }
+
+  /* === TABLES === */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 10pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #000 !important;
+    padding: 8pt !important;
+    text-align: left !important;
+    background: white !important;
+    color: #000 !important;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: bold !important;
+  }
+
+  /* === FORMS === */
+  input, textarea, select {
+    border: 1px solid #000 !important;
+    background: white !important;
+    color: #000 !important;
+    padding: 5pt !important;
+  }
+
+  button {
+    border: 1px solid #000 !important;
+    background: white !important;
+    color: #000 !important;
+    padding: 5pt 10pt !important;
+  }
+
+  /* === PORTFOLIO SPECIFIC === */
+  .portfolio-summary {
+    background: #f8f8f8 !important;
+    border: 2px solid #000 !important;
+    padding: 15pt !important;
+    margin: 10pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .position-card {
+    border: 1px solid #000 !important;
+    padding: 10pt !important;
+    margin: 5pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .profit-positive {
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  .profit-negative {
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  /* === CHARTS === */
+  .portfolio-chart {
+    border: 1px solid #000 !important;
+    background: white !important;
+    padding: 10pt !important;
+    margin: 10pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  /* Hide chart SVGs and show text alternative */
+  svg {
+    display: none !important;
+  }
+
+  .chart-fallback {
+    display: block !important;
+    color: #000 !important;
+    font-style: italic !important;
+  }
+
+  /* === NEWS SECTION === */
+  .news-item {
+    border-bottom: 1px solid #ccc !important;
+    padding: 10pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .news-title {
+    font-weight: bold !important;
+    color: #000 !important;
+    margin-bottom: 5pt !important;
+  }
+
+  .news-meta {
+    color: #666 !important;
+    font-size: 10pt !important;
+  }
+
+  /* === BUTTONS & INTERACTIVE ELEMENTS === */
+  .btn, button, a[role="button"] {
+    border: 1px solid #000 !important;
+    background: white !important;
+    color: #000 !important;
+    text-decoration: none !important;
+    padding: 5pt 10pt !important;
+    display: inline-block !important;
+    margin: 2pt !important;
+  }
+
+  /* === LAYOUT === */
+  .grid, .flex {
+    display: block !important;
+  }
+
+  .grid > *, .flex > * {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 10pt !important;
+  }
+
+  /* === PAGE BREAKS === */
+  .page-break-before {
+    page-break-before: always !important;
+  }
+
+  .page-break-after {
+    page-break-after: always !important;
+  }
+
+  .page-break-inside-avoid {
+    page-break-inside: avoid !important;
+  }
+
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid #000 !important;
+    padding: 10pt 0 !important;
+    margin-top: 20pt !important;
+    text-align: center !important;
+    font-size: 10pt !important;
+    color: #666 !important;
+  }
+
+  /* === UTILITIES === */
+  .print-hidden {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .text-center {
+    text-align: center !important;
+  }
+
+  .text-left {
+    text-align: left !important;
+  }
+
+  .text-right {
+    text-align: right !important;
+  }
+
+  /* === MOBILE-SPECIFIC PRINT OVERRIDES === */
+  @media print and (max-width: 768px) {
+    body {
+      font-size: 10pt !important;
+    }
+
+    .mobile-card-row {
+      padding: 10pt !important;
+      margin-bottom: 10pt !important;
+    }
+
+    table {
+      font-size: 9pt !important;
+    }
+
+    th, td {
+      padding: 5pt !important;
+    }
+
+    h1 { font-size: 16pt !important; }
+    h2 { font-size: 14pt !important; }
+    h3 { font-size: 12pt !important; }
+  }
+}
+
+
+
+
+

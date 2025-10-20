@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Convert eToro CSV to OpenBrokerCSV (free tool)</title>
+  <meta name="description" content="Normalize eToro trade history to OpenBrokerCSV. Private, browser-based conversion with validation and downloadable CSV.">
+  <link rel="icon" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="stylesheet" href="/app/style.css">
+  <link rel="canonical" href="https://pocketportfolio.app/app/static/csv-etoro-to-openbrokercsv">
+  <meta name="theme-color" content="#0b1220">
+  <style>
+    main { max-width: 980px; margin: 2rem auto; padding: 0 1rem; }
+    .mapping { overflow:auto; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 8px; text-align: left; }
+    .muted { opacity:.75; }
+    .drop { border:2px dashed #d1d5db; border-radius:12px; padding:18px; text-align:center; }
+  </style>
+  <!-- HowTo JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"HowTo",
+    "name":"Convert eToro CSV to OpenBrokerCSV",
+    "description":"Normalize your eToro trade history to the OpenBrokerCSV schema for accurate portfolio imports.",
+    "step":[
+      {"@type":"HowToStep","name":"Export eToro CSV","text":"In eToro, export your full trade history as CSV."},
+      {"@type":"HowToStep","name":"Upload CSV","text":"Upload the CSV to the converter and review detected columns."},
+      {"@type":"HowToStep","name":"Validate & fix","text":"Resolve date/number errors; the tool highlights invalid rows."},
+      {"@type":"HowToStep","name":"Download normalized CSV","text":"Download the OpenBrokerCSV file and import it into the tracker."}
+    ],
+    "tool":[{"@type":"SoftwareApplication","name":"OpenBrokerCSV Converter"}]
+  }
+  </script>
+</head>
+<body>
+  <header class="pp-nav">
+    <div class="pp-nav-inner">
+      <a href="/" class="pp-brand"><img src="/brand/pp-wordmark.svg" alt="Pocket Portfolio" width="156" height="20"></a>
+      <nav class="pp-links">
+        <a class="btn" href="/app/">App</a>
+        <a class="btn" href="/app/static/openbrokercsv">OpenBrokerCSV</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h1>Convert eToro CSV to OpenBrokerCSV</h1>
+    <p class="muted">Client-side conversion — nothing leaves your browser.</p>
+
+    <section class="card">
+      <h2 class="card-title">Supported eToro columns</h2>
+      <div class="mapping">
+        <table>
+          <thead><tr><th>eToro Header</th><th>OpenBrokerCSV</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Open Date / OpenTime</td><td><code>timestamp</code></td><td>ISO 8601 (UTC)</td></tr>
+            <tr><td>Instrument</td><td><code>symbol</code></td><td>e.g., AAPL, TSLA</td></tr>
+            <tr><td>Side</td><td><code>side</code></td><td>BUY or SELL</td></tr>
+            <tr><td>Units</td><td><code>quantity</code></td><td>number (negative if SELL)</td></tr>
+            <tr><td>Open Rate</td><td><code>price</code></td><td>number</td></tr>
+            <tr><td>Currency</td><td><code>trade_currency</code></td><td>ISO 4217 (USD, GBP, EUR)</td></tr>
+            <tr><td>Position ID</td><td><code>trade_id</code></td><td>string</td></tr>
+            <tr><td>Fees/Spread</td><td><code>fee</code></td><td>optional number</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Convert your file</h2>
+      <div class="drop">
+        <p>Drag &amp; drop your eToro CSV here or <label class="btn primary"><input type="file" id="csvFile" accept=".csv" hidden> choose a file</label></p>
+        <p class="muted">After validation you can download a normalized OpenBrokerCSV file.</p>
+        <p><a href="/fixtures/csv/sample-etoro.csv">Download a sample eToro CSV</a></p>
+      </div>
+      <div id="result" class="muted" style="margin-top:10px;"></div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Common errors &amp; fixes</h2>
+      <ul>
+        <li>Non-ISO date → convert to <code>YYYY-MM-DDTHH:mm:ssZ</code></li>
+        <li>Missing quantity/price → fill or remove the row</li>
+        <li>Wrong symbol → use broker’s ticker (AAPL, MSFT) or pair for crypto (BTC-USD)</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">FAQ</h2>
+      <details><summary>Is my data uploaded?</summary><p>No. This page runs fully in your browser.</p></details>
+      <details><summary>Where is the CLI?</summary><p>See <code>scripts/validate-csv.js</code> in the repo.</p></details>
+    </section>
+  </main>
+
+  <!-- Tiny client-side converter using your existing parser rules -->
+  <script>
+  (function(){
+    const fileIn = document.getElementById('csvFile');
+    const result = document.getElementById('result');
+    function parseCSV(text){
+      const lines = text.split(/\r?\n/).filter(Boolean);
+      const headers = (lines.shift()||"").split(",").map(s=>s.trim());
+      return lines.map(row=>{
+        const cols = row.split(","); const obj = {};
+        headers.forEach((h,i)=> obj[h] = cols[i]);
+        return obj;
+      });
+    }
+    function toISO(s){
+      const t = String(s||"").trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(t)) return t;
+      const d = new Date(t); return isNaN(d) ? "" : d.toISOString();
+    }
+    function normalise(row){
+      const side = (row.Side||row['Buy/Sell']||row.side||"").toUpperCase();
+      const qty = Number(row.Units ?? row.Qty ?? row.quantity ?? 0);
+      const sign = /SELL/i.test(side) ? -1 : 1;
+      return {
+        broker: "etoro",
+        trade_id: row["Position ID"] || row["Trade ID"] || row.trade_id || "",
+        timestamp: toISO(row["Open Date"] || row.OpenTime || row.timestamp || ""),
+        symbol: (row.Instrument || row.Symbol || "").toUpperCase().replace(/\s+/g,""),
+        side: /SELL/i.test(side)? "SELL":"BUY",
+        quantity: sign * Math.abs(qty),
+        price: Number(row["Open Rate"] ?? row.Price ?? row.price ?? 0),
+        trade_currency: (row.Currency || row.trade_currency || "USD").toUpperCase(),
+        fee: Number(row.Fees || row.fee || 0) || undefined
+      };
+    }
+    function download(rows){
+      const headers = ["broker","trade_id","timestamp","symbol","side","quantity","price","fee","trade_currency","settlement_currency","fx_rate"];
+      const csv = [headers.join(",")].concat(
+        rows.map(r=>headers.map(h=> r[h] ?? "").join(","))
+      ).join("\n");
+      const blob = new Blob([csv],{type:"text/csv"});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "openbrokercsv-etoro.csv"; a.click();
+    }
+    async function handle(file){
+      const text = await file.text();
+      const rows = parseCSV(text).map(normalise);
+      const invalid = rows.filter(r=>!r.timestamp || !r.symbol || !r.side || !isFinite(r.quantity) || !isFinite(r.price));
+      if (invalid.length){
+        result.textContent = `Found ${invalid.length} invalid row(s). Please fix and try again.`;
+        return;
+      }
+      download(rows);
+      result.textContent = `Converted ${rows.length} rows ✅`;
+    }
+    fileIn?.addEventListener('change', e => {
+      const f = e.target.files?.[0]; if (f) handle(f);
+    });
+  })();
+  </script>
+</body>
+</html>

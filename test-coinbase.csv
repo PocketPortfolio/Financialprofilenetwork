@@ -1,0 +1,3 @@
+Timestamp,Transaction Type,Asset,Asset Name,Quantity Transacted,Spot Price Currency,Spot Price at Transaction,Subtotal (USD),Total (USD),Fees (USD),Notes,Trade ID,Order ID,Payment Method,Account Platform
+2025-01-09 18:08:44Z,Buy,KO,The Coca‑Cola Company,32.522488,USD,64.48,2097.05,2109.24,12.19,,T-MBFLW58Q,ORD-SIZLX7J,USD Wallet,Coinbase (Mock)
+2025-01-10 11:25:24Z,Buy,MRK,"Merck & Co., Inc.",4.153289,USD,128.45,533.49,542.03,8.54,,T-5CFQGAPH,ORD-CU8CX9K,Debit Card,Coinbase (Mock)

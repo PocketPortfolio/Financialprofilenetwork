@@ -1,0 +1,1242 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import PortfolioChart from '../components/PortfolioChart';
+import Logo from '../components/Logo';
+import TickerSearch from '../components/TickerSearch';
+import ThemeSwitcher from '../components/ThemeSwitcher';
+import CSVImporter from '../components/CSVImporter';
+import AccountManagement from '../components/AccountManagement';
+import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
+import SEOHead from '../components/SEOHead';
+import StructuredData, { webAppData } from '../components/StructuredData';
+import { useQuotes, useNews, useMarketData } from '../hooks/useDataFetching';
+import { useAuth } from '../hooks/useAuth';
+import { useTrades } from '../hooks/useTrades';
+import { getDeviceInfo } from '../lib/utils/device';
+import { initializeMobileAnalytics } from '../lib/analytics/device';
+
+interface Trade {
+  id: string;
+  date: string;
+  ticker: string;
+  type: 'BUY' | 'SELL';
+  currency: string;
+  qty: number;
+  price: number;
+  mock: boolean;
+}
+
+// Start with empty trades - users should add their own
+const mockTrades: Trade[] = [];
+
+// Dynamic live prices based on user positions
+const getLivePricesForPositions = (tickers: string[]) => {
+  const basePrices: Record<string, { price: number, change: number }> = {
+    'AAPL': { price: 175.43, change: 2.15 },
+    'GOOGL': { price: 142.56, change: -1.23 },
+    'MSFT': { price: 378.85, change: 3.42 },
+    'TSLA': { price: 239.14, change: -1.45 },
+    'NVDA': { price: 124.80, change: 3.28 },
+    'AMZN': { price: 155.20, change: 1.85 },
+    'META': { price: 485.30, change: -0.92 },
+  };
+  
+  return tickers.map(ticker => ({
+    ticker,
+    price: basePrices[ticker]?.price || 100.00,
+    change: basePrices[ticker]?.change || 0.00
+  }));
+};
+
+const mockNews = [
+  { id: 1, title: 'Apple Reports Strong Q4 Earnings', source: 'Reuters', date: '2025-01-15' },
+  { id: 2, title: 'Google Announces New AI Features', source: 'TechCrunch', date: '2025-01-15' },
+  { id: 3, title: 'Microsoft Cloud Revenue Surges', source: 'Bloomberg', date: '2025-01-14' },
+];
+
+const mockMostTraded = [
+  { rank: 1, ticker: 'AAPL', price: 175.43, change: 2.15, volume: '45.2M', marketCap: '$2.8T' },
+  { rank: 2, ticker: 'TSLA', price: 239.14, change: -1.45, volume: '56.8M', marketCap: '$750.0B' },
+  { rank: 3, ticker: 'NVDA', price: 124.80, change: 3.28, volume: '67.9M', marketCap: '$3.0T' },
+];
+
+export default function AppPage() {
+  // Dashboard component - fixed syntax error
+  const { user, signInWithGoogle, logout, isAuthenticated, loading: authLoading } = useAuth();
+  const [deviceInfo, setDeviceInfo] = useState(getDeviceInfo());
+  const { 
+    trades, 
+    loading: tradesLoading, 
+    error: tradesError,
+    userTickers,
+    totalInvested,
+    totalTrades,
+    totalPositions,
+    addTrade: addTradeToFirebase,
+    deleteTrade: deleteTradeFromFirebase,
+    importTrades: importTradesToFirebase
+  } = useTrades();
+
+  // Debug logging for trades
+  useEffect(() => {
+    console.log('Dashboard: trades updated', trades.length, 'trades');
+    console.log('Dashboard: userTickers', userTickers);
+    console.log('Dashboard: totalInvested', totalInvested);
+  }, [trades, userTickers, totalInvested]);
+  
+  // Fetch data using hooks with optimized refresh intervals
+  const { data: quotesData, loading: quotesLoading, error: quotesError } = useQuotes(userTickers, 120000); // 2 minutes
+  // Request minimum 2 articles per ticker (minimum 6 for 3 tickers, but scale with portfolio size)
+  const newsLimit = Math.max(6, userTickers.length * 2);
+  const { data: newsData, loading: newsLoading, error: newsError, refetch: refetchNews } = useNews(userTickers, newsLimit);
+  const { data: marketData, loading: marketLoading, error: marketError } = useMarketData();
+
+  // Clear news cache when tickers change to ensure balanced representation
+  useEffect(() => {
+    if (userTickers.length > 0) {
+      const tickersKey = userTickers.join(',');
+      const cacheKey = `news_${tickersKey}_${newsLimit}`;
+      localStorage.removeItem(cacheKey);
+      refetchNews();
+    }
+  }, [userTickers.join(','), newsLimit, refetchNews]);
+
+  const [newTrade, setNewTrade] = useState({
+    date: new Date().toISOString().split('T')[0],
+    ticker: '',
+    type: 'Stock',
+    currency: 'USD',
+    qty: '',
+    price: '',
+  });
+  const [isMockTrade, setIsMockTrade] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
+  const [chartType, setChartType] = useState<'pie' | 'line'>('pie');
+  const [showAllNews, setShowAllNews] = useState(false);
+
+  // Set timestamp only on client side to avoid hydration mismatch
+  useEffect(() => {
+    setCurrentTime(new Date().toLocaleTimeString('en-US', { hour12: false }));
+  }, []);
+
+  // Initialize mobile analytics
+  useEffect(() => {
+    initializeMobileAnalytics();
+  }, []);
+
+  // Update device info on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setDeviceInfo(getDeviceInfo());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Portfolio metrics are now calculated in the useTrades hook
+  
+  // Calculate P/L for each position (excluding mock trades)
+  const realTrades = trades.filter(trade => !trade.mock);
+  
+  // Filter out invalid trades (invalid tickers, NaN values, etc.)
+  const validTrades = realTrades.filter(trade => {
+    // Check for valid ticker (more flexible pattern to handle various formats)
+    const validTickerPattern = /^[A-Z0-9.-]{1,10}$/;
+    if (!validTickerPattern.test(trade.ticker)) {
+      console.warn(`Filtering out invalid ticker: ${trade.ticker}`);
+      return false;
+    }
+    
+    // Check for valid numeric values
+    if (isNaN(trade.qty) || isNaN(trade.price) || trade.qty <= 0 || trade.price <= 0) {
+      console.warn(`Filtering out trade with invalid values:`, trade);
+      return false;
+    }
+    
+    return true;
+  });
+  
+  const calculatePositionPL = (ticker: string) => {
+    const positionTrades = validTrades.filter(trade => trade.ticker === ticker);
+    const totalShares = positionTrades.reduce((sum, trade) => sum + trade.qty, 0);
+    const avgCost = positionTrades.reduce((sum, trade) => sum + (trade.qty * trade.price), 0) / totalShares;
+    const currentPrice = quotesData?.[ticker]?.price || avgCost;
+    const currentValue = totalShares * currentPrice;
+    const totalCost = totalShares * avgCost;
+    const unrealizedPL = currentValue - totalCost;
+    const unrealizedPLPercent = totalCost > 0 ? (unrealizedPL / totalCost) * 100 : 0;
+    
+    // Find the most recent trade date
+    const lastTradeDate = positionTrades.length > 0 
+      ? positionTrades.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
+      : '';
+    
+    // Check if any trades are mock
+    const hasMockTrades = positionTrades.some(trade => trade.mock);
+    
+    return {
+      ticker,
+      shares: totalShares,
+      avgCost,
+      currentPrice,
+      currentValue,
+      totalCost,
+      unrealizedPL,
+      unrealizedPLPercent,
+      totalTrades: positionTrades.length,
+      lastTradeDate,
+      isMock: hasMockTrades
+    };
+  };
+  
+  // Calculate total P/L (only for valid trades, not mock)
+  const positions = Array.from(new Set(validTrades.map(t => t.ticker))).map(calculatePositionPL);
+  const totalUnrealizedPL = positions.reduce((sum, pos) => sum + pos.unrealizedPL, 0);
+  const totalCurrentValue = positions.reduce((sum, pos) => sum + pos.currentValue, 0);
+  const totalUnrealizedPLPercent = totalInvested > 0 ? (totalUnrealizedPL / totalInvested) * 100 : 0;
+
+  const handleAddTrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTrade.ticker && newTrade.qty && newTrade.price && isAuthenticated) {
+      try {
+        await addTradeToFirebase({
+          date: newTrade.date,
+          ticker: newTrade.ticker.toUpperCase(),
+          type: 'BUY', // Default to BUY for manual trades
+          currency: 'USD', // Default currency
+          qty: parseFloat(newTrade.qty),
+          price: parseFloat(newTrade.price),
+          mock: isMockTrade,
+        });
+        setNewTrade({
+          date: new Date().toISOString().split('T')[0],
+          ticker: '',
+          type: 'Stock',
+          currency: 'USD',
+          qty: '',
+          price: '',
+        });
+        setIsMockTrade(false);
+      } catch (error) {
+        console.error('Error adding trade:', error);
+      }
+      alert(`Trade added successfully: ${parseFloat(newTrade.qty)} shares of ${newTrade.ticker.toUpperCase()} at $${parseFloat(newTrade.price)}`);
+    } else {
+      alert('Please fill in all required fields with valid values.');
+    }
+  };
+
+  const handleDeleteTrade = async (id: string) => {
+    try {
+      await deleteTradeFromFirebase(id);
+    } catch (error) {
+      console.error('Error deleting trade:', error);
+    }
+  };
+
+  const handleCSVImport = async (importedTrades: { date: string; ticker: string; type: 'BUY' | 'SELL'; currency: string; qty: number; price: number; mock: boolean; }[]) => {
+    try {
+      // Always use the importTrades function which handles both authenticated and local users
+      await importTradesToFirebase(importedTrades);
+      
+      if (isAuthenticated) {
+        alert(`Successfully imported ${importedTrades.length} trades to your account`);
+      } else {
+        alert(`Successfully imported ${importedTrades.length} trades locally`);
+      }
+    } catch (error) {
+      console.error('Error importing trades:', error);
+      alert('Failed to import trades. Please try again.');
+    }
+  };
+
+  return (
+    <>
+      <SEOHead
+        title="Portfolio Dashboard - Track Your Investments"
+        description="Manage your investment portfolio with live P/L tracking, real-time prices, mock trading, and CSV import. Free portfolio management dashboard with advanced analytics and insights."
+        keywords={[
+          'portfolio dashboard',
+          'investment tracking',
+          'stock portfolio',
+          'crypto portfolio',
+          'portfolio management',
+          'investment analytics',
+          'trading dashboard',
+          'financial dashboard',
+          'portfolio tracker',
+          'investment tools'
+        ]}
+        canonical="https://pocketportfolio.app/dashboard"
+        ogImage="/brand/preview-dashboard.svg"
+        ogType="website"
+      />
+      
+      <StructuredData type="WebApplication" data={webAppData} />
+
+      {/* Top Navigation Header - Same as Live page */}
+      <header style={{ 
+        borderBottom: '1px solid var(--card-border)', 
+        background: 'var(--chrome)', 
+        padding: '16px 24px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <Logo size="medium" showWordmark={true} />
+          </Link>
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Link href="/dashboard" style={{ color: 'var(--brand)', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Dashboard</Link>
+              <Link href="/live" style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>Live</Link>
+            </div>
+            
+            <ThemeSwitcher />
+            
+            {isAuthenticated && user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '14px', color: 'var(--muted)' }}>{user.displayName || user.email}</span>
+                <button 
+                  onClick={logout}
+                  style={{
+                    padding: '8px 16px',
+                    background: 'var(--card)',
+                    border: '1px solid var(--card-border)',
+                    borderRadius: '6px',
+                    color: 'var(--text)',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--hover)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--card)'}
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={signInWithGoogle}
+                style={{
+                  padding: '8px 16px',
+                  background: 'var(--brand)',
+                  border: '1px solid var(--brand)',
+                  borderRadius: '6px',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--brand-hover)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--brand)'}
+              >
+                Sign In
+              </button>
+            )}
+          </nav>
+        </div>
+      </header>
+
+      <div className="mobile-container main-content" style={{ 
+        minHeight: '100vh', 
+        background: 'var(--bg)', 
+        color: 'var(--text)', 
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
+        paddingBottom: deviceInfo.isMobile ? 'calc(var(--touch-target-large) + var(--safe-area-bottom))' : '0'
+      }}>
+
+          {/* Mobile Navigation */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <nav style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Link 
+                href="/app" 
+                style={{ 
+                  padding: '8px 12px', 
+                  background: 'var(--brand)', 
+                  color: 'white', 
+                  textDecoration: 'none', 
+                  borderRadius: '20px', 
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                href="/live" 
+                style={{ 
+                  padding: '8px 12px', 
+                  background: 'transparent',
+                  border: '1px solid var(--card-border)', 
+                  color: 'var(--text)', 
+                  textDecoration: 'none', 
+                  borderRadius: '20px', 
+                  fontSize: '12px',
+                  fontWeight: '500'
+                }}
+              >
+                Live
+              </Link>
+            </nav>
+            
+            <ThemeSwitcher />
+            
+            {isAuthenticated && user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ 
+                  width: '32px', 
+                  height: '32px', 
+                  background: 'var(--brand)', 
+                  borderRadius: '50%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}>
+                  {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
+                </div>
+                <button 
+                  onClick={logout}
+                  style={{
+                    padding: '6px 12px',
+                    background: 'transparent',
+                    border: '1px solid var(--card-border)',
+                    color: 'var(--text)',
+                    borderRadius: '16px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={signInWithGoogle}
+                style={{
+                  padding: '8px 12px',
+                  background: 'white',
+                  color: '#3c4043',
+                  border: '1px solid #dadce0',
+                  borderRadius: '16px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  fontFamily: 'Roboto, sans-serif'
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#FBBC05" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  <path fill="#EA4335" d="M12 22c2.97 0 5.46-.98 7.28-2.66l-3.15-3.15c-1.16.88-2.59 1.41-4.13 1.41-2.86 0-5.29-1.93-6.16-4.53L2.18 16.93C3.99 20.53 7.7 22 12 22z"/>
+                </svg>
+                Sign In
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content - Compact Financial Layout */}
+      <main className="mobile-container" style={{ 
+        padding: deviceInfo.isMobile ? '16px 12px' : '12px', 
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        paddingTop: deviceInfo.isMobile ? '16px' : '12px'
+      }}>
+        {/* Compact Summary Row */}
+        <div className="mobile-card brand-card brand-candlestick brand-grid" style={{ 
+          marginBottom: '12px',
+          display: 'grid',
+          gridTemplateColumns: '2fr 1fr 1fr',
+          gap: '12px',
+          alignItems: 'center',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          <div>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--muted)', marginBottom: '2px', textTransform: 'uppercase' }}>Total Invested</div>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: trades.length === 0 ? 'var(--muted)' : 'var(--text)' }}>
+              {trades.length === 0 ? '—' : `$${totalInvested.toFixed(2)}`}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--muted)', marginBottom: '2px', textTransform: 'uppercase' }}>Trades</div>
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: trades.length === 0 ? 'var(--muted)' : 'var(--text)' }}>
+              {trades.length === 0 ? '—' : totalTrades}
+            </div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--muted)', marginBottom: '2px', textTransform: 'uppercase' }}>Positions</div>
+            <div style={{ fontSize: '16px', fontWeight: 'bold', color: trades.length === 0 ? 'var(--muted)' : 'var(--text)' }}>
+              {trades.length === 0 ? '—' : totalPositions}
+            </div>
+          </div>
+        </div>
+
+        {/* P/L Status Bar */}
+        {trades.length > 0 && (
+          <div style={{ 
+            background: totalUnrealizedPL >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', 
+            border: `1px solid ${totalUnrealizedPL >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`, 
+            borderRadius: '12px', 
+            padding: '12px',
+            marginBottom: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--muted)', marginBottom: '2px', textTransform: 'uppercase' }}>Unrealized P/L</div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: totalUnrealizedPL >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
+                {totalUnrealizedPL >= 0 ? '+' : ''}${totalUnrealizedPL.toFixed(2)}
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '14px', fontWeight: 'bold', color: totalUnrealizedPL >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
+                {totalUnrealizedPL >= 0 ? '+' : ''}{totalUnrealizedPLPercent.toFixed(2)}%
+              </div>
+              <div style={{ fontSize: '10px', color: 'var(--muted)' }}>
+                {totalUnrealizedPL >= 0 ? '📈' : '📉'} {totalUnrealizedPL >= 0 ? 'Gain' : 'Loss'}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Account Management - Only show when authenticated */}
+        {isAuthenticated && user && (
+          <AccountManagement 
+            user={user} 
+            trades={trades}
+            onAccountDeleted={() => {
+              // Redirect to landing page after account deletion
+              window.location.href = '/';
+            }}
+          />
+        )}
+
+        {/* Data Sources + Add Trade Row */}
+        <div className="data-sources-trade-row" style={{ 
+          display: 'grid',
+          gridTemplateColumns: '200px 1fr',
+          gap: '12px',
+          marginBottom: '12px',
+          alignItems: 'start'
+        }}>
+          {/* Data Sources Status - Expanded */}
+          <div style={{ 
+            background: 'var(--card)', 
+            border: '1px solid var(--card-border)', 
+            borderRadius: '8px', 
+            padding: '12px',
+            minWidth: '180px'
+          }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--muted)', marginBottom: '8px', textTransform: 'uppercase' }}>Data Sources</div>
+            
+            {/* Status Legend */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px', 
+              marginBottom: '8px',
+              padding: '4px 6px',
+              background: 'rgba(16, 185, 129, 0.05)',
+              borderRadius: '4px',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--pos)' }}></div>
+              <span style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: '500' }}>Fresh</span>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
+              <span style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: '500' }}>Fallback</span>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--neg)' }}></div>
+              <span style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: '500' }}>Unhealthy</span>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--pos)' }}></div>
+                <span style={{ fontSize: '11px', color: 'var(--text)', fontWeight: '500' }}>Yahoo Finance</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--pos)' }}></div>
+                <span style={{ fontSize: '11px', color: 'var(--text)', fontWeight: '500' }}>Stooq</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--pos)' }}></div>
+                <span style={{ fontSize: '11px', color: 'var(--text)', fontWeight: '500' }}>Google News</span>
+              </div>
+            </div>
+            <div style={{ 
+              marginTop: '8px', 
+              padding: '4px 8px', 
+              background: 'rgba(16, 185, 129, 0.1)', 
+              borderRadius: '4px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '10px', color: 'var(--pos)', fontWeight: '500' }}>
+                Fresh • {currentTime ? currentTime.split(':').slice(0, 2).join(':') : '--:--'}
+              </div>
+            </div>
+          </div>
+
+          {/* Add Trade - Compact */}
+          <div id="import" className="brand-card" style={{ 
+            background: 'var(--card)', 
+            border: '1px solid var(--card-border)', 
+            borderRadius: '8px', 
+            padding: '12px'
+          }}>
+            <div style={{ marginBottom: '12px' }}>
+              <h3 style={{ 
+                fontSize: '14px', 
+                fontWeight: '700', 
+                marginBottom: '2px',
+                background: 'linear-gradient(135deg, var(--brand), #8b5cf6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Quick Trade
+              </h3>
+              <p style={{ fontSize: '10px', color: 'var(--muted)', margin: 0 }}>
+                Add position
+              </p>
+            </div>
+
+            <form className="mobile-form" onSubmit={handleAddTrade} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Asset + Type Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div>
+                  <label htmlFor="trade-ticker" style={{ 
+                    display: 'block', 
+                    fontSize: '10px', 
+                    fontWeight: '600', 
+                    color: 'var(--muted)', 
+                    marginBottom: '4px',
+                    textTransform: 'uppercase'
+                  }}>
+                    Asset
+                  </label>
+                  <TickerSearch
+                    onTickerSelect={(ticker) => setNewTrade({ ...newTrade, ticker })}
+                    placeholder="AAPL, BTC..."
+                  />
+                </div>
+                <div>
+                  <label htmlFor="trade-type" style={{ 
+                    display: 'block', 
+                    fontSize: '10px', 
+                    fontWeight: '600', 
+                    color: 'var(--muted)', 
+                    marginBottom: '4px',
+                    textTransform: 'uppercase'
+                  }}>
+                    Type
+                  </label>
+                  <select
+                    id="trade-type"
+                    style={{
+                      width: '100%',
+                      padding: '8px',
+                      background: 'var(--bg)',
+                      border: '1px solid var(--card-border)',
+                      borderRadius: '6px',
+                      color: 'var(--text)',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      appearance: 'none',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                    value={newTrade.type}
+                    onChange={(e) => setNewTrade({ ...newTrade, type: e.target.value as 'Stock' | 'Crypto' })}
+                  >
+                    <option>Stock</option>
+                    <option>Crypto</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Quantity + Price Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div>
+                  <label htmlFor="trade-qty" style={{ 
+                    display: 'block', 
+                    fontSize: '10px', 
+                    fontWeight: '600', 
+                    color: 'var(--muted)', 
+                    marginBottom: '4px',
+                    textTransform: 'uppercase'
+                  }}>
+                    Qty
+                  </label>
+                  <input
+                    type="number"
+                    id="trade-qty"
+                    placeholder="0.00"
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px', 
+                      background: 'var(--bg)', 
+                      border: '1px solid var(--card-border)', 
+                      borderRadius: '6px', 
+                      color: 'var(--text)', 
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                    value={newTrade.qty}
+                    onChange={(e) => setNewTrade({ ...newTrade, qty: e.target.value })}
+                    min="0"
+                    step="any"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="trade-price" style={{ 
+                    display: 'block', 
+                    fontSize: '10px', 
+                    fontWeight: '600', 
+                    color: 'var(--muted)', 
+                    marginBottom: '4px',
+                    textTransform: 'uppercase'
+                  }}>
+                    Price
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="number"
+                      id="trade-price"
+                      placeholder="0.00"
+                      style={{ 
+                        width: '100%', 
+                        padding: '8px', 
+                        paddingRight: '24px',
+                        background: 'var(--bg)', 
+                        border: '1px solid var(--card-border)', 
+                        borderRadius: '6px', 
+                        color: 'var(--text)', 
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                      value={newTrade.price}
+                      onChange={(e) => setNewTrade({ ...newTrade, price: e.target.value })}
+                      min="0"
+                      step="any"
+                      required
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      right: '8px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--muted)',
+                      fontSize: '10px',
+                      fontWeight: '600',
+                      pointerEvents: 'none'
+                    }}>
+                      $
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mock Toggle + Submit Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', alignItems: 'end' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  padding: '6px 8px',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--card-border)',
+                  borderRadius: '6px'
+                }}>
+                  <input
+                    id="mock-trade"
+                    type="checkbox"
+                    style={{ 
+                      width: '16px', 
+                      height: '16px', 
+                      appearance: 'none',
+                      background: isMockTrade ? 'var(--brand)' : 'var(--card-border)',
+                      borderRadius: '3px',
+                      position: 'relative',
+                      cursor: 'pointer',
+                      outline: 'none',
+                      margin: 0
+                    }}
+                    checked={isMockTrade}
+                    onChange={(e) => setIsMockTrade(e.target.checked)}
+                  />
+                  <label htmlFor="mock-trade" style={{ 
+                    fontSize: '10px', 
+                    fontWeight: '500', 
+                    color: 'var(--text)',
+                    cursor: 'pointer',
+                    margin: 0
+                  }}>
+                    Mock Trade
+                  </label>
+                </div>
+                
+                <button
+                  type="submit"
+                  style={{ 
+                    background: 'linear-gradient(135deg, var(--brand), #8b5cf6)',
+                    color: 'white', 
+                    padding: '8px 16px', 
+                    borderRadius: '6px', 
+                    fontSize: '12px', 
+                    fontWeight: '600', 
+                    cursor: 'pointer', 
+                    border: 'none',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 6px 0 rgba(99, 102, 241, 0.3)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {isMockTrade ? 'Mock' : 'Trade'}
+                </button>
+              </div>
+            </form>
+
+            <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--card-border)' }}>
+              <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Import CSV</div>
+              <CSVImporter onImport={handleCSVImport} />
+            </div>
+          </div>
+        </div>
+
+        {/* Consolidated Portfolio Table - Positions Section */}
+        <div id="positions">
+          <ConsolidatedPortfolioTable 
+            trades={trades}
+            positions={positions}
+            onDeleteTrade={handleDeleteTrade}
+            onViewTrades={(ticker) => {
+              // This will be handled by the component's internal state
+              console.log('View trades for:', ticker);
+            }}
+          />
+        </div>
+
+        {/* Compact Portfolio Chart */}
+        {positions.length > 0 && (
+          <div className="portfolio-allocation-card brand-card brand-sparkline brand-spine" style={{ 
+            marginBottom: '24px',
+            overflow: 'hidden'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: 0 }}>Portfolio Allocation</h3>
+              <select 
+                style={{ background: 'var(--bg)', color: 'var(--text)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--card-border)', fontSize: '10px' }}
+                value={chartType}
+                onChange={(e) => setChartType(e.target.value as 'pie' | 'line')}
+              >
+                <option value="pie">Pie</option>
+                <option value="line">Line</option>
+              </select>
+            </div>
+            <div className="portfolio-container" style={{ 
+              height: 'auto',
+              minHeight: '200px',
+              maxHeight: '280px',
+              overflow: 'hidden',
+              paddingBottom: '8px'
+            }}>
+              <PortfolioChart positions={positions} type={chartType} />
+            </div>
+          </div>
+        )}
+
+        {/* Compact Smart News */}
+        {userTickers.length > 0 && (
+          <div className="brand-card" style={{ 
+            background: 'var(--card)', 
+            border: '1px solid var(--card-border)', 
+            borderRadius: '12px', 
+            padding: '16px', 
+            marginTop: '8px',
+            marginBottom: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: 0 }}>
+                Smart News
+                <span style={{ 
+                  fontSize: '9px', 
+                  fontWeight: '500', 
+                  color: 'var(--brand)', 
+                  marginLeft: '6px',
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  padding: '1px 6px',
+                  borderRadius: '8px'
+                }}>
+                  2+ per ticker
+                </span>
+              </h3>
+              {newsLoading && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Loading...</span>}
+            </div>
+            {newsError && (
+              <div style={{ 
+                background: 'rgba(239, 68, 68, 0.1)', 
+                border: '1px solid rgba(239, 68, 68, 0.3)', 
+                borderRadius: '4px', 
+                padding: '6px', 
+                marginBottom: '8px',
+                color: 'var(--neg)',
+                fontSize: '10px'
+              }}>
+                Error loading news: {newsError}
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: showAllNews ? '500px' : '300px', overflowY: 'auto' }}>
+              {newsData && newsData.slice(0, showAllNews ? newsData.length : 3).map((article, index) => (
+                <a 
+                  key={index} 
+                  href={article.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    background: 'var(--bg)', 
+                    border: '1px solid var(--card-border)', 
+                    borderRadius: '6px', 
+                    padding: '8px',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    display: 'block',
+                    transition: 'transform 0.2s ease'
+                  }}
+                >
+                  <h4 style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '4px', color: 'var(--text)', lineHeight: '1.3' }}>{article.title}</h4>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '9px', color: 'var(--muted)' }}>
+                      {article.source}
+                    </span>
+                    <span style={{ fontSize: '9px', color: 'var(--muted)' }}>
+                      {new Date(article.publishedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </a>
+              ))}
+              {newsData && newsData.length > 3 && (
+                <div style={{ textAlign: 'center', padding: '8px' }}>
+                  <button
+                    onClick={() => setShowAllNews(!showAllNews)}
+                    style={{
+                      background: 'var(--brand)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '10px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(99, 102, 241, 0.3)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#2563eb';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'var(--brand)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    {showAllNews ? 'Show Less' : `+${newsData.length - 3} more articles`}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Compact Live Prices */}
+        {quotesData && Object.keys(quotesData).length > 0 && (
+          <div className="brand-card" style={{ background: 'var(--card)', border: '1px solid var(--card-border)', borderRadius: '12px', padding: '12px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: 0 }}>Live Prices</h3>
+              {quotesLoading && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Updating...</span>}
+            </div>
+            {quotesError && (
+              <div style={{ 
+                background: 'rgba(239, 68, 68, 0.1)', 
+                border: '1px solid rgba(239, 68, 68, 0.3)', 
+                borderRadius: '4px', 
+                padding: '6px', 
+                marginBottom: '8px',
+                color: 'var(--neg)',
+                fontSize: '10px'
+              }}>
+                Error loading prices: {quotesError}
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '200px', overflowY: 'auto' }}>
+              {quotesData && Object.values(quotesData).map(quote => (
+                <div key={quote.symbol} style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'auto 1fr auto auto', 
+                  gap: '12px', 
+                  alignItems: 'center',
+                  padding: '8px',
+                  background: 'var(--bg)',
+                  borderRadius: '6px',
+                  border: '1px solid var(--card-border)'
+                }}>
+                  <a 
+                    href={`https://finance.yahoo.com/quote/${quote.symbol}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ 
+                      color: 'var(--brand)', 
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      fontSize: '12px',
+                      fontWeight: '600'
+                    }}
+                  >
+                    {quote.symbol}
+                  </a>
+                  <div style={{ fontSize: '12px', color: 'var(--text)', fontWeight: '500' }}>
+                    {quote.price ? `$${quote.price.toFixed(2)}` : '—'}
+                  </div>
+                  <div style={{ 
+                    fontSize: '10px', 
+                    color: (quote.change || 0) >= 0 ? 'var(--pos)' : 'var(--neg)',
+                    fontWeight: '500'
+                  }}>
+                    {quote.change && quote.changePct ? `${quote.change >= 0 ? '+' : ''}${quote.changePct.toFixed(2)}%` : '—'}
+                  </div>
+                  <div style={{ 
+                    width: '6px', 
+                    height: '6px', 
+                    borderRadius: '50%', 
+                    background: (quote.change || 0) >= 0 ? 'var(--pos)' : 'var(--neg)' 
+                  }}></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Most Traded Today */}
+        <div className="brand-card" style={{ background: 'var(--card)', border: '1px solid var(--card-border)', borderRadius: '8px', padding: '24px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>
+            Most Traded Today (US)
+            {marketLoading && <span style={{ fontSize: '14px', color: 'var(--muted)', marginLeft: '8px' }}>(Loading...)</span>}
+          </h2>
+          {marketError && (
+            <div style={{ 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              border: '1px solid rgba(239, 68, 68, 0.3)', 
+              borderRadius: '6px', 
+              padding: '12px', 
+              marginBottom: '16px',
+              color: 'var(--neg)',
+              fontSize: '14px'
+            }}>
+              Error loading market data: {marketError}
+            </div>
+          )}
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead style={{ background: 'var(--bg)' }}>
+                <tr>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>#</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ticker</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Price</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Change</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Volume</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Market Cap</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                {marketData && marketData.map(stock => (
+                  <tr key={stock.symbol} style={{ borderBottom: '1px solid var(--card-border)' }}>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', fontWeight: '500', color: 'var(--text)' }}>{stock.rank}</td>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', fontWeight: '500', color: 'var(--text)' }}>
+                      <a 
+                        href={`https://finance.yahoo.com/quote/${stock.symbol}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: 'var(--brand)', 
+                          textDecoration: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = 'none'}
+                      >
+                        {stock.symbol}
+                      </a>
+                    </td>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: 'var(--text)' }}>
+                      {stock.price ? `$${stock.price.toFixed(2)}` : '—'}
+                    </td>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: (stock.changePct || 0) >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
+                      {stock.changePct ? `${stock.changePct >= 0 ? '+' : ''}${stock.changePct.toFixed(2)}%` : '—'}
+                    </td>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: 'var(--text)' }}>
+                      {stock.volume ? `${(stock.volume / 1000000).toFixed(1)}M` : '—'}
+                    </td>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: 'var(--text)' }}>
+                      {stock.marketCap ? `$${(stock.marketCap / 1000000000).toFixed(1)}B` : '—'}
+                    </td>
+                    <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '12px', color: 'var(--muted)' }}>
+                      <a 
+                        href="https://finance.yahoo.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: 'var(--brand)', 
+                          textDecoration: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => (e.target as HTMLElement).style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => (e.target as HTMLElement).style.textDecoration = 'none'}
+                      >
+                        YAHOO FINANCE
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Settings Section */}
+        <div id="settings" className="brand-card" style={{ 
+          background: 'var(--card)', 
+          border: '1px solid var(--card-border)', 
+          borderRadius: '12px', 
+          padding: '16px', 
+          marginBottom: '24px'
+        }}>
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ 
+              fontSize: '14px', 
+              fontWeight: '700', 
+              marginBottom: '2px',
+              background: 'linear-gradient(135deg, var(--brand), #8b5cf6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Settings
+            </h3>
+            <p style={{ fontSize: '10px', color: 'var(--muted)', margin: 0 }}>
+              Manage your account and preferences
+            </p>
+          </div>
+          
+          <div style={{ 
+            background: 'var(--bg)', 
+            border: '1px solid var(--card-border)', 
+            borderRadius: '8px', 
+            padding: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div>
+                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '2px' }}>Theme</div>
+                <div style={{ fontSize: '10px', color: 'var(--muted)' }}>Switch between light and dark mode</div>
+              </div>
+              <ThemeSwitcher />
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div>
+                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '2px' }}>Account</div>
+                <div style={{ fontSize: '10px', color: 'var(--muted)' }}>Manage your portfolio data</div>
+              </div>
+              {isAuthenticated && user && (
+                <AccountManagement 
+                  user={user} 
+                  trades={trades}
+                  onAccountDeleted={() => {
+                    // Account deletion will be handled by the AccountManagement component
+                    window.location.href = '/';
+                  }}
+                />
+              )}
+            </div>
+            
+            <div style={{ paddingTop: '8px', borderTop: '1px solid var(--card-border)' }}>
+              <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>Quick Links</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Link href="/openbrokercsv" style={{ 
+                  padding: '8px 12px', 
+                  border: '1px solid var(--card-border)', 
+                  borderRadius: '6px', 
+                  color: 'var(--text)', 
+                  textDecoration: 'none', 
+                  fontSize: '11px', 
+                  fontWeight: '500',
+                  background: 'var(--bg)'
+                }}>
+                  OpenBrokerCSV Format
+                </Link>
+                <Link href="/csv/etoro-to-openbrokercsv" style={{ 
+                  padding: '8px 12px', 
+                  border: '1px solid var(--card-border)', 
+                  borderRadius: '6px', 
+                  color: 'var(--text)', 
+                  textDecoration: 'none', 
+                  fontSize: '11px', 
+                  fontWeight: '500',
+                  background: 'var(--bg)'
+                }}>
+                  eToro → OpenBrokerCSV Converter
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer style={{ marginTop: '80px', padding: '32px 24px', borderTop: '1px solid var(--card-border)', textAlign: 'center', background: 'var(--chrome)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '32px', flexWrap: 'wrap' }}>
+            <Link href="/openbrokercsv" style={{ padding: '12px 24px', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>
+              OpenBrokerCSV
+            </Link>
+            <Link href="/app/static/portfolio-tracker" style={{ padding: '12px 24px', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>
+              Portfolio Tracker
+            </Link>
+            <Link href="/csv/etoro-to-openbrokercsv" style={{ padding: '12px 24px', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'var(--text)', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}>
+              eToro → OpenBrokerCSV
+            </Link>
+          </div>
+          <p style={{ color: 'var(--muted)', fontSize: '14px' }}>© 2025 Pocket Portfolio — Built with the community.</p>
+        </div>
+      </footer>
+      </div>
+
+    </>
+  );
+}

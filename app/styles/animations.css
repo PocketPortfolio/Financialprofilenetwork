@@ -1,0 +1,321 @@
+/**
+ * Pocket Portfolio Animations
+ * Subtle, purposeful motion respecting prefers-reduced-motion
+ */
+
+/* === Fade Animations === */
+
+@keyframes brand-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes brand-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.brand-fade-in {
+  animation: brand-fade-in var(--transition-base) ease-out;
+}
+
+.brand-fade-out {
+  animation: brand-fade-out var(--transition-base) ease-in;
+}
+
+/* === Slide Animations === */
+
+@keyframes brand-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes brand-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes brand-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes brand-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.brand-slide-up {
+  animation: brand-slide-up var(--transition-base) ease-out;
+}
+
+.brand-slide-down {
+  animation: brand-slide-down var(--transition-base) ease-out;
+}
+
+.brand-slide-left {
+  animation: brand-slide-left var(--transition-base) ease-out;
+}
+
+.brand-slide-right {
+  animation: brand-slide-right var(--transition-base) ease-out;
+}
+
+/* === Scale Animations === */
+
+@keyframes brand-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes brand-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.brand-scale-in {
+  animation: brand-scale-in var(--transition-base) ease-out;
+}
+
+.brand-scale-out {
+  animation: brand-scale-out var(--transition-base) ease-in;
+}
+
+/* === Pulse Animations (for KPI updates) === */
+
+@keyframes brand-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes brand-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.brand-pulse {
+  animation: brand-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.brand-pulse-ring {
+  animation: brand-pulse-ring 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* === Shimmer (for loading states) === */
+
+@keyframes brand-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.brand-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 0%,
+    var(--surface-elevated) 50%,
+    var(--surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: brand-shimmer 1.5s ease-in-out infinite;
+}
+
+/* === Spin (for loaders) === */
+
+@keyframes brand-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.brand-spin {
+  animation: brand-spin 1s linear infinite;
+}
+
+.brand-spin-slow {
+  animation: brand-spin 2s linear infinite;
+}
+
+/* === Transition Utilities === */
+
+.brand-transition {
+  transition: all var(--transition-base);
+}
+
+.brand-transition-fast {
+  transition: all var(--transition-fast);
+}
+
+.brand-transition-slow {
+  transition: all var(--transition-slow);
+}
+
+.brand-transition-colors {
+  transition: color var(--transition-base),
+              background-color var(--transition-base),
+              border-color var(--transition-base);
+}
+
+.brand-transition-transform {
+  transition: transform var(--transition-base);
+}
+
+.brand-transition-opacity {
+  transition: opacity var(--transition-base);
+}
+
+/* === Hover Effects === */
+
+.brand-hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.brand-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.brand-hover-glow {
+  position: relative;
+  transition: all var(--transition-base);
+}
+
+.brand-hover-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--signal), var(--info));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--transition-base);
+}
+
+.brand-hover-glow:hover::after {
+  opacity: 0.15;
+}
+
+/* === Stagger Animations (for lists) === */
+
+.brand-stagger > * {
+  animation: brand-slide-up var(--transition-base) ease-out;
+  animation-fill-mode: both;
+}
+
+.brand-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.brand-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.brand-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.brand-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.brand-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.brand-stagger > *:nth-child(6) { animation-delay: 200ms; }
+.brand-stagger > *:nth-child(7) { animation-delay: 240ms; }
+.brand-stagger > *:nth-child(8) { animation-delay: 280ms; }
+.brand-stagger > *:nth-child(9) { animation-delay: 320ms; }
+.brand-stagger > *:nth-child(10) { animation-delay: 360ms; }
+
+/* === Reduced Motion Preferences === */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .brand-pulse,
+  .brand-pulse-ring,
+  .brand-shimmer,
+  .brand-spin,
+  .brand-spin-slow {
+    animation: none !important;
+  }
+  
+  .brand-hover-lift:hover {
+    transform: none !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

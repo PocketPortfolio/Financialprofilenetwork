@@ -1,0 +1,121 @@
+// Pocket Portfolio - Firestore Security Rules
+// Principle: Least privilege + defense in depth
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() 
+        && request.auth.token.get('admin', false) == true;
+    }
+    
+    function withinRateLimit() {
+      // Limit document creates to 100 per minute per user
+      return request.time > resource.data.get('_lastWrite', request.time - duration.value(61, 's'))
+        + duration.value(1, 's');
+    }
+    
+    // Provider health: read-only for all, write only by server (via Admin SDK)
+    match /providerHealth/{doc} {
+      allow read: if true;
+      allow write: if false; // Only server can write via Admin SDK
+    }
+    
+    // Analytics/telemetry events: authenticated writes only, read only by owner or admin
+    match /telemetry/{eventId} {
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() 
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.timestamp is timestamp
+        && request.resource.data.keys().hasAll(['userId', 'eventType', 'timestamp']);
+      allow update, delete: if false; // Immutable once written
+    }
+    
+    // User portfolios: full CRUD for owner only
+    match /users/{userId}/portfolios/{portfolioId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) 
+        && request.resource.data.keys().hasAll(['name', 'createdAt'])
+        && request.resource.data.createdAt is timestamp
+        && withinRateLimit();
+      allow update: if isOwner(userId)
+        && request.resource.data.createdAt == resource.data.createdAt; // Can't change createdAt
+      allow delete: if isOwner(userId);
+    }
+    
+    // Root-level trades collection: owner only (using uid field)
+    match /trades/{tradeId} {
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() 
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasAll(['uid', 'ticker', 'type', 'qty', 'price', 'currency', 'date', 'mock', 'createdAt']);
+      allow update: if isAuthenticated() 
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid; // Can't change uid
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
+    }
+    
+    // Root-level watchlist collection: owner only (using uid field)
+    match /watchlist/{watchlistId} {
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() 
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasAll(['uid', 'symbol', 'name', 'createdAt', 'updatedAt']);
+      allow update: if isAuthenticated() 
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid; // Can't change uid
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
+    }
+    
+    // Watchlists: owner only
+    match /users/{userId}/watchlists/{watchlistId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.symbols is list
+        && request.resource.data.symbols.size() <= 50; // Limit watchlist size
+      allow update: if isOwner(userId)
+        && request.resource.data.symbols.size() <= 50;
+      allow delete: if isOwner(userId);
+    }
+    
+    // User preferences: owner only
+    match /users/{userId}/preferences/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Migrations metadata: read by all authenticated, write only by admin
+    match /migrations/{migrationId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Waitlist: allow unauthenticated users to create entries
+    match /waitlist/{waitlistId} {
+      allow create: if true; // Allow all creates for waitlist entries
+      allow read: if isAdmin(); // Only admins can read waitlist data
+      allow update, delete: if false; // Immutable once created
+    }
+    
+    // Rate limiting for waitlist: create/update by server
+    match /waitlist_rate_limit/{rateLimitId} {
+      allow read: if false; // No reads allowed
+      allow create, update: if true; // Allow server to manage rate limits
+    }
+    
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

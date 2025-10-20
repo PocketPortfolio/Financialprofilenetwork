@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Don’t waste crawl budget on APIs or service worker
+Disallow: /api/
+Disallow: /app/service-worker.js
+
+Sitemap: https://www.pocketportfolio.app/sitemap.xml

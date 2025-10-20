@@ -1,0 +1,425 @@
+/**
+ * Pocket Portfolio Design Tokens
+ * Evidence-first investing aesthetic: clean, precise, data-driven
+ */
+
+:root {
+  /* Color System - Dark (default) */
+  --bg: #0b0d10;
+  --surface: #111418;
+  --surface-elevated: #1a1e24;
+  --text: #e7eaf0;
+  --text-secondary: #9aa3ae;
+  --muted: #5a6572;
+  --border: #1c232b;
+  --border-subtle: #151921;
+  
+  /* Accent Colors */
+  --signal: #ff6b35; /* orange - growth, positive */
+  --signal-muted: #cc4a1a;
+  --warning: #f59e0b; /* amber - caution */
+  --warning-muted: #78350f;
+  --danger: #ef4444; /* red - loss, error */
+  --danger-muted: #7f1d1d;
+  --info: #0ea5e9; /* sky - informational */
+  --info-muted: #075985;
+  
+  /* Human-centered design additions for dark theme */
+  --warm-bg: #2d2a1a; /* Dark warm background with better contrast */
+  --accent-warm: #f59e0b; /* Warm accent color */
+  --text-warm: #fbbf24; /* Bright warm text for dark theme */
+  --border-warm: #f59e0b; /* Warm border color */
+  
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  /* Fluid Type Scale (mobile-first, scales up) */
+  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.813rem); /* 12-13px */
+  --font-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.938rem); /* 14-15px */
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.063rem); /* 16-17px */
+  --font-size-md: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem); /* 18-20px */
+  --font-size-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem); /* 20-24px */
+  --font-size-xl: clamp(1.5rem, 1.35rem + 0.75vw, 2rem); /* 24-32px */
+  --font-size-2xl: clamp(2rem, 1.75rem + 1.25vw, 2.75rem); /* 32-44px */
+  --font-size-3xl: clamp(2.5rem, 2rem + 2.5vw, 4rem); /* 40-64px */
+  
+  /* Line Heights */
+  --line-tight: 1.25;
+  --line-snug: 1.375;
+  --line-normal: 1.5;
+  --line-relaxed: 1.625;
+  
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  
+  /* Spacing Scale (8px base unit) */
+  --space-0: 0;
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem;  /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem;    /* 16px */
+  --space-5: 1.5rem;  /* 24px */
+  --space-6: 2rem;    /* 32px */
+  --space-8: 3rem;    /* 48px */
+  --space-10: 4rem;   /* 64px */
+  --space-12: 6rem;   /* 96px */
+  --space-16: 8rem;   /* 128px */
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;  /* 6px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1.25rem;   /* 20px */
+  --radius-xl: 1.5rem;    /* 24px */
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  
+  /* Z-Index Scale */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-overlay: 1200;
+  --z-modal: 1300;
+  --z-popover: 1400;
+  --z-toast: 1500;
+  
+  /* Transitions */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enterprise-grade theme transitions */
+.theme-transitioning * {
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .theme-transitioning * {
+    transition: none !important;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+  
+  /* Grid & Layout */
+  --container-max: 1280px;
+  --container-padding: var(--space-4);
+  --grid-gap: var(--space-4);
+}
+
+  /* Light Mode - Enhanced Human-Centered Design */
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #ffe6d1; /* Warm orange-tinted background for better contrast and accessibility */
+        --surface: #ffe6d1; /* Warm orange-tinted surface */
+        --surface-elevated: #ffffff; /* Pure white for elevated elements */
+        --text: #1a202c; /* Warmer dark text */
+        --text-secondary: #2d3748; /* Better contrast */
+        --muted: #4a5568; /* More readable */
+        --border: #e2e8f0;
+        --border-subtle: #f7fafc; /* Softer borders */
+        
+        /* Enhanced human-centered accents */
+        --signal: #ff6b35; /* More vibrant, accessible orange */
+        --signal-muted: #fed7aa; /* Softer orange background */
+        --warning: #d97706; /* More vibrant orange */
+        --warning-muted: #fef5e7; /* Cream background */
+        --danger: #dc2626; /* More vibrant red */
+        --danger-muted: #fed7d7; /* Soft red background */
+        --info: #2563eb; /* More vibrant blue */
+        --info-muted: #bee3f8; /* Soft blue background */
+    
+    /* Enhanced shadows with warmth */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px -1px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+    
+        /* Human-centered design additions */
+        --warm-bg: #fde68a; /* Much more visible warm background */
+        --accent-warm: #f59e0b; /* More vibrant warm accent color */
+        --text-warm: #92400e; /* More visible warm text color */
+        --border-warm: #f59e0b; /* Much more visible warm border */
+  }
+}
+
+/* Explicit Light Theme - Enhanced Human-Centered Design */
+[data-theme="light"] {
+  --bg: #ffe6d1; /* Warm orange-tinted background for better contrast and accessibility */
+  --surface: #ffe6d1; /* Warm orange-tinted surface */
+  --surface-elevated: #ffffff; /* Pure white for elevated elements */
+  --text: #1a202c; /* Warmer dark text */
+  --text-secondary: #2d3748; /* Better contrast */
+  --muted: #4a5568; /* More readable */
+  --border: #e2e8f0;
+  --border-subtle: #f7fafc; /* Softer borders */
+  
+        /* Enhanced human-centered accents */
+        --signal: #ff6b35; /* More vibrant, accessible orange */
+        --signal-muted: #fed7aa; /* Softer orange background */
+        --warning: #d97706; /* More vibrant orange */
+        --warning-muted: #fef5e7; /* Cream background */
+        --danger: #dc2626; /* More vibrant red */
+        --danger-muted: #fed7d7; /* Soft red background */
+        --info: #2563eb; /* More vibrant blue */
+        --info-muted: #bee3f8; /* Soft blue background */
+  
+  /* Enhanced shadows with warmth */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px -1px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -2px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -4px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.12);
+  
+        /* Human-centered design additions */
+        --warm-bg: #fde68a; /* Much more visible warm background */
+        --accent-warm: #f59e0b; /* More vibrant warm accent color */
+        --text-warm: #92400e; /* More visible warm text color */
+        --border-warm: #f59e0b; /* Much more visible warm border */
+}
+
+/* Explicit Dark Theme */
+[data-theme="dark"] {
+  --bg: #0b0d10;
+  --surface: #111418;
+  --surface-elevated: #1a1e24;
+  --text: #e7eaf0;
+  --text-secondary: #9aa3ae;
+  --muted: #5a6572;
+  --border: #1c232b;
+  --border-subtle: #151921;
+  
+  --signal: #ff6b35;
+  --signal-muted: #cc4a1a;
+  --warning: #f59e0b;
+  --warning-muted: #78350f;
+  --danger: #ef4444;
+  --danger-muted: #7f1d1d;
+  --info: #0ea5e9;
+  --info-muted: #075985;
+  
+  /* Human-centered design additions for dark theme */
+  --warm-bg: #2d2a1a; /* Dark warm background with better contrast */
+  --accent-warm: #f59e0b; /* Keep warm accent color */
+  --text-warm: #fbbf24; /* Bright warm text for dark theme */
+  --border-warm: #f59e0b; /* Keep warm border color */
+}
+
+/* High Contrast Mode */
+[data-theme="contrast"] {
+  --bg: #000000;
+  --surface: #0a0a0a;
+  --surface-elevated: #141414;
+  --text: #ffffff;
+  --text-secondary: #d1d5db;
+  --muted: #9ca3af;
+  --border: #374151;
+  --border-subtle: #1f2937;
+  
+  --signal: #22d3ee; /* brighter for contrast */
+  --signal-muted: #083344;
+  --warning: #fbbf24;
+  --warning-muted: #92400e;
+  --danger: #f87171;
+  --danger-muted: #991b1b;
+  --info: #38bdf8;
+  --info-muted: #0c4a6e;
+}
+
+/* Print Styles */
+@media print {
+  :root {
+    --bg: #faf8f5;
+    --surface: #fefcf9;
+    --text: #000000;
+    --text-secondary: #4b5563;
+    --border: #d1d5db;
+  }
+}
+
+/* Real-time animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+/* === ADDITIONAL DESIGN TOKENS === */
+:root {
+  /* === SPACING SCALE === */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 0.75rem;    /* 12px */
+  --space-lg: 1rem;       /* 16px */
+  --space-xl: 1.5rem;     /* 24px */
+  --space-2xl: 2rem;      /* 32px */
+  --space-3xl: 3rem;      /* 48px */
+  --space-4xl: 4rem;      /* 64px */
+
+  /* === TYPOGRAPHY SCALE === */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+
+  /* Mobile-specific typography */
+  --text-mobile-xs: 0.75rem;
+  --text-mobile-sm: 0.875rem;
+  --text-mobile-base: 1rem;
+  --text-mobile-lg: 1.125rem;
+  --text-mobile-xl: 1.25rem;
+  --text-mobile-2xl: 1.5rem;
+
+  /* === RADII === */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-full: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* === TOUCH TARGETS === */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --touch-target-large: 56px;
+
+  /* === BREAKPOINTS === */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  /* === SAFE AREAS (iOS) === */
+  --safe-area-top: env(safe-area-inset-top, 0);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0);
+  --safe-area-left: env(safe-area-inset-left, 0);
+  --safe-area-right: env(safe-area-inset-right, 0);
+
+  /* === Z-INDEX SCALE === */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+}
+
+/* === MOBILE-SPECIFIC OVERRIDES === */
+@media (max-width: 768px) {
+  :root {
+    /* Larger touch targets on mobile */
+    --touch-target-min: 48px;
+    --touch-target-comfortable: 52px;
+    --touch-target-large: 60px;
+    
+    /* Tighter spacing on mobile */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 0.75rem;
+    --space-lg: 1rem;
+    --space-xl: 1.25rem;
+    --space-2xl: 1.5rem;
+    --space-3xl: 2rem;
+    --space-4xl: 2.5rem;
+  }
+}
+
+/* === DARK MODE TOKENS === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* === UTILITY CLASSES === */
+.safe-area-top { padding-top: var(--safe-area-top); }
+.safe-area-bottom { padding-bottom: var(--safe-area-bottom); }
+.safe-area-left { padding-left: var(--safe-area-left); }
+.safe-area-right { padding-right: var(--safe-area-right); }
+.safe-area-all { 
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+.touch-target-comfortable {
+  min-height: var(--touch-target-comfortable);
+  min-width: var(--touch-target-comfortable);
+}
+
+.touch-target-large {
+  min-height: var(--touch-target-large);
+  min-width: var(--touch-target-large);
+}
+
+/* === RESPONSIVE UTILITIES === */
+@media (max-width: 768px) {
+  .mobile-hidden { display: none !important; }
+  .mobile-block { display: block !important; }
+  .mobile-flex { display: flex !important; }
+  .mobile-grid { display: grid !important; }
+}
+
+@media (min-width: 769px) {
+  .desktop-hidden { display: none !important; }
+  .desktop-block { display: block !important; }
+  .desktop-flex { display: flex !important; }
+  .desktop-grid { display: grid !important; }
+}
+

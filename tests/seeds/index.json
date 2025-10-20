@@ -1,0 +1,72 @@
+{
+  "trades": [
+    {
+      "id": "trade_1",
+      "userId": "test_user_123",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "price": 150.00,
+      "timestamp": "2024-01-01T10:00:00Z",
+      "currency": "USD",
+      "broker": "etoro",
+      "fees": 1.50
+    },
+    {
+      "id": "trade_2", 
+      "userId": "test_user_123",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "price": 155.00,
+      "timestamp": "2024-01-02T10:00:00Z",
+      "currency": "USD",
+      "broker": "etoro",
+      "fees": 1.00
+    },
+    {
+      "id": "trade_3",
+      "userId": "test_user_456",
+      "symbol": "TSLA",
+      "side": "BUY",
+      "quantity": 2,
+      "price": 200.00,
+      "timestamp": "2024-01-01T10:00:00Z",
+      "currency": "USD",
+      "broker": "coinbase",
+      "fees": 0.50
+    }
+  ],
+  "users": [
+    {
+      "uid": "test_user_123",
+      "email": "test@example.com",
+      "displayName": "Test User",
+      "photoURL": "https://example.com/photo.jpg",
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "uid": "test_user_456", 
+      "email": "test2@example.com",
+      "displayName": "Test User 2",
+      "photoURL": "https://example.com/photo2.jpg",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "waitlist": [
+    {
+      "id": "waitlist_1",
+      "email": "waitlist@example.com",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "source": "web:footer"
+    },
+    {
+      "id": "waitlist_2",
+      "email": "waitlist2@example.com", 
+      "createdAt": "2024-01-01T00:00:00Z",
+      "source": "web:landing"
+    }
+  ]
+}
+
+

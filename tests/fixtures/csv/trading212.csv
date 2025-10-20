@@ -1,0 +1,8 @@
+Action,Time,ISIN,Ticker,Name,No. of shares,Price / share,Currency (Price / share),Exchange rate,Result (USD),Total (USD),Withholding tax (USD),Charge amount (USD),Notes
+Market buy,2025-01-15 09:12:41,US0378331005,AAPL,Apple Inc.,10,180.00,USD,1.0000,1800.00,1800.00,0.00,0.00,
+Market buy,2025-01-15 09:14:22,US5949181045,MSFT,Microsoft Corporation,4,410.00,USD,1.0000,1640.00,1640.00,0.00,0.00,
+Market buy,2025-01-15 09:16:33,US9229087692,VOO,Vanguard S&P 500 ETF,5,480.00,USD,1.0000,2400.00,2400.00,0.00,0.00,
+Limit buy,2025-01-15 09:18:44,US02079K3059,GOOGL,Alphabet Inc. Class A,3,150.00,USD,1.0000,450.00,450.00,0.00,0.00,
+Market buy,2025-01-15 09:20:55,US88160R1014,TSLA,Tesla Inc.,2,250.00,USD,1.0000,500.00,500.00,0.00,0.00,
+Market sell,2025-01-15 09:22:66,US88160R1014,TSLA,Tesla Inc.,1,265.00,USD,1.0000,265.00,265.00,0.00,0.00,
+
