@@ -3,6 +3,8 @@ import { MetadataRoute } from 'next';
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://pocketportfolio.app';
   
+  // Force cache refresh - Updated 2025-10-20-11:45
+  
   // Ensure we have a valid base URL
   if (!baseUrl) {
     console.error('Invalid base URL for sitemap generation');
