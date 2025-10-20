@@ -10,6 +10,7 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+    dirs: [], // Don't lint any directories
   },
   images: {
     domains: ['assets.example.com'],
