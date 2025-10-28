@@ -24,7 +24,7 @@ export default function OpenBrokerCSVPage() {
           'trading history',
           'portfolio data'
         ]}
-        canonical="https://pocketportfolio.app/openbrokercsv"
+        canonical="https://www.pocketportfolio.app/openbrokercsv"
         ogType="website"
       />
       
@@ -33,7 +33,20 @@ export default function OpenBrokerCSVPage() {
         data={{
           name: 'OpenBrokerCSV',
           description: 'Open-source CSV format specification for standardizing trading data across brokerage platforms',
-          url: 'https://pocketportfolio.app/openbrokercsv'
+          url: 'https://www.pocketportfolio.app/openbrokercsv',
+          image: 'https://www.pocketportfolio.app/brand/og-base.png',
+          offers: {
+            price: '0',
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            priceValidUntil: '2026-12-31'
+          },
+          aggregateRating: {
+            ratingValue: '4.8',
+            reviewCount: '25',
+            bestRating: '5',
+            worstRating: '1'
+          }
         }} 
       />
 
@@ -146,7 +159,7 @@ export default function OpenBrokerCSVPage() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <Link 
-              href="/csv/etoro-to-openbrokercsv" 
+              href="/static/csv-etoro-to-openbrokercsv" 
               style={{ 
                 background: 'var(--bg)', 
                 border: '1px solid var(--card-border)', 

@@ -28,28 +28,28 @@ export const metadata: Metadata = brandEnabled
       title: 'Pocket Portfolio — Invest smarter, together',
       description: 'Pocket Portfolio is an open-source, community-led investing dashboard with live prices, profit/loss, mock trades, news, and simple trade import. Invest smarter, together.',
       robots: 'index,follow,max-image-preview:large',
-      openGraph: {
-        title: 'Pocket Portfolio — Invest smarter, together',
-        description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
-        url: 'https://www.pocketportfolio.app/',
-        siteName: 'Pocket Portfolio',
-        images: [
-          {
-            url: 'https://pocketportfolio.app/brand/og-base.png',
-            width: 1200,
-            height: 630,
-            alt: 'Pocket Portfolio app preview',
-          },
-        ],
-        locale: 'en_GB',
-        type: 'website',
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: 'Pocket Portfolio — Invest smarter, together',
-        description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
-        images: ['https://pocketportfolio.app/brand/og-base.png'],
-      },
+        openGraph: {
+          title: 'Pocket Portfolio — Invest smarter, together',
+          description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
+          url: 'https://www.pocketportfolio.app/',
+          siteName: 'Pocket Portfolio',
+          images: [
+            {
+              url: 'https://www.pocketportfolio.app/brand/og-base.png',
+              width: 1200,
+              height: 630,
+              alt: 'Pocket Portfolio app preview',
+            },
+          ],
+          locale: 'en_GB',
+          type: 'website',
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: 'Pocket Portfolio — Invest smarter, together',
+          description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
+          images: ['https://www.pocketportfolio.app/brand/og-base.png'],
+        },
     };
 
 export const viewport: Viewport = {

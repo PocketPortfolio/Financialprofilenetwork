@@ -146,3 +146,7 @@ export default function SymbolPage({ params }: SymbolPageProps) {
 export const revalidate = 300; // 5 minutes
 
 
+
+
+
+

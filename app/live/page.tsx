@@ -150,7 +150,7 @@ export default function LivePage() {
           'stock market data',
           'cryptocurrency prices'
         ]}
-        canonical="https://pocketportfolio.app/live"
+        canonical="https://www.pocketportfolio.app/live"
         ogImage="/brand/preview-live.svg"
         ogType="website"
       />
@@ -159,7 +159,7 @@ export default function LivePage() {
         type="WebApplication" 
         data={{
           name: 'Pocket Portfolio Live Market Data',
-          url: 'https://pocketportfolio.app/live',
+          url: 'https://www.pocketportfolio.app/live',
           applicationCategory: 'FinanceApplication',
           featureList: ['Real-time Stock Prices', 'Cryptocurrency Prices', 'Market Data', 'Live Updates']
         }} 

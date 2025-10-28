@@ -88,3 +88,7 @@ describe('freetrade adapter', () => {
 });
 
 
+
+
+
+

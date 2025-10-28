@@ -1,48 +1,47 @@
 import React from 'react';
 import Link from 'next/link';
-import Head from 'next/head';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Portfolio Tracker — Import CSVs, Live Prices & P/L | Pocket Portfolio',
+  description: 'Import broker CSVs, see real-time prices, and track performance. Works with stocks, ETFs, and crypto. Free, open-source portfolio tracker.',
+  keywords: 'portfolio tracker, CSV import, live stock prices, investment tracking, broker import, P&L calculator',
+  alternates: {
+    canonical: 'https://www.pocketportfolio.app/static/portfolio-tracker',
+  },
+  other: {
+    'application/ld+json': JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Pocket Portfolio Tracker",
+      "description": "Free, open-source portfolio tracker with CSV import, live prices, and P/L tracking",
+      "url": "https://www.pocketportfolio.app/static/portfolio-tracker",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "CSV import with automatic broker normalization",
+        "Live prices with staleness badge",
+        "FIFO / average cost with fees",
+        "Per-position breakdowns",
+        "News cards & Most Traded panel",
+        "PWA: offline app shell, no API caching"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "Pocket Portfolio"
+      }
+    })
+  }
+};
 
 export default function PortfolioTrackerPage() {
   return (
-    <>
-      <Head>
-        <title>Portfolio Tracker — Import CSVs, Live Prices & P/L | Pocket Portfolio</title>
-        <meta name="description" content="Import broker CSVs, see real-time prices, and track performance. Works with stocks, ETFs, and crypto. Free, open-source portfolio tracker." />
-        <meta name="keywords" content="portfolio tracker, CSV import, live stock prices, investment tracking, broker import, P&L calculator" />
-        <link rel="canonical" href="https://pocketportfolio.app/static/portfolio-tracker" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              "name": "Pocket Portfolio Tracker",
-              "description": "Free, open-source portfolio tracker with CSV import, live prices, and P/L tracking",
-              "url": "https://pocketportfolio.app/static/portfolio-tracker",
-              "applicationCategory": "FinanceApplication",
-              "operatingSystem": "Web",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-              },
-              "featureList": [
-                "CSV import with automatic broker normalization",
-                "Live prices with staleness badge",
-                "FIFO / average cost with fees",
-                "Per-position breakdowns",
-                "News cards & Most Traded panel",
-                "PWA: offline app shell, no API caching"
-              ],
-              "author": {
-                "@type": "Organization",
-                "name": "Pocket Portfolio"
-              }
-            })
-          }}
-        />
-      </Head>
-      <div style={{ maxWidth: '980px', margin: '2rem auto', padding: '0 1rem' }}>
+    <div style={{ maxWidth: '980px', margin: '2rem auto', padding: '0 1rem' }}>
       <header style={{
         display: 'flex',
         alignItems: 'center',
@@ -107,7 +106,7 @@ export default function PortfolioTrackerPage() {
             }}>
               Open the App
             </Link>
-            <Link href="/static/openbrokercsv" style={{
+            <Link href="/openbrokercsv" style={{
               padding: '12px 24px',
               border: '1px solid var(--card-border)',
               borderRadius: '8px',
@@ -168,7 +167,6 @@ export default function PortfolioTrackerPage() {
           </details>
         </section>
       </main>
-      </div>
-    </>
+    </div>
   );
 }

@@ -193,7 +193,7 @@ export async function generateMetadata({ params }: BrokerPageProps): Promise<Met
       images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
     },
     alternates: {
-      canonical: `https://pocketportfolio.app/import/${params.broker}`,
+      canonical: `https://www.pocketportfolio.app/import/${params.broker}`,
     },
   };
 }
@@ -221,38 +221,38 @@ export default async function BrokerImportPage({ params }: BrokerPageProps) {
     tool: {
       '@type': 'SoftwareApplication',
       name: 'Pocket Portfolio',
-      url: 'https://pocketportfolio.app'
+      url: 'https://www.pocketportfolio.app'
     },
     step: [
       {
         '@type': 'HowToStep',
         name: 'Export Your Data',
         text: `Log into your ${config.displayName} account and export your trading history or account statement as a CSV file.`,
-        url: `https://pocketportfolio.app/import/${broker}#step1`
+        url: `https://www.pocketportfolio.app/import/${broker}#step1`
       },
       {
         '@type': 'HowToStep',
         name: 'Verify Required Columns',
         text: `Ensure your CSV contains the required columns: ${config.requiredColumns.join(', ')}.`,
-        url: `https://pocketportfolio.app/import/${broker}#step2`
+        url: `https://www.pocketportfolio.app/import/${broker}#step2`
       },
       {
         '@type': 'HowToStep',
         name: 'Sign In to Pocket Portfolio',
         text: 'Sign in to Pocket Portfolio using your Google account to access the CSV import feature.',
-        url: `https://pocketportfolio.app/import/${broker}#step3`
+        url: `https://www.pocketportfolio.app/import/${broker}#step3`
       },
       {
         '@type': 'HowToStep',
         name: 'Upload Your CSV',
         text: 'Navigate to the dashboard and use the CSV import feature to upload your exported data.',
-        url: `https://pocketportfolio.app/import/${broker}#step4`
+        url: `https://www.pocketportfolio.app/import/${broker}#step4`
       },
       {
         '@type': 'HowToStep',
         name: 'Verify Import',
         text: 'Review your imported trades and positions to ensure everything looks correct.',
-        url: `https://pocketportfolio.app/import/${broker}#step5`
+        url: `https://www.pocketportfolio.app/import/${broker}#step5`
       }
     ]
   };
@@ -707,5 +707,9 @@ export default async function BrokerImportPage({ params }: BrokerPageProps) {
 
 // ISR configuration
 export const revalidate = 86400; // 24 hours
+
+
+
+
 
 
