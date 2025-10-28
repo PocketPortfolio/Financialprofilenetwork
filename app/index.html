@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pocket Portfolio</title>
+  <meta name="description" content="Pocket Portfolio — import broker CSVs, see live prices, and track P/L across stocks and crypto. Supports OpenBrokerCSV standard.">
+  <link rel="canonical" href="/app/">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/app/manifest.webmanifest">
+  <link rel="icon" href="/icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="theme-color" content="#0b1220">
+
+  <!-- Styles -->
+  <!-- index.html (in /app) -->
+<link rel="stylesheet" href="/app/style.css?v=2025-01-15-1">
+
+
+  <!-- (Optional) Tailwind for the app shell only if you really need it here -->
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+</head>
+<body>
+  <!-- ===== Nav ===== -->
+  <header class="pp-nav" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%); border-bottom: 1px solid rgba(255, 107, 53, 0.1); box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 107, 53, 0.05);">
+    <div class="pp-nav-inner">
+      <a href="/" class="pp-brand" aria-label="Pocket Portfolio — Home">
+        <picture>
+          <source srcset="/brand/pp-monogram.svg" type="image/svg+xml" />
+          <img src="/icon-192.png" alt="Pocket Portfolio" class="pp-logo" width="32" height="32" fetchpriority="high" />
+        </picture>
+        <img src="/brand/pp-wordmark.svg" alt="Pocket Portfolio" class="pp-wordmark" width="156" height="20" loading="eager" decoding="async" />
+      </a>
+
+      <nav class="pp-links" aria-label="Primary tabs">
+        <button class="pp-tab active" data-tab="dashboard" aria-selected="true" style="background: linear-gradient(135deg, #ff6b35 0%, #f59e0b 100%); border: 1px solid rgba(255, 107, 53, 0.3); color: #fff; font-weight: 600; box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transform: scale(1.02); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">Dashboard</button>
+        <button class="pp-tab" data-tab="live" aria-selected="false" style="border: 1px solid rgba(255, 107, 53, 0.2); background: rgba(255, 107, 53, 0.05); color: rgba(15, 23, 42, 0.8);">Live</button>
+      </nav>
+
+      <div class="pp-actions">
+        <label for="themeSelApp" class="sr-only">Theme</label>
+        <select id="themeSelApp" class="btn" title="Theme" style="border: 1px solid rgba(255, 107, 53, 0.2); background: rgba(255, 107, 53, 0.05); color: rgba(15, 23, 42, 0.8);">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="contrast">High contrast</option>
+        </select>
+
+        <div id="auth">
+          <button id="sign-in" class="btn primary" style="background: linear-gradient(135deg, #ff6b35 0%, #f59e0b 100%); border: 1px solid rgba(255, 107, 53, 0.3); color: #fff; box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);">Sign in with Google</button>
+        </div>
+
+        <div id="profile" class="hidden" aria-live="polite">
+          <span id="user-email" class="email"></span>
+          <button id="sign-out" class="btn">Sign out from Google</button>
+          <button id="delete-account" class="btn danger">Delete account</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main ===== -->
+  <main class="pp-main">
+    <section class="metrics">
+      <div class="metric-card">Total Invested: <span id="invested">0</span></div>
+      <div class="metric-card">Trades: <span id="trade-count">0</span></div>
+      <div class="metric-card">Positions: <span id="positions-count">0</span></div>
+      <div class="metric-card">P/L (Unrealised): <span id="pl-amount">—</span> <small id="pl-percent" class="muted"></small></div>
+    </section>
+
+    <div id="dashboard">
+      <!-- ===== Price Pipeline Health (NEW) ===== -->
+      <section class="card" id="health-card" aria-live="polite">
+        <h2 class="card-title">Price Pipeline Health</h2>
+        <div id="health-body">
+          <span class="muted">Loading…</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Add trade</h2>
+        <form id="trade-form" autocomplete="off" spellcheck="false">
+          <input type="date" id="date" required />
+          <input type="text" id="ticker" placeholder="Search stocks or crypto…" list="ticker-suggestions" required />
+          <datalist id="ticker-suggestions"></datalist>
+
+          <select id="kind" aria-label="Asset kind">
+            <option value="stock">Stock</option>
+            <option value="crypto">Crypto</option>
+          </select>
+          <select id="ccy" aria-label="Trade currency">
+            <option>USD</option><option>GBP</option><option>EUR</option>
+          </select>
+
+          <input type="number" id="quantity" placeholder="Qty" step="any" inputmode="decimal" required />
+          <input type="number" id="price" placeholder="Price" step="any" inputmode="decimal" required />
+          <label class="inline"><input type="checkbox" id="mock" /> Mock trade</label>
+
+          <button type="submit" class="btn primary">Add trade</button>
+
+          <div class="csv">
+            <strong>Import CSV</strong>
+            <input type="file" id="csv-file" accept=".csv" />
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Trades</h2>
+        <div class="table-wrap">
+          <table id="trades-table" class="data-table">
+            <thead><tr><th>Date</th><th>Ticker</th><th>Qty</th><th>Price</th><th>Mock</th><th>Delete</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">
+          Portfolio Breakdown
+          <select id="chart-type" style="margin-left:8px;">
+            <option value="pie" selected>Pie</option>
+            <option value="line">Line</option>
+          </select>
+        </h2>
+        <canvas id="asset-chart" width="400" height="400" aria-label="Portfolio chart"></canvas>
+        <p id="chart-note" class="muted" style="margin:.5rem 0 0;"></p>
+      </section>
+
+      <section class="card" id="positions" aria-live="polite"></section>
+
+      <section class="card" id="news">
+        <h2 class="card-title">News</h2>
+        <div id="news-cards" class="news-grid"></div>
+      </section>
+    </div>
+
+    <section id="live" style="display:none;">
+      <section class="card">
+        <h2 class="card-title">Live Prices</h2>
+        <div class="table-wrap">
+          <table id="live-table" class="data-table">
+            <colgroup><col style="width:40%"><col style="width:30%"><col style="width:30%"></colgroup>
+            <thead><tr><th>Ticker</th><th>Price</th><th>Change</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title" style="display:flex;align-items:center;gap:8px;">Most Traded Today <span class="muted">(US)</span></h2>
+        <div class="table-wrap">
+          <table id="most-traded-table" class="data-table">
+            <colgroup><col style="width:6%"><col style="width:24%"><col style="width:20%"><col style="width:18%"><col style="width:16%"><col style="width:16%"></colgroup>
+            <thead><tr><th>#</th><th>Ticker</th><th>Price</th><th>Change</th><th>Volume</th><th>Market Cap</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- ===== Footer (internal SEO links + community) ===== -->
+  <footer class="pp-footer" style="margin:40px 0 20px;">
+    <div class="pp-nav-inner" style="display:flex;flex-direction:column;gap:16px;align-items:center;justify-content:center;">
+      <!-- Internal Links -->
+      <nav aria-label="Helpful links" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+        <!-- Default to static pages; script below upgrades to pretty URLs if available -->
+        <a id="link-openbrokercsv" class="btn" href="/app/static/openbrokercsv" aria-label="OpenBrokerCSV">OpenBrokerCSV</a>
+        <a id="link-tracker" class="btn" href="/app/static/portfolio-tracker" aria-label="Portfolio Tracker">Portfolio Tracker</a>
+        <a id="link-etoro" class="btn" href="/app/static/csv-etoro-to-openbrokercsv" aria-label="eToro to OpenBrokerCSV Converter">eToro → OpenBrokerCSV</a>
+      </nav>
+      
+      <!-- Community & Developer Content -->
+      <nav aria-label="Community links" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+        <a class="btn" href="https://dev.to/pocketportfolioapp" target="_blank" rel="noopener noreferrer" aria-label="Pocket Portfolio on dev.to" style="border-color: rgba(59, 73, 223, 0.3); background: rgba(59, 73, 223, 0.05);">
+          <svg width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="currentColor"><path d="M7.42 10.05c-.18-.16-.46-.23-.84-.23H6l.02 2.44.04 2.45.56-.02c.41 0 .63-.07.83-.26.24-.24.26-.36.26-2.2 0-1.91-.02-1.96-.29-2.18zM0 4.94v14.12h24V4.94H0zM8.56 15.3c-.44.58-1.06.77-2.53.77H4.71V8.53h1.4c1.67 0 2.16.18 2.6.9.27.43.29.6.32 2.57.05 2.23-.02 2.73-.47 3.3zm5.09-5.47h-2.47v1.77h1.52v1.28l-.72.04-.75.03v1.77l1.22.03 1.2.04v1.28h-1.6c-1.53 0-1.6-.01-1.87-.3l-.3-.28v-3.16c0-3.02.01-3.18.25-3.48.23-.31.25-.31 1.88-.31h1.64v1.3zm4.68 5.45c-.17.43-.64.79-1 .79-.18 0-.45-.15-.67-.39-.32-.32-.45-.63-.82-2.08l-.9-3.39-.45-1.67h.76c.4 0 .75.02.75.05 0 .06 1.16 4.54 1.26 4.83.04.15.32-.7.73-2.3l.66-2.52.74-.04c.4-.02.73 0 .73.04 0 .14-1.67 6.38-1.8 6.68z"/></svg>
+          Dev.to Articles
+        </a>
+        <a class="btn" href="https://coderlegion.com/5738/welcome-to-coderlegion-22s" target="_blank" rel="noopener noreferrer" aria-label="Pocket Portfolio on CoderLegion" style="border-color: rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.05);">
+          <svg width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+          CoderLegion Posts
+        </a>
+        <a class="btn" href="https://github.com/pocket-portfolio" target="_blank" rel="noopener noreferrer" aria-label="Pocket Portfolio on GitHub" style="border-color: rgba(88, 166, 255, 0.3); background: rgba(88, 166, 255, 0.05);">
+          <svg width="16" height="16" style="display:inline-block;vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+          GitHub
+        </a>
+      </nav>
+      
+      <!-- Copyright & Legal -->
+      <div style="font-size:12px;color:rgba(100,100,100,0.7);text-align:center;">
+        <p style="margin:0;">© 2024 Pocket Portfolio. Built with ❤️ by the developer community.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js" crossorigin="anonymous"></script>
+
+  <!-- libs -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+
+  <!-- Theme controller -->
+  <script>
+    (function(){
+      const KEY = 'pp-theme';
+      const meta = document.querySelector('meta[name="theme-color"]');
+      const prefersDark = matchMedia('(prefers-color-scheme: dark)');
+      const sel = document.getElementById('themeSelApp');
+      function sys(){ return prefersDark.matches ? 'dark' : 'light'; }
+      function setTheme(mode){
+        const t = mode === 'system' ? sys() : mode;
+        document.documentElement.setAttribute('data-theme', t);
+        if (meta) meta.content = getComputedStyle(document.documentElement)
+          .getPropertyValue('--chrome').trim() || (t==='light'?'#ffffff':'#0b1220');
+        localStorage.setItem(KEY, mode);
+      }
+      const saved = localStorage.getItem(KEY) || 'system';
+      if (sel) sel.value = saved;
+      setTheme(saved);
+      sel?.addEventListener('change', e => setTheme(e.target.value));
+      prefersDark.addEventListener?.('change', () => {
+        if ((localStorage.getItem(KEY)||'system')==='system') setTheme('system');
+      });
+    })();
+  </script>
+
+  <!-- App logic -->
+  <script type="module" src="/app/app.js?v=9"></script>
+
+  <!-- Upgrade footer links to pretty URLs if rewrites exist -->
+  <script>
+    (function(){
+      const upgrades = [
+        { id: 'link-openbrokercsv', pretty: '/openbrokercsv' },
+        { id: 'link-tracker',       pretty: '/portfolio-tracker' },
+        { id: 'link-etoro',         pretty: '/csv/etoro-to-openbrokercsv' }
+      ];
+      upgrades.forEach(async ({id, pretty}) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        try {
+          const res = await fetch(pretty, { method: 'HEAD' });
+          if (res.ok) el.href = pretty;
+        } catch { /* keep fallback href */ }
+      });
+    })();
+  </script>
+
+  <!-- SW register (prod only) -->
+<script>
+  if ('serviceWorker' in navigator &&
+      location.hostname !== 'localhost' &&
+      location.hostname !== '127.0.0.1') {
+    navigator.serviceWorker.register('/app/service-worker.js?sw=9').catch(()=>{});
+  }
+</script>
+</body>
+</html>

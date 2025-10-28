@@ -1,8 +1,3 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/health-price/route": "app/api/health-price/route.js",
-  "/api/most-traded/route": "app/api/most-traded/route.js",
-  "/api/news/route": "app/api/news/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/quote/route": "app/api/quote/route.js"
+  "/api/health-price/route": "app/api/health-price/route.js"
 }

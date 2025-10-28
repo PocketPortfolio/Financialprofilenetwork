@@ -1583,7 +1583,7 @@ export default function LandingPage() {
             }}>
               Portfolio Tracker
             </Link>
-            <Link href="/csv/etoro-to-openbrokercsv" style={{ 
+            <Link href="/static/csv-etoro-to-openbrokercsv" style={{ 
               padding: '12px 24px', 
               border: '1px solid var(--card-border)', 
               borderRadius: '8px', 

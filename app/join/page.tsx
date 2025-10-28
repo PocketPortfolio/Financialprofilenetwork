@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Head from 'next/head';
 import Link from 'next/link';
 import Logo from '../components/Logo';
 import ThemeSwitcher from '../components/ThemeSwitcher';
@@ -41,7 +40,7 @@ function JoinWaitlistContent() {
           'product updates',
           'financial technology'
         ]}
-        canonical="https://pocketportfolio.app/join"
+        canonical="https://www.pocketportfolio.app/join"
         ogImage="/brand/og-base.png"
         ogType="website"
       />

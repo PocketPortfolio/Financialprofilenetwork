@@ -19,8 +19,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           ...baseData,
           '@type': 'Organization',
           name: 'Pocket Portfolio',
-          url: 'https://pocketportfolio.app',
-          logo: 'https://pocketportfolio.app/brand/pp-wordmark.svg',
+          url: 'https://www.pocketportfolio.app',
+          logo: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
           description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
           sameAs: [
             'https://github.com/pocketportfolio',
@@ -29,7 +29,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           contactPoint: {
             '@type': 'ContactPoint',
             contactType: 'Customer Service',
-            url: 'https://pocketportfolio.app'
+            url: 'https://www.pocketportfolio.app'
           }
         };
 
@@ -38,11 +38,11 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           ...baseData,
           '@type': 'WebSite',
           name: 'Pocket Portfolio',
-          url: 'https://pocketportfolio.app',
+          url: 'https://www.pocketportfolio.app',
           description: 'Open-source, community-led investing dashboard',
           potentialAction: {
             '@type': 'SearchAction',
-            target: 'https://pocketportfolio.app/search?q={search_term_string}',
+            target: 'https://www.pocketportfolio.app/search?q={search_term_string}',
             'query-input': 'required name=search_term_string'
           }
         };
@@ -52,7 +52,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           ...baseData,
           '@type': 'WebApplication',
           name: 'Pocket Portfolio',
-          url: 'https://pocketportfolio.app',
+          url: 'https://www.pocketportfolio.app',
           applicationCategory: 'FinanceApplication',
           operatingSystem: 'Web Browser',
           offers: {
@@ -103,7 +103,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             name: 'Pocket Portfolio',
             logo: {
               '@type': 'ImageObject',
-              url: 'https://pocketportfolio.app/brand/pp-wordmark.svg'
+              url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
             }
           },
           datePublished: data.datePublished || new Date().toISOString(),
@@ -142,8 +142,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
 // Predefined structured data for common pages
 export const organizationData = {
   name: 'Pocket Portfolio',
-  url: 'https://pocketportfolio.app',
-  logo: 'https://pocketportfolio.app/brand/pp-wordmark.svg',
+  url: 'https://www.pocketportfolio.app',
+  logo: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
   description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
   sameAs: [
     'https://github.com/pocketportfolio',
@@ -153,18 +153,18 @@ export const organizationData = {
 
 export const websiteData = {
   name: 'Pocket Portfolio',
-  url: 'https://pocketportfolio.app',
+  url: 'https://www.pocketportfolio.app',
   description: 'Open-source, community-led investing dashboard',
   potentialAction: {
     '@type': 'SearchAction',
-    target: 'https://pocketportfolio.app/search?q={search_term_string}',
+    target: 'https://www.pocketportfolio.app/search?q={search_term_string}',
     'query-input': 'required name=search_term_string'
   }
 };
 
 export const webAppData = {
   name: 'Pocket Portfolio',
-  url: 'https://pocketportfolio.app',
+  url: 'https://www.pocketportfolio.app',
   applicationCategory: 'FinanceApplication',
   operatingSystem: 'Web Browser',
   offers: {

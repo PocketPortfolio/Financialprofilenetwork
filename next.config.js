@@ -17,9 +17,35 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
-  // Redirects for legacy routes
+  // Comprehensive redirects for canonicalization and legacy routes
   async redirects() {
     return [
+      // HTTP to HTTPS redirects (force HTTPS)
+      {
+        source: '/:path*',
+        destination: 'https://www.pocketportfolio.app/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: 'http',
+          },
+        ],
+      },
+      // Non-www to www redirects (canonical domain)
+      {
+        source: '/:path*',
+        destination: 'https://www.pocketportfolio.app/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'host',
+            value: 'pocketportfolio.app',
+          },
+        ],
+      },
+      // Legacy route redirects
       {
         source: '/portfolio-tracker',
         destination: '/static/portfolio-tracker',
@@ -28,6 +54,18 @@ const nextConfig = {
       {
         source: '/app',
         destination: '/dashboard',
+        permanent: true,
+      },
+      // Static file path normalization
+      {
+        source: '/app/static/:path*',
+        destination: '/static/:path*',
+        permanent: true,
+      },
+      // Remove .html extensions for cleaner URLs
+      {
+        source: '/static/:path*.html',
+        destination: '/static/:path*',
         permanent: true,
       },
     ];
@@ -83,6 +121,14 @@ const nextConfig = {
         ],
       },
     ];
+  },
+  // Windows-specific webpack configuration to prevent runtime errors
+  webpack: (config, { dev, isServer }) => {
+    if (dev && process.platform === 'win32') {
+      // Disable webpack caching on Windows to prevent corruption
+      config.cache = false;
+    }
+    return config;
   },
 };
 
