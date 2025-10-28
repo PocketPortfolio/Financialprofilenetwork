@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Skip middleware entirely for sitemap and robots to avoid CSP issues
+  if (request.nextUrl.pathname === '/sitemap.xml' || request.nextUrl.pathname === '/robots.txt') {
+    return NextResponse.next();
+  }
+  
   const res = NextResponse.next();
   
   // Skip security headers in development to avoid CSP issues with Next.js dev server
@@ -45,7 +50,7 @@ export const config = {
      * - sitemap.xml (sitemap file)
      * - robots.txt (robots file)
      */
-    '/((?!_next/static|_next/image|favicon.ico|brand|public|api|sitemap.xml|robots.txt).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|sitemap\\.xml|robots\\.txt).*)',
   ],
 };
 
