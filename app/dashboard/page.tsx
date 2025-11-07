@@ -243,7 +243,7 @@ export default function Dashboard() {
   // Get current prices and calculate P&L
   Object.values(positions).forEach(position => {
     const quote = quotesData?.[position.ticker];
-    if (quote && typeof quote === 'object' && 'price' in quote && quote.price > 0) {
+    if (quote && typeof quote === 'object' && 'price' in quote && quote.price !== null && quote.price !== undefined && quote.price > 0) {
       // Convert GBp (pence) to GBP (pounds) for UK stocks
       if (quote.currency === 'GBp') {
         position.currentPrice = quote.price / 100; // Convert pence to pounds
@@ -1367,7 +1367,7 @@ export default function Dashboard() {
           
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
             <a 
-              href="https://github.com/pocketportfolio" 
+              href="https://github.com/PocketPortfolio/Financialprofilenetwork" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
