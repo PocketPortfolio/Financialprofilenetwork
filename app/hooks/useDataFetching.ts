@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 interface Quote {
   symbol: string;
   name: string;
-  price: number;
-  change: number;
-  changePct: number;
+  price: number | null;
+  change: number | null;
+  changePct: number | null;
   currency: string;
   source: string;
 }
