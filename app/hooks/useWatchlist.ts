@@ -4,9 +4,9 @@ import { WatchlistService, WatchlistItem } from '../services/watchlistService';
 import { useQuotes } from './useDataFetching';
 
 interface WatchlistItemWithPrice extends WatchlistItem {
-  price?: number;
-  change?: number;
-  changePercent?: number;
+  price?: number | null;
+  change?: number | null;
+  changePercent?: number | null;
   currency?: string;
   lastUpdated?: string;
 }
