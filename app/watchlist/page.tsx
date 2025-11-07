@@ -432,7 +432,7 @@ export default function WatchlistPage() {
                 </div>
                 
                 <div style={{ fontWeight: '600' }}>
-                  {item.price !== undefined ? (
+                  {item.price !== undefined && item.price !== null ? (
                     <>
                       {item.currency === 'GBP' ? '£' : '$'}{item.price.toFixed(2)}
                     </>
@@ -442,10 +442,10 @@ export default function WatchlistPage() {
                 </div>
                 
                 <div style={{ 
-                  color: item.change !== undefined ? (item.change >= 0 ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)',
+                  color: item.change !== undefined && item.change !== null ? (item.change >= 0 ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)',
                   fontWeight: '600'
                 }}>
-                  {item.change !== undefined ? (
+                  {item.change !== undefined && item.change !== null ? (
                     <>
                       {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}
                     </>
@@ -455,10 +455,10 @@ export default function WatchlistPage() {
                 </div>
                 
                 <div style={{ 
-                  color: item.changePercent !== undefined ? (item.changePercent >= 0 ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)',
+                  color: item.changePercent !== undefined && item.changePercent !== null ? (item.changePercent >= 0 ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)',
                   fontWeight: '600'
                 }}>
-                  {item.changePercent !== undefined ? (
+                  {item.changePercent !== undefined && item.changePercent !== null ? (
                     <>
                       {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
                     </>

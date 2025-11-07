@@ -397,14 +397,20 @@ export default function LivePage() {
                       ${item.price > 0 ? item.price.toFixed(2) : 'N/A'}
                     </div>
                     <div style={{ 
-                      color: item.change >= 0 ? '#10b981' : '#ef4444', 
+                      color: item.change !== null && item.change !== undefined && item.change >= 0 ? '#10b981' : '#ef4444', 
                       fontSize: '14px',
                       fontWeight: '600',
                       padding: '2px 8px',
                       borderRadius: '6px',
-                      background: item.change >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'
+                      background: item.change !== null && item.change !== undefined && item.change >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'
                     }}>
-                      {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)} ({item.change >= 0 ? '+' : ''}{item.changePct.toFixed(2)}%)
+                      {item.change !== null && item.change !== undefined ? (
+                        <>
+                          {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)} ({item.change >= 0 ? '+' : ''}{item.changePct !== null && item.changePct !== undefined ? item.changePct.toFixed(2) : 'N/A'}%)
+                        </>
+                      ) : (
+                        'N/A'
+                      )}
                     </div>
                   </div>
                 </div>
@@ -485,10 +491,10 @@ export default function LivePage() {
                         </a>
                       </td>
                       <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: 'var(--text)' }}>
-                        ${item.price ? item.price.toFixed(2) : 'N/A'}
+                        ${item.price !== null && item.price !== undefined ? item.price.toFixed(2) : 'N/A'}
                       </td>
-                      <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: item.changePct >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
-                        {item.changePct ? `${item.changePct >= 0 ? '+' : ''}${item.changePct.toFixed(2)}%` : 'N/A'}
+                      <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: item.changePct !== null && item.changePct !== undefined && item.changePct >= 0 ? 'var(--pos)' : 'var(--neg)' }}>
+                        {item.changePct !== null && item.changePct !== undefined ? `${item.changePct >= 0 ? '+' : ''}${item.changePct.toFixed(2)}%` : 'N/A'}
                       </td>
                       <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: 'var(--text)' }}>
                         {item.volume ? `${(item.volume / 1000000).toFixed(1)}M` : 'N/A'}

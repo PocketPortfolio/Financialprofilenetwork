@@ -77,12 +77,12 @@ export function useWatchlist() {
     if (quotesData && watchlist.length > 0) {
       const updatedWatchlist = watchlist.map(item => {
         const quote = quotesData[item.symbol];
-        if (quote && quote.price !== undefined) {
+        if (quote && quote.price !== undefined && quote.price !== null) {
           return {
             ...item,
             price: quote.price,
-            change: quote.change,
-            changePercent: quote.changePct,
+            change: quote.change ?? null,
+            changePercent: quote.changePct ?? null,
             currency: quote.currency,
             lastUpdated: new Date().toISOString()
           };
