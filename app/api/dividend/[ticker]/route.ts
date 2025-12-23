@@ -571,9 +571,11 @@ async function fetchFromYahooFinance(ticker: string): Promise<DividendData | nul
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { ticker: string } }
+  { params }: { params: Promise<{ ticker: string }> | { ticker: string } }
 ) {
-  const ticker = params.ticker.toUpperCase();
+  // Handle both Next.js 14 (Promise) and Next.js 13 (direct) params
+  const resolvedParams = 'then' in params ? await params : params;
+  const ticker = resolvedParams.ticker.toUpperCase();
   console.log(`[Dividend API] Request received for ${ticker}`);
   console.log(`[Dividend API] EODHD_API_KEY configured: ${EODHD_API_KEY ? 'YES (' + EODHD_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
   console.log(`[Dividend API] ALPHA_VANTAGE_API_KEY configured: ${ALPHA_VANTAGE_API_KEY ? 'YES (' + ALPHA_VANTAGE_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
