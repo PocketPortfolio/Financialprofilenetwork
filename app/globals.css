@@ -27,6 +27,8 @@ body {
   -ms-user-select: none;
   user-select: none;
   overflow-x: hidden;
+  /* Instant transition for theme changes - no delay for immediate visual feedback */
+  transition: background-color 0s ease, color 0s ease;
 }
 
 /* Re-enable text selection for inputs and content areas */
@@ -39,6 +41,16 @@ input, textarea, [contenteditable] {
 
 a {
   color: var(--signal);
+}
+
+/* Pulse animation for WebOne badge */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .glass {
@@ -86,6 +98,181 @@ a {
   --card-border: var(--card-border-on-dark);
 }
 
+/* ============================================
+   INSTITUTIONAL-GRADE WORDMARK
+   "Owned" brand typography - Financial Infrastructure
+   ============================================ */
+.brand-wordmark {
+  font-family: 'Inter', var(--font-sans);
+  font-weight: 700; /* Bold/Premium */
+  font-size: 1.5rem; /* 24px - Prominent */
+  letter-spacing: -0.04em; /* The "Expensive" Squeeze */
+  color: #0F172A; /* Obsidian - Slate 900 */
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle glass effect */
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Default - Obsidian for light backgrounds (most common on marketing pages) */
+.brand-wordmark {
+  color: #0F172A; /* Obsidian - High contrast on light backgrounds */
+}
+
+/* Light theme - Obsidian text */
+[data-theme="light"] .brand-wordmark {
+  color: #0F172A; /* Obsidian for light backgrounds */
+}
+
+/* Dark theme - Light text */
+[data-theme="dark"] .brand-wordmark {
+  color: #F8FAFC; /* Slate-50 - Light text for dark backgrounds */
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3); /* Stronger shadow for dark mode */
+}
+
+/* The teal dot accent - connects to logo icon */
+.brand-wordmark-dot {
+  color: #06B6D4; /* Cyan-500 - matches logo icon teal */
+}
+
+/* Responsive sizing for smaller contexts */
+.brand-wordmark-small {
+  font-size: 1.25rem; /* 20px */
+  letter-spacing: -0.03em;
+}
+
+.brand-wordmark-large {
+  font-size: 2rem; /* 32px */
+  letter-spacing: -0.05em;
+}
+
+/* ============================================
+   PREMIUM THEMES (Founder & Corporate)
+   Respects light/dark mode via data-theme attribute
+   ============================================ */
+
+/* Royal Founder Theme - Light Variant */
+[data-theme="light"] body.theme-founder,
+[data-theme="light"] html.theme-founder body {
+  --bg: #F8FAFC; /* Light Slate-50 */
+  --surface: #F1F5F9; /* Light Slate-100 */
+  --surface-elevated: #E2E8F0; /* Light Slate-200 */
+  --text: #0F172A; /* Dark Slate-900 */
+  --text-secondary: #475569; /* Slate-600 */
+  --muted: #64748B; /* Slate-500 */
+  --border: #CBD5E1; /* Slate-300 */
+  --border-subtle: #E2E8F0; /* Slate-200 */
+  
+  /* Gold/Amber Accents (more vibrant for light mode) */
+  --signal: #B45309; /* Amber-700 (Darker gold for contrast) */
+  --signal-muted: #92400E; /* Amber-800 */
+  --accent-warm: #D97706; /* Amber-600 */
+  --text-warm: #B45309; /* Amber-700 for better contrast */
+  --border-warm: #D97706; /* Amber-600 */
+  
+  background-color: var(--bg);
+  color: var(--text);
+  /* Instant transition for theme changes - no delay for immediate visual feedback */
+  transition: background-color 0s ease, color 0s ease;
+}
+
+/* Royal Founder Theme - Dark Variant (Default) */
+[data-theme="dark"] body.theme-founder,
+body.theme-founder,
+html.theme-founder body {
+  --bg: #0F172A; /* Deep Midnight Blue */
+  --surface: #1E293B; /* Slate-800 */
+  --surface-elevated: #334155; /* Slate-700 */
+  --text: #F8FAFC; /* Slate-50 */
+  --text-secondary: #CBD5E1; /* Slate-300 */
+  --muted: #94A3B8; /* Slate-400 */
+  --border: #475569; /* Slate-600 */
+  --border-subtle: #334155; /* Slate-700 */
+  
+  /* Gold/Amber Accents */
+  --signal: #D97706; /* Amber-600 (Gold) */
+  --signal-muted: #B45309; /* Amber-700 */
+  --accent-warm: #F59E0B; /* Amber-500 */
+  --text-warm: #FCD34D; /* Amber-300 */
+  --border-warm: #F59E0B; /* Amber-500 */
+  
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.05s ease, color 0.05s ease;
+}
+
+/* Terminal Pro Theme - Light Variant */
+[data-theme="light"] body.theme-corporate,
+[data-theme="light"] html.theme-corporate body {
+  --bg: #FFFFFF; /* Pure White */
+  --surface: #F5F5F5; /* Light Gray */
+  --surface-elevated: #E5E5E5; /* Slightly Darker Gray */
+  --text: #006622; /* Dark Green (inverted for light mode) */
+  --text-secondary: #008833; /* Medium Green */
+  --muted: #00AA44; /* Brighter Green */
+  --border: #00CC55; /* Light Green Border */
+  --border-subtle: #E0F0E5; /* Very Light Green */
+  
+  /* Terminal Green Accents (darker for light mode) */
+  --signal: #006622; /* Dark Green */
+  --signal-muted: #008833;
+  --accent-warm: #00AA44;
+  --text-warm: #006622;
+  --border-warm: #00AA44;
+  
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Terminal Pro Theme - Dark Variant (Default) */
+[data-theme="dark"] body.theme-corporate,
+body.theme-corporate,
+html.theme-corporate body {
+  --bg: #000000; /* Pure Black */
+  --surface: #111111; /* Near Black */
+  --surface-elevated: #1a1a1a; /* Slightly Lighter */
+  --text: #00FF41; /* Matrix Green */
+  --text-secondary: #00CC33; /* Darker Green */
+  --muted: #008822; /* Muted Green */
+  --border: #003311; /* Dark Green Border */
+  --border-subtle: #001a0a; /* Very Dark Green */
+  
+  /* Terminal Green Accents */
+  --signal: #00FF41; /* Matrix Green */
+  --signal-muted: #00CC33;
+  --accent-warm: #00FF41;
+  --text-warm: #00FF41;
+  --border-warm: #00FF41;
+  
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ensure theme applies to all elements with fast transitions for immediate feedback */
+body.theme-founder *,
+body.theme-corporate * {
+  transition: background-color 0.05s ease, color 0.05s ease, border-color 0.05s ease;
+}
+
+/* Floating banner animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.theme-preview-banner {
+  animation: slide-up 0.4s ease-out;
+}
+
 /* Loading animations */
 @keyframes loading {
   0% {
@@ -103,6 +290,21 @@ a {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Tour highlight animation */
+@keyframes pulse-highlight {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.tour-highlight {
+  animation: pulse-highlight 2s ease-in-out;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6) !important;
 }
 
 .skeleton-loader {
@@ -502,5 +704,114 @@ select option:checked {
     visibility: hidden !important;
     opacity: 0 !important;
   }
+}
+
+/* Theme switcher processing state - must override all other styles including hover */
+.theme-switcher-processing,
+.theme-switcher-processing:hover,
+.theme-switcher-processing:focus,
+.theme-switcher-processing:active {
+  opacity: 0.3 !important;
+  transform: scale(0.8) !important;
+  background-color: rgba(249, 115, 22, 0.6) !important;
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.8) !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  transition: transform 0.1s ease-out, opacity 0.1s ease-out, background-color 0.1s ease-out !important;
+}
+
+/* Blog Content Styles */
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  margin-top: 2em;
+  margin-bottom: 1em;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.blog-content h2 {
+  font-size: 2em;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.5em;
+}
+
+.blog-content h3 {
+  font-size: 1.5em;
+}
+
+.blog-content p {
+  margin-bottom: 1.5em;
+  line-height: 1.8;
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin-bottom: 1.5em;
+  padding-left: 2em;
+}
+
+.blog-content li {
+  margin-bottom: 0.5em;
+}
+
+.blog-content code {
+  background: var(--surface-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: 'Courier New', monospace;
+  color: var(--accent-warm);
+}
+
+.blog-content pre {
+  background: var(--surface-elevated);
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1.5em;
+  border: 1px solid var(--border);
+}
+
+.blog-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text);
+}
+
+.blog-content blockquote {
+  border-left: 4px solid var(--accent-warm);
+  padding-left: 1em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.blog-content a {
+  color: var(--accent-warm);
+  text-decoration: underline;
+}
+
+.blog-content a:hover {
+  text-decoration: none;
+}
+
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5em 0;
+}
+
+.blog-content strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.blog-cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
 }
 
