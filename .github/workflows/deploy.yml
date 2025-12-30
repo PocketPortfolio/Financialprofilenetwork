@@ -1,4 +1,5 @@
 name: Deploy to Vercel
+# Workflow for automated Vercel deployments
 
 on:
   push:
