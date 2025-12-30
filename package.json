@@ -40,8 +40,13 @@
     "generate-blog-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-blog-calendar.ts",
     "generate-blog": "ts-node --project scripts/tsconfig.json scripts/generate-autonomous-blog.ts",
     "check-actions": "ts-node --project scripts/tsconfig.json scripts/check-github-actions.ts",
+    "check-all-workflows": "ts-node --project scripts/tsconfig.json scripts/check-all-workflows.ts",
+    "check-recent-runs": "ts-node --project scripts/tsconfig.json scripts/check-recent-runs.ts",
     "trigger-workflow": "ts-node --project scripts/tsconfig.json scripts/trigger-workflow.ts",
-    "check-workflow-state": "ts-node --project scripts/tsconfig.json scripts/check-workflow-state.ts"
+    "check-workflow-state": "ts-node --project scripts/tsconfig.json scripts/check-workflow-state.ts",
+    "verify-workflow": "ts-node --project scripts/tsconfig.json scripts/verify-workflow-content.ts",
+    "check-all-workflows": "ts-node --project scripts/tsconfig.json scripts/check-all-workflows.ts",
+    "validate-workflow": "ts-node --project scripts/tsconfig.json scripts/validate-workflow.ts"
   },
   "dependencies": {
     "@pocket-portfolio/importer": "file:packages/importer",
