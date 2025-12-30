@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import fs from 'fs';
 import path from 'path';
+import matter from 'gray-matter';
 import { getAllTickers, getAllExchanges } from '@/app/lib/pseo/data';
 import { SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 
@@ -285,7 +286,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           try {
             const filePath = path.join(postsDir, file);
             const fileContents = fs.readFileSync(filePath, 'utf-8');
-            const matter = require('gray-matter');
             const { data } = matter(fileContents);
             const slug = file.replace('.mdx', '');
             

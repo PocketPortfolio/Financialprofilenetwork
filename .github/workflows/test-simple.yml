@@ -1,4 +1,5 @@
 name: Simple Test Workflow
+# Trigger test - $(date +%s)
 
 on:
   workflow_dispatch:
@@ -9,6 +10,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      
       - name: Test Message
         run: echo "✅ Workflow triggered successfully at $(date)"
+        
+      - name: Verify GitHub Actions is working
+        run: |
+          echo "Workflow ID: ${{ github.run_id }}"
+          echo "Workflow Run Number: ${{ github.run_number }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref }}"
 
