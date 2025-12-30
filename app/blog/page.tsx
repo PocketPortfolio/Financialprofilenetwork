@@ -156,7 +156,7 @@ export default function BlogPage() {
         marginBottom: '48px'
       }}>
         {/* Generated Posts */}
-        {filter === 'all' || filter === 'generated' ? generatedPosts.map((post, index) => (
+        {(filter === 'all' || filter === 'generated') && generatedPosts.map((post, index) => (
           <Link
             key={`generated-${index}`}
             href={`/blog/${post.slug}`}
@@ -248,10 +248,10 @@ export default function BlogPage() {
               </div>
             )}
           </Link>
-        )) : null}
+        ))}
         
         {/* External Articles */}
-        {showExternal ? filteredArticles.map((article, index) => (
+        {showExternal && filteredArticles.map((article, index) => (
           <a
             key={index}
             href={article.url}
