@@ -38,7 +38,10 @@
     "debug-env": "ts-node --project scripts/tsconfig.json scripts/debug-env.ts",
     "extract-firebase": "ts-node --project scripts/tsconfig.json scripts/extract-firebase-env.ts",
     "generate-blog-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-blog-calendar.ts",
-    "generate-blog": "ts-node --project scripts/tsconfig.json scripts/generate-autonomous-blog.ts"
+    "generate-blog": "ts-node --project scripts/tsconfig.json scripts/generate-autonomous-blog.ts",
+    "check-actions": "ts-node --project scripts/tsconfig.json scripts/check-github-actions.ts",
+    "trigger-workflow": "ts-node --project scripts/tsconfig.json scripts/trigger-workflow.ts",
+    "check-workflow-state": "ts-node --project scripts/tsconfig.json scripts/check-workflow-state.ts"
   },
   "dependencies": {
     "@pocket-portfolio/importer": "file:packages/importer",

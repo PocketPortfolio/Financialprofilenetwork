@@ -1,0 +1,14 @@
+name: Simple Test Workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Message
+        run: echo "✅ Workflow triggered successfully at $(date)"
+
