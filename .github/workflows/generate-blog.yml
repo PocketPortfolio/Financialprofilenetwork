@@ -1,0 +1,46 @@
+name: Generate Blog Posts
+
+on:
+  schedule:
+    # Every Monday and Thursday at 9 AM UTC (2 posts per week)
+    - cron: '0 9 * * 1,4'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate blog posts
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: npm run generate-blog
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: '🤖 Auto-generate blog posts'
+          commit_user_name: 'Pocket Portfolio Bot'
+          commit_user_email: 'bot@pocketportfolio.app'
+          commit_options: '--no-verify'
+
+      - name: Create Pull Request (if posts generated)
+        if: failure()
+        run: |
+          echo "Blog generation completed. Check logs for any failed posts."
+

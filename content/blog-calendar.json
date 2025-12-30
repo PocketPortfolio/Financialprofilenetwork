@@ -1,0 +1,1562 @@
+[
+  {
+    "id": "week-1-post-1",
+    "date": "2026-01-01",
+    "title": "The Death of the Cloud Portfolio: Why Vendor Lock-in Kills Financial Freedom",
+    "slug": "the-death-of-the-cloud-portfolio-why-vendor-lock-in-kills-fi",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "death"
+    ]
+  },
+  {
+    "id": "week-1-post-2",
+    "date": "2026-01-04",
+    "title": "Dollar Cost Averaging vs. Lump Sum: A Data-Driven Analysis",
+    "slug": "dollar-cost-averaging-vs-lump-sum-a-data-driven-analysis",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "dollar"
+    ]
+  },
+  {
+    "id": "week-2-post-1",
+    "date": "2026-01-08",
+    "title": "Optimizing JSON Parsing: From 10s to 10ms",
+    "slug": "optimizing-json-parsing-from-10s-to-10ms",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-2-post-2",
+    "date": "2026-01-11",
+    "title": "The Roadmap to Data Sovereignty: What's Next",
+    "slug": "the-roadmap-to-data-sovereignty-what-s-next",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "roadmap"
+    ]
+  },
+  {
+    "id": "week-3-post-1",
+    "date": "2026-01-15",
+    "title": "Why Most Investors Underperform: The Data Doesn't Lie",
+    "slug": "why-most-investors-underperform-the-data-doesn-t-lie",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "investors"
+    ]
+  },
+  {
+    "id": "week-3-post-2",
+    "date": "2026-01-18",
+    "title": "JSON Finance: The Open Standard That Breaks Wall Street's Grip",
+    "slug": "json-finance-the-open-standard-that-breaks-wall-street-s-gri",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "finance:"
+    ]
+  },
+  {
+    "id": "week-4-post-1",
+    "date": "2026-01-22",
+    "title": "The Future of Portfolio Management: Local-First and Open",
+    "slug": "the-future-of-portfolio-management-local-first-and-open",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "future"
+    ]
+  },
+  {
+    "id": "week-4-post-2",
+    "date": "2026-01-25",
+    "title": "The Architecture of Sovereign Sync: How It Really Works",
+    "slug": "the-architecture-of-sovereign-sync-how-it-really-works",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-5-post-1",
+    "date": "2026-01-29",
+    "title": "Breaking Free: How JSON Unlocks True Financial Data Ownership",
+    "slug": "breaking-free-how-json-unlocks-true-financial-data-ownership",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "breaking"
+    ]
+  },
+  {
+    "id": "week-5-post-2",
+    "date": "2026-02-01",
+    "title": "The Power of Compounding: Visualizing Long-Term Growth",
+    "slug": "the-power-of-compounding-visualizing-long-term-growth",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "power"
+    ]
+  },
+  {
+    "id": "week-6-post-1",
+    "date": "2026-02-05",
+    "title": "Type Safety for Financial Data: TypeScript Meets JSON",
+    "slug": "type-safety-for-financial-data-typescript-meets-json",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-6-post-2",
+    "date": "2026-02-08",
+    "title": "The Security Model of Local-First Finance",
+    "slug": "the-security-model-of-local-first-finance",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "security"
+    ]
+  },
+  {
+    "id": "week-7-post-1",
+    "date": "2026-02-12",
+    "title": "Dividend Investing: The Strategy That Time Forgot",
+    "slug": "dividend-investing-the-strategy-that-time-forgot",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "dividend"
+    ]
+  },
+  {
+    "id": "week-7-post-2",
+    "date": "2026-02-15",
+    "title": "The Open Source Advantage: Why Transparency Beats Trust",
+    "slug": "the-open-source-advantage-why-transparency-beats-trust",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "source"
+    ]
+  },
+  {
+    "id": "week-8-post-1",
+    "date": "2026-02-19",
+    "title": "Sovereign Sync: Frequently Asked Questions",
+    "slug": "sovereign-sync-frequently-asked-questions",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-8-post-2",
+    "date": "2026-02-22",
+    "title": "Building a Financial Data Pipeline: From CSV to JSON",
+    "slug": "building-a-financial-data-pipeline-from-csv-to-json",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-9-post-1",
+    "date": "2026-02-26",
+    "title": "Privacy is Profit: The Business Case for Local-First Finance",
+    "slug": "privacy-is-profit-the-business-case-for-local-first-finance",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "privacy"
+    ]
+  },
+  {
+    "id": "week-9-post-2",
+    "date": "2026-03-01",
+    "title": "The Small-Cap Advantage: Myth or Reality?",
+    "slug": "the-small-cap-advantage-myth-or-reality",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "small-cap"
+    ]
+  },
+  {
+    "id": "week-10-post-1",
+    "date": "2026-03-05",
+    "title": "Schema Evolution: Managing Changes in Financial Data Structures",
+    "slug": "schema-evolution-managing-changes-in-financial-data-structur",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-10-post-2",
+    "date": "2026-03-08",
+    "title": "The Community Behind Sovereign Sync",
+    "slug": "the-community-behind-sovereign-sync",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "community"
+    ]
+  },
+  {
+    "id": "week-11-post-1",
+    "date": "2026-03-12",
+    "title": "The Impact of Inflation on Portfolio Returns",
+    "slug": "the-impact-of-inflation-on-portfolio-returns",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "impact"
+    ]
+  },
+  {
+    "id": "week-11-post-2",
+    "date": "2026-03-15",
+    "title": "The Local-First Movement: Finance's Next Evolution",
+    "slug": "the-local-first-movement-finance-s-next-evolution",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "local-first"
+    ]
+  },
+  {
+    "id": "week-12-post-1",
+    "date": "2026-03-19",
+    "title": "Sovereign Sync: Security and Privacy Deep Dive",
+    "slug": "sovereign-sync-security-and-privacy-deep-dive",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-12-post-2",
+    "date": "2026-03-22",
+    "title": "Building Resilient Sync: Handling Network Failures",
+    "slug": "building-resilient-sync-handling-network-failures",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-13-post-1",
+    "date": "2026-03-26",
+    "title": "The Developer's Portfolio: Code Your Way to Freedom",
+    "slug": "the-developer-s-portfolio-code-your-way-to-freedom",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "developer's"
+    ]
+  },
+  {
+    "id": "week-13-post-2",
+    "date": "2026-03-29",
+    "title": "The Low-Volatility Anomaly: Why Safe Stocks Outperform",
+    "slug": "the-low-volatility-anomaly-why-safe-stocks-outperform",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "low-volatility"
+    ]
+  },
+  {
+    "id": "week-14-post-1",
+    "date": "2026-04-01",
+    "title": "Parsing 1 Million Trades in JSON: Performance Benchmarks for Local-First Finance",
+    "slug": "parsing-1-million-trades-in-json-performance-benchmarks-for-",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-14-post-2",
+    "date": "2026-04-04",
+    "title": "Introducing JSON Portfolio Management: A New Era",
+    "slug": "introducing-json-portfolio-management-a-new-era",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "introducing"
+    ]
+  },
+  {
+    "id": "week-15-post-1",
+    "date": "2026-04-08",
+    "title": "Market Timing is Dead: What 10 Years of Data Shows",
+    "slug": "market-timing-is-dead-what-10-years-of-data-shows",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "market"
+    ]
+  },
+  {
+    "id": "week-15-post-2",
+    "date": "2026-04-11",
+    "title": "Data Sovereignty: The New Frontier of Financial Independence",
+    "slug": "data-sovereignty-the-new-frontier-of-financial-independence",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "sovereignty:"
+    ]
+  },
+  {
+    "id": "week-16-post-1",
+    "date": "2026-04-15",
+    "title": "Sovereign Sync vs. Cloud Portfolios: A Feature Comparison",
+    "slug": "sovereign-sync-vs-cloud-portfolios-a-feature-comparison",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-16-post-2",
+    "date": "2026-04-18",
+    "title": "JSON Schema Validation: Ensuring Data Integrity",
+    "slug": "json-schema-validation-ensuring-data-integrity",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-17-post-1",
+    "date": "2026-04-22",
+    "title": "From SaaS to Sovereignty: The Evolution of Personal Finance Tools",
+    "slug": "from-saas-to-sovereignty-the-evolution-of-personal-finance-t",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "sovereignty:"
+    ]
+  },
+  {
+    "id": "week-17-post-2",
+    "date": "2026-04-25",
+    "title": "The Hidden Costs of Active Trading: A Data Analysis",
+    "slug": "the-hidden-costs-of-active-trading-a-data-analysis",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "hidden"
+    ]
+  },
+  {
+    "id": "week-18-post-1",
+    "date": "2026-04-29",
+    "title": "Performance Optimization: Making JSON Finance Fast",
+    "slug": "performance-optimization-making-json-finance-fast",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-18-post-2",
+    "date": "2026-05-02",
+    "title": "The Evolution of Pocket Portfolio: From Cloud to Sovereign",
+    "slug": "the-evolution-of-pocket-portfolio-from-cloud-to-sovereign",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "evolution"
+    ]
+  },
+  {
+    "id": "week-19-post-1",
+    "date": "2026-05-06",
+    "title": "Sector Rotation Strategies: What the Data Reveals",
+    "slug": "sector-rotation-strategies-what-the-data-reveals",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "sector"
+    ]
+  },
+  {
+    "id": "week-19-post-2",
+    "date": "2026-05-09",
+    "title": "The Decentralized Portfolio: Beyond the Cloud",
+    "slug": "the-decentralized-portfolio-beyond-the-cloud",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "decentralized"
+    ]
+  },
+  {
+    "id": "week-20-post-1",
+    "date": "2026-05-13",
+    "title": "How to Migrate from Cloud to Sovereign: A Guide",
+    "slug": "how-to-migrate-from-cloud-to-sovereign-a-guide",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "migrate"
+    ]
+  },
+  {
+    "id": "week-20-post-2",
+    "date": "2026-05-16",
+    "title": "Data Migration Patterns: Moving from Cloud to Local",
+    "slug": "data-migration-patterns-moving-from-cloud-to-local",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-21-post-1",
+    "date": "2026-05-20",
+    "title": "From Prisoner to Sovereign: Escaping Financial Data Jails",
+    "slug": "from-prisoner-to-sovereign-escaping-financial-data-jails",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "prisoner"
+    ]
+  },
+  {
+    "id": "week-21-post-2",
+    "date": "2026-05-23",
+    "title": "The Efficient Market Hypothesis: Still Relevant?",
+    "slug": "the-efficient-market-hypothesis-still-relevant",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "efficient"
+    ]
+  },
+  {
+    "id": "week-22-post-1",
+    "date": "2026-05-27",
+    "title": "The Power of Raw Data: Why JSON Beats Databases",
+    "slug": "the-power-of-raw-data-why-json-beats-databases",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-22-post-2",
+    "date": "2026-05-30",
+    "title": "The Developer Tools: JSON Schema and Seed Files",
+    "slug": "the-developer-tools-json-schema-and-seed-files",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "developer"
+    ]
+  },
+  {
+    "id": "week-23-post-1",
+    "date": "2026-06-03",
+    "title": "International Diversification: The Numbers Behind the Strategy",
+    "slug": "international-diversification-the-numbers-behind-the-strateg",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "international"
+    ]
+  },
+  {
+    "id": "week-23-post-2",
+    "date": "2026-06-06",
+    "title": "The Sovereign Investor: Taking Control of Your Financial Future",
+    "slug": "the-sovereign-investor-taking-control-of-your-financial-futu",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-24-post-1",
+    "date": "2026-06-10",
+    "title": "What Makes Pocket Portfolio Different: The Sovereign Advantage",
+    "slug": "what-makes-pocket-portfolio-different-the-sovereign-advantag",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "makes"
+    ]
+  },
+  {
+    "id": "week-24-post-2",
+    "date": "2026-06-13",
+    "title": "JSON Compression: Reducing File Sizes Without Losing Data",
+    "slug": "json-compression-reducing-file-sizes-without-losing-data",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-25-post-1",
+    "date": "2026-06-17",
+    "title": "JSON vs. Proprietary: The Format War for Your Data",
+    "slug": "json-vs-proprietary-the-format-war-for-your-data",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "proprietary:"
+    ]
+  },
+  {
+    "id": "week-25-post-2",
+    "date": "2026-06-20",
+    "title": "The Weekend Effect: Trading Patterns Revealed",
+    "slug": "the-weekend-effect-trading-patterns-revealed",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "weekend"
+    ]
+  },
+  {
+    "id": "week-26-post-1",
+    "date": "2026-06-24",
+    "title": "The Developer Experience of JSON Finance",
+    "slug": "the-developer-experience-of-json-finance",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-26-post-2",
+    "date": "2026-06-27",
+    "title": "The Future of Financial Data: Predictions and Trends",
+    "slug": "the-future-of-financial-data-predictions-and-trends",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "future"
+    ]
+  },
+  {
+    "id": "week-27-post-1",
+    "date": "2026-07-01",
+    "title": "The Psychology of Panic Selling: What Data Reveals",
+    "slug": "the-psychology-of-panic-selling-what-data-reveals",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "psychology"
+    ]
+  },
+  {
+    "id": "week-27-post-2",
+    "date": "2026-07-04",
+    "title": "The Case for Local-First Finance: Your Data, Your Rules",
+    "slug": "the-case-for-local-first-finance-your-data-your-rules",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "local-first"
+    ]
+  },
+  {
+    "id": "week-28-post-1",
+    "date": "2026-07-08",
+    "title": "Why We Built Sovereign Sync: The Story Behind the Feature",
+    "slug": "why-we-built-sovereign-sync-the-story-behind-the-feature",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "built"
+    ]
+  },
+  {
+    "id": "week-28-post-2",
+    "date": "2026-07-11",
+    "title": "Version Control for Portfolios: Git as a Financial Tool",
+    "slug": "version-control-for-portfolios-git-as-a-financial-tool",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-29-post-1",
+    "date": "2026-07-15",
+    "title": "The Psychology of Vendor Lock-in: Why We Accept Digital Serfdom",
+    "slug": "the-psychology-of-vendor-lock-in-why-we-accept-digital-serfd",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "psychology"
+    ]
+  },
+  {
+    "id": "week-29-post-2",
+    "date": "2026-07-18",
+    "title": "The Rebalancing Myth: When to Actually Adjust Your Portfolio",
+    "slug": "the-rebalancing-myth-when-to-actually-adjust-your-portfolio",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "rebalancing"
+    ]
+  },
+  {
+    "id": "week-30-post-1",
+    "date": "2026-07-22",
+    "title": "Handling Large Datasets: Streaming JSON Parsing Strategies",
+    "slug": "handling-large-datasets-streaming-json-parsing-strategies",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-30-post-2",
+    "date": "2026-07-25",
+    "title": "Building the Developer-First Portfolio Tool",
+    "slug": "building-the-developer-first-portfolio-tool",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "building"
+    ]
+  },
+  {
+    "id": "week-31-post-1",
+    "date": "2026-07-29",
+    "title": "Market Volatility: Friend or Foe? The Numbers Tell the Story",
+    "slug": "market-volatility-friend-or-foe-the-numbers-tell-the-story",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "market"
+    ]
+  },
+  {
+    "id": "week-31-post-2",
+    "date": "2026-08-01",
+    "title": "The Cloud is Someone Else's Computer: Why Finance Should Stay Local",
+    "slug": "the-cloud-is-someone-else-s-computer-why-finance-should-stay",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "cloud"
+    ]
+  },
+  {
+    "id": "week-32-post-1",
+    "date": "2026-08-05",
+    "title": "Sovereign Sync: Early Adopter Stories",
+    "slug": "sovereign-sync-early-adopter-stories",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-32-post-2",
+    "date": "2026-08-08",
+    "title": "Caching Strategies for Local-First Applications",
+    "slug": "caching-strategies-for-local-first-applications",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-33-post-1",
+    "date": "2026-08-12",
+    "title": "Your Financial Data is Not a Product: The Ethics of Data Ownership",
+    "slug": "your-financial-data-is-not-a-product-the-ethics-of-data-owne",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "financial"
+    ]
+  },
+  {
+    "id": "week-33-post-2",
+    "date": "2026-08-15",
+    "title": "The Psychology of FOMO: Data on Emotional Trading",
+    "slug": "the-psychology-of-fomo-data-on-emotional-trading",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "psychology"
+    ]
+  },
+  {
+    "id": "week-34-post-1",
+    "date": "2026-08-19",
+    "title": "Conflict Resolution in Bidirectional Sync",
+    "slug": "conflict-resolution-in-bidirectional-sync",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-34-post-2",
+    "date": "2026-08-22",
+    "title": "The Philosophy Behind Pocket Portfolio's Design",
+    "slug": "the-philosophy-behind-pocket-portfolio-s-design",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "philosophy"
+    ]
+  },
+  {
+    "id": "week-35-post-1",
+    "date": "2026-08-26",
+    "title": "Value vs. Growth: What 20 Years of Data Shows",
+    "slug": "value-vs-growth-what-20-years-of-data-shows",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "value"
+    ]
+  },
+  {
+    "id": "week-35-post-2",
+    "date": "2026-08-29",
+    "title": "The Cloud Portfolio Scam: What They Don't Tell You",
+    "slug": "the-cloud-portfolio-scam-what-they-don-t-tell-you",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "cloud"
+    ]
+  },
+  {
+    "id": "week-36-post-1",
+    "date": "2026-09-02",
+    "title": "Sovereign Sync: Performance and Reliability",
+    "slug": "sovereign-sync-performance-and-reliability",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-36-post-2",
+    "date": "2026-09-05",
+    "title": "The Technical Debt of Cloud Portfolios",
+    "slug": "the-technical-debt-of-cloud-portfolios",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-37-post-1",
+    "date": "2026-09-09",
+    "title": "Beyond the API: Why Direct File Access Matters",
+    "slug": "beyond-the-api-why-direct-file-access-matters",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "beyond"
+    ]
+  },
+  {
+    "id": "week-37-post-2",
+    "date": "2026-09-12",
+    "title": "Market Sentiment Indicators: What Actually Works",
+    "slug": "market-sentiment-indicators-what-actually-works",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "market"
+    ]
+  },
+  {
+    "id": "week-38-post-1",
+    "date": "2026-09-16",
+    "title": "The Performance Cost of Cloud APIs",
+    "slug": "the-performance-cost-of-cloud-apis",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-38-post-2",
+    "date": "2026-09-19",
+    "title": "The API-First Approach: Programmatic Portfolio Management",
+    "slug": "the-api-first-approach-programmatic-portfolio-management",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "api-first"
+    ]
+  },
+  {
+    "id": "week-39-post-1",
+    "date": "2026-09-23",
+    "title": "The Momentum Factor: Persistence or Persistence Bias?",
+    "slug": "the-momentum-factor-persistence-or-persistence-bias",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "momentum"
+    ]
+  },
+  {
+    "id": "week-39-post-2",
+    "date": "2026-09-26",
+    "title": "The Open Standard Advantage: Why JSON Wins",
+    "slug": "the-open-standard-advantage-why-json-wins",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "standard"
+    ]
+  },
+  {
+    "id": "week-40-post-1",
+    "date": "2026-09-30",
+    "title": "Sovereign Sync: The End of Vendor Lock-in",
+    "slug": "sovereign-sync-the-end-of-vendor-lock-in",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-40-post-2",
+    "date": "2026-10-03",
+    "title": "Schema Design for Financial Data: Building Robust JSON Structures",
+    "slug": "schema-design-for-financial-data-building-robust-json-struct",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-41-post-1",
+    "date": "2026-10-07",
+    "title": "Why Cloud Portfolios are Traps: The Hidden Cost of Convenience",
+    "slug": "why-cloud-portfolios-are-traps-the-hidden-cost-of-convenienc",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "cloud"
+    ]
+  },
+  {
+    "id": "week-41-post-2",
+    "date": "2026-10-10",
+    "title": "The Behavioral Economics of Portfolio Management",
+    "slug": "the-behavioral-economics-of-portfolio-management",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "behavioral"
+    ]
+  },
+  {
+    "id": "week-42-post-1",
+    "date": "2026-10-14",
+    "title": "Building a Bidirectional Sync Engine: Technical Deep Dive",
+    "slug": "building-a-bidirectional-sync-engine-technical-deep-dive",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-42-post-2",
+    "date": "2026-10-17",
+    "title": "How Sovereign Sync Works: A Technical Overview",
+    "slug": "how-sovereign-sync-works-a-technical-overview",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "sovereign"
+    ]
+  },
+  {
+    "id": "week-43-post-1",
+    "date": "2026-10-21",
+    "title": "Tax-Loss Harvesting: The Strategy That Actually Works",
+    "slug": "tax-loss-harvesting-the-strategy-that-actually-works",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "tax-loss"
+    ]
+  },
+  {
+    "id": "week-43-post-2",
+    "date": "2026-10-24",
+    "title": "The Local-First Manifesto: Why Your Portfolio Belongs on Your Drive",
+    "slug": "the-local-first-manifesto-why-your-portfolio-belongs-on-your",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "local-first"
+    ]
+  },
+  {
+    "id": "week-44-post-1",
+    "date": "2026-10-29",
+    "title": "Why JSON? The Design Decision That Changed Everything",
+    "slug": "why-json-the-design-decision-that-changed-everything",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "json?"
+    ]
+  },
+  {
+    "id": "week-44-post-2",
+    "date": "2026-11-01",
+    "title": "Error Handling in Financial Data: Building Resilient Parsers",
+    "slug": "error-handling-in-financial-data-building-resilient-parsers",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-45-post-1",
+    "date": "2026-11-05",
+    "title": "Vendor Lock-in is Theft: The Economic Case for Data Sovereignty",
+    "slug": "vendor-lock-in-is-theft-the-economic-case-for-data-sovereign",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "vendor"
+    ]
+  },
+  {
+    "id": "week-45-post-2",
+    "date": "2026-11-08",
+    "title": "The Impact of Fees on Long-Term Returns",
+    "slug": "the-impact-of-fees-on-long-term-returns",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "impact"
+    ]
+  },
+  {
+    "id": "week-46-post-1",
+    "date": "2026-11-12",
+    "title": "The JSON API: Building Programmatic Access to Your Portfolio",
+    "slug": "the-json-api-building-programmatic-access-to-your-portfolio",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-46-post-2",
+    "date": "2026-11-15",
+    "title": "The Benefits of Bidirectional Sync: Real User Stories",
+    "slug": "the-benefits-of-bidirectional-sync-real-user-stories",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "benefits"
+    ]
+  },
+  {
+    "id": "week-47-post-1",
+    "date": "2026-11-19",
+    "title": "Market Crashes: Patterns and Predictions from History",
+    "slug": "market-crashes-patterns-and-predictions-from-history",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "market"
+    ]
+  },
+  {
+    "id": "week-47-post-2",
+    "date": "2026-11-22",
+    "title": "The JSON Revolution: How Raw Data Changes Everything",
+    "slug": "the-json-revolution-how-raw-data-changes-everything",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "revolution:"
+    ]
+  },
+  {
+    "id": "week-48-post-1",
+    "date": "2026-11-26",
+    "title": "Why We Chose Google Drive: The Technical Rationale",
+    "slug": "why-we-chose-google-drive-the-technical-rationale",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "chose"
+    ]
+  },
+  {
+    "id": "week-48-post-2",
+    "date": "2026-11-29",
+    "title": "Streaming Large Financial Datasets: Techniques and Trade-offs",
+    "slug": "streaming-large-financial-datasets-techniques-and-trade-offs",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-49-post-1",
+    "date": "2026-12-03",
+    "title": "Data Portability: The Right They Don't Want You to Have",
+    "slug": "data-portability-the-right-they-don-t-want-you-to-have",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "portability:"
+    ]
+  },
+  {
+    "id": "week-49-post-2",
+    "date": "2026-12-06",
+    "title": "The Bond-Equity Correlation: What Changes in Crisis",
+    "slug": "the-bond-equity-correlation-what-changes-in-crisis",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "bond-equity"
+    ]
+  },
+  {
+    "id": "week-50-post-1",
+    "date": "2026-12-10",
+    "title": "Building a Local-First Financial App: Architecture Patterns",
+    "slug": "building-a-local-first-financial-app-architecture-patterns",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  },
+  {
+    "id": "week-50-post-2",
+    "date": "2026-12-13",
+    "title": "The Road to 1.0: What We've Learned",
+    "slug": "the-road-to-1-0-what-we-ve-learned",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "we've"
+    ]
+  },
+  {
+    "id": "week-51-post-1",
+    "date": "2026-12-17",
+    "title": "The January Effect: Fact or Fiction?",
+    "slug": "the-january-effect-fact-or-fiction",
+    "status": "pending",
+    "pillar": "market",
+    "keywords": [
+      "investment strategy",
+      "portfolio management",
+      "market analysis",
+      "data-driven",
+      "january"
+    ]
+  },
+  {
+    "id": "week-51-post-2",
+    "date": "2026-12-20",
+    "title": "The Cost of Convenience: Hidden Fees in Cloud Portfolios",
+    "slug": "the-cost-of-convenience-hidden-fees-in-cloud-portfolios",
+    "status": "pending",
+    "pillar": "philosophy",
+    "keywords": [
+      "data sovereignty",
+      "local-first",
+      "vendor lock-in",
+      "financial freedom",
+      "convenience:"
+    ]
+  },
+  {
+    "id": "week-52-post-1",
+    "date": "2026-12-24",
+    "title": "Why Open Source Matters: The Pocket Portfolio Story",
+    "slug": "why-open-source-matters-the-pocket-portfolio-story",
+    "status": "pending",
+    "pillar": "product",
+    "keywords": [
+      "sovereign sync",
+      "pocket portfolio",
+      "json finance",
+      "local-first finance",
+      "source"
+    ]
+  },
+  {
+    "id": "week-52-post-2",
+    "date": "2026-12-27",
+    "title": "From REST to Files: A New Paradigm for Financial APIs",
+    "slug": "from-rest-to-files-a-new-paradigm-for-financial-apis",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "json",
+      "performance",
+      "local-first",
+      "financial data",
+      "developer tools"
+    ]
+  }
+]
