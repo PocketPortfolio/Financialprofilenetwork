@@ -58,17 +58,6 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./
-        continue-on-error: true
-      
-      - name: Deployment Status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment completed successfully"
-          else
-            echo "❌ Deployment failed - check logs above for details"
-            exit 1
-          fi
 
   deploy-preview:
     name: Deploy Preview (PR)
