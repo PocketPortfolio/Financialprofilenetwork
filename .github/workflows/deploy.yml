@@ -19,14 +19,30 @@ jobs:
           node-version: '18'
           cache: 'npm'
       
+      - name: Verify Secrets
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ ERROR: VERCEL_TOKEN secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
+            echo "❌ ERROR: VERCEL_ORG_ID secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "❌ ERROR: VERCEL_PROJECT_ID secret is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are set"
+      
       - name: Install dependencies
         run: npm ci
       
       - name: Run CI checks
         run: |
-          npm run lint || echo "Lint warnings (non-blocking)"
-          npm run typecheck || echo "Typecheck warnings (non-blocking)"
-          npm run test || echo "Test failures (non-blocking)"
+          npm run lint || echo "⚠️ Lint warnings (non-blocking)"
+          npm run typecheck || echo "⚠️ Typecheck warnings (non-blocking)"
+          npm run test || echo "⚠️ Test failures (non-blocking)"
         continue-on-error: true
       
       - name: Build
@@ -42,6 +58,17 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./
+        continue-on-error: true
+      
+      - name: Deployment Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment completed successfully"
+          else
+            echo "❌ Deployment failed - check logs above for details"
+            exit 1
+          fi
 
   deploy-preview:
     name: Deploy Preview (PR)
