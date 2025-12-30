@@ -1,0 +1,63 @@
+name: Diagnostic Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    name: Diagnose Issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Check Secrets
+        run: |
+          echo "Checking if secrets are set..."
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ VERCEL_TOKEN is missing"
+          else
+            echo "✅ VERCEL_TOKEN is set"
+          fi
+          
+          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
+            echo "❌ VERCEL_ORG_ID is missing"
+          else
+            echo "✅ VERCEL_ORG_ID is set"
+          fi
+          
+          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "❌ VERCEL_PROJECT_ID is missing"
+          else
+            echo "✅ VERCEL_PROJECT_ID is set"
+          fi
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Check Node and npm
+        run: |
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+      
+      - name: Install dependencies
+        run: npm ci
+        continue-on-error: true
+      
+      - name: Check build script
+        run: |
+          if npm run build --dry-run 2>/dev/null || grep -q '"build"' package.json; then
+            echo "✅ Build script exists"
+          else
+            echo "❌ Build script not found"
+          fi
+      
+      - name: Try build (dry run)
+        run: |
+          echo "Testing if build would work..."
+          npm run build || echo "Build failed - check logs above"
+        continue-on-error: true
+
