@@ -1,10 +1,13 @@
 name: Simple Test Workflow
-# Trigger test - $(date +%s)
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   test:
