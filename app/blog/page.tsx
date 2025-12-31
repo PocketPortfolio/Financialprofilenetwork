@@ -24,7 +24,7 @@ export default function BlogPage() {
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
 
   useEffect(() => {
-    // Fetch generated posts metadata
+    // Fetch Pocket Portfolio posts metadata
     fetch('/api/blog/posts')
       .then(res => res.json())
       .then(data => setGeneratedPosts(data || []))
@@ -143,7 +143,7 @@ export default function BlogPage() {
               transition: 'all 0.2s ease'
             }}
           >
-            Generated Posts
+            Pocket Portfolio Posts
           </button>
         </div>
       </header>
@@ -155,7 +155,7 @@ export default function BlogPage() {
         gap: '24px',
         marginBottom: '48px'
       }}>
-        {/* Generated Posts */}
+        {/* Pocket Portfolio Posts */}
         {(filter === 'all' || filter === 'generated') && generatedPosts.map((post, index) => (
           <Link
             key={`generated-${index}`}

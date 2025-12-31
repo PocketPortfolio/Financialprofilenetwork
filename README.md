@@ -1,10 +1,14 @@
 # Pocket Portfolio
 
+> **⚠️ Disclaimer:** Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
+
 **A privacy-first, production-ready investment tracking platform**
 
 Pocket Portfolio is a modern web application for tracking investments across stocks, crypto, and FX. Import trades from any broker, visualize your portfolio in real-time, and gain insights—all while keeping your data secure and private.
 
-[![CI Pipeline](https://github.com/your-org/pocket-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/pocket-portfolio/actions)
+🌐 **Live App:** [https://www.pocketportfolio.app/](https://www.pocketportfolio.app/)
+
+[![CI Pipeline](https://github.com/PocketPortfolio/Financialprofilenetwork/actions/workflows/ci.yml/badge.svg)](https://github.com/PocketPortfolio/Financialprofilenetwork/actions)
 [![Lighthouse Score](https://img.shields.io/badge/Lighthouse-95%2B-success)](https://developers.google.com/web/tools/lighthouse)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -35,8 +39,8 @@ Pocket Portfolio is a modern web application for tracking investments across sto
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/pocket-portfolio.git
-cd pocket-portfolio
+git clone https://github.com/PocketPortfolio/Financialprofilenetwork.git
+cd Financialprofilenetwork
 
 # Install dependencies
 npm install
@@ -52,6 +56,24 @@ npm run dev
 ```
 
 Visit `http://localhost:5173` to see the app.
+
+## 📋 OpenBrokerCSV Schema
+
+All broker CSVs are normalized to a standardized format. See [SCHEMA.md](SCHEMA.md) for the full specification.
+
+**Quick Preview:**
+```json
+{
+  "date": "2024-01-15",
+  "ticker": "AAPL",
+  "action": "BUY",
+  "quantity": 10,
+  "price": 150.00,
+  "currency": "USD"
+}
+```
+
+Implemented in [`@pocket-portfolio/importer`](https://www.npmjs.com/package/@pocket-portfolio/importer).
 
 ### Environment Variables
 
@@ -192,8 +214,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📮 Support
 
-- **Issues**: [GitHub Issues](https://github.com/your-org/pocket-portfolio/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/pocket-portfolio/discussions)
+- **Issues**: [GitHub Issues](https://github.com/PocketPortfolio/Financialprofilenetwork/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/PocketPortfolio/Financialprofilenetwork/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md)
 
 ---

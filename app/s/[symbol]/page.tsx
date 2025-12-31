@@ -1,149 +1,224 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
+import { generateTickerContent } from '@/app/lib/pseo/content';
+import { generateFAQStructuredData } from '@/app/lib/pseo/content';
+import StructuredData from '@/app/components/StructuredData';
+import TickerPageContent from '@/app/components/TickerPageContent';
 
 interface SymbolPageProps {
   params: { symbol: string };
 }
 
+// Server-side quote fetching for SEO (runs during ISR revalidation)
+async function fetchQuoteData(symbol: string) {
+  try {
+    // During build time, skip API call (API routes aren't available)
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
+                        process.env.NEXT_PHASE === 'phase-development-build';
+    
+    // Skip API call during build, only fetch during ISR revalidation
+    if (isBuildTime || typeof window !== 'undefined') {
+      return null;
+    }
+    
+    // Fetch from API during ISR revalidation
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app';
+    const response = await fetch(`${baseUrl}/api/quote?symbols=${symbol}`, {
+      next: { revalidate: 300 } // Cache for 5 minutes
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      const quote = Array.isArray(data) ? data[0] : data;
+      if (quote) {
+        return {
+          price: quote.price,
+          change: quote.change,
+          changePct: quote.changePct,
+          currency: quote.currency || 'USD',
+        };
+      }
+    }
+  } catch (error) {
+    // Silently fail - client-side will handle it
+    // This is expected during build time or if API is unavailable
+  }
+  return null;
+}
+
+// Generate static params for popular tickers (ISR will handle the rest)
+export async function generateStaticParams() {
+  // Pre-generate top 500 most popular REAL tickers for faster initial load
+  // ISR will handle the remaining on-demand
+  // Growth Mandate: Only real tickers = real traffic
+  const allTickers = getAllTickers();
+  const popularTickers = allTickers.slice(0, 500); // Reduced from 1000 since we have ~1000-1200 real tickers total
+  
+  return popularTickers.map((symbol) => ({
+    symbol: symbol.toLowerCase().replace(/-/g, ''), // Remove dashes for URL
+  }));
+}
+
 // Generate metadata for SEO
 export async function generateMetadata({ params }: SymbolPageProps): Promise<Metadata> {
   const symbol = params.symbol.toUpperCase();
+  const metadata = await getTickerMetadata(symbol);
+  
+  if (!metadata) {
+    return {
+      title: `${symbol} Price & Dividends (No Login Required) - Pocket Portfolio`,
+      description: `Analyze ${symbol} stock without signing up. Import your CSV from Robinhood, eToro, or Fidelity directly in the browser. Privacy-first.`,
+    };
+  }
+  
+  const content = await generateTickerContent(symbol, metadata);
   
   return {
-    title: `${symbol} Stock Price & Analysis | Pocket Portfolio`,
-    description: `Track ${symbol} stock price, performance, and portfolio analysis. Free, open-source portfolio tracking for ${symbol} investors.`,
-    keywords: `${symbol}, stock price, portfolio tracking, investment analysis, free portfolio tracker`,
+    title: content.title,
+    description: content.description,
+    keywords: metadata.keywords.join(', '),
     openGraph: {
-      title: `${symbol} Stock Analysis | Pocket Portfolio`,
-      description: `Track ${symbol} stock performance with Pocket Portfolio's free portfolio tracker.`,
+      title: content.title,
+      description: content.description,
       type: 'website',
+      url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}`,
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${symbol} Stock Analysis | Pocket Portfolio`,
-      description: `Track ${symbol} stock performance with Pocket Portfolio's free portfolio tracker.`,
+      title: content.title,
+      description: content.description,
+    },
+    alternates: {
+      canonical: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}`,
     },
   };
 }
 
 // Main component
-export default function SymbolPage({ params }: SymbolPageProps) {
-  const symbol = params.symbol.toUpperCase();
+export default async function SymbolPage({ params }: SymbolPageProps) {
+  // Normalize symbol (remove dashes, handle crypto pairs)
+  const normalizedSymbol = params.symbol.toUpperCase().replace(/-/g, '');
+  const metadata = await getTickerMetadata(normalizedSymbol);
   
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {symbol} Stock Analysis
+  // Fetch quote data server-side for SEO (only during ISR revalidation, not during build)
+  const initialQuoteData = await fetchQuoteData(normalizedSymbol);
+  
+  // For generated tickers that don't have metadata, still generate a page
+  // This allows all 10K+ pages to be accessible
+  if (!metadata) {
+    // Generate basic metadata for unknown tickers
+    const basicMetadata = {
+      symbol: normalizedSymbol,
+      name: `${normalizedSymbol} Inc.`,
+      exchange: 'NYSE',
+      description: `Export ${normalizedSymbol} historical data to JSON or import ${normalizedSymbol} positions from Robinhood, Fidelity, eToro CSV. Free portfolio integration API.`,
+      keywords: [normalizedSymbol, `${normalizedSymbol} stock`, `${normalizedSymbol} JSON export`, `${normalizedSymbol} CSV import`],
+      relatedTickers: [],
+      faqs: [
+        {
+          question: `What is ${normalizedSymbol}?`,
+          answer: `${normalizedSymbol} is a stock you can integrate into your portfolio using Pocket Portfolio's free portfolio integration platform.`
+        },
+        {
+          question: `How do I track ${normalizedSymbol}?`,
+          answer: `Import your ${normalizedSymbol} trades from any supported broker (Robinhood, Fidelity, eToro, etc.) via CSV import, or export ${normalizedSymbol} historical data to JSON format.`
+        }
+      ],
+      contentTemplate: 'default'
+    };
+    const content = await generateTickerContent(normalizedSymbol, basicMetadata as any);
+    const faqStructuredData = generateFAQStructuredData(basicMetadata.faqs);
+    
+    return (
+      <>
+        <StructuredData type="FinancialProduct" data={content.structuredData} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+        />
+        <div style={{
+          background: 'var(--bg)',
+          minHeight: '100vh'
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '32px 16px'
+          }}>
+            <h1 style={{
+              fontSize: '30px',
+              fontWeight: '700',
+              color: 'var(--text)',
+              marginBottom: '8px'
+            }}>
+              {content.h1}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Track {symbol} stock price, performance, and portfolio analysis
+            <p style={{
+              color: 'var(--text-secondary)',
+              marginBottom: '32px',
+              lineHeight: '1.6'
+            }}>
+              {content.description}
             </p>
-          </div>
-
-          {/* Stock Information Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {symbol} Stock Information
+            <div style={{
+              background: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: '24px',
+              marginBottom: '32px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h2 style={{
+                fontSize: '20px',
+                fontWeight: '600',
+                color: 'var(--text)',
+                marginBottom: '16px'
+              }}>
+                Track {normalizedSymbol} in Your Portfolio
               </h2>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                Real-time data
-              </span>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  Loading...
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Current Price
-                </div>
-              </div>
-              
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Loading...
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Change
-                </div>
-              </div>
-              
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Loading...
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Change %
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Portfolio Integration */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Add {symbol} to Your Portfolio
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Track {symbol} in your portfolio with Pocket Portfolio's free portfolio tracker.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="/dashboard"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                href={content.cta.url}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '12px 24px',
+                  background: 'var(--accent-warm)',
+                  color: '#ffffff',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  transition: 'background-color 0.2s',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                }}
               >
-                Go to Dashboard
+                {content.cta.text}
               </a>
-              <a
-                href="/import"
-                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                Import Trades
-              </a>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                Free Portfolio Tracking
-              </h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400">
-                <li>• Track {symbol} performance</li>
-                <li>• Real-time price updates</li>
-                <li>• Portfolio analytics</li>
-                <li>• No signup required</li>
-              </ul>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                Open Source
-              </h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400">
-                <li>• Community-driven</li>
-                <li>• Privacy-first</li>
-                <li>• Always ad-free</li>
-                <li>• Transparent code</li>
-              </ul>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </>
+    );
+  }
+  
+  // Main content generation for known tickers
+  const content = await generateTickerContent(normalizedSymbol, metadata);
+  const faqStructuredData = generateFAQStructuredData(metadata.faqs);
+  
+  return (
+    <TickerPageContent
+      normalizedSymbol={normalizedSymbol}
+      metadata={metadata}
+      content={content}
+      faqStructuredData={faqStructuredData}
+      initialQuoteData={initialQuoteData}
+    />
   );
 }
 
-// ISR configuration
-export const revalidate = 300; // 5 minutes
+// ISR configuration - revalidate every 6 hours for SEO freshness
+export const revalidate = 21600; // 6 hours
 
 
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTrades } from '../hooks/useTrades';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
@@ -10,6 +10,7 @@ import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable
 import { Trade } from '../services/tradeService';
 import { useQuotes } from '../hooks/useDataFetching';
 import { BrandProvider } from '../lib/brand/theme';
+import AlertModal from '../components/modals/AlertModal';
 
 interface Position {
   ticker: string;
@@ -28,6 +29,8 @@ interface Position {
 export default function PositionsPage() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   const { trades, deleteTrade } = useTrades();
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
 
   // Debug: Log trades state changes (disabled to reduce console noise)
   // React.useEffect(() => {
@@ -113,10 +116,19 @@ export default function PositionsPage() {
       console.error('Error deleting trade:', error);
       // Show user-friendly message
       if (error instanceof Error && (error.message.includes('permissions') || error.message.includes('Missing or insufficient permissions'))) {
-        alert('Unable to delete this trade. It may have been created before sign-in. Try deleting from localStorage or re-importing your data.');
+        setAlertModalData({
+          title: 'Permission Error',
+          message: 'Unable to delete this trade. It may have been created before sign-in. Try deleting from localStorage or re-importing your data.',
+          type: 'warning'
+        });
       } else {
-        alert('Failed to delete trade. Please try again.');
+        setAlertModalData({
+          title: 'Error',
+          message: 'Failed to delete trade. Please try again.',
+          type: 'error'
+        });
       }
+      setShowAlertModal(true);
     }
   };
 
@@ -270,6 +282,16 @@ export default function PositionsPage() {
           />
         )}
       </main>
+      
+      {alertModalData && (
+        <AlertModal
+          isOpen={showAlertModal}
+          title={alertModalData.title}
+          message={alertModalData.message}
+          type={alertModalData.type}
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
     </div>
   );
 }

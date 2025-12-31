@@ -12,6 +12,7 @@ import { getCleanGAId } from './lib/env-utils';
 import TabBar from './components/nav/TabBar';
 import LandingPageTracker from './components/LandingPageTracker';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import PremiumThemeProvider from './components/PremiumThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,17 +26,17 @@ export const metadata: Metadata = brandEnabled
       path: '/',
     })
   : {
-      title: 'Pocket Portfolio — Invest smarter, together',
-      description: 'Pocket Portfolio is an open-source, community-led investing dashboard with live prices, profit/loss, mock trades, news, and simple trade import. Invest smarter, together.',
+      title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
+      description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
       robots: 'index,follow,max-image-preview:large',
         openGraph: {
-          title: 'Pocket Portfolio — Invest smarter, together',
-          description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
+          title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
+          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
           url: 'https://www.pocketportfolio.app/',
           siteName: 'Pocket Portfolio',
           images: [
             {
-              url: 'https://www.pocketportfolio.app/brand/og-base.png',
+              url: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123',
               width: 1200,
               height: 630,
               alt: 'Pocket Portfolio app preview',
@@ -46,9 +47,9 @@ export const metadata: Metadata = brandEnabled
         },
         twitter: {
           card: 'summary_large_image',
-          title: 'Pocket Portfolio — Invest smarter, together',
-          description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
-          images: ['https://www.pocketportfolio.app/brand/og-base.png'],
+          title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
+          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
+          images: ['https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123'],
         },
     };
 
@@ -73,8 +74,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/brand/pp-monogram.svg" />
-        <link rel="apple-touch-icon" href="/brand/pp-monogram.svg" />
+        <link rel="icon" href="/brand/pp-maskable.svg" />
+        <link rel="apple-touch-icon" href="/brand/pp-maskable.svg" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="preconnect" href="https://www.gstatic.com" crossOrigin="anonymous" />
@@ -162,6 +163,7 @@ export default function RootLayout({
         )}
         <BrandProvider>
           <ErrorBoundary scope="app-root">
+            <PremiumThemeProvider />
             <LandingPageTracker />
             <div className="safe-area-all">
               <ErrorBoundary scope="main-content">

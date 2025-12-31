@@ -5,6 +5,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useWatchlist } from '../hooks/useWatchlist';
 import SEOHead from '../components/SEOHead';
 import MobileHeader from '../components/nav/MobileHeader';
+import AlertModal from '../components/modals/AlertModal';
+import { getDeviceInfo } from '../lib/utils/device';
 
 interface SearchSuggestion {
   symbol: string;
@@ -19,6 +21,23 @@ export default function WatchlistPage() {
   const [searchSuggestions, setSearchSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile detection
+  useEffect(() => {
+    const deviceInfo = getDeviceInfo();
+    setIsMobile(deviceInfo.isMobile);
+    
+    const handleResize = () => {
+      const updatedDeviceInfo = getDeviceInfo();
+      setIsMobile(updatedDeviceInfo.isMobile);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
 
   // Auto-search functionality
@@ -79,7 +98,12 @@ export default function WatchlistPage() {
         // Check if symbol already exists
         const exists = watchlist.some(item => item.symbol === newSymbol.toUpperCase());
         if (exists) {
-          alert(`${newSymbol.toUpperCase()} is already in your watchlist`);
+          setAlertModalData({
+            title: 'Already in Watchlist',
+            message: `${newSymbol.toUpperCase()} is already in your watchlist`,
+            type: 'warning'
+          });
+          setShowAlertModal(true);
           return;
         }
 
@@ -92,7 +116,12 @@ export default function WatchlistPage() {
         setShowSuggestions(false);
       } catch (error) {
         console.error('Error adding to watchlist:', error);
-        alert(error instanceof Error ? error.message : 'Failed to add to watchlist');
+        setAlertModalData({
+          title: 'Error',
+          message: error instanceof Error ? error.message : 'Failed to add to watchlist',
+          type: 'error'
+        });
+        setShowAlertModal(true);
       }
     }
   };
@@ -107,7 +136,12 @@ export default function WatchlistPage() {
       await removeFromWatchlist(watchlistItemId);
     } catch (error) {
       console.error('Error removing from watchlist:', error);
-      alert(error instanceof Error ? error.message : 'Failed to remove from watchlist');
+      setAlertModalData({
+        title: 'Error',
+        message: error instanceof Error ? error.message : 'Failed to remove from watchlist',
+        type: 'error'
+      });
+      setShowAlertModal(true);
     }
   };
 
@@ -175,32 +209,36 @@ export default function WatchlistPage() {
       
       <main style={{ 
         flex: 1, 
-        padding: '20px',
+        padding: isMobile ? '16px' : '20px',
         maxWidth: '1200px',
         margin: '0 auto',
-        width: '100%'
+        width: '100%',
+        boxSizing: 'border-box',
+        overflowX: 'hidden'
       }}>
-        <div style={{ marginBottom: '32px' }}>
+        <div style={{ marginBottom: isMobile ? '24px' : '32px' }}>
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            marginBottom: '16px' 
+            marginBottom: '16px',
+            flexWrap: 'wrap'
           }}>
             <div style={{
-              width: '48px',
-              height: '48px',
+              width: isMobile ? '40px' : '48px',
+              height: isMobile ? '40px' : '48px',
               borderRadius: '12px',
               background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginRight: '16px'
+              marginRight: isMobile ? '12px' : '16px',
+              flexShrink: 0
             }}>
-              <span style={{ fontSize: '24px' }}>📈</span>
+              <span style={{ fontSize: isMobile ? '20px' : '24px' }}>📈</span>
             </div>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <h1 style={{ 
-                fontSize: '32px', 
+                fontSize: isMobile ? '24px' : '32px', 
                 fontWeight: '700', 
                 margin: '0 0 4px 0',
                 color: 'var(--text)'
@@ -209,7 +247,7 @@ export default function WatchlistPage() {
               </h1>
               <p style={{ 
                 color: 'var(--muted)', 
-                fontSize: '16px',
+                fontSize: isMobile ? '14px' : '16px',
                 margin: 0
               }}>
                 Track your favorite stocks and get real-time updates
@@ -223,12 +261,17 @@ export default function WatchlistPage() {
           background: 'var(--surface)',
           border: '1px solid var(--border)',
           borderRadius: '12px',
-          padding: '20px',
+          padding: isMobile ? '16px' : '20px',
           marginBottom: '24px',
           position: 'relative'
         }}>
-          <h3 style={{ fontSize: '18px', marginBottom: '16px' }}>Add to Watchlist</h3>
-          <form onSubmit={handleAddToWatchlist} style={{ display: 'flex', gap: '12px', position: 'relative' }}>
+          <h3 style={{ fontSize: isMobile ? '16px' : '18px', marginBottom: '16px' }}>Add to Watchlist</h3>
+          <form onSubmit={handleAddToWatchlist} style={{ 
+            display: 'flex', 
+            gap: '12px', 
+            position: 'relative',
+            flexDirection: isMobile ? 'column' : 'row'
+          }}>
             <div style={{ flex: 1, position: 'relative' }}>
               <input
                 type="text"
@@ -314,11 +357,13 @@ export default function WatchlistPage() {
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                padding: '12px 24px',
-                fontSize: '16px',
+                padding: isMobile ? '12px 16px' : '12px 24px',
+                fontSize: isMobile ? '14px' : '16px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                width: isMobile ? '100%' : 'auto',
+                minWidth: isMobile ? 'auto' : '80px'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
@@ -394,18 +439,22 @@ export default function WatchlistPage() {
             background: 'var(--surface)',
             border: '1px solid var(--border)',
             borderRadius: '12px',
-            overflow: 'hidden'
+            overflow: isMobile ? 'auto' : 'hidden',
+            overflowX: isMobile ? 'auto' : 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'thin'
           }}>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr auto',
-              gap: '16px',
-              padding: '16px 20px',
+              gridTemplateColumns: isMobile ? '140px 100px 100px 100px 90px' : '1fr 1fr 1fr 1fr auto',
+              gap: isMobile ? '12px' : '16px',
+              padding: isMobile ? '12px 16px' : '16px 20px',
               background: 'var(--bg)',
               borderBottom: '1px solid var(--border)',
               fontWeight: '600',
-              fontSize: '14px',
-              color: 'var(--muted)'
+              fontSize: isMobile ? '12px' : '14px',
+              color: 'var(--muted)',
+              minWidth: isMobile ? '540px' : 'auto'
             }}>
               <div>Symbol</div>
               <div>Price</div>
@@ -419,19 +468,20 @@ export default function WatchlistPage() {
                 key={item.id || item.symbol}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr 1fr auto',
-                  gap: '16px',
-                  padding: '16px 20px',
+                  gridTemplateColumns: isMobile ? '140px 100px 100px 100px 90px' : '1fr 1fr 1fr 1fr auto',
+                  gap: isMobile ? '12px' : '16px',
+                  padding: isMobile ? '12px 16px' : '16px 20px',
                   borderBottom: index < watchlist.length - 1 ? '1px solid var(--border)' : 'none',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  minWidth: isMobile ? '540px' : 'auto'
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: '600', fontSize: '16px' }}>{item.symbol}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{item.name}</div>
+                  <div style={{ fontWeight: '600', fontSize: isMobile ? '14px' : '16px' }}>{item.symbol}</div>
+                  <div style={{ fontSize: isMobile ? '11px' : '12px', color: 'var(--muted)' }}>{item.name}</div>
                 </div>
                 
-                <div style={{ fontWeight: '600' }}>
+                <div style={{ fontWeight: '600', fontSize: isMobile ? '14px' : '16px' }}>
                   {item.price !== undefined && item.price !== null ? (
                     <>
                       {item.currency === 'GBP' ? '£' : '$'}{item.price.toFixed(2)}
@@ -443,7 +493,8 @@ export default function WatchlistPage() {
                 
                 <div style={{ 
                   color: item.change !== undefined && item.change !== null ? (item.change >= 0 ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)',
-                  fontWeight: '600'
+                  fontWeight: '600',
+                  fontSize: isMobile ? '14px' : '16px'
                 }}>
                   {item.change !== undefined && item.change !== null ? (
                     <>
@@ -456,7 +507,8 @@ export default function WatchlistPage() {
                 
                 <div style={{ 
                   color: item.changePercent !== undefined && item.changePercent !== null ? (item.changePercent >= 0 ? 'var(--pos)' : 'var(--neg)') : 'var(--muted)',
-                  fontWeight: '600'
+                  fontWeight: '600',
+                  fontSize: isMobile ? '14px' : '16px'
                 }}>
                   {item.changePercent !== undefined && item.changePercent !== null ? (
                     <>
@@ -474,9 +526,10 @@ export default function WatchlistPage() {
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                    cursor: 'pointer'
+                    padding: isMobile ? '6px 10px' : '8px 12px',
+                    fontSize: isMobile ? '11px' : '12px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   Remove
@@ -486,6 +539,16 @@ export default function WatchlistPage() {
           </div>
         )}
       </main>
+      
+      {alertModalData && (
+        <AlertModal
+          isOpen={showAlertModal}
+          title={alertModalData.title}
+          message={alertModalData.message}
+          type={alertModalData.type}
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
     </div>
   );
 }

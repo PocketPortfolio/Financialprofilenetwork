@@ -3,8 +3,8 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Logo from '../components/Logo';
-import ThemeSwitcher from '../components/ThemeSwitcher';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
+import ToolFooter from '../components/marketing/ToolFooter';
 import WaitlistForm from '../components/waitlist/WaitlistForm';
 import SEOHead from '../components/SEOHead';
 import StructuredData, { webAppData } from '../components/StructuredData';
@@ -41,7 +41,7 @@ function JoinWaitlistContent() {
           'financial technology'
         ]}
         canonical="https://www.pocketportfolio.app/join"
-        ogImage="/brand/og-base.png"
+        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123"
         ogType="website"
       />
       
@@ -57,103 +57,7 @@ function JoinWaitlistContent() {
         maxWidth: '100vw',
         overflowX: 'hidden'
       }}>
-        {/* Header */}
-        <header className="join-page-header" style={{
-          borderBottom: '1px solid var(--card-border)',
-          background: 'var(--chrome)',
-          padding: '16px',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          backdropFilter: 'blur(10px)',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            maxWidth: '1200px',
-            margin: '0 auto',
-            width: '100%',
-            boxSizing: 'border-box',
-            flexWrap: 'nowrap'
-          }}>
-            {/* Logo */}
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <Logo size="medium" showWordmark={true} />
-            </Link>
-
-            {/* Navigation - Hidden on Mobile */}
-            <div className="mobile-hidden" style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '16px',
-              flexShrink: 0
-            }}>
-              <nav style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <Link
-                  href="/"
-                  style={{
-                    padding: '8px 12px',
-                    background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                    color: 'white',
-                    textDecoration: 'none',
-                    borderRadius: '20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    border: '2px solid var(--border-warm)',
-                    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/dashboard"
-                  style={{
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: '1px solid var(--border-warm)',
-                    color: 'var(--text-warm)',
-                    textDecoration: 'none',
-                    borderRadius: '20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/live"
-                  style={{
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: '1px solid var(--border-warm)',
-                    color: 'var(--text-warm)',
-                    textDecoration: 'none',
-                    borderRadius: '20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  Live
-                </Link>
-              </nav>
-
-              <ThemeSwitcher />
-            </div>
-          </div>
-        </header>
+        <ProductionNavbar />
 
         {/* Main Content */}
         <main className="join-page-main" style={{
@@ -252,38 +156,7 @@ function JoinWaitlistContent() {
           </div>
         </main>
 
-        {/* Footer */}
-        <footer style={{
-          borderTop: '1px solid var(--card-border)',
-          background: 'var(--chrome)',
-          padding: '24px 16px',
-          textAlign: 'center'
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            fontSize: '14px',
-            color: 'var(--muted)'
-          }}>
-            <p style={{ margin: '0 0 8px 0' }}>
-              Questions? Contact us at{' '}
-              <a 
-                href="mailto:pocketportfolioapp@gmail.com" 
-                style={{ color: 'var(--brand)', textDecoration: 'none' }}
-              >
-                pocketportfolioapp@gmail.com
-              </a>
-            </p>
-            <p style={{ margin: 0 }}>
-              <Link href="/" style={{ color: 'var(--muted)', textDecoration: 'none', marginRight: '16px' }}>
-                Privacy Policy
-              </Link>
-              <Link href="/" style={{ color: 'var(--muted)', textDecoration: 'none' }}>
-                Terms of Service
-              </Link>
-            </p>
-          </div>
-        </footer>
+        <ToolFooter />
       </div>
     </>
   );

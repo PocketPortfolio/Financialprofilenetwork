@@ -1,16 +1,27 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
 import ThemeSwitcher from '../components/ThemeSwitcher';
-import WaitlistCTA from '../components/waitlist/WaitlistCTA';
 import CommunityContent from '../components/CommunityContent';
+import SocialShare from '../components/viral/SocialShare';
+import SocialProof from '../components/viral/SocialProof';
+import FunnelTracker from '../components/analytics/FunnelTracker';
+import CSVImporter from '../components/CSVImporter';
+import { useTrades } from '../hooks/useTrades';
+import { WebOneBadge } from '../components/hero/WebOneBadge';
+import NPMStats from '../components/NPMStats';
+import { useStickyHeader } from '../hooks/useStickyHeader';
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { importTrades } = useTrades();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
+  const [csvUploaded, setCsvUploaded] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -25,35 +36,43 @@ export default function LandingPage() {
   }, []);
 
   const handleStarGitHub = () => {
-    window.open('https://github.com/pocketportfolio', '_blank');
+    window.open('https://github.com/PocketPortfolio/Financialprofilenetwork', '_blank');
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  // Ensure header stays visible when scrolling
+  useStickyHeader('header.brand-header');
+
   return (
     <>
-      <div className="mobile-container" style={{ 
-        minHeight: '100vh', 
-        background: 'var(--bg)', 
-        color: 'var(--text)', 
-        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        lineHeight: '1.6',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-      {/* Header */}
-    <header className="brand-surface brand-header brand-spine" style={{
-      padding: '12px 24px',
-      position: 'sticky',
-      top: 0,
-      zIndex: 50,
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid var(--border)'
-    }}>
+      <FunnelTracker 
+        funnelName="user_onboarding" 
+        stage="landing"
+        autoTrackScroll={true}
+        autoTrackTime={true}
+      />
+      {/* Header - Outside scrolling container for proper sticky positioning */}
+      <header 
+        className="brand-header brand-spine" 
+        style={{
+          padding: '12px 24px',
+          position: 'sticky',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%)',
+          borderBottom: '1px solid var(--border)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+          width: '100%',
+          margin: 0
+        } as React.CSSProperties}
+      >
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <div style={{ 
             display: 'flex', 
@@ -62,7 +81,7 @@ export default function LandingPage() {
           }}>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Logo size="medium" showWordmark={true} />
+              <Logo size="medium" showWordmark={!isMobile} />
             </div>
 
             {/* Navigation */}
@@ -105,6 +124,22 @@ export default function LandingPage() {
                   (e.target as HTMLElement).style.borderBottomColor = 'transparent';
                 }}
                 >Features</a>
+                <Link href="#popular-stocks" className="brand-link" style={{ 
+                  fontSize: '15px',
+                  padding: '8px 0',
+                  borderBottom: '2px solid transparent',
+                  textDecoration: 'none',
+                  color: 'var(--text)'
+                }}
+                onMouseEnter={(e) => {
+                  (e.target as HTMLElement).style.color = 'var(--signal)';
+                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.target as HTMLElement).style.color = 'var(--text)';
+                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                }}
+                >Stocks</Link>
                 <a href="#fin-pillars" className="brand-link" style={{ 
                   fontSize: '15px',
                   padding: '8px 0',
@@ -180,11 +215,45 @@ export default function LandingPage() {
                 >
                   Launch App
                 </Link>
-                <WaitlistCTA 
-                  source="web:header" 
-                  variant="outline" 
-                  size="sm"
-                />
+                <a
+                  href="/sponsor"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 16px',
+                    background: 'transparent',
+                    border: '1px solid var(--border)',
+                    borderRadius: '12px',
+                    color: 'var(--text)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#E1306C';
+                    e.currentTarget.style.color = '#E1306C';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.color = 'var(--text)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="sponsor-heart"
+                  >
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#E1306C"/>
+                  </svg>
+                  Sponsor
+                </a>
                 <ThemeSwitcher />
               </div>
 
@@ -286,7 +355,11 @@ export default function LandingPage() {
               background: 'rgba(0, 0, 0, 0.5)',
               zIndex: 1000,
               overflowY: 'auto',
-              overflowX: 'hidden'
+              overflowX: 'hidden',
+              WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+              overscrollBehavior: 'contain', // Prevent scroll chaining
+              paddingTop: '20px', // Top padding for close button
+              paddingBottom: `calc(20px + env(safe-area-inset-bottom, 0px))` // Account for iPhone safe area + extra padding
             }}>
           {/* Close Button */}
           <button
@@ -303,7 +376,8 @@ export default function LandingPage() {
               color: 'var(--text)',
               fontSize: '24px',
               fontWeight: 'bold',
-              transition: 'background-color 0.2s ease'
+              transition: 'background-color 0.2s ease',
+              zIndex: 1001 // Ensure close button is above content
             }}
             onMouseEnter={(e) => {
               (e.target as HTMLElement).style.background = 'var(--chrome)';
@@ -404,7 +478,8 @@ export default function LandingPage() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
-                padding: '20px'
+                padding: '0 20px 20px 20px',
+                marginBottom: `calc(20px + env(safe-area-inset-bottom, 0px))` // Extra bottom margin for iPhone to ensure Sponsor button is visible
               }}>
                 {/* Launch App Button */}
                 <Link 
@@ -443,45 +518,6 @@ export default function LandingPage() {
                   Launch App
                 </Link>
 
-                {/* Join Waitlist Button */}
-                <Link 
-                  href="/join" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  style={{ 
-                    width: '100%',
-                    padding: '16px 24px', 
-                    background: 'linear-gradient(135deg, var(--warm-bg) 0%, var(--accent-warm) 100%)', 
-                    color: 'var(--text-warm)', 
-                    textDecoration: 'none', 
-                    borderRadius: '12px', 
-                    fontSize: '16px', 
-                    fontWeight: '600',
-                    textAlign: 'center',
-                    border: '2px solid var(--border-warm)',
-                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)';
-                    e.currentTarget.style.color = 'white';
-                    e.currentTarget.style.transform = 'translateY(-1px)';
-                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, var(--warm-bg) 0%, var(--accent-warm) 100%)';
-                    e.currentTarget.style.color = 'var(--text-warm)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
-                  }}
-                >
-                  <span style={{ fontSize: '18px' }}>📝</span>
-                  Join Waitlist
-                </Link>
-                
                 {/* Theme Switcher */}
                 <div style={{
                   display: 'flex',
@@ -506,6 +542,9 @@ export default function LandingPage() {
         width: '100%',
         maxWidth: '100vw',
         padding: 'clamp(24px, 6vw, 60px) clamp(12px, 3vw, 24px)',
+        paddingTop: isMobile 
+          ? 'calc(clamp(24px, 6vw, 60px) + 80px)' // Mobile: add header height to prevent nav from blocking hero
+          : undefined, // Desktop: use default padding (no override)
         minHeight: 'calc(100vh - 80px)',
         display: 'flex',
         flexDirection: 'column',
@@ -525,6 +564,76 @@ export default function LandingPage() {
           padding: 'clamp(20px, 4vw, 32px)',
           boxSizing: 'border-box'
         }}>
+            {/* npm Install Badge - Top of Hero */}
+            <div style={{
+              marginBottom: '32px',
+              width: '100%',
+              maxWidth: '600px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              alignItems: 'center'
+            }}>
+              <a
+                href="https://www.npmjs.com/package/@pocket-portfolio/importer"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  padding: '12px 20px',
+                  background: 'var(--surface)',
+                  border: '2px solid var(--border-warm)',
+                  borderRadius: '8px',
+                  fontFamily: 'monospace',
+                  fontSize: '14px',
+                  color: 'var(--text)',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.1)',
+                  width: '100%',
+                  textAlign: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-warm)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <span style={{ color: 'var(--muted)' }}>$</span> npm install @pocket-portfolio/importer
+              </a>
+              
+              {/* NPM Download Stats */}
+              <NPMStats />
+            </div>
+
+            {/* WebOne Trust Badge */}
+            <WebOneBadge />
+            
+            {/* Google Drive Verified Badge */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              background: 'rgba(66, 133, 244, 0.1)',
+              border: '1px solid rgba(66, 133, 244, 0.3)',
+              borderRadius: '20px',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#4285F4',
+              marginBottom: '16px'
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#4285F4">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>Google Drive Verified</span>
+            </div>
+
             <h1 className="brand-text" style={{ 
               fontSize: 'clamp(2.5rem, 5vw, 3rem)', 
               fontWeight: 'bold', 
@@ -532,8 +641,8 @@ export default function LandingPage() {
               marginBottom: '24px',
               letterSpacing: '-0.02em'
             }}>
-              Invest smarter,{' '}
-              <span style={{ color: 'var(--accent-warm)' }}>together.</span>
+              Your Portfolio. Your Data.{' '}
+              <span style={{ color: 'var(--accent-warm)' }}>Sovereign.</span>
             </h1>
             <p className="brand-text-secondary" style={{ 
               fontSize: 'clamp(1.125rem, 2vw, 1.25rem)', 
@@ -541,8 +650,87 @@ export default function LandingPage() {
               marginBottom: '32px',
               maxWidth: '600px'
             }}>
-              Free, open-source portfolio tracker with live P/L, real-time prices, mock trading, and CSV import. No signup required—start tracking your investments in seconds.
+              Free, open-source portfolio tracker with live P/L, real-time prices, and CSV import. No signup required—your data stays local or syncs securely to your Google Drive.
             </p>
+            
+            {/* CSV Upload Section - Local-First Onboarding */}
+            <div style={{
+              width: '100%',
+              maxWidth: '600px',
+              marginBottom: '24px'
+            }}>
+              <p style={{
+                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                marginBottom: '12px',
+                fontWeight: '500'
+              }}>
+                Drop your Robinhood/Fidelity CSV here to visualize instantly. No login required.
+              </p>
+              <CSVImporter 
+                onImport={async (trades) => {
+                  try {
+                    // Convert CSVImporter trades to useTrades format (remove id, uid, createdAt, updatedAt)
+                    const tradesToImport = trades.map(({ id, ...trade }) => trade);
+                    await importTrades(tradesToImport);
+                    setCsvUploaded(true);
+                    // Redirect to dashboard after successful import
+                    setTimeout(() => {
+                      router.push('/dashboard');
+                    }, 500);
+                  } catch (error) {
+                    console.error('Error importing CSV:', error);
+                    alert('Error importing CSV. Please try again.');
+                  }
+                }}
+              />
+              {csvUploaded && (
+                <div style={{
+                  marginTop: '16px',
+                  padding: '12px',
+                  background: 'var(--accent-warm)',
+                  color: 'white',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  ✓ Portfolio imported! Redirecting to dashboard...
+                </div>
+              )}
+            </div>
+
+            {/* Enterprise Upsell Link */}
+            <Link 
+              href="/sponsor" 
+              style={{ 
+                fontSize: 'clamp(13px, 2vw, 14px)', 
+                color: 'var(--text-secondary)', 
+                textDecoration: 'none',
+                textAlign: 'center',
+                marginBottom: '16px',
+                display: 'block',
+                transition: 'color 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-warm)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+            >
+              Enterprise Sync available for{' '}
+              <span style={{ 
+                fontWeight: '600', 
+                color: 'var(--accent-warm)',
+                textDecoration: 'underline',
+                textDecorationColor: 'var(--accent-warm)'
+              }}>
+                Corporate Sponsors →
+              </span>
+            </Link>
+
             <div style={{ 
               display: 'flex', 
               gap: 'clamp(8px, 2vw, 12px)', 
@@ -568,14 +756,8 @@ export default function LandingPage() {
                 minWidth: '200px',
                 border: '2px solid var(--border-warm)'
               }}>
-                Start Tracking Free
+                Launch Dashboard
               </Link>
-              <WaitlistCTA 
-                source="web:footer" 
-                variant="outline" 
-                size="lg"
-                className="flex-1 min-w-[200px]"
-              />
               <button 
                 onClick={handleStarGitHub}
                 style={{ 
@@ -596,6 +778,88 @@ export default function LandingPage() {
                 Star on GitHub
               </button>
             </div>
+            
+            {/* Product Hunt Badge */}
+            <div style={{
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+              border: '1px solid rgb(224, 224, 224)',
+              borderRadius: '12px',
+              padding: '20px',
+              maxWidth: '500px',
+              margin: '0 auto 24px',
+              background: 'rgb(255, 255, 255)',
+              boxShadow: 'rgba(0, 0, 0, 0.05) 0px 2px 8px'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginBottom: '12px'
+              }}>
+                <img 
+                  alt="Pocket Portfolio" 
+                  src="https://ph-files.imgix.net/22f9f173-77d7-4560-90cd-8a059d3cc612.svg?auto=format&fit=crop&w=80&h=80" 
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '8px',
+                    objectFit: 'cover',
+                    flexShrink: 0
+                  }}
+                />
+                <div style={{
+                  flex: '1 1 0%',
+                  minWidth: 0
+                }}>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    color: 'rgb(26, 26, 26)',
+                    lineHeight: 1.3,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    Pocket Portfolio
+                  </h3>
+                  <p style={{
+                    margin: '4px 0px 0px',
+                    fontSize: '14px',
+                    color: 'rgb(102, 102, 102)',
+                    lineHeight: 1.4,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical'
+                  }}>
+                    The Local-First Investment Tracker. Stop paying monthly fees
+                  </p>
+                </div>
+              </div>
+              <a 
+                href="https://www.producthunt.com/products/pocket-portfolio?embed=true&utm_source=embed&utm_medium=post_embed" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  marginTop: '12px',
+                  padding: '8px 16px',
+                  background: 'rgb(255, 97, 84)',
+                  color: 'rgb(255, 255, 255)',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 600
+                }}
+              >
+                Check it out on Product Hunt →
+              </a>
+            </div>
+            
             <div style={{ 
               display: 'flex', 
               gap: 'clamp(20px, 5vw, 32px)', 
@@ -640,7 +904,7 @@ export default function LandingPage() {
                   fontWeight: '500',
                   color: 'var(--text-warm)',
                   letterSpacing: '0.02em'
-                }}>Community-led</span>
+                }}>Local storage</span>
               </div>
               <div style={{ 
                 display: 'flex', 
@@ -659,7 +923,26 @@ export default function LandingPage() {
                   fontWeight: '500',
                   color: 'var(--text-warm)',
                   letterSpacing: '0.02em'
-                }}>Privacy-first</span>
+                }}>No signup</span>
+              </div>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px'
+              }}>
+                <div style={{ 
+                  width: '10px', 
+                  height: '10px', 
+                  background: 'var(--accent-warm)', 
+                  borderRadius: '50%',
+                  boxShadow: '0 0 6px rgba(245, 158, 11, 0.6)'
+                }}></div>
+                <span style={{ 
+                  fontSize: '15px', 
+                  fontWeight: '500',
+                  color: 'var(--text-warm)',
+                  letterSpacing: '0.02em'
+                }}>Sovereign Sync</span>
               </div>
               <div style={{ 
                 display: 'flex', 
@@ -682,44 +965,56 @@ export default function LandingPage() {
               </div>
             </div>
           
+          {/* JSON Data Preview - Replaces Dashboard Preview */}
           <div className="brand-card brand-candlestick brand-spine mobile-container" style={{ 
             width: '100%',
-            maxWidth: 'min(500px, 95vw)',
-            margin: '0 auto',
+            maxWidth: 'min(600px, 95vw)',
+            margin: '32px auto 0',
             padding: 'clamp(20px, 4vw, 32px)',
             boxSizing: 'border-box'
           }}>
-            <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', textAlign: 'center', color: 'var(--text-warm)' }}>Dashboard Preview</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center', color: 'var(--text-warm)' }}>JSON Data Endpoint Example</h3>
             <div style={{ 
               background: 'var(--bg)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              marginBottom: '24px',
-              border: '2px solid var(--border-warm)'
+              borderRadius: '8px', 
+              padding: '20px', 
+              marginBottom: '16px',
+              border: '2px solid var(--border-warm)',
+              overflowX: 'auto'
             }}>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text)', textAlign: 'center' }}>$24,560</div>
-              <div style={{ color: 'var(--pos)', fontSize: '18px', textAlign: 'center', fontWeight: '600' }}>+$1,382 (+5.96%)</div>
+              <pre style={{
+                margin: 0,
+                fontSize: '12px',
+                fontFamily: 'monospace',
+                color: 'var(--text)',
+                lineHeight: '1.6',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word'
+              }}>
+{`GET /s/aapl/json-api
+
+{
+  "symbol": "AAPL",
+  "price": 215.22,
+  "change": "+1.1%",
+  "volume": 45234567,
+  "marketCap": "3.2T",
+  "data": {
+    "realTime": true,
+    "source": "Yahoo Finance",
+    "lastUpdated": "2025-01-XX"
+  }
+}`}
+              </pre>
             </div>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr 1fr', 
-              gap: '24px', 
-              marginBottom: '24px' 
+            <p style={{
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+              margin: 0
             }}>
-              <div style={{ textAlign: 'center', padding: '16px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: '16px', color: 'var(--muted)', marginBottom: '8px' }}>Equities</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-warm)' }}>62%</div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '16px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: '16px', color: 'var(--muted)', marginBottom: '8px' }}>Cash</div>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--signal)' }}>15%</div>
-              </div>
-            </div>
-            <div style={{ fontSize: '16px', color: 'var(--muted)', lineHeight: '1.6' }}>
-              <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>AAPL $215.22 <span style={{ color: 'var(--pos)', fontWeight: '600' }}>+1.1%</span></div>
-              <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>NVDA $124.80 <span style={{ color: 'var(--pos)', fontWeight: '600' }}>+2.7%</span></div>
-              <div style={{ padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border)' }}>TSLA $239.14 <span style={{ color: 'var(--neg)', fontWeight: '600' }}>-0.6%</span></div>
-            </div>
+              Free JSON endpoints for every ticker. No API key required.
+            </p>
           </div>
         </div>
 
@@ -832,18 +1127,37 @@ export default function LandingPage() {
                 justifyContent: 'center', 
                 marginBottom: '16px' 
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                  <path d="M14 2v6h6"/>
-                  <path d="M16 13H8"/>
-                  <path d="M16 17H8"/>
-                  <path d="M10 9H8"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                  <path d="M12 2v20c5.16-1.26 9-6.45 9-12V7l-9-5z" fill="rgba(255,255,255,0.3)"/>
                 </svg>
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Smart News</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Ticker-aware news with images, interleaved so every position is represented.
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Google Drive Backed</h3>
+              <p style={{ color: 'var(--text)', lineHeight: '1.6', marginBottom: '12px' }}>
+                Turn Google Drive into your personal database. Real-time 2-way sync with version history and audit trails included.
               </p>
+              <Link 
+                href="/features/google-drive-sync"
+                style={{ 
+                  color: 'var(--accent-warm)', 
+                  fontWeight: '600', 
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  display: 'inline-block',
+                  marginTop: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.textDecoration = 'underline';
+                  e.currentTarget.style.transform = 'translateX(4px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.textDecoration = 'none';
+                  e.currentTarget.style.transform = 'translateX(0)';
+                }}
+              >
+                Learn How It Works →
+              </Link>
             </div>
             
             <div className="brand-card brand-candlestick brand-sparkline" style={{ 
@@ -934,14 +1248,29 @@ export default function LandingPage() {
               </p>
             </div>
             
-            <div className="brand-card brand-sparkline brand-candlestick" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
+            <Link 
+              href="/features/google-drive-sync"
+              className="brand-card brand-sparkline brand-candlestick"
+              style={{ 
+                background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
+                border: '2px solid var(--border-warm)', 
+                borderRadius: '12px', 
+                padding: '24px', 
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                display: 'block'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
+              }}
+            >
               <div style={{ 
                 width: '48px', 
                 height: '48px', 
@@ -952,15 +1281,177 @@ export default function LandingPage() {
                 justifyContent: 'center', 
                 marginBottom: '16px' 
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                  <path d="M12 2v20c5.16-1.26 9-6.45 9-12V7l-9-5z" fill="rgba(255,255,255,0.3)"/>
                 </svg>
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Privacy-first</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Own your data. Export any time. Open roadmap and open source.
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Sovereign Sync</h3>
+              <p style={{ color: 'var(--text)', lineHeight: '1.6', marginBottom: '12px' }}>
+                Own your data. Sync bidirectionally with <strong>Google Drive</strong>. Edit directly in Drive, view in app. Zero vendor lock-in.
               </p>
-            </div>
+              <span style={{ 
+                color: 'var(--accent-warm)', 
+                fontWeight: '600', 
+                fontSize: '14px',
+                display: 'inline-block',
+                marginTop: '8px'
+              }}>
+                Learn More →
+              </span>
+            </Link>
+          </div>
+        </section>
+
+        {/* Popular Stocks Section - Developer Data Utility */}
+        <section id="popular-stocks" className="mobile-container" style={{ 
+          marginBottom: 'clamp(60px, 10vw, 120px)',
+          width: '100%',
+          maxWidth: '100vw',
+          padding: '0 clamp(12px, 3vw, 24px)',
+          boxSizing: 'border-box'
+        }}>
+          <h2 style={{ 
+            fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
+            fontWeight: 'bold', 
+            textAlign: 'center', 
+            marginBottom: '16px',
+            letterSpacing: '-0.02em'
+          }}>
+            Open Financial Data (JSON endpoints)
+          </h2>
+          <p style={{ 
+            fontSize: 'clamp(1rem, 2vw, 1.125rem)', 
+            textAlign: 'center', 
+            marginBottom: '48px',
+            color: 'var(--text-secondary)',
+            maxWidth: '600px',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+          }}>
+            Programmatic access to real-time price data and normalized historical CSVs. Free for developers.
+          </p>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
+            gap: 'clamp(12px, 3vw, 16px)',
+            width: '100%',
+            maxWidth: '1000px',
+            margin: '0 auto'
+          }}>
+            {['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM', 'JNJ', 'V', 'WMT', 'PG'].map((ticker) => {
+              // Get company name for title attribute
+              const companyNames: Record<string, string> = {
+                'AAPL': 'Apple',
+                'MSFT': 'Microsoft',
+                'GOOGL': 'Alphabet',
+                'AMZN': 'Amazon',
+                'NVDA': 'NVIDIA',
+                'META': 'Meta',
+                'TSLA': 'Tesla',
+                'JPM': 'JPMorgan Chase',
+                'JNJ': 'Johnson & Johnson',
+                'V': 'Visa',
+                'WMT': 'Walmart',
+                'PG': 'Procter & Gamble'
+              };
+              const companyName = companyNames[ticker] || ticker;
+              
+              return (
+                <Link
+                  key={ticker}
+                  href={`/s/${ticker.toLowerCase()}`}
+                  title={`Get free JSON market data for ${companyName} (${ticker})`}
+                  className="brand-card"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+                    border: '2px solid var(--border-warm)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    color: 'var(--text)',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(245, 158, 11, 0.1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 8px 16px rgba(245, 158, 11, 0.3)';
+                    e.currentTarget.style.borderColor = 'var(--accent-warm)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.1)';
+                    e.currentTarget.style.borderColor = 'var(--border-warm)';
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '8px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '24px', 
+                      fontWeight: 'bold', 
+                      color: 'var(--accent-warm)'
+                    }}>
+                      {ticker}
+                    </div>
+                    <span style={{
+                      fontSize: '18px',
+                      color: 'var(--text-secondary)',
+                      fontFamily: 'monospace',
+                      fontWeight: '600'
+                    }}>
+                      {'{ }'}
+                    </span>
+                  </div>
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: 'var(--text-secondary)',
+                    fontWeight: '500'
+                  }}>
+                    GET /JSON →
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+          <div style={{ 
+            textAlign: 'center', 
+            marginTop: '32px' 
+          }}>
+            <Link
+              href="/dashboard"
+              style={{
+                display: 'inline-block',
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                border: '2px solid var(--border-warm)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              Track Your Portfolio →
+            </Link>
           </div>
         </section>
 
@@ -1274,7 +1765,7 @@ export default function LandingPage() {
             flexWrap: 'wrap'
           }}>
             <a 
-              href="https://github.com/pocketportfolio" 
+              href="https://github.com/PocketPortfolio/Financialprofilenetwork" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
@@ -1528,104 +2019,271 @@ export default function LandingPage() {
       {/* Community Content Section */}
       <CommunityContent />
 
+      {/* Social Proof Section */}
+      <section style={{ 
+        marginBottom: '80px', 
+        padding: '40px 24px',
+        maxWidth: '1200px',
+        margin: '0 auto 80px'
+      }}>
+        <SocialProof variant="full" />
+      </section>
+
+      {/* Share Section */}
+      <section className="brand-card brand-spine" style={{ 
+        marginBottom: '80px', 
+        padding: '40px 24px',
+        textAlign: 'center',
+        maxWidth: '800px',
+        margin: '0 auto 80px',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px'
+      }}>
+        <h2 style={{ 
+          fontSize: 'var(--font-size-xl)', 
+          fontWeight: 'bold', 
+          marginBottom: '16px',
+          color: 'var(--text)'
+        }}>
+          Share Pocket Portfolio
+        </h2>
+        <p style={{ 
+          fontSize: 'var(--font-size-base)', 
+          color: 'var(--text-secondary)', 
+          marginBottom: '24px',
+          lineHeight: 'var(--line-snug)'
+        }}>
+          Help others discover free, open-source portfolio tracking
+        </p>
+        <SocialShare
+          title="Pocket Portfolio - Free, Open-Source Portfolio Tracker"
+          description="Track your investments with a free, privacy-first portfolio tracker. No signup required. Open source."
+          url="https://www.pocketportfolio.app"
+          context="landing_page"
+          showLabel={true}
+          hashtags={['PocketPortfolio', 'PortfolioTracker', 'OpenSource', 'FreeFinance']}
+        />
+      </section>
+
       {/* Footer */}
-      <footer className="mobile-container" style={{ 
+      <footer style={{ 
         marginTop: 'clamp(40px, 8vw, 80px)', 
         paddingTop: 'clamp(20px, 4vw, 32px)', 
-        borderTop: '1px solid var(--card-border)', 
+        borderTop: '1px solid var(--border)', 
         textAlign: 'center', 
-        background: 'var(--chrome)', 
+        background: 'var(--bg)',
         padding: 'clamp(20px, 4vw, 32px) clamp(12px, 3vw, 24px)',
         width: '100%',
         maxWidth: '100vw',
         boxSizing: 'border-box'
       }}>
         <div style={{ 
-          maxWidth: '100%', 
+          maxWidth: '1200px', 
           margin: '0 auto',
           width: '100%',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px'
         }}>
-          <div style={{ marginBottom: 'clamp(20px, 4vw, 32px)' }}>
-            <p style={{ color: 'var(--muted)', fontSize: '14px', margin: 0 }}>
-              © 2025 Pocket Portfolio — Built with the community.
-            </p>
+          {/* Brand & Legal */}
+          <div style={{ textAlign: 'center' }}>
+            <span className="brand-wordmark brand-wordmark-small">Pocket Portfolio<span className="brand-wordmark-dot">.</span></span>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '8px 0 0 0' }}>© 2025 Open Source. Local-First.</p>
           </div>
-          
+
+          {/* The Money Links (Bolded) */}
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
             gap: '24px', 
-            marginBottom: '32px', 
+            flexWrap: 'wrap',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
+            <Link href="/for/advisors" style={{ 
+              color: '#D97706',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#B45309'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#D97706'}
+            >
+              For Advisors
+            </Link>
+            <Link href="/features/google-drive-sync" style={{ 
+              color: 'var(--text)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              Google Drive Sync
+            </Link>
+            <Link href="/tools/google-sheets-formula" style={{ 
+              color: 'var(--text)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              Google Sheets
+            </Link>
+            <Link href="/sponsor" style={{ 
+              color: 'var(--text)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              Founders Club
+            </Link>
+          </div>
+
+          {/* Tool Links */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '24px', 
+            marginBottom: '16px', 
             flexWrap: 'wrap' 
           }}>
             <Link href="/openbrokercsv" style={{ 
               padding: '12px 24px', 
-              border: '1px solid var(--card-border)', 
+              border: '1px solid var(--border)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
               fontSize: '14px', 
               fontWeight: '500',
               transition: 'all 0.2s'
-            }}>
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = '#1a1a1a';
+            }}
+            >
               OpenBrokerCSV
             </Link>
             <Link href="/static/portfolio-tracker" style={{ 
               padding: '12px 24px', 
-              border: '1px solid var(--card-border)', 
+              border: '1px solid var(--border)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
               fontSize: '14px', 
               fontWeight: '500',
               transition: 'all 0.2s'
-            }}>
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = '#1a1a1a';
+            }}
+            >
               Portfolio Tracker
             </Link>
             <Link href="/static/csv-etoro-to-openbrokercsv" style={{ 
               padding: '12px 24px', 
-              border: '1px solid var(--card-border)', 
+              border: '1px solid var(--border)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
               fontSize: '14px', 
               fontWeight: '500',
               transition: 'all 0.2s'
-            }}>
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = '#1a1a1a';
+            }}
+            >
               eToro → OpenBrokerCSV
             </Link>
-            <WaitlistCTA 
-              source="web:footer" 
-              variant="secondary" 
-              size="md"
-            />
           </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
+
+          {/* The Trust Links */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '24px', 
+            flexWrap: 'wrap',
+            fontSize: '14px',
+            color: 'var(--text-secondary)'
+          }}>
+            <Link href="/live" style={{ 
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Browse Stocks
+            </Link>
             <a 
-              href="https://github.com/pocketportfolio" 
+              href="https://github.com/PocketPortfolio/Financialprofilenetwork" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
               GitHub
             </a>
+          </div>
+
+          {/* Community Links */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '24px', 
+            flexWrap: 'wrap',
+            fontSize: '14px',
+            color: 'var(--text-secondary)'
+          }}>
+            <Link 
+              href="/blog" 
+              style={{ 
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              Blog & News
+            </Link>
             <a 
               href="https://dev.to/pocketportfolioapp" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
               Dev.to
             </a>
@@ -1634,11 +2292,12 @@ export default function LandingPage() {
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
               CoderLegion
             </a>
@@ -1647,29 +2306,79 @@ export default function LandingPage() {
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
               Discord
+            </a>
+            <a 
+              href="https://www.linkedin.com/company/pocket-portfolio-community" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              LinkedIn
+            </a>
+            <a 
+              href="https://www.webone.one" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+            >
+              1EO Certified
             </a>
             <Link 
               href="/dashboard" 
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
               Launch App
             </Link>
           </div>
+
+          {/* Disclaimer */}
+          <div style={{ 
+            marginTop: '16px',
+            padding: '12px 16px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            maxWidth: '800px',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+          }}>
+            <p style={{ 
+              color: 'var(--text-secondary)',
+              fontSize: '12px',
+              margin: 0,
+              lineHeight: '1.5'
+            }}>
+              <strong>⚠️ Disclaimer:</strong> Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
+            </p>
+          </div>
         </div>
       </footer>
-      </div>
     </>
   );
 }

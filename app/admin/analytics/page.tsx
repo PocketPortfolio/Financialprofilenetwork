@@ -1,0 +1,799 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/app/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import MobileHeader from '@/app/components/nav/MobileHeader';
+
+interface AnalyticsData {
+  monetization: {
+    totalMRR: number;
+    patronCount: number;
+    goal: number;
+    subscriptions: Array<{
+      tier: string;
+      count: number;
+      revenue: number;
+    }>;
+    foundersClub: {
+      revenue: number;
+      count: number;
+    };
+    oneTimeDonations: number; // Deprecated - kept for backwards compatibility
+  };
+  toolUsage: {
+    taxConverter: {
+      total: number;
+      successful: number;
+      byPair: Record<string, number>;
+      last7Days: number;
+    };
+    googleSheets: {
+      total: number;
+      formulasGenerated: number;
+      copies: number;
+      last7Days: number;
+    };
+    advisorTool: {
+      total: number;
+      pdfsGenerated: number;
+      last7Days: number;
+    };
+  };
+  seoPages: {
+    totalViews: number;
+    topPages: Array<{ path: string; views: number }>;
+    conversionRate: number;
+  };
+  npm: {
+    packages: Array<{
+      name: string;
+      version: string;
+      monthlyDownloads: number;
+      last7Days: number;
+      error?: boolean;
+    }>;
+    totalMonthlyDownloads: number;
+    totalLast7Days: number;
+    packageCount: number;
+  };
+  timeRange: '7d' | '30d' | '90d' | 'all';
+}
+
+export default function AdminAnalyticsPage() {
+  const { user, isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
+
+  // Check admin status
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        setCheckingAdmin(false);
+        return;
+      }
+
+      try {
+        const token = await user.getIdTokenResult();
+        const hasAdminClaim = token.claims.admin === true;
+        setIsAdmin(hasAdminClaim);
+        
+        if (!hasAdminClaim) {
+          // Don't redirect immediately, let user see the access denied message
+          console.log('User does not have admin privileges');
+        }
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        setIsAdmin(false);
+      } finally {
+        setCheckingAdmin(false);
+      }
+    };
+
+    if (!loading && user) {
+      checkAdmin();
+    } else if (!loading && !user) {
+      setCheckingAdmin(false);
+    }
+  }, [user, loading]);
+
+  // Fetch analytics data
+  useEffect(() => {
+    if (!isAdmin || checkingAdmin) return;
+
+    const fetchData = async () => {
+      try {
+        setLoadingData(true);
+        setError(null);
+
+        const response = await fetch(`/api/admin/analytics?range=${timeRange}`);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to fetch analytics data' }));
+          throw new Error(errorData.error || 'Failed to fetch analytics data');
+        }
+
+        const data = await response.json();
+        setAnalyticsData(data);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load analytics');
+        console.error('Analytics fetch error:', err);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+    
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [isAdmin, checkingAdmin, timeRange]);
+
+  // Show loading while checking auth
+  if (loading || checkingAdmin) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'var(--bg)',
+        color: 'var(--text)'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show access denied if not authenticated or not admin
+  if (!isAuthenticated || !isAdmin) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'var(--bg)',
+        color: 'var(--text)',
+        padding: '20px'
+      }}>
+        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+          <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Access Denied</h1>
+          <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>
+            {!isAuthenticated 
+              ? 'You must be logged in to access this page.'
+              : 'You need admin privileges to access this page.'}
+          </p>
+          <Link 
+            href="/dashboard"
+            style={{
+              padding: '12px 24px',
+              background: 'var(--signal)',
+              color: 'white',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              display: 'inline-block',
+              fontWeight: '500'
+            }}
+          >
+            Go to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Mobile Header - matches dashboard */}
+      <MobileHeader title="Analytics Dashboard" />
+      
+      <div style={{
+        minHeight: '100vh',
+        background: 'var(--bg)',
+        color: 'var(--text)',
+        padding: 'var(--space-6)',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        {/* Header */}
+      <div style={{
+        marginBottom: 'var(--space-8)',
+        borderBottom: '1px solid var(--border)',
+        paddingBottom: 'var(--space-4)'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 'var(--space-4)'
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: '32px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-2)',
+              color: 'var(--text)'
+            }}>
+              Analytics Dashboard
+            </h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+              Track SEO pages, monetization, and tool usage
+            </p>
+          </div>
+          
+          {/* Time Range Selector */}
+          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            {(['7d', '30d', '90d', 'all'] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                style={{
+                  padding: '8px 16px',
+                  border: `1px solid ${timeRange === range ? 'var(--signal)' : 'var(--border)'}`,
+                  borderRadius: '6px',
+                  background: timeRange === range ? 'var(--signal)' : 'var(--surface)',
+                  color: timeRange === range ? 'white' : 'var(--text)',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: timeRange === range ? '600' : '400',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : 'All Time'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Loading State */}
+      {loadingData && (
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Loading analytics data...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          borderRadius: '8px',
+          color: '#ef4444',
+          marginBottom: 'var(--space-6)'
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Analytics Data */}
+      {analyticsData && !loadingData && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {/* Monetization Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              💰 Monetization
+            </h2>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <MetricCard
+                label="Monthly Recurring Revenue"
+                value={`$${analyticsData.monetization.totalMRR.toFixed(2)}`}
+                subtitle={`Goal: $${analyticsData.monetization.goal}`}
+                progress={Math.min((analyticsData.monetization.totalMRR / analyticsData.monetization.goal) * 100, 100)}
+              />
+              <MetricCard
+                label="Active Patrons"
+                value={analyticsData.monetization.patronCount.toString()}
+                subtitle="Monthly subscribers"
+              />
+              <MetricCard
+                label="UK Founder's Club"
+                value={`£${analyticsData.monetization.foundersClub.revenue.toFixed(2)}`}
+                subtitle={`${analyticsData.monetization.foundersClub.count} lifetime members`}
+              />
+            </div>
+
+            {/* Subscription Breakdown */}
+            {analyticsData.monetization.subscriptions.length > 0 && (
+              <div style={{ marginTop: 'var(--space-4)' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)' }}>
+                  Subscription Breakdown
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {analyticsData.monetization.subscriptions.map((sub) => (
+                    <div
+                      key={sub.tier}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '12px',
+                        background: 'var(--surface-elevated)',
+                        borderRadius: '6px',
+                        border: '1px solid var(--border)'
+                      }}
+                    >
+                      <span style={{ fontWeight: '500' }}>{sub.tier}</span>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: '600' }}>{sub.count} patrons</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                          ${sub.revenue.toFixed(2)}/mo
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* Tool Usage Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              🛠️ Tool Usage
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: 'var(--space-4)'
+            }}>
+              {/* Tax Converter */}
+              <ToolCard
+                title="Tax Converter"
+                total={analyticsData.toolUsage.taxConverter.total}
+                successful={analyticsData.toolUsage.taxConverter.successful}
+                last7Days={analyticsData.toolUsage.taxConverter.last7Days}
+                conversionRate={
+                  analyticsData.toolUsage.taxConverter.total > 0
+                    ? (analyticsData.toolUsage.taxConverter.successful / analyticsData.toolUsage.taxConverter.total) * 100
+                    : 0
+                }
+                topPairs={Object.entries(analyticsData.toolUsage.taxConverter.byPair)
+                  .sort(([, a], [, b]) => b - a)
+                  .slice(0, 3)
+                  .map(([pair, count]) => ({ pair, count }))}
+              />
+
+              {/* Google Sheets */}
+              <ToolCard
+                title="Google Sheets Tool"
+                total={analyticsData.toolUsage.googleSheets.total}
+                successful={analyticsData.toolUsage.googleSheets.copies}
+                last7Days={analyticsData.toolUsage.googleSheets.last7Days}
+                conversionRate={
+                  analyticsData.toolUsage.googleSheets.total > 0
+                    ? (analyticsData.toolUsage.googleSheets.copies / analyticsData.toolUsage.googleSheets.total) * 100
+                    : 0
+                }
+                copies={analyticsData.toolUsage.googleSheets.copies}
+              />
+
+              {/* Advisor Tool */}
+              <ToolCard
+                title="Advisor Tool"
+                total={analyticsData.toolUsage.advisorTool.total}
+                successful={analyticsData.toolUsage.advisorTool.pdfsGenerated}
+                last7Days={analyticsData.toolUsage.advisorTool.last7Days}
+                conversionRate={
+                  analyticsData.toolUsage.advisorTool.total > 0
+                    ? (analyticsData.toolUsage.advisorTool.pdfsGenerated / analyticsData.toolUsage.advisorTool.total) * 100
+                    : 0
+                }
+              />
+            </div>
+          </section>
+
+          {/* SEO Pages Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              📈 SEO Pages
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <MetricCard
+                label="Total Page Views"
+                value={analyticsData.seoPages.totalViews.toLocaleString()}
+                subtitle={`${timeRange} period`}
+              />
+              <MetricCard
+                label="Conversion Rate"
+                value={`${analyticsData.seoPages.conversionRate.toFixed(1)}%`}
+                subtitle="Views → Signups"
+              />
+            </div>
+
+            {/* Top Pages */}
+            {analyticsData.seoPages.topPages.length > 0 && (
+              <div style={{ marginTop: 'var(--space-4)' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)' }}>
+                  Top Pages
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {analyticsData.seoPages.topPages.map((page, index) => (
+                    <div
+                      key={page.path}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px',
+                        background: 'var(--surface-elevated)',
+                        borderRadius: '6px',
+                        border: '1px solid var(--border)'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                        <span style={{
+                          width: '24px',
+                          height: '24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'var(--signal)',
+                          color: 'white',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          fontWeight: '600'
+                        }}>
+                          {index + 1}
+                        </span>
+                        <Link
+                          href={page.path}
+                          style={{
+                            color: 'var(--signal)',
+                            textDecoration: 'none',
+                            fontSize: '14px'
+                          }}
+                        >
+                          {page.path}
+                        </Link>
+                      </div>
+                      <span style={{ fontWeight: '600', fontSize: '14px' }}>
+                        {page.views.toLocaleString()} views
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* NPM Packages Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              📦 NPM Packages
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <MetricCard
+                label="This Month"
+                value={analyticsData.npm.totalMonthlyDownloads.toLocaleString()}
+                subtitle="All packages combined"
+              />
+              <MetricCard
+                label="Last 7 Days"
+                value={analyticsData.npm.totalLast7Days.toLocaleString()}
+                subtitle="Recent downloads"
+              />
+              <MetricCard
+                label="Active Packages"
+                value={analyticsData.npm.packageCount.toString()}
+                subtitle="Published packages"
+              />
+            </div>
+
+            {/* Package Breakdown */}
+            {analyticsData.npm.packages.length > 0 && (
+              <div style={{ marginTop: 'var(--space-4)' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)' }}>
+                  Package Breakdown
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {analyticsData.npm.packages
+                    .sort((a, b) => b.monthlyDownloads - a.monthlyDownloads)
+                    .map((pkg) => (
+                      <div
+                        key={pkg.name}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '12px',
+                          background: 'var(--surface-elevated)',
+                          borderRadius: '6px',
+                          border: '1px solid var(--border)',
+                          opacity: pkg.error ? 0.6 : 1
+                        }}
+                      >
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                            <a
+                              href={`https://www.npmjs.com/package/${pkg.name}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                color: 'var(--signal)',
+                                textDecoration: 'none',
+                                fontWeight: '500',
+                                fontSize: '14px'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.textDecoration = 'underline';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.textDecoration = 'none';
+                              }}
+                            >
+                              {pkg.name}
+                            </a>
+                            <span style={{
+                              fontSize: '11px',
+                              color: 'var(--text-secondary)',
+                              background: 'var(--surface)',
+                              padding: '2px 6px',
+                              borderRadius: '4px'
+                            }}>
+                              v{pkg.version}
+                            </span>
+                            {pkg.error && (
+                              <span style={{
+                                fontSize: '11px',
+                                color: '#ef4444',
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                padding: '2px 6px',
+                                borderRadius: '4px'
+                              }}>
+                                Error
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right', display: 'flex', gap: 'var(--space-4)' }}>
+                          <div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                              Monthly
+                            </div>
+                            <div style={{ fontWeight: '600', fontSize: '14px' }}>
+                              {pkg.monthlyDownloads.toLocaleString()}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                              Last 7d
+                            </div>
+                            <div style={{ fontWeight: '600', fontSize: '14px' }}>
+                              {pkg.last7Days.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <div style={{
+        marginTop: 'var(--space-8)',
+        paddingTop: 'var(--space-4)',
+        borderTop: '1px solid var(--border)',
+        display: 'flex',
+        gap: 'var(--space-4)'
+      }}>
+        <Link
+          href="/dashboard"
+          style={{
+            padding: '12px 24px',
+            border: '1px solid var(--border)',
+            borderRadius: '8px',
+            textDecoration: 'none',
+            color: 'var(--text)',
+            fontSize: '14px',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--signal)';
+            e.currentTarget.style.color = 'var(--signal)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.color = 'var(--text)';
+          }}
+        >
+         ← Back to Dashboard
+         </Link>
+       </div>
+     </div>
+    </>
+  );
+}
+
+// Helper Components
+function MetricCard({ 
+  label, 
+  value, 
+  subtitle, 
+  progress 
+}: { 
+  label: string; 
+  value: string; 
+  subtitle?: string; 
+  progress?: number;
+}) {
+  return (
+    <div style={{
+      padding: 'var(--space-4)',
+      background: 'var(--surface-elevated)',
+      border: '1px solid var(--border)',
+      borderRadius: '8px'
+    }}>
+      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: 'var(--space-1)' }}>
+        {label}
+      </div>
+      <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: 'var(--space-1)' }}>
+        {value}
+      </div>
+      {subtitle && (
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+          {subtitle}
+        </div>
+      )}
+      {progress !== undefined && (
+        <div style={{ marginTop: 'var(--space-2)' }}>
+          <div style={{
+            height: '4px',
+            background: 'var(--border)',
+            borderRadius: '2px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              height: '100%',
+              width: `${Math.min(progress, 100)}%`,
+              background: 'var(--signal)',
+              transition: 'width 0.3s'
+            }} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToolCard({
+  title,
+  total,
+  successful,
+  last7Days,
+  conversionRate,
+  topPairs,
+  copies
+}: {
+  title: string;
+  total: number;
+  successful: number;
+  last7Days: number;
+  conversionRate: number;
+  topPairs?: Array<{ pair: string; count: number }>;
+  copies?: number;
+}) {
+  return (
+    <div style={{
+      padding: 'var(--space-4)',
+      background: 'var(--surface-elevated)',
+      border: '1px solid var(--border)',
+      borderRadius: '8px'
+    }}>
+      <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)' }}>
+        {title}
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total Uses:</span>
+          <span style={{ fontWeight: '600' }}>{total.toLocaleString()}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Successful:</span>
+          <span style={{ fontWeight: '600', color: 'var(--signal)' }}>{successful.toLocaleString()}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Last 7 Days:</span>
+          <span style={{ fontWeight: '600' }}>{last7Days.toLocaleString()}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Conversion Rate:</span>
+          <span style={{ fontWeight: '600' }}>{conversionRate.toFixed(1)}%</span>
+        </div>
+        {copies !== undefined && (
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Copies:</span>
+            <span style={{ fontWeight: '600' }}>{copies.toLocaleString()}</span>
+          </div>
+        )}
+        {topPairs && topPairs.length > 0 && (
+          <div style={{ marginTop: 'var(--space-2)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: 'var(--space-1)' }}>
+              Top Conversion Pairs:
+            </div>
+            {topPairs.map(({ pair, count }) => (
+              <div key={pair} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span>{pair}</span>
+                <span>{count}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+

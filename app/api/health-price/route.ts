@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Force dynamic rendering for API route
+export const dynamic = 'force-dynamic';
+
 // ACTUAL Pocket Portfolio data sources (from api/health-price.js)
 interface DataSourceHealth {
   name: string;

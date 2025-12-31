@@ -8,9 +8,13 @@ import SEOHead from '../components/SEOHead';
 import StructuredData from '../components/StructuredData';
 import { useQuotes, useMarketData } from '../hooks/useDataFetching';
 import { useAuth } from '../hooks/useAuth';
+import { useStickyHeader } from '../hooks/useStickyHeader';
 
 export default function LivePage() {
   const [loading, setLoading] = useState(true);
+  
+  // Ensure header stays visible when scrolling
+  useStickyHeader('header.brand-spine');
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const { user, signInWithGoogle, logout, isAuthenticated, loading: authLoading } = useAuth();
 
@@ -167,14 +171,15 @@ export default function LivePage() {
 
       <div className="brand-surface brand-grid" style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       {/* Mobile-First Header */}
-      <header className="brand-surface brand-spine" style={{ 
+      <header className="brand-spine" style={{ 
         borderBottom: '1px solid var(--card-border)', 
         background: 'var(--chrome)', 
         padding: '16px',
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        backdropFilter: 'blur(10px)'
+        backdropFilter: 'blur(10px)',
+        width: '100%'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -389,7 +394,27 @@ export default function LivePage() {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <div>
-                    <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text)', marginBottom: '4px' }}>{item.ticker}</div>
+                    <Link 
+                      href={`/s/${item.ticker.toLowerCase().replace(/-/g, '')}`}
+                      style={{ 
+                        fontSize: '18px', 
+                        fontWeight: '700', 
+                        color: 'var(--accent-warm)', 
+                        marginBottom: '4px',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = 'var(--brand)';
+                        e.currentTarget.style.textDecoration = 'underline';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = 'var(--accent-warm)';
+                        e.currentTarget.style.textDecoration = 'none';
+                      }}
+                    >
+                      {item.ticker}
+                    </Link>
                     <div style={{ fontSize: '14px', color: 'var(--text-warm)', fontWeight: '500' }}>{item.name}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
@@ -481,14 +506,25 @@ export default function LivePage() {
                     <tr key={item.symbol} style={{ borderBottom: '1px solid var(--card-border)' }}>
                       <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', fontWeight: '500', color: 'var(--text)' }}>{item.rank}</td>
                       <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', fontWeight: '500', color: 'var(--text)' }}>
-                        <a
-                          href={`https://finance.yahoo.com/quote/${item.symbol}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ color: 'var(--brand)', textDecoration: 'none' }}
+                        <Link
+                          href={`/s/${item.symbol.toLowerCase().replace(/-/g, '')}`}
+                          style={{ 
+                            color: 'var(--accent-warm)', 
+                            textDecoration: 'none',
+                            fontWeight: '600',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = 'var(--brand)';
+                            e.currentTarget.style.textDecoration = 'underline';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = 'var(--accent-warm)';
+                            e.currentTarget.style.textDecoration = 'none';
+                          }}
                         >
                           {item.symbol}
-                        </a>
+                        </Link>
                       </td>
                       <td style={{ padding: '16px', whiteSpace: 'nowrap', fontSize: '14px', color: 'var(--text)' }}>
                         ${item.price !== null && item.price !== undefined ? item.price.toFixed(2) : 'N/A'}
