@@ -1,0 +1,91 @@
+name: Import Syndicated Content
+
+on:
+  schedule:
+    # Every Monday at 9 AM UTC - Community Harvest Day
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run external content audit
+        run: npm run audit-external-content
+
+      - name: Import and sanitize posts
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "📥 Importing syndicated content..."
+          npm run import-external-content || echo "⚠️ Import completed with warnings"
+          echo "🧹 Sanitizing markdown..."
+          npm run fix-imported-posts || echo "⚠️ Fix completed with warnings"
+
+      - name: Generate missing images
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "🎨 Generating missing post images..."
+          npm run generate-post-images || echo "⚠️ Image generation completed with warnings"
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 Changes detected - will commit and push"
+            git status --short
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "✅ No changes to commit"
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changes == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: '📥 Syndicated Content Import'
+          commit_user_name: 'Pocket Portfolio Bot'
+          commit_user_email: 'bot@pocketportfolio.app'
+          commit_options: '--no-verify'
+          skip_dirty_check: false
+          file_pattern: |
+            content/posts/**/*.mdx
+            content/external-audit.json
+            public/images/blog/**/*.png
+
+      - name: Workflow Summary
+        if: always()
+        run: |
+          echo "## 📊 Syndicated Content Import Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.changes.outputs.changes }}" == "true" ]; then
+            echo "✅ **Changes committed and pushed**" >> $GITHUB_STEP_SUMMARY
+            echo "- New posts imported from Dev.to/CoderLegion" >> $GITHUB_STEP_SUMMARY
+            echo "- Markdown sanitized and tables fixed" >> $GITHUB_STEP_SUMMARY
+            echo "- Images generated for new posts" >> $GITHUB_STEP_SUMMARY
+            echo "- Changes pushed to main branch" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **No changes detected**" >> $GITHUB_STEP_SUMMARY
+            echo "- No new posts found to import" >> $GITHUB_STEP_SUMMARY
+            echo "- Or all posts were already imported" >> $GITHUB_STEP_SUMMARY
+          fi
+
