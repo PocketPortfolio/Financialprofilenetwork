@@ -5,7 +5,9 @@ on:
     # Daily at 9 AM UTC - checks for due posts automatically
     # Posts are generated when their date <= today and status is "pending"
     - cron: '0 9 * * *'
-  workflow_dispatch: # Allow manual triggering (for testing/debugging)
+    # One-time: NYE 2025 Year in Review post at 17:30 GMT (Dec 31, 2025)
+    - cron: '30 17 31 12 *'
+  workflow_dispatch: # Allow manual triggering (for testing/debugging only)
 
 jobs:
   generate:
