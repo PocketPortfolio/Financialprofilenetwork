@@ -1,0 +1,137 @@
+---
+title: "Stop Building Fintech with Databases: Why I Went Local-First for Pocket Portfolio"
+date: "2024-12-22"
+updated: "2025-12-31"
+description: "Why Pocket Portfolio rejected centralized databases in favor of a privacy-absolute, local-first architecture for modern investors."
+tags: ["fintech", "privacy", "localfirst", "nextjs", "local-first", "architecture"]
+author: "Pocket Portfolio"
+image: "/images/blog/stop-building-fintech-with-databases-why-i-went-local-first-.png"
+pillar: "Philosophy"
+source: "dev.to"
+original_url: "https://dev.to/pocketportfolioapp/stop-building-fintech-with-databases-why-i-went-local-first-for-pocket-portfolio-1b2a"
+canonical_url: "https://pocketportfolio.app/blog/stop-building-fintech-with-databases-why-i-went-local-first-"
+---
+
+## Stop building fintech with databases. Why I went local-first for Pocket Portfolio.
+
+For the last decade, building a fintech app meant one architecture: a centralized PostgreSQL database, a backend in Node or Python, and an API that hoards user data.
+
+As an engineer, I always found this disturbing. Why does a portfolio tracker need my trade history stored on AWS us-east-1? It does not. It stores it because the data is the product, not the software.
+
+I wanted to build a tool for modern investors — those of us using Trade Republic, Trading 212, or Robinhood — who want insights without surveillance.
+
+So I set a hard constraint:
+
+**Zero user data leaves the client.**
+
+That constraint became the foundation of Pocket Portfolio — a privacy-absolute, local-first financial application.
+
+![Local-First Architecture](/images/blog/local-first-architecture.png)
+
+Learn more about [Sovereign Financial Tracking](/).
+
+---
+
+## The Zero-Server Stack
+
+We stripped everything back.
+
+There is no backend database.  
+No user accounts.  
+No cloud sync.
+
+- **The Core:** Next.js (static export). The entire app is JavaScript shipped to the browser.  
+- **The Database:** Browser storage (localStorage and IndexedDB). Your financial data lives on your device, not ours.  
+- **The Parser:** Web Workers processing CSV files entirely client-side.  
+
+No servers storing user data.  
+No silent replication.  
+No surveillance by default.
+
+---
+
+## The Hardest Part: Client-Side Parsing
+
+The hardest technical problem was not charts or performance.
+
+It was standardizing messy, inconsistent CSV exports from more than 15 brokers — without sending a single byte to a server.
+
+Each broker formats exports differently. Headers change. Dates vary by locale. Fees are embedded or omitted. Some files are technically valid CSVs but semantically broken.
+
+So we built a robust, open-source parsing engine that runs entirely in the browser.
+
+The flow looks like this:
+
+1. User drops a CSV file (for example, a 5MB Trade Republic export).  
+2. The main thread hands the file to a Web Worker to avoid UI freezes.  
+3. The worker identifies the broker schema and normalizes each row into a standard JSON format.  
+4. Clean data is returned to the main thread and hydrated into application state.  
+
+All of this happens locally.  
+No uploads.  
+No APIs.
+
+---
+
+## The Market Has Spoken
+
+I was not sure if other developers cared about this level of privacy. I was wrong.
+
+Within the first seven days of soft-launching the parser engine on npm, it crossed **5,800+ weekly downloads**.
+
+Developers are already integrating the local parser into their own pipelines.
+
+The takeaway is simple:
+
+You do not need to hoard user data to build valuable software.
+
+---
+
+## Key Takeaways
+
+Unlike cloud apps, Pocket Portfolio uses **Sovereign Sync** to turn your Google Drive into a database. This approach ensures:
+
+- **Data Ownership**: Your financial data lives in your Google Drive, not a vendor's database
+- **No Vendor Lock-in**: Export anytime, use any tool
+- **Privacy by Default**: Your data never leaves your control
+- **Local-First Resilience**: Works offline, syncs when online
+
+Learn how to set up [Google Drive Sync](/features/google-drive-sync) and turn your Drive into your personal financial database.
+
+---
+
+## Verdict
+
+The fintech industry has normalized data hoarding. But you do not need a centralized database to build powerful financial software.
+
+Pocket Portfolio proves that local-first architecture is not just viable — it is superior for user privacy and data sovereignty.
+
+For more on [Sovereign Financial Tracking](/), see our homepage.
+
+---
+
+## Try It (and Break It)
+
+Pocket Portfolio is live.
+
+If you are an investor or a developer tired of the current fintech status quo, try it with your messiest CSV file and see how the local engine handles it.
+
+- [Live App](https://www.pocketportfolio.app/)
+- [npm Package](https://www.npmjs.com/package/@pocket-portfolio/importer)
+
+We are also running a limited Founder's Club for early supporters who believe in local-first software and want lifetime access to advanced features.
+
+Keep building.  
+Keep it local.
+
+---
+
+## 🚀 Unlock Sovereign Sync
+
+**Ready to own your financial data?**
+
+Pocket Portfolio's **Sovereign Sync** turns your Google Drive into a personal database. No vendor lock-in. No cloud dependencies. Just your data, your way.
+
+👉 [Upgrade to Corporate/Founder Tier →](/sponsor)
+
+*Sovereign Sync is available for Corporate and Founder tier sponsors. [Learn more →](/sponsor) | [Set up Google Drive Sync →](/features/google-drive-sync)

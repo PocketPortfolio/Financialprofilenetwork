@@ -1,0 +1,57 @@
+{
+  "name": "@pocket-portfolio/importer",
+  "version": "1.0.8",
+  "description": "Universal CSV parser for 19+ brokers (Robinhood, Fidelity, eToro, Koinly, TurboTax, Ghostfolio, Sharesight, etc.) - TypeScript, privacy-first. Free & open-source. Support: pocketportfolio.app/sponsor",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "keywords": [
+    "csv",
+    "parser",
+    "broker",
+    "robinhood",
+    "fidelity",
+    "portfolio",
+    "finance",
+    "trading",
+    "typescript",
+    "koinly",
+    "turbotax",
+    "ghostfolio",
+    "sharesight",
+    "tax-software",
+    "portfolio-tracker"
+  ],
+  "author": "Pocket Portfolio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PocketPortfolio/Financialprofilenetwork.git",
+    "directory": "packages/importer"
+  },
+  "dependencies": {
+    "papaparse": "^5.4.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/papaparse": "^5.3.14",
+    "typescript": "^5.5.4"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "scripts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://www.pocketportfolio.app",
+  "bugs": {
+    "url": "https://github.com/PocketPortfolio/Financialprofilenetwork/issues"
+  }
+}
