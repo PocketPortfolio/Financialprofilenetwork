@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -26,22 +27,73 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify OpenAI API Key
+        run: |
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "❌ ERROR: OPENAI_API_KEY secret is not set"
+            exit 1
+          fi
+          echo "✅ OPENAI_API_KEY is configured"
+
       - name: Generate blog posts
+        id: generate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run generate-blog
+        run: |
+          echo "🚀 Starting blog post generation..."
+          npm run generate-blog || exit_code=$?
+          if [ -n "$exit_code" ]; then
+            echo "⚠️ Blog generation completed with errors (exit code: $exit_code)"
+            echo "error=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Blog generation completed successfully"
+            echo "error=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Commit changes
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 Changes detected - will commit and push"
+            git status --short
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "✅ No changes to commit"
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changes == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: '🤖 Auto-generate blog posts'
+          commit_message: '🤖 Auto-generate blog posts [skip ci]'
           commit_user_name: 'Pocket Portfolio Bot'
           commit_user_email: 'bot@pocketportfolio.app'
           commit_options: '--no-verify'
+          skip_dirty_check: false
+          file_pattern: |
+            content/posts/**/*.mdx
+            public/images/blog/**/*.png
+            content/blog-calendar.json
 
-      - name: Create Pull Request (if posts generated)
-        if: failure()
+      - name: Workflow Summary
+        if: always()
         run: |
-          echo "Blog generation completed. Check logs for any failed posts."
+          echo "## 📊 Blog Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.changes.outputs.changes }}" == "true" ]; then
+            echo "✅ **Changes committed and pushed**" >> $GITHUB_STEP_SUMMARY
+            echo "- New blog posts have been generated" >> $GITHUB_STEP_SUMMARY
+            echo "- Changes have been pushed to main branch" >> $GITHUB_STEP_SUMMARY
+            echo "- Deployment will trigger automatically" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **No changes detected**" >> $GITHUB_STEP_SUMMARY
+            echo "- No posts were due for generation" >> $GITHUB_STEP_SUMMARY
+            echo "- Or all posts were already generated" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.generate.outputs.error }}" == "true" ]; then
+            echo "⚠️ **Some posts may have failed** - Check logs above for details" >> $GITHUB_STEP_SUMMARY
+          fi
 
 
