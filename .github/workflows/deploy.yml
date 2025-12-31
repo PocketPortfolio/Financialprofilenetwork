@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Prevent infinite loop: Skip deployment if commit message contains [skip ci]
+# This allows blog generation commits to trigger deployment without re-triggering
+
 jobs:
   deploy-production:
     name: Deploy to Production
@@ -51,6 +54,15 @@ jobs:
         env:
           NODE_ENV: production
       
+      - name: Check commit message
+        id: commit-check
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          if echo "$COMMIT_MSG" | grep -q "\[skip ci\]"; then
+            echo "⚠️ Commit contains [skip ci] - deployment will proceed (blog generation commit)"
+          fi
+
       - name: Deploy to Vercel Production
         uses: amondnet/vercel-action@v25
         with:
@@ -59,6 +71,17 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Deployment to Vercel Production**" >> $GITHUB_STEP_SUMMARY
+          echo "- Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- Changes deployed to production" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📝 **Commit:** \`$(git log -1 --pretty=%h)\` - $(git log -1 --pretty=%s)" >> $GITHUB_STEP_SUMMARY
 
   deploy-preview:
     name: Deploy Preview (PR)
