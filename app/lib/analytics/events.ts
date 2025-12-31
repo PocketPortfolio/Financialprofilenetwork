@@ -133,6 +133,30 @@ export function trackPageView(page: string) {
   }
 }
 
+// Blog post tracking
+export function trackBlogPostClick(title: string, platform: string, url: string) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'blog_post_click', {
+      event_category: 'Blog',
+      event_label: title,
+      custom_parameter_platform: platform,
+      custom_parameter_url: url,
+      value: 1
+    });
+  }
+}
+
+export function trackBlogPlatformView(platform: string, action: string) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'blog_platform_view', {
+      event_category: 'Blog',
+      event_label: platform,
+      custom_parameter_action: action,
+      value: 1
+    });
+  }
+}
+
 // Error tracking
 export function trackError(error: string, context?: string) {
   if (typeof window !== 'undefined' && window.gtag) {
@@ -145,7 +169,39 @@ export function trackError(error: string, context?: string) {
   }
 }
 
+// Feature Announcement tracking
+export function trackFeatureAnnouncementView() {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'view_feature_announcement', {
+      event_category: 'Feature Announcement',
+      event_label: 'sovereign_sync',
+      value: 1
+    });
+  }
+}
+
+export function trackFeatureUpgradeClick() {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'click_feature_upgrade', {
+      event_category: 'Feature Announcement',
+      event_label: 'sovereign_sync',
+      value: 1
+    });
+  }
+}
+
+export function trackSyncSessionStart() {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'sync_session_start', {
+      event_category: 'Sovereign Sync',
+      event_label: 'google_drive_sync',
+      value: 1
+    });
+  }
+}
+
 // TypeScript declarations for gtag
+// Extended to support all custom parameters from conversion.ts, viral.ts, and events.ts
 declare global {
   interface Window {
     gtag: (
@@ -155,13 +211,42 @@ declare global {
         event_category?: string;
         event_label?: string;
         value?: number;
+        currency?: string;
         utm_source?: string;
         utm_medium?: string;
         utm_campaign?: string;
+        // Events.ts parameters
         custom_parameter_error?: string;
         custom_parameter_type?: string;
         custom_parameter_source?: string;
         custom_parameter_context?: string;
+        custom_parameter_platform?: string;
+        custom_parameter_url?: string;
+        custom_parameter_action?: string;
+        // Conversion.ts parameters
+        custom_parameter_funnel_name?: string;
+        custom_parameter_session_id?: string;
+        custom_parameter_user_id?: string;
+        custom_parameter_stage_order?: number;
+        custom_parameter_metadata?: string;
+        custom_parameter_element_id?: string;
+        custom_parameter_element_type?: string;
+        custom_parameter_page?: string;
+        custom_parameter_value?: number;
+        custom_parameter_conversion_type?: string;
+        custom_parameter_drop_off_stage?: string;
+        custom_parameter_drop_off_reason?: string;
+        custom_parameter_time_in_funnel?: number;
+        custom_parameter_test_id?: string;
+        custom_parameter_variant_id?: string;
+        custom_parameter_variant_name?: string;
+        custom_parameter_is_control?: string;
+        custom_parameter_depth?: number;
+        custom_parameter_seconds?: number;
+        // Viral.ts parameters
+        custom_parameter_referral_code?: string;
+        // Allow additional custom parameters for future extensibility
+        [key: string]: any;
       }
     ) => void;
   }

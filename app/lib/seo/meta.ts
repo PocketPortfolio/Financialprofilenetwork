@@ -5,10 +5,10 @@
 
 export const siteConfig = {
   name: 'Pocket Portfolio',
-  title: 'Pocket Portfolio — Evidence-First Investing',
-  description: 'Track positions with clean, reliable data pipelines. Built in public, evidence first.',
+  title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
+  description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
   url: 'https://www.pocketportfolio.app',
-  ogImage: '/api/og?title=Pocket%20Portfolio',
+  ogImage: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123',
   twitter: '@PocketPortApp',
   keywords: [
     'portfolio tracker',
@@ -29,6 +29,16 @@ export const siteConfig = {
     'portfolio analytics',
     'dev.to portfolio',
     'developer community finance',
+    'google drive portfolio',
+    'sovereign finance',
+    'json stock tracker',
+    'self-hosted portfolio',
+    'excel trading journal',
+    'google drive database',
+    'sovereign sync',
+    'bidirectional sync',
+    'data ownership',
+    'zero knowledge portfolio',
   ],
 };
 
@@ -119,7 +129,7 @@ export function generateMetadata(options: MetadataOptions = {}) {
 // Pre-configured metadata for common pages
 export const homeMetadata = generateMetadata({
   title: '',
-  description: 'Track positions with clean, reliable data pipelines. Built in public, evidence first.',
+  description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
   path: '/',
 });
 

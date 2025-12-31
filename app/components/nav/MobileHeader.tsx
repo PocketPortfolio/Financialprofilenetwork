@@ -12,6 +12,7 @@ interface MobileHeaderProps {
   title?: string;
   className?: string;
   onMenuClick?: () => void;
+  fixed?: boolean; // If true, header will be fixed (not scrolling). If false, it will be sticky (scrollable)
 }
 
 // Menu icon
@@ -75,6 +76,14 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const AdminIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 const HomeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -101,7 +110,8 @@ function getPageTitle(pathname: string): string {
 export default function MobileHeader({ 
   title, 
   className = '', 
-  onMenuClick 
+  onMenuClick,
+  fixed = false // Default to false (sticky/scrollable)
 }: MobileHeaderProps) {
   
   const pathname = usePathname();
@@ -110,10 +120,49 @@ export default function MobileHeader({
   const [isTablet, setIsTablet] = useState(false);
   const [width, setWidth] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
-  const { logout, user, isAuthenticated, signInWithGoogle } = useAuth();
+  const { logout, user, isAuthenticated, signInWithGoogle, loading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Define pageTitle early to avoid initialization issues
   const pageTitle = title || getPageTitle(pathname);
+
+  // Apply fixed positioning for dashboard only using useEffect
+  // This avoids conditional hook calls (React rules violation)
+  useEffect(() => {
+    if (!fixed) return;
+    
+    const header = document.querySelector('header.mobile-header');
+    if (!header) return;
+    
+    const applyFixedPositioning = () => {
+      const rect = header.getBoundingClientRect();
+      const headerHeight = rect.height;
+      
+      // Apply fixed positioning
+      (header as HTMLElement).style.position = 'fixed';
+      (header as HTMLElement).style.top = '0';
+      (header as HTMLElement).style.left = '0';
+      (header as HTMLElement).style.right = '0';
+      (header as HTMLElement).style.width = '100%';
+      
+      // Add padding to body to prevent content from jumping under fixed header
+      const bodyPadding = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
+      if (bodyPadding < headerHeight) {
+        document.body.style.paddingTop = `${headerHeight}px`;
+      }
+    };
+    
+    // Apply immediately and on resize
+    applyFixedPositioning();
+    setTimeout(applyFixedPositioning, 100);
+    window.addEventListener('resize', applyFixedPositioning, { passive: true });
+    
+    return () => {
+      window.removeEventListener('resize', applyFixedPositioning);
+      // Cleanup body padding
+      document.body.style.paddingTop = '';
+    };
+  }, [fixed]);
 
   // Hydration-safe mobile detection
   useEffect(() => {
@@ -124,6 +173,31 @@ export default function MobileHeader({
     setIsHydrated(true);
   }, []);
 
+  // Check admin status
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      try {
+        const token = await user.getIdTokenResult();
+        const hasAdminClaim = token.claims.admin === true;
+        setIsAdmin(hasAdminClaim);
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        setIsAdmin(false);
+      }
+    };
+
+    if (!loading && user) {
+      checkAdmin();
+    } else if (!loading && !user) {
+      setIsAdmin(false);
+    }
+  }, [user, loading]);
+
   // Show loading state during hydration, then show based on device
   if (!isHydrated) {
     // Return a placeholder during hydration to prevent mismatch
@@ -131,7 +205,7 @@ export default function MobileHeader({
       <header
         className={`mobile-header ${className}`}
         style={{
-          position: 'sticky',
+          position: fixed ? 'fixed' : 'sticky', // Use fixed when prop is true
           top: 0,
           zIndex: 'var(--z-sticky)',
           background: 'var(--bg)',
@@ -147,9 +221,9 @@ export default function MobileHeader({
           visibility: 'hidden' // Hide during hydration
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-          <Logo size="small" showWordmark={false} />
-          <h1 style={{ fontSize: 'var(--text-mobile-lg)', fontWeight: '600', color: 'var(--text)', margin: 0, lineHeight: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Logo size={isMobile ? "small" : "medium"} showWordmark={false} />
+          <h1 style={{ fontSize: 'var(--text-mobile-lg)', fontWeight: '600', color: 'var(--text)', margin: 0, lineHeight: 1.2 }}>
             {pageTitle}
           </h1>
         </div>
@@ -169,15 +243,14 @@ export default function MobileHeader({
     onMenuClick?.();
   };
 
-
   return (
     <header
       className={`mobile-header ${className}`}
       style={{
-        position: 'sticky',
+        position: fixed ? 'fixed' : 'sticky', // Use fixed when prop is true
         top: 0,
         zIndex: 'var(--z-sticky)',
-        background: 'transparent',
+        background: fixed ? 'var(--bg)' : 'transparent', // Solid background when fixed
         borderBottom: '2px solid var(--signal)',
         paddingTop: 'var(--safe-area-top)',
         paddingBottom: 'var(--space-md)',
@@ -190,17 +263,25 @@ export default function MobileHeader({
       }}
     >
       {/* Logo/Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px', // Increased gap for better spacing on mobile
+        flex: '1',
+        minWidth: 0, // Allow flex item to shrink
+        overflow: 'hidden' // Prevent overflow
+      }}>
         <Link 
           href="/landing" 
           style={{ 
             textDecoration: 'none',
             display: 'flex',
-            alignItems: 'center'
+            alignItems: 'center',
+            flexShrink: 0 // Prevent logo from shrinking
           }}
           aria-label="Go to Pocket Portfolio homepage"
         >
-          <Logo size="small" showWordmark={false} />
+          <Logo size={isMobile ? "small" : "medium"} showWordmark={false} />
         </Link>
         <h1
           style={{
@@ -208,7 +289,12 @@ export default function MobileHeader({
             fontWeight: '600',
             color: 'var(--text)',
             margin: 0,
-            lineHeight: 1,
+            lineHeight: 1.2, // Better line height to prevent overlap
+            whiteSpace: 'nowrap', // Prevent text wrapping
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            flex: '1',
+            minWidth: 0
           }}
         >
           {pageTitle}
@@ -275,7 +361,10 @@ export default function MobileHeader({
               padding: '0px',
               width: '300px',
               height: '100vh',
-              overflowY: 'auto',
+              maxHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden', // Prevent outer container from scrolling
               zIndex: 10000
             }}
             onClick={(e) => e.stopPropagation()}
@@ -286,7 +375,8 @@ export default function MobileHeader({
               justifyContent: 'flex-end', 
               padding: 'var(--space-md)',
               background: 'var(--signal)',
-              borderRadius: '0 0 0 var(--radius-md)'
+              borderRadius: '0 0 0 var(--radius-md)',
+              flexShrink: 0 // Prevent header from shrinking
             }}>
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -306,13 +396,18 @@ export default function MobileHeader({
               </button>
             </div>
             
-            {/* Menu items - modern clean design */}
+            {/* Menu items - modern clean design - Scrollable */}
             <div style={{ 
               display: 'flex', 
               flexDirection: 'column', 
               gap: '4px', 
               padding: 'var(--space-lg)',
-              background: 'var(--surface-elevated)'
+              background: 'var(--surface-elevated)',
+              flex: 1,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+              overscrollBehavior: 'contain' // Prevent scroll chaining
             }}>
               <Link 
                 href="/dashboard"
@@ -474,6 +569,46 @@ export default function MobileHeader({
                 <SettingsIcon />
                 Settings
               </Link>
+              
+              {/* Admin Link - Only show if user is admin */}
+              {isAdmin && (
+                <Link 
+                  href="/admin/analytics"
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{
+                    padding: 'var(--space-md) var(--space-lg)',
+                    borderRadius: 'var(--radius-md)',
+                    color: pathname === '/admin/analytics' ? 'var(--text-inverse)' : 'var(--text)',
+                    textDecoration: 'none',
+                    fontSize: 'var(--text-md)',
+                    fontWeight: pathname === '/admin/analytics' ? '600' : '500',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-md)',
+                    background: pathname === '/admin/analytics' 
+                      ? 'var(--signal)' 
+                      : 'transparent',
+                    border: 'none',
+                    margin: '0'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (pathname !== '/admin/analytics') {
+                      e.currentTarget.style.background = 'var(--surface)';
+                      e.currentTarget.style.transform = 'translateX(4px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (pathname !== '/admin/analytics') {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.transform = 'translateX(0)';
+                    }
+                  }}
+                >
+                  <AdminIcon />
+                  Admin
+                </Link>
+              )}
               
               {/* Divider */}
               <div style={{ 

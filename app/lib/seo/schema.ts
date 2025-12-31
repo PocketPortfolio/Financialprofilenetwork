@@ -29,14 +29,14 @@ export function getHomePageSchema(): HomePageSchema {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Pocket Portfolio',
-    description: 'Track your investments with real-time portfolio analytics. Import trades from 10+ brokers, analyze performance, and make informed decisions.',
-    url: 'https://pocket-portfolio.app',
+    description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
+    url: 'https://www.pocketportfolio.app',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://pocket-portfolio.app/brand/pp-wordmark.svg'
+      url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
     },
     sameAs: [
-      'https://github.com/pocket-portfolio',
+      'https://github.com/PocketPortfolio/Financialprofilenetwork',
       'https://twitter.com/pocketportfolio',
       'https://discord.gg/Ch9PpjRzwe',
       'https://dev.to/pocketportfolioapp',
@@ -44,7 +44,7 @@ export function getHomePageSchema(): HomePageSchema {
     ],
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://pocket-portfolio.app/search?q={search_term_string}',
+      target: 'https://www.pocketportfolio.app/search?q={search_term_string}',
       'query-input': 'required name=search_term_string'
     }
   };

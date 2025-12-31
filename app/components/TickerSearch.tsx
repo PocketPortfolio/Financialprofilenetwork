@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 interface TickerSearchProps {
-  onTickerSelect: (ticker: string) => void;
+  onTickerSelect?: (ticker: string) => void;
   placeholder?: string;
+  linkToTickerPage?: boolean; // New prop to enable linking to /s/[symbol] pages
 }
 
 interface TickerResult {
@@ -30,7 +32,7 @@ const popularTickers = [
   { symbol: 'SPY', name: 'SPDR S&P 500 ETF Trust' },
 ];
 
-export default function TickerSearch({ onTickerSelect, placeholder = "Search stocks or crypto..." }: TickerSearchProps) {
+export default function TickerSearch({ onTickerSelect, placeholder = "Search stocks or crypto...", linkToTickerPage = false }: TickerSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TickerResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -52,9 +54,10 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
 
   // Search function with debouncing
   useEffect(() => {
-    console.log('TickerSearch useEffect triggered, query:', query, 'length:', query.length);
+    // Debug logging removed to reduce console noise
+    // console.log('TickerSearch useEffect triggered, query:', query, 'length:', query.length);
     if (query.length < 2) {
-      console.log('TickerSearch: query too short, clearing results');
+      // console.log('TickerSearch: query too short, clearing results');
       setResults([]);
       return;
     }
@@ -128,7 +131,9 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
   const handleSelect = (ticker: TickerResult) => {
     setQuery(ticker.symbol);
     setIsOpen(false);
-    onTickerSelect(ticker.symbol);
+    if (onTickerSelect) {
+      onTickerSelect(ticker.symbol);
+    }
   };
 
 
@@ -143,7 +148,11 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && query) {
-      onTickerSelect(query.toUpperCase());
+      if (linkToTickerPage) {
+        window.location.href = `/s/${query.toUpperCase().toLowerCase()}`;
+      } else if (onTickerSelect) {
+        onTickerSelect(query.toUpperCase());
+      }
       setIsOpen(false);
     }
   };
@@ -228,63 +237,100 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                 Searching...
               </div>
             ) : results.length > 0 ? (
-              results.map((result, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSelect(result)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--text)',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    borderBottom: index < results.length - 1 ? '1px solid var(--card-border)' : 'none',
-                    transition: 'all 0.2s ease',
-                    fontSize: '14px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderRadius: '0'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'var(--warm-bg)';
-                    e.currentTarget.style.color = 'var(--text-warm)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = 'var(--text)';
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ 
-                      fontWeight: '600', 
-                      fontSize: '16px',
-                      color: 'var(--text)',
-                      marginBottom: '4px'
-                    }}>
-                      {result.symbol}
+              results.map((result, index) => {
+                const commonStyle = {
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text)',
+                  textAlign: 'left' as const,
+                  cursor: 'pointer',
+                  borderBottom: index < results.length - 1 ? '1px solid var(--card-border)' : 'none',
+                  transition: 'all 0.2s ease',
+                  fontSize: '14px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderRadius: '0',
+                  textDecoration: 'none'
+                };
+
+                const content = (
+                  <>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ 
+                        fontWeight: '600', 
+                        fontSize: '16px',
+                        color: 'var(--text)',
+                        marginBottom: '4px'
+                      }}>
+                        {result.symbol}
+                      </div>
+                      <div style={{ 
+                        fontSize: '14px', 
+                        color: 'var(--muted)',
+                        lineHeight: '1.4'
+                      }}>
+                        {result.name}
+                      </div>
                     </div>
                     <div style={{ 
-                      fontSize: '14px', 
+                      fontSize: '12px', 
                       color: 'var(--muted)',
-                      lineHeight: '1.4'
+                      textAlign: 'right',
+                      whiteSpace: 'nowrap',
+                      marginLeft: '12px'
                     }}>
-                      {result.name}
+                      {result.type} • {result.region}
                     </div>
-                  </div>
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: 'var(--muted)',
-                    textAlign: 'right',
-                    whiteSpace: 'nowrap',
-                    marginLeft: '12px'
-                  }}>
-                    {result.type} • {result.region}
-                  </div>
-                </button>
-              ))
+                  </>
+                );
+
+                if (linkToTickerPage) {
+                  return (
+                    <Link
+                      key={index}
+                      href={`/s/${result.symbol.toLowerCase()}`}
+                      onClick={() => {
+                        setIsOpen(false);
+                        if (onTickerSelect) {
+                          onTickerSelect(result.symbol);
+                        }
+                      }}
+                      style={commonStyle}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--warm-bg)';
+                        e.currentTarget.style.color = 'var(--text-warm)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'var(--text)';
+                      }}
+                    >
+                      {content}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleSelect(result)}
+                    style={commonStyle}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--warm-bg)';
+                      e.currentTarget.style.color = 'var(--text-warm)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'var(--text)';
+                    }}
+                  >
+                    {content}
+                  </button>
+                );
+              })
             ) : query.length >= 2 ? (
               <div style={{ 
                 padding: '20px 16px', 

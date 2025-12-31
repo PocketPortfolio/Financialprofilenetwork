@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Logo from './Logo';
 import ThemeSwitcher from './ThemeSwitcher';
 import { useAuth } from '../hooks/useAuth';
+import { getDeviceInfo } from '../lib/utils/device';
+import { useStickyHeader } from '../hooks/useStickyHeader';
+import SyncStatusIndicator from './SyncStatusIndicator';
 
 interface HeaderProps {
   activeTab?: 'dashboard' | 'live' | 'news' | 'faq';
@@ -14,7 +17,14 @@ interface HeaderProps {
 export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { logout, isAuthenticated, signInWithGoogle } = useAuth();
+
+  // Device detection for responsive logo sizing
+  useEffect(() => {
+    const deviceInfo = getDeviceInfo();
+    setIsMobile(deviceInfo.isMobile);
+  }, []);
 
   const getPageTitle = (path: string) => {
     const titles: { [key: string]: string } = {
@@ -30,6 +40,9 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
   };
 
   const pageTitle = getPageTitle(pathname);
+
+  // Ensure header stays visible when scrolling
+  useStickyHeader('header[style*="position: sticky"]');
 
   const handleMenuClick = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -64,13 +77,23 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
       }}
     >
       {/* Logo and Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px', // Increased gap for better spacing on mobile
+        flex: '1',
+        minWidth: 0, // Allow flex item to shrink
+        overflow: 'hidden' // Prevent overflow
+      }}>
         <Link
           href="/"
-          style={{ textDecoration: 'none' }}
+          style={{ 
+            textDecoration: 'none',
+            flexShrink: 0 // Prevent logo from shrinking
+          }}
           aria-label="Go to Pocket Portfolio homepage"
         >
-          <Logo size="small" showWordmark={false} />
+          <Logo size={isMobile ? "small" : "medium"} showWordmark={false} />
         </Link>
         <h1
           style={{
@@ -78,11 +101,18 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
             fontWeight: '600',
             color: 'var(--text)',
             margin: 0,
-            lineHeight: 1,
+            lineHeight: 1.2, // Better line height to prevent overlap
+            whiteSpace: 'nowrap', // Prevent text wrapping
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            flex: '1',
+            minWidth: 0
           }}
         >
           {pageTitle}
         </h1>
+        {/* Sync Status Indicator for direct traffic free-tier users */}
+        <SyncStatusIndicator />
       </div>
 
       {/* Hamburger Menu Button */}
@@ -139,14 +169,16 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
           <div
             style={{
               width: '320px',
-              height: '100%',
+              height: '100vh',
+              maxHeight: '100vh', // Ensure it respects viewport
               background: 'var(--surface-elevated)',
               borderLeft: '1px solid var(--border)',
               display: 'flex',
               flexDirection: 'column',
               boxShadow: 'var(--shadow-lg)',
               transform: 'translateX(0)',
-              transition: 'transform 0.3s ease'
+              transition: 'transform 0.3s ease',
+              overflow: 'hidden' // Prevent outer container from scrolling
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -157,7 +189,8 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
               alignItems: 'center',
               padding: 'var(--space-lg)',
               borderBottom: '1px solid var(--border)',
-              background: 'var(--signal)'
+              background: 'var(--signal)',
+              flexShrink: 0 // Prevent header from shrinking
             }}>
               <h2 style={{ margin: 0, color: 'white', fontSize: 'var(--text-lg)' }}>Menu</h2>
               <button
@@ -176,8 +209,14 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
               </button>
             </div>
 
-            {/* Menu Items */}
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            {/* Menu Items - Scrollable */}
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+              overscrollBehavior: 'contain' // Prevent scroll chaining
+            }}>
               <div style={{ padding: 'var(--space-md) 0' }}>
                 <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{
                   display: 'flex',

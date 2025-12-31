@@ -8,17 +8,18 @@ interface LogoProps {
 
 export default function Logo({ size = 'medium', showWordmark = true }: LogoProps) {
   const sizeClasses = {
-    small: { width: 24, height: 24 },
-    medium: { width: 32, height: 32 },
-    large: { width: 48, height: 48 }
+    small: { width: 36, height: 36 },   // Increased from 24px for better visibility in mobile nav
+    medium: { width: 44, height: 44 }, // Increased from 32px to match industry standards (40-48px range)
+    large: { width: 56, height: 56 }   // Increased from 48px for hero sections
   };
 
-  const wordmarkHeight = size === 'small' ? 16 : size === 'large' ? 28 : 20;
+  // Determine wordmark size class
+  const wordmarkSizeClass = size === 'small' ? 'brand-wordmark-small' : size === 'large' ? 'brand-wordmark-large' : '';
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <Image
-        src="/brand/pp-monogram.svg"
+        src="/brand/pp-maskable.svg"
         alt="Pocket Portfolio"
         width={sizeClasses[size].width}
         height={sizeClasses[size].height}
@@ -29,16 +30,9 @@ export default function Logo({ size = 'medium', showWordmark = true }: LogoProps
         }}
       />
       {showWordmark && (
-        <Image
-          src="/brand/pp-wordmark.svg"
-          alt="Pocket Portfolio"
-          width={wordmarkHeight * (140 / 28)} // Maintain aspect ratio based on original 140x28
-          height={wordmarkHeight}
-          priority
-          style={{
-            filter: 'brightness(0.8) contrast(1.2)'
-          }}
-        />
+        <span className={`brand-wordmark ${wordmarkSizeClass}`}>
+          Pocket Portfolio<span className="brand-wordmark-dot">.</span>
+        </span>
       )}
     </div>
   );

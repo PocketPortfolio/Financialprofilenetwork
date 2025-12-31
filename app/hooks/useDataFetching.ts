@@ -134,14 +134,23 @@ export function useNews(tickers: string[] = [], limit: number = 5): ApiResponse<
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const mountedRef = useRef(true);
   const lastFetchRef = useRef<number>(0);
+  const lastTickersKeyRef = useRef<string>('');
 
   // Create stable keys to prevent infinite loops
-  const tickersKey = useMemo(() => tickers.join(','), [tickers]);
+  const tickersKey = useMemo(() => tickers.sort().join(','), [tickers]);
 
   const fetchNews = useCallback(async () => {
     if (!mountedRef.current) return;
+    
+    // Prevent duplicate fetches for the same tickers
+    if (lastTickersKeyRef.current === tickersKey) {
+      return;
+    }
 
-    console.log('🔍 Fetching news for tickers:', tickers, 'limit:', limit);
+    // Only log in development to reduce console noise
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Fetching news for tickers:', tickers, 'limit:', limit);
+    }
 
     // Check if we have cached data and it's recent enough (less than 15 minutes old for better balance)
     const now = Date.now();
@@ -151,17 +160,24 @@ export function useNews(tickers: string[] = [], limit: number = 5): ApiResponse<
     if (cachedData && (now - lastFetchRef.current) < 900000) { // 15 minutes cache for fresher news
       try {
         const parsedData = JSON.parse(cachedData);
-        console.log('📰 Using cached news:', parsedData.length, 'articles');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📰 Using cached news:', parsedData.length, 'articles');
+        }
         if (mountedRef.current) {
           setData(parsedData);
+          lastTickersKeyRef.current = tickersKey;
           return;
         }
       } catch (e) {
-        console.log('🗑️ Invalid cache, fetching fresh news');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🗑️ Invalid cache, fetching fresh news');
+        }
         // Invalid cache, continue with fetch
       }
     } else {
-      console.log('⏰ Cache expired or no cache, fetching fresh news');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⏰ Cache expired or no cache, fetching fresh news');
+      }
     }
 
     setLoading(true);
@@ -183,8 +199,11 @@ export function useNews(tickers: string[] = [], limit: number = 5): ApiResponse<
       const result: NewsArticle[] = await response.json();
       
       if (mountedRef.current) {
-        console.log('✅ News fetched successfully:', result.length, 'articles');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ News fetched successfully:', result.length, 'articles');
+        }
         setData(result);
+        lastTickersKeyRef.current = tickersKey;
         
         // Cache the data
         localStorage.setItem(cacheKey, JSON.stringify(result));
@@ -200,13 +219,15 @@ export function useNews(tickers: string[] = [], limit: number = 5): ApiResponse<
         setLoading(false);
       }
     }
-  }, [tickersKey, limit]);
+  }, [tickersKey, limit, tickers]);
 
   useEffect(() => {
     mountedRef.current = true;
     
-    // Fetch news when tickers or limit changes
-    fetchNews();
+    // Only fetch if tickers actually changed
+    if (lastTickersKeyRef.current !== tickersKey) {
+      fetchNews();
+    }
 
     return () => {
       mountedRef.current = false;
@@ -214,7 +235,7 @@ export function useNews(tickers: string[] = [], limit: number = 5): ApiResponse<
         clearInterval(intervalRef.current);
       }
     };
-  }, [tickersKey, limit]); // Use tickersKey and limit instead of fetchNews to prevent infinite loops
+  }, [tickersKey, limit, fetchNews]); // Include fetchNews but it's memoized with stable deps
 
   return {
     data,
@@ -222,6 +243,12 @@ export function useNews(tickers: string[] = [], limit: number = 5): ApiResponse<
     error,
     refetch: fetchNews
   };
+}
+
+// Hook for fetching news for portfolio positions
+export function usePortfolioNews(positions: Array<{ ticker: string }>, limit: number = 10): ApiResponse<NewsArticle[]> {
+  const tickers = useMemo(() => positions.map(p => p.ticker), [positions]);
+  return useNews(tickers, limit);
 }
 
 // Hook for fetching most traded stocks from real Yahoo Finance screener API

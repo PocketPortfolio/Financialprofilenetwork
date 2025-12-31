@@ -499,7 +499,17 @@ export default function ConsolidatedPortfolioTable({
                   </td>
                   <td style={{ padding: '16px', textAlign: 'center' }}>
                     <button
-                      onClick={() => onDeleteTrade(trade.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        try {
+                          onDeleteTrade(trade.id);
+                        } catch (error) {
+                          console.error('Error calling onDeleteTrade:', error);
+                          
+                        }
+                      }}
                       style={{
                         padding: '8px 16px',
                         background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   User, 
   signInWithPopup, 
@@ -10,15 +10,34 @@ import {
   signOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
+import { terminate, clearIndexedDbPersistence } from 'firebase/firestore';
 import { trackGoogleSignIn, getLandingPage, getStoredUTMParameters } from '../lib/analytics/events';
+import { trackFunnelStage, trackConversion } from '../lib/analytics/conversion';
+import { getSEOPageAttribution, trackSEOSignupConversion } from '../lib/analytics/seo';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Track previous auth state to detect signups
+  const previousUserRef = useRef<User | null>(null);
+  
   // Use stable callback to prevent infinite loops
   const handleAuthStateChange = useCallback((user: User | null) => {
+    // Detect new signup: user was null, now has a user
+    if (!previousUserRef.current && user) {
+      // User just signed up - check for SEO page attribution
+      const attribution = getSEOPageAttribution();
+      if (attribution) {
+        // Track conversion from SEO page
+        trackSEOSignupConversion(attribution.path).catch(err => {
+          console.error('Failed to track SEO signup conversion:', err);
+        });
+      }
+    }
+    
+    previousUserRef.current = user;
     setUser(user);
     setLoading(false);
   }, []);
@@ -49,6 +68,26 @@ export function useAuth() {
           utmCampaign: utmParams?.utmCampaign,
           utmContent: utmParams?.utmContent,
         });
+        
+        // Track funnel progression
+        trackFunnelStage('signup_complete', 'user_onboarding', {
+          method: 'redirect',
+          landingPage: landingPage || undefined
+        });
+        
+        // Track conversion
+        trackConversion('signup_complete', 1, 'USD', {
+          method: 'google_redirect',
+          landingPage: landingPage || undefined
+        });
+        
+        // Track SEO page conversion if applicable
+        const attribution = getSEOPageAttribution();
+        if (attribution) {
+          trackSEOSignupConversion(attribution.path).catch(err => {
+            console.error('Failed to track SEO signup conversion:', err);
+          });
+        }
       }
     }).catch((error) => {
       console.log('No redirect result or error:', error);
@@ -75,6 +114,12 @@ export function useAuth() {
     try {
       // Try popup first
       const result = await signInWithPopup(auth, provider);
+      
+      // Track funnel stage: signup start
+      trackFunnelStage('signup_start', 'user_onboarding', {
+        method: 'popup',
+        landingPage: getLandingPage() || undefined
+      });
       
       // Track successful Google Sign-In with attribution
       const landingPage = getLandingPage();
@@ -119,7 +164,43 @@ export function useAuth() {
     }
     
     try {
+      // 1. Sign out from Auth
       await signOut(auth);
+      
+      // 2. CRITICAL: Nuke the Local Cache to prevent "Ghost Trades"
+      if (db) {
+        try {
+          // Try to clear IndexedDB persistence first (requires no active connections)
+          // If this fails, terminate() and reload will still clear everything
+          try {
+            await clearIndexedDbPersistence(db);
+            console.log('🧹 Local Firestore cache cleared');
+            
+          } catch (clearError: any) {
+            // clearIndexedDbPersistence may fail if there are active connections
+            // This is expected, we'll terminate and reload which will clear everything
+            if (clearError.code !== 'failed-precondition') {
+              console.warn('⚠️ Could not clear IndexedDB persistence (will clear on reload):', clearError);
+            }
+            
+          }
+          
+          // Terminate all Firestore connections (closes all active connections)
+          await terminate(db);
+          console.log('🧹 Firestore connections terminated');
+          
+          
+        } catch (cacheError) {
+          console.error('❌ Failed to clear local Firestore cache:', cacheError);
+          
+          // Don't throw - cache clearing is best effort, auth signout succeeded
+          // Reload will clear everything anyway
+        }
+      }
+      
+      // 3. Force Reload to reset SDK state and clear any remaining cache
+      // This ensures a clean state for the next user session
+      window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;

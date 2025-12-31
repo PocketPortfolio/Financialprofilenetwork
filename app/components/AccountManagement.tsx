@@ -5,6 +5,9 @@ import React, { useState } from 'react';
 import { User } from 'firebase/auth';
 import { AccountService, UserData } from '../services/accountService';
 import { Trade } from '../services/tradeService';
+import SustainabilityWidget from './SustainabilityWidget';
+import AlertModal from './modals/AlertModal';
+import Accordion from './Accordion';
 
 interface AccountManagementProps {
   user: User;
@@ -229,6 +232,8 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
@@ -250,7 +255,12 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
         ? error.message 
         : 'Failed to delete account. Please try again.';
       
-      alert(errorMessage);
+      setAlertModalData({
+        title: 'Delete Account Error',
+        message: errorMessage,
+        type: 'error'
+      });
+      setShowAlertModal(true);
       setIsDeleting(false);
     }
     // Note: Don't reset isDeleting in finally if redirecting
@@ -270,7 +280,12 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
       setShowExportModal(false);
     } catch (error) {
       console.error('Error exporting data:', error);
-      alert('Failed to export data. Please try again.');
+      setAlertModalData({
+        title: 'Export Error',
+        message: 'Failed to export data. Please try again.',
+        type: 'error'
+      });
+      setShowAlertModal(true);
     } finally {
       setIsExporting(false);
     }
@@ -314,56 +329,33 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
 
   return (
     <>
-      <div style={{
-        background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
-        border: '2px solid var(--border-warm)',
-        borderRadius: '16px',
-        padding: '28px',
-        marginBottom: '24px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(245, 158, 11, 0.1)'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '24px'
-        }}>
-          <div style={{
-            width: '56px',
-            height: '56px',
-            borderRadius: '16px',
-            background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: '20px',
-            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+      <Accordion
+        title="Account Management"
+        defaultExpanded={false}
+        persistState={true}
+        storageKey="account-management"
+        icon={
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="var(--accent-warm)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        }
+        headerContent={
+          <p style={{
+            fontSize: '14px',
+            color: 'var(--text-secondary)',
+            margin: 0,
+            fontWeight: '500'
           }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div>
-            <h2 style={{
-              fontSize: '24px',
-              fontWeight: '700',
-              color: 'var(--text)',
-              margin: '0 0 6px 0',
-              letterSpacing: '-0.5px'
-            }}>
-              Account Management
-            </h2>
-            <p style={{
-              fontSize: '16px',
-              color: 'var(--text-warm)',
-              margin: 0,
-              fontWeight: '500'
-            }}>
-              {user.displayName || user.email}
-            </p>
-          </div>
-        </div>
-
-        {/* Account Summary */}
+            {user.displayName || user.email}
+          </p>
+        }
+      >
+        <div style={{
+          background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+          padding: '20px',
+          borderRadius: '12px',
+        }}>
+          {/* Account Summary */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
@@ -504,7 +496,8 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
             Delete Account
           </button>
         </div>
-      </div>
+        </div>
+      </Accordion>
 
       {/* Export Modal */}
       {showExportModal && (
@@ -650,6 +643,11 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
               </div>
             </div>
             
+            {/* Sustainability Widget */}
+            <div style={{ marginBottom: '24px' }}>
+              <SustainabilityWidget context="export" />
+            </div>
+            
             {/* Clear Action Buttons */}
             <div style={{
               display: 'flex',
@@ -757,6 +755,16 @@ export default function AccountManagement({ user, trades, onAccountDeleted }: Ac
         onCancel={() => setShowDeleteModal(false)}
         isLoading={isDeleting}
       />
+
+      {alertModalData && (
+        <AlertModal
+          isOpen={showAlertModal}
+          title={alertModalData.title}
+          message={alertModalData.message}
+          type={alertModalData.type}
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
     </>
   );
 }
