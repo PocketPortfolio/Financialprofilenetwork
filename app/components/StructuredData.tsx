@@ -1,7 +1,7 @@
 'use client';
 
 interface StructuredDataProps {
-  type: 'Organization' | 'WebSite' | 'WebApplication' | 'Product' | 'Article' | 'FAQPage';
+  type: 'Organization' | 'WebSite' | 'WebApplication' | 'Product' | 'Article' | 'FAQPage' | 'FinancialProduct';
   data: any;
 }
 
@@ -23,8 +23,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           logo: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
           description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
           sameAs: [
-            'https://github.com/pocketportfolio',
-            'https://discord.gg/Ch9PpjRzwe'
+            'https://github.com/PocketPortfolio/Financialprofilenetwork',
+            'https://discord.gg/Ch9PpjRzwe',
+            'https://dev.to/pocketportfolioapp',
+            'https://coderlegion.com/5738/welcome-to-coderlegion-22s'
           ],
           contactPoint: {
             '@type': 'ContactPoint',
@@ -58,9 +60,13 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           offers: {
             '@type': 'Offer',
             price: '0',
-            priceCurrency: 'USD'
+            priceCurrency: 'USD',
+            description: 'Free tier available. Enterprise Sync for Corporate Sponsors.'
           },
           featureList: [
+            'Google Drive Bidirectional Sync',
+            'JSON Data Ownership',
+            'Zero Knowledge Privacy',
             'Portfolio Tracking',
             'Live Price Updates',
             'CSV Import',
@@ -124,6 +130,21 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           })) || []
         };
 
+      case 'FinancialProduct':
+        return {
+          ...baseData,
+          '@type': 'FinancialProduct',
+          name: data.name || 'Financial Product',
+          description: data.description,
+          identifier: data.identifier,
+          category: data.category || 'Financial Product',
+          provider: {
+            '@type': 'Organization',
+            name: data.provider?.name || 'Pocket Portfolio',
+            url: 'https://www.pocketportfolio.app'
+          }
+        };
+
       default:
         return baseData;
     }
@@ -146,8 +167,10 @@ export const organizationData = {
   logo: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
   description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
   sameAs: [
-    'https://github.com/pocketportfolio',
-    'https://discord.gg/Ch9PpjRzwe'
+    'https://github.com/PocketPortfolio/Financialprofilenetwork',
+    'https://discord.gg/Ch9PpjRzwe',
+    'https://dev.to/pocketportfolioapp',
+    'https://coderlegion.com/5738/welcome-to-coderlegion-22s'
   ]
 };
 
@@ -170,9 +193,13 @@ export const webAppData = {
   offers: {
     '@type': 'Offer',
     price: '0',
-    priceCurrency: 'USD'
+    priceCurrency: 'USD',
+    description: 'Free tier available. Enterprise Sync for Corporate Sponsors.'
   },
   featureList: [
+    'Google Drive Bidirectional Sync',
+    'JSON Data Ownership',
+    'Zero Knowledge Privacy',
     'Portfolio Tracking',
     'Live Price Updates',
     'CSV Import',

@@ -145,10 +145,26 @@ export function calculatePositions(trades: Trade[]): {
       const newTotalCost = currentTotalCost + (qty * price);
       const newTotalShares = positions[ticker].shares + qty;
 
+      // CRITICAL: Guard against division by zero and NaN values
+      if (!Number.isFinite(newTotalCost) || !Number.isFinite(newTotalShares) || newTotalShares <= 0) {
+        validation.errors.push(
+          `${ticker}: Invalid BUY transaction on ${date} - qty: ${qty}, price: ${price}, shares: ${positions[ticker].shares} (skipping trade)`
+        );
+        return; // Skip this trade - don't add it to positions
+      }
+
       positions[ticker].shares = newTotalShares;
       positions[ticker].avgCost = newTotalCost / newTotalShares;
       positions[ticker].totalInvested = newTotalCost;
     } else if (type === 'SELL') {
+      // Guard against NaN values before processing
+      if (!Number.isFinite(qty) || !Number.isFinite(positions[ticker].shares)) {
+        validation.errors.push(
+          `${ticker}: Invalid SELL transaction on ${date} - qty: ${qty}, shares: ${positions[ticker].shares} (skipping trade)`
+        );
+        return; // Skip this trade
+      }
+
       // Verify we have enough shares to sell
       if (positions[ticker].shares < qty) {
         validation.errors.push(
@@ -160,7 +176,7 @@ export function calculatePositions(trades: Trade[]): {
       positions[ticker].shares -= qty;
       
       // Update total invested (reduce proportionally)
-      if (positions[ticker].shares >= 0) {
+      if (positions[ticker].shares >= 0 && Number.isFinite(positions[ticker].avgCost)) {
         positions[ticker].totalInvested = positions[ticker].shares * positions[ticker].avgCost;
       }
     }

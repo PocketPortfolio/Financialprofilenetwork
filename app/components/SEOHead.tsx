@@ -18,7 +18,7 @@ export default function SEOHead({
   description,
   keywords = [],
   canonical,
-  ogImage = '/brand/og-base.png',
+  ogImage = 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123',
   ogType = 'website',
   noIndex = false,
   structuredData

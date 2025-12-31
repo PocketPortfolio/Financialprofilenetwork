@@ -33,10 +33,10 @@ const DashboardIcon = ({ isActive }: { isActive: boolean }) => (
         <stop offset="100%" stopColor={isActive ? "#f59e0b" : "#ff6b35"} />
       </linearGradient>
     </defs>
-    <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"}/>
-    <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"}/>
-    <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"}/>
-    <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"}/>
+    <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"} opacity={isActive ? "1" : "0.85"}/>
+    <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"} opacity={isActive ? "1" : "0.85"}/>
+    <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"} opacity={isActive ? "1" : "0.85"}/>
+    <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="url(#dashboardGradient)" strokeWidth="2.5" fill={isActive ? "url(#dashboardGradient)" : "none"} opacity={isActive ? "1" : "0.85"}/>
   </svg>
 );
 
@@ -151,14 +151,33 @@ const SettingsIcon = ({ isActive }: { isActive: boolean }) => (
   </svg>
 );
 
+const SponsorIcon = ({ isActive }: { isActive: boolean }) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+    className="sponsor-heart"
+  >
+    <defs>
+      <linearGradient id="sponsorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor={isActive ? "#E1306C" : "#E1306C"} />
+        <stop offset="100%" stopColor={isActive ? "#C2185B" : "#E1306C"} />
+      </linearGradient>
+    </defs>
+    <path
+      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+      fill={isActive ? "url(#sponsorGradient)" : "#E1306C"}
+      stroke={isActive ? "url(#sponsorGradient)" : "#E1306C"}
+      strokeWidth={isActive ? "0" : "1.5"}
+      opacity={isActive ? "1" : "0.9"}
+    />
+  </svg>
+);
+
 const tabs: TabItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: '/dashboard',
-    icon: <DashboardIcon isActive={false} />,
-    ariaLabel: 'Go to Dashboard',
-  },
   {
     id: 'positions',
     label: 'Positions',
@@ -187,14 +206,28 @@ const tabs: TabItem[] = [
     icon: <SettingsIcon isActive={false} />,
     ariaLabel: 'Open Settings',
   },
+  {
+    id: 'stocks',
+    label: 'Stocks',
+    href: '/s/aapl', // Popular stocks entry point
+    icon: <DashboardIcon isActive={false} />,
+    ariaLabel: 'Browse Stocks',
+  },
+  {
+    id: 'sponsor',
+    label: 'Sponsor',
+    href: '/sponsor',
+    icon: <SponsorIcon isActive={false} />,
+    ariaLabel: 'Support Pocket Portfolio',
+  },
 ];
 
 export default function TabBar({ className = '' }: TabBarProps) {
   const pathname = usePathname();
   const router = useRouter();
   
-  // Debug logging
-  console.log('TabBar rendering:', { pathname, className });
+  // Debug logging removed to reduce console noise and prevent unnecessary re-renders
+  // console.log('TabBar rendering:', { pathname, className });
   
   // Always render - CSS will handle mobile/desktop visibility
 
@@ -209,8 +242,10 @@ export default function TabBar({ className = '' }: TabBarProps) {
         left: 0,
         right: 0,
         zIndex: 1000,
-        background: 'linear-gradient(135deg, rgba(255, 107, 53, 0.95) 0%, rgba(245, 158, 11, 0.95) 100%)',
-        borderTop: '2px solid rgba(255, 107, 53, 0.3)',
+        // Theme-aware background: use surface-elevated which is lighter on dark themes
+        // Add subtle orange tint using color-mix for better visibility
+        background: 'linear-gradient(135deg, color-mix(in srgb, var(--surface-elevated) 92%, rgba(255, 107, 53, 0.25) 8%) 0%, color-mix(in srgb, var(--surface) 92%, rgba(245, 158, 11, 0.25) 8%) 100%)',
+        borderTop: '2px solid var(--border)',
         paddingTop: '12px',
         paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
         paddingLeft: '16px',
@@ -220,33 +255,18 @@ export default function TabBar({ className = '' }: TabBarProps) {
         alignItems: 'center',
         minHeight: '72px',
         backdropFilter: 'blur(20px) saturate(1.2)',
-        boxShadow: '0 -8px 32px rgba(255, 107, 53, 0.3), 0 -4px 16px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.2), 0 -4px 16px rgba(0, 0, 0, 0.1)',
         width: '100%',
         boxSizing: 'border-box',
       }}
     >
       {tabs.map((tab) => {
         const isActive = pathname === tab.href || 
-                        (tab.id === 'dashboard' && pathname === '/dashboard') ||
-                        (tab.id === 'watchlist' && pathname === '/live');
+                        (tab.id === 'watchlist' && pathname === '/live') ||
+                        (tab.id === 'sponsor' && pathname === '/sponsor');
         
         const handleTabClick = (e: React.MouseEvent, href: string) => {
           e.preventDefault();
-          
-          // Special handling for Dashboard button
-          if (tab.id === 'dashboard') {
-            if (pathname === '/dashboard') {
-              // If we're already on the dashboard, scroll to top
-              window.scrollTo({ 
-                top: 0, 
-                behavior: 'smooth' 
-              });
-            } else {
-              // Navigate to dashboard
-              router.push('/dashboard');
-            }
-            return;
-          }
           
           // Handle hash links for scrolling to sections
           if (href.includes('#')) {
@@ -294,32 +314,34 @@ export default function TabBar({ className = '' }: TabBarProps) {
               padding: '8px 12px',
               borderRadius: '12px',
               background: isActive 
-                ? 'rgba(255, 255, 255, 0.2)' 
+                ? 'color-mix(in srgb, var(--accent-warm) 20%, var(--surface-elevated))' 
                 : 'transparent',
               border: isActive 
-                ? '2px solid rgba(255, 255, 255, 0.3)' 
+                ? '2px solid var(--accent-warm)' 
                 : '2px solid transparent',
-              color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
+              color: isActive ? 'var(--text)' : 'var(--text-secondary)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               minHeight: '52px',
               minWidth: '52px',
               cursor: 'pointer',
               flex: '1',
-              maxWidth: '80px',
+              maxWidth: '80px', // Increased back since we now have 6 items instead of 7
               transform: isActive ? 'scale(1.05)' : 'scale(1)',
               boxShadow: isActive 
-                ? '0 4px 16px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)' 
+                ? '0 4px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 var(--border), 0 0 0 1px color-mix(in srgb, var(--accent-warm) 30%, transparent)' 
                 : 'none',
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.background = 'color-mix(in srgb, var(--accent-warm) 10%, var(--surface-elevated))';
+                e.currentTarget.style.borderColor = 'var(--border)';
                 e.currentTarget.style.transform = 'scale(1.02)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
                 e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'transparent';
                 e.currentTarget.style.transform = 'scale(1)';
               }
             }}
@@ -328,13 +350,16 @@ export default function TabBar({ className = '' }: TabBarProps) {
               {React.cloneElement(tab.icon as React.ReactElement, { isActive })}
             </div>
             <span
+              className="mobile-tab-label"
               style={{
                 fontSize: '11px',
-                fontWeight: isActive ? '700' : '500',
+                fontWeight: isActive ? '700' : '600',
                 textAlign: 'center',
                 lineHeight: 1.2,
-                color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
-                textShadow: isActive ? '0 1px 2px rgba(0, 0, 0, 0.2)' : 'none',
+                color: isActive ? 'var(--text)' : 'var(--text-secondary)',
+                textShadow: isActive 
+                  ? '0 1px 3px rgba(0, 0, 0, 0.4), 0 0 2px color-mix(in srgb, var(--accent-warm) 40%, transparent)' 
+                  : '0 1px 2px rgba(0, 0, 0, 0.2)',
                 letterSpacing: '0.025em',
                 marginTop: '2px',
               }}

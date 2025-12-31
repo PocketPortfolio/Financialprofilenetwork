@@ -57,7 +57,10 @@ export function trackDeviceCategory(): void {
       });
     }
 
-    console.log('📱 Device category detected:', payload);
+    // Only log in development to reduce console noise in production
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📱 Device category detected:', payload);
+    }
   } catch (error) {
     console.error('Failed to track device category:', error);
   }
@@ -326,6 +329,9 @@ export function trackMobileFormSubmit(formType: string, success: boolean): void 
   }
 }
 
+// Global flag to prevent multiple initializations
+let analyticsInitialized = false;
+
 /**
  * Initialize mobile analytics
  * Call this on app startup
@@ -335,20 +341,33 @@ export function initializeMobileAnalytics(): void {
     return; // SSR
   }
 
+  // Prevent multiple initializations
+  if (analyticsInitialized) {
+    return;
+  }
+  analyticsInitialized = true;
+
   // Track device category on first load
   trackDeviceCategory();
 
-  // Track viewport changes
+  // Track viewport changes (debounced to prevent excessive calls)
   let resizeTimeout: NodeJS.Timeout;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
       trackDeviceCategory();
-    }, 250);
+    }, 1000); // Increased debounce to 1 second to reduce calls
   });
 
-  console.log('📱 Mobile analytics initialized');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('📱 Mobile analytics initialized');
+  }
 }
+
+
+
+
+
 
 
 

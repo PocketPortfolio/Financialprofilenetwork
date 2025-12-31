@@ -1,61 +1,39 @@
 'use client';
 
 import React from 'react';
-
-interface Article {
-  title: string;
-  description: string;
-  url: string;
-  platform: 'dev.to' | 'coderlegion';
-  date: string;
-  tags: string[];
-}
-
-const featuredArticles: Article[] = [
-  {
-    title: "Price Pipeline Health — transparency you can see (and trust)",
-    description: "Learn how Pocket Portfolio built a transparent price pipeline with real-time health monitoring and fallback providers.",
-    url: "https://dev.to/pocketportfolioapp/price-pipeline-health-transparency-you-can-see-and-trust",
-    platform: "dev.to",
-    date: "2024-10",
-    tags: ["infrastructure", "transparency", "real-time"]
-  },
-  {
-    title: "Devlog: Building the Price Pipeline Health Card",
-    description: "A deep dive into designing and implementing the Price Pipeline Health Card so users know when data is fresh or on fallback.",
-    url: "https://dev.to/pocketportfolioapp/devlog-building-the-price-pipeline-health-card",
-    platform: "dev.to",
-    date: "2024-10",
-    tags: ["devlog", "ui/ux", "monitoring"]
-  },
-  {
-    title: "Designing a 'Never-0.00' Price Pipeline in the Real World",
-    description: "Exploring the architectural decisions behind a resilient price pipeline that never shows $0.00 to users.",
-    url: "https://dev.to/pocketportfolioapp/designing-a-never-0-00-price-pipeline",
-    platform: "dev.to",
-    date: "2024-10",
-    tags: ["architecture", "reliability", "design"]
-  },
-  {
-    title: "Today's ship: Mock-Trade Lab, 5-min CSV Import, and bulletproof Price Fallbacks",
-    description: "Shipping updates including the Mock-Trade Lab for testing strategies, faster CSV imports, and resilient price fallbacks.",
-    url: "https://coderlegion.com/5738/todays-ship-mock-trade-lab-csv-import-price-fallbacks",
-    platform: "coderlegion",
-    date: "2024-10",
-    tags: ["features", "csv", "testing"]
-  },
-  {
-    title: "DISCUSS: The 'Never 0.00' Challenge — design a resilient price pipeline",
-    description: "Community discussion on designing a resilient client-to-edge price pipeline that never fails users.",
-    url: "https://coderlegion.com/5738/discuss-never-0-00-challenge",
-    platform: "coderlegion",
-    date: "2024-10",
-    tags: ["discussion", "community", "architecture"]
-  }
-];
+import StructuredData from './StructuredData';
+import { trackBlogPostClick, trackBlogPlatformView } from '../lib/analytics/events';
+import { featuredArticles, type Article } from '../lib/blog/articles';
 
 export default function CommunityContent() {
   return (
+    <>
+      {/* Article Structured Data for SEO */}
+      {featuredArticles.map((article, index) => (
+        <StructuredData
+          key={`structured-${index}`}
+          type="Article"
+          data={{
+            headline: article.title,
+            description: article.description,
+            url: article.url,
+            datePublished: article.datePublished || new Date().toISOString(),
+            dateModified: article.dateModified || article.datePublished || new Date().toISOString(),
+            author: {
+              '@type': 'Organization',
+              name: 'Pocket Portfolio Team'
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Pocket Portfolio',
+              logo: {
+                '@type': 'ImageObject',
+                url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
+              }
+            }
+          }}
+        />
+      ))}
     <section 
       className="brand-surface" 
       style={{ 
@@ -102,6 +80,7 @@ export default function CommunityContent() {
               href={article.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackBlogPostClick(article.title, article.platform, article.url)}
               style={{
                 display: 'block',
                 padding: '24px',
@@ -201,6 +180,7 @@ export default function CommunityContent() {
               target="_blank" 
               rel="noopener noreferrer"
               className="brand-button-primary"
+              onClick={() => trackBlogPlatformView('dev.to', 'view_all')}
               style={{
                 padding: '12px 24px',
                 fontSize: '15px',
@@ -228,6 +208,7 @@ export default function CommunityContent() {
               target="_blank" 
               rel="noopener noreferrer"
               className="brand-button-secondary"
+              onClick={() => trackBlogPlatformView('coderlegion', 'join_discussion')}
               style={{
                 padding: '12px 24px',
                 fontSize: '15px',
@@ -254,6 +235,7 @@ export default function CommunityContent() {
         </div>
       </div>
     </section>
+    </>
   );
 }
 
