@@ -2,9 +2,10 @@ name: Generate Blog Posts
 
 on:
   schedule:
-    # Every Monday and Thursday at 9 AM UTC (2 posts per week)
-    - cron: '0 9 * * 1,4'
-  workflow_dispatch: # Allow manual triggering
+    # Daily at 9 AM UTC - checks for due posts automatically
+    # Posts are generated when their date <= today and status is "pending"
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual triggering (for testing/debugging)
 
 jobs:
   generate:
