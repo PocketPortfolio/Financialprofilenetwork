@@ -7,14 +7,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Prevent infinite loop: Skip deployment if commit message contains [skip ci]
-# This allows blog generation commits to trigger deployment without re-triggering
+# Automatic deployment on all pushes to main
+# Blog generation commits will trigger deployment automatically
 
 jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
       - uses: actions/checkout@v4
       
