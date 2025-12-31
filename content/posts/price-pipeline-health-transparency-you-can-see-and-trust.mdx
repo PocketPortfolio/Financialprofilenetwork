@@ -1,0 +1,155 @@
+---
+title: "Price Pipeline Health — transparency you can see (and trust)"
+date: "2025-10-10"
+updated: "2025-12-31"
+description: "Ask your finance app today: Where do your live prices come from, how fresh are they, and what..."
+tags: ["fintech", "webdev", "opensource", "performance"]
+author: "Pocket Portfolio"
+image: "/images/blog/price-pipeline-health-transparency-you-can-see-and-trust.png"
+pillar: "Technical"
+source: "dev.to"
+original_url: "https://dev.to/pocketportfolioapp/price-pipeline-health-transparency-you-can-see-and-trust-1m2f"
+canonical_url: "https://pocketportfolio.app/blog/price-pipeline-health-transparency-you-can-see-and-trust"
+---
+
+[JSON-based Investment Tracker](/)
+
+
+> **Ask your finance app today:** *Where do your live prices come from, how fresh are they, and what happens when a provider is down?*  
+> Pocket Portfolio is setting a precedent: **never 0.00** and **always show provenance**.
+
+## Context
+
+Price data is only useful if you can **trust** it. Pocket Portfolio already runs a time-boxed, multi-provider quote engine (Yahoo Finance Quote, Yahoo Chart, Stooq). We fetch in parallel, the **first valid** response wins, and if everyone times out we serve **last-known good** marked as *stale*.
+
+Until now, that reliability was largely invisible. Users (and support) couldn’t instantly tell *which* provider answered, *how fresh* the quote was, or *whether* we were on a fallback. The **Price Pipeline Health** widget changes that with a small, honest panel on your dashboard.
+
+***
+
+## What's new
+
+- **Provider status at a glance.** Each provider shows a badge — **Fresh** (green), **Fallback** (amber), **Unhealthy** (red) — plus a timestamp.  
+- **Self-healing snapshot.** If the cached snapshot is stale, the edge endpoint performs **lightweight probes** (no heavy parsing) to refresh state responsibly.  
+- **Edge-friendly & optional Redis.** Works in memory for local/dev; persists across regions with **Upstash Redis** in production.  
+- **Accessible by design.** Colour is never the only cue; badges include text + `aria-live="polite"` updates.
+
+***
+
+## How it works (high-level)
+
+1. **Record & store health.** Each provider call in our quote path records **success/failure** with timestamps and whether a **fallback** was used. Storage is Redis (if configured) or in-memory per edge process.
+2. **Serve a small contract.** `GET /api/health-price` returns:
+
+```json
+{
+  "providers": [
+    { "provider": "yahoo", "lastSuccess": 1730000000000, "lastFailure": null, "failureCount": 0, "activeFallback": false },
+    { "provider": "chart", "lastSuccess": 1730000000000, "lastFailure": null, "failureCount": 1, "activeFallback": true },
+    { "provider": "stooq", "lastSuccess": null, "lastFailure": 1730000000000, "failureCount": 4, "activeFallback": false }
+  ]
+}
+```
+
+It's CDN-friendly (`s-maxage=5`) and **never** blocks the dashboard.
+
+3. **Classify on the client.** The UI applies documented rules:
+
+* **Fresh:** last success < **30s**
+* **Fallback:** active fallback **or** last failure < **60s**
+* **Unhealthy:** no success ≥ **5 min**
+
+4. **Render the card.** A tiny component maps providers → RAG badges and shows “Updated HH:MM:SS” in your locale/time-zone.
+
+> **Diagram (words):** Providers (Yahoo/Chart/Stooq) → Parallel quote engine (1.5s budget) → Shared health store (lastSuccess/lastFailure/failureCount/activeFallback) → `/api/health-price` → Dashboard card with Fresh/Fallback/Unhealthy badges.
+
+***
+
+## Impact on users
+
+* **Confidence, not guesswork.** Know immediately if your quotes are live or on fallback, and whether a provider is having a bad day.
+* **Support with receipts.** Provenance reduces back-and-forth (“was this cached?”) and speeds incident triage.
+* **Integrity by default.** We never mask outages; we label them, keep the app responsive, and recover gracefully.
+
+***
+
+## How to contribute / try it today
+
+We built this to be easy to audit and extend.
+
+### Try it locally
+
+1. Start the app and visit the dashboard — the **Price Pipeline Health** card renders automatically.
+2. Call the endpoint directly:
+
+   ```bash
+   curl -sS http://localhost:3000/api/health-price | jq .
+   ```
+3. (Optional) Test vendor reachability:
+
+   ```bash
+   curl -sS http://localhost:3000/api/yahoo-smoke | jq .
+   ```
+
+### Configure persistence (production)
+
+Set these env vars and redeploy:
+
+```
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+```
+
+No code changes needed; the store switches from in-memory → Redis.
+
+### Open-source collaboration
+
+* **UX:** propose badge copy/contrast improvements or a compact mobile layout.
+* **Providers:** PR an adapter + probe for another data source (the contract is tiny).
+* **Docs:** help explain the *why* — especially for regulated audiences — with examples and screenshots.
+
+***
+
+## Why this matters (and a friendly challenge)
+
+Real-time finance should be **observable**. If your provider can’t tell you *source • age • status* for every price, ask them *why not*. We’re sharing our approach so health becomes a **boring, industry-wide default** — not a hidden detail.
+
+***
+
+## Appendix: implementation notes
+
+* **UI shell**: `/app/index.html` card container with `aria-live="polite"`.
+* **Styles**: token-based badges (green/amber/red) in `/app/style.css`.
+* **Health store**: Redis|memory module in `/api/_health.js`.
+* **Endpoint**: `/api/health-price` probes vendors when stale, then returns the snapshot.
+* **Diagnostics**: `/api/yahoo-smoke` prints RTT + samples for debugging.
+* **Routing**: All endpoints run on the **Edge runtime** (Vercel).
+* **Guardrails**: no client secrets; small cache window; probes are lightweight.
+
+***
+
+### Credits
+
+Thanks to our early testers and everyone filing issues. Shout-out to **@22s** for the probe design, and the [Open-fintech-builders](https://coderlegion.com/groups/openfi-builders) group on CoderLegion for chaos-testing on spotty networks.
+
+***
+
+## Key Takeaways
+
+Unlike cloud apps, Pocket Portfolio uses **Sovereign Sync** to turn your Google Drive into a database. This approach ensures:
+
+- **Data Ownership**: Your financial data lives in your Google Drive, not a vendor's database
+- **No Vendor Lock-in**: Export anytime, use any tool
+- **Privacy by Default**: Your data never leaves your control
+- **Local-First Resilience**: Works offline, syncs when online
+
+Learn how to set up [Google Drive Sync](/features/google-drive-sync) and turn your Drive into your personal financial database.
+
+## 🚀 Unlock Sovereign Sync
+
+**Ready to own your financial data?**
+
+Pocket Portfolio's **Sovereign Sync** turns your Google Drive into a personal database. No vendor lock-in. No cloud dependencies. Just your data, your way.
+
+👉 [Upgrade to Corporate/Founder Tier →](/sponsor)
+
+*Sovereign Sync is available for Corporate and Founder tier sponsors. [Learn more →](/sponsor)

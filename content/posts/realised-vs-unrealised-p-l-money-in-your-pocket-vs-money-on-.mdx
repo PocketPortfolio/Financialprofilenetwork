@@ -1,0 +1,163 @@
+﻿---
+title: "Realised vs Unrealised P/L — Money in Your Pocket vs Money on Paper"
+date: "2025-10-23"
+updated: "2025-12-31"
+description: "Learn the simple difference between realised and unrealised profit & loss using Pocket Portfolio’s interactive examples."
+tags: ["investing", "fintech", "pocketportfolio", "education"]
+author: "Pocket Portfolio"
+image: "/images/blog/realised-vs-unrealised-p-l-money-in-your-pocket-vs-money-on-.png"
+pillar: "Market"
+source: "dev.to"
+original_url: "https://dev.to/pocketportfolioapp/realised-vs-unrealised-pl-money-in-your-pocket-vs-money-on-paper-4p50"
+canonical_url: "https://pocketportfolio.app/blog/realised-vs-unrealised-p-l-money-in-your-pocket-vs-money-on-"
+---
+
+
+Learn more about [Google Drive Portfolio Sync](/).
+
+## 💰 Realised vs Unrealised P/L — Money in Your Pocket vs Money on Paper
+
+Most investors check their portfolio and see **numbers changing** every day — but not all those gains (or losses) are *real*.  
+Let’s clear that up.
+
+---
+
+## 🧠 The Simple Truth
+
+- **Realised Profit/Loss** → You **sold** the investment. The gain or loss is **locked in**.  
+- **Unrealised Profit/Loss** → You **still hold** the investment. The value changed, but it’s **only on paper**.
+
+Think of it like a house:
+
+> The *market value* of your house may rise — that’s unrealised profit.  
+> You only *realise* it when you sell.
+
+---
+
+## 📊 Real-World Example
+
+You bought **AAPL** at **£150**.  
+Today it's **£170**.
+
+| Status | Meaning | Value Change |
+|:-------|:---------|:--------------|
+| **Unrealised P/L** | Price moved, but you haven't sold. | +£20 (13.3%) |
+| **Realised P/L** | You sold at £170 — gain is final. | +£20 (13.3%) |
+
+If AAPL drops back to £150 *before you sell*, the unrealised gain disappears — you never actually made (or lost) money.
+
+---
+
+## 🧮 Try It Yourself — P/L Calculator
+
+Paste this code snippet into your local repo (`/components/PLCalculator.tsx`)  
+
+
+```tsx
+import React, { useState } from "react";
+
+export default function PLCalculator() {
+  const [buy, setBuy] = useState(150);
+  const [sell, setSell] = useState(170);
+  const [shares, setShares] = useState(10);
+
+  const pl = (sell - buy) * shares;
+  const percent = ((sell - buy) / buy) * 100;
+
+  return (
+    <div className="max-w-sm p-4 border rounded-xl bg-white dark:bg-gray-900">
+      <h3 className="font-semibold mb-2">P/L Calculator</h3>
+      <label>Buy Price (£)</label>
+      <input value={buy} onChange={e=>setBuy(+e.target.value)} type="number" />
+      <label>Sell Price / Current Price (£)</label>
+      <input value={sell} onChange={e=>setSell(+e.target.value)} type="number" />
+      <label>Shares Held</label>
+      <input value={shares} onChange={e=>setShares(+e.target.value)} type="number" />
+      <p className="mt-3">
+        <strong>{pl >= 0 ? "Gain" : "Loss"}:</strong> £{pl.toFixed(2)} 
+        (<strong>{percent.toFixed(2)}%</strong>)
+      </p>
+    </div>
+  );
+}
+```
+
+> 💡 *Tip:* Change the “Sell Price” to test different outcomes —
+> what’s your profit if AAPL falls to £145?
+
+---
+
+## 📚 Why This Matters for You
+
+* You only **pay taxes** on *realised* gains.
+* **Unrealised losses** may recover — don’t panic-sell.
+* Knowing the difference helps you plan exits, re-entry, and rebalancing.
+
+---
+
+## 📺 See It in Action
+
+Inside **Pocket Portfolio → Trades → P/L View**,
+you’ll find **unrealised** values.
+
+
+---
+
+## ⚠️ Common Mistakes to Avoid
+
+1. **Celebrating too early** — gains aren’t real until sold.
+2. **Ignoring taxes** — realised profits can trigger capital-gains tax.
+3. **Confusing volatility with loss** — prices move, but that’s not final.
+
+---
+
+## ✅ Key Takeaways
+
+* *Realised = sold = final profit or loss.*
+* *Unrealised = still invested = paper profit or loss.*
+* Pocket Portfolio shows **both** transparently so you always know what’s real.
+
+---
+
+## 🔗 Further Reading & References
+
+* [FINRA Smart Investing Basics](https://www.finra.org/investors/learn-to-invest)
+* [CFA Institute — Measuring Performance Accurately](https://www.cfainstitute.org/)
+* [Set up Google Drive Sync →](/features/google-drive-sync)
+
+---
+
+> 🧩 *This article is part 1 of the “Investing Made Simple” series.*
+> Next up: [Reading Your Portfolio Timeline Like a Pro →]
+
+---
+
+*Educational content only — not financial advice.
+© Pocket Portfolio 2025 · Evidence-First Investing for Everyone.*
+
+
+---
+
+## Key Takeaways
+
+Unlike cloud apps, Pocket Portfolio uses **Sovereign Sync** to turn your Google Drive into a database. This approach ensures:
+
+- **Data Ownership**: Your financial data lives in your Google Drive, not a vendor's database
+- **No Vendor Lock-in**: Export anytime, use any tool
+- **Privacy by Default**: Your data never leaves your control
+- **Local-First Resilience**: Works offline, syncs when online
+
+Learn how to set up [Google Drive Sync](/features/google-drive-sync) and turn your Drive into your personal financial database.
+
+## 🚀 Unlock Sovereign Sync
+
+**Ready to own your financial data?**
+
+Pocket Portfolio's **Sovereign Sync** turns your Google Drive into a personal database. No vendor lock-in. No cloud dependencies. Just your data, your way.
+
+👉 [Upgrade to Corporate/Founder Tier →](/sponsor)
+
+*Sovereign Sync is available for Corporate and Founder tier sponsors. [Learn more →](/sponsor)
+
+
+
