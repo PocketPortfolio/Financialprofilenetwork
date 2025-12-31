@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import StructuredData from './StructuredData';
 import { trackBlogPostClick, trackBlogPlatformView } from '../lib/analytics/events';
 import { featuredArticles, type Article } from '../lib/blog/articles';
@@ -203,6 +204,31 @@ export default function CommunityContent() {
             >
               View All Dev.to Articles →
             </a>
+            <Link
+              href="/blog"
+              onClick={() => trackBlogPlatformView('pocket-portfolio', 'view_all')}
+              style={{
+                padding: '12px 24px',
+                fontSize: '15px',
+                fontWeight: '600',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(245, 158, 11, 1) 100%)',
+                color: 'white',
+                textDecoration: 'none',
+                display: 'inline-block',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              View Pocket Portfolio Posts →
+            </Link>
             <a 
               href="https://coderlegion.com/5738/welcome-to-coderlegion-22s" 
               target="_blank" 
