@@ -4,23 +4,47 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import SimplePieChart from '../components/SimplePieChart';
 import PortfolioChart from '../components/PortfolioChart';
+import PortfolioAllocationChart from '../components/portfolio/PortfolioAllocationChart';
+import DrillDownChart from '../components/portfolio/DrillDownChart';
+import PortfolioPerformanceChart from '../components/portfolio/PortfolioPerformanceChart';
+import AnalyticsPanel from '../components/portfolio/AnalyticsPanel';
+import AllocationRecommendations from '../components/portfolio/AllocationRecommendations';
+import SectorFilter from '../components/portfolio/SectorFilter';
+import ReturnHeatMap from '../components/portfolio/ReturnHeatMap';
+import SharePortfolio from '../components/portfolio/SharePortfolio';
+import { usePortfolioStore } from '../lib/store/portfolioStore';
+import { usePortfolioHistory } from '../hooks/usePortfolioHistory';
+import { calculatePortfolioAnalytics } from '../lib/portfolio/analytics';
+import { saveDailySnapshot } from '../lib/portfolio/snapshot';
+import { usePortfolioNews } from '../hooks/useDataFetching';
+import { getSectorSync } from '../lib/portfolio/sectorService';
+import { GICSSector, GICS_SECTOR_INFO, normalizeSector } from '../lib/portfolio/sectorClassification';
 import Logo from '../components/Logo';
 import TickerSearch from '../components/TickerSearch';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import CSVImporter from '../components/CSVImporter';
 import AccountManagement from '../components/AccountManagement';
+import ReferralProgram from '../components/viral/ReferralProgram';
+import SyncUpgradeCTA from '../components/SyncUpgradeCTA';
 import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
 import PricePipelineHealth from '../components/PricePipelineHealth';
+import CloudStatusIcon from '../components/CloudStatusIcon';
+import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import SEOHead from '../components/SEOHead';
 import StructuredData, { webAppData } from '../components/StructuredData';
 import { useQuotes, useNews, useMarketData } from '../hooks/useDataFetching';
 import { useAuth } from '../hooks/useAuth';
 import { useTrades } from '../hooks/useTrades';
+import { usePremiumTheme } from '../hooks/usePremiumTheme';
+import ConfirmationModal from '../components/modals/ConfirmationModal';
+import AlertModal from '../components/modals/AlertModal';
+import FeatureAnnouncementModal from '../components/modals/FeatureAnnouncementModal';
 // import { usePortfolios } from '../hooks/usePortfolios';
 // import PortfolioSelector from '../components/PortfolioSelector';
 import { getDeviceInfo } from '../lib/utils/device';
 import { initializeMobileAnalytics } from '../lib/analytics/device';
 import MobileHeader from '../components/nav/MobileHeader';
+import OnboardingTour from '../components/OnboardingTour';
 import { 
   calculatePositions, 
   calculatePortfolioTotals, 
@@ -49,13 +73,27 @@ interface Position {
   totalTrades: number;
   lastTradeDate: string;
   isMock: boolean;
-  currency?: string;
+  currency: string;
+  totalInvested: number;
 }
 
 export default function Dashboard() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   // const { selectedPortfolio, selectedPortfolioId } = usePortfolios();
-  const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions } = useTrades();
+  const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
+  const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
+  const { tier } = usePremiumTheme();
+  
+  // Use ref to track latest trades for sync operations (avoids stale closure)
+  const tradesRef = React.useRef(trades);
+  // Track last synced trades content to prevent auto-sync loop
+  const lastSyncedTradesContentRef = React.useRef<string>('');
+  // Track if trades were updated from a remote source (Drive) to prevent auto-sync loop
+  const isRemoteUpdateRef = React.useRef(false);
+  React.useEffect(() => {
+    
+    tradesRef.current = trades;
+  }, [trades]);
   
   // State for adding new trades
   const [newTrade, setNewTrade] = useState({
@@ -71,25 +109,67 @@ export default function Dashboard() {
   // Debug authentication state (reduced logging)
   // console.log('🔐 Auth state:', { isAuthenticated, user: user?.email, loading: false });
   
-  // Clean and filter valid tickers (memoized to prevent infinite loops)
-  const userTickers = useMemo(() => {
-  const rawTickers = trades.map(trade => trade.ticker);
-  const invalidPatterns = ['ADR', 'INC.', 'CORPORATION', 'COMPANY', 'CO.', 'LTD', 'LLC', 'INC', 'CORP'];
+  // Calculate portfolio metrics (excluding mock trades) - MEMOIZED to prevent recalculation
+  const realTrades = useMemo(() => trades.filter(trade => !trade.mock), [trades]);
   
-    return Array.from(new Set(
-    rawTickers
-      .filter(ticker => {
-        const normalized = ticker.trim().toUpperCase();
-        const isValid = !invalidPatterns.includes(normalized) && 
-                       normalized.length >= 2 && 
-                       normalized.length <= 10;
-        if (!isValid) {
-          console.log(`⚠️ Filtering out invalid ticker: "${ticker}"`);
-        }
-        return isValid;
-      })
-  ));
-  }, [trades]);
+  // For display: Show all trades when only mock trades exist (demo mode), otherwise show only real trades
+  // This allows users to test with demo data, but hides demo data when real CSV is imported
+  const displayTrades = useMemo(() => {
+    const hasRealTrades = realTrades.length > 0;
+    // If there are real trades, only show real trades. Otherwise, show all trades (including mock for demo)
+    return hasRealTrades ? realTrades : trades;
+  }, [trades, realTrades]);
+  
+  // Clean and filter valid tickers (memoized with stable key to prevent infinite loops)
+  // Use displayTrades so demo data tickers are included when no real trades exist
+  const tradesKey = useMemo(() => {
+    return displayTrades.map(t => t.ticker).sort().join(',');
+  }, [displayTrades]);
+  
+  const userTickers = useMemo(() => {
+    const rawTickers = displayTrades.map(trade => trade.ticker);
+    const invalidPatterns = ['ADR', 'INC.', 'CORPORATION', 'COMPANY', 'CO.', 'LTD', 'LLC', 'INC', 'CORP'];
+    
+    // Normalize tickers: extract base currency from trading pairs (e.g., "BTC/USDT" -> "BTC")
+    // Also add .L suffix for UK stocks for London Stock Exchange
+    const normalizeTicker = (ticker: string): string => {
+      const trimmed = ticker.trim().toUpperCase();
+      let baseTicker = trimmed;
+      // Handle exchange suffixes (e.g., "TSLA:US" -> "TSLA")
+      if (/^[A-Z0-9]+:[A-Z0-9]+$/i.test(trimmed)) {
+        baseTicker = trimmed.split(':')[0];
+      } else if (/^[A-Z0-9]+\/[A-Z0-9]+$/i.test(trimmed)) {
+        // Handle trading pairs like "BTC/USDT" or "BTC-USDT" -> extract base currency
+        baseTicker = trimmed.split('/')[0];
+      } else if (/^[A-Z0-9]+\-[A-Z0-9]+$/i.test(trimmed)) {
+        baseTicker = trimmed.split('-')[0];
+      }
+      // For UK stocks, add .L suffix for London Stock Exchange (must match quote API)
+      const UK_STOCKS = ['HSBA', 'ULVR', 'VOD', 'BP', 'RDS', 'RDS-A', 'RDS-B', 'GSK', 'AZN', 'BATS', 'BT', 'LLOY', 'BARC', 'RBS', 'TSCO', 'SBRY', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT'];
+      if (UK_STOCKS.includes(baseTicker)) {
+        return `${baseTicker}.L`;
+      }
+      return baseTicker;
+    };
+    
+    // Normalize FIRST, then filter and validate
+    const normalizedTickers = Array.from(new Set(
+      rawTickers
+        .map(ticker => normalizeTicker(ticker)) // Normalize first
+        .filter(normalized => {
+          // Then validate the normalized ticker
+          const isValid = !invalidPatterns.includes(normalized) && 
+                         normalized.length >= 2 && 
+                         normalized.length <= 10;
+          if (!isValid && normalized) {
+            console.warn(`Filtering out invalid ticker: ${normalized}`);
+          }
+          return isValid;
+        })
+    ));
+    
+    return normalizedTickers;
+  }, [tradesKey]); // Use stable key instead of trades array
   
   // Debug: Log all tickers being processed (reduced logging)
   // if (trades.length > 0) {
@@ -98,7 +178,15 @@ export default function Dashboard() {
   // }
   
   const quotesResponse = useQuotes(userTickers);
-  const newsResponse = useNews(userTickers.length > 0 ? userTickers : ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'], 5);
+  
+  // Memoize news tickers to prevent new array reference on every render
+  const defaultTickers = useMemo(() => ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'], []);
+  const userTickersKey = useMemo(() => userTickers.sort().join(','), [userTickers]);
+  const newsTickers = useMemo(() => 
+    userTickers.length > 0 ? userTickers : defaultTickers,
+    [userTickersKey, defaultTickers] // Use stable key instead of array reference
+  );
+  const newsResponse = useNews(newsTickers, 5);
   const marketResponse = useMarketData();
   
   const quotesData = quotesResponse.data;
@@ -111,7 +199,7 @@ export default function Dashboard() {
     if (userTickers.length > 0) {
       refetchQuotes();
     }
-  }, [userTickers.length]); // Only depend on length to prevent infinite loops
+  }, [userTickers.length, refetchQuotes]); // Include refetchQuotes to prevent stale closures
   
   const newsData = newsResponse.data;
   const newsLoading = newsResponse.loading;
@@ -133,36 +221,159 @@ export default function Dashboard() {
   const [showAllNews, setShowAllNews] = useState(false);
   const [chartType, setChartType] = useState<'pie' | 'line'>('pie');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [useNewDashboard, setUseNewDashboard] = useState(true); // Toggle for new vs old dashboard
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showFeatureAnnouncement, setShowFeatureAnnouncement] = useState(false);
 
-  const deviceInfo = getDeviceInfo();
+  // Prevent dashboard repaints when modals are open
+  React.useEffect(() => {
+    const hasModalOpen = showDeleteModal || showAlertModal;
+    const dashboardContent = document.querySelector('[data-dashboard-content]');
+    if (dashboardContent) {
+      const el = dashboardContent as HTMLElement;
+      if (hasModalOpen) {
+        // Prevent repaints and interactions when modal is open
+        el.style.pointerEvents = 'none';
+        el.style.userSelect = 'none';
+        el.style.contentVisibility = 'hidden'; // Skip rendering when hidden
+        el.style.contain = 'layout style paint'; // Isolate from parent
+        el.style.willChange = 'auto';
+      } else {
+        // Restore normal behavior when modal is closed
+        el.style.pointerEvents = '';
+        el.style.userSelect = '';
+        el.style.contentVisibility = '';
+        el.style.contain = '';
+        el.style.willChange = '';
+      }
+    }
+  }, [showDeleteModal, showAlertModal, alertModalData, isDeleting]);
+
+  // Portfolio store integration
+  const {
+    chartView,
+    timeRange,
+    selectedSectors,
+    drillDownPath,
+    setPositions: setStorePositions,
+    setChartView: setStoreChartView,
+    setTimeRange: setStoreTimeRange,
+    setSelectedSectors: setStoreSelectedSectors,
+    setDrillDownPath: setStoreDrillDownPath,
+    pushDrillDown,
+    popDrillDown,
+    resetDrillDown,
+  } = usePortfolioStore();
+
+  // Historical data
+  const { data: historicalSnapshots, loading: historyLoading } = usePortfolioHistory({
+    userId: user?.uid || null,
+    enabled: useNewDashboard && !!user?.uid,
+  });
+
+  // Portfolio news (commented out - positions calculated later)
+  // const portfolioNews = usePortfolioNews(Object.values(positions), 5);
+
+  // Memoize device info to prevent re-renders on every render cycle
+  const deviceInfo = useMemo(() => getDeviceInfo(), []);
 
   // Initialize analytics
   useEffect(() => {
     initializeMobileAnalytics();
   }, []);
 
-  // Mobile detection for hamburger menu
+  // Mobile detection for hamburger menu - debounced to prevent excessive re-renders
   useEffect(() => {
+    let resizeTimeout: NodeJS.Timeout;
+    
     const checkMobile = () => {
-      setShowHamburger(window.innerWidth <= 768);
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        setShowHamburger(window.innerWidth <= 768);
+      }, 150); // Debounce resize events to prevent flickering
     };
     
-    checkMobile();
+    checkMobile(); // Initial check
     window.addEventListener('resize', checkMobile);
     
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => {
+      clearTimeout(resizeTimeout);
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
-  // Update time every second
+  // Update time every 5 seconds to reduce re-render frequency
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000);
+    }, 5000); // Update every 5 seconds instead of 1 to reduce flickering
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate portfolio metrics (excluding mock trades)
-  const realTrades = trades.filter(trade => !trade.mock);
+  // Show feature announcement modal once per user
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Allow forcing modal via URL parameter (for testing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceShow = urlParams.get('showFeatureModal') === 'true';
+    
+    if (forceShow) {
+      console.log('🧪 Force showing feature announcement modal (URL parameter)');
+      // Clear the localStorage flag so it shows
+      localStorage.removeItem('pocket-portfolio-feature-announcement-seen');
+      const timer = setTimeout(() => {
+        setShowFeatureAnnouncement(true);
+      }, 500); // Shorter delay for testing
+      return () => clearTimeout(timer);
+    }
+    
+    // Check if user has seen the announcement
+    const hasSeenAnnouncement = localStorage.getItem('pocket-portfolio-feature-announcement-seen');
+    
+    if (!hasSeenAnnouncement) {
+      console.log('📢 User has not seen announcement, will show in 2 seconds');
+      // Small delay to ensure page is loaded and user sees the dashboard first
+      const timer = setTimeout(() => {
+        console.log('🚀 Showing feature announcement modal');
+        setShowFeatureAnnouncement(true);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    } else {
+      console.log('ℹ️ Feature announcement already seen, skipping');
+    }
+  }, []);
+
+  const handleCloseAnnouncement = () => {
+    setShowFeatureAnnouncement(false);
+    localStorage.setItem('pocket-portfolio-feature-announcement-seen', 'true');
+  };
+
+  // Listen for sync errors and show toast notification
+  useEffect(() => {
+    const handleSyncError = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const detail = customEvent.detail;
+      
+      if (detail?.type === 'invalid_json') {
+        setAlertModalData({
+          title: 'Sync Paused',
+          message: detail.message + ' Your local data is safe and unchanged. Please fix the JSON syntax in Google Drive.',
+          type: 'warning'
+        });
+        setShowAlertModal(true);
+      }
+    };
+
+    window.addEventListener('sync-error', handleSyncError);
+    return () => {
+      window.removeEventListener('sync-error', handleSyncError);
+    };
+  }, []);
   
   // Debug: Log actual trades data to identify inconsistencies (disabled to reduce console noise)
   // if (trades.length > 0) {
@@ -178,106 +389,282 @@ export default function Dashboard() {
   // Warn about data inconsistency (only on client side) - removed direct localStorage check to avoid race conditions
   // The useTrades hook handles localStorage synchronization properly
   
-  // DATA INTEGRITY: Validate all trades
+  // DATA INTEGRITY: Validate all trades (use realTrades for validation, but displayTrades for UI)
   const validationResult = validateTrades(realTrades);
   
   // Log validation results only if there are errors or warnings (and not already logged)
   if (validationResult.errors.length > 0 || validationResult.warnings.length > 0) {
     if (!window.validationErrorsLogged) {
       console.group('📊 PORTFOLIO DATA VALIDATION');
-      if (validationResult.errors.length > 0) {
-        console.error('❌ Errors found:');
-        validationResult.errors.forEach(error => console.error('  ', error));
-      }
-      if (validationResult.warnings.length > 0) {
-        console.warn('⚠️  Warnings:');
-        validationResult.warnings.forEach(warning => console.warn('  ', warning));
-      }
-      console.groupEnd();
+      // Validation errors are handled by the validation system
       window.validationErrorsLogged = true;
     }
-  } else if (realTrades.length > 0 && !window.validationSuccessLogged) {
-    console.log('✅ All trades validated successfully:', realTrades.length, 'trades');
-    window.validationSuccessLogged = true;
   }
   
-  const positions = realTrades.reduce((acc: { [key: string]: Position }, trade) => {
-    const { ticker, qty, price, type, date } = trade;
-    if (!acc[ticker]) {
-      acc[ticker] = { 
-        ticker, 
-        shares: 0, 
-        avgCost: 0, 
-        currentPrice: 0,
-        currentValue: 0, 
-        unrealizedPL: 0, 
-        unrealizedPLPercent: 0,
-        totalTrades: 0,
-        lastTradeDate: date,
-        isMock: false,
-        currency: trade.currency || 'USD'
-      };
-    }
-    
-    if (type === 'BUY') {
-      const totalCost = acc[ticker].shares * acc[ticker].avgCost + qty * price;
-      acc[ticker].shares += qty;
-      acc[ticker].avgCost = totalCost / acc[ticker].shares;
-      
-      // Debug: Log position updates (reduced logging)
-      // console.log(`🔍 Position update for ${ticker}:`, { tradeQty: qty, tradePrice: price });
-    } else {
-      // For SELL trades, reduce shares but keep the same average cost
-      // The average cost represents the cost basis of the remaining shares
-      acc[ticker].shares -= qty;
-      // avgCost remains unchanged for remaining shares
-    }
-    
-    acc[ticker].totalTrades += 1;
-    acc[ticker].lastTradeDate = date;
-    acc[ticker].isMock = false;
-    
-    return acc;
-  }, {});
+  // Create stable key from quotesData to prevent unnecessary position recalculations
+  const quotesDataKey = useMemo(() => {
+    if (!quotesData) return '';
+    return Object.entries(quotesData)
+      .map(([symbol, quote]) => `${symbol}:${quote?.price || 0}`)
+      .sort()
+      .join('|');
+  }, [quotesData]);
 
-  // Get current prices and calculate P&L
-  Object.values(positions).forEach(position => {
-    const quote = quotesData?.[position.ticker];
-    if (quote && typeof quote === 'object' && 'price' in quote && quote.price !== null && quote.price !== undefined && quote.price > 0) {
-      // Convert GBp (pence) to GBP (pounds) for UK stocks
-      if (quote.currency === 'GBp') {
-        position.currentPrice = quote.price / 100; // Convert pence to pounds
-        position.currency = 'GBP'; // Update currency to GBP
+  // Memoize positions calculation to prevent recalculation on every render
+  const positions = useMemo(() => {
+    // Calculate positions from displayTrades (shows demo data when no real trades, otherwise only real trades)
+    const calculated = displayTrades.reduce((acc: { [key: string]: Position }, trade) => {
+      const { ticker, qty, price, type, date } = trade;
+      if (!acc[ticker]) {
+        acc[ticker] = { 
+          ticker, 
+          shares: 0, 
+          avgCost: 0, 
+          currentPrice: 0,
+          currentValue: 0, 
+          unrealizedPL: 0, 
+          unrealizedPLPercent: 0,
+          totalTrades: 0,
+          lastTradeDate: date,
+          isMock: false,
+          currency: trade.currency || 'USD',
+          totalInvested: 0
+        };
+      }
+      
+      if (type === 'BUY') {
+        const totalCost = acc[ticker].shares * acc[ticker].avgCost + qty * price;
+        acc[ticker].shares += qty;
+        acc[ticker].avgCost = totalCost / acc[ticker].shares;
+        acc[ticker].totalInvested = totalCost;
       } else {
-        position.currentPrice = quote.price;
-        position.currency = quote.currency;
+        // For SELL trades, reduce shares but keep the same average cost
+        acc[ticker].shares -= qty;
+        if (acc[ticker].shares >= 0) {
+          acc[ticker].totalInvested = acc[ticker].shares * acc[ticker].avgCost;
+        }
       }
       
-      position.currentValue = position.currentPrice * position.shares;
-      position.unrealizedPL = (position.currentPrice - position.avgCost) * position.shares;
-      position.unrealizedPLPercent = position.avgCost > 0 ? (position.unrealizedPL / (position.avgCost * position.shares)) * 100 : 0;
-    } else {
-      // Set default values when no quote data is available
-      position.currentPrice = 0;
-      position.currentValue = 0;
-      position.unrealizedPL = 0;
-      position.unrealizedPLPercent = 0;
+      acc[ticker].totalTrades += 1;
+      acc[ticker].lastTradeDate = date;
+      acc[ticker].isMock = false;
       
-      // Debug: Log when quotes are missing for positions
-      if (position.shares > 0) {
-        console.warn(`⚠️ No quote data for ${position.ticker}, shares: ${position.shares}, avgCost: ${position.avgCost}`);
+      return acc;
+    }, {});
+
+    // Apply current prices and calculate P&L (moved inside useMemo to avoid side effects in render)
+    Object.values(calculated).forEach(position => {
+      // Commodity ticker mapping (must match quote API mapping)
+      const COMMODITY_TICKER_MAP: Record<string, string> = {
+        'GOLD': 'GC=F',
+        'SILVER': 'SI=F',
+        'OIL': 'CL=F',
+        'CRUDE OIL': 'CL=F',
+        'BRENT': 'BZ=F',
+        'NATURAL GAS': 'NG=F',
+        'COPPER': 'HG=F',
+        'PLATINUM': 'PL=F',
+        'PALLADIUM': 'PA=F',
+        'CORN': 'ZC=F',
+        'WHEAT': 'ZW=F',
+        'SOYBEAN': 'ZS=F',
+        'SUGAR': 'SB=F',
+        'COFFEE': 'KC=F',
+        'COTTON': 'CT=F',
+        'US TECH 100': '^NDX',
+        'NASDAQ 100': '^NDX',
+        'S&P 500': '^GSPC',
+        'DOW JONES': '^DJI',
+        'FTSE 100': '^FTSE',
+        'DAX': '^GDAXI',
+        'NIKKEI 225': '^N225'
+      };
+      
+      // Normalize ticker for quote lookup (e.g., "BTC/USDT" -> "BTC" -> "BTC-USD" for Yahoo Finance)
+      const normalizeTickerForQuote = (ticker: string): string => {
+        const trimmed = ticker.trim().toUpperCase();
+        
+        // Check commodity map FIRST (must match quote API logic)
+        if (COMMODITY_TICKER_MAP[trimmed]) {
+          const mapped = COMMODITY_TICKER_MAP[trimmed];
+          return mapped;
+        }
+        
+        let baseTicker = trimmed;
+        // Handle exchange suffixes (e.g., "TSLA:US" -> "TSLA")
+        if (/^[A-Z0-9]+:[A-Z0-9]+$/i.test(trimmed)) {
+          baseTicker = trimmed.split(':')[0];
+        } else if (/^[A-Z0-9]+\/[A-Z0-9]+$/i.test(trimmed)) {
+          baseTicker = trimmed.split('/')[0];
+        } else if (/^[A-Z0-9]+\-[A-Z0-9]+$/i.test(trimmed)) {
+          baseTicker = trimmed.split('-')[0];
+        }
+        // For UK stocks, add .L suffix for London Stock Exchange (must match quote API)
+        const UK_STOCKS = ['HSBA', 'ULVR', 'VOD', 'BP', 'RDS', 'RDS-A', 'RDS-B', 'GSK', 'AZN', 'BATS', 'BT', 'LLOY', 'BARC', 'RBS', 'TSCO', 'SBRY', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT'];
+        if (UK_STOCKS.includes(baseTicker)) {
+          return `${baseTicker}.L`;
+        }
+        // For crypto, Yahoo Finance uses BTC-USD format
+        const CRYPTO_SYMBOLS = ['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'MATIC', 'AVAX', 'LINK', 'UNI', 'ATOM', 'ALGO', 'XRP', 'DOGE', 'LTC', 'BCH', 'ETC', 'XLM', 'TRX', 'EOS'];
+        if (CRYPTO_SYMBOLS.includes(baseTicker)) {
+          return `${baseTicker}-USD`;
+        }
+        return baseTicker;
+      };
+      
+      const normalizedTicker = normalizeTickerForQuote(position.ticker);
+      // For UK stocks, the quote API returns the symbol without .L (e.g., "VOD" not "VOD.L")
+      // So we need to look up using the original ticker, not the normalized one with .L
+      const lookupTicker = normalizedTicker.endsWith('.L') ? normalizedTicker.replace('.L', '') : normalizedTicker;
+      // Handle exchange suffixes like "TSLA:US" - try with and without the suffix
+      const tickerWithoutSuffix = position.ticker.includes(':') ? position.ticker.split(':')[0] : position.ticker;
+      // Try normalized ticker first (e.g., "GC=F" for "GOLD"), then base ticker, then original, then without suffix
+      const quote = quotesData?.[lookupTicker] || quotesData?.[normalizedTicker] || quotesData?.[normalizedTicker.split('-')[0]] || quotesData?.[normalizedTicker.split('=')[0]] || quotesData?.[position.ticker] || quotesData?.[tickerWithoutSuffix];
+      
+      if (quote && typeof quote === 'object' && 'price' in quote && quote.price !== null && quote.price !== undefined && quote.price > 0) {
+        // Convert GBp (pence) to GBP (pounds) for UK stocks
+        if (quote.currency === 'GBp') {
+          position.currentPrice = quote.price / 100; // Convert pence to pounds
+          position.currency = 'GBP'; // Update currency to GBP
+        } else {
+          position.currentPrice = quote.price;
+          position.currency = quote.currency;
+        }
+        
+        position.currentValue = position.currentPrice * position.shares;
+        position.unrealizedPL = (position.currentPrice - position.avgCost) * position.shares;
+        position.unrealizedPLPercent = position.avgCost > 0 ? (position.unrealizedPL / (position.avgCost * position.shares)) * 100 : 0;
+      } else {
+        // Set default values when no quote data is available
+        position.currentPrice = 0;
+        position.currentValue = 0;
+        position.unrealizedPL = 0;
+        position.unrealizedPLPercent = 0;
       }
+    });
+
+    return calculated;
+  }, [displayTrades, quotesDataKey]); // Use displayTrades (includes demo when no real trades) and stable key instead of quotesData object
+
+  // Update portfolio store with positions (only when positions actually change)
+  // Use a ref to track previous positions and prevent infinite loops
+  const prevPositionsKeyRef = React.useRef<string>('');
+  
+  // Memoize positionsArray to prevent new array reference on every render
+  const positionsArray = useMemo(() => Object.values(positions), [positions]);
+  
+  // Create stable JSON key from positions for comparison (matches original format)
+  const positionsKey = useMemo(() => {
+    return JSON.stringify(
+      positionsArray
+        .map((p) => ({
+          ticker: p.ticker,
+          shares: p.shares,
+          currentValue: p.currentValue,
+        }))
+        .sort((a, b) => a.ticker.localeCompare(b.ticker))
+    );
+  }, [positionsArray]);
+  
+  useEffect(() => {
+    if (!useNewDashboard) return;
+    
+    // Only update if positions actually changed
+    if (prevPositionsKeyRef.current !== positionsKey) {
+      prevPositionsKeyRef.current = positionsKey;
+      setStorePositions(positionsArray);
     }
-  });
+  }, [positionsKey, positionsArray, useNewDashboard, setStorePositions]);
+
+  // Save daily snapshot (only once per day, using stable key)
+  const snapshotKey = useMemo(() => {
+    return Object.values(positions)
+      .map((p) => `${p.ticker}:${p.shares.toFixed(4)}:${p.currentValue.toFixed(2)}`)
+      .sort()
+      .join('|');
+  }, [
+    Object.keys(positions).sort().join(','),
+    Object.values(positions)
+      .map((p) => `${p.ticker}:${p.shares.toFixed(4)}:${p.currentValue.toFixed(2)}`)
+      .sort()
+      .join('|'),
+  ]);
+
+  const prevSnapshotKeyRef = React.useRef<string>('');
+  const lastSnapshotDateRef = React.useRef<string>('');
+
+  useEffect(() => {
+    if (!user?.uid || Object.values(positions).length === 0 || !useNewDashboard) return;
+    
+    // Only save if positions actually changed
+    if (prevSnapshotKeyRef.current === snapshotKey) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if we already saved today
+    if (lastSnapshotDateRef.current === today) return;
+    
+    const totalValue = Object.values(positions).reduce(
+      (sum, pos) => sum + (pos.currentValue || pos.avgCost * pos.shares),
+      0
+    );
+    const totalInvested = Object.values(positions).reduce(
+      (sum, pos) => sum + pos.avgCost * pos.shares,
+      0
+    );
+
+    // Save snapshot once per day
+    const lastSnapshotDate = localStorage.getItem(`lastSnapshot_${user.uid}`);
+    
+    if (lastSnapshotDate !== today) {
+      prevSnapshotKeyRef.current = snapshotKey;
+      lastSnapshotDateRef.current = today;
+      
+      saveDailySnapshot(user.uid, Object.values(positions), totalValue, totalInvested)
+        .then(() => {
+          localStorage.setItem(`lastSnapshot_${user.uid}`, today);
+        })
+        .catch((error) => {
+          // Reset refs on error so it can retry
+          prevSnapshotKeyRef.current = '';
+          lastSnapshotDateRef.current = '';
+        });
+    }
+  }, [snapshotKey, user?.uid, useNewDashboard, positions]);
+
+  // Calculate analytics
+  const analytics = useMemo(() => {
+    if (historicalSnapshots.length === 0) return null;
+    return calculatePortfolioAnalytics(historicalSnapshots);
+  }, [historicalSnapshots]);
+
+  // Filter positions by selected sectors
+  const filteredPositions = useMemo(() => {
+    if (selectedSectors.length === 0) return Object.values(positions);
+    
+    return Object.values(positions).filter((pos) => {
+      const positionSector = getSectorSync(pos.ticker);
+      const positionSectorStr = positionSector as string;
+      
+      // Check if selectedSectors contains this position's sector
+      // selectedSectors contains enum values as strings (e.g., "Information Technology")
+      return selectedSectors.includes(positionSectorStr);
+    });
+  }, [positions, selectedSectors]);
 
   // Convert all positions to USD for portfolio totals
   // Note: In a real app, you'd use live exchange rates
   const GBP_TO_USD = 1.27; // Approximate exchange rate
   
   // Use values from useTrades hook for consistency
-  const totalInvested: number = useTradesTotalInvested;
-  const totalTrades: number = useTradesTotalTrades;
-  const totalPositions: number = useTradesTotalPositions;
+  // Calculate metrics from displayTrades (includes mock when no real trades, otherwise only real)
+  // This ensures demo data shows metrics, but real data overrides when imported
+  const totalInvested: number = useMemo(() => {
+    return Object.values(positions).reduce((sum, pos) => sum + (pos.totalInvested || pos.avgCost * pos.shares), 0);
+  }, [positions]);
+  
+  const totalTrades: number = displayTrades.length;
+  const totalPositions: number = Object.keys(positions).length;
   
   const totalUnrealizedPL = Object.values(positions).reduce((sum, pos) => {
     if (pos.currency === 'GBP') {
@@ -287,6 +674,9 @@ export default function Dashboard() {
   }, 0);
   
   const totalUnrealizedPLPercent = totalInvested > 0 ? (totalUnrealizedPL / totalInvested) * 100 : 0;
+  
+  // Track dashboard re-renders and modal state
+  const hasModalOpen = showDeleteModal || showAlertModal;
   
   // DATA INTEGRITY: Verify calculations
   // Calculate expected total invested from positions for comparison
@@ -306,24 +696,165 @@ export default function Dashboard() {
       // Create a unique key for this data set
       const dataKey = `${realTrades.length}-${totalInvested.toFixed(2)}-${totalUnrealizedPL.toFixed(2)}`;
       
-      // Only log if we haven't logged this exact data set yet
-      if (!(window as any).lastLoggedPortfolioData || (window as any).lastLoggedPortfolioData !== dataKey) {
-        console.group('📈 PORTFOLIO SUMMARY');
-        console.log('Total Invested:', `$${totalInvested.toFixed(2)}`);
-        console.log('Total Current Value:', `$${(totalInvested + totalUnrealizedPL).toFixed(2)}`);
-        console.log('Total Unrealized P/L:', `$${totalUnrealizedPL.toFixed(2)} (${totalUnrealizedPLPercent.toFixed(2)}%)`);
-        console.log('Total Positions:', totalPositions);
-        console.log('Total Trades:', totalTrades);
-        console.log('Tickers:', Object.keys(positions).join(', '));
-        console.groupEnd();
-        (window as any).lastLoggedPortfolioData = dataKey;
-      }
+      // Portfolio data is calculated and displayed in the UI
     }
   }, [realTrades.length, totalInvested, totalUnrealizedPL, totalUnrealizedPLPercent, totalPositions, totalTrades, positions, quotesData]);
 
+  // Check for Drive updates on mount
+  useEffect(() => {
+    if (syncState.isConnected) {
+      checkForUpdates();
+    }
+  }, [syncState.isConnected, checkForUpdates]);
+
+  // Listen for Drive sync events and reload trades
+  useEffect(() => {
+    const handleDriveSync = async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const detail = customEvent.detail;
+      
+      // CRITICAL: If we skipped due to empty Drive, trigger syncToDrive to upload Firebase trades
+      // This fixes the root cause of the sync loop by populating Drive with Firebase trades
+      if (detail?.skippedDueToEmptyDrive && isAuthenticated && user && syncState.isConnected) {
+        console.log('📤 Drive is empty - uploading Firebase trades to Drive to fix sync loop...');
+        try {
+          // Get current trades from Firebase
+          const currentTrades = tradesRef.current;
+          if (currentTrades.length > 0) {
+            await syncToDrive(undefined, currentTrades, true); // skipPreUploadCheck = true
+            console.log('✅ Successfully uploaded Firebase trades to Drive - sync loop should be resolved');
+          } else {
+            console.log('⚠️ No Firebase trades to upload - Drive will remain empty');
+          }
+        } catch (error) {
+          console.error('❌ Failed to upload Firebase trades to Drive:', error);
+        }
+        return; // Don't refresh trades - we just uploaded to Drive, let it sync naturally
+      }
+        
+      // For authenticated users, wait a bit for Firebase to update
+      if (isAuthenticated && user) {
+        // Give Firebase time to update (deleteAllTrades + importTrades)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      // Reload trades from localStorage/Firebase to reflect Drive changes
+      console.log('🔄 Drive sync complete, reloading trades...');
+      
+      
+      // CRITICAL: Set flag to prevent auto-sync from triggering when refreshTrades() updates state
+      // This prevents the "write-back loop" where Drive edits trigger immediate auto-save
+      isRemoteUpdateRef.current = true;
+      
+      
+      await refreshTrades();
+      
+      // CRITICAL: Mark Drive sync complete AFTER refreshTrades() completes
+      // This extends the auto-sync block to prevent overwriting Drive changes
+      // The block was set in syncFromDrive, but we extend it here after state updates
+      markDriveSyncComplete();
+      
+      
+      
+      // Wait a bit more to ensure state has fully updated
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // CRITICAL: Update lastSyncedTradesContentRef to prevent auto-sync loop
+      // After pulling from Drive, we need to mark the new trades as "synced" so we don't immediately sync them back
+      // Use tradesRef.current which is updated by the useEffect, so it has the latest value
+      lastSyncedTradesContentRef.current = JSON.stringify(tradesRef.current);
+      
+      
+      
+    };
+
+    window.addEventListener('drive-sync-complete', handleDriveSync);
+    return () => {
+      window.removeEventListener('drive-sync-complete', handleDriveSync);
+    };
+  }, [refreshTrades, isAuthenticated, user]);
+
+  // Auto-sync to Drive when trades change (but not when syncing FROM Drive)
+  useEffect(() => {
+    if (isAuthenticated && user && syncState.isConnected && syncState.fileId) {
+      // CRITICAL: Skip auto-sync if trades were updated from a remote source (Drive)
+      // This prevents the "write-back loop" where Drive edits trigger immediate auto-save
+      if (isRemoteUpdateRef.current) {
+        
+        // Reset flag after skipping
+        isRemoteUpdateRef.current = false;
+        // Update lastSyncedTradesContentRef to match current state
+        lastSyncedTradesContentRef.current = JSON.stringify(trades);
+        
+        return;
+      }
+      
+      // Remove trades.length > 0 condition to allow syncing deletions (empty state)
+      // But skip if we just synced from Drive to prevent overwriting Drive edits
+      
+      // Skip auto-sync if we're currently syncing
+      if (syncState.isSyncing) {
+        return;
+      }
+      
+      // CRITICAL: Skip auto-sync if we're in the middle of deleting all trades
+      // This prevents auto-sync from interfering with intentional deletion
+      if (isDeleting) {
+        
+        return;
+      }
+      
+      // Check if we recently synced from Drive (within last 5 seconds)
+      // This prevents immediate overwrite of Drive edits, but allows syncing after a short delay
+      // This makes the sync collaborative - we respect Drive edits but can still sync our changes
+      if (recentlySyncedFromDrive()) {
+        console.log('⏸️ Skipping auto-sync - recently synced from Drive (respecting Drive edits, will retry shortly)');
+        return;
+      }
+      
+      // CRITICAL: Prevent auto-sync loop - check if trades content actually changed since last sync
+      // Compare current trades with what we last synced (not just ref, which updates on every render)
+      const currentTradesContent = JSON.stringify(trades);
+      const tradesChanged = currentTradesContent !== lastSyncedTradesContentRef.current;
+      
+      
+      
+      if (!tradesChanged) {
+        // Trades content didn't change - this is likely a re-render from syncState update
+        
+        return;
+      }
+      
+      // Debounce changes to trades before pushing to Drive
+      const handler = setTimeout(() => {
+        
+        // Double-check we're not syncing and didn't just sync from Drive
+        // CRITICAL: Also check if we're deleting - don't auto-sync during deletion
+        if (!syncState.isSyncing && !recentlySyncedFromDrive() && !isDeleting) {
+          console.log('🔄 Trades changed, syncing to Drive...', trades.length, 'trades');
+          
+          syncToDrive(undefined, trades).then(() => {
+            // Mark this content as synced to prevent loop
+            lastSyncedTradesContentRef.current = JSON.stringify(trades);
+            
+          }).catch((error) => {
+            console.error('Auto-sync failed:', error);
+          }); // Pass current trades (can be empty array)
+        }
+      }, 1000); // 1-second debounce
+
+      return () => clearTimeout(handler);
+    }
+  }, [trades, isAuthenticated, user, syncState.isConnected, syncState.fileId, syncState.isSyncing, syncToDrive, recentlySyncedFromDrive]);
+
   const handleAddTrade = async () => {
     if (!newTrade.symbol || !newTrade.quantity || !newTrade.price) {
-      alert('Please fill in all required fields');
+      setAlertModalData({
+        title: 'Missing Information',
+        message: 'Please fill in all required fields (Symbol, Quantity, and Price).',
+        type: 'warning'
+      });
+      setShowAlertModal(true);
       return;
     }
 
@@ -338,60 +869,213 @@ export default function Dashboard() {
     };
 
     try {
+      
       await addTrade(trade);
-        setNewTrade({
+      
+      setNewTrade({
         symbol: '',
         quantity: '',
-          price: '',
+        price: '',
         date: new Date().toISOString().split('T')[0],
         type: 'buy',
         fees: ''
-        });
-      } catch (error) {
-        console.error('Error adding trade:', error);
-      alert('Failed to add trade. Please try again.');
+      });
+      // Wait for state to update, then sync with updated trades
+      // Use ref to get the latest trades after state update
+      if (syncState.isConnected && !syncState.isSyncing && !recentlySyncedFromDrive()) {
+        
+        setTimeout(() => {
+          
+          // At this point, tradesRef.current should have the updated trades
+          if (syncState.isConnected && !syncState.isSyncing && !recentlySyncedFromDrive()) {
+            
+            syncToDrive(undefined, tradesRef.current); // Use ref to get latest trades
+          }
+        }, 300); // Wait for React to update state
+      }
+    } catch (error) {
+      setAlertModalData({
+        title: 'Error',
+        message: 'Failed to add trade. Please try again.',
+        type: 'error'
+      });
+      setShowAlertModal(true);
     }
   };
 
   const handleDeleteTrade = async (tradeId: string) => {
     try {
+      
+      
+      // Mark deletion start to prevent Drive polling from pulling during deletion
+      if (syncState.isConnected) {
+        markDeletionStart();
+      }
+      
       await deleteTrade(tradeId);
+      
+      
+      
       console.log('✅ Trade deleted successfully:', tradeId);
+      
+      // CRITICAL: Sync deletion to Drive immediately to prevent Drive from pulling back the deleted trade
+      // Explicitly filter out the deleted trade to ensure we sync the correct state
+      // This handles the case where tradesRef.current might be stale
+      if (syncState.isConnected) {
+        // Get current trades and explicitly remove the deleted one
+        const currentTrades = tradesRef.current.filter(t => t.id !== tradeId);
+        
+        
+        
+        // Update tradesRef to reflect the deletion immediately
+        tradesRef.current = currentTrades;
+        
+        // Sync the filtered trades array (without the deleted trade)
+        await syncToDrive(undefined, currentTrades);
+        console.log('✅ Deletion synced to Drive');
+      }
+      
+      // Don't manually sync here - the auto-sync useEffect will handle it
+      // when trades state updates (it watches trades changes)
+      // The auto-sync will trigger when trades array changes
     } catch (error) {
       console.error('❌ Error deleting trade:', error);
       
-      // The error is already handled in useTrades.ts, which removes it from local state
-      // So we don't need to show an alert here - the deletion is effective from the user's perspective
+      
+      
+      // Check if this is a permission error that was handled gracefully
+      const isPermissionError = error instanceof Error && (
+        error.message.includes('Permission denied') || 
+        error.message.includes('permission-denied')
+      );
+      
+      // Only show error if it's not a permission error (permission errors are handled gracefully in useTrades)
+      if (!isPermissionError) {
+        setAlertModalData({
+          title: 'Delete Failed',
+          message: error instanceof Error ? error.message : 'Failed to delete trade. Please try again.',
+          type: 'error'
+        });
+        setShowAlertModal(true);
+      } else {
+        // Permission error was handled - trade was removed from local state
+        // Just log it, don't show error to user since the trade is gone from their view
+        console.log('ℹ️ Trade removed from local state (Firebase deletion had permission issue)');
+      }
     }
   };
 
   const handleCSVImport = async (csvData: Omit<Trade, 'id' | 'uid' | 'createdAt' | 'updatedAt'>[]) => {
+    
+    // CRITICAL: Mark CSV import as in progress to prevent Drive from pulling and overwriting
+    markCsvImportStart();
     try {
       await importTrades(csvData);
+      
+      // Wait for state to update, then sync with updated trades
+      // Use ref to get the latest trades after state update
+      if (syncState.isConnected && !syncState.isSyncing && !recentlySyncedFromDrive()) {
+        setTimeout(async () => {
+          // At this point, tradesRef.current should have the updated trades
+          
+          if (syncState.isConnected && !syncState.isSyncing && !recentlySyncedFromDrive()) {
+            await syncToDrive(undefined, tradesRef.current); // Use ref to get latest trades, wait for completion
+            
+            // Clear CSV import flag after sync completes (Drive now has the updated data)
+            clearCsvImportFlag();
+          } else {
+            // If we didn't sync, still clear the flag after a delay (safety net)
+            setTimeout(() => clearCsvImportFlag(), 20000);
+          }
+        }, 500); // Wait longer for CSV import (more trades to process)
+      }
     } catch (error) {
       console.error('Error importing trades:', error);
-      alert('Failed to import trades. Please try again.');
+      
+      setAlertModalData({
+        title: 'Import Error',
+        message: 'Failed to import trades. Please try again.',
+        type: 'error'
+      });
+      setShowAlertModal(true);
     }
   };
 
   const handleClearAllTrades = async () => {
     if (!isAuthenticated || !user) {
-      alert('You must be signed in to clear trades.');
+      setAlertModalData({
+        title: 'Sign In Required',
+        message: 'You must be signed in to clear trades.',
+        type: 'warning'
+      });
+      setShowAlertModal(true);
       return;
     }
 
-    const confirmed = window.confirm(
-      'Are you sure you want to delete ALL trades from your account? This action cannot be undone.'
-    );
+    setShowDeleteModal(true);
+  };
 
-    if (!confirmed) return;
-
+  const confirmDeleteAllTrades = async () => {
+    
+    // CRITICAL: Mark deletion in progress BEFORE deleting to prevent polling from pulling stale trades
+    markDeletionStart();
+    setIsDeleting(true);
+    // CRITICAL: Update lastSyncedTradesContentRef immediately to prevent auto-sync from triggering
+    // This prevents the auto-sync useEffect from seeing empty trades as a "change" and syncing again
+    const emptyTradesContent = JSON.stringify([]);
+    lastSyncedTradesContentRef.current = emptyTradesContent;
+    
     try {
       const deletedCount = await deleteAllTrades();
-      alert(`Successfully deleted ${deletedCount} trade(s) from your account.`);
+      
+      
+      // IMPORTANT: Sync empty state to Drive IMMEDIATELY to prevent syncFromDrive from recreating trades
+      // CRITICAL: Call syncToDrive synchronously (await it) to ensure empty state is synced before polling can trigger syncFromDrive
+      // Pass empty array directly (don't rely on tradesRef which may be stale)
+      if (syncState.isConnected && !syncState.isSyncing && !recentlySyncedFromDrive()) {
+        // CRITICAL: Update lastSyncedTradesContentRef BEFORE syncing to prevent auto-sync from triggering
+        // This prevents the auto-sync useEffect from seeing empty trades as a "change" and syncing again
+        const emptyTrades: Trade[] = [];
+        lastSyncedTradesContentRef.current = JSON.stringify(emptyTrades);
+        
+        
+        
+        // CRITICAL: Await syncToDrive to ensure empty state is synced before allowing syncFromDrive to run
+        try {
+          await syncToDrive(undefined, emptyTrades, true); // skipPreUploadCheck = true
+          // Update again after sync completes to ensure it's in sync
+          lastSyncedTradesContentRef.current = JSON.stringify(emptyTrades);
+          // CRITICAL: Clear localStorage flag after successful sync
+          localStorage.removeItem('pp_deletion_in_progress');
+          
+        } catch (error) {
+          console.error('Failed to sync empty state to Drive:', error);
+          // Keep localStorage flag if sync failed - will retry on next syncFromDrive
+          
+        } finally {
+          // Clear deletion flag after sync completes (or fails)
+          setIsDeleting(false);
+        }
+      }
+      
+      setShowDeleteModal(false);
+      setAlertModalData({
+        title: 'Success',
+        message: `Successfully deleted ${deletedCount} trade${deletedCount === 1 ? '' : 's'} from your account.`,
+        type: 'success'
+      });
+      setShowAlertModal(true);
     } catch (error) {
-      console.error('Error clearing all trades:', error);
-      alert('Failed to clear trades. Please try again.');
+      
+      setShowDeleteModal(false);
+      setAlertModalData({
+        title: 'Error',
+        message: 'Failed to clear trades. Please try again.',
+        type: 'error'
+      });
+      setShowAlertModal(true);
+      // Note: setIsDeleting(false) is called after sync completes, not here
+      // This ensures auto-sync is blocked during the entire deletion + sync process
     }
   };
 
@@ -408,6 +1092,7 @@ export default function Dashboard() {
 
   return (
     <>
+      <OnboardingTour />
       <SEOHead
         title="Portfolio Dashboard - Track Your Investments"
         description="Manage your investment portfolio with live P/L tracking, real-time prices, mock trading, and CSV import. Free portfolio management dashboard with advanced analytics and insights."
@@ -431,12 +1116,12 @@ export default function Dashboard() {
       <StructuredData type="WebApplication" data={webAppData} />
 
       {/* Mobile Header */}
-      <MobileHeader title="Dashboard" />
+      <MobileHeader title="Dashboard" fixed={true} />
 
       {/* Portfolio Selector */}
       {/* <PortfolioSelector /> */}
 
-      <div className="mobile-container main-content" style={{ 
+      <div className="mobile-container main-content" data-dashboard-content style={{ 
         minHeight: '100vh', 
         background: 'var(--bg)', 
         color: 'var(--text)', 
@@ -444,20 +1129,24 @@ export default function Dashboard() {
         maxWidth: '100vw',
         overflowX: 'hidden',
         boxSizing: 'border-box',
+        paddingTop: typeof window !== 'undefined' && window.innerWidth < 768 
+          ? 'calc(var(--touch-target-large) + var(--safe-area-top) + var(--space-md))' 
+          : '0', // Add space for fixed header on mobile
         paddingBottom: 'calc(var(--touch-target-large) + var(--safe-area-bottom))'
       }}>
       {/* Main Content - Compact Financial Layout */}
       <main className="mobile-container" style={{ 
-          padding: '16px 12px', 
-        maxWidth: '100%',
+          padding: '16px',
+          maxWidth: '100%',
+          width: '100%',
           boxSizing: 'border-box',
-          paddingTop: '16px'
+          overflowX: 'hidden', // Prevent horizontal overflow
       }}>
         {/* Compact Summary Row */}
             <div className="mobile-card brand-card brand-candlestick brand-grid" style={{ 
           marginBottom: '12px',
           display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr',
+          gridTemplateColumns: '2fr 1fr 1fr auto',
           gap: '12px',
           alignItems: 'center',
           width: '100%',
@@ -471,20 +1160,23 @@ export default function Dashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: '500' }}>Total Invested</div>
               <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
-                ${trades.length > 0 ? totalInvested.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
+                ${displayTrades.length > 0 ? totalInvested.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
             </div>
           </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: '500' }}>Trades</div>
               <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
-                {trades.length > 0 ? totalTrades : '0'}
+                {displayTrades.length > 0 ? totalTrades : '0'}
             </div>
           </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: '500' }}>Positions</div>
               <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
-                {trades.length > 0 ? totalPositions : '0'}
+                {displayTrades.length > 0 ? totalPositions : '0'}
             </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <CloudStatusIcon />
           </div>
         </div>
 
@@ -532,6 +1224,9 @@ export default function Dashboard() {
             </div>
         )}
 
+          {/* Sync Upgrade CTA - Show for unauthenticated users with local trades */}
+          <SyncUpgradeCTA />
+
           {/* Authentication Status */}
           {isAuthenticated && user ? (
             <div style={{ marginBottom: '12px' }}>
@@ -543,13 +1238,7 @@ export default function Dashboard() {
             }}
           />
             </div>
-          ) : (
-            <div style={{ marginBottom: '12px', textAlign: 'center' }}>
-              <p style={{ fontSize: '14px', color: 'var(--muted)', marginBottom: '8px' }}>
-                Sign in to save your portfolio data
-              </p>
-            </div>
-          )}
+          ) : null}
 
           {/* Add Trade Form */}
           <div className="mobile-card brand-card brand-candlestick brand-spine" style={{ 
@@ -706,7 +1395,7 @@ export default function Dashboard() {
               </div>
 
           {/* CSV Import */}
-            <div id="import" className="mobile-card brand-card brand-grid" style={{ 
+            <div id="import-trigger" className="mobile-card brand-card brand-grid" style={{ 
               marginBottom: '12px',
               padding: '12px',
               background: 'var(--surface)',
@@ -717,8 +1406,91 @@ export default function Dashboard() {
                 <CSVImporter onImport={handleCSVImport} />
             </div>
 
-          {/* Portfolio Chart - Simple 3D Pie Chart */}
-          {trades.length > 0 && (
+          {/* Portfolio Dashboard - New Enhanced Version */}
+          {trades.length > 0 && useNewDashboard && (
+            <>
+              {/* Analytics Panel */}
+              {analytics && (
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <AnalyticsPanel analytics={analytics} loading={historyLoading} />
+                </div>
+              )}
+
+              {/* Allocation Recommendations */}
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <AllocationRecommendations
+                  positions={Object.values(positions)}
+                  totalValue={Object.values(positions).reduce(
+                    (sum, pos) => sum + pos.currentValue,
+                    0
+                  )}
+                  portfolioAnalytics={analytics}
+                  historicalSnapshots={historicalSnapshots}
+                />
+              </div>
+
+              {/* Main Dashboard Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth < 768 ? '1fr' : '1fr 300px',
+                  gap: 'var(--space-4)',
+                  marginBottom: 'var(--space-4)',
+                  width: '100%',
+                  maxWidth: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {/* Charts Section */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {/* Allocation Chart with Drill-Down */}
+                  <DrillDownChart
+                    positions={filteredPositions}
+                    chartView={chartView}
+                    onChartViewChange={setStoreChartView}
+                    drillDownPath={drillDownPath}
+                    onDrillDown={pushDrillDown}
+                    onDrillUp={popDrillDown}
+                    onReset={resetDrillDown}
+                  />
+
+                  {/* Performance Chart - Always show, component handles empty state */}
+                  <PortfolioPerformanceChart
+                    snapshots={historicalSnapshots}
+                    timeRange={timeRange}
+                    onTimeRangeChange={setStoreTimeRange}
+                  />
+
+                  {/* Heat Map */}
+                  {historicalSnapshots.length > 0 && chartView === 'heatmap' && (
+                    <ReturnHeatMap
+                      positions={filteredPositions}
+                      snapshots={historicalSnapshots}
+                    />
+                  )}
+                </div>
+
+                {/* Sidebar */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {/* Sector Filter */}
+                  <SectorFilter
+                    positions={Object.values(positions)}
+                    selectedSectors={selectedSectors}
+                    onSectorChange={setStoreSelectedSectors}
+                  />
+
+                  {/* Share/Export */}
+                  <SharePortfolio
+                    positions={Object.values(positions)}
+                    excludeSensitiveData={true}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Portfolio Chart - Legacy Simple Version (fallback) */}
+          {trades.length > 0 && !useNewDashboard && (
             <div className="mobile-card brand-card brand-sparkline brand-spine" style={{ 
               marginBottom: '12px',
               padding: '12px',
@@ -866,6 +1638,142 @@ export default function Dashboard() {
               trades={trades}
               noCard={true}
             />
+          </div>
+        )}
+
+        {/* Empty State with Demo Data Button */}
+        {trades.length === 0 && (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '48px 24px',
+            color: 'var(--muted)',
+            background: 'var(--surface)',
+            borderRadius: '12px',
+            border: '1px solid var(--border)',
+            marginBottom: '12px'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
+                <rect x="14" y="3" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
+                <rect x="14" y="14" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
+                <rect x="3" y="14" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
+              </svg>
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0', color: 'var(--text)' }}>
+              No trades yet
+            </h3>
+            <p style={{ fontSize: '14px', margin: '0 0 24px 0', color: 'var(--muted)' }}>
+              {(() => {
+                const isPremium = tier === 'corporateSponsor' || tier === 'foundersClub';
+                return isPremium 
+                  ? 'Inject via JSON or add manually. Configure Drive Sync in Settings.'
+                  : 'Import your CSV file or add trades manually to get started';
+              })()}
+            </p>
+            {(() => {
+              const isPremium = tier === 'corporateSponsor' || tier === 'foundersClub';
+              if (isPremium) {
+                return (
+                  <Link
+                    href="/settings"
+                    style={{
+                      display: 'inline-block',
+                      marginBottom: '16px',
+                      padding: '12px 24px',
+                      background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+                      color: 'white',
+                      textDecoration: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+                    }}
+                  >
+                    Configure Drive Sync
+                  </Link>
+                );
+              }
+              return null;
+            })()}
+            <button
+              onClick={() => {
+                // Inject demo trades (Apple, Tesla, NVIDIA)
+                // CRITICAL: Set mock: true so demo trades are filtered out from real portfolio calculations
+                const demoTrades = [
+                  { 
+                    ticker: 'AAPL', 
+                    qty: 10, 
+                    price: 150, 
+                    date: new Date().toISOString().split('T')[0], 
+                    type: 'BUY' as const,
+                    currency: 'USD',
+                    mock: true
+                  },
+                  { 
+                    ticker: 'TSLA', 
+                    qty: 5, 
+                    price: 200, 
+                    date: new Date().toISOString().split('T')[0], 
+                    type: 'BUY' as const,
+                    currency: 'USD',
+                    mock: true
+                  },
+                  { 
+                    ticker: 'NVDA', 
+                    qty: 8, 
+                    price: 400, 
+                    date: new Date().toISOString().split('T')[0], 
+                    type: 'BUY' as const,
+                    currency: 'USD',
+                    mock: true
+                  },
+                ];
+                // Use importTrades to add all demo trades at once
+                importTrades(demoTrades);
+              }}
+              style={{
+                marginTop: '24px',
+                padding: '16px 32px',
+                background: 'linear-gradient(135deg, var(--accent-warm) 0%, var(--accent) 100%)',
+                border: 'none',
+                borderRadius: '12px',
+                color: 'var(--text-warm)',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: '600',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+                maxWidth: '320px',
+                margin: '24px auto 0',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.opacity = '0.95';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              🎮 Play with Demo Data
+            </button>
           </div>
         )}
 
@@ -1293,120 +2201,367 @@ export default function Dashboard() {
               </div>
             )}
           </div>
+
+          {/* Referral Program */}
+          {isAuthenticated && user && (
+            <div className="mobile-card brand-card" style={{ 
+              marginBottom: '12px',
+              padding: '0',
+              background: 'var(--surface)',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              overflow: 'hidden'
+            }}>
+              <ReferralProgram userId={user.uid} />
+            </div>
+          )}
       </main>
 
 
       {/* Footer */}
-      <footer className="mobile-container" style={{ 
+      <footer style={{ 
         marginTop: 'clamp(40px, 8vw, 80px)', 
         paddingTop: 'clamp(20px, 4vw, 32px)', 
-        borderTop: '1px solid var(--card-border)', 
-          textAlign: 'center',
-        background: 'var(--chrome)', 
+        borderTop: '1px solid var(--border)', 
+        textAlign: 'center', 
+        background: 'var(--bg)',
         padding: 'clamp(20px, 4vw, 32px) clamp(12px, 3vw, 24px)',
         width: '100%',
         maxWidth: '100vw',
         boxSizing: 'border-box'
       }}>
         <div style={{ 
-          maxWidth: '100%', 
+          maxWidth: '1200px', 
           margin: '0 auto',
           width: '100%',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px'
         }}>
-          <div style={{ marginBottom: 'clamp(20px, 4vw, 32px)' }}>
-            <p style={{ color: 'var(--muted)', fontSize: '14px', margin: 0 }}>
-              © 2025 Pocket Portfolio — Built with the community.
-            </p>
+          {/* Brand & Legal */}
+          <div style={{ textAlign: 'center' }}>
+            <span className="brand-wordmark brand-wordmark-small">Pocket Portfolio<span className="brand-wordmark-dot">.</span></span>
+            <p id="privacy-status" style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '8px 0 0 0' }}>© 2025 Open Source. Local-First.</p>
           </div>
-          
+
+          {/* The Money Links (Bolded) */}
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
             gap: '24px', 
-            marginBottom: '32px', 
+            flexWrap: 'wrap',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}>
+            <Link href="/for/advisors" style={{ 
+              color: '#D97706',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#B45309'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#D97706'}
+            >
+              For Advisors
+            </Link>
+            <Link href="/features/google-drive-sync" style={{ 
+              color: 'var(--text)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              Google Drive Sync
+            </Link>
+            <Link href="/tools/google-sheets-formula" style={{ 
+              color: 'var(--text)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              Google Sheets
+            </Link>
+            <Link href="/sponsor" style={{ 
+              color: 'var(--text)',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              Founders Club
+            </Link>
+          </div>
+
+          {/* Tool Links */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '24px', 
+            marginBottom: '16px', 
             flexWrap: 'wrap' 
           }}>
             <Link href="/openbrokercsv" style={{ 
               padding: '12px 24px', 
-              border: '1px solid var(--card-border)', 
+              border: '1px solid var(--border)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
               fontSize: '14px', 
               fontWeight: '500',
               transition: 'all 0.2s'
-            }}>
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = '#1a1a1a';
+            }}
+            >
               OpenBrokerCSV
             </Link>
             <Link href="/static/portfolio-tracker" style={{ 
               padding: '12px 24px', 
-              border: '1px solid var(--card-border)', 
+              border: '1px solid var(--border)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
               fontSize: '14px', 
               fontWeight: '500',
               transition: 'all 0.2s'
-            }}>
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = '#1a1a1a';
+            }}
+            >
               Portfolio Tracker
             </Link>
             <Link href="/static/csv-etoro-to-openbrokercsv" style={{ 
               padding: '12px 24px', 
-              border: '1px solid var(--card-border)', 
+              border: '1px solid var(--border)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
               fontSize: '14px', 
               fontWeight: '500',
               transition: 'all 0.2s'
-            }}>
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = '#1a1a1a';
+            }}
+            >
               eToro → OpenBrokerCSV
             </Link>
           </div>
-          
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap' }}>
+
+          {/* The Trust Links */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '24px', 
+            flexWrap: 'wrap',
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            <Link href="/live" style={{ 
+              color: '#666',
+              textDecoration: 'none',
+              transition: 'color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              Browse Stocks
+            </Link>
             <a 
               href="https://github.com/PocketPortfolio/Financialprofilenetwork" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: '#666',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
             >
               GitHub
+            </a>
+          </div>
+
+          {/* Community Links */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '24px', 
+            flexWrap: 'wrap',
+            fontSize: '14px',
+            color: '#666'
+          }}>
+            <Link 
+              href="/blog" 
+              style={{ 
+                color: '#666',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              Blog & News
+            </Link>
+            <a 
+              href="https://dev.to/pocketportfolioapp" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                color: '#666',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              Dev.to
+            </a>
+            <a 
+              href="https://coderlegion.com/5738/welcome-to-coderlegion-22s" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                color: '#666',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              CoderLegion
             </a>
             <a 
               href="https://discord.gg/Ch9PpjRzwe" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: '#666',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
             >
               Discord
             </a>
-            <Link 
-              href="/landing" 
+            <a 
+              href="https://www.linkedin.com/company/pocket-portfolio-community" 
+              target="_blank" 
+              rel="noopener noreferrer"
               style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '14px',
+                color: '#666',
+                textDecoration: 'none',
                 transition: 'color 0.2s'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
             >
-              About
+              LinkedIn
+            </a>
+            <a 
+              href="https://www.webone.one" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                color: '#666',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              1EO Certified
+            </a>
+            <Link 
+              href="/dashboard" 
+              style={{ 
+                color: '#666',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+            >
+              Launch App
             </Link>
+          </div>
+
+          {/* Disclaimer */}
+          <div style={{ 
+            marginTop: '16px',
+            padding: '12px 16px',
+            background: '#FFFFFF',
+            border: '1px solid rgba(245, 158, 11, 0.2)',
+            borderRadius: '8px',
+            maxWidth: '800px',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+          }}>
+            <p style={{ 
+              color: '#666',
+              fontSize: '12px',
+              margin: 0,
+              lineHeight: '1.5'
+            }}>
+              <strong>⚠️ Disclaimer:</strong> Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
+            </p>
           </div>
         </div>
       </footer>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        title="Delete All Trades"
+        message="Are you sure you want to delete ALL trades from your account? This action cannot be undone."
+        confirmText="Delete All"
+        cancelText="Cancel"
+        type="delete"
+        onConfirm={confirmDeleteAllTrades}
+        onCancel={() => setShowDeleteModal(false)}
+        isLoading={isDeleting}
+      />
+
+      {/* Alert Modal */}
+      {alertModalData && (
+        <AlertModal
+          isOpen={showAlertModal}
+          title={alertModalData.title}
+          message={alertModalData.message}
+          type={alertModalData.type}
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
+
+      {/* Feature Announcement Modal */}
+      <FeatureAnnouncementModal
+        isOpen={showFeatureAnnouncement}
+        onClose={handleCloseAnnouncement}
+      />
     </>
   );
 }

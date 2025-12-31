@@ -1,156 +1,19 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-
-// Supported brokers
-const SUPPORTED_BROKERS = [
-  'etoro', 'trading212', 'coinbase', 'interactive-brokers', 'revolut',
-  'freetrade', 'robinhood', 'webull', 'schwab', 'fidelity'
-];
+import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 
 interface BrokerPageProps {
   params: { broker: string };
 }
 
-// Generate static params for supported brokers
+// Generate static params for supported brokers (50 brokers for Operation Velocity)
 export async function generateStaticParams() {
   return SUPPORTED_BROKERS.map((broker) => ({
     broker: broker.toLowerCase(),
   }));
 }
 
-// Broker configuration
-const BROKER_CONFIG = {
-  'etoro': {
-    name: 'eToro',
-    displayName: 'eToro',
-    description: 'Social trading platform with copy trading features',
-    logo: '📈',
-    requiredColumns: ['Instrument', 'Type', 'Units', 'Open Rate', 'Close Rate', 'PnL'],
-    sampleData: 'Instrument,Type,Units,Open Rate,Close Rate,PnL\nAAPL,BUY,10,150.00,155.00,50.00',
-    tips: [
-      'Export your account statement from eToro',
-      'Make sure to include all closed positions',
-      'The "Instrument" column should contain stock symbols'
-    ]
-  },
-  'trading212': {
-    name: 'Trading212',
-    displayName: 'Trading212',
-    description: 'Commission-free trading platform',
-    logo: '📊',
-    requiredColumns: ['Instrument', 'Action', 'Quantity', 'Price', 'Value'],
-    sampleData: 'Instrument,Action,Quantity,Price,Value\nAAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Use the "Export" feature in Trading212',
-      'Include both buy and sell transactions',
-      'Check that instrument symbols are correct'
-    ]
-  },
-  'coinbase': {
-    name: 'Coinbase',
-    displayName: 'Coinbase',
-    description: 'Cryptocurrency exchange and wallet',
-    logo: '₿',
-    requiredColumns: ['Timestamp', 'Transaction Type', 'Asset', 'Quantity Transacted', 'USD Spot Price at Transaction'],
-    sampleData: 'Timestamp,Transaction Type,Asset,Quantity Transacted,USD Spot Price at Transaction\n2024-01-01T12:00:00Z,Buy,BTC,0.01,45000.00',
-    tips: [
-      'Download transaction history from Coinbase Pro',
-      'Include all transaction types (buy, sell, convert)',
-      'Ensure timestamps are in UTC format'
-    ]
-  },
-  'interactive-brokers': {
-    name: 'Interactive Brokers',
-    displayName: 'Interactive Brokers',
-    description: 'Professional trading platform',
-    logo: '🏦',
-    requiredColumns: ['Symbol', 'Quantity', 'T.Price', 'Proceeds', 'Comm/Fee'],
-    sampleData: 'Symbol,Quantity,T.Price,Proceeds,Comm/Fee\nAAPL,100,150.00,15000.00,1.00',
-    tips: [
-      'Use the Flex Query feature for detailed reports',
-      'Include all transaction fees',
-      'Export in CSV format for best compatibility'
-    ]
-  },
-  'revolut': {
-    name: 'Revolut',
-    displayName: 'Revolut',
-    description: 'Digital banking and trading app',
-    logo: '💳',
-    requiredColumns: ['Date', 'Instrument', 'Type', 'Quantity', 'Price', 'Total'],
-    sampleData: 'Date,Instrument,Type,Quantity,Price,Total\n2024-01-01,AAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Export trading history from Revolut app',
-      'Include transaction fees in calculations',
-      'Verify instrument symbols match standard format'
-    ]
-  },
-  'freetrade': {
-    name: 'Freetrade',
-    displayName: 'Freetrade',
-    description: 'Commission-free UK trading platform',
-    logo: '🇬🇧',
-    requiredColumns: ['Date', 'Stock', 'Type', 'Quantity', 'Price', 'Total'],
-    sampleData: 'Date,Stock,Type,Quantity,Price,Total\n2024-01-01,AAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Download account statement from Freetrade',
-      'Include all trade types (buy, sell, dividend)',
-      'Check that dates are in correct format'
-    ]
-  },
-  'robinhood': {
-    name: 'Robinhood',
-    displayName: 'Robinhood',
-    description: 'Commission-free trading app',
-    logo: '🟢',
-    requiredColumns: ['Date', 'Symbol', 'Type', 'Quantity', 'Price', 'Total'],
-    sampleData: 'Date,Symbol,Type,Quantity,Price,Total\n2024-01-01,AAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Request account statement from Robinhood',
-      'Include all transaction types',
-      'Verify symbol format matches standard tickers'
-    ]
-  },
-  'webull': {
-    name: 'Webull',
-    displayName: 'Webull',
-    description: 'Advanced trading platform',
-    logo: '📱',
-    requiredColumns: ['Date', 'Symbol', 'Side', 'Quantity', 'Price', 'Amount'],
-    sampleData: 'Date,Symbol,Side,Quantity,Price,Amount\n2024-01-01,AAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Export detailed transaction history',
-      'Include all order types and fees',
-      'Ensure proper date formatting'
-    ]
-  },
-  'schwab': {
-    name: 'Charles Schwab',
-    displayName: 'Charles Schwab',
-    description: 'Full-service investment firm',
-    logo: '🏛️',
-    requiredColumns: ['Date', 'Symbol', 'Action', 'Quantity', 'Price', 'Amount'],
-    sampleData: 'Date,Symbol,Action,Quantity,Price,Amount\n2024-01-01,AAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Use Schwab account statement export',
-      'Include all transaction types',
-      'Verify commission calculations'
-    ]
-  },
-  'fidelity': {
-    name: 'Fidelity',
-    displayName: 'Fidelity',
-    description: 'Investment and retirement services',
-    logo: '💼',
-    requiredColumns: ['Date', 'Symbol', 'Action', 'Quantity', 'Price', 'Amount'],
-    sampleData: 'Date,Symbol,Action,Quantity,Price,Amount\n2024-01-01,AAPL,BUY,10,150.00,1500.00',
-    tips: [
-      'Export transaction history from Fidelity',
-      'Include all trade types and dividends',
-      'Check for proper symbol formatting'
-    ]
-  }
-};
+// Broker configuration is now imported from centralized config (50 brokers)
 
 // Generate metadata for each broker page
 export async function generateMetadata({ params }: BrokerPageProps): Promise<Metadata> {
@@ -624,7 +487,6 @@ export default async function BrokerImportPage({ params }: BrokerPageProps) {
                 transition: 'all 0.2s ease',
                 minWidth: '160px'
               }}
-              className="hover:transform hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
             >
               Sign in with Google
             </a>
@@ -643,7 +505,6 @@ export default async function BrokerImportPage({ params }: BrokerPageProps) {
                 transition: 'all 0.2s ease',
                 minWidth: '160px'
               }}
-              className="hover:bg-white hover:bg-opacity-10 hover:transform hover:-translate-y-0.5 transition-all duration-200"
             >
               Import CSV Now
             </a>
@@ -688,7 +549,7 @@ export default async function BrokerImportPage({ params }: BrokerPageProps) {
               );
             })}
             <a
-              href="/csv-portfolio-tracker"
+              href="/static/portfolio-tracker"
               style={{
                 color: 'var(--text-warm)',
                 textDecoration: 'none',

@@ -14,7 +14,7 @@ const APP_SHELL = [
   '/app/index.html',
   '/app/style.css',
   '/app/manifest.webmanifest',
-  '/brand/pp-monogram.svg'
+  '/brand/pp-maskable.svg'
 ];
 
 self.addEventListener('install', (event) => {

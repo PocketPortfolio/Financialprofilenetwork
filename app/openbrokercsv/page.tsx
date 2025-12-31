@@ -5,6 +5,9 @@ import Link from 'next/link';
 import Logo from '../components/Logo';
 import SEOHead from '../components/SEOHead';
 import StructuredData from '../components/StructuredData';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
+import ToolFooter from '../components/marketing/ToolFooter';
+import SEOPageTracker from '../components/SEOPageTracker';
 
 export default function OpenBrokerCSVPage() {
   return (
@@ -34,7 +37,7 @@ export default function OpenBrokerCSVPage() {
           name: 'OpenBrokerCSV',
           description: 'Open-source CSV format specification for standardizing trading data across brokerage platforms',
           url: 'https://www.pocketportfolio.app/openbrokercsv',
-          image: 'https://www.pocketportfolio.app/brand/og-base.png',
+          image: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123',
           offers: {
             price: '0',
             priceCurrency: 'USD',
@@ -52,41 +55,24 @@ export default function OpenBrokerCSVPage() {
 
       <div style={{ 
         minHeight: '100vh', 
+        display: 'flex',
+        flexDirection: 'column',
         background: 'var(--bg)', 
         color: 'var(--text)', 
         fontFamily: 'system-ui, -apple-system, sans-serif' 
       }}>
-      {/* Header */}
-      <header style={{ 
-        borderBottom: '1px solid var(--card-border)', 
-        background: 'var(--chrome)', 
-        padding: '16px 24px'
-      }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <Logo size="medium" showWordmark={true} />
-            </Link>
-            <Link 
-              href="/app" 
-              style={{ 
-                padding: '8px 16px', 
-                background: 'var(--brand)', 
-                color: 'white', 
-                textDecoration: 'none', 
-                borderRadius: '6px', 
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-            >
-              Back to App
-            </Link>
-          </div>
-        </div>
-      </header>
+      <ProductionNavbar />
+      <SEOPageTracker />
 
       {/* Main Content */}
-      <main style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 24px' }}>
+      <main style={{ 
+        flexGrow: 1,
+        maxWidth: '800px', 
+        margin: '0 auto', 
+        padding: '48px 24px',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
         <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '24px' }}>
           OpenBrokerCSV
         </h1>
@@ -176,35 +162,11 @@ export default function OpenBrokerCSVPage() {
               <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>eToro</h3>
               <p style={{ fontSize: '14px', color: 'var(--muted)' }}>Convert eToro CSV to OpenBrokerCSV format</p>
             </Link>
-            
-            <div style={{ 
-              background: 'var(--bg)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '8px', 
-              padding: '16px',
-              opacity: 0.6
-            }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>More Brokers</h3>
-              <p style={{ fontSize: '14px', color: 'var(--muted)' }}>Coming soon: Robinhood, TD Ameritrade, Interactive Brokers</p>
-            </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer style={{ 
-        marginTop: '80px', 
-        padding: '32px 24px', 
-        borderTop: '1px solid var(--card-border)', 
-        textAlign: 'center', 
-        background: 'var(--chrome)' 
-      }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <p style={{ color: 'var(--muted)', fontSize: '14px' }}>
-            © 2025 Pocket Portfolio — Built with the community.
-          </p>
-        </div>
-      </footer>
+      <ToolFooter />
       </div>
     </>
   );

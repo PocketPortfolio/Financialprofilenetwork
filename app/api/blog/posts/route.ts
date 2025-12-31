@@ -24,7 +24,7 @@ export async function GET() {
           title: data.title,
           description: data.description,
           date: data.date,
-          author: data.author || 'Pocket Portfolio AI',
+          author: data.author || 'Pocket Portfolio Team',
           tags: data.tags || [],
           image: data.image,
           pillar: data.pillar,
@@ -38,4 +38,8 @@ export async function GET() {
     return NextResponse.json([], { status: 500 });
   }
 }
+
+
+
+
 

@@ -100,7 +100,7 @@ export default function EtoroConverterPage() {
             "name": "eToro CSV to OpenBrokerCSV Converter",
             "description": "Free tool to convert eToro CSV exports to OpenBrokerCSV format for portfolio tracking.",
             "url": "https://www.pocketportfolio.app/static/csv-etoro-to-openbrokercsv",
-            "image": "https://www.pocketportfolio.app/brand/og-base.png",
+            "image": "https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Web",
             "offers": {
@@ -122,102 +122,61 @@ export default function EtoroConverterPage() {
       />
 
       <div style={{ maxWidth: '980px', margin: '2rem auto', padding: '0 1rem' }}>
-        <header style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '1rem 0',
-          borderBottom: '1px solid #e5e7eb'
-        }}>
-          <a href="/" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/brand/pp-wordmark.svg" alt="Pocket Portfolio" width="156" height="20" />
-          </a>
-          <nav style={{ display: 'flex', gap: '1rem' }}>
-            <a href="/dashboard" style={{
-              padding: '8px 16px',
-              background: '#f59e0b',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}>
-              Launch App
-            </a>
-            <a href="/openbrokercsv" style={{
-              padding: '8px 16px',
-              background: 'transparent',
-              border: '1px solid #d1d5db',
-              color: '#374151',
-              textDecoration: 'none',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: '500'
-            }}>
-              OpenBrokerCSV
-            </a>
-          </nav>
-        </header>
-
         <main>
           <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
             Convert eToro CSV to OpenBrokerCSV
           </h1>
-          <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
             Client-side conversion — nothing leaves your browser.
           </p>
 
-          <section style={{
-            background: '#f9fafb',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            padding: '1.5rem',
+          <section className="brand-card" style={{
             marginBottom: '2rem'
           }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
               Supported eToro columns
             </h2>
             <div style={{ overflow: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <table className="brand-table" style={{ width: '100%' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>eToro Header</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>OpenBrokerCSV</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>Notes</th>
+                  <tr>
+                    <th>eToro Header</th>
+                    <th>OpenBrokerCSV</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Open Date / OpenTime</td>
                     <td style={{ padding: '8px' }}><code>timestamp</code></td>
                     <td style={{ padding: '8px' }}>ISO 8601 (UTC)</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Instrument</td>
                     <td style={{ padding: '8px' }}><code>symbol</code></td>
                     <td style={{ padding: '8px' }}>e.g., AAPL, TSLA</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Side</td>
                     <td style={{ padding: '8px' }}><code>side</code></td>
                     <td style={{ padding: '8px' }}>BUY or SELL</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Units</td>
                     <td style={{ padding: '8px' }}><code>quantity</code></td>
                     <td style={{ padding: '8px' }}>number (negative if SELL)</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Open Rate</td>
                     <td style={{ padding: '8px' }}><code>price</code></td>
                     <td style={{ padding: '8px' }}>number</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Currency</td>
                     <td style={{ padding: '8px' }}><code>trade_currency</code></td>
                     <td style={{ padding: '8px' }}>ISO 4217 (USD, GBP, EUR)</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <tr>
                     <td style={{ padding: '8px' }}>Position ID</td>
                     <td style={{ padding: '8px' }}><code>trade_id</code></td>
                     <td style={{ padding: '8px' }}>string</td>
@@ -232,18 +191,14 @@ export default function EtoroConverterPage() {
             </div>
           </section>
 
-          <section style={{
-            background: '#f9fafb',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            padding: '1.5rem',
+          <section className="brand-card" style={{
             marginBottom: '2rem'
           }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
               Convert your file
             </h2>
             <div style={{
-              border: '2px dashed #d1d5db',
+              border: '2px dashed var(--border)',
               borderRadius: '12px',
               padding: '18px',
               textAlign: 'center',
@@ -257,34 +212,34 @@ export default function EtoroConverterPage() {
                 style={{
                   marginBottom: '1rem',
                   padding: '8px',
-                  border: '1px solid #d1d5db',
+                  border: '1px solid var(--border)',
                   borderRadius: '6px',
                   width: '100%',
-                  maxWidth: '300px'
+                  maxWidth: '300px',
+                  background: 'var(--surface)',
+                  color: 'var(--text)'
                 }}
               />
-              <p style={{ color: '#6b7280', fontSize: '14px' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
                 Upload your eToro CSV file to convert it to OpenBrokerCSV format
               </p>
             </div>
 
             {file && (
               <div style={{ marginBottom: '1rem' }}>
-                <p style={{ color: '#10b981', fontWeight: '500' }}>
+                <p style={{ color: 'var(--signal)', fontWeight: '500' }}>
                   Selected: {file.name}
                 </p>
                 <button
                   onClick={handleConvert}
                   disabled={isProcessing}
+                  className="brand-button brand-button-primary"
                   style={{
-                    padding: '8px 16px',
-                    background: isProcessing ? '#9ca3af' : '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: isProcessing ? 'not-allowed' : 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
+                    padding: 'var(--space-3) var(--space-5)',
+                    fontSize: 'var(--font-size-sm)',
+                    fontWeight: 'var(--font-medium)',
+                    opacity: isProcessing ? 0.6 : 1,
+                    cursor: isProcessing ? 'not-allowed' : 'pointer'
                   }}
                 >
                   {isProcessing ? 'Processing...' : 'Convert File'}
@@ -294,29 +249,21 @@ export default function EtoroConverterPage() {
 
             {result && (
               <div style={{ marginBottom: '1rem' }}>
-                <div style={{ 
-                  background: '#f3f4f6', 
-                  border: '1px solid #d1d5db', 
-                  borderRadius: '6px', 
-                  padding: '12px',
+                <div className="brand-card" style={{ 
                   marginBottom: '1rem'
                 }}>
-                  <pre style={{ margin: 0, fontSize: '14px', color: '#374151' }}>
+                  <pre style={{ margin: 0, fontSize: '14px', color: 'var(--text)', fontFamily: 'var(--font-mono)' }}>
                     {result}
                   </pre>
                 </div>
                 {convertedData.length > 0 && (
                   <button
                     onClick={() => downloadCSV(convertedData)}
+                    className="brand-button brand-button-primary"
                     style={{
-                      padding: '8px 16px',
-                      background: '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500'
+                      padding: 'var(--space-3) var(--space-5)',
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 'var(--font-medium)'
                     }}
                   >
                     Download OpenBrokerCSV

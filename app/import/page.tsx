@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useTrades } from '../hooks/useTrades';
 import SEOHead from '../components/SEOHead';
-import MobileHeader from '../components/nav/MobileHeader';
 import CSVImporter from '../components/CSVImporter';
+import AlertModal from '../components/modals/AlertModal';
 
 interface Trade {
   id: string;
@@ -28,6 +28,12 @@ export default function ImportPage() {
     date: string;
     status: 'success' | 'error';
   }>>([]);
+  const [alertModal, setAlertModal] = useState<{ isOpen: boolean; title: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   const handleCSVImport = async (trades: Trade[]) => {
     try {
@@ -45,10 +51,20 @@ export default function ImportPage() {
       setImportHistory(prev => [newImport, ...prev.slice(0, 9)]); // Keep last 10
       
       // Show success message
-      alert(`Successfully imported ${trades.length} trades!`);
+      setAlertModal({
+        isOpen: true,
+        title: 'Import Successful',
+        message: `Successfully imported ${trades.length} trades!`,
+        type: 'success'
+      });
     } catch (error) {
       console.error('Import failed:', error);
-      alert('Import failed. Please check your CSV format.');
+      setAlertModal({
+        isOpen: true,
+        title: 'Import Failed',
+        message: 'Import failed. Please check your CSV format.',
+        type: 'error'
+      });
     }
   };
 
@@ -65,7 +81,6 @@ export default function ImportPage() {
           title="Import Trades - Pocket Portfolio"
           description="Import your trades from any broker with our universal CSV importer"
         />
-        <MobileHeader title="Import" />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -112,7 +127,6 @@ export default function ImportPage() {
         title="Import Trades - Pocket Portfolio"
         description="Import your trades from any broker with our universal CSV importer"
       />
-      <MobileHeader title="Import" />
       
       <main style={{ 
         flex: 1, 
@@ -122,7 +136,7 @@ export default function ImportPage() {
         width: '100%',
         border: '2px solid var(--signal)',
         borderRadius: '16px',
-        marginTop: '20px',
+        marginTop: '0',
         marginBottom: '20px',
         background: 'var(--surface)',
         boxShadow: '0 8px 32px rgba(255, 107, 53, 0.2)'
@@ -162,90 +176,6 @@ export default function ImportPage() {
                 Upload CSV files from any broker and we'll automatically detect the format
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Account Management */}
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '12px',
-          padding: '24px',
-          marginBottom: '32px'
-        }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>Account Management</h2>
-          <div style={{ 
-            display: 'flex', 
-            gap: '16px',
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
-            <button
-              style={{
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px 24px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.89 22 5.99 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10 9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Export Data
-            </button>
-            
-            <button
-              style={{
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px 24px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M14 11V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              Delete Account
-            </button>
           </div>
         </div>
 
@@ -384,6 +314,15 @@ export default function ImportPage() {
           </div>
         </div>
       </main>
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

@@ -75,6 +75,11 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=86400, s-maxage=86400, immutable',
+          'X-Content-Type-Options': 'nosniff',
+        },
       }
     );
   } catch (error) {
@@ -82,4 +87,7 @@ export async function GET(request: NextRequest) {
     return new Response('Failed to generate image', { status: 500 });
   }
 }
+
+// Configure for edge runtime with proper caching
+export const runtime = 'edge';
 

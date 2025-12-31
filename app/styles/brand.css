@@ -25,7 +25,30 @@ html, body {
   width: 100% !important;
   max-width: 100vw !important;
   overflow-x: hidden !important;
+  overflow-y: visible !important; /* Prevent creating scrolling container for sticky positioning */
   box-sizing: border-box !important;
+}
+
+/* Marketing Navbar Mobile Styles */
+.github-stars-text {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .github-stars-text {
+    display: inline;
+  }
+}
+
+/* Mobile Upsell Banner - Hidden on Desktop */
+.mobile-upsell-banner {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .mobile-upsell-banner {
+    display: none !important;
+  }
 }
 
 /* Ensure all main containers respect viewport width */
@@ -41,6 +64,12 @@ main, section, div {
   color: var(--text);
   position: relative;
   overflow: hidden;
+}
+
+/* Exception: brand-surface on headers should NOT have position: relative or overflow: hidden */
+.brand-header.brand-surface {
+  overflow: visible !important; /* Override overflow: hidden to allow sticky */
+  /* Don't set position - inline styles have higher specificity and will override position: relative */
 }
 
 .brand-surface > * {
@@ -74,11 +103,15 @@ main, section, div {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   padding: var(--space-4) var(--space-6);
-  position: sticky;
+  /* position: sticky is controlled by inline styles to allow override */
   top: 0;
   z-index: var(--z-sticky);
   backdrop-filter: blur(12px);
-  position: relative;
+  /* Removed position: relative to allow sticky positioning from inline styles */
+  /* Ensure no properties that break sticky */
+  transform: none !important;
+  will-change: auto !important;
+  filter: none !important;
 }
 
 .brand-header::before {
@@ -921,6 +954,41 @@ main, section, div {
   }
 }
 
+/* Heartbeat animation for sponsor button */
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  10% {
+    transform: scale(1.15);
+  }
+  20% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.15);
+  }
+  40% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.sponsor-heart {
+  animation: heartbeat 1.5s ease-in-out infinite;
+  transform-origin: center;
+  display: inline-block;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-heart {
+    animation: none;
+  }
+}
+
 /* Enhanced TabBar with Pocket Portfolio branding */
 .mobile-tab-bar {
   display: flex !important;
@@ -989,6 +1057,24 @@ main, section, div {
   text-shadow: none !important;
   letter-spacing: 0.025em !important;
   margin-top: 2px !important;
+}
+
+/* Hide text labels on mobile - icon only */
+@media (max-width: 768px) {
+  .mobile-tab-bar .mobile-tab-item .mobile-tab-label {
+    display: none !important;
+  }
+  
+  .mobile-tab-bar .mobile-tab-item > div {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* Show text labels on desktop/tablet */
+@media (min-width: 769px) {
+  .mobile-tab-bar .mobile-tab-item .mobile-tab-label {
+    display: block !important;
+  }
 }
 
 .mobile-tab-bar .mobile-tab-item[data-active="true"] span {

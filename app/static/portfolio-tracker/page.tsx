@@ -42,29 +42,6 @@ export const metadata: Metadata = {
 export default function PortfolioTrackerPage() {
   return (
     <div style={{ maxWidth: '980px', margin: '2rem auto', padding: '0 1rem' }}>
-      <header style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '1rem 0',
-        borderBottom: '1px solid var(--border)',
-        marginBottom: '2rem'
-      }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <img src="/brand/pp-wordmark.svg" alt="Pocket Portfolio" width="156" height="20" />
-        </Link>
-        <Link href="/dashboard" style={{
-          padding: '8px 16px',
-          backgroundColor: 'var(--accent)',
-          color: 'white',
-          textDecoration: 'none',
-          borderRadius: '6px',
-          fontWeight: '600'
-        }}>
-          Launch App
-        </Link>
-      </header>
-
       <main>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', fontWeight: '700' }}>
           Portfolio Tracker: import broker CSVs, get live prices &amp; P/L
@@ -73,11 +50,7 @@ export default function PortfolioTrackerPage() {
           Works with stocks, ETFs, and crypto. Import via OpenBrokerCSV for clean positions and accurate P/L.
         </p>
 
-        <section style={{
-          backgroundColor: 'var(--card-bg)',
-          border: '1px solid var(--card-border)',
-          borderRadius: '12px',
-          padding: '2rem',
+        <section className="brand-card" style={{
           marginBottom: '2rem'
         }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: '600' }}>Key features</h2>
@@ -96,33 +69,34 @@ export default function PortfolioTrackerPage() {
             </ul>
           </div>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <Link href="/dashboard" style={{
-              padding: '12px 24px',
-              backgroundColor: 'var(--accent)',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: '600'
-            }}>
+            <Link 
+              href="/dashboard" 
+              className="brand-button brand-button-primary"
+              style={{
+                padding: 'var(--space-3) var(--space-5)',
+                textDecoration: 'none',
+                fontWeight: 'var(--font-semibold)',
+                fontSize: 'var(--font-size-base)'
+              }}
+            >
               Open the App
             </Link>
-            <Link href="/openbrokercsv" style={{
-              padding: '12px 24px',
-              border: '1px solid var(--card-border)',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              color: 'var(--text)'
-            }}>
+            <Link 
+              href="/openbrokercsv" 
+              className="brand-button brand-button-secondary"
+              style={{
+                padding: 'var(--space-3) var(--space-5)',
+                textDecoration: 'none',
+                fontWeight: 'var(--font-medium)',
+                fontSize: 'var(--font-size-base)'
+              }}
+            >
               What is OpenBrokerCSV?
             </Link>
           </div>
         </section>
 
-        <section style={{
-          backgroundColor: 'var(--card-bg)',
-          border: '1px solid var(--card-border)',
-          borderRadius: '12px',
-          padding: '2rem',
+        <section className="brand-card" style={{
           marginBottom: '2rem'
         }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: '600' }}>Import from any broker</h2>
@@ -134,22 +108,14 @@ export default function PortfolioTrackerPage() {
           <p>Try a sample file: <Link href="/fixtures/csv/sample-etoro.csv">sample-etoro.csv</Link></p>
         </section>
 
-        <section style={{
-          backgroundColor: 'var(--card-bg)',
-          border: '1px solid var(--card-border)',
-          borderRadius: '12px',
-          padding: '2rem',
+        <section className="brand-card" style={{
           marginBottom: '2rem'
         }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: '600' }}>Real-time &amp; freshness</h2>
           <p>We fetch quotes from multiple providers and display a freshness badge. See <Link href="/dashboard">app</Link> for live data.</p>
         </section>
 
-        <section style={{
-          backgroundColor: 'var(--card-bg)',
-          border: '1px solid var(--card-border)',
-          borderRadius: '12px',
-          padding: '2rem',
+        <section className="brand-card" style={{
           marginBottom: '2rem'
         }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: '600' }}>FAQ</h2>

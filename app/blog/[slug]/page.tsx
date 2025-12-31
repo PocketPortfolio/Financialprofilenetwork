@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
 import LandingFooter from '../../components/marketing/LandingFooter';
 import SEOHead from '../../components/SEOHead';
@@ -30,6 +31,60 @@ const mdxComponents = {
       overflowX: 'auto',
       marginBottom: '1.5em',
       border: '1px solid var(--border)'
+    }} />
+  ),
+  table: (props: any) => (
+    <div style={{ 
+      overflowX: 'auto', 
+      marginBottom: '2em',
+      marginTop: '1.5em',
+      borderRadius: '12px',
+      border: '1px solid rgba(128, 128, 128, 0.2)',
+      background: 'var(--surface-elevated)',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+    }}>
+      <table {...props} style={{
+        width: '100%',
+        borderCollapse: 'collapse',
+        fontSize: '16px',
+        lineHeight: '1.6',
+        minWidth: '100%'
+      }} />
+    </div>
+  ),
+  thead: (props: any) => (
+    <thead {...props} style={{
+      background: 'var(--surface)',
+      borderBottom: '2px solid rgba(128, 128, 128, 0.3)'
+    }} />
+  ),
+  tbody: (props: any) => <tbody {...props} />,
+  tr: (props: any) => (
+    <tr {...props} style={{
+      borderBottom: '1px solid rgba(128, 128, 128, 0.15)',
+      transition: 'background 0.2s ease'
+    }} />
+  ),
+  th: (props: any) => (
+    <th {...props} style={{
+      padding: '18px 20px',
+      textAlign: 'left',
+      fontWeight: '700',
+      color: 'var(--text)',
+      fontSize: '15px',
+      letterSpacing: '0.01em',
+      borderRight: '1px solid rgba(128, 128, 128, 0.15)',
+      whiteSpace: 'nowrap'
+    }} />
+  ),
+  td: (props: any) => (
+    <td {...props} style={{
+      padding: '18px 20px',
+      color: 'var(--text-secondary)',
+      borderRight: '1px solid rgba(128, 128, 128, 0.15)',
+      verticalAlign: 'top',
+      fontSize: '15px',
+      lineHeight: '1.7'
     }} />
   ),
 };
@@ -69,7 +124,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         images: [data.image || 'https://www.pocketportfolio.app/brand/og-base.svg'],
         type: 'article',
         publishedTime: data.date,
-        authors: [data.author || 'Pocket Portfolio AI'],
+        authors: [data.author || 'Pocket Portfolio Team'],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/blog/${params.slug}`,
@@ -100,7 +155,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     dateModified: data.dateModified || data.date,
     author: {
       '@type': 'Organization',
-      name: data.author || 'Pocket Portfolio AI',
+      name: data.author || 'Pocket Portfolio Team',
     },
     publisher: {
       '@type': 'Organization',
@@ -176,7 +231,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             }}
           >
             <span>{new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            <span>By {data.author || 'Pocket Portfolio AI'}</span>
+            <span>By {data.author || 'Pocket Portfolio Team'}</span>
             {data.pillar && (
               <span style={{
                 padding: '4px 12px',
@@ -230,7 +285,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           }}
           className="blog-content"
         >
-          <MDXRemote source={content} components={mdxComponents} />
+          <MDXRemote source={content} components={mdxComponents} options={{
+            mdxOptions: {
+              remarkPlugins: [remarkGfm],
+            },
+          }} />
         </div>
         
         {/* CTA Section */}
