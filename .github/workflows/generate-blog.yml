@@ -60,6 +60,12 @@ jobs:
             echo "changes=true" >> $GITHUB_OUTPUT
             echo "📝 Changes detected - will commit and push"
             git status --short
+            # Explicitly add the files to ensure they're staged
+            git add content/posts/**/*.mdx || true
+            git add public/images/blog/**/*.png || true
+            git add content/blog-calendar.json || true
+            echo "📦 Files staged for commit"
+            git status --short
           else
             echo "changes=false" >> $GITHUB_OUTPUT
             echo "✅ No changes to commit"
@@ -73,7 +79,7 @@ jobs:
           commit_user_name: 'Pocket Portfolio Bot'
           commit_user_email: 'bot@pocketportfolio.app'
           commit_options: '--no-verify'
-          skip_dirty_check: false
+          skip_dirty_check: true
           file_pattern: |
             content/posts/**/*.mdx
             public/images/blog/**/*.png
