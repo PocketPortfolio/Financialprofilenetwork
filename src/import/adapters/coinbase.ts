@@ -4,7 +4,14 @@ import { toISO, toNumber, toTicker, inferCurrency, hashRow } from '../normalize'
 
 export const coinbase: BrokerAdapter = {
   id: 'coinbase',
-  detect: (sample) => /(^|\n)(Timestamp|Transaction Type|Asset|Quantity|Spot Price|Coinbase)/i.test(sample),
+  detect: (sample) => {
+    // More specific: require "Transaction Type" AND "Spot Price at Transaction" (Coinbase-specific columns)
+    const hasTransactionType = /(^|\n)(Transaction Type)/i.test(sample);
+    const hasSpotPriceAtTransaction = /(^|\n)(Spot Price at Transaction)/i.test(sample);
+    const hasAsset = /(^|\n)(Asset)/i.test(sample);
+    // Coinbase has these three specific columns together
+    return hasTransactionType && hasSpotPriceAtTransaction && hasAsset;
+  },
   parse: async (file, locale='en-US') => {
     const t0 = performance.now();
     const text = await csvFrom(file);

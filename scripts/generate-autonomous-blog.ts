@@ -100,7 +100,7 @@ title: "${post.title}"
 date: "${post.date}"
 description: "[SEO-optimized description, 150-160 characters, include keywords]"
 tags: [${post.keywords.map(k => `"${k}"`).join(', ')}]
-author: "Pocket Portfolio AI"
+author: "Pocket Portfolio Team"
 image: "/images/blog/${post.slug}.png"
 pillar: "${post.pillar}"
 ---
