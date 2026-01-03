@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+
   // Skip middleware entirely for sitemap and robots to avoid CSP issues
   if (request.nextUrl.pathname === '/sitemap.xml' || request.nextUrl.pathname === '/robots.txt') {
     return NextResponse.next();
@@ -10,22 +11,21 @@ export function middleware(request: NextRequest) {
   const res = NextResponse.next();
   
   // Skip security headers in development to avoid CSP issues with Next.js dev server
-  if (process.env.NODE_ENV === 'development') {
+  // Also skip for _next routes which need unsafe-eval for React refresh
+  if (process.env.NODE_ENV === 'development' || request.nextUrl.pathname.startsWith('/_next/')) {
     return res;
   }
-  
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   
   res.headers.set(
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://apis.google.com https://www.google-analytics.com",
+      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://apis.google.com https://accounts.google.com https://www.google-analytics.com https://js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.googleapis.com https://*.finance.yahoo.com https://stooq.com https://region1.google-analytics.com https://*.google-analytics.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://*.firebaseinstallations.googleapis.com https://www.googletagmanager.com https://securetoken.google.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com",
-      "frame-src 'self' https://accounts.google.com https://pocket-portfolio-67fa6.firebaseapp.com"
+      "connect-src 'self' https://*.googleapis.com https://*.finance.yahoo.com https://stooq.com https://region1.google-analytics.com https://*.google-analytics.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://*.firebaseinstallations.googleapis.com https://www.googletagmanager.com https://securetoken.google.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://api.stripe.com https://checkout.stripe.com https://www.google.com",
+      "frame-src 'self' https://accounts.google.com https://content.googleapis.com https://pocket-portfolio-67fa6.firebaseapp.com https://checkout.stripe.com https://js.stripe.com"
     ].join('; ')
   );
   

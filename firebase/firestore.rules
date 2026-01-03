@@ -112,6 +112,35 @@ service cloud.firestore {
       allow create, update: if true; // Allow server to manage rate limits
     }
     
+    // API Keys: Server-side only (via Admin SDK)
+    match /apiKeys/{apiKeyId} {
+      allow read, write: if false; // Only server can access via Admin SDK
+    }
+    
+    // API Keys by Email: Server-side only
+    match /apiKeysByEmail/{email} {
+      allow read, write: if false; // Only server can access via Admin SDK
+    }
+    
+    // Corporate Licenses: Server-side only
+    match /corporateLicenses/{email} {
+      allow read, write: if false; // Only server can access via Admin SDK
+    }
+    
+    // Tool Usage Tracking: anyone can write (for analytics), only admins can read
+    match /toolUsage/{eventId} {
+      allow create: if true; // Allow anonymous tracking
+      allow read: if isAdmin(); // Only admins can read analytics
+      allow update, delete: if false; // Immutable once written
+    }
+    
+    // Page Views Tracking: anyone can write (for analytics), only admins can read
+    match /pageViews/{eventId} {
+      allow create: if true; // Allow anonymous tracking
+      allow read: if isAdmin(); // Only admins can read analytics
+      allow update, delete: if false; // Immutable once written
+    }
+    
     // Default deny all other paths
     match /{document=**} {
       allow read, write: if false;

@@ -25,9 +25,19 @@ export const trading212: BrokerAdapter = {
 
     for (const r of rows) {
       try {
-        const action = (r['Action'] || r['Type'] || '').toUpperCase();
-        if (!action || action.includes('DEPOSIT') || action.includes('WITHDRAWAL') || action.includes('DIVIDEND') || action.includes('INTEREST')) {
+        let action = (r['Action'] || r['Type'] || '').toUpperCase();
+        if (!action) continue;
+        
+        // Extract base action from suffixes (e.g., "Dividend (Ordinary)" -> skip, "Market buy" -> "BUY")
+        if (action.includes('DIVIDEND') || action.includes('INTEREST') || action.includes('DEPOSIT') || action.includes('WITHDRAWAL')) {
           continue; // Skip non-trade rows
+        }
+        
+        // Handle "Market buy", "Market sell" -> extract "BUY" or "SELL"
+        if (action.includes('MARKET BUY') || action.includes('BUY')) {
+          action = 'BUY';
+        } else if (action.includes('MARKET SELL') || action.includes('SELL')) {
+          action = 'SELL';
         }
         
         const type = /SELL/i.test(action) ? 'SELL' : 'BUY';

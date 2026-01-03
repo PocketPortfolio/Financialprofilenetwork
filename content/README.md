@@ -40,7 +40,7 @@ Required:
 
 ## Content Guidelines
 
-All generated posts follow strict guidelines:
+All Pocket Portfolio posts follow strict guidelines:
 - ❌ **NEVER** mention "Excel editing" or "Spreadsheets" as features
 - ✅ Use "Raw Data" or "JSON" only
 - ✅ Always include a "Verdict" section
@@ -55,4 +55,7 @@ Posts are organized into 4 content pillars:
 2. **Technical** - JSON parsing, performance, architecture
 3. **Market** - Investment strategies, data-driven analysis
 4. **Product** - Sovereign Sync, features, updates
+
+
+
 

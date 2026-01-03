@@ -14,13 +14,20 @@ import { ibkrFlex } from './adapters/ibkrFlex';
 import { kraken } from './adapters/kraken';
 import { binance } from './adapters/binance';
 import { coinbase } from './adapters/coinbase';
+import { koinly } from './adapters/koinly';
+import { turbotax } from './adapters/turbotax';
+import { ghostfolio } from './adapters/ghostfolio';
+import { sharesight } from './adapters/sharesight';
 
 export const ADAPTERS: BrokerAdapter[] = [
   // Order matters! More specific patterns first
   trading212, ibkrFlex, // Most specific headers
   schwab, vanguard, etrade, fidelity, // US brokers
-  freetrade, degiro, ig, saxo, interactiveInvestor, revolut, // UK/EU
-  kraken, binance, coinbase // Crypto
+  freetrade, ig, saxo, interactiveInvestor, revolut, // UK/EU (without degiro)
+  coinbase, // Crypto (coinbase before degiro - has "Transaction Type" + "Spot Price at Transaction")
+  kraken, binance, // Crypto (binance before degiro to avoid false match)
+  degiro, // UK/EU (after crypto brokers to avoid false matches)
+  koinly, turbotax, ghostfolio, sharesight // Competitor platforms
 ];
 
 export function detectBroker(sampleCsvHead: string): BrokerId | 'unknown' {

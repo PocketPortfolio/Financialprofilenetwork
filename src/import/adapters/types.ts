@@ -1,7 +1,8 @@
 export type BrokerId =
   | 'schwab'|'vanguard'|'etrade'|'fidelity'
   | 'trading212'|'freetrade'|'degiro'|'ig'|'saxo'|'interactive_investor'|'revolut'
-  | 'ibkr_flex'|'kraken'|'binance'|'coinbase';
+  | 'ibkr_flex'|'kraken'|'binance'|'coinbase'
+  | 'koinly'|'turbotax'|'ghostfolio'|'sharesight';
 
 export interface RawFile {
   name: string;
