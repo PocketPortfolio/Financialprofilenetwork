@@ -16,7 +16,7 @@
   },
   {
     "id": "week-1-post-1",
-    "date": "2026-01-01",
+    "date": "2026-01-05",
     "title": "The Death of the Cloud Portfolio: Why Vendor Lock-in Kills Financial Freedom",
     "slug": "the-death-of-the-cloud-portfolio-why-vendor-lock-in-kills-fi",
     "status": "pending",
@@ -31,7 +31,7 @@
   },
   {
     "id": "week-1-post-2",
-    "date": "2026-01-04",
+    "date": "2026-01-08",
     "title": "Dollar Cost Averaging vs. Lump Sum: A Data-Driven Analysis",
     "slug": "dollar-cost-averaging-vs-lump-sum-a-data-driven-analysis",
     "status": "pending",
@@ -46,7 +46,7 @@
   },
   {
     "id": "week-2-post-1",
-    "date": "2026-01-08",
+    "date": "2026-01-12",
     "title": "Optimizing JSON Parsing: From 10s to 10ms",
     "slug": "optimizing-json-parsing-from-10s-to-10ms",
     "status": "pending",
@@ -61,7 +61,7 @@
   },
   {
     "id": "week-2-post-2",
-    "date": "2026-01-11",
+    "date": "2026-01-15",
     "title": "The Roadmap to Data Sovereignty: What's Next",
     "slug": "the-roadmap-to-data-sovereignty-what-s-next",
     "status": "pending",
@@ -76,7 +76,7 @@
   },
   {
     "id": "week-3-post-1",
-    "date": "2026-01-15",
+    "date": "2026-01-19",
     "title": "Why Most Investors Underperform: The Data Doesn't Lie",
     "slug": "why-most-investors-underperform-the-data-doesn-t-lie",
     "status": "pending",
@@ -91,7 +91,7 @@
   },
   {
     "id": "week-3-post-2",
-    "date": "2026-01-18",
+    "date": "2026-01-22",
     "title": "JSON Finance: The Open Standard That Breaks Wall Street's Grip",
     "slug": "json-finance-the-open-standard-that-breaks-wall-street-s-gri",
     "status": "pending",
@@ -106,7 +106,7 @@
   },
   {
     "id": "week-4-post-1",
-    "date": "2026-01-22",
+    "date": "2026-01-26",
     "title": "The Future of Portfolio Management: Local-First and Open",
     "slug": "the-future-of-portfolio-management-local-first-and-open",
     "status": "pending",
@@ -121,7 +121,7 @@
   },
   {
     "id": "week-4-post-2",
-    "date": "2026-01-25",
+    "date": "2026-01-29",
     "title": "The Architecture of Sovereign Sync: How It Really Works",
     "slug": "the-architecture-of-sovereign-sync-how-it-really-works",
     "status": "pending",
@@ -136,7 +136,7 @@
   },
   {
     "id": "week-5-post-1",
-    "date": "2026-01-29",
+    "date": "2026-02-02",
     "title": "Breaking Free: How JSON Unlocks True Financial Data Ownership",
     "slug": "breaking-free-how-json-unlocks-true-financial-data-ownership",
     "status": "pending",
@@ -151,7 +151,7 @@
   },
   {
     "id": "week-5-post-2",
-    "date": "2026-02-01",
+    "date": "2026-02-05",
     "title": "The Power of Compounding: Visualizing Long-Term Growth",
     "slug": "the-power-of-compounding-visualizing-long-term-growth",
     "status": "pending",
@@ -166,7 +166,7 @@
   },
   {
     "id": "week-6-post-1",
-    "date": "2026-02-05",
+    "date": "2026-02-09",
     "title": "Type Safety for Financial Data: TypeScript Meets JSON",
     "slug": "type-safety-for-financial-data-typescript-meets-json",
     "status": "pending",
@@ -181,7 +181,7 @@
   },
   {
     "id": "week-6-post-2",
-    "date": "2026-02-08",
+    "date": "2026-02-12",
     "title": "The Security Model of Local-First Finance",
     "slug": "the-security-model-of-local-first-finance",
     "status": "pending",
@@ -196,7 +196,7 @@
   },
   {
     "id": "week-7-post-1",
-    "date": "2026-02-12",
+    "date": "2026-02-16",
     "title": "Dividend Investing: The Strategy That Time Forgot",
     "slug": "dividend-investing-the-strategy-that-time-forgot",
     "status": "pending",
@@ -211,7 +211,7 @@
   },
   {
     "id": "week-7-post-2",
-    "date": "2026-02-15",
+    "date": "2026-02-19",
     "title": "The Open Source Advantage: Why Transparency Beats Trust",
     "slug": "the-open-source-advantage-why-transparency-beats-trust",
     "status": "pending",
@@ -226,7 +226,7 @@
   },
   {
     "id": "week-8-post-1",
-    "date": "2026-02-19",
+    "date": "2026-02-23",
     "title": "Sovereign Sync: Frequently Asked Questions",
     "slug": "sovereign-sync-frequently-asked-questions",
     "status": "pending",
@@ -241,7 +241,7 @@
   },
   {
     "id": "week-8-post-2",
-    "date": "2026-02-22",
+    "date": "2026-02-26",
     "title": "Building a Financial Data Pipeline: From CSV to JSON",
     "slug": "building-a-financial-data-pipeline-from-csv-to-json",
     "status": "pending",
@@ -256,7 +256,7 @@
   },
   {
     "id": "week-9-post-1",
-    "date": "2026-02-26",
+    "date": "2026-03-02",
     "title": "Privacy is Profit: The Business Case for Local-First Finance",
     "slug": "privacy-is-profit-the-business-case-for-local-first-finance",
     "status": "pending",
@@ -271,7 +271,7 @@
   },
   {
     "id": "week-9-post-2",
-    "date": "2026-03-01",
+    "date": "2026-03-05",
     "title": "The Small-Cap Advantage: Myth or Reality?",
     "slug": "the-small-cap-advantage-myth-or-reality",
     "status": "pending",
@@ -286,7 +286,7 @@
   },
   {
     "id": "week-10-post-1",
-    "date": "2026-03-05",
+    "date": "2026-03-09",
     "title": "Schema Evolution: Managing Changes in Financial Data Structures",
     "slug": "schema-evolution-managing-changes-in-financial-data-structur",
     "status": "pending",
@@ -301,7 +301,7 @@
   },
   {
     "id": "week-10-post-2",
-    "date": "2026-03-08",
+    "date": "2026-03-12",
     "title": "The Community Behind Sovereign Sync",
     "slug": "the-community-behind-sovereign-sync",
     "status": "pending",
@@ -316,7 +316,7 @@
   },
   {
     "id": "week-11-post-1",
-    "date": "2026-03-12",
+    "date": "2026-03-16",
     "title": "The Impact of Inflation on Portfolio Returns",
     "slug": "the-impact-of-inflation-on-portfolio-returns",
     "status": "pending",
@@ -331,7 +331,7 @@
   },
   {
     "id": "week-11-post-2",
-    "date": "2026-03-15",
+    "date": "2026-03-19",
     "title": "The Local-First Movement: Finance's Next Evolution",
     "slug": "the-local-first-movement-finance-s-next-evolution",
     "status": "pending",
@@ -346,7 +346,7 @@
   },
   {
     "id": "week-12-post-1",
-    "date": "2026-03-19",
+    "date": "2026-03-23",
     "title": "Sovereign Sync: Security and Privacy Deep Dive",
     "slug": "sovereign-sync-security-and-privacy-deep-dive",
     "status": "pending",
@@ -361,7 +361,7 @@
   },
   {
     "id": "week-12-post-2",
-    "date": "2026-03-22",
+    "date": "2026-03-26",
     "title": "Building Resilient Sync: Handling Network Failures",
     "slug": "building-resilient-sync-handling-network-failures",
     "status": "pending",
@@ -376,7 +376,7 @@
   },
   {
     "id": "week-13-post-1",
-    "date": "2026-03-26",
+    "date": "2026-03-29",
     "title": "The Developer's Portfolio: Code Your Way to Freedom",
     "slug": "the-developer-s-portfolio-code-your-way-to-freedom",
     "status": "pending",
@@ -391,7 +391,7 @@
   },
   {
     "id": "week-13-post-2",
-    "date": "2026-03-29",
+    "date": "2026-04-01",
     "title": "The Low-Volatility Anomaly: Why Safe Stocks Outperform",
     "slug": "the-low-volatility-anomaly-why-safe-stocks-outperform",
     "status": "pending",
@@ -406,7 +406,7 @@
   },
   {
     "id": "week-14-post-1",
-    "date": "2026-04-01",
+    "date": "2026-04-05",
     "title": "Parsing 1 Million Trades in JSON: Performance Benchmarks for Local-First Finance",
     "slug": "parsing-1-million-trades-in-json-performance-benchmarks-for-",
     "status": "pending",
@@ -421,7 +421,7 @@
   },
   {
     "id": "week-14-post-2",
-    "date": "2026-04-04",
+    "date": "2026-04-08",
     "title": "Introducing JSON Portfolio Management: A New Era",
     "slug": "introducing-json-portfolio-management-a-new-era",
     "status": "pending",
@@ -436,7 +436,7 @@
   },
   {
     "id": "week-15-post-1",
-    "date": "2026-04-08",
+    "date": "2026-04-12",
     "title": "Market Timing is Dead: What 10 Years of Data Shows",
     "slug": "market-timing-is-dead-what-10-years-of-data-shows",
     "status": "pending",
@@ -451,7 +451,7 @@
   },
   {
     "id": "week-15-post-2",
-    "date": "2026-04-11",
+    "date": "2026-04-15",
     "title": "Data Sovereignty: The New Frontier of Financial Independence",
     "slug": "data-sovereignty-the-new-frontier-of-financial-independence",
     "status": "pending",
@@ -466,7 +466,7 @@
   },
   {
     "id": "week-16-post-1",
-    "date": "2026-04-15",
+    "date": "2026-04-19",
     "title": "Sovereign Sync vs. Cloud Portfolios: A Feature Comparison",
     "slug": "sovereign-sync-vs-cloud-portfolios-a-feature-comparison",
     "status": "pending",
@@ -481,7 +481,7 @@
   },
   {
     "id": "week-16-post-2",
-    "date": "2026-04-18",
+    "date": "2026-04-22",
     "title": "JSON Schema Validation: Ensuring Data Integrity",
     "slug": "json-schema-validation-ensuring-data-integrity",
     "status": "pending",
@@ -496,7 +496,7 @@
   },
   {
     "id": "week-17-post-1",
-    "date": "2026-04-22",
+    "date": "2026-04-26",
     "title": "From SaaS to Sovereignty: The Evolution of Personal Finance Tools",
     "slug": "from-saas-to-sovereignty-the-evolution-of-personal-finance-t",
     "status": "pending",
@@ -511,7 +511,7 @@
   },
   {
     "id": "week-17-post-2",
-    "date": "2026-04-25",
+    "date": "2026-04-29",
     "title": "The Hidden Costs of Active Trading: A Data Analysis",
     "slug": "the-hidden-costs-of-active-trading-a-data-analysis",
     "status": "pending",
@@ -526,7 +526,7 @@
   },
   {
     "id": "week-18-post-1",
-    "date": "2026-04-29",
+    "date": "2026-05-03",
     "title": "Performance Optimization: Making JSON Finance Fast",
     "slug": "performance-optimization-making-json-finance-fast",
     "status": "pending",
@@ -541,7 +541,7 @@
   },
   {
     "id": "week-18-post-2",
-    "date": "2026-05-02",
+    "date": "2026-05-06",
     "title": "The Evolution of Pocket Portfolio: From Cloud to Sovereign",
     "slug": "the-evolution-of-pocket-portfolio-from-cloud-to-sovereign",
     "status": "pending",
@@ -556,7 +556,7 @@
   },
   {
     "id": "week-19-post-1",
-    "date": "2026-05-06",
+    "date": "2026-05-10",
     "title": "Sector Rotation Strategies: What the Data Reveals",
     "slug": "sector-rotation-strategies-what-the-data-reveals",
     "status": "pending",
@@ -571,7 +571,7 @@
   },
   {
     "id": "week-19-post-2",
-    "date": "2026-05-09",
+    "date": "2026-05-13",
     "title": "The Decentralized Portfolio: Beyond the Cloud",
     "slug": "the-decentralized-portfolio-beyond-the-cloud",
     "status": "pending",
@@ -586,7 +586,7 @@
   },
   {
     "id": "week-20-post-1",
-    "date": "2026-05-13",
+    "date": "2026-05-17",
     "title": "How to Migrate from Cloud to Sovereign: A Guide",
     "slug": "how-to-migrate-from-cloud-to-sovereign-a-guide",
     "status": "pending",
@@ -601,7 +601,7 @@
   },
   {
     "id": "week-20-post-2",
-    "date": "2026-05-16",
+    "date": "2026-05-20",
     "title": "Data Migration Patterns: Moving from Cloud to Local",
     "slug": "data-migration-patterns-moving-from-cloud-to-local",
     "status": "pending",
@@ -616,7 +616,7 @@
   },
   {
     "id": "week-21-post-1",
-    "date": "2026-05-20",
+    "date": "2026-05-24",
     "title": "From Prisoner to Sovereign: Escaping Financial Data Jails",
     "slug": "from-prisoner-to-sovereign-escaping-financial-data-jails",
     "status": "pending",
@@ -631,7 +631,7 @@
   },
   {
     "id": "week-21-post-2",
-    "date": "2026-05-23",
+    "date": "2026-05-27",
     "title": "The Efficient Market Hypothesis: Still Relevant?",
     "slug": "the-efficient-market-hypothesis-still-relevant",
     "status": "pending",
@@ -646,7 +646,7 @@
   },
   {
     "id": "week-22-post-1",
-    "date": "2026-05-27",
+    "date": "2026-05-31",
     "title": "The Power of Raw Data: Why JSON Beats Databases",
     "slug": "the-power-of-raw-data-why-json-beats-databases",
     "status": "pending",
@@ -661,7 +661,7 @@
   },
   {
     "id": "week-22-post-2",
-    "date": "2026-05-30",
+    "date": "2026-06-03",
     "title": "The Developer Tools: JSON Schema and Seed Files",
     "slug": "the-developer-tools-json-schema-and-seed-files",
     "status": "pending",
@@ -676,7 +676,7 @@
   },
   {
     "id": "week-23-post-1",
-    "date": "2026-06-03",
+    "date": "2026-06-07",
     "title": "International Diversification: The Numbers Behind the Strategy",
     "slug": "international-diversification-the-numbers-behind-the-strateg",
     "status": "pending",
@@ -691,7 +691,7 @@
   },
   {
     "id": "week-23-post-2",
-    "date": "2026-06-06",
+    "date": "2026-06-10",
     "title": "The Sovereign Investor: Taking Control of Your Financial Future",
     "slug": "the-sovereign-investor-taking-control-of-your-financial-futu",
     "status": "pending",
@@ -706,7 +706,7 @@
   },
   {
     "id": "week-24-post-1",
-    "date": "2026-06-10",
+    "date": "2026-06-14",
     "title": "What Makes Pocket Portfolio Different: The Sovereign Advantage",
     "slug": "what-makes-pocket-portfolio-different-the-sovereign-advantag",
     "status": "pending",
@@ -721,7 +721,7 @@
   },
   {
     "id": "week-24-post-2",
-    "date": "2026-06-13",
+    "date": "2026-06-17",
     "title": "JSON Compression: Reducing File Sizes Without Losing Data",
     "slug": "json-compression-reducing-file-sizes-without-losing-data",
     "status": "pending",
@@ -736,7 +736,7 @@
   },
   {
     "id": "week-25-post-1",
-    "date": "2026-06-17",
+    "date": "2026-06-21",
     "title": "JSON vs. Proprietary: The Format War for Your Data",
     "slug": "json-vs-proprietary-the-format-war-for-your-data",
     "status": "pending",
@@ -751,7 +751,7 @@
   },
   {
     "id": "week-25-post-2",
-    "date": "2026-06-20",
+    "date": "2026-06-24",
     "title": "The Weekend Effect: Trading Patterns Revealed",
     "slug": "the-weekend-effect-trading-patterns-revealed",
     "status": "pending",
@@ -766,7 +766,7 @@
   },
   {
     "id": "week-26-post-1",
-    "date": "2026-06-24",
+    "date": "2026-06-28",
     "title": "The Developer Experience of JSON Finance",
     "slug": "the-developer-experience-of-json-finance",
     "status": "pending",
@@ -781,7 +781,7 @@
   },
   {
     "id": "week-26-post-2",
-    "date": "2026-06-27",
+    "date": "2026-07-01",
     "title": "The Future of Financial Data: Predictions and Trends",
     "slug": "the-future-of-financial-data-predictions-and-trends",
     "status": "pending",
@@ -796,7 +796,7 @@
   },
   {
     "id": "week-27-post-1",
-    "date": "2026-07-01",
+    "date": "2026-07-05",
     "title": "The Psychology of Panic Selling: What Data Reveals",
     "slug": "the-psychology-of-panic-selling-what-data-reveals",
     "status": "pending",
@@ -811,7 +811,7 @@
   },
   {
     "id": "week-27-post-2",
-    "date": "2026-07-04",
+    "date": "2026-07-08",
     "title": "The Case for Local-First Finance: Your Data, Your Rules",
     "slug": "the-case-for-local-first-finance-your-data-your-rules",
     "status": "pending",
@@ -826,7 +826,7 @@
   },
   {
     "id": "week-28-post-1",
-    "date": "2026-07-08",
+    "date": "2026-07-12",
     "title": "Why We Built Sovereign Sync: The Story Behind the Feature",
     "slug": "why-we-built-sovereign-sync-the-story-behind-the-feature",
     "status": "pending",
@@ -841,7 +841,7 @@
   },
   {
     "id": "week-28-post-2",
-    "date": "2026-07-11",
+    "date": "2026-07-15",
     "title": "Version Control for Portfolios: Git as a Financial Tool",
     "slug": "version-control-for-portfolios-git-as-a-financial-tool",
     "status": "pending",
@@ -856,7 +856,7 @@
   },
   {
     "id": "week-29-post-1",
-    "date": "2026-07-15",
+    "date": "2026-07-19",
     "title": "The Psychology of Vendor Lock-in: Why We Accept Digital Serfdom",
     "slug": "the-psychology-of-vendor-lock-in-why-we-accept-digital-serfd",
     "status": "pending",
@@ -871,7 +871,7 @@
   },
   {
     "id": "week-29-post-2",
-    "date": "2026-07-18",
+    "date": "2026-07-22",
     "title": "The Rebalancing Myth: When to Actually Adjust Your Portfolio",
     "slug": "the-rebalancing-myth-when-to-actually-adjust-your-portfolio",
     "status": "pending",
@@ -886,7 +886,7 @@
   },
   {
     "id": "week-30-post-1",
-    "date": "2026-07-22",
+    "date": "2026-07-26",
     "title": "Handling Large Datasets: Streaming JSON Parsing Strategies",
     "slug": "handling-large-datasets-streaming-json-parsing-strategies",
     "status": "pending",
@@ -901,7 +901,7 @@
   },
   {
     "id": "week-30-post-2",
-    "date": "2026-07-25",
+    "date": "2026-07-29",
     "title": "Building the Developer-First Portfolio Tool",
     "slug": "building-the-developer-first-portfolio-tool",
     "status": "pending",
@@ -916,7 +916,7 @@
   },
   {
     "id": "week-31-post-1",
-    "date": "2026-07-29",
+    "date": "2026-08-02",
     "title": "Market Volatility: Friend or Foe? The Numbers Tell the Story",
     "slug": "market-volatility-friend-or-foe-the-numbers-tell-the-story",
     "status": "pending",
@@ -931,7 +931,7 @@
   },
   {
     "id": "week-31-post-2",
-    "date": "2026-08-01",
+    "date": "2026-08-05",
     "title": "The Cloud is Someone Else's Computer: Why Finance Should Stay Local",
     "slug": "the-cloud-is-someone-else-s-computer-why-finance-should-stay",
     "status": "pending",
@@ -946,7 +946,7 @@
   },
   {
     "id": "week-32-post-1",
-    "date": "2026-08-05",
+    "date": "2026-08-09",
     "title": "Sovereign Sync: Early Adopter Stories",
     "slug": "sovereign-sync-early-adopter-stories",
     "status": "pending",
@@ -961,7 +961,7 @@
   },
   {
     "id": "week-32-post-2",
-    "date": "2026-08-08",
+    "date": "2026-08-12",
     "title": "Caching Strategies for Local-First Applications",
     "slug": "caching-strategies-for-local-first-applications",
     "status": "pending",
@@ -976,7 +976,7 @@
   },
   {
     "id": "week-33-post-1",
-    "date": "2026-08-12",
+    "date": "2026-08-16",
     "title": "Your Financial Data is Not a Product: The Ethics of Data Ownership",
     "slug": "your-financial-data-is-not-a-product-the-ethics-of-data-owne",
     "status": "pending",
@@ -991,7 +991,7 @@
   },
   {
     "id": "week-33-post-2",
-    "date": "2026-08-15",
+    "date": "2026-08-19",
     "title": "The Psychology of FOMO: Data on Emotional Trading",
     "slug": "the-psychology-of-fomo-data-on-emotional-trading",
     "status": "pending",
@@ -1006,7 +1006,7 @@
   },
   {
     "id": "week-34-post-1",
-    "date": "2026-08-19",
+    "date": "2026-08-23",
     "title": "Conflict Resolution in Bidirectional Sync",
     "slug": "conflict-resolution-in-bidirectional-sync",
     "status": "pending",
@@ -1021,7 +1021,7 @@
   },
   {
     "id": "week-34-post-2",
-    "date": "2026-08-22",
+    "date": "2026-08-26",
     "title": "The Philosophy Behind Pocket Portfolio's Design",
     "slug": "the-philosophy-behind-pocket-portfolio-s-design",
     "status": "pending",
@@ -1036,7 +1036,7 @@
   },
   {
     "id": "week-35-post-1",
-    "date": "2026-08-26",
+    "date": "2026-08-30",
     "title": "Value vs. Growth: What 20 Years of Data Shows",
     "slug": "value-vs-growth-what-20-years-of-data-shows",
     "status": "pending",
@@ -1051,7 +1051,7 @@
   },
   {
     "id": "week-35-post-2",
-    "date": "2026-08-29",
+    "date": "2026-09-02",
     "title": "The Cloud Portfolio Scam: What They Don't Tell You",
     "slug": "the-cloud-portfolio-scam-what-they-don-t-tell-you",
     "status": "pending",
@@ -1066,7 +1066,7 @@
   },
   {
     "id": "week-36-post-1",
-    "date": "2026-09-02",
+    "date": "2026-09-06",
     "title": "Sovereign Sync: Performance and Reliability",
     "slug": "sovereign-sync-performance-and-reliability",
     "status": "pending",
@@ -1081,7 +1081,7 @@
   },
   {
     "id": "week-36-post-2",
-    "date": "2026-09-05",
+    "date": "2026-09-09",
     "title": "The Technical Debt of Cloud Portfolios",
     "slug": "the-technical-debt-of-cloud-portfolios",
     "status": "pending",
@@ -1096,7 +1096,7 @@
   },
   {
     "id": "week-37-post-1",
-    "date": "2026-09-09",
+    "date": "2026-09-13",
     "title": "Beyond the API: Why Direct File Access Matters",
     "slug": "beyond-the-api-why-direct-file-access-matters",
     "status": "pending",
@@ -1111,7 +1111,7 @@
   },
   {
     "id": "week-37-post-2",
-    "date": "2026-09-12",
+    "date": "2026-09-16",
     "title": "Market Sentiment Indicators: What Actually Works",
     "slug": "market-sentiment-indicators-what-actually-works",
     "status": "pending",
@@ -1126,7 +1126,7 @@
   },
   {
     "id": "week-38-post-1",
-    "date": "2026-09-16",
+    "date": "2026-09-20",
     "title": "The Performance Cost of Cloud APIs",
     "slug": "the-performance-cost-of-cloud-apis",
     "status": "pending",
@@ -1141,7 +1141,7 @@
   },
   {
     "id": "week-38-post-2",
-    "date": "2026-09-19",
+    "date": "2026-09-23",
     "title": "The API-First Approach: Programmatic Portfolio Management",
     "slug": "the-api-first-approach-programmatic-portfolio-management",
     "status": "pending",
@@ -1156,7 +1156,7 @@
   },
   {
     "id": "week-39-post-1",
-    "date": "2026-09-23",
+    "date": "2026-09-27",
     "title": "The Momentum Factor: Persistence or Persistence Bias?",
     "slug": "the-momentum-factor-persistence-or-persistence-bias",
     "status": "pending",
@@ -1171,7 +1171,7 @@
   },
   {
     "id": "week-39-post-2",
-    "date": "2026-09-26",
+    "date": "2026-09-30",
     "title": "The Open Standard Advantage: Why JSON Wins",
     "slug": "the-open-standard-advantage-why-json-wins",
     "status": "pending",
@@ -1186,7 +1186,7 @@
   },
   {
     "id": "week-40-post-1",
-    "date": "2026-09-30",
+    "date": "2026-10-04",
     "title": "Sovereign Sync: The End of Vendor Lock-in",
     "slug": "sovereign-sync-the-end-of-vendor-lock-in",
     "status": "pending",
@@ -1201,7 +1201,7 @@
   },
   {
     "id": "week-40-post-2",
-    "date": "2026-10-03",
+    "date": "2026-10-07",
     "title": "Schema Design for Financial Data: Building Robust JSON Structures",
     "slug": "schema-design-for-financial-data-building-robust-json-struct",
     "status": "pending",
@@ -1216,7 +1216,7 @@
   },
   {
     "id": "week-41-post-1",
-    "date": "2026-10-07",
+    "date": "2026-10-11",
     "title": "Why Cloud Portfolios are Traps: The Hidden Cost of Convenience",
     "slug": "why-cloud-portfolios-are-traps-the-hidden-cost-of-convenienc",
     "status": "pending",
@@ -1231,7 +1231,7 @@
   },
   {
     "id": "week-41-post-2",
-    "date": "2026-10-10",
+    "date": "2026-10-14",
     "title": "The Behavioral Economics of Portfolio Management",
     "slug": "the-behavioral-economics-of-portfolio-management",
     "status": "pending",
@@ -1246,7 +1246,7 @@
   },
   {
     "id": "week-42-post-1",
-    "date": "2026-10-14",
+    "date": "2026-10-18",
     "title": "Building a Bidirectional Sync Engine: Technical Deep Dive",
     "slug": "building-a-bidirectional-sync-engine-technical-deep-dive",
     "status": "pending",
@@ -1261,7 +1261,7 @@
   },
   {
     "id": "week-42-post-2",
-    "date": "2026-10-17",
+    "date": "2026-10-21",
     "title": "How Sovereign Sync Works: A Technical Overview",
     "slug": "how-sovereign-sync-works-a-technical-overview",
     "status": "pending",
@@ -1276,7 +1276,7 @@
   },
   {
     "id": "week-43-post-1",
-    "date": "2026-10-21",
+    "date": "2026-10-26",
     "title": "Tax-Loss Harvesting: The Strategy That Actually Works",
     "slug": "tax-loss-harvesting-the-strategy-that-actually-works",
     "status": "pending",
@@ -1291,7 +1291,7 @@
   },
   {
     "id": "week-43-post-2",
-    "date": "2026-10-24",
+    "date": "2026-10-29",
     "title": "The Local-First Manifesto: Why Your Portfolio Belongs on Your Drive",
     "slug": "the-local-first-manifesto-why-your-portfolio-belongs-on-your",
     "status": "pending",
@@ -1306,7 +1306,7 @@
   },
   {
     "id": "week-44-post-1",
-    "date": "2026-10-29",
+    "date": "2026-11-02",
     "title": "Why JSON? The Design Decision That Changed Everything",
     "slug": "why-json-the-design-decision-that-changed-everything",
     "status": "pending",
@@ -1321,7 +1321,7 @@
   },
   {
     "id": "week-44-post-2",
-    "date": "2026-11-01",
+    "date": "2026-11-05",
     "title": "Error Handling in Financial Data: Building Resilient Parsers",
     "slug": "error-handling-in-financial-data-building-resilient-parsers",
     "status": "pending",
@@ -1336,7 +1336,7 @@
   },
   {
     "id": "week-45-post-1",
-    "date": "2026-11-05",
+    "date": "2026-11-09",
     "title": "Vendor Lock-in is Theft: The Economic Case for Data Sovereignty",
     "slug": "vendor-lock-in-is-theft-the-economic-case-for-data-sovereign",
     "status": "pending",
@@ -1351,7 +1351,7 @@
   },
   {
     "id": "week-45-post-2",
-    "date": "2026-11-08",
+    "date": "2026-11-12",
     "title": "The Impact of Fees on Long-Term Returns",
     "slug": "the-impact-of-fees-on-long-term-returns",
     "status": "pending",
@@ -1366,7 +1366,7 @@
   },
   {
     "id": "week-46-post-1",
-    "date": "2026-11-12",
+    "date": "2026-11-16",
     "title": "The JSON API: Building Programmatic Access to Your Portfolio",
     "slug": "the-json-api-building-programmatic-access-to-your-portfolio",
     "status": "pending",
@@ -1381,7 +1381,7 @@
   },
   {
     "id": "week-46-post-2",
-    "date": "2026-11-15",
+    "date": "2026-11-19",
     "title": "The Benefits of Bidirectional Sync: Real User Stories",
     "slug": "the-benefits-of-bidirectional-sync-real-user-stories",
     "status": "pending",
@@ -1396,7 +1396,7 @@
   },
   {
     "id": "week-47-post-1",
-    "date": "2026-11-19",
+    "date": "2026-11-23",
     "title": "Market Crashes: Patterns and Predictions from History",
     "slug": "market-crashes-patterns-and-predictions-from-history",
     "status": "pending",
@@ -1411,7 +1411,7 @@
   },
   {
     "id": "week-47-post-2",
-    "date": "2026-11-22",
+    "date": "2026-11-26",
     "title": "The JSON Revolution: How Raw Data Changes Everything",
     "slug": "the-json-revolution-how-raw-data-changes-everything",
     "status": "pending",
@@ -1426,7 +1426,7 @@
   },
   {
     "id": "week-48-post-1",
-    "date": "2026-11-26",
+    "date": "2026-11-30",
     "title": "Why We Chose Google Drive: The Technical Rationale",
     "slug": "why-we-chose-google-drive-the-technical-rationale",
     "status": "pending",
@@ -1441,7 +1441,7 @@
   },
   {
     "id": "week-48-post-2",
-    "date": "2026-11-29",
+    "date": "2026-12-03",
     "title": "Streaming Large Financial Datasets: Techniques and Trade-offs",
     "slug": "streaming-large-financial-datasets-techniques-and-trade-offs",
     "status": "pending",
@@ -1456,7 +1456,7 @@
   },
   {
     "id": "week-49-post-1",
-    "date": "2026-12-03",
+    "date": "2026-12-07",
     "title": "Data Portability: The Right They Don't Want You to Have",
     "slug": "data-portability-the-right-they-don-t-want-you-to-have",
     "status": "pending",
@@ -1471,7 +1471,7 @@
   },
   {
     "id": "week-49-post-2",
-    "date": "2026-12-06",
+    "date": "2026-12-10",
     "title": "The Bond-Equity Correlation: What Changes in Crisis",
     "slug": "the-bond-equity-correlation-what-changes-in-crisis",
     "status": "pending",
@@ -1486,7 +1486,7 @@
   },
   {
     "id": "week-50-post-1",
-    "date": "2026-12-10",
+    "date": "2026-12-14",
     "title": "Building a Local-First Financial App: Architecture Patterns",
     "slug": "building-a-local-first-financial-app-architecture-patterns",
     "status": "pending",
@@ -1501,7 +1501,7 @@
   },
   {
     "id": "week-50-post-2",
-    "date": "2026-12-13",
+    "date": "2026-12-17",
     "title": "The Road to 1.0: What We've Learned",
     "slug": "the-road-to-1-0-what-we-ve-learned",
     "status": "pending",
@@ -1516,7 +1516,7 @@
   },
   {
     "id": "week-51-post-1",
-    "date": "2026-12-17",
+    "date": "2026-12-21",
     "title": "The January Effect: Fact or Fiction?",
     "slug": "the-january-effect-fact-or-fiction",
     "status": "pending",
@@ -1531,7 +1531,7 @@
   },
   {
     "id": "week-51-post-2",
-    "date": "2026-12-20",
+    "date": "2026-12-24",
     "title": "The Cost of Convenience: Hidden Fees in Cloud Portfolios",
     "slug": "the-cost-of-convenience-hidden-fees-in-cloud-portfolios",
     "status": "pending",
@@ -1546,7 +1546,7 @@
   },
   {
     "id": "week-52-post-1",
-    "date": "2026-12-24",
+    "date": "2026-12-28",
     "title": "Why Open Source Matters: The Pocket Portfolio Story",
     "slug": "why-open-source-matters-the-pocket-portfolio-story",
     "status": "pending",
@@ -1561,7 +1561,7 @@
   },
   {
     "id": "week-52-post-2",
-    "date": "2026-12-27",
+    "date": "2026-12-31",
     "title": "From REST to Files: A New Paradigm for Financial APIs",
     "slug": "from-rest-to-files-a-new-paradigm-for-financial-apis",
     "status": "pending",
