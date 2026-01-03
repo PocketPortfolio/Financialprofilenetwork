@@ -3,6 +3,10 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
+// Disable caching to ensure fresh posts are always returned
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const postsDir = path.join(process.cwd(), 'content', 'posts');
@@ -32,7 +36,13 @@ export async function GET() {
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    return NextResponse.json(posts);
+    return NextResponse.json(posts, {
+      headers: {
+        'Cache-Control': 'no-store, must-revalidate',
+        'CDN-Cache-Control': 'no-store',
+        'Vercel-CDN-Cache-Control': 'no-store',
+      },
+    });
   } catch (error) {
     console.error('Error reading blog posts:', error);
     return NextResponse.json([], { status: 500 });
