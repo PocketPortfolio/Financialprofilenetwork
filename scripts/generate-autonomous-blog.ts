@@ -243,12 +243,31 @@ async function main() {
     const calendar: BlogPost[] = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
     
     const today = new Date().toISOString().split('T')[0];
+    
+    // Debug logging
+    console.log(`📅 Today's date: ${today}`);
+    console.log(`📋 Total posts in calendar: ${calendar.length}`);
+    console.log(`📋 Posts with status "pending": ${calendar.filter(p => p.status === 'pending').length}`);
+    console.log(`📋 Posts with date <= today: ${calendar.filter(p => p.date <= today).length}`);
+    
+    // Log NYE post specifically if it exists
+    const nyePost = calendar.find(p => p.id === 'nye-2025-review');
+    if (nyePost) {
+      console.log(`\n🔍 NYE Post Debug:`);
+      console.log(`   - Date: ${nyePost.date}`);
+      console.log(`   - Status: ${nyePost.status}`);
+      console.log(`   - Date <= today: ${nyePost.date <= today}`);
+      console.log(`   - Status === 'pending': ${nyePost.status === 'pending'}`);
+      console.log(`   - Should be included: ${nyePost.date <= today && nyePost.status === 'pending'}`);
+    }
+    
     const duePosts = calendar.filter(
       post => post.date <= today && post.status === 'pending'
     );
 
     if (duePosts.length === 0) {
-      console.log('✅ No posts due for generation');
+      console.log('\n✅ No posts due for generation');
+      console.log('💡 Debug: Check if any posts have date <= today and status === "pending"');
       process.exit(0);
     }
 
