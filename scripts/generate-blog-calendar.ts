@@ -156,7 +156,7 @@ function getKeywords(pillar: string, title: string): string[] {
 
 function generateCalendar(): BlogPost[] {
   const calendar: BlogPost[] = [];
-  const startDate = new Date('2026-01-01');
+  const startDate = new Date('2026-01-05'); // Start from Monday, Jan 5, 2026
   let postIndex = 0;
 
   // Generate 52 weeks (104 posts)
@@ -209,11 +209,26 @@ function generateCalendar(): BlogPost[] {
 import fs from 'fs';
 import path from 'path';
 
+const calendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+
+// Preserve NYE post if it exists
+let nyePost: BlogPost | null = null;
+if (fs.existsSync(calendarPath)) {
+  const existingCalendar = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
+  nyePost = existingCalendar.find((post: BlogPost) => post.id === 'nye-2025-review') || null;
+}
+
 const calendar = generateCalendar();
 
-const calendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
-fs.writeFileSync(calendarPath, JSON.stringify(calendar, null, 2));
+// Prepend NYE post if it exists
+const finalCalendar = nyePost ? [nyePost, ...calendar] : calendar;
+
+fs.writeFileSync(calendarPath, JSON.stringify(finalCalendar, null, 2));
 
 console.log(`✅ Generated ${calendar.length} blog post entries`);
+if (nyePost) {
+  console.log(`📅 Preserved NYE post: ${nyePost.title}`);
+}
+console.log(`📅 First regular post: ${calendar[0].date} - ${calendar[0].title}`);
 console.log(`📅 Calendar saved to: ${calendarPath}`);
 
