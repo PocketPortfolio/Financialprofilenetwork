@@ -6,6 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true; // Explicitly allow dynamic params
 
 // EODHD API Configuration
 const EODHD_API_KEY = process.env.EODHD_API_KEY || '';

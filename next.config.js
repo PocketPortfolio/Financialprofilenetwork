@@ -2,8 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Enable standalone output for Docker (Vercel handles this automatically)
+  // Only use standalone for Docker deployments, not for Vercel
+  // output: 'standalone', // Commented out - Vercel uses serverless functions
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    // Keep console.warn and console.error in production for debugging
+    // Only remove console.log (but keep DIVIDEND_DEBUG logs via console.warn)
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['warn', 'error'],
+    } : false,
   },
   typescript: {
     ignoreBuildErrors: false,
@@ -56,6 +63,17 @@ const nextConfig = {
         destination: '/dashboard',
         permanent: true,
       },
+      // Sector pages not yet implemented - redirect to dashboard
+      {
+        source: '/sector',
+        destination: '/dashboard',
+        permanent: false, // Temporary redirect until sector pages are implemented
+      },
+      {
+        source: '/sector/:path*',
+        destination: '/dashboard',
+        permanent: false, // Temporary redirect until sector pages are implemented
+      },
       // Static file path normalization
       {
         source: '/app/static/:path*',
@@ -105,12 +123,12 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://apis.google.com https://www.google-analytics.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://apis.google.com https://accounts.google.com https://www.google-analytics.com https://js.stripe.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https://www.googleapis.com https://*.googleapis.com https://securetoken.google.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://region1.google-analytics.com https://*.google-analytics.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://*.firebaseinstallations.googleapis.com",
-              "frame-src 'self' https://accounts.google.com https://pocket-portfolio-67fa6.firebaseapp.com",
+              "connect-src 'self' https://www.googleapis.com https://*.googleapis.com https://securetoken.google.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://region1.google-analytics.com https://*.google-analytics.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://*.firebaseinstallations.googleapis.com https://api.stripe.com https://checkout.stripe.com https://www.google.com",
+              "frame-src 'self' https://accounts.google.com https://content.googleapis.com https://pocket-portfolio-67fa6.firebaseapp.com https://checkout.stripe.com https://js.stripe.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",
