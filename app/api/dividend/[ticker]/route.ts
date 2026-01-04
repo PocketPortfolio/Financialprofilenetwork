@@ -791,20 +791,43 @@ export async function GET(
   console.warn(`[DIVIDEND_DEBUG] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Params: ${JSON.stringify(params)} | Timestamp: ${new Date().toISOString()}`);
 
   try {
+    // Defensive check - handle undefined params gracefully
+    if (!params || !params.ticker) {
+      console.warn(`[DIVIDEND_DEBUG] Params missing or invalid | Path: ${request.nextUrl.pathname} | Params: ${JSON.stringify(params)}`);
+      return NextResponse.json(
+        { 
+          error: 'Ticker parameter required', 
+          diagnostic: {
+            params: params || 'undefined',
+            pathname: request.nextUrl.pathname,
+            url: request.url
+          }
+        }, 
+        { 
+          status: 400,
+          headers: {
+            'X-Dividend-Route': 'called',
+            'X-Dividend-Error': 'missing-ticker',
+            'X-Dividend-Params': JSON.stringify(params || 'undefined')
+          }
+        }
+      );
+    }
+    
     // Match working /api/price/[ticker] route pattern exactly
     const ticker = params.ticker.toUpperCase();
     
     console.warn(`[DIVIDEND_DEBUG] Ticker extracted: ${ticker}`);
     
     if (!ticker) {
-      console.warn(`[DIVIDEND_DEBUG] Missing ticker param | Path: ${request.nextUrl.pathname}`);
+      console.warn(`[DIVIDEND_DEBUG] Empty ticker after extraction | Path: ${request.nextUrl.pathname}`);
       return NextResponse.json(
         { error: 'Ticker parameter required' }, 
         { 
           status: 400,
           headers: {
             'X-Dividend-Route': 'called',
-            'X-Dividend-Error': 'missing-ticker'
+            'X-Dividend-Error': 'empty-ticker'
           }
         }
       );
