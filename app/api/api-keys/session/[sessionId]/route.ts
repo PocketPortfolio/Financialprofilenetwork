@@ -41,10 +41,12 @@ const stripe = process.env.STRIPE_SECRET_KEY
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const sessionId = decodeURIComponent(params.sessionId);
+    // Next.js 15: params is always a Promise
+    const resolvedParams = await params;
+    const sessionId = decodeURIComponent(resolvedParams.sessionId);
 
     if (!stripe) {
       return NextResponse.json(

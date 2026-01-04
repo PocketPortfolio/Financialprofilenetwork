@@ -43,8 +43,10 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: { params: { competitor: string } }): Promise<Metadata> {
-  const competitor = COMPETITORS[params.competitor as keyof typeof COMPETITORS];
+export async function generateMetadata({ params }: { params: Promise<{ competitor: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const competitor = COMPETITORS[resolvedParams.competitor as keyof typeof COMPETITORS];
   
   if (!competitor) {
     return {
@@ -60,16 +62,18 @@ export async function generateMetadata({ params }: { params: { competitor: strin
       title: `${competitor.name} vs Pocket Portfolio: The Privacy-First Alternative`,
       description: `${competitor.name} costs ${competitor.cost}. We're free (local) or £100 (lifetime).`,
       type: 'website',
-      url: `https://www.pocketportfolio.app/compare/${params.competitor}`,
+      url: `https://www.pocketportfolio.app/compare/${resolvedParams.competitor}`,
     },
     alternates: {
-      canonical: `https://www.pocketportfolio.app/compare/${params.competitor}`,
+      canonical: `https://www.pocketportfolio.app/compare/${resolvedParams.competitor}`,
     },
   };
 }
 
-export default function ComparePage({ params }: { params: { competitor: string } }) {
-  const competitor = COMPETITORS[params.competitor as keyof typeof COMPETITORS];
+export default async function ComparePage({ params }: { params: Promise<{ competitor: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const competitor = COMPETITORS[resolvedParams.competitor as keyof typeof COMPETITORS];
 
   if (!competitor) {
     notFound();

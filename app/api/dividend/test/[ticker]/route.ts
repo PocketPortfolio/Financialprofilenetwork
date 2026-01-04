@@ -2,20 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-interface RouteParams {
-  params: Promise<{ ticker: string }> | { ticker: string };
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ ticker: string }> }
 ) {
-  // Handle both Next.js 14 (Promise) and Next.js 13 (direct) params
-  const resolvedParams = params && typeof (params as any).then === 'function' 
-    ? await (params as Promise<{ ticker: string }>)
-    : params as { ticker: string };
-  
-  const ticker = resolvedParams?.ticker?.toUpperCase() || 'UNKNOWN';
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const ticker = resolvedParams.ticker.toUpperCase();
   
   return NextResponse.json(
     { 

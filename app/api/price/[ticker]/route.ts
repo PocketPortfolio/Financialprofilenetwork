@@ -13,17 +13,13 @@ const FREE_TIER_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
 // Demo key (free community key)
 const DEMO_KEY = 'demo_key';
 
-interface RouteParams {
-  params: {
-    ticker: string;
-  };
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ ticker: string }> }
 ) {
-  const ticker = params.ticker.toUpperCase();
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const ticker = resolvedParams.ticker.toUpperCase();
   const apiKey = request.nextUrl.searchParams.get('key') || DEMO_KEY;
   
   // Get client IP for rate limiting

@@ -3,11 +3,9 @@ import { notFound } from 'next/navigation';
 import { decodePortfolio } from '@/app/lib/share';
 import ShareChart from './ShareChart';
 
-interface SharePageProps {
-  params: { blob: string };
-}
-
-export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ blob: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
   return {
     title: 'Portfolio Allocation | Pocket Portfolio',
     description: 'View anonymized portfolio allocation. Generated locally, no server saw this data.',
@@ -24,8 +22,10 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
   };
 }
 
-export default async function SharePage({ params }: SharePageProps) {
-  const data = decodePortfolio(params.blob);
+export default async function SharePage({ params }: { params: Promise<{ blob: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const data = decodePortfolio(resolvedParams.blob);
   
   if (!data || !data.positions || data.positions.length === 0) {
     notFound();

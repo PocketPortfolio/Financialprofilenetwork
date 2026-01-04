@@ -7,9 +7,6 @@ import { generateFAQStructuredData } from '@/app/lib/pseo/content';
 import StructuredData from '@/app/components/StructuredData';
 import TickerPageContent from '@/app/components/TickerPageContent';
 
-interface SymbolPageProps {
-  params: { symbol: string };
-}
 
 // Server-side quote fetching for SEO (runs during ISR revalidation)
 async function fetchQuoteData(symbol: string) {
@@ -62,8 +59,10 @@ export async function generateStaticParams() {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: SymbolPageProps): Promise<Metadata> {
-  const symbol = params.symbol.toUpperCase();
+export async function generateMetadata({ params }: { params: Promise<{ symbol: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const symbol = resolvedParams.symbol.toUpperCase();
   const metadata = await getTickerMetadata(symbol);
   
   if (!metadata) {
@@ -97,9 +96,11 @@ export async function generateMetadata({ params }: SymbolPageProps): Promise<Met
 }
 
 // Main component
-export default async function SymbolPage({ params }: SymbolPageProps) {
+export default async function SymbolPage({ params }: { params: Promise<{ symbol: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
   // Normalize symbol (remove dashes, handle crypto pairs)
-  const normalizedSymbol = params.symbol.toUpperCase().replace(/-/g, '');
+  const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
   const metadata = await getTickerMetadata(normalizedSymbol);
   
   // Fetch quote data server-side for SEO (only during ISR revalidation, not during build)

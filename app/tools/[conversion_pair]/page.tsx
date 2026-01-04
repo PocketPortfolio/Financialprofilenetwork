@@ -5,12 +5,11 @@ import { type TaxSoftware } from '@/app/lib/tax-formats/mappings';
 import TaxConverter from './TaxConverter';
 import PageWrapper from './PageWrapper';
 
-interface ConversionPageProps {
-  params: { conversion_pair: string };
-}
 
-export async function generateMetadata({ params }: ConversionPageProps): Promise<Metadata> {
-  const pair = getConversionPair(params.conversion_pair);
+export async function generateMetadata({ params }: { params: Promise<{ conversion_pair: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const pair = getConversionPair(resolvedParams.conversion_pair);
   
   if (!pair) {
     return {
@@ -30,7 +29,7 @@ export async function generateMetadata({ params }: ConversionPageProps): Promise
       title,
       description,
       type: 'website',
-      url: `https://www.pocketportfolio.app/tools/${params.conversion_pair}`,
+      url: `https://www.pocketportfolio.app/tools/${resolvedParams.conversion_pair}`,
     },
     twitter: {
       card: 'summary_large_image',
@@ -38,13 +37,15 @@ export async function generateMetadata({ params }: ConversionPageProps): Promise
       description,
     },
     alternates: {
-      canonical: `https://www.pocketportfolio.app/tools/${params.conversion_pair}`,
+      canonical: `https://www.pocketportfolio.app/tools/${resolvedParams.conversion_pair}`,
     },
   };
 }
 
-export default async function ConversionPage({ params }: ConversionPageProps) {
-  const pair = getConversionPair(params.conversion_pair);
+export default async function ConversionPage({ params }: { params: Promise<{ conversion_pair: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const pair = getConversionPair(resolvedParams.conversion_pair);
   
   if (!pair) {
     notFound();
@@ -63,7 +64,7 @@ export default async function ConversionPage({ params }: ConversionPageProps) {
       priceCurrency: 'GBP'
     },
     description: pair.description,
-    url: `https://www.pocketportfolio.app/tools/${params.conversion_pair}`,
+    url: `https://www.pocketportfolio.app/tools/${resolvedParams.conversion_pair}`,
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '4.9',
