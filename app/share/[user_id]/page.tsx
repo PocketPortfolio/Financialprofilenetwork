@@ -7,11 +7,9 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ShareButtons from './ShareButtons';
 
-interface SharePageProps {
-  params: { user_id: string };
-}
-
-export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ user_id: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
   // In production, fetch user portfolio data to generate dynamic metadata
   // For now, use generic metadata
   
@@ -22,10 +20,10 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
       title: `Portfolio Performance | Pocket Portfolio`,
       description: `View anonymized portfolio performance and 1-year chart.`,
       type: 'website',
-      url: `https://www.pocketportfolio.app/share/${params.user_id}`,
+      url: `https://www.pocketportfolio.app/share/${resolvedParams.user_id}`,
       images: [
         {
-          url: `/api/og/portfolio?user_id=${params.user_id}`,
+          url: `/api/og/portfolio?user_id=${resolvedParams.user_id}`,
           width: 1200,
           height: 630,
           alt: 'Portfolio Performance Chart',
@@ -36,16 +34,18 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
       card: 'summary_large_image',
       title: `Portfolio Performance | Pocket Portfolio`,
       description: `View anonymized portfolio performance and 1-year chart.`,
-      images: [`/api/og/portfolio?user_id=${params.user_id}`],
+      images: [`/api/og/portfolio?user_id=${resolvedParams.user_id}`],
     },
     alternates: {
-      canonical: `https://www.pocketportfolio.app/share/${params.user_id}`,
+      canonical: `https://www.pocketportfolio.app/share/${resolvedParams.user_id}`,
     },
   };
 }
 
-export default async function SharePage({ params }: SharePageProps) {
-  const userId = params.user_id;
+export default async function SharePage({ params }: { params: Promise<{ user_id: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const userId = resolvedParams.user_id;
   
   // In production, fetch user portfolio data from database
   // For now, show a placeholder

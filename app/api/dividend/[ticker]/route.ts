@@ -778,28 +778,24 @@ async function fetchFromYahooFinanceHTML(ticker: string): Promise<DividendData |
   }
 }
 
-interface RouteParams {
-  params: {
-    ticker: string;
-  };
-}
-
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ ticker: string }> }
 ) {
   // Route handler entry - log immediately for production visibility
-  console.warn(`[DIVIDEND_DEBUG] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Params: ${JSON.stringify(params)} | Timestamp: ${new Date().toISOString()}`);
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  console.warn(`[DIVIDEND_DEBUG] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
 
   try {
     // Defensive check - handle undefined params gracefully
-    if (!params || !params.ticker) {
-      console.warn(`[DIVIDEND_DEBUG] Params missing or invalid | Path: ${request.nextUrl.pathname} | Params: ${JSON.stringify(params)}`);
+    if (!resolvedParams || !resolvedParams.ticker) {
+      console.warn(`[DIVIDEND_DEBUG] Params missing or invalid | Path: ${request.nextUrl.pathname} | Params: ${JSON.stringify(resolvedParams)}`);
       return NextResponse.json(
         { 
           error: 'Ticker parameter required', 
           diagnostic: {
-            params: params || 'undefined',
+            params: resolvedParams || 'undefined',
             pathname: request.nextUrl.pathname,
             url: request.url
           }
@@ -809,14 +805,14 @@ export async function GET(
           headers: {
             'X-Dividend-Route': 'called',
             'X-Dividend-Error': 'missing-ticker',
-            'X-Dividend-Params': JSON.stringify(params || 'undefined')
+            'X-Dividend-Params': JSON.stringify(resolvedParams || 'undefined')
           }
         }
       );
     }
     
     // Match working /api/price/[ticker] route pattern exactly
-    const ticker = params.ticker.toUpperCase();
+    const ticker = resolvedParams.ticker.toUpperCase();
     
     console.warn(`[DIVIDEND_DEBUG] Ticker extracted: ${ticker}`);
     

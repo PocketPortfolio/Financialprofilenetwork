@@ -103,8 +103,10 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const postPath = path.join(process.cwd(), 'content', 'posts', `${params.slug}.mdx`);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const postPath = path.join(process.cwd(), 'content', 'posts', `${resolvedParams.slug}.mdx`);
   
   if (!fs.existsSync(postPath)) {
     return { title: 'Post Not Found' };
@@ -127,7 +129,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         authors: [data.author || 'Pocket Portfolio Team'],
       },
       alternates: {
-        canonical: `https://www.pocketportfolio.app/blog/${params.slug}`,
+        canonical: `https://www.pocketportfolio.app/blog/${resolvedParams.slug}`,
       },
     };
   } catch (error) {
@@ -135,8 +137,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const postPath = path.join(process.cwd(), 'content', 'posts', `${params.slug}.mdx`);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const postPath = path.join(process.cwd(), 'content', 'posts', `${resolvedParams.slug}.mdx`);
   
   if (!fs.existsSync(postPath)) {
     notFound();
@@ -167,7 +171,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://www.pocketportfolio.app/blog/${params.slug}`,
+      '@id': `https://www.pocketportfolio.app/blog/${resolvedParams.slug}`,
     },
   };
 
@@ -177,7 +181,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         title={data.title}
         description={data.description}
         keywords={data.tags || []}
-        canonical={`https://www.pocketportfolio.app/blog/${params.slug}`}
+        canonical={`https://www.pocketportfolio.app/blog/${resolvedParams.slug}`}
         ogType="article"
         ogImage={data.image ? `https://www.pocketportfolio.app${data.image}` : undefined}
       />

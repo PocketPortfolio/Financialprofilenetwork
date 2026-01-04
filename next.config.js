@@ -27,9 +27,9 @@ const nextConfig = {
   // Comprehensive redirects for canonicalization and legacy routes
   async redirects() {
     return [
-      // HTTP to HTTPS redirects (force HTTPS)
+      // HTTP to HTTPS redirects (force HTTPS) - exclude API routes
       {
-        source: '/:path*',
+        source: '/:path((?!api).)*',
         destination: 'https://www.pocketportfolio.app/:path*',
         permanent: true,
         has: [
@@ -40,9 +40,9 @@ const nextConfig = {
           },
         ],
       },
-      // Non-www to www redirects (canonical domain)
+      // Non-www to www redirects (canonical domain) - exclude API routes
       {
-        source: '/:path*',
+        source: '/:path((?!api).)*',
         destination: 'https://www.pocketportfolio.app/:path*',
         permanent: true,
         has: [

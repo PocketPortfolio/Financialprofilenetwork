@@ -2,10 +2,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 
-interface BrokerPageProps {
-  params: { broker: string };
-}
-
 // Generate static params for supported brokers (50 brokers for Operation Velocity)
 export async function generateStaticParams() {
   return SUPPORTED_BROKERS.map((broker) => ({
@@ -16,8 +12,10 @@ export async function generateStaticParams() {
 // Broker configuration is now imported from centralized config (50 brokers)
 
 // Generate metadata for each broker page
-export async function generateMetadata({ params }: BrokerPageProps): Promise<Metadata> {
-  const broker = params.broker.toLowerCase();
+export async function generateMetadata({ params }: { params: Promise<{ broker: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const broker = resolvedParams.broker.toLowerCase();
   const config = BROKER_CONFIG[broker as keyof typeof BROKER_CONFIG];
   
   if (!config) {
@@ -56,13 +54,15 @@ export async function generateMetadata({ params }: BrokerPageProps): Promise<Met
       images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
     },
     alternates: {
-      canonical: `https://www.pocketportfolio.app/import/${params.broker}`,
+      canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
     },
   };
 }
 
-export default async function BrokerImportPage({ params }: BrokerPageProps) {
-  const broker = params.broker.toLowerCase();
+export default async function BrokerImportPage({ params }: { params: Promise<{ broker: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const broker = resolvedParams.broker.toLowerCase();
   const config = BROKER_CONFIG[broker as keyof typeof BROKER_CONFIG];
   
   if (!config) {

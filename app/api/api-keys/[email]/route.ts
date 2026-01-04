@@ -35,16 +35,14 @@ function getDb() {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { email: string } | Promise<{ email: string }> }
+  { params }: { params: Promise<{ email: string }> }
 ) {
   try {
     // Initialize Firebase Admin first
     initializeFirebaseAdmin();
     
-    // Handle both Next.js 14 (Promise) and Next.js 13 (direct) params
-    const resolvedParams = params && typeof (params as any).then === 'function' 
-      ? await (params as Promise<{ email: string }>)
-      : params as { email: string };
+    // Next.js 15: params is always a Promise
+    const resolvedParams = await params;
     
     const email = decodeURIComponent(resolvedParams.email);
     

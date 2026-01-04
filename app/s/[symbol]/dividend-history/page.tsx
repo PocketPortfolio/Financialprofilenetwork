@@ -9,10 +9,6 @@ import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 import DividendHistory from '@/app/components/DividendHistory';
 import HistoricalDividends from '@/app/components/HistoricalDividends';
 
-interface DividendHistoryPageProps {
-  params: { symbol: string };
-}
-
 // Generate static params for all tickers
 export async function generateStaticParams() {
   const allTickers = getAllTickers();
@@ -21,8 +17,10 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: DividendHistoryPageProps): Promise<Metadata> {
-  const symbol = params.symbol.toUpperCase();
+export async function generateMetadata({ params }: { params: Promise<{ symbol: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const symbol = resolvedParams.symbol.toUpperCase();
   const metadata = await getTickerMetadata(symbol);
   
   if (!metadata) {
@@ -55,8 +53,10 @@ export async function generateMetadata({ params }: DividendHistoryPageProps): Pr
   };
 }
 
-export default async function DividendHistoryPage({ params }: DividendHistoryPageProps) {
-  const normalizedSymbol = params.symbol.toUpperCase().replace(/-/g, '');
+export default async function DividendHistoryPage({ params }: { params: Promise<{ symbol: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
   const metadata = await getTickerMetadata(normalizedSymbol);
   
   if (!metadata) {

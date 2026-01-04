@@ -7,9 +7,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 
-interface JsonApiPageProps {
-  params: { symbol: string };
-}
 
 // Generate static params for all tickers
 export async function generateStaticParams() {
@@ -19,8 +16,10 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: JsonApiPageProps): Promise<Metadata> {
-  const symbol = params.symbol.toUpperCase();
+export async function generateMetadata({ params }: { params: Promise<{ symbol: string }> }): Promise<Metadata> {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const symbol = resolvedParams.symbol.toUpperCase();
   const metadata = await getTickerMetadata(symbol);
   
   if (!metadata) {
@@ -53,8 +52,10 @@ export async function generateMetadata({ params }: JsonApiPageProps): Promise<Me
   };
 }
 
-export default async function JsonApiPage({ params }: JsonApiPageProps) {
-  const normalizedSymbol = params.symbol.toUpperCase().replace(/-/g, '');
+export default async function JsonApiPage({ params }: { params: Promise<{ symbol: string }> }) {
+  // Next.js 15: params is always a Promise
+  const resolvedParams = await params;
+  const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
   const metadata = await getTickerMetadata(normalizedSymbol);
   
   if (!metadata) {
