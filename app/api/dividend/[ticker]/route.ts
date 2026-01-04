@@ -778,7 +778,9 @@ async function fetchFromYahooFinanceHTML(ticker: string): Promise<DividendData |
 }
 
 interface RouteParams {
-  params: Promise<{ ticker: string }> | { ticker: string };
+  params: {
+    ticker: string;
+  };
 }
 
 export async function GET(
@@ -789,12 +791,8 @@ export async function GET(
   console.warn(`[DIVIDEND_DEBUG] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Timestamp: ${new Date().toISOString()}`);
 
   try {
-    // Handle both Next.js 14 (Promise) and Next.js 13 (direct) params
-    const resolvedParams = params && typeof (params as any).then === 'function' 
-      ? await (params as Promise<{ ticker: string }>)
-      : params as { ticker: string };
-    
-    const ticker = resolvedParams?.ticker?.toUpperCase();
+    // In Next.js 14, params is a direct object, not a Promise
+    const ticker = params?.ticker?.toUpperCase();
     
     if (!ticker) {
       console.warn(`[DIVIDEND_DEBUG] Missing ticker param | Path: ${request.nextUrl.pathname}`);
