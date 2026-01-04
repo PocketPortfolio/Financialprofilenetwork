@@ -867,16 +867,22 @@ export async function GET(
   }
 
   // Try multiple data sources in order:
-  // 1. EODHD (for paid tier users)
-  // 2. Alpha Vantage (free tier, includes dividend data)
+  // 1. EODHD (for paid tier users) - skip if not configured
+  // 2. Alpha Vantage (free tier, includes dividend data) - primary fallback
   // 3. Yahoo Finance (free but requires auth, may fail)
   
+  // Prioritize Alpha Vantage if EODHD is not configured
+  let dividendData: DividendData | null = null;
   
-  let dividendData = await fetchFromEODHD(ticker);
-  console.warn(`[DIVIDEND_DEBUG] After EODHD | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
+  if (EODHD_API_KEY) {
+    dividendData = await fetchFromEODHD(ticker);
+    console.warn(`[DIVIDEND_DEBUG] After EODHD | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
+  } else {
+    console.warn(`[DIVIDEND_DEBUG] EODHD not configured, skipping to Alpha Vantage...`);
+  }
 
   if (!dividendData) {
-    console.warn(`[DIVIDEND_DEBUG] EODHD failed, trying Alpha Vantage...`);
+    console.warn(`[DIVIDEND_DEBUG] Trying Alpha Vantage (primary/fallback)...`);
     dividendData = await fetchFromAlphaVantage(ticker);
     console.warn(`[DIVIDEND_DEBUG] After AlphaVantage | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
   }
