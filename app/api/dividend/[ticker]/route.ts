@@ -788,11 +788,13 @@ export async function GET(
   { params }: RouteParams
 ) {
   // Route handler entry - log immediately for production visibility
-  console.warn(`[DIVIDEND_DEBUG] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Timestamp: ${new Date().toISOString()}`);
+  console.warn(`[DIVIDEND_DEBUG] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Params: ${JSON.stringify(params)} | Timestamp: ${new Date().toISOString()}`);
 
   try {
-    // In Next.js 14, params is a direct object, not a Promise
-    const ticker = params?.ticker?.toUpperCase();
+    // Match working /api/price/[ticker] route pattern exactly
+    const ticker = params.ticker.toUpperCase();
+    
+    console.warn(`[DIVIDEND_DEBUG] Ticker extracted: ${ticker}`);
     
     if (!ticker) {
       console.warn(`[DIVIDEND_DEBUG] Missing ticker param | Path: ${request.nextUrl.pathname}`);
