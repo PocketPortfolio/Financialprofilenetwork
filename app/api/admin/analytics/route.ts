@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import fs from 'fs';
+import path from 'path';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -117,11 +119,15 @@ export async function GET(request: NextRequest) {
     // Fetch NPM package data
     const npmData = await getNPMData();
 
+    // Fetch blog posts data
+    const blogPosts = await getBlogPostsData();
+
     return NextResponse.json({
       monetization,
       toolUsage,
       seoPages,
       npm: npmData,
+      blogPosts,
       timeRange: range,
       lastUpdated: new Date().toISOString()
     });
@@ -712,6 +718,95 @@ async function getNPMData() {
       totalMonthlyDownloads: 0,
       totalLast7Days: 0,
       packageCount: 0,
+    };
+  }
+}
+
+async function getBlogPostsData() {
+  try {
+    const calendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+    
+    if (!fs.existsSync(calendarPath)) {
+      return {
+        total: 0,
+        published: 0,
+        pending: 0,
+        overdue: 0,
+        failed: 0,
+        posts: []
+      };
+    }
+
+    const calendar = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check which posts have actual files
+    const postsDir = path.join(process.cwd(), 'content', 'posts');
+    const imagesDir = path.join(process.cwd(), 'public', 'images', 'blog');
+    const existingPosts = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).map(f => f.replace('.mdx', '')) : [];
+    const existingImages = fs.existsSync(imagesDir) ? fs.readdirSync(imagesDir).map(f => f.replace('.png', '')) : [];
+    
+    const posts = calendar.map((post: any) => {
+      const hasFiles = existingPosts.includes(post.slug) && existingImages.includes(post.slug);
+      const postDate = new Date(post.date);
+      const todayDate = new Date(today);
+      const isOverdue = postDate < todayDate && post.status === 'pending';
+      
+      // Get published time from file if it exists
+      let publishedTime: string | null = null;
+      if (hasFiles && post.status === 'published') {
+        const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
+        if (fs.existsSync(mdxPath)) {
+          const stats = fs.statSync(mdxPath);
+          publishedTime = stats.mtime.toISOString();
+        }
+      }
+      
+      return {
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        date: post.date,
+        scheduledDate: post.date,
+        status: post.status,
+        pillar: post.pillar,
+        isOverdue,
+        hasFiles,
+        publishedTime,
+        daysOverdue: isOverdue ? Math.floor((todayDate.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24)) : 0
+      };
+    });
+
+    const published = posts.filter((p: any) => p.status === 'published').length;
+    const pending = posts.filter((p: any) => p.status === 'pending').length;
+    const overdue = posts.filter((p: any) => p.isOverdue).length;
+    const failed = posts.filter((p: any) => p.status === 'failed').length;
+
+    return {
+      total: posts.length,
+      published,
+      pending,
+      overdue,
+      failed,
+      posts: posts.sort((a: any, b: any) => {
+        // Sort by date, then by status (overdue first)
+        const dateCompare = new Date(a.date).getTime() - new Date(b.date).getTime();
+        if (dateCompare !== 0) return dateCompare;
+        if (a.isOverdue && !b.isOverdue) return -1;
+        if (!a.isOverdue && b.isOverdue) return 1;
+        return 0;
+      })
+    };
+  } catch (error: any) {
+    console.error('Error reading blog calendar:', error);
+    return {
+      total: 0,
+      published: 0,
+      pending: 0,
+      overdue: 0,
+      failed: 0,
+      posts: [],
+      error: error.message
     };
   }
 }

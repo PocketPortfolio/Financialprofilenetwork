@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   // Enable standalone output for Docker (Vercel handles this automatically)
   // Only use standalone for Docker deployments, not for Vercel
   // output: 'standalone', // Commented out - Vercel uses serverless functions
