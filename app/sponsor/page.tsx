@@ -7,6 +7,7 @@ import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import LandingFooter from '../components/marketing/LandingFooter';
 import SponsorModal from '../components/SponsorModal';
 import AlertModal from '../components/modals/AlertModal';
+import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 
 // Get publishable key with fallback
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_live_51SeZTKD4sftWa1WtU6oGAzAVSAp6qTLUOPMbK5gaetspAelBzAou1epdTwj9ngybvv8ZiSWJgdbSfSeaRCTezO9T00OzhxwstL';
@@ -558,7 +559,7 @@ export default function SponsorPage() {
                 boxShadow: '0 0 0 0 rgba(220, 38, 38, 0.7)'
               }}
             >
-              Batch 1: 12/50 Remaining
+              Batch 1: {getFoundersClubScarcityMessage()}
             </div>
 
             {/* Limited Edition Badge */}

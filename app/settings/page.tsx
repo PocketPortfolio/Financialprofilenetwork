@@ -673,6 +673,94 @@ export default function SettingsPage() {
           )}
         </div>
 
+        {/* Power User Card - For developers needing higher rate limits */}
+        {(!apiKey || tierFromApi !== 'foundersClub') && (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+              border: '2px solid var(--border-warm)',
+              borderRadius: '12px',
+              padding: '24px',
+              marginBottom: '24px',
+              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
+            }}
+          >
+            <h3
+              style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                color: 'var(--text)',
+                marginBottom: '12px',
+              }}
+            >
+              Need higher rate limits?
+            </h3>
+            <p
+              style={{
+                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                lineHeight: '1.6',
+                marginBottom: '16px',
+              }}
+            >
+              Free tier is capped. Join the <strong>UK Founders Club</strong> for expanded API limits and direct programmatic access via Google Drive.
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: '12px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <Link
+                href="/sponsor?utm_source=settings_api&utm_medium=power_user_card&utm_campaign=founders_club"
+                style={{
+                  padding: '12px 24px',
+                  background: '#f59e0b',
+                  color: '#000000',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#d97706';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f59e0b';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                Join Founders Club - £100
+              </Link>
+              <Link
+                href="/sponsor"
+                style={{
+                  padding: '12px 24px',
+                  background: 'transparent',
+                  color: 'var(--accent-warm)',
+                  textDecoration: 'none',
+                  border: '1px solid var(--border-warm)',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--warm-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                View All Plans →
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Preferences Section - Hidden until implementation is complete */}
         {false && (
         <div style={{

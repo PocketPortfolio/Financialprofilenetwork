@@ -6,6 +6,8 @@ import { parseCSV as parseCSVAdapter, detectBrokerFromSample } from '@pocket-por
 import { detectBroker } from '@pocket-portfolio/importer';
 import type { BrokerId, NormalizedTrade } from '@pocket-portfolio/importer';
 import AlertModal from './modals/AlertModal';
+import InfrastructureUpgradeModal from './InfrastructureUpgradeModal';
+import { getFoundersClubSpotsRemaining } from '../lib/utils/foundersClub';
 
 interface Trade {
   id: string;
@@ -28,6 +30,7 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
   const [processing, setProcessing] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Helper function to show alerts
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
@@ -1263,6 +1266,13 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       return;
     }
 
+    // Check for large files (>10MB) - trigger Infrastructure Upgrade modal
+    const MAX_BROWSER_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_BROWSER_FILE_SIZE) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setProcessing(true);
 
     try {
@@ -2076,6 +2086,13 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
         onClose={() => setShowAlertModal(false)}
       />
     )}
+
+    {/* Infrastructure Upgrade Modal - For large CSV files */}
+    <InfrastructureUpgradeModal
+      isOpen={showUpgradeModal}
+      onClose={() => setShowUpgradeModal(false)}
+      spotsRemaining={getFoundersClubSpotsRemaining()}
+    />
     </>
   );
 }
