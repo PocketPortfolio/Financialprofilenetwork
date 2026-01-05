@@ -8,6 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true; // Explicitly allow dynamic params
 export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
+export const revalidate = 0; // Force no caching - ensure fresh data
 
 // EODHD API Configuration
 const EODHD_API_KEY = process.env.EODHD_API_KEY || '';
