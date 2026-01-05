@@ -45,6 +45,21 @@
     ]
   },
   {
+    "id": "engine-verification-test-jan-6",
+    "date": "2026-01-06",
+    "title": "Building Production-Ready Systems: Infrastructure as an Autonomous Engines",
+    "slug": "building-production-ready-systems-infrastructure-as-an-autonomous-engines",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "production systems",
+      "autonomous systems",
+      "infrastructure as code",
+      "continuous deployment",
+      "system architecture"
+    ]
+  },
+  {
     "id": "week-1-post-2",
     "date": "2026-01-08",
     "title": "Dollar Cost Averaging vs. Lump Sum: A Data-Driven Analysis",
