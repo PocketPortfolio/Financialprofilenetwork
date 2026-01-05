@@ -1,0 +1,207 @@
+name: Blog Health Check
+
+on:
+  schedule:
+    # Run daily at 10 PM UTC to check for missed posts
+    - cron: '0 22 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      actions: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check for overdue posts
+        id: check-overdue
+        run: |
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+          
+          const calendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+          const calendar = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
+          const today = new Date().toISOString().split('T')[0];
+          
+          const overdue = calendar.filter(p => {
+            const postDate = new Date(p.date);
+            const todayDate = new Date(today);
+            return postDate < todayDate && p.status === 'pending';
+          });
+          
+          if (overdue.length > 0) {
+            console.log('Found', overdue.length, 'overdue posts');
+            overdue.forEach(p => {
+              const days = Math.floor((new Date(today) - new Date(p.date)) / (1000*60*60*24));
+              console.log('  -', p.title, '(' + p.date + ') -', days, 'days overdue');
+            });
+            
+            // Output for GitHub Actions
+            console.log('::set-output name=overdue_count::' + overdue.length);
+            console.log('::set-output name=overdue_posts::' + JSON.stringify(overdue));
+            process.exit(1);
+          } else {
+            console.log('✅ No overdue posts - system is healthy');
+            console.log('::set-output name=overdue_count::0');
+            process.exit(0);
+          }
+          "
+        continue-on-error: true
+
+      - name: Verify post files exist
+        id: verify-files
+        run: |
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+          
+          const calendar = JSON.parse(fs.readFileSync('content/blog-calendar.json', 'utf-8'));
+          const today = new Date().toISOString().split('T')[0];
+          
+          const shouldBePublished = calendar.filter(p => p.date <= today && p.status === 'published');
+          
+          let missing = [];
+          shouldBePublished.forEach(post => {
+            const mdxPath = path.join('content', 'posts', post.slug + '.mdx');
+            const imagePath = path.join('public', 'images', 'blog', post.slug + '.png');
+            
+            if (!fs.existsSync(mdxPath) || !fs.existsSync(imagePath)) {
+              missing.push(post);
+              console.error('❌ Missing files for:', post.title);
+              if (!fs.existsSync(mdxPath)) console.error('   - MDX file missing:', mdxPath);
+              if (!fs.existsSync(imagePath)) console.error('   - Image file missing:', imagePath);
+            }
+          });
+          
+          if (missing.length > 0) {
+            console.log('::set-output name=missing_count::' + missing.length);
+            console.log('::set-output name=missing_posts::' + JSON.stringify(missing.map(p => ({title: p.title, slug: p.slug}))));
+            process.exit(1);
+          } else {
+            console.log('✅ All', shouldBePublished.length, 'published posts have files');
+            console.log('::set-output name=missing_count::0');
+            process.exit(0);
+          }
+          "
+        continue-on-error: true
+
+      - name: Trigger generation if overdue
+        if: steps.check-overdue.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log('🚨 Overdue posts detected - triggering blog generation workflow...');
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'generate-blog.yml',
+              ref: 'main'
+            });
+            console.log('✅ Blog generation workflow triggered');
+
+      - name: Create GitHub issue for overdue posts
+        if: steps.check-overdue.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const overdueCount = '${{ steps.check-overdue.outputs.overdue_count }}';
+            const overduePosts = JSON.parse('${{ steps.check-overdue.outputs.overdue_posts }}' || '[]');
+            
+            const overdueList = overduePosts.map(p => {
+              const days = Math.floor((new Date() - new Date(p.date)) / (1000*60*60*24));
+              return `- **${p.title}** (scheduled: ${p.date}) - ${days} day(s) overdue`;
+            }).join('\n');
+            
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'blog-overdue'
+            });
+            
+            if (issues.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Blog Health Check: ${overdueCount} Post(s) Overdue`,
+                body: `## ⚠️ Overdue Blog Posts Detected\n\n${overdueList}\n\n**Health Check Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n**Automatic Actions Taken:**\n- ✅ Blog generation workflow has been triggered automatically\n\n**If posts still don't generate:**\n1. Check workflow logs: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/generate-blog.yml\n2. Verify OPENAI_API_KEY secret is set\n3. Manually trigger workflow if needed\n4. Close this issue once posts are generated`,
+                labels: ['bug', 'urgent', 'blog-overdue', 'auto-triggered']
+              });
+              console.log('🚨 Created GitHub issue for overdue posts');
+            } else {
+              console.log('ℹ️ Issue already exists for overdue posts - updating...');
+              // Update existing issue
+              const issue = issues[0];
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `## ⚠️ Overdue Blog Posts Detected (Updated)\n\n${overdueList}\n\n**Latest Health Check:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n**Automatic Actions Taken:**\n- ✅ Blog generation workflow has been triggered automatically\n\n**If posts still don't generate:**\n1. Check workflow logs: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/generate-blog.yml\n2. Verify OPENAI_API_KEY secret is set\n3. Manually trigger workflow if needed\n4. Close this issue once posts are generated`
+              });
+            }
+
+      - name: Create GitHub issue for missing files
+        if: steps.verify-files.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const missingCount = '${{ steps.verify-files.outputs.missing_count }}';
+            const missingPosts = JSON.parse('${{ steps.verify-files.outputs.missing_posts }}' || '[]');
+            
+            const missingList = missingPosts.map(p => `- **${p.title}** (slug: ${p.slug})`).join('\n');
+            
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'blog-missing-files'
+            });
+            
+            if (issues.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Blog Health Check: ${missingCount} Post(s) Missing Files`,
+                body: `## ⚠️ Missing Blog Post Files\n\n${missingList}\n\n**Health Check Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n**Action Required:**\n1. Check if posts were generated but files weren't committed\n2. Manually regenerate missing posts\n3. Verify file paths are correct\n4. Close this issue once files are restored`,
+                labels: ['bug', 'urgent', 'blog-missing-files']
+              });
+              console.log('🚨 Created GitHub issue for missing files');
+            }
+
+      - name: Health Check Summary
+        if: always()
+        run: |
+          echo "## 🏥 Blog Health Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.check-overdue.outcome }}" == "failure" ]; then
+            echo "❌ **Overdue Posts Detected:** ${{ steps.check-overdue.outputs.overdue_count }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Blog generation workflow has been triggered automatically" >> $GITHUB_STEP_SUMMARY
+            echo "- GitHub issue created" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **No Overdue Posts**" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.verify-files.outcome }}" == "failure" ]; then
+            echo "❌ **Missing Files:** ${{ steps.verify-files.outputs.missing_count }} post(s)" >> $GITHUB_STEP_SUMMARY
+            echo "- GitHub issue created" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **All Post Files Present**" >> $GITHUB_STEP_SUMMARY
+          fi
+
