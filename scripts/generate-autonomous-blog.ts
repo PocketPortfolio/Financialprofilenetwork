@@ -71,13 +71,15 @@ async function generateBlogPost(post: BlogPost, retryCount = 0): Promise<void> {
   const MAX_RETRIES = 2;
   console.log(`📝 Generating: ${post.title}${retryCount > 0 ? ` (Retry ${retryCount}/${MAX_RETRIES})` : ''}`);
   
-  // Determine homepage anchor text based on pillar
+  // Determine homepage anchor text and route based on pillar
   const homepageAnchors = [
-    'Sovereign Financial Tracking',
-    'Google Drive Portfolio Sync',
-    'JSON-based Investment Tracker'
+    { text: 'Sovereign Financial Tracking', route: '/' },
+    { text: 'Google Drive Portfolio Sync', route: '/features/google-drive-sync' },
+    { text: 'JSON-based Investment Tracker', route: '/' }
   ];
-  const selectedAnchor = homepageAnchors[Math.floor(Math.random() * homepageAnchors.length)];
+  const selectedAnchorObj = homepageAnchors[Math.floor(Math.random() * homepageAnchors.length)];
+  const selectedAnchor = selectedAnchorObj.text;
+  const homepageLink = selectedAnchorObj.route;
 
   // Determine cross-pollination link based on content
   let crossLink = '';
@@ -98,7 +100,7 @@ CRITICAL CONSTRAINTS:
 - NEVER mention "Excel editing" or "Spreadsheets" as a feature. Use "Raw Data" or "JSON" only.
 - NEVER promise users can "edit in Excel" - this is a lie that breaks the sync.
 - ALWAYS include a "Verdict" section at the end with a clear conclusion
-- ALWAYS include a CTA for Corporate/Founder Tiers to unlock Sovereign Sync
+- DO NOT include a CTA section in the content - the template already includes one at the bottom
 - Write in MDX format with frontmatter
 - Minimum 1200 words, maximum 2000 words
 - Use code examples when relevant (especially JSON examples)
@@ -108,11 +110,18 @@ CRITICAL CONSTRAINTS:
 - Include practical examples and use cases
 
 🔗 SEO STRATEGY - INTERNAL LINKING (CRITICAL):
-- In the introduction OR the "Verdict" section, you MUST include ONE contextual link back to the homepage (/) using this exact anchor text: "${selectedAnchor}"
+- In the introduction OR the "Verdict" section, you MUST include ONE contextual link using this exact anchor text: "${selectedAnchor}" pointing to "${homepageLink}"
 - DO NOT use generic phrases like "Click here" or "Learn more" - use the exact anchor text provided
 - When generating the "Key Takeaways" section, explicitly mention: "Unlike cloud apps, Pocket Portfolio uses **Sovereign Sync** to turn your Google Drive into a database." This reinforces the keywords found on the homepage.
-${crossLink ? `- If relevant to the content, include a contextual link to ${crossLink} using natural anchor text related to the topic.` : ''}
-- The homepage link should feel natural and contextual, not forced`;
+${crossLink ? `- If relevant to the content, include a contextual link to "${crossLink}" using natural anchor text related to the topic.` : ''}
+- The link should feel natural and contextual, not forced
+- All links must use markdown format: [Anchor Text](/route)
+- Anchor text routing:
+  * "Sovereign Financial Tracking" → "/" (homepage)
+  * "Google Drive Portfolio Sync" → "/features/google-drive-sync" (features page)
+  * "JSON-based Investment Tracker" → "/" (homepage)
+- Sponsor links must use: [Learn more about our Corporate and Founder Tiers](/sponsor) or [sponsor page](/sponsor)
+- Feature links must use: [Set up Google Drive Sync](/features/google-drive-sync) or [Google Drive Sync](/features/google-drive-sync)`;
 
   const userPrompt = `Write a comprehensive blog post titled "${post.title}".
 
@@ -125,12 +134,13 @@ Structure:
 3. Deep dive / analysis (technical or philosophical exploration)
 4. Solution / insights (what we've learned or built)
 5. Key Takeaways section (MUST include: "Unlike cloud apps, Pocket Portfolio uses **Sovereign Sync** to turn your Google Drive into a database.")
-6. Verdict (clear conclusion with actionable takeaways - MUST include homepage link with anchor text: "${selectedAnchor}")
-7. CTA for Sovereign Sync (link to /sponsor page)
+6. Verdict (clear conclusion with actionable takeaways - MUST include link with anchor text: "${selectedAnchor}" pointing to "${homepageLink}")
 
-🔗 REQUIRED INTERNAL LINKS:
-- Homepage link: In the introduction or Verdict section, link to "/" using anchor text "${selectedAnchor}"
-${crossLink ? `- Cross-link: If relevant, include a natural link to "${crossLink}"` : ''}
+🔗 REQUIRED INTERNAL LINKS (CRITICAL):
+- Primary link: In the introduction or Verdict section, link to "${homepageLink}" using anchor text "${selectedAnchor}" (format: [${selectedAnchor}](${homepageLink}))
+${crossLink ? `- Cross-link: If relevant, include a natural link to "${crossLink}" using contextual anchor text` : ''}
+
+⚠️ IMPORTANT: DO NOT include a CTA section in your content. The blog template automatically adds a CTA at the bottom of every post.
 
 Format as MDX with frontmatter:
 ---
