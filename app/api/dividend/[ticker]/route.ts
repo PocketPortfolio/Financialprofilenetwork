@@ -7,6 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true; // Explicitly allow dynamic params
+export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
 
 // EODHD API Configuration
 const EODHD_API_KEY = process.env.EODHD_API_KEY || '';
@@ -520,6 +521,134 @@ async function _fetchHistoricalDividendsFromAlphaVantage_UNUSED(ticker: string):
   }
 }
 
+// Fetch from Yahoo Finance Chart endpoint (provides historical dividends via events=div)
+// This is the recommended approach for getting dividend history from Yahoo Finance
+async function fetchFromYahooFinanceChart(ticker: string): Promise<DividendData | null> {
+  console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: ATTEMPTING | Ticker: ${ticker}`);
+  
+  // Use same headers as quote API (JUA pattern)
+  const JUA = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    Accept: "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache"
+  };
+
+  // Calculate date range (10 years as recommended)
+  const endDate = Math.floor(Date.now() / 1000);
+  const startDate = Math.floor((Date.now() - 10 * 365 * 24 * 60 * 60 * 1000) / 1000);
+
+  // Try multiple endpoints (query1 and query2, with/without .US suffix)
+  const endpoints = [
+    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?symbol=${ticker}&interval=1d&events=div&period1=${startDate}&period2=${endDate}`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?symbol=${ticker}&interval=1d&events=div&period1=${startDate}&period2=${endDate}`,
+    `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}.US?symbol=${ticker}.US&interval=1d&events=div&period1=${startDate}&period2=${endDate}`,
+    `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}.US?symbol=${ticker}.US&interval=1d&events=div&period1=${startDate}&period2=${endDate}`,
+  ];
+
+  for (const url of endpoints) {
+    try {
+      console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: TRYING_ENDPOINT | URL: ${url.substring(0, 80)}...`);
+      const response = await fetch(url, {
+        headers: JUA,
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: ${response.status} | URL: ${url.substring(0, 50)}...`);
+        continue; // Try next endpoint
+      }
+
+      const data = await response.json();
+      
+      // Navigate through Yahoo Finance Chart API structure
+      // Structure: chart.result[0].events.dividends
+      const chartResult = data?.chart?.result?.[0];
+      if (!chartResult) {
+        console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: NO_CHART_RESULT | Ticker: ${ticker}`);
+        continue; // Try next endpoint
+      }
+
+      const dividends = chartResult.events?.dividends;
+      if (!dividends || Object.keys(dividends).length === 0) {
+        console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: NO_DIVIDENDS | Ticker: ${ticker} | URL: ${url.substring(0, 50)}...`);
+        continue; // Try next endpoint
+      }
+
+      // Convert dividends object to array format
+      // Yahoo returns: { timestamp: { amount: number, date: number } }
+      const dividendArray: Array<{date: string; amount: number}> = Object.entries(dividends)
+        .map(([timestamp, div]: [string, any]) => ({
+          date: new Date(parseInt(timestamp) * 1000).toISOString().split('T')[0],
+          amount: div.amount || 0,
+        }))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      if (dividendArray.length === 0) {
+        console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: NO_VALID_DIVIDENDS | Ticker: ${ticker}`);
+        continue; // Try next endpoint
+      }
+
+      console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: FOUND_DIVIDENDS | Ticker: ${ticker} | Count: ${dividendArray.length}`);
+
+      // Get current price for yield calculation (optional)
+      let currentPrice: number | undefined;
+      try {
+        const quoteUrl = process.env.NEXT_PUBLIC_APP_URL 
+          ? `${process.env.NEXT_PUBLIC_APP_URL}/api/quote?symbol=${ticker}`
+          : `http://localhost:${process.env.PORT || 3001}/api/quote?symbol=${ticker}`;
+        
+        const quoteResponse = await fetch(quoteUrl, {
+          cache: 'no-store',
+        });
+        if (quoteResponse.ok) {
+          const quoteData = await quoteResponse.json();
+          currentPrice = quoteData.price;
+        }
+      } catch (e) {
+        // Ignore quote fetch errors - not critical
+        console.log(`[Dividend API] Could not fetch price for yield calculation: ${ticker}`);
+      }
+
+      // Convert to EODHD format for calculateDividendMetrics
+      const eodhdFormat: EODHDDividendResponse[] = dividendArray.map(d => ({
+        date: d.date,
+        value: d.amount,
+        currency: 'USD',
+      }));
+
+      // Calculate metrics from historical data
+      const metrics = calculateDividendMetrics(eodhdFormat, currentPrice);
+
+      const dividendData: DividendData = {
+        symbol: ticker,
+        ...metrics,
+        currency: 'USD',
+        historicalDividends: dividendArray.slice(0, 50), // Last 50 dividends
+      };
+
+      // Cache the result
+      dividendCache.set(ticker, {
+        data: dividendData,
+        timestamp: Date.now(),
+        expiresAt: Date.now() + CACHE_DURATION_MS,
+      });
+
+      console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: SUCCESS | Ticker: ${ticker} | Yield: ${dividendData.annualDividendYield}% | Payout: $${dividendData.quarterlyPayout} | Historical: ${dividendArray.length} dividends`);
+      return dividendData;
+    } catch (fetchError: any) {
+      console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: FETCH_ERROR | URL: ${url.substring(0, 50)}... | Error: ${fetchError.message}`);
+      continue; // Try next endpoint
+    }
+  }
+
+  // All endpoints failed
+  console.warn(`[DIVIDEND_DEBUG] Source: YahooFinanceChart | Status: ALL_ENDPOINTS_FAILED | Ticker: ${ticker}`);
+  return null;
+}
+
 // Fetch from Yahoo Finance as fallback (free, no API key required, but requires auth)
 async function fetchFromYahooFinance(ticker: string): Promise<DividendData | null> {
   // Use same headers as quote API (JUA pattern) - exact copy from quote API
@@ -885,7 +1014,13 @@ export async function GET(
   }
 
   if (!dividendData) {
-    console.warn(`[DIVIDEND_DEBUG] AlphaVantage failed, trying Yahoo Finance fallback...`);
+    console.warn(`[DIVIDEND_DEBUG] AlphaVantage failed, trying Yahoo Finance Chart endpoint (historical dividends)...`);
+    dividendData = await fetchFromYahooFinanceChart(ticker);
+    console.warn(`[DIVIDEND_DEBUG] After YahooFinanceChart | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}% | Historical: ${dividendData?.historicalDividends?.length || 0} dividends`);
+  }
+
+  if (!dividendData) {
+    console.warn(`[DIVIDEND_DEBUG] Yahoo Finance Chart failed, trying Yahoo Finance quoteSummary fallback...`);
     dividendData = await fetchFromYahooFinance(ticker);
     console.warn(`[DIVIDEND_DEBUG] After YahooFinance | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
   }
