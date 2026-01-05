@@ -17,9 +17,154 @@ export const dynamicParams = true;
 
 // MDX components for custom rendering (RSC-compatible)
 // Using React.createElement to avoid React version conflicts during build
+// CRITICAL: All standard HTML elements must be defined to prevent render errors
 const mdxComponents = {
+  // Headings
+  h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => 
+    React.createElement('h1', { 
+      ...props, 
+      style: { 
+        fontSize: '2em', 
+        fontWeight: '700', 
+        marginTop: '1.5em', 
+        marginBottom: '0.5em',
+        lineHeight: '1.3',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => 
+    React.createElement('h2', { 
+      ...props, 
+      style: { 
+        fontSize: '1.5em', 
+        fontWeight: '600', 
+        marginTop: '1.2em', 
+        marginBottom: '0.5em',
+        lineHeight: '1.4',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => 
+    React.createElement('h3', { 
+      ...props, 
+      style: { 
+        fontSize: '1.25em', 
+        fontWeight: '600', 
+        marginTop: '1em', 
+        marginBottom: '0.5em',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  h4: (props: React.HTMLAttributes<HTMLHeadingElement>) => 
+    React.createElement('h4', { 
+      ...props, 
+      style: { 
+        fontSize: '1.1em', 
+        fontWeight: '600', 
+        marginTop: '0.8em', 
+        marginBottom: '0.4em',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  h5: (props: React.HTMLAttributes<HTMLHeadingElement>) => 
+    React.createElement('h5', { 
+      ...props, 
+      style: { 
+        fontSize: '1em', 
+        fontWeight: '600', 
+        marginTop: '0.6em', 
+        marginBottom: '0.4em',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  h6: (props: React.HTMLAttributes<HTMLHeadingElement>) => 
+    React.createElement('h6', { 
+      ...props, 
+      style: { 
+        fontSize: '0.9em', 
+        fontWeight: '600', 
+        marginTop: '0.5em', 
+        marginBottom: '0.3em',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  
+  // Text elements
+  p: (props: React.HTMLAttributes<HTMLParagraphElement>) => 
+    React.createElement('p', { 
+      ...props, 
+      style: { 
+        marginBottom: '1em', 
+        lineHeight: '1.8',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  strong: (props: React.HTMLAttributes<HTMLElement>) => 
+    React.createElement('strong', { 
+      ...props, 
+      style: { 
+        fontWeight: '700',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  em: (props: React.HTMLAttributes<HTMLElement>) => 
+    React.createElement('em', { 
+      ...props, 
+      style: { 
+        fontStyle: 'italic',
+        ...props.style 
+      } 
+    }),
+  
+  // Lists
+  ul: (props: React.HTMLAttributes<HTMLUListElement>) => 
+    React.createElement('ul', { 
+      ...props, 
+      style: { 
+        marginBottom: '1em', 
+        paddingLeft: '1.5em',
+        listStyleType: 'disc',
+        ...props.style 
+      } 
+    }),
+  ol: (props: React.HTMLAttributes<HTMLOListElement>) => 
+    React.createElement('ol', { 
+      ...props, 
+      style: { 
+        marginBottom: '1em', 
+        paddingLeft: '1.5em',
+        ...props.style 
+      } 
+    }),
+  li: (props: React.HTMLAttributes<HTMLLIElement>) => 
+    React.createElement('li', { 
+      ...props, 
+      style: { 
+        marginBottom: '0.5em',
+        lineHeight: '1.6',
+        color: 'var(--text)',
+        ...props.style 
+      } 
+    }),
+  
+  // Links and code
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => 
-    React.createElement('a', { ...props, style: { color: 'var(--accent-warm)', textDecoration: 'underline', ...props.style } }),
+    React.createElement('a', { 
+      ...props, 
+      style: { 
+        color: 'var(--accent-warm)', 
+        textDecoration: 'underline', 
+        ...props.style 
+      } 
+    }),
   code: (props: React.HTMLAttributes<HTMLElement>) => 
     React.createElement('code', { 
       ...props, 
@@ -46,6 +191,48 @@ const mdxComponents = {
         ...props.style
       } 
     }),
+  
+  // Blockquote and horizontal rule
+  blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => 
+    React.createElement('blockquote', { 
+      ...props, 
+      style: { 
+        borderLeft: '4px solid var(--accent-warm)',
+        paddingLeft: '1em',
+        marginLeft: '0',
+        marginBottom: '1em',
+        marginTop: '1em',
+        fontStyle: 'italic',
+        color: 'var(--text-secondary)',
+        ...props.style 
+      } 
+    }),
+  hr: (props: React.HTMLAttributes<HTMLHRElement>) => 
+    React.createElement('hr', { 
+      ...props, 
+      style: { 
+        border: 'none',
+        borderTop: '1px solid var(--border)',
+        margin: '2em 0',
+        ...props.style 
+      } 
+    }),
+  
+  // Images
+  img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => 
+    React.createElement('img', { 
+      ...props, 
+      style: { 
+        maxWidth: '100%',
+        height: 'auto',
+        borderRadius: '8px',
+        marginBottom: '1em',
+        marginTop: '1em',
+        ...props.style 
+      } 
+    }),
+  
+  // Tables
   table: (props: React.TableHTMLAttributes<HTMLTableElement>) => 
     React.createElement('div', { 
       style: { 
@@ -120,6 +307,53 @@ const mdxComponents = {
     }),
 };
 
+// MDX Content component with error handling
+// Must be defined after mdxComponents
+async function MDXContent({ content }: { content: string }) {
+  try {
+    return (
+      <MDXRemote 
+        source={content} 
+        components={mdxComponents} 
+        options={{
+          mdxOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        }} 
+      />
+    );
+  } catch (error: any) {
+    console.error('Error rendering MDX content:', error);
+    return (
+      <div style={{
+        padding: '2em',
+        background: 'var(--surface-elevated)',
+        borderRadius: '8px',
+        border: '1px solid var(--border)',
+        color: 'var(--text)',
+      }}>
+        <h2 style={{ color: 'var(--accent-warm)', marginBottom: '1em' }}>
+          Error Loading Content
+        </h2>
+        <p style={{ marginBottom: '1em' }}>
+          There was an error rendering this blog post. Please try refreshing the page.
+        </p>
+        {process.env.NODE_ENV === 'development' && (
+          <pre style={{
+            background: '#f5f5f5',
+            padding: '1em',
+            borderRadius: '4px',
+            overflow: 'auto',
+            fontSize: '12px',
+          }}>
+            {error.message}
+          </pre>
+        )}
+      </div>
+    );
+  }
+}
+
 export async function generateStaticParams() {
   const postsDir = path.join(process.cwd(), 'content', 'posts');
   if (!fs.existsSync(postsDir)) return [];
@@ -177,8 +411,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
-  const fileContents = fs.readFileSync(postPath, 'utf-8');
-  const { data, content } = matter(fileContents);
+  // Parse MDX file with error handling
+  let fileContents: string;
+  let data: any;
+  let content: string;
+  
+  try {
+    fileContents = fs.readFileSync(postPath, 'utf-8');
+    const parsed = matter(fileContents);
+    data = parsed.data;
+    content = parsed.content;
+  } catch (error: any) {
+    console.error(`Error parsing MDX file for ${resolvedParams.slug}:`, error);
+    throw new Error(`Failed to parse blog post: ${error.message}`);
+  }
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -320,11 +566,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           }}
           className="blog-content"
         >
-          <MDXRemote source={content} components={mdxComponents} options={{
-            mdxOptions: {
-              remarkPlugins: [remarkGfm],
-            },
-          }} />
+          <MDXContent content={content} />
         </div>
         
         {/* CTA Section */}
