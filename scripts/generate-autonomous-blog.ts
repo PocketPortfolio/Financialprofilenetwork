@@ -261,9 +261,22 @@ async function main() {
       console.log(`   - Should be included: ${nyePost.date <= today && nyePost.status === 'pending'}`);
     }
     
+    // Find all posts that are due (date <= today) or overdue (date < today)
     const duePosts = calendar.filter(
       post => post.date <= today && post.status === 'pending'
     );
+
+    // Check for overdue posts (past their date but still pending) for logging
+    const overduePosts = duePosts.filter(post => post.date < today);
+    
+    if (overduePosts.length > 0) {
+      console.log(`\n⚠️  Found ${overduePosts.length} overdue post(s) that should have been generated:`);
+      overduePosts.forEach(post => {
+        const daysOverdue = Math.floor((new Date(today).getTime() - new Date(post.date).getTime()) / (1000 * 60 * 60 * 24));
+        console.log(`   - ${post.title} (${post.date}) - ${daysOverdue} day(s) overdue`);
+      });
+      console.log(`   → These will be generated now to catch up\n`);
+    }
 
     if (duePosts.length === 0) {
       console.log('\n✅ No posts due for generation');

@@ -2,8 +2,10 @@ name: Generate Blog Posts
 
 on:
   schedule:
-    # Daily at 9 AM UTC - checks for due posts automatically
+    # Run every 6 hours to catch missed posts (more reliable than once daily)
     # Posts are generated when their date <= today and status is "pending"
+    - cron: '0 */6 * * *'  # Every 6 hours: 00:00, 06:00, 12:00, 18:00 UTC
+    # Also run at 9 AM UTC as primary time (keeps original schedule)
     - cron: '0 9 * * *'
     # One-time: NYE 2025 Year in Review post at 18:30 GMT (Dec 31, 2025)
     - cron: '30 18 31 12 *'
