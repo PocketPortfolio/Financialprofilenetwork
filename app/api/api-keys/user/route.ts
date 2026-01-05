@@ -5,6 +5,11 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
 
+// Rate limiting storage (in-memory, resets on serverless cold start)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute per user
+
 // Shared Firebase Admin initialization function
 function initializeFirebaseAdmin() {
   if (!getApps().length) {
@@ -61,6 +66,34 @@ export async function GET(request: NextRequest) {
         { error: 'No email in token' },
         { status: 401 }
       );
+    }
+
+    // Rate limiting check
+    const now = Date.now();
+    const limitKey = `user:${userEmail}`;
+    const limit = rateLimitMap.get(limitKey);
+    
+    if (limit) {
+      if (now > limit.resetTime) {
+        // Window expired, reset counter
+        rateLimitMap.set(limitKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+      } else {
+        if (limit.count >= MAX_REQUESTS_PER_WINDOW) {
+          return NextResponse.json(
+            { 
+              error: 'Too many requests. Please wait a moment and try again.',
+              retryAfter: Math.ceil((limit.resetTime - now) / 1000)
+            },
+            { status: 429 }
+          );
+        }
+        // Increment counter
+        limit.count++;
+        rateLimitMap.set(limitKey, limit);
+      }
+    } else {
+      // First request from this user
+      rateLimitMap.set(limitKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     }
 
     // Get API key from Firestore
