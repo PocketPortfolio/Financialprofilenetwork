@@ -2,9 +2,9 @@ name: Generate Blog Posts
 
 on:
   schedule:
-    # Run every 6 hours to catch missed posts (more reliable than once daily)
+    # Run every 2 hours for maximum reliability (12 checks per day)
     # Posts are generated when their date <= today and status is "pending"
-    - cron: '0 */6 * * *'  # Every 6 hours: 00:00, 06:00, 12:00, 18:00 UTC
+    - cron: '0 */2 * * *'  # Every 2 hours: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
     # Also run at 9 AM UTC as primary time (keeps original schedule)
     - cron: '0 9 * * *'
     # One-time: Real-Time Portfolio Tracking post at 16:00 GMT on Jan 5, 2026
@@ -42,19 +42,37 @@ jobs:
           fi
           echo "✅ OPENAI_API_KEY is configured"
 
-      - name: Generate blog posts
+      - name: Generate blog posts (with automatic retry)
         id: generate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          echo "🚀 Starting blog post generation..."
-          npm run generate-blog || exit_code=$?
-          if [ -n "$exit_code" ]; then
-            echo "⚠️ Blog generation completed with errors (exit code: $exit_code)"
-            echo "error=true" >> $GITHUB_OUTPUT
-          else
-            echo "✅ Blog generation completed successfully"
-            echo "error=false" >> $GITHUB_OUTPUT
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          EXIT_CODE=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "🚀 Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
+            if npm run generate-blog; then
+              echo "✅ Blog generation completed successfully"
+              echo "error=false" >> $GITHUB_OUTPUT
+              EXIT_CODE=0
+              break
+            else
+              EXIT_CODE=$?
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⚠️ Attempt $RETRY_COUNT failed, waiting 5 minutes before retry..."
+                sleep 300
+              else
+                echo "❌ Blog generation failed after $MAX_RETRIES attempts"
+                echo "error=true" >> $GITHUB_OUTPUT
+              fi
+            fi
+          done
+          
+          if [ $EXIT_CODE -ne 0 ]; then
+            exit $EXIT_CODE
           fi
 
       - name: Check for changes
@@ -91,6 +109,57 @@ jobs:
           skip_dirty_check: true
           # Don't use file_pattern - files are already staged above
 
+      - name: Check for overdue posts
+        if: failure()
+        id: overdue-check
+        run: |
+          node -e "
+          const fs = require('fs');
+          const calendar = JSON.parse(fs.readFileSync('content/blog-calendar.json', 'utf-8'));
+          const today = new Date().toISOString().split('T')[0];
+          const overdue = calendar.filter(p => p.date < today && p.status === 'pending');
+          
+          if (overdue.length > 0) {
+            console.log('OVERDUE_COUNT=' + overdue.length);
+            console.log('OVERDUE_POSTS=' + JSON.stringify(overdue.map(p => ({title: p.title, date: p.date}))));
+            process.exit(0);
+          } else {
+            console.log('OVERDUE_COUNT=0');
+            process.exit(0);
+          }
+          " >> $GITHUB_ENV
+          echo "overdue_count=${{ env.OVERDUE_COUNT }}" >> $GITHUB_OUTPUT
+          echo "overdue_posts=${{ env.OVERDUE_POSTS }}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub issue for overdue posts
+        if: failure() && steps.overdue-check.outputs.overdue_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const overdue = JSON.parse('${{ steps.overdue-check.outputs.overdue_posts }}');
+            const overdueList = overdue.map(p => `- **${p.title}** (scheduled: ${p.date})`).join('\n');
+            
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'blog-overdue'
+            });
+            
+            if (issues.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Blog Generation Failed: ${overdue.length} Post(s) Overdue`,
+                body: `## ⚠️ Overdue Blog Posts\n\n${overdueList}\n\n**Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n**Action Required:**\n1. Check workflow logs for errors\n2. Verify OPENAI_API_KEY secret is set\n3. Manually trigger workflow if needed\n4. Close this issue once posts are generated`,
+                labels: ['bug', 'urgent', 'blog-overdue']
+              });
+              console.log('🚨 Created GitHub issue for overdue posts');
+            } else {
+              console.log('ℹ️ Issue already exists for overdue posts');
+            }
+
       - name: Workflow Summary
         if: always()
         run: |
@@ -109,6 +178,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.generate.outputs.error }}" == "true" ]; then
             echo "⚠️ **Some posts may have failed** - Check logs above for details" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.overdue-check.outputs.overdue_count }}" != "0" ]; then
+              echo "🚨 **${{ steps.overdue-check.outputs.overdue_count }} overdue post(s) detected** - GitHub issue created" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
 
