@@ -45,6 +45,28 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (isAuthenticated && user && auth) {
+      // Check cache first to avoid unnecessary API calls
+      const cacheKey = `apiKeys_${user.email}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+      
+      // Use cached data if it's less than 5 minutes old
+      if (cachedData && cacheTimestamp) {
+        const age = Date.now() - parseInt(cacheTimestamp, 10);
+        if (age < 5 * 60 * 1000) { // 5 minutes
+          try {
+            const data = JSON.parse(cachedData);
+            setApiKey(data.apiKey);
+            setCorporateLicense(data.corporateLicense);
+            setTier(data.tier);
+            setLoadingKeys(false);
+            return; // Don't fetch if we have fresh cache
+          } catch (e) {
+            // Invalid cache, continue to fetch
+          }
+        }
+      }
+      
       fetchApiKeys();
     }
   }, [isAuthenticated, user]);
@@ -76,9 +98,42 @@ export default function SettingsPage() {
         setApiKey(data.apiKey);
         setCorporateLicense(data.corporateLicense);
         setTier(data.tier);
+        
+        // Cache the result
+        const cacheKey = `apiKeys_${user.email}`;
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+      } else if (response.status === 503 || response.status === 500) {
+        // If quota exceeded or service unavailable, try to use cached data as fallback
+        const cacheKey = `apiKeys_${user.email}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          try {
+            const data = JSON.parse(cachedData);
+            setApiKey(data.apiKey);
+            setCorporateLicense(data.corporateLicense);
+            setTier(data.tier);
+            console.warn('Using cached API keys due to service limit');
+          } catch (e) {
+            // Invalid cache
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching API keys:', error);
+      // Try cached data on error
+      const cacheKey = `apiKeys_${user.email}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        try {
+          const data = JSON.parse(cachedData);
+          setApiKey(data.apiKey);
+          setCorporateLicense(data.corporateLicense);
+          setTier(data.tier);
+        } catch (e) {
+          // Invalid cache
+        }
+      }
     } finally {
       setLoadingKeys(false);
     }

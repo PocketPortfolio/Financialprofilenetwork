@@ -33,6 +33,10 @@ export default function RetrieveApiKeyPage() {
         } else {
           setError('No API keys found for this email. Make sure you have completed a purchase.');
         }
+      } else if (response.status === 503) {
+        // Handle quota exceeded error
+        const errorData = await response.json().catch(() => ({}));
+        setError('Service temporarily unavailable due to high demand. Please try again in a few minutes.');
       } else {
         setError('Failed to retrieve API keys. Please check your email and try again.');
       }
