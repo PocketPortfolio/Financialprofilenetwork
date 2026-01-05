@@ -81,6 +81,19 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error fetching API keys for user:', error);
+    
+    // Handle quota exceeded errors specifically
+    if (error?.code === 8 || error?.message?.includes('RESOURCE_EXHAUSTED') || error?.message?.includes('Quota exceeded')) {
+      return NextResponse.json(
+        { 
+          error: 'Service temporarily unavailable due to high demand',
+          code: 'QUOTA_EXCEEDED',
+          retryAfter: 60 // Suggest retrying after 60 seconds
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Failed to fetch API keys' },
       { status: 500 }

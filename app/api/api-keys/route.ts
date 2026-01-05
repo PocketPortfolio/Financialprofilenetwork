@@ -83,6 +83,19 @@ export async function GET(request: NextRequest) {
       code: error?.code,
       stack: error?.stack
     });
+    
+    // Handle quota exceeded errors specifically
+    if (error?.code === 8 || error?.message?.includes('RESOURCE_EXHAUSTED') || error?.message?.includes('Quota exceeded')) {
+      return NextResponse.json(
+        { 
+          error: 'Service temporarily unavailable due to high demand',
+          code: 'QUOTA_EXCEEDED',
+          retryAfter: 60 // Suggest retrying after 60 seconds
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+    
     return NextResponse.json(
       { 
         error: 'Failed to fetch API keys',
