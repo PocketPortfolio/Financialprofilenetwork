@@ -25,25 +25,28 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: `${symbol} Dividend History - Payout Dates & Yields | Pocket Portfolio`,
-      description: `View complete ${symbol} dividend history including payout dates, amounts, and yields. Track dividend income for ${symbol} stock.`,
+      title: `${symbol} Dividend History & JSON Export | Payout Dates & Yields | Pocket Portfolio`,
+      description: `View ${symbol} dividend history and export to JSON format. Download ${symbol} dividend payout dates, amounts, and yields. Free API access.`,
     };
   }
 
   return {
-    title: `${metadata.name} (${symbol}) Dividend History - Payout Dates & Yields | Pocket Portfolio`,
-    description: `View complete ${metadata.name} (${symbol}) dividend history including payout dates, amounts, yields, and ex-dividend dates. Track dividend income for ${symbol} stock.`,
+    title: `${symbol} Dividend History & JSON Export | Payout Dates & Yields | Pocket Portfolio`,
+    description: `View ${metadata.name} (${symbol}) dividend history and export to JSON format. Download ${symbol} dividend payout dates, amounts, yields, and ex-dividend dates. Free API access.`,
     keywords: [
       `${symbol} dividend history`,
+      `${symbol} dividend JSON export`,
+      `${symbol} dividend data API`,
       `${symbol} dividend yield`,
       `${symbol} dividend dates`,
       `${symbol} ex-dividend date`,
       `${symbol} dividend payout`,
-      `${symbol} dividend income`
+      `${symbol} dividend income`,
+      `export ${symbol} dividends to JSON`
     ],
     openGraph: {
-      title: `${metadata.name} (${symbol}) Dividend History`,
-      description: `Complete dividend history for ${symbol} including dates, amounts, and yields.`,
+      title: `${symbol} Dividend History & JSON Export`,
+      description: `View and export ${symbol} dividend history to JSON format. Free API access.`,
       type: 'website',
       url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/dividend-history`,
     },
@@ -155,6 +158,47 @@ export default async function DividendHistoryPage({ params }: { params: Promise<
               Complete history of dividend payments for {normalizedSymbol}:
             </p>
             <HistoricalDividends symbol={normalizedSymbol} />
+          </div>
+
+          {/* NEW: JSON Export CTA */}
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: '24px',
+            marginBottom: '32px',
+            textAlign: 'center'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              marginBottom: '12px',
+              color: 'var(--text)'
+            }}>
+              Export {normalizedSymbol} Dividend Data to JSON
+            </h2>
+            <p style={{
+              color: 'var(--text-secondary)',
+              marginBottom: '20px',
+              lineHeight: '1.6'
+            }}>
+              Download {normalizedSymbol} dividend history in JSON format for programmatic access.
+            </p>
+            <a
+              href={`/s/${normalizedSymbol.toLowerCase()}/json-api?utm_source=dividend_page&utm_medium=json_export_cta&utm_campaign=dividend_export`}
+              style={{
+                display: 'inline-block',
+                padding: '12px 24px',
+                background: 'var(--accent-warm)',
+                color: '#ffffff',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: '600',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Get JSON API Access →
+            </a>
           </div>
 
           <div style={{

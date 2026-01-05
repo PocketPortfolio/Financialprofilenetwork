@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
+import SovereignSyncCTA from '@/app/components/SovereignSyncCTA';
 
 // Generate static params for supported brokers (50 brokers for Operation Velocity)
 export async function generateStaticParams() {
@@ -25,10 +26,13 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
   }
 
   return {
-    title: `${config.displayName} CSV Import Guide | Pocket Portfolio`,
-    description: `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio. Step-by-step guide with required columns, sample data, and troubleshooting tips.`,
+    title: `${config.displayName} CSV Export & Import Guide | Free Converter | Pocket Portfolio`,
+    description: `Export your ${config.displayName} trading data to CSV, then import into Pocket Portfolio. Convert ${config.displayName} CSV to JSON format. Step-by-step guide with required columns, sample data, and troubleshooting tips.`,
     keywords: [
+      `${config.displayName} CSV export`,
       `${config.displayName} CSV import`,
+      `convert ${config.displayName} CSV`,
+      `${config.displayName} CSV to JSON`,
       `import ${config.displayName} trades`,
       `${config.displayName} portfolio export`,
       `${config.displayName} CSV format`,
@@ -36,8 +40,8 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       `${config.displayName} account statement`
     ],
     openGraph: {
-      title: `${config.displayName} CSV Import Guide`,
-      description: `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio.`,
+      title: `${config.displayName} CSV Export & Import Guide | Free Converter`,
+      description: `Export your ${config.displayName} trading data to CSV, then import into Pocket Portfolio. Convert CSV to JSON format.`,
       images: [
         {
           url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
@@ -49,8 +53,8 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${config.displayName} CSV Import Guide`,
-      description: `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio.`,
+      title: `${config.displayName} CSV Export & Import Guide | Free Converter`,
+      description: `Export your ${config.displayName} trading data to CSV, then import into Pocket Portfolio.`,
       images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
     },
     alternates: {
@@ -163,6 +167,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             Learn how to import your {config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.
           </p>
         </header>
+
+        {/* NEW: Sovereign Sync CTA Section */}
+        <SovereignSyncCTA brokerName={config.displayName} />
 
         {/* Overview */}
         <section style={{ marginBottom: '32px' }}>

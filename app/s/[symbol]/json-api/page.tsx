@@ -24,25 +24,28 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: `${symbol} JSON API - Historical Data Export | Pocket Portfolio`,
-      description: `Export ${symbol} historical stock data to JSON format. Free API for developers to integrate ${symbol} price data into applications.`,
+      title: `${symbol} Historical Data & JSON API | Free Download | Pocket Portfolio`,
+      description: `Download ${symbol} historical stock data in JSON format. Free API for developers. Export ${symbol} price, volume, and dividend data. No login required.`,
     };
   }
 
   return {
-    title: `${metadata.name} (${symbol}) JSON API - Historical Data Export | Pocket Portfolio`,
-    description: `Export ${metadata.name} (${symbol}) historical stock data to JSON format. Free API for developers to integrate ${symbol} price, volume, and dividend data into applications.`,
+    title: `${symbol} Historical Data & JSON API | Free Download | Pocket Portfolio`,
+    description: `Download ${metadata.name} (${symbol}) historical stock data in JSON format. Free API for developers. Export price, volume, and dividend data. No login required.`,
     keywords: [
+      `${symbol} historical data json format`,
+      `${symbol} stock historical data json`,
       `${symbol} JSON API`,
       `${symbol} JSON export`,
       `${symbol} historical data JSON`,
       `${symbol} stock data API`,
       `${symbol} price API`,
-      `export ${symbol} to JSON`
+      `export ${symbol} to JSON`,
+      `download ${symbol} JSON data`
     ],
     openGraph: {
-      title: `${metadata.name} (${symbol}) JSON API`,
-      description: `Export ${symbol} historical data to JSON format for developers.`,
+      title: `${symbol} Historical Data & JSON API | Free Download`,
+      description: `Download ${symbol} historical stock data in JSON format. Free API for developers.`,
       type: 'website',
       url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
     },
@@ -80,14 +83,14 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
               color: 'var(--text)',
               marginBottom: '16px'
             }}>
-              {normalizedSymbol} JSON API
+              {normalizedSymbol} Historical Data & JSON API
             </h1>
             <p style={{
               color: 'var(--text-secondary)',
               marginBottom: '32px',
               lineHeight: '1.6'
             }}>
-              Export {normalizedSymbol} historical data to JSON format for programmatic access.
+              Download {normalizedSymbol} historical stock data in JSON format. Free API for developers. No login required.
             </p>
           </div>
         </div>
@@ -116,15 +119,14 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             color: 'var(--text)',
             marginBottom: '16px'
           }}>
-            {metadata.name} ({normalizedSymbol}) JSON API
+            {normalizedSymbol} Historical Data & JSON API
           </h1>
           <p style={{
             color: 'var(--text-secondary)',
             marginBottom: '32px',
             lineHeight: '1.6'
           }}>
-            Export {metadata.name} ({normalizedSymbol}) historical stock data to JSON format. 
-            Free API for developers to integrate {normalizedSymbol} price, volume, and dividend data into applications.
+            Download {normalizedSymbol} historical stock data in JSON format. Free API for developers. No login required.
           </p>
 
           <div style={{
