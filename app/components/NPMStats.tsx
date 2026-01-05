@@ -4,10 +4,6 @@ import React, { useState, useEffect } from 'react';
 
 interface NPMStatsData {
   totalDownloads: number;
-  previousWeekDownloads: number;
-  change: number;
-  isIncrease: boolean;
-  hasValidComparison?: boolean;
   lastUpdated?: string;
   error?: boolean;
 }
@@ -31,9 +27,6 @@ export default function NPMStats() {
         } else {
           setStats({
             totalDownloads: 0,
-            previousWeekDownloads: 0,
-            change: 0,
-            isIncrease: false,
             error: true,
           });
         }
@@ -41,9 +34,6 @@ export default function NPMStats() {
         console.error('Error fetching NPM stats:', error);
         setStats({
           totalDownloads: 0,
-          previousWeekDownloads: 0,
-          change: 0,
-          isIncrease: false,
           error: true,
         });
       } finally {
@@ -79,46 +69,6 @@ export default function NPMStats() {
     return null; // Fail silently
   }
 
-  // Determine arrow and color based on change
-  // Only show trend if we have valid comparison data
-  const hasValidComparison = stats.hasValidComparison !== false;
-  
-  let changeColor = '#6b7280'; // Neutral gray
-  let arrowIcon = null;
-  let showPercentage = false;
-  
-  if (hasValidComparison) {
-    if (stats.change > 0.1) {
-      // Increase - green
-      changeColor = '#10b981';
-      arrowIcon = (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 3L12 7H9V13H7V7H4L8 3Z" fill={changeColor} />
-        </svg>
-      );
-      showPercentage = true;
-    } else if (stats.change < -0.1) {
-      // Decrease - red
-      changeColor = '#ef4444';
-      arrowIcon = (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 13L4 9H7V3H9V9H12L8 13Z" fill={changeColor} />
-        </svg>
-      );
-      showPercentage = true;
-    } else if (Math.abs(stats.change) <= 0.1) {
-      // Neutral - no significant change
-      changeColor = '#6b7280';
-      arrowIcon = (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 8H13" stroke={changeColor} strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      );
-      showPercentage = false; // Don't show 0.0% for neutral
-    }
-  }
-  // If no valid comparison, don't show arrow or percentage
-
   return (
     <div style={{
       display: 'inline-flex',
@@ -136,23 +86,8 @@ export default function NPMStats() {
         {stats.totalDownloads.toLocaleString()}
       </span>
       <span style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
-        weekly downloads
+        Total downloads
       </span>
-      {arrowIcon && hasValidComparison && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          color: changeColor,
-          fontWeight: '500',
-          fontSize: '12px'
-        }}>
-          {arrowIcon}
-          {showPercentage && Math.abs(stats.change) > 0.01 && (
-            <span>{Math.abs(stats.change).toFixed(1)}%</span>
-          )}
-        </div>
-      )}
     </div>
   );
 }
