@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true; // Explicitly allow dynamic params
 export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
 export const revalidate = 0; // Force no caching - ensure fresh data
+export const fetchCache = 'force-no-store'; // Force no fetch caching - workaround for Next.js 15 routing bug
 
 // EODHD API Configuration
 const EODHD_API_KEY = process.env.EODHD_API_KEY || '';
