@@ -7,6 +7,8 @@ on:
     - cron: '0 */6 * * *'  # Every 6 hours: 00:00, 06:00, 12:00, 18:00 UTC
     # Also run at 9 AM UTC as primary time (keeps original schedule)
     - cron: '0 9 * * *'
+    # One-time: Real-Time Portfolio Tracking post at 16:00 GMT on Jan 5, 2026
+    - cron: '0 16 5 1 *'  # 16:00 UTC on Jan 5, 2026
     # One-time: NYE 2025 Year in Review post at 18:30 GMT (Dec 31, 2025)
     - cron: '30 18 31 12 *'
   workflow_dispatch: # Allow manual triggering (for testing/debugging only)
