@@ -22,7 +22,7 @@ export default function HistoricalDividends({ symbol }: HistoricalDividendsProps
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`/api/dividend/${symbol}`);
+        const response = await fetch(`/api/dividend?ticker=${symbol}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch dividend data: ${response.status}`);

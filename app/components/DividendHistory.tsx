@@ -51,8 +51,8 @@ export default function DividendHistory({ symbol }: DividendHistoryProps) {
           }
         }
         
-        console.warn(`[DividendHistory] Fetching dividend data for ${symbol} from /api/dividend/${symbol}`);
-        const apiUrl = `/api/dividend/${symbol}`;
+        console.warn(`[DividendHistory] Fetching dividend data for ${symbol} from /api/dividend?ticker=${symbol}`);
+        const apiUrl = `/api/dividend?ticker=${symbol}`;
         const startTime = Date.now();
         
         const response = await fetch(apiUrl, {

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Zero-Server Stack: Stop Renting Your Financial History | Pocket Portfolio</title>
+  <meta name="description" content="Learn how Pocket Portfolio uses a zero-server architecture to give you complete ownership of your financial data.">
+  <style>
+    /* Pocket Portfolio Brand Colors & Typography */
+    :root {
+      --signal: #ff6b35; /* orange - growth, positive */
+      --accent-warm: #f59e0b; /* amber */
+      --brand: #2563eb; /* blue */
+      --bg: #ffe6d1; /* warm orange-tinted background */
+      --surface: #ffffff; /* white */
+      --text: #1a202c; /* dark text */
+      --text-secondary: #2d3748; /* secondary text */
+      --muted: #4a5568; /* muted text */
+      --border: #e2e8f0; /* border */
+      --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, SF Mono, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      padding: 60px 80px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      overflow: visible;
+      position: relative;
+    }
+    
+    /* Ensure all text is visible for PDF generation */
+    #content-to-pdf * {
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    /* Header */
+    .header {
+      border-bottom: 3px solid var(--signal);
+      padding-bottom: 30px;
+      margin-bottom: 50px;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    .logo svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .brand-name {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      font-family: 'Inter', var(--font-sans);
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* Content Sections */
+    .section {
+      margin-bottom: 50px;
+    }
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .lead {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    /* Zero-Server Stack Section */
+    .zero-stack {
+      background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+      border-left: 4px solid var(--signal);
+      padding: 30px;
+      margin: 40px 0;
+      border-radius: 8px;
+    }
+
+    .zero-stack h3 {
+      color: var(--signal);
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    .zero-stack ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .zero-stack li {
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 16px;
+      padding-left: 32px;
+      position: relative;
+    }
+
+    .zero-stack li:before {
+      content: "✗";
+      position: absolute;
+      left: 0;
+      color: var(--signal);
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .zero-stack li.positive:before {
+      content: "✓";
+      color: var(--accent-warm);
+    }
+
+    /* Components Grid */
+    .components-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin: 30px 0;
+    }
+
+    .component-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .component-card:hover {
+      border-color: var(--signal);
+      box-shadow: 0 8px 24px rgba(255, 107, 53, 0.15);
+    }
+
+    .component-card h4 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--signal);
+      margin-bottom: 12px;
+    }
+
+    .component-card p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+    }
+
+    /* Key Takeaways */
+    .key-takeaways {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(255, 107, 53, 0.08) 100%);
+      border-radius: 12px;
+      padding: 40px;
+      margin: 40px 0;
+    }
+
+    .key-takeaways h2 {
+      border-bottom: none;
+      margin-bottom: 30px;
+      color: var(--text);
+    }
+
+    .takeaways-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .takeaways-list li {
+      font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      padding-left: 40px;
+      position: relative;
+    }
+
+    .takeaways-list li:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent-warm);
+      font-weight: 700;
+      font-size: 24px;
+    }
+
+    .takeaways-list strong {
+      color: var(--signal);
+      font-weight: 600;
+    }
+
+    /* Real-World Example */
+    .example-section {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 40px 0;
+    }
+
+    .example-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 16px;
+    }
+
+    .example-table thead {
+      background: linear-gradient(135deg, var(--signal) 0%, var(--accent-warm) 100%);
+      color: white;
+    }
+
+    .example-table th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .example-table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .example-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .example-table tbody tr:nth-child(even) {
+      background: rgba(255, 107, 53, 0.03);
+    }
+
+    .positive-value {
+      color: var(--accent-warm);
+      font-weight: 600;
+    }
+
+    /* Philosophy Box */
+    .philosophy-box {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(255, 107, 53, 0.05) 100%);
+      border-left: 4px solid var(--brand);
+      padding: 30px;
+      margin: 40px 0;
+      border-radius: 8px;
+    }
+
+    .philosophy-box p {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0;
+      line-height: 1.6;
+    }
+
+    .philosophy-box .highlight {
+      color: var(--signal);
+      font-weight: 700;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 2px solid var(--border);
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .footer a {
+      color: var(--signal);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Download Button */
+    .download-button-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .download-pdf-btn {
+      background: linear-gradient(135deg, var(--signal) 0%, var(--accent-warm) 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+    }
+
+    .download-pdf-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    }
+
+    .download-pdf-btn:active {
+      transform: translateY(0);
+    }
+
+    .download-pdf-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    @media print {
+      .download-button-container {
+        display: none;
+      }
+    }
+
+    /* Comment Screenshot Section */
+    .comment-section {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin: 40px 0;
+    }
+
+    .comment-section h2 {
+      margin-bottom: 24px;
+    }
+
+    .comment-screenshot {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      margin: 20px 0;
+      border: 1px solid var(--border);
+    }
+
+    .comment-note {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--accent-warm);
+      padding: 16px 20px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+
+    .comment-note strong {
+      color: var(--accent-warm);
+      font-weight: 600;
+    }
+
+    /* Print Styles - Optimized for PDF */
+    @media print {
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+        line-height: 1.5;
+      }
+
+      .download-button-container {
+        display: none !important;
+      }
+
+      .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        background: white !important;
+      }
+
+      .header {
+        border-bottom: 3px solid #ff6b35 !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 30px !important;
+        page-break-after: avoid;
+      }
+
+      h1 {
+        font-size: 28pt !important;
+        color: black !important;
+        page-break-after: avoid;
+        margin-bottom: 12pt !important;
+      }
+
+      h2 {
+        font-size: 20pt !important;
+        color: black !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        margin-top: 20pt !important;
+        margin-bottom: 12pt !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+      }
+
+      h3 {
+        font-size: 16pt !important;
+        color: black !important;
+        page-break-after: avoid;
+        margin-top: 16pt !important;
+        margin-bottom: 8pt !important;
+      }
+
+      p {
+        font-size: 11pt !important;
+        color: black !important;
+        line-height: 1.6 !important;
+        margin-bottom: 10pt !important;
+        orphans: 3;
+        widows: 3;
+      }
+
+      .lead {
+        font-size: 13pt !important;
+        color: #2d3748 !important;
+        margin-bottom: 20pt !important;
+      }
+
+      .zero-stack,
+      .key-takeaways,
+      .example-section,
+      .philosophy-box,
+      .comment-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin: 20pt 0 !important;
+      }
+
+      .component-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin: 12pt 0 !important;
+      }
+
+      .comment-screenshot {
+        max-width: 100% !important;
+        height: auto !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin: 15pt 0 !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+
+      .example-table {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        font-size: 10pt !important;
+      }
+
+      .example-table th {
+        background: #ff6b35 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .footer {
+        margin-top: 30pt !important;
+        padding-top: 20pt !important;
+        border-top: 2px solid #e2e8f0 !important;
+        page-break-inside: avoid;
+      }
+
+      .footer p {
+        font-size: 9pt !important;
+        color: #4a5568 !important;
+      }
+
+      /* Ensure gradients and colors print */
+      .zero-stack,
+      .key-takeaways,
+      .philosophy-box {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* Logo and images */
+      .logo svg {
+        max-width: 56px !important;
+        height: auto !important;
+      }
+
+      /* Lists */
+      ul, ol {
+        margin: 10pt 0 !important;
+        padding-left: 20pt !important;
+      }
+
+      li {
+        margin-bottom: 6pt !important;
+        font-size: 11pt !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 40px 30px;
+      }
+
+      h1 {
+        font-size: 32px;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      .lead {
+        font-size: 18px;
+      }
+    }
+  </style>
+  <!-- html2pdf library for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <!-- Download PDF Button -->
+  <div class="download-button-container">
+    <button class="download-pdf-btn" onclick="downloadPDF()" title="Download as PDF">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Download PDF
+    </button>
+  </div>
+
+  <div class="container" id="content-to-pdf">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo">
+          <svg width="56" height="56" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="bg" cx="35%" cy="30%" r="90%">
+                <stop offset="0" stop-color="#1f5fe0"/>
+                <stop offset="1" stop-color="#0b1220"/>
+              </radialGradient>
+              <linearGradient id="ink" x1="0" x2="1">
+                <stop offset="0" stop-color="#34d399"/>
+                <stop offset="1" stop-color="#2563eb"/>
+              </linearGradient>
+            </defs>
+            <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+            <g fill="url(#ink)">
+              <path d="M62 78a20 20 0 0 1 20-20h52c28 0 44 16 44 40s-16 40-44 40H122v40a20 20 0 0 1-20 20H82a20 20 0 0 1-20-20V78zm40 20v20h32c8 0 12-4 12-10s-4-10-12-10h-32z"/>
+              <rect x="144" y="138" width="36" height="36" rx="8" opacity=".9"/>
+            </g>
+          </svg>
+        </div>
+        <div class="brand-name">Pocket Portfolio</div>
+      </div>
+      <h1>The Zero-Server Stack: Stop Renting Your Financial History</h1>
+      <p class="subtitle">How we built a portfolio tracker that puts you in complete control of your data</p>
+    </header>
+
+    <!-- Introduction -->
+    <section class="section">
+      <p class="lead">
+        We stripped everything back. There is no backend database. No user accounts. No cloud sync. 
+        Your financial data lives on your device, not ours.
+      </p>
+    </section>
+
+    <!-- The Zero-Server Stack -->
+    <section class="section">
+      <div class="zero-stack">
+        <h3>The Zero-Server Stack</h3>
+        <ul>
+          <li>There is no backend database.</li>
+          <li>No user accounts.</li>
+          <li>No cloud sync.</li>
+        </ul>
+      </div>
+
+      <div class="components-grid">
+        <div class="component-card">
+          <h4>The Core</h4>
+          <p><strong>Next.js (static export).</strong> The entire app is JavaScript shipped to the browser.</p>
+        </div>
+        <div class="component-card">
+          <h4>The Database</h4>
+          <p><strong>Browser storage</strong> (localStorage and IndexedDB). Your financial data lives on your device, not ours.</p>
+        </div>
+        <div class="component-card">
+          <h4>The Parser</h4>
+          <p><strong>Web Workers</strong> processing CSV files entirely client-side.</p>
+        </div>
+      </div>
+
+      <div class="zero-stack" style="margin-top: 30px;">
+        <ul>
+          <li class="positive">No servers storing user data.</li>
+          <li class="positive">No silent replication.</li>
+          <li class="positive">No surveillance by default.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Key Takeaways -->
+    <section class="section">
+      <div class="key-takeaways">
+        <h2>Key Takeaways</h2>
+        <p style="font-size: 18px; margin-bottom: 24px;">
+          Unlike cloud apps, Pocket Portfolio uses <strong>Sovereign Sync</strong> to turn your Google Drive into a database. 
+          This approach ensures:
+        </p>
+        <ul class="takeaways-list">
+          <li>
+            <strong>Data Ownership:</strong> Your financial data lives in your Google Drive, not a vendor's database
+          </li>
+          <li>
+            <strong>No Vendor Lock-in:</strong> Export anytime, use any tool
+          </li>
+          <li>
+            <strong>Privacy by Default:</strong> Your data never leaves your control
+          </li>
+          <li>
+            <strong>Local-First Resilience:</strong> Works offline, syncs when online
+          </li>
+        </ul>
+        <p style="font-size: 18px; margin-top: 24px; margin-bottom: 0;">
+          Learn how to set up Google Drive Sync and turn your Drive into your personal financial database.
+        </p>
+      </div>
+    </section>
+
+    <!-- Real-World Example -->
+    <section class="section">
+      <div class="example-section">
+        <h2>Real-World Example</h2>
+        <p style="font-size: 18px; margin-bottom: 20px;">
+          You bought AAPL at £150. Today it's £170.
+        </p>
+        <table class="example-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Meaning</th>
+              <th>Value Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Unrealised P/L</strong></td>
+              <td>Price moved, but you haven't sold.</td>
+              <td class="positive-value">+£20 (13.3%)</td>
+            </tr>
+            <tr>
+              <td><strong>Realised P/L</strong></td>
+              <td>You sold at £170 — gain is final.</td>
+              <td class="positive-value">+£20 (13.3%)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 16px; color: var(--text-secondary); margin-top: 20px; font-style: italic;">
+          If AAPL drops back to £150 <em>before you sell</em>, the unrealised gain disappears — you never actually made (or lost) money.
+        </p>
+      </div>
+    </section>
+
+    <!-- Community Proof - Vanessa Paul Comment -->
+    <section class="section">
+      <div class="comment-section">
+        <h2>Community Feedback</h2>
+        <p style="font-size: 18px; margin-bottom: 20px;">
+          Here's what the community is saying about our local-first approach:
+        </p>
+        <!-- Screenshot of Vanessa Paul comment thread -->
+        <img 
+          id="vanessa-screenshot"
+          src="Vanessa.png" 
+          alt="Vanessa Paul comment thread: 'The client side CSV parsing with Web Workers was the part that really jumped out to me, nice point there, how do you handle long term backups if everything stays local?' with Pocket Portfolio's detailed response about local-first backups, explicit user-controlled exports, and opt-in encrypted sync philosophy." 
+          class="comment-screenshot"
+        />
+        <div id="screenshot-placeholder" style="display: none; padding: 40px; background: rgba(255, 107, 53, 0.1); border: 2px dashed var(--signal); border-radius: 8px; text-align: center; margin: 20px 0;">
+          <p style="color: var(--signal); font-weight: 600; margin-bottom: 8px; font-size: 18px;">📸 Screenshot Placeholder</p>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">
+            Please add the Vanessa Paul comment screenshot as one of these filenames:
+          </p>
+          <ul style="color: var(--text-secondary); font-size: 14px; text-align: left; display: inline-block; margin: 0;">
+            <li><code>vanessa-paul-comment.png</code></li>
+            <li><code>vanessa-paul-comment.jpg</code></li>
+            <li><code>vanessa-paul-comment.jpeg</code></li>
+          </ul>
+          <p style="color: var(--text-secondary); font-size: 14px; margin-top: 12px;">
+            Place it in the same directory as this HTML file.
+          </p>
+        </div>
+        <div class="comment-note">
+          <strong>Vanessa Paul asked:</strong> "The client side CSV parsing with Web Workers was the part that really jumped out to me, nice point there, how do you handle long term backups if everything stays local?"
+        </div>
+        <div style="margin-top: 24px; padding: 24px; background: rgba(255, 107, 53, 0.05); border-radius: 8px;">
+          <p style="font-size: 18px; margin-bottom: 16px; font-weight: 600; color: var(--signal);">
+            Our Response:
+          </p>
+          <p style="font-size: 16px; line-height: 1.8; margin-bottom: 12px;">
+            <strong>Short answer:</strong> backups are explicit and user-controlled, not automatic or silent.
+          </p>
+          <p style="font-size: 16px; line-height: 1.8; margin-bottom: 12px;">
+            Right now we treat the browser as the source of truth, but we make it easy for users to <em>export</em> that state:
+          </p>
+          <ul style="font-size: 16px; line-height: 1.8; margin-left: 24px; margin-bottom: 12px;">
+            <li>Full portfolio export to JSON (and CSV) that can be stored anywhere the user wants</li>
+            <li>Manual snapshotting so users can version their data (GitHub, cloud drive, encrypted disk, etc.)</li>
+          </ul>
+          <p style="font-size: 16px; line-height: 1.8; margin-bottom: 12px;">
+            Longer-term, the direction is <strong>opt-in encrypted sync</strong>, not a default cloud:
+          </p>
+          <ul style="font-size: 16px; line-height: 1.8; margin-left: 24px; margin-bottom: 12px;">
+            <li>End-to-end encryption where only the user holds the key</li>
+            <li>Sync as a convenience layer, not a data-collection layer</li>
+            <li>Local remains authoritative even when sync exists</li>
+          </ul>
+          <p style="font-size: 18px; line-height: 1.8; margin-top: 16px; font-weight: 600; color: var(--signal);">
+            So the philosophy is: <strong>local by default, portable by design, synced only with consent.</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Philosophy -->
+    <section class="section">
+      <div class="philosophy-box">
+        <h3 style="margin-top: 0; color: var(--brand);">The Philosophy</h3>
+        <p>
+          <span class="highlight">Local by default,</span> 
+          <span class="highlight">portable by design,</span> 
+          <span class="highlight">synced only with consent.</span>
+        </p>
+        <p style="margin-top: 16px; font-size: 18px; font-weight: 400;">
+          Backups are explicit and user-controlled, not automatic or silent. Right now we treat the browser as the source of truth, 
+          but we make it easy for users to export that state: full portfolio export to JSON (and CSV) that can be stored anywhere the user wants.
+        </p>
+        <p style="margin-top: 16px; font-size: 18px; font-weight: 400;">
+          Longer-term, the direction is <strong>opt-in encrypted sync</strong>, not a default cloud: end-to-end encryption where only the user holds the key, 
+          sync as a convenience layer, not a data-collection layer. Local remains authoritative even when sync exists.
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p><strong>Pocket Portfolio</strong> — Your financial data, your device, your control.</p>
+      <p>
+        <a href="https://pocketportfolio.app">pocketportfolio.app</a> | 
+        <a href="https://github.com/PocketPortfolio">GitHub</a> | 
+        <a href="https://www.linkedin.com/company/pocket-portfolio-community">LinkedIn</a>
+      </p>
+      <p style="margin-top: 16px; font-size: 12px;">
+        © 2025 Pocket Portfolio. Built with ❤️ by the developer community.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Handle successful image load
+    function handleImageLoad(img) {
+      const placeholder = document.getElementById('screenshot-placeholder');
+      if (placeholder) {
+        placeholder.style.display = 'none';
+      }
+      img.style.display = 'block';
+    }
+
+    // Handle image loading errors
+    function handleImageError(img) {
+      const placeholder = document.getElementById('screenshot-placeholder');
+      
+      // Try alternative image formats and filenames
+      const formats = [
+        'Vanessa', 'Vanessa.png', 'Vanessa.jpg', 'Vanessa.jpeg',
+        'vanessa-paul-comment.png', 'vanessa-paul-comment.jpg', 'vanessa-paul-comment.jpeg'
+      ];
+      let currentFormat = 0;
+      
+      const tryNextFormat = () => {
+        if (currentFormat < formats.length) {
+          const testImg = new Image();
+          testImg.onload = () => {
+            img.src = formats[currentFormat];
+            img.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+          };
+          testImg.onerror = () => {
+            currentFormat++;
+            if (currentFormat >= formats.length) {
+              // All formats failed, show placeholder
+              img.style.display = 'none';
+              if (placeholder) placeholder.style.display = 'block';
+            } else {
+              tryNextFormat();
+            }
+          };
+          testImg.src = formats[currentFormat];
+        } else {
+          // All formats failed
+          img.style.display = 'none';
+          if (placeholder) placeholder.style.display = 'block';
+        }
+      };
+      
+      tryNextFormat();
+    }
+
+    // Alternative: Embed screenshot as base64
+    // To embed the screenshot directly, uncomment the line below and replace with your base64 data:
+    /*
+    window.addEventListener('DOMContentLoaded', () => {
+      const img = document.getElementById('vanessa-screenshot');
+      if (img) {
+        // Paste your base64 data URI here (use embed-screenshot.html helper to generate it)
+        img.src = 'data:image/png;base64,YOUR_BASE64_DATA_HERE';
+      }
+    });
+    */
+    
+    // Auto-detect image on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const img = document.getElementById('vanessa-screenshot');
+      if (img && !img.complete) {
+        // Image not loaded yet, will be handled by onload/onerror handlers
+      }
+    });
+
+    // Convert image to base64 to avoid CORS issues
+    function imageToBase64(img) {
+      return new Promise((resolve, reject) => {
+        // If already base64, return it
+        if (img.src.startsWith('data:')) {
+          resolve(img.src);
+          return;
+        }
+
+        // Create canvas to convert image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas dimensions
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        
+        // Draw image to canvas
+        try {
+          ctx.drawImage(img, 0, 0);
+          // Convert to base64
+          const base64 = canvas.toDataURL('image/png');
+          resolve(base64);
+        } catch (error) {
+          console.warn('Could not convert image to base64:', error);
+          // Return original src as fallback
+          resolve(img.src);
+        }
+      });
+    }
+
+    // Convert all images to base64 before PDF generation
+    async function prepareImagesForPDF() {
+      const element = document.getElementById('content-to-pdf');
+      const images = element.querySelectorAll('img');
+      const imagePromises = Array.from(images).map(async (img) => {
+        // Wait for image to load
+        if (!img.complete) {
+          await new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+            setTimeout(resolve, 3000); // Timeout after 3 seconds
+          });
+        }
+        
+        // Convert to base64
+        try {
+          const base64 = await imageToBase64(img);
+          img.setAttribute('data-original-src', img.src);
+          img.src = base64;
+          img.crossOrigin = 'anonymous';
+        } catch (error) {
+          console.warn('Failed to convert image:', error);
+        }
+      });
+      
+      await Promise.all(imagePromises);
+    }
+
+    function downloadPDF() {
+      // Use browser print for best quality (recommended)
+      // Browser print produces much better text rendering than html2canvas
+      const btn = document.querySelector('.download-pdf-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 20px; height: 20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg> Opening Print...';
+      btn.disabled = true;
+
+      // Show helpful message
+      setTimeout(() => {
+        alert('For best PDF quality:\n\n1. In the print dialog, select "Save as PDF" or "Microsoft Print to PDF"\n2. Make sure "Background graphics" is enabled\n3. Click "Save" or "Print"\n\nThis method produces much better text quality than automated PDF generation.');
+        window.print();
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }, 100);
+      
+      return; // Use browser print method
+      
+      /* Alternative: html2pdf method (commented out due to quality issues)
+      // Check if html2pdf is loaded
+      if (typeof html2pdf === 'undefined') {
+        alert('PDF library not loaded. Using browser print instead...');
+        window.print();
+        return;
+      }
+
+      const element = document.getElementById('content-to-pdf');
+      if (!element) {
+        alert('Content not found!');
+        return;
+      }
+
+      // Show loading state
+      const btn = document.querySelector('.download-pdf-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 20px; height: 20px; animation: spin 1s linear infinite;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Preparing PDF...';
+      btn.disabled = true;
+
+      // Prepare images (convert to base64) then generate PDF
+      prepareImagesForPDF().then(() => {
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 20px; height: 20px; animation: spin 1s linear infinite;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg> Generating PDF...';
+        
+        // Wait a moment for everything to settle
+        setTimeout(() => {
+          // Calculate proper dimensions
+          const rect = element.getBoundingClientRect();
+          const width = Math.max(element.scrollWidth, rect.width);
+          const height = Math.max(element.scrollHeight, rect.height);
+          
+          // Improved PDF options with better rendering
+          const opt = {
+            margin: [15, 15, 15, 15],
+            filename: 'zero-server-stack-pocket-portfolio.pdf',
+            image: { type: 'png', quality: 1.0, html2canvas: { scale: 4 } },
+            enableLinks: false,
+            html2canvas: { 
+              scale: 4, // Much higher scale for crisp text
+              useCORS: false,
+              allowTaint: false,
+              letterRendering: true, // Enable for better text
+              logging: false,
+              backgroundColor: '#ffffff',
+              width: width,
+              height: height,
+              x: 0,
+              y: 0,
+              scrollX: 0,
+              scrollY: -window.scrollY,
+              windowWidth: width,
+              windowHeight: height,
+              removeContainer: false,
+              foreignObjectRendering: false, // Disable to avoid text issues
+              imageTimeout: 15000,
+              proxy: undefined,
+              onclone: function(clonedDoc) {
+                // Fix text rendering in cloned document
+                const clonedElement = clonedDoc.getElementById('content-to-pdf');
+                if (clonedElement) {
+                  // Ensure all text is visible and properly styled
+                  const style = clonedDoc.createElement('style');
+                  style.textContent = `
+                    * {
+                      -webkit-font-smoothing: antialiased !important;
+                      -moz-osx-font-smoothing: grayscale !important;
+                      text-rendering: optimizeLegibility !important;
+                      font-family: ${getComputedStyle(document.body).fontFamily} !important;
+                    }
+                    body {
+                      overflow: visible !important;
+                      margin: 0 !important;
+                      padding: 0 !important;
+                      background: white !important;
+                    }
+                    .container {
+                      width: ${width}px !important;
+                      max-width: ${width}px !important;
+                      overflow: visible !important;
+                      background: white !important;
+                    }
+                    img {
+                      image-rendering: -webkit-optimize-contrast !important;
+                      image-rendering: crisp-edges !important;
+                      max-width: 100% !important;
+                      height: auto !important;
+                    }
+                    p, h1, h2, h3, h4, li, td, th, span, div {
+                      text-rendering: optimizeLegibility !important;
+                      -webkit-font-smoothing: antialiased !important;
+                      -moz-osx-font-smoothing: grayscale !important;
+                    }
+                  `;
+                  clonedDoc.head.appendChild(style);
+                  
+                  // Ensure all text elements are visible and properly rendered
+                  const textElements = clonedElement.querySelectorAll('p, h1, h2, h3, h4, li, td, th, span, div, a');
+                  textElements.forEach(el => {
+                    if (el.style) {
+                      el.style.visibility = 'visible';
+                      el.style.opacity = '1';
+                      el.style.display = '';
+                      el.style.textRendering = 'optimizeLegibility';
+                      el.style.webkitFontSmoothing = 'antialiased';
+                      el.style.mozOsxFontSmoothing = 'grayscale';
+                    }
+                  });
+                  
+                  // Ensure images are properly loaded
+                  const images = clonedElement.querySelectorAll('img');
+                  images.forEach(img => {
+                    if (img.complete && img.naturalWidth > 0) {
+                      img.style.imageRendering = 'crisp-edges';
+                    }
+                  });
+                }
+              }
+            },
+            jsPDF: { 
+              unit: 'mm', 
+              format: 'a4', 
+              orientation: 'portrait',
+              compress: false,
+              precision: 16
+            },
+            pagebreak: { 
+              mode: ['avoid-all', 'css', 'legacy'],
+              before: '.page-break-before',
+              after: '.page-break-after',
+              avoid: ['.no-break', 'h2', 'h3', '.section', '.zero-stack', '.key-takeaways', '.example-section', '.philosophy-box', '.comment-section']
+            }
+          };
+
+          html2pdf().set(opt).from(element).save().then(() => {
+            // Restore original image sources
+            const images = element.querySelectorAll('img[data-original-src]');
+            images.forEach(img => {
+              if (img.getAttribute('data-original-src')) {
+                img.src = img.getAttribute('data-original-src');
+                img.removeAttribute('data-original-src');
+              }
+            });
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.textContent = '✓ PDF downloaded successfully!';
+            successMsg.style.cssText = 'position: fixed; top: 80px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1001; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-weight: 600;';
+            document.body.appendChild(successMsg);
+            setTimeout(() => successMsg.remove(), 3000);
+          }).catch((error) => {
+            console.error('PDF generation error:', error);
+            
+            // Restore original image sources
+            const images = element.querySelectorAll('img[data-original-src]');
+            images.forEach(img => {
+              if (img.getAttribute('data-original-src')) {
+                img.src = img.getAttribute('data-original-src');
+                img.removeAttribute('data-original-src');
+              }
+            });
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            
+            // Show error and offer fallback
+            const usePrint = confirm('PDF generation encountered an issue.\n\nError: ' + (error.message || error) + '\n\nWould you like to use the browser\'s print dialog instead?\n(You can save as PDF from there)');
+            if (usePrint) {
+              window.print();
+            } else {
+              alert('PDF generation failed. Please try again or use your browser\'s print function (Ctrl+P / Cmd+P) and select "Save as PDF".');
+            }
+          });
+        }, 500); // Small delay to ensure everything is rendered
+        */
+        
+        /* Removed html2pdf code - using browser print for better quality
+        html2pdf().set(opt).from(element).save().then(() => {
+          // Restore original image sources
+          const images = element.querySelectorAll('img[data-original-src]');
+          images.forEach(img => {
+            if (img.getAttribute('data-original-src')) {
+              img.src = img.getAttribute('data-original-src');
+              img.removeAttribute('data-original-src');
+            }
+          });
+
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          
+          // Show success message
+          const successMsg = document.createElement('div');
+          successMsg.textContent = '✓ PDF downloaded successfully!';
+          successMsg.style.cssText = 'position: fixed; top: 80px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; z-index: 1001; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-weight: 600;';
+          document.body.appendChild(successMsg);
+          setTimeout(() => successMsg.remove(), 3000);
+        }).catch((error) => {
+          console.error('PDF generation error:', error);
+          
+          // Restore original image sources
+          const images = element.querySelectorAll('img[data-original-src]');
+          images.forEach(img => {
+            if (img.getAttribute('data-original-src')) {
+              img.src = img.getAttribute('data-original-src');
+              img.removeAttribute('data-original-src');
+            }
+          });
+
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          
+          // Show error and offer fallback
+          const usePrint = confirm('PDF generation encountered an issue.\n\nError: ' + error.message + '\n\nWould you like to use the browser\'s print dialog instead?\n(You can save as PDF from there)');
+          if (usePrint) {
+            window.print();
+          } else {
+            alert('PDF generation failed. Please try again or use your browser\'s print function (Ctrl+P / Cmd+P) and select "Save as PDF".');
+          }
+        });
+      }).catch((error) => {
+        console.error('Image preparation error:', error);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert('Error preparing images. Please ensure all images are loaded and try again.');
+      });
+      */
+    }
+
+    // Add spin animation for loading
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

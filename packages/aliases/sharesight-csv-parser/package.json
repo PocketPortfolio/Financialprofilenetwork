@@ -1,0 +1,40 @@
+{
+  "name": "@pocket-portfolio/sharesight-csv-parser",
+  "version": "1.0.8",
+  "description": "Parse Sharesight CSV exports into normalized format. Free & open-source. Support: pocketportfolio.app/sponsor",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "keywords": [
+    "sharesight",
+    "portfolio",
+    "tracker",
+    "csv",
+    "parser",
+    "finance",
+    "tax"
+  ],
+  "author": "Pocket Portfolio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PocketPortfolio/Financialprofilenetwork.git",
+    "directory": "packages/aliases/sharesight-csv-parser"
+  },
+  "dependencies": {
+    "@pocket-portfolio/importer": "^1.0.6"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "scripts"
+  ],
+  "homepage": "https://www.pocketportfolio.app",
+  "bugs": {
+    "url": "https://github.com/PocketPortfolio/Financialprofilenetwork/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

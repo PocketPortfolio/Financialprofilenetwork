@@ -1,0 +1,496 @@
+{
+  "timestamp": "2025-12-31T12:12:43.647Z",
+  "sources": {
+    "devto": {
+      "url": "https://dev.to/pocketportfolioapp",
+      "posts": [
+        {
+          "id": "devto-3120399",
+          "title": "Stop Building Fintech with Databases: Why I Went Local-First for Pocket Portfolio",
+          "url": "https://dev.to/pocketportfolioapp/stop-building-fintech-with-databases-why-i-went-local-first-for-pocket-portfolio-1b2a",
+          "source": "dev.to",
+          "date": "2025-12-22T10:32:23Z",
+          "excerpt": "Why Pocket Portfolio rejected centralized databases in favor of a privacy-absolute, local-first architecture for modern investors.",
+          "tags": [
+            "fintech",
+            "privacy",
+            "localfirst",
+            "nextjs"
+          ],
+          "pillar": "philosophy",
+          "ritual": null,
+          "priority": "high"
+        },
+        {
+          "id": "devto-3058455",
+          "title": "Designing Trust: UX Principles in Fintech Apps",
+          "url": "https://dev.to/pocketportfolioapp/designing-trust-ux-principles-in-fintech-apps-2gfo",
+          "source": "dev.to",
+          "date": "2025-11-25T17:11:03Z",
+          "excerpt": "How Pocket Portfolio rebuilt its UX to make data accuracy, privacy, and reliability visually obvious from the first screen.",
+          "tags": [
+            "fintech",
+            "ux",
+            "design",
+            "psychology"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2954083",
+          "title": "Realised vs Unrealised P/L — Money in Your Pocket vs Money on Paper",
+          "url": "https://dev.to/pocketportfolioapp/realised-vs-unrealised-pl-money-in-your-pocket-vs-money-on-paper-4p50",
+          "source": "dev.to",
+          "date": "2025-10-23T19:21:10Z",
+          "excerpt": "Learn the simple difference between realised and unrealised profit & loss using Pocket Portfolio’s interactive examples.",
+          "tags": [
+            "investing",
+            "fintech",
+            "pocketportfolio",
+            "education"
+          ],
+          "pillar": "market",
+          "ritual": null,
+          "priority": "medium"
+        },
+        {
+          "id": "devto-2911773",
+          "title": "Price Pipeline Health — transparency you can see (and trust)",
+          "url": "https://dev.to/pocketportfolioapp/price-pipeline-health-transparency-you-can-see-and-trust-1m2f",
+          "source": "dev.to",
+          "date": "2025-10-10T13:44:21Z",
+          "excerpt": "Ask your finance app today: Where do your live prices come from, how fresh are they, and what...",
+          "tags": [
+            "fintech",
+            "webdev",
+            "opensource",
+            "performance"
+          ],
+          "pillar": "technical",
+          "ritual": null,
+          "priority": "medium"
+        },
+        {
+          "id": "devto-2905076",
+          "title": "Devlog: Building the **Price Pipeline Health** Card (so you know when data is fresh or fallback)",
+          "url": "https://dev.to/pocketportfolioapp/devlog-building-the-price-pipeline-health-card-so-you-know-when-data-is-fresh-or-fallback-57p2",
+          "source": "dev.to",
+          "date": "2025-10-08T12:59:57Z",
+          "excerpt": "Stack: React + Vite (SPA), Firebase Auth/Firestore, Vercel (Edge Functions). Status: scoped &amp;...",
+          "tags": [
+            "webdev",
+            "opensource",
+            "typescript",
+            "api"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2883095",
+          "title": "Designing a “Never-0.00” Price Pipeline in the Real World",
+          "url": "https://dev.to/pocketportfolioapp/designing-a-never-000-price-pipeline-in-the-real-world-3m3i",
+          "source": "dev.to",
+          "date": "2025-10-01T18:01:17Z",
+          "excerpt": "Your users don’t care why a quote failed—they care that the number didn’t flash 0.00. Here’s a...",
+          "tags": [
+            "webperf",
+            "fintech",
+            "opensource",
+            "typescript"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2875021",
+          "title": "Engineers, last call: help us build the cleanest open-source investing dashboard (before it gets boring)",
+          "url": "https://dev.to/pocketportfolioapp/engineers-last-call-help-us-build-the-cleanest-open-source-investing-dashboard-before-it-gets-2ji9",
+          "source": "dev.to",
+          "date": "2025-09-28T19:03:45Z",
+          "excerpt": "If you’ve ever yelled at a portfolio tool that showed 0.00 for prices or made CSV import a hostage...",
+          "tags": [
+            "showdev",
+            "react",
+            "opensource",
+            "webdev"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2866262",
+          "title": "ELI5: What’s the difference between *realized* vs *unrealized* P/L?",
+          "url": "https://dev.to/pocketportfolioapp/eli5-whats-the-difference-between-realized-vs-unrealized-pl-285d",
+          "source": "dev.to",
+          "date": "2025-09-24T17:34:12Z",
+          "excerpt": "I’m building an open-source portfolio dashboard and keep tripping over how to explain P/L in a way...",
+          "tags": [
+            "explainlikeimfive",
+            "beginners",
+            "finance",
+            "discuss"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2866252",
+          "title": "Today’s ship: Mock-Trade Lab, 5-min CSV Import, and bulletproof Price Fallbacks",
+          "url": "https://dev.to/pocketportfolioapp/todays-ship-mock-trade-lab-5-min-csv-import-and-bulletproof-price-fallbacks-9oa",
+          "source": "dev.to",
+          "date": "2025-09-24T17:23:35Z",
+          "excerpt": "Quick one from me. We pushed three things live today that make Pocket Portfolio immediately useful...",
+          "tags": [
+            "showdev",
+            "opensource",
+            "fintech",
+            "webdev"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2863678",
+          "title": "Test ideas without risking a penny — Mock Trade & Scenario Lab (open source)",
+          "url": "https://dev.to/pocketportfolioapp/test-ideas-without-risking-a-penny-mock-trade-scenario-lab-open-source-3ajb",
+          "source": "dev.to",
+          "date": "2025-09-23T15:58:08Z",
+          "excerpt": "Before you buy/sell, preview the impact. Our Mock Trade &amp; Scenario Lab lets you model positions...",
+          "tags": [
+            "showdev",
+            "opensource",
+            "fintech",
+            "webdev"
+          ],
+          "ritual": null,
+          "priority": "low"
+        },
+        {
+          "id": "devto-2861451",
+          "title": "Hello DEV — we’re building Pocket Portfolio in public",
+          "url": "https://dev.to/pocketportfolioapp/hello-dev-were-building-pocket-portfolio-in-public-2d0a",
+          "source": "dev.to",
+          "date": "2025-09-22T16:53:16Z",
+          "excerpt": "Pocket Portfolio is an open-source investing dashboard. Drag-drop a CSV → get clean, live P/L with...",
+          "tags": [
+            "showdev",
+            "opensource",
+            "fintech",
+            "webdev"
+          ],
+          "pillar": "market",
+          "ritual": null,
+          "priority": "medium"
+        },
+        {
+          "id": "devto-2861434",
+          "title": "Discuss: What’s the #1 headache in portfolio tracking today?",
+          "url": "https://dev.to/pocketportfolioapp/discuss-whats-the-1-headache-in-portfolio-tracking-today-3mgi",
+          "source": "dev.to",
+          "date": "2025-09-22T16:37:19Z",
+          "excerpt": "Pick one (or add your own in comments):   Missing/slow prices CSV hell (every broker is...",
+          "tags": [
+            "discuss",
+            "opensource",
+            "fintech",
+            "productivity"
+          ],
+          "pillar": "market",
+          "ritual": null,
+          "priority": "medium"
+        }
+      ]
+    },
+    "coderlegion_profile": {
+      "url": "https://coderlegion.com/user/Pocket+Portfolio",
+      "posts": [
+        {
+          "id": "coderlegion-profile-manual",
+          "title": "Pocket Portfolio Beta",
+          "url": "https://coderlegion.com/user/Pocket+Portfolio",
+          "source": "coderlegion_profile",
+          "date": "2024-10-20",
+          "priority": "medium"
+        }
+      ]
+    },
+    "coderlegion_group": {
+      "url": "https://coderlegion.com/groups/openfi-builders",
+      "posts": [
+        {
+          "id": "coderlegion-group-stop-building",
+          "title": "Stop building fintech with databases. Why I went local-first for Pocket Portfolio.",
+          "url": "https://coderlegion.com/groups/openfi-builders",
+          "source": "coderlegion_group",
+          "date": "2024-12-22",
+          "excerpt": "Stop building fintech with databases. Why I went local-first for Pocket Portfolio. For the last decade, building a fintech app meant one architecture: a centralized PostgreSQL database, a backend in...",
+          "tags": [
+            "local-first",
+            "fintech",
+            "architecture"
+          ],
+          "pillar": "philosophy",
+          "ritual": null,
+          "priority": "high"
+        },
+        {
+          "id": "coderlegion-group-beta",
+          "title": "Pocket Portfolio Beta",
+          "url": "https://coderlegion.com/groups/openfi-builders",
+          "source": "coderlegion_group",
+          "date": "2024-10-20",
+          "tags": [
+            "fintech",
+            "opensource",
+            "nextjs"
+          ],
+          "priority": "medium"
+        }
+      ]
+    }
+  },
+  "prioritized": [
+    {
+      "id": "devto-3120399",
+      "title": "Stop Building Fintech with Databases: Why I Went Local-First for Pocket Portfolio",
+      "url": "https://dev.to/pocketportfolioapp/stop-building-fintech-with-databases-why-i-went-local-first-for-pocket-portfolio-1b2a",
+      "source": "dev.to",
+      "date": "2025-12-22T10:32:23Z",
+      "excerpt": "Why Pocket Portfolio rejected centralized databases in favor of a privacy-absolute, local-first architecture for modern investors.",
+      "tags": [
+        "fintech",
+        "privacy",
+        "localfirst",
+        "nextjs"
+      ],
+      "pillar": "philosophy",
+      "ritual": null,
+      "priority": "high"
+    },
+    {
+      "id": "coderlegion-group-stop-building",
+      "title": "Stop building fintech with databases. Why I went local-first for Pocket Portfolio.",
+      "url": "https://coderlegion.com/groups/openfi-builders",
+      "source": "coderlegion_group",
+      "date": "2024-12-22",
+      "excerpt": "Stop building fintech with databases. Why I went local-first for Pocket Portfolio. For the last decade, building a fintech app meant one architecture: a centralized PostgreSQL database, a backend in...",
+      "tags": [
+        "local-first",
+        "fintech",
+        "architecture"
+      ],
+      "pillar": "philosophy",
+      "ritual": null,
+      "priority": "high"
+    },
+    {
+      "id": "devto-2954083",
+      "title": "Realised vs Unrealised P/L — Money in Your Pocket vs Money on Paper",
+      "url": "https://dev.to/pocketportfolioapp/realised-vs-unrealised-pl-money-in-your-pocket-vs-money-on-paper-4p50",
+      "source": "dev.to",
+      "date": "2025-10-23T19:21:10Z",
+      "excerpt": "Learn the simple difference between realised and unrealised profit & loss using Pocket Portfolio’s interactive examples.",
+      "tags": [
+        "investing",
+        "fintech",
+        "pocketportfolio",
+        "education"
+      ],
+      "pillar": "market",
+      "ritual": null,
+      "priority": "medium"
+    },
+    {
+      "id": "devto-2911773",
+      "title": "Price Pipeline Health — transparency you can see (and trust)",
+      "url": "https://dev.to/pocketportfolioapp/price-pipeline-health-transparency-you-can-see-and-trust-1m2f",
+      "source": "dev.to",
+      "date": "2025-10-10T13:44:21Z",
+      "excerpt": "Ask your finance app today: Where do your live prices come from, how fresh are they, and what...",
+      "tags": [
+        "fintech",
+        "webdev",
+        "opensource",
+        "performance"
+      ],
+      "pillar": "technical",
+      "ritual": null,
+      "priority": "medium"
+    },
+    {
+      "id": "devto-2861451",
+      "title": "Hello DEV — we’re building Pocket Portfolio in public",
+      "url": "https://dev.to/pocketportfolioapp/hello-dev-were-building-pocket-portfolio-in-public-2d0a",
+      "source": "dev.to",
+      "date": "2025-09-22T16:53:16Z",
+      "excerpt": "Pocket Portfolio is an open-source investing dashboard. Drag-drop a CSV → get clean, live P/L with...",
+      "tags": [
+        "showdev",
+        "opensource",
+        "fintech",
+        "webdev"
+      ],
+      "pillar": "market",
+      "ritual": null,
+      "priority": "medium"
+    },
+    {
+      "id": "devto-2861434",
+      "title": "Discuss: What’s the #1 headache in portfolio tracking today?",
+      "url": "https://dev.to/pocketportfolioapp/discuss-whats-the-1-headache-in-portfolio-tracking-today-3mgi",
+      "source": "dev.to",
+      "date": "2025-09-22T16:37:19Z",
+      "excerpt": "Pick one (or add your own in comments):   Missing/slow prices CSV hell (every broker is...",
+      "tags": [
+        "discuss",
+        "opensource",
+        "fintech",
+        "productivity"
+      ],
+      "pillar": "market",
+      "ritual": null,
+      "priority": "medium"
+    },
+    {
+      "id": "coderlegion-profile-manual",
+      "title": "Pocket Portfolio Beta",
+      "url": "https://coderlegion.com/user/Pocket+Portfolio",
+      "source": "coderlegion_profile",
+      "date": "2024-10-20",
+      "priority": "medium"
+    },
+    {
+      "id": "coderlegion-group-beta",
+      "title": "Pocket Portfolio Beta",
+      "url": "https://coderlegion.com/groups/openfi-builders",
+      "source": "coderlegion_group",
+      "date": "2024-10-20",
+      "tags": [
+        "fintech",
+        "opensource",
+        "nextjs"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "devto-3058455",
+      "title": "Designing Trust: UX Principles in Fintech Apps",
+      "url": "https://dev.to/pocketportfolioapp/designing-trust-ux-principles-in-fintech-apps-2gfo",
+      "source": "dev.to",
+      "date": "2025-11-25T17:11:03Z",
+      "excerpt": "How Pocket Portfolio rebuilt its UX to make data accuracy, privacy, and reliability visually obvious from the first screen.",
+      "tags": [
+        "fintech",
+        "ux",
+        "design",
+        "psychology"
+      ],
+      "ritual": null,
+      "priority": "low"
+    },
+    {
+      "id": "devto-2905076",
+      "title": "Devlog: Building the **Price Pipeline Health** Card (so you know when data is fresh or fallback)",
+      "url": "https://dev.to/pocketportfolioapp/devlog-building-the-price-pipeline-health-card-so-you-know-when-data-is-fresh-or-fallback-57p2",
+      "source": "dev.to",
+      "date": "2025-10-08T12:59:57Z",
+      "excerpt": "Stack: React + Vite (SPA), Firebase Auth/Firestore, Vercel (Edge Functions). Status: scoped &amp;...",
+      "tags": [
+        "webdev",
+        "opensource",
+        "typescript",
+        "api"
+      ],
+      "ritual": null,
+      "priority": "low"
+    },
+    {
+      "id": "devto-2883095",
+      "title": "Designing a “Never-0.00” Price Pipeline in the Real World",
+      "url": "https://dev.to/pocketportfolioapp/designing-a-never-000-price-pipeline-in-the-real-world-3m3i",
+      "source": "dev.to",
+      "date": "2025-10-01T18:01:17Z",
+      "excerpt": "Your users don’t care why a quote failed—they care that the number didn’t flash 0.00. Here’s a...",
+      "tags": [
+        "webperf",
+        "fintech",
+        "opensource",
+        "typescript"
+      ],
+      "ritual": null,
+      "priority": "low"
+    },
+    {
+      "id": "devto-2875021",
+      "title": "Engineers, last call: help us build the cleanest open-source investing dashboard (before it gets boring)",
+      "url": "https://dev.to/pocketportfolioapp/engineers-last-call-help-us-build-the-cleanest-open-source-investing-dashboard-before-it-gets-2ji9",
+      "source": "dev.to",
+      "date": "2025-09-28T19:03:45Z",
+      "excerpt": "If you’ve ever yelled at a portfolio tool that showed 0.00 for prices or made CSV import a hostage...",
+      "tags": [
+        "showdev",
+        "react",
+        "opensource",
+        "webdev"
+      ],
+      "ritual": null,
+      "priority": "low"
+    },
+    {
+      "id": "devto-2866262",
+      "title": "ELI5: What’s the difference between *realized* vs *unrealized* P/L?",
+      "url": "https://dev.to/pocketportfolioapp/eli5-whats-the-difference-between-realized-vs-unrealized-pl-285d",
+      "source": "dev.to",
+      "date": "2025-09-24T17:34:12Z",
+      "excerpt": "I’m building an open-source portfolio dashboard and keep tripping over how to explain P/L in a way...",
+      "tags": [
+        "explainlikeimfive",
+        "beginners",
+        "finance",
+        "discuss"
+      ],
+      "ritual": null,
+      "priority": "low"
+    },
+    {
+      "id": "devto-2866252",
+      "title": "Today’s ship: Mock-Trade Lab, 5-min CSV Import, and bulletproof Price Fallbacks",
+      "url": "https://dev.to/pocketportfolioapp/todays-ship-mock-trade-lab-5-min-csv-import-and-bulletproof-price-fallbacks-9oa",
+      "source": "dev.to",
+      "date": "2025-09-24T17:23:35Z",
+      "excerpt": "Quick one from me. We pushed three things live today that make Pocket Portfolio immediately useful...",
+      "tags": [
+        "showdev",
+        "opensource",
+        "fintech",
+        "webdev"
+      ],
+      "ritual": null,
+      "priority": "low"
+    },
+    {
+      "id": "devto-2863678",
+      "title": "Test ideas without risking a penny — Mock Trade & Scenario Lab (open source)",
+      "url": "https://dev.to/pocketportfolioapp/test-ideas-without-risking-a-penny-mock-trade-scenario-lab-open-source-3ajb",
+      "source": "dev.to",
+      "date": "2025-09-23T15:58:08Z",
+      "excerpt": "Before you buy/sell, preview the impact. Our Mock Trade &amp; Scenario Lab lets you model positions...",
+      "tags": [
+        "showdev",
+        "opensource",
+        "fintech",
+        "webdev"
+      ],
+      "ritual": null,
+      "priority": "low"
+    }
+  ],
+  "summary": {
+    "total": 15,
+    "high_priority": 2,
+    "medium_priority": 6,
+    "low_priority": 7
+  }
+}

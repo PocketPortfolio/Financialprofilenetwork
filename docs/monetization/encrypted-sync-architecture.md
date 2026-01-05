@@ -1,0 +1,348 @@
+# Encrypted Sync Architecture
+
+## Overview
+
+This document describes the architecture for an end-to-end encrypted sync service that will allow users to sync their portfolio data across devices while maintaining complete privacy. The server cannot read user data (zero-knowledge architecture).
+
+**Status:** Design phase - Build but do not launch
+
+## Architecture Principles
+
+1. **Zero-Knowledge**: Server cannot decrypt user data
+2. **End-to-End Encryption**: Data encrypted client-side before transmission
+3. **Client-Side Key Management**: Encryption keys never leave the client
+4. **Optional Service**: Core app remains free; sync is opt-in paid feature ($4/month)
+
+## Technology Stack
+
+- **Encryption Library**: `libsodium-wrappers` (JavaScript port of libsodium)
+- **Key Derivation**: Argon2id (via libsodium)
+- **Symmetric Encryption**: XChaCha20-Poly1305 (AEAD)
+- **Key Exchange**: X25519 (for future multi-device sync)
+- **Storage**: Firebase Firestore (encrypted blobs only)
+
+## Data Flow
+
+### Initial Setup
+
+```
+1. User signs up for sync service
+2. Client generates master key (32 bytes, random)
+3. Client derives encryption key from master key + user ID (Argon2id)
+4. Client encrypts portfolio data with encryption key
+5. Encrypted data sent to server
+6. Master key stored locally (never sent to server)
+```
+
+### Sync Process
+
+```
+1. Client loads master key from secure storage
+2. Client derives encryption key
+3. Client fetches encrypted data from server
+4. Client decrypts data locally
+5. Client merges with local changes
+6. Client re-encrypts and uploads
+```
+
+### Multi-Device Sync
+
+```
+1. Device A generates sync token (X25519 public key)
+2. Device A encrypts master key with sync token
+3. Device B receives sync token via secure channel
+4. Device B decrypts master key
+5. Both devices can now sync encrypted data
+```
+
+## Implementation
+
+### Encryption Service
+
+```typescript
+// app/lib/sync/encryption.ts
+import _sodium from 'libsodium-wrappers';
+
+export interface EncryptionKey {
+  key: Uint8Array;
+  salt: Uint8Array;
+}
+
+export async function deriveKey(
+  masterKey: Uint8Array,
+  userId: string
+): Promise<EncryptionKey> {
+  await _sodium.ready;
+  const sodium = _sodium;
+  
+  const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
+  const key = sodium.crypto_pwhash(
+    32, // key length
+    masterKey,
+    salt,
+    sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+    sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+    sodium.crypto_pwhash_ALG_ARGON2ID13
+  );
+  
+  return { key, salt };
+}
+
+export async function encryptData(
+  data: string,
+  key: Uint8Array
+): Promise<{ encrypted: string; nonce: string }> {
+  await _sodium.ready;
+  const sodium = _sodium;
+  
+  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const encrypted = sodium.crypto_secretbox_easy(
+    sodium.from_string(data),
+    nonce,
+    key
+  );
+  
+  return {
+    encrypted: sodium.to_base64(encrypted),
+    nonce: sodium.to_base64(nonce)
+  };
+}
+
+export async function decryptData(
+  encrypted: string,
+  nonce: string,
+  key: Uint8Array
+): Promise<string> {
+  await _sodium.ready;
+  const sodium = _sodium;
+  
+  const decrypted = sodium.crypto_secretbox_open_easy(
+    sodium.from_base64(encrypted),
+    sodium.from_base64(nonce),
+    key
+  );
+  
+  return sodium.to_string(decrypted);
+}
+```
+
+### Sync Service Interface
+
+```typescript
+// app/lib/sync/syncService.ts
+export interface SyncService {
+  // Initialize sync for user
+  initialize(userId: string, masterKey: Uint8Array): Promise<void>;
+  
+  // Upload encrypted data
+  upload(data: EncryptedData): Promise<void>;
+  
+  // Download encrypted data
+  download(): Promise<EncryptedData | null>;
+  
+  // Check for conflicts
+  checkConflicts(): Promise<ConflictInfo[]>;
+  
+  // Resolve conflicts
+  resolveConflicts(resolution: ConflictResolution): Promise<void>;
+}
+
+export interface EncryptedData {
+  userId: string;
+  encryptedPayload: string;
+  nonce: string;
+  salt: string;
+  version: number;
+  timestamp: string;
+}
+
+export interface ConflictInfo {
+  localVersion: number;
+  remoteVersion: number;
+  lastModified: string;
+}
+
+export interface ConflictResolution {
+  strategy: 'local' | 'remote' | 'merge';
+  mergedData?: EncryptedData;
+}
+```
+
+### Migration Path
+
+```typescript
+// app/lib/sync/migration.ts
+export async function migrateLocalToSync(
+  localTrades: Trade[],
+  masterKey: Uint8Array,
+  userId: string
+): Promise<void> {
+  // 1. Derive encryption key
+  const { key } = await deriveKey(masterKey, userId);
+  
+  // 2. Encrypt local data
+  const dataJson = JSON.stringify(localTrades);
+  const { encrypted, nonce } = await encryptData(dataJson, key);
+  
+  // 3. Upload to sync service
+  await syncService.upload({
+    userId,
+    encryptedPayload: encrypted,
+    nonce,
+    salt: '', // Will be generated by deriveKey
+    version: 1,
+    timestamp: new Date().toISOString()
+  });
+  
+  // 4. Clear local data (optional)
+  // clearLocalPortfolio();
+}
+```
+
+## Security Considerations
+
+### Key Storage
+
+- **Browser**: Use `sessionStorage` for master key (cleared on tab close)
+- **Mobile**: Use secure keychain/keystore
+- **Never**: Store keys in localStorage or send to server
+
+### Key Recovery
+
+- **No key recovery**: If master key is lost, data cannot be recovered
+- **Backup codes**: Generate 12-word mnemonic for key backup (optional)
+- **Export**: Always allow users to export unencrypted data
+
+### Threat Model
+
+**Protected Against:**
+- Server-side data breaches
+- Man-in-the-middle attacks
+- Server administrators viewing data
+- Database leaks
+
+**Not Protected Against:**
+- Client-side malware
+- Physical device access
+- Browser extensions with access
+- User key loss
+
+## API Design
+
+### Endpoints
+
+```
+POST /api/sync/initialize
+  - Initialize sync for user
+  - Returns: sync token
+
+POST /api/sync/upload
+  - Upload encrypted data
+  - Body: { encryptedPayload, nonce, version }
+
+GET /api/sync/download
+  - Download encrypted data
+  - Returns: { encryptedPayload, nonce, version, timestamp }
+
+GET /api/sync/conflicts
+  - Check for sync conflicts
+  - Returns: ConflictInfo[]
+
+POST /api/sync/resolve
+  - Resolve conflicts
+  - Body: ConflictResolution
+```
+
+### Rate Limiting
+
+- Upload: 10 requests/minute
+- Download: 30 requests/minute
+- Conflicts: 5 requests/minute
+
+## Pricing Model
+
+- **Free Tier**: Core app (localStorage only)
+- **Sync Tier**: $4/month
+  - Encrypted cloud sync
+  - Multi-device support
+  - Conflict resolution
+  - Backup/restore
+
+## Implementation Status
+
+- [x] Architecture design
+- [ ] Encryption service implementation
+- [ ] Sync service implementation
+- [ ] Migration utility
+- [ ] API endpoints
+- [ ] UI components
+- [ ] Payment integration
+- [ ] Testing
+- [ ] Documentation
+
+## Feature Flag
+
+```typescript
+// app/lib/sync/config.ts
+export const ENABLE_ENCRYPTED_SYNC = process.env.ENABLE_ENCRYPTED_SYNC === 'true';
+```
+
+**Default:** `false` (do not enable in production until ready)
+
+## Testing
+
+### Unit Tests
+
+- Encryption/decryption correctness
+- Key derivation consistency
+- Conflict detection
+- Migration logic
+
+### Integration Tests
+
+- End-to-end sync flow
+- Multi-device scenarios
+- Conflict resolution
+- Error handling
+
+### Security Tests
+
+- Key never sent to server
+- Encrypted data cannot be decrypted without key
+- No plaintext data in logs
+- Proper key cleanup
+
+## Future Enhancements
+
+1. **Shared Portfolios**: Encrypt with shared key, allow multiple users
+2. **Version History**: Encrypted snapshots for rollback
+3. **Selective Sync**: Choose which data to sync
+4. **Offline Support**: Queue syncs when offline
+5. **Webhooks**: Notify external services of changes
+
+## Dependencies
+
+```json
+{
+  "libsodium-wrappers": "^0.7.11"
+}
+```
+
+## References
+
+- [libsodium Documentation](https://doc.libsodium.org/)
+- [Zero-Knowledge Architecture](https://en.wikipedia.org/wiki/Zero-knowledge_architecture)
+- [End-to-End Encryption](https://en.wikipedia.org/wiki/End-to-end_encryption)
+
+---
+
+**Note:** This feature is designed but not implemented. Do not enable in production until fully tested and audited.
+
+
+
+
+
+
+
+
+

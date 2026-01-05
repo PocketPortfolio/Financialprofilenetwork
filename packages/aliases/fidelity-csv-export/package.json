@@ -1,0 +1,38 @@
+{
+  "name": "@pocket-portfolio/fidelity-csv-export",
+  "version": "1.0.8",
+  "description": "Parse Fidelity CSV exports for portfolio tracking. Free & open-source. Support: pocketportfolio.app/sponsor",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "keywords": [
+    "fidelity",
+    "csv",
+    "export",
+    "parser",
+    "portfolio"
+  ],
+  "author": "Pocket Portfolio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PocketPortfolio/Financialprofilenetwork.git",
+    "directory": "packages/aliases/fidelity-csv-export"
+  },
+  "dependencies": {
+    "@pocket-portfolio/importer": "^1.0.6"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "scripts"
+  ],
+  "homepage": "https://www.pocketportfolio.app",
+  "bugs": {
+    "url": "https://github.com/PocketPortfolio/Financialprofilenetwork/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

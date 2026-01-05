@@ -1,3 +1,5 @@
 {
-  "/api/health-price/route": "app/api/health-price/route.js"
+  "/blog/[slug]/page": "app/blog/[slug]/page.js",
+  "/features/google-drive-sync/page": "app/features/google-drive-sync/page.js",
+  "/blog/page": "app/blog/page.js"
 }
