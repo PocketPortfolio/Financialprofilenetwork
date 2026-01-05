@@ -26,6 +26,7 @@ import CSVImporter from '../components/CSVImporter';
 import AccountManagement from '../components/AccountManagement';
 import ReferralProgram from '../components/viral/ReferralProgram';
 import SyncUpgradeCTA from '../components/SyncUpgradeCTA';
+import FoundersClubBanner from '../components/FoundersClubBanner';
 import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
 import PricePipelineHealth from '../components/PricePipelineHealth';
 import CloudStatusIcon from '../components/CloudStatusIcon';
@@ -1117,6 +1118,9 @@ export default function Dashboard() {
 
       {/* Mobile Header */}
       <MobileHeader title="Dashboard" fixed={true} />
+
+      {/* Founders Club Banner - Sticky at top for free tier users */}
+      <FoundersClubBanner />
 
       {/* Portfolio Selector */}
       {/* <PortfolioSelector /> */}

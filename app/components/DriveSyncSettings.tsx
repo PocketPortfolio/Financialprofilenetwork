@@ -11,6 +11,8 @@ import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useTrades } from '../hooks/useTrades';
 import { driveService } from '../lib/google-drive/driveService';
 import { getSyncEntitlements } from '../lib/utils/syncEntitlements';
+import { getFoundersClubSpotsRemaining } from '../lib/utils/foundersClub';
+import InfrastructureUpgradeModal from './InfrastructureUpgradeModal';
 import Link from 'next/link';
 
 interface DriveSyncSettingsProps {
@@ -28,6 +30,7 @@ export default function DriveSyncSettings({ onConnect, onDisconnect }: DriveSync
   const [error, setError] = useState<string | null>(null);
   const [folderName, setFolderName] = useState<string>('Pocket Portfolio');
   const [syncExcel, setSyncExcel] = useState<boolean>(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Get sync entitlements based on tier
   const entitlements = getSyncEntitlements(tier);
@@ -40,8 +43,8 @@ export default function DriveSyncSettings({ onConnect, onDisconnect }: DriveSync
   const handleConnect = async () => {
     // Check if user has sync access (Corporate or Founder tier)
     if (!hasSyncAccess) {
-      // Redirect to sponsor page for upgrade
-      window.location.href = '/sponsor';
+      // Show Infrastructure Upgrade modal instead of redirecting
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -690,6 +693,12 @@ export default function DriveSyncSettings({ onConnect, onDisconnect }: DriveSync
         </div>
       </section>
 
+      {/* Infrastructure Upgrade Modal */}
+      <InfrastructureUpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        spotsRemaining={getFoundersClubSpotsRemaining()}
+      />
     </>
   );
 }
