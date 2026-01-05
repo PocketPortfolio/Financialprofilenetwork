@@ -8,6 +8,44 @@ import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
 
+// Load .env.local if it exists
+const envFiles = ['.env.local', '.env'];
+for (const envFile of envFiles) {
+  const envPath = path.join(process.cwd(), envFile);
+  if (fs.existsSync(envPath)) {
+    try {
+      const envContent = fs.readFileSync(envPath, 'utf-8');
+      const lines = envContent.split(/\r?\n/);
+      
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || trimmedLine.startsWith('#')) continue;
+        
+        const equalIndex = trimmedLine.indexOf('=');
+        if (equalIndex <= 0) continue;
+        
+        const key = trimmedLine.substring(0, equalIndex).trim();
+        let value = trimmedLine.substring(equalIndex + 1);
+        
+        value = value.trim();
+        
+        // Remove surrounding quotes if present
+        if ((value.startsWith('"') && value.endsWith('"')) || 
+            (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        
+        // Only set if not already in process.env
+        if (!process.env[key] && value) {
+          process.env[key] = value;
+        }
+      }
+    } catch (error) {
+      console.warn(`⚠️  Failed to load ${envFile}:`, error);
+    }
+  }
+}
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!OPENAI_API_KEY) {
