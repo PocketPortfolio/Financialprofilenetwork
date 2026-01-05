@@ -895,29 +895,35 @@ export async function GET(request: NextRequest) {
 
   // Try multiple data sources in order:
   // 1. EODHD (for paid tier users) - skip if not configured
-  // 2. Alpha Vantage (free tier, includes dividend data) - primary fallback
-  // 3. Yahoo Finance (free but requires auth, may fail)
+  // 2. Yahoo Finance Chart (best free source for historical dividends + summary) - prioritized for complete data
+  // 3. Alpha Vantage (free tier, summary data only, no historical on free tier)
+  // 4. Yahoo Finance quoteSummary (summary data only)
+  // 5. Yahoo Finance HTML scraping (last resort)
   
-  // Prioritize Alpha Vantage if EODHD is not configured
   let dividendData: DividendData | null = null;
   
+  // Priority 1: EODHD (if configured) - provides both summary and historical data
   if (EODHD_API_KEY) {
     dividendData = await fetchFromEODHD(ticker);
-    console.warn(`[DIVIDEND_DEBUG] After EODHD | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
+    console.warn(`[DIVIDEND_DEBUG] After EODHD | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}% | Historical: ${dividendData?.historicalDividends?.length || 0} dividends`);
   } else {
-    console.warn(`[DIVIDEND_DEBUG] EODHD not configured, skipping to Alpha Vantage...`);
+    console.warn(`[DIVIDEND_DEBUG] EODHD not configured, skipping to Yahoo Finance Chart...`);
   }
 
+  // Priority 2: Yahoo Finance Chart - BEST free source for historical dividends
+  // Provides both historical dividend list AND can calculate summary metrics
+  // Prioritized over Alpha Vantage because it provides complete data (historical + summary)
   if (!dividendData) {
-    console.warn(`[DIVIDEND_DEBUG] Trying Alpha Vantage (primary/fallback)...`);
-    dividendData = await fetchFromAlphaVantage(ticker);
-    console.warn(`[DIVIDEND_DEBUG] After AlphaVantage | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
-  }
-
-  if (!dividendData) {
-    console.warn(`[DIVIDEND_DEBUG] AlphaVantage failed, trying Yahoo Finance Chart endpoint (historical dividends)...`);
+    console.warn(`[DIVIDEND_DEBUG] Trying Yahoo Finance Chart endpoint (best free source for historical dividends)...`);
     dividendData = await fetchFromYahooFinanceChart(ticker);
     console.warn(`[DIVIDEND_DEBUG] After YahooFinanceChart | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}% | Historical: ${dividendData?.historicalDividends?.length || 0} dividends`);
+  }
+
+  // Priority 3: Alpha Vantage - summary data only (no historical dividends on free tier)
+  if (!dividendData) {
+    console.warn(`[DIVIDEND_DEBUG] Yahoo Finance Chart failed, trying Alpha Vantage (summary data only, no historical on free tier)...`);
+    dividendData = await fetchFromAlphaVantage(ticker);
+    console.warn(`[DIVIDEND_DEBUG] After AlphaVantage | Ticker: ${ticker} | HasData: ${!!dividendData} | Yield: ${dividendData?.annualDividendYield}%`);
   }
 
   if (!dividendData) {
