@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OG Meta Tag Test</title>
+    <script>
+        // Test script to verify OG meta tags
+        async function testOGMeta() {
+            const url = 'https://www.pocketportfolio.app/';
+            try {
+                const response = await fetch(url);
+                const html = await response.text();
+                
+                // Extract OG image meta tag
+                const ogImageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
+                const twitterImageMatch = html.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i);
+                
+                console.log('OG Image:', ogImageMatch ? ogImageMatch[1] : 'NOT FOUND');
+                console.log('Twitter Image:', twitterImageMatch ? twitterImageMatch[1] : 'NOT FOUND');
+                
+                // Test if OG image URL is accessible
+                if (ogImageMatch) {
+                    const ogImageUrl = ogImageMatch[1];
+                    console.log('Testing OG image URL:', ogImageUrl);
+                    
+                    const imageResponse = await fetch(ogImageUrl);
+                    console.log('OG Image Status:', imageResponse.status);
+                    console.log('OG Image Content-Type:', imageResponse.headers.get('content-type'));
+                    
+                    if (imageResponse.ok) {
+                        console.log('✅ OG Image is accessible');
+                    } else {
+                        console.log('❌ OG Image is NOT accessible');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // Run test
+        testOGMeta();
+    </script>
+</head>
+<body>
+    <h1>OG Meta Tag Test</h1>
+    <p>Open browser console to see results</p>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

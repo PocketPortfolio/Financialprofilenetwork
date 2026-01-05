@@ -1,0 +1,18 @@
+# NPM Authentication Token
+# 
+# INSTRUCTIONS:
+# 1. Copy this file to .npmrc: `cp .npmrc.example .npmrc`
+# 2. Get your token from: https://www.npmjs.com/settings/[your-username]/tokens
+# 3. Replace YOUR_TOKEN_HERE with your actual token
+# 4. The .npmrc file is gitignored for security
+#
+#registry.npmjs.org/:_authToken=YOUR_TOKEN_HERE
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      # Add your environment variables here
+      # - NEXT_PUBLIC_SITE_URL=https://your-domain.com
+      # - FIREBASE_API_KEY=your-api-key
+      # - FIREBASE_AUTH_DOMAIN=your-auth-domain
+      # - FIREBASE_PROJECT_ID=your-project-id
+      # - FIREBASE_STORAGE_BUCKET=your-storage-bucket
+      # - FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+      # - FIREBASE_APP_ID=your-app-id
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    # Optional: Add volume for persistent data if needed
+    # volumes:
+    #   - ./data:/app/data
+
+  # Optional: Add PostgreSQL for future use
+  # postgres:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     - POSTGRES_DB=pocketportfolio
+  #     - POSTGRES_USER=pocketportfolio
+  #     - POSTGRES_PASSWORD=changeme
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:
+
+
+
+
+
+
+
+
+
