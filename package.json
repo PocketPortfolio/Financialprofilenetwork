@@ -54,7 +54,6 @@
     "trigger-workflow": "ts-node --project scripts/tsconfig.json scripts/trigger-workflow.ts",
     "check-workflow-state": "ts-node --project scripts/tsconfig.json scripts/check-workflow-state.ts",
     "verify-workflow": "ts-node --project scripts/tsconfig.json scripts/verify-workflow-content.ts",
-    "check-all-workflows": "ts-node --project scripts/tsconfig.json scripts/check-all-workflows.ts",
     "validate-workflow": "ts-node --project scripts/tsconfig.json scripts/validate-workflow.ts"
   },
   "dependencies": {
@@ -65,7 +64,7 @@
     "driver.js": "^1.4.0",
     "firebase": "^10.13.0",
     "firebase-admin": "^13.5.0",
-    "next": "^14.2.35",
+    "next": "15.5.9",
     "papaparse": "^5.4.1",
     "postcss": "^8.5.6",
     "react": "^18.3.1",

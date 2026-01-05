@@ -9,84 +9,115 @@ import ProductionNavbar from '../../components/marketing/ProductionNavbar';
 import LandingFooter from '../../components/marketing/LandingFooter';
 import SEOHead from '../../components/SEOHead';
 import Link from 'next/link';
+import React from 'react';
 
-// MDX components for custom rendering
+// Force dynamic rendering to avoid React version conflicts during static generation
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
+// MDX components for custom rendering (RSC-compatible)
+// Using React.createElement to avoid React version conflicts during build
 const mdxComponents = {
-  a: (props: any) => <a {...props} style={{ color: 'var(--accent-warm)', textDecoration: 'underline' }} />,
-  code: (props: any) => (
-    <code {...props} style={{ 
-      background: 'var(--surface-elevated)', 
-      padding: '2px 6px', 
-      borderRadius: '4px',
-      fontSize: '0.9em',
-      fontFamily: 'Courier New, monospace',
-      color: 'var(--accent-warm)'
-    }} />
-  ),
-  pre: (props: any) => (
-    <pre {...props} style={{
-      background: 'var(--surface-elevated)',
-      padding: '1em',
-      borderRadius: '8px',
-      overflowX: 'auto',
-      marginBottom: '1.5em',
-      border: '1px solid var(--border)'
-    }} />
-  ),
-  table: (props: any) => (
-    <div style={{ 
-      overflowX: 'auto', 
-      marginBottom: '2em',
-      marginTop: '1.5em',
-      borderRadius: '12px',
-      border: '1px solid rgba(128, 128, 128, 0.2)',
-      background: 'var(--surface-elevated)',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-    }}>
-      <table {...props} style={{
-        width: '100%',
-        borderCollapse: 'collapse',
-        fontSize: '16px',
-        lineHeight: '1.6',
-        minWidth: '100%'
-      }} />
-    </div>
-  ),
-  thead: (props: any) => (
-    <thead {...props} style={{
-      background: 'var(--surface)',
-      borderBottom: '2px solid rgba(128, 128, 128, 0.3)'
-    }} />
-  ),
-  tbody: (props: any) => <tbody {...props} />,
-  tr: (props: any) => (
-    <tr {...props} style={{
-      borderBottom: '1px solid rgba(128, 128, 128, 0.15)',
-      transition: 'background 0.2s ease'
-    }} />
-  ),
-  th: (props: any) => (
-    <th {...props} style={{
-      padding: '18px 20px',
-      textAlign: 'left',
-      fontWeight: '700',
-      color: 'var(--text)',
-      fontSize: '15px',
-      letterSpacing: '0.01em',
-      borderRight: '1px solid rgba(128, 128, 128, 0.15)',
-      whiteSpace: 'nowrap'
-    }} />
-  ),
-  td: (props: any) => (
-    <td {...props} style={{
-      padding: '18px 20px',
-      color: 'var(--text-secondary)',
-      borderRight: '1px solid rgba(128, 128, 128, 0.15)',
-      verticalAlign: 'top',
-      fontSize: '15px',
-      lineHeight: '1.7'
-    }} />
-  ),
+  a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => 
+    React.createElement('a', { ...props, style: { color: 'var(--accent-warm)', textDecoration: 'underline', ...props.style } }),
+  code: (props: React.HTMLAttributes<HTMLElement>) => 
+    React.createElement('code', { 
+      ...props, 
+      style: { 
+        background: 'var(--surface-elevated)', 
+        padding: '2px 6px', 
+        borderRadius: '4px',
+        fontSize: '0.9em',
+        fontFamily: 'Courier New, monospace',
+        color: 'var(--accent-warm)',
+        ...props.style
+      } 
+    }),
+  pre: (props: React.HTMLAttributes<HTMLPreElement>) => 
+    React.createElement('pre', { 
+      ...props, 
+      style: {
+        background: 'var(--surface-elevated)',
+        padding: '1em',
+        borderRadius: '8px',
+        overflowX: 'auto',
+        marginBottom: '1.5em',
+        border: '1px solid var(--border)',
+        ...props.style
+      } 
+    }),
+  table: (props: React.TableHTMLAttributes<HTMLTableElement>) => 
+    React.createElement('div', { 
+      style: { 
+        overflowX: 'auto', 
+        marginBottom: '2em',
+        marginTop: '1.5em',
+        borderRadius: '12px',
+        border: '1px solid rgba(128, 128, 128, 0.2)',
+        background: 'var(--surface-elevated)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+      } 
+    },
+      React.createElement('table', { 
+        ...props, 
+        style: {
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: '16px',
+          lineHeight: '1.6',
+          minWidth: '100%',
+          ...props.style
+        } 
+      })
+    ),
+  thead: (props: React.HTMLAttributes<HTMLTableSectionElement>) => 
+    React.createElement('thead', { 
+      ...props, 
+      style: {
+        background: 'var(--surface)',
+        borderBottom: '2px solid rgba(128, 128, 128, 0.3)',
+        ...props.style
+      } 
+    }),
+  tbody: (props: React.HTMLAttributes<HTMLTableSectionElement>) => 
+    React.createElement('tbody', props),
+  tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => 
+    React.createElement('tr', { 
+      ...props, 
+      style: {
+        borderBottom: '1px solid rgba(128, 128, 128, 0.15)',
+        transition: 'background 0.2s ease',
+        ...props.style
+      } 
+    }),
+  th: (props: React.ThHTMLAttributes<HTMLTableCellElement>) => 
+    React.createElement('th', { 
+      ...props, 
+      style: {
+        padding: '18px 20px',
+        textAlign: 'left',
+        fontWeight: '700',
+        color: 'var(--text)',
+        fontSize: '15px',
+        letterSpacing: '0.01em',
+        borderRight: '1px solid rgba(128, 128, 128, 0.15)',
+        whiteSpace: 'nowrap',
+        ...props.style
+      } 
+    }),
+  td: (props: React.TdHTMLAttributes<HTMLTableCellElement>) => 
+    React.createElement('td', { 
+      ...props, 
+      style: {
+        padding: '18px 20px',
+        color: 'var(--text-secondary)',
+        borderRight: '1px solid rgba(128, 128, 128, 0.15)',
+        verticalAlign: 'top',
+        fontSize: '15px',
+        lineHeight: '1.7',
+        ...props.style
+      } 
+    }),
 };
 
 export async function generateStaticParams() {

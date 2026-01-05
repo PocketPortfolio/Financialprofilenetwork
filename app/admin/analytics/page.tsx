@@ -58,6 +58,27 @@ interface AnalyticsData {
     totalLast7Days: number;
     packageCount: number;
   };
+  blogPosts: {
+    total: number;
+    published: number;
+    pending: number;
+    overdue: number;
+    failed: number;
+    posts: Array<{
+      id: string;
+      title: string;
+      slug: string;
+      date: string;
+      scheduledDate: string;
+      status: 'pending' | 'published' | 'failed';
+      pillar: string;
+      isOverdue: boolean;
+      hasFiles: boolean;
+      publishedTime: string | null;
+      daysOverdue: number;
+    }>;
+    error?: string;
+  };
   timeRange: '7d' | '30d' | '90d' | 'all';
 }
 
@@ -636,6 +657,177 @@ export default function AdminAnalyticsPage() {
                       </div>
                     ))}
                 </div>
+              </div>
+            )}
+          </section>
+
+          {/* Blog Posts Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)',
+            marginTop: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              📝 Blog Posts (Autonomous Engine)
+            </h2>
+
+            {/* Summary Metrics */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <MetricCard
+                label="Total Posts"
+                value={analyticsData.blogPosts.total.toString()}
+                subtitle="Scheduled"
+              />
+              <MetricCard
+                label="Published"
+                value={analyticsData.blogPosts.published.toString()}
+                subtitle="Live"
+              />
+              <MetricCard
+                label="Pending"
+                value={analyticsData.blogPosts.pending.toString()}
+                subtitle="Scheduled"
+              />
+              <MetricCard
+                label="Overdue"
+                value={analyticsData.blogPosts.overdue.toString()}
+                subtitle={analyticsData.blogPosts.overdue > 0 ? "⚠️ Action needed" : "All on track"}
+              />
+            </div>
+
+            {/* Posts Table */}
+            <div style={{
+              marginTop: 'var(--space-4)',
+              maxHeight: '600px',
+              overflowY: 'auto',
+              border: '1px solid var(--border)',
+              borderRadius: '8px'
+            }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '14px'
+              }}>
+                <thead style={{
+                  position: 'sticky',
+                  top: 0,
+                  background: 'var(--surface-elevated)',
+                  borderBottom: '2px solid var(--border)',
+                  zIndex: 10
+                }}>
+                  <tr>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Status</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Title</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Scheduled Date</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Published Time</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Pillar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analyticsData.blogPosts.posts.map((post, index) => {
+                    const isOverdue = post.isOverdue;
+                    const statusColor = post.status === 'published' 
+                      ? '#10b981' 
+                      : post.status === 'failed' 
+                      ? '#ef4444' 
+                      : isOverdue 
+                      ? '#f59e0b' 
+                      : '#6b7280';
+                    
+                    return (
+                      <tr
+                        key={post.id}
+                        style={{
+                          borderBottom: '1px solid var(--border)',
+                          background: isOverdue ? 'rgba(245, 158, 11, 0.1)' : index % 2 === 0 ? 'var(--surface)' : 'var(--surface-elevated)'
+                        }}
+                      >
+                        <td style={{ padding: '12px' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            background: statusColor,
+                            color: 'white'
+                          }}>
+                            {post.status === 'published' ? '✅ Published' : 
+                             post.status === 'failed' ? '❌ Failed' : 
+                             isOverdue ? `⚠️ Overdue (${post.daysOverdue}d)` : '⏳ Pending'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          <div style={{ fontWeight: isOverdue ? '600' : '400' }}>
+                            {post.title}
+                          </div>
+                          {!post.hasFiles && post.status === 'published' && (
+                            <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '4px' }}>
+                              ⚠️ Files missing
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                          {new Date(post.scheduledDate).toLocaleDateString('en-GB', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </td>
+                        <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                          {post.publishedTime 
+                            ? new Date(post.publishedTime).toLocaleString('en-GB', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                timeZoneName: 'short'
+                              })
+                            : '-'}
+                        </td>
+                        <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                          <span style={{
+                            textTransform: 'capitalize',
+                            fontSize: '12px',
+                            padding: '2px 6px',
+                            background: 'var(--surface-elevated)',
+                            borderRadius: '4px'
+                          }}>
+                            {post.pillar}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Warning for overdue posts */}
+            {analyticsData.blogPosts.overdue > 0 && (
+              <div style={{
+                marginTop: 'var(--space-4)',
+                padding: 'var(--space-4)',
+                background: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid #f59e0b',
+                borderRadius: '8px',
+                color: '#f59e0b'
+              }}>
+                <strong>⚠️ Warning:</strong> {analyticsData.blogPosts.overdue} post(s) are overdue. 
+                The health check workflow should auto-trigger generation. Check GitHub Actions if posts don't appear.
               </div>
             )}
           </section>
