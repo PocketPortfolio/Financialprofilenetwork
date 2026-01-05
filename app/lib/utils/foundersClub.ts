@@ -7,8 +7,8 @@
  */
 
 const TOTAL_SPOTS = 50;
-const SOLD_SPOTS = 38; // Update this when spots are sold (50 - remaining = sold)
-// Current: 12 spots remaining (50 - 38 = 12)
+const SOLD_SPOTS = 8; // Update this when spots are sold (50 - remaining = sold)
+// Current: 42 spots remaining (50 - 8 = 42)
 
 /**
  * Get the current number of spots remaining for UK Founders Club
@@ -23,7 +23,7 @@ export function getFoundersClubSpotsRemaining(): number {
 
 /**
  * Get the formatted scarcity message
- * @returns Formatted string like "12/50 Remaining"
+ * @returns Formatted string like "42/50 Remaining"
  */
 export function getFoundersClubScarcityMessage(): string {
   const remaining = getFoundersClubSpotsRemaining();

@@ -150,14 +150,14 @@ Multiple hardcoded values across codebase:
 
 **Functions:**
 ```typescript
-getFoundersClubSpotsRemaining(): number      // Returns 12
-getFoundersClubScarcityMessage(): string     // Returns "12/50 Remaining"
+getFoundersClubSpotsRemaining(): number      // Returns 42
+getFoundersClubScarcityMessage(): string     // Returns "42/50 Remaining"
 isFoundersClubSoldOut(): boolean            // Returns false
 ```
 
 **Configuration:**
 - `TOTAL_SPOTS = 50`
-- `SOLD_SPOTS = 38` (12 remaining)
+- `SOLD_SPOTS = 8` (42 remaining)
 - **Single point of update** when spots are sold
 
 ### Components Updated
@@ -171,10 +171,10 @@ All components now use the utility:
 
 ### Consistency Achieved
 
-**All pages now show:** `12/50 Remaining`
-- ✅ Dashboard banner: 12/50
-- ✅ Sponsor page: 12/50
-- ✅ Infrastructure modals: 12 spots
+**All pages now show:** `42/50 Remaining`
+- ✅ Dashboard banner: 42/50
+- ✅ Sponsor page: 42/50
+- ✅ Infrastructure modals: 42 spots
 - ✅ All components: Consistent
 
 ---
@@ -243,14 +243,14 @@ All Components (Consistent Value)
 
 - [ ] Dashboard banner appears for free users
 - [ ] Dashboard banner hides for premium users
-- [ ] Banner shows correct "12/50" count
+- [ ] Banner shows correct "42/50" count
 - [ ] Clicking banner CTA navigates to `/sponsor` with UTM params
 - [ ] Sovereign Sync modal appears when free user clicks "Connect"
 - [ ] Large CSV (>10MB) triggers modal
-- [ ] Modal shows correct "12 Spots Left" message
+- [ ] Modal shows correct "42 Spots Left" message
 - [ ] Power User card appears in Settings for non-Founders
 - [ ] Power User card hides for Founders Club members
-- [ ] Sponsor page shows "12/50 Remaining" (matches banner)
+- [ ] Sponsor page shows "42/50 Remaining" (matches banner)
 
 ### Integration Testing
 
@@ -348,7 +348,7 @@ All CTAs include UTM tracking:
 
 ### Phase 4: Real-Time Count (Recommended)
 
-**Current:** Static constant (`SOLD_SPOTS = 38`)
+**Current:** Static constant (`SOLD_SPOTS = 8`)
 
 **Enhancement:** Firestore query for real-time count
 
