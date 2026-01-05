@@ -21,15 +21,21 @@ export function usePremiumTheme() {
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Check localStorage first for cached tier
+    // Check localStorage first for cached tier with timestamp
     const cachedTier = localStorage.getItem('pocket-portfolio-tier') as Tier;
     const cachedTheme = localStorage.getItem('pocket-portfolio-premium-theme') as PremiumTheme;
+    const cacheTimestamp = localStorage.getItem('pocket-portfolio-tier-timestamp');
 
-    if (cachedTier && cachedTheme) {
-      setTier(cachedTier);
-      setUnlockedTheme(cachedTheme);
-      setIsLoading(false);
-      // Still refresh in background to ensure it's up to date
+    // Use cached data if it's less than 5 minutes old - CRITICAL for quota management
+    if (cachedTier && cachedTheme && cacheTimestamp) {
+      const age = Date.now() - parseInt(cacheTimestamp, 10);
+      if (age < 5 * 60 * 1000) { // 5 minutes
+        setTier(cachedTier);
+        setUnlockedTheme(cachedTheme);
+        setIsLoading(false);
+        // Don't make API call if cache is fresh - this prevents quota exhaustion
+        return;
+      }
     }
 
     // Determine which email to use and which endpoint to call
@@ -79,6 +85,13 @@ export function usePremiumTheme() {
         }
 
         if (!response.ok) {
+          // If quota error, use cached data if available
+          if (response.status === 503) {
+            if (cachedTier && cachedTheme) {
+              setTier(cachedTier);
+              setUnlockedTheme(cachedTheme);
+            }
+          }
           setIsLoading(false);
           return;
         }
@@ -90,6 +103,7 @@ export function usePremiumTheme() {
         if (userTier) {
           setTier(userTier);
           localStorage.setItem('pocket-portfolio-tier', userTier);
+          localStorage.setItem('pocket-portfolio-tier-timestamp', Date.now().toString());
 
           // Use themeAccess from API if available, otherwise map tier to theme
           let theme: PremiumTheme = userThemeAccess || null;
@@ -109,9 +123,15 @@ export function usePremiumTheme() {
           // No tier found - clear cache if it exists
           localStorage.removeItem('pocket-portfolio-tier');
           localStorage.removeItem('pocket-portfolio-premium-theme');
+          localStorage.removeItem('pocket-portfolio-tier-timestamp');
         }
       } catch (error) {
         console.error('Error checking tier:', error);
+        // Use cached data on error
+        if (cachedTier && cachedTheme) {
+          setTier(cachedTier);
+          setUnlockedTheme(cachedTheme);
+        }
       } finally {
         setIsLoading(false);
       }

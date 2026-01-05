@@ -61,6 +61,26 @@ export default function AdvisorTool() {
         return;
       }
 
+      // Check cache first to avoid unnecessary API calls
+      const cacheKey = `apiKeys_${user.email}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+      
+      if (cachedData && cacheTimestamp) {
+        const age = Date.now() - parseInt(cacheTimestamp, 10);
+        if (age < 5 * 60 * 1000) { // 5 minutes
+          try {
+            const data = JSON.parse(cachedData);
+            const hasLicense = !!data.corporateLicense;
+            setHasCorporateLicense(hasLicense);
+            setCheckingLicense(false);
+            return; // Don't fetch if we have fresh cache
+          } catch (e) {
+            // Invalid cache, continue to fetch
+          }
+        }
+      }
+
       try {
         // Get Firebase ID token
         const idToken = await user.getIdToken();
@@ -77,11 +97,31 @@ export default function AdvisorTool() {
           const hasLicense = !!data.corporateLicense;
           setHasCorporateLicense(hasLicense);
           
+          // Cache the result
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+          localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+          
           // Store in localStorage for persistence (optional, for client-side checks)
           if (hasLicense && data.corporateLicense) {
             localStorage.setItem('CORPORATE_KEY', data.corporateLicense);
           } else {
             localStorage.removeItem('CORPORATE_KEY');
+          }
+        } else if (response.status === 503) {
+          // Quota exceeded - use cached data
+          if (cachedData) {
+            try {
+              const data = JSON.parse(cachedData);
+              setHasCorporateLicense(!!data.corporateLicense);
+            } catch (e) {
+              // Invalid cache
+            }
+          } else {
+            // Fallback to localStorage check
+            const corporateKey = typeof window !== 'undefined' 
+              ? localStorage.getItem('CORPORATE_KEY') 
+              : null;
+            setHasCorporateLicense(corporateKey === 'VALID_CORPORATE_KEY');
           }
         } else {
           // API call failed - fallback to localStorage check
@@ -92,11 +132,25 @@ export default function AdvisorTool() {
         }
       } catch (error) {
         console.error('Error checking corporate license:', error);
-        // Fallback to localStorage on error
-        const corporateKey = typeof window !== 'undefined' 
-          ? localStorage.getItem('CORPORATE_KEY') 
-          : null;
-        setHasCorporateLicense(corporateKey === 'VALID_CORPORATE_KEY');
+        // Use cached data on error
+        if (cachedData) {
+          try {
+            const data = JSON.parse(cachedData);
+            setHasCorporateLicense(!!data.corporateLicense);
+          } catch (e) {
+            // Invalid cache, fallback to localStorage
+            const corporateKey = typeof window !== 'undefined' 
+              ? localStorage.getItem('CORPORATE_KEY') 
+              : null;
+            setHasCorporateLicense(corporateKey === 'VALID_CORPORATE_KEY');
+          }
+        } else {
+          // Fallback to localStorage on error
+          const corporateKey = typeof window !== 'undefined' 
+            ? localStorage.getItem('CORPORATE_KEY') 
+            : null;
+          setHasCorporateLicense(corporateKey === 'VALID_CORPORATE_KEY');
+        }
       } finally {
         setCheckingLicense(false);
       }
