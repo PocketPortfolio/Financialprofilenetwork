@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true; // Explicitly allow dynamic params
+export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
+export const revalidate = 0; // Force no caching - ensure fresh data
 
 // Rate limiting storage (in production, use Redis or Vercel KV)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
