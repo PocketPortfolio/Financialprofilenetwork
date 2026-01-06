@@ -6,6 +6,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
+import { getDatasetSchema } from '@/app/lib/seo/schema';
 
 
 // Generate static params for all tickers
@@ -61,49 +62,71 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
   const metadata = await getTickerMetadata(normalizedSymbol);
   
+  // Generate Dataset schema for AI agents and search engines
+  const datasetSchema = getDatasetSchema(
+    normalizedSymbol,
+    metadata?.name,
+    metadata?.exchange
+  );
+
   if (!metadata) {
     return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(datasetSchema)
+          }}
+        />
+        <div style={{
+          minHeight: '100vh',
+          background: 'var(--bg)',
+          color: 'var(--text)'
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '32px 16px'
+          }}>
+            <div style={{
+              maxWidth: '896px',
+              margin: '0 auto'
+            }}>
+              <h1 style={{
+                fontSize: '30px',
+                fontWeight: '700',
+                color: 'var(--text)',
+                marginBottom: '16px'
+              }}>
+                {normalizedSymbol} Historical Data & JSON API
+              </h1>
+              <p style={{
+                color: 'var(--text-secondary)',
+                marginBottom: '32px',
+                lineHeight: '1.6'
+              }}>
+                Download {normalizedSymbol} historical stock data in JSON format. Free API for developers. No login required.
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(datasetSchema)
+        }}
+      />
       <div style={{
         minHeight: '100vh',
         background: 'var(--bg)',
         color: 'var(--text)'
       }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '32px 16px'
-        }}>
-          <div style={{
-            maxWidth: '896px',
-            margin: '0 auto'
-          }}>
-            <h1 style={{
-              fontSize: '30px',
-              fontWeight: '700',
-              color: 'var(--text)',
-              marginBottom: '16px'
-            }}>
-              {normalizedSymbol} Historical Data & JSON API
-            </h1>
-            <p style={{
-              color: 'var(--text-secondary)',
-              marginBottom: '32px',
-              lineHeight: '1.6'
-            }}>
-              Download {normalizedSymbol} historical stock data in JSON format. Free API for developers. No login required.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg)',
-      color: 'var(--text)'
-    }}>
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
@@ -284,7 +307,8 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

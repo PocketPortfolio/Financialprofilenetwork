@@ -95,3 +95,57 @@ export function getBrokerSchema(brokerName: string, description?: string) {
     }
   };
 }
+
+/**
+ * Generate Dataset schema for JSON API pages
+ * This helps AI agents and search engines recognize our data as a public dataset
+ */
+export function getDatasetSchema(
+  symbol: string,
+  name?: string,
+  exchange?: string
+) {
+  const normalizedSymbol = symbol.toUpperCase();
+  const symbolLower = normalizedSymbol.toLowerCase();
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: `${normalizedSymbol} Historical Stock Data`,
+    description: `Free JSON API providing historical price, volume, and dividend data for ${normalizedSymbol}${name ? ` (${name})` : ''}. No API key required.`,
+    url: `https://www.pocketportfolio.app/s/${symbolLower}/json-api`,
+    identifier: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/json`,
+    keywords: [
+      `${normalizedSymbol} historical data`,
+      `${normalizedSymbol} JSON API`,
+      `${normalizedSymbol} stock data`,
+      'free stock data API',
+      'historical price data',
+      'JSON financial data'
+    ],
+    license: 'https://www.pocketportfolio.app',
+    creator: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app'
+    },
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'application/json',
+        contentUrl: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/json`,
+        description: `JSON endpoint for ${normalizedSymbol} historical data`
+      }
+    ],
+    temporalCoverage: '2000-01-01/..',
+    spatialCoverage: {
+      '@type': 'Place',
+      name: exchange || 'Global'
+    },
+    about: {
+      '@type': 'FinancialProduct',
+      name: name || normalizedSymbol,
+      tickerSymbol: normalizedSymbol
+    }
+  };
+}
