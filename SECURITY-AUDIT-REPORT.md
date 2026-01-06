@@ -30,7 +30,7 @@ Security audit executed end-to-end per General Order 001. **CRITICAL VULNERABILI
 
 **Action Taken:**
 - ✅ **FIXED:** Removed hardcoded Stripe publishable key from `app/sponsor/page.tsx:13`
-  - **Before:** Hardcoded fallback key `pk_live_51SeZTKD4sftWa1WtU6oGAzAVSAp6qTLUOPMbK5gaetspAelBzAou1epdTwj9ngybvv8ZiSWJgdbSfSeaRCTezO9T00OzhxwstL`
+  - **Before:** Hardcoded fallback key `pk_live_...` (removed for security)
   - **After:** Requires `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` environment variable (no fallback)
 
 **Commands Executed:**
