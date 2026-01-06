@@ -76,6 +76,22 @@
     ]
   },
   {
+    "id": "stress-test-self-healing-jan-6-2pm",
+    "date": "2026-01-06",
+    "title": "Building Resilient Systems: The Power of Self-Healing Architecture in Production",
+    "slug": "building-resilient-systems-the-power-of-self-healing-architecture-in-production",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "system reliability",
+      "self-healing systems",
+      "production architecture",
+      "automated recovery",
+      "fault tolerance",
+      "system resilience"
+    ]
+  },
+  {
     "id": "stress-test-finance-jan-7-9am",
     "date": "2026-01-07",
     "title": "The Fundamentals of Wealth Building: Principles That Stand the Test of Time",
