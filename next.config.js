@@ -23,6 +23,16 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  // Rewrites for API route compatibility (internal mapping, no URL change)
+  async rewrites() {
+    return [
+      // Map /api/tickers/{ticker}/json to catch-all route for Next.js 15 compatibility
+      {
+        source: '/api/tickers/:ticker/json',
+        destination: '/api/tickers/:ticker/json',
+      },
+    ];
+  },
   // Comprehensive redirects for canonicalization and legacy routes
   async redirects() {
     return [

@@ -133,13 +133,24 @@ export async function GET(
   // Log for debugging (production-safe)
   console.warn(`[TICKERS_JSON_API] Route handler ENTRY | Path: ${pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
   
-  // Catch-all route: ticker is an array like ["AAPL", "json"]
-  // Extract ticker symbol (first element) and verify format (last element should be "json")
-  const tickerArray = resolvedParams.ticker || [];
-  const ticker = tickerArray[0]?.toUpperCase();
-  const format = tickerArray[tickerArray.length - 1]?.toLowerCase();
+  // Extract ticker and format from pathname as fallback (more reliable than params on Vercel)
+  // Path format: /api/tickers/{TICKER}/json
+  const pathMatch = pathname.match(/^\/api\/tickers\/([^\/]+)\/json$/i);
+  let ticker: string | undefined;
+  let format: string | undefined;
   
-  console.warn(`[TICKERS_JSON_API] Ticker array: ${JSON.stringify(tickerArray)} | Extracted ticker: ${ticker} | Format: ${format}`);
+  if (pathMatch) {
+    // Extract from pathname (most reliable)
+    ticker = pathMatch[1]?.toUpperCase();
+    format = 'json';
+    console.warn(`[TICKERS_JSON_API] Extracted from pathname: ticker=${ticker}, format=${format}`);
+  } else {
+    // Fallback to params (catch-all route)
+    const tickerArray = resolvedParams.ticker || [];
+    ticker = tickerArray[0]?.toUpperCase();
+    format = tickerArray[tickerArray.length - 1]?.toLowerCase();
+    console.warn(`[TICKERS_JSON_API] Extracted from params: ticker array=${JSON.stringify(tickerArray)}, ticker=${ticker}, format=${format}`);
+  }
   
   // Verify format is "json"
   if (format !== 'json') {
