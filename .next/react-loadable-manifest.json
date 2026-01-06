@@ -1,4 +1,8 @@
 {
+  "app\\hooks\\useGoogleDrive.ts -> ../lib/analytics/events": {
+    "id": "app\\hooks\\useGoogleDrive.ts -> ../lib/analytics/events",
+    "files": []
+  },
   "node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
     "id": "node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",
     "files": [
