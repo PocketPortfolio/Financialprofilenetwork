@@ -61,6 +61,7 @@
     "@pocket-portfolio/importer": "file:packages/importer",
     "@stripe/stripe-js": "^8.5.3",
     "@tailwindcss/postcss": "^4.1.14",
+    "@vercel/kv": "^3.0.0",
     "autoprefixer": "^10.4.21",
     "driver.js": "^1.4.0",
     "firebase": "^10.13.0",
