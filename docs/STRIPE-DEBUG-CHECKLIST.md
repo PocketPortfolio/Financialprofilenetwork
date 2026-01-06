@@ -11,7 +11,7 @@ The deployed application is using a Stripe **secret key** (`sk_live_...`) instea
 ### Step 1: Verify Vercel Environment Variable
 1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
 2. Find `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-3. Verify it's set to: `pk_live_51SeZTKD4sftWa1WtU6oGAzAVSAp6qTLUOPMbK5gaetspAelBzAou1epdTwj9ngybvv8ZiSWJgdbSfSeaRCTezO9T00OzhxwstL`
+3. Verify it's set to your Stripe publishable key (starts with `pk_live_...` or `pk_test_...`)
 4. Ensure it's set for **Production** environment
 
 ### Step 2: Clear Build Cache and Redeploy

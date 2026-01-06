@@ -51,9 +51,11 @@ npm install @vercel/kv
 **Status:** ✅ **Automatically added by Vercel when KV database was created**
 
 The following environment variables should be present in Vercel:
-- `KV_REST_API_URL` = `https://maximum-stallion-26649.upstash.io`
-- `KV_REST_API_TOKEN` = `AWgZAAIncDI4MzRkMDdjNGFjNWI0Yjc0OTk4MzUyMjYxN2NmNmY2YXAyMjY2NDk`
-- `KV_REST_API_READ_ONLY_TOKEN` = `AmgZAAIgcDLTxtWdTkSLUB-S9LJQIlt9xNd5ilvcscWiVcRYpF65wQ`
+- `KV_REST_API_URL` = `https://your-database.upstash.io` (example - use your actual URL)
+- `KV_REST_API_TOKEN` = `YOUR_TOKEN_HERE` (example - use your actual token)
+- `KV_REST_API_READ_ONLY_TOKEN` = `YOUR_READ_ONLY_TOKEN_HERE` (example - use your actual token)
+
+**⚠️ SECURITY NOTE:** These are sensitive credentials. Never commit actual values to git. Only store them in Vercel Environment Variables.
 
 **Verification:**
 1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables

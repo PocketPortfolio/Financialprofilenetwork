@@ -29,7 +29,7 @@ Add these to your `.env.local` (for local development) and Vercel environment va
 ```bash
 # Stripe Keys
 STRIPE_SECRET_KEY=sk_live_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_51SeZTKD4sftWa1WtU6oGAzAVSAp6qTLUOPMbK5gaetspAelBzAou1epdTwj9ngybvv8ZiSWJgdbSfSeaRCTezO9T00OzhxwstL
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_YOUR_PUBLISHABLE_KEY_HERE
 
 # Stripe Price IDs (optional - already configured in code)
 NEXT_PUBLIC_STRIPE_PRICE_CODE_SUPPORTER=price_1SeZh7D4sftWa1WtWsDwvQu5
