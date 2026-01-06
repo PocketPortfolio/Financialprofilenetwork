@@ -9,9 +9,11 @@
 ## 📋 Summary
 
 **Exposed Credentials Found in Git History:**
-- `KV_REST_API_TOKEN` = `AWgZAAIncDI4MzRkMDdjNGFjNWI0Yjc0OTk4MzUyMjYxN2NmNmY2YXAyMjY2NDk`
-- `KV_REST_API_READ_ONLY_TOKEN` = `AmgZAAIgcDLTxtWdTkSLUB-S9LJQIlt9xNd5ilvcscWiVcRYpF65wQ`
-- `KV_REST_API_URL` = `https://maximum-stallion-26649.upstash.io`
+- `KV_REST_API_TOKEN` = `[REDACTED - Token ends with ...YXAyMjY2NDk]`
+- `KV_REST_API_READ_ONLY_TOKEN` = `[REDACTED - Token ends with ...RYpF65wQ]`
+- `KV_REST_API_URL` = `https://[REDACTED].upstash.io`
+
+**⚠️ SECURITY NOTE:** Full credentials were exposed in commit `a499e23`. These tokens must be rotated immediately. Do not include full credentials in any documentation.
 
 **Files That Contained Credentials:**
 - `RATE-LIMIT-FIX-DEPLOYMENT.md` (committed in commit `a499e23`)
@@ -49,16 +51,16 @@
 
 **Check Git History:**
 ```bash
-# Search git history for exposed tokens
-git log --all --full-history -p -S "AWgZAAIncDI4MzRkMDdjNGFjNWI0Yjc0OTk4MzUyMjYxN2NmNmY2YXAyMjY2NDk" 
-git log --all --full-history -p -S "AmgZAAIgcDLTxtWdTkSLUB-S9LJQIlt9xNd5ilvcscWiVcRYpF65wQ"
+# Search git history for exposed tokens (use partial matches only)
+# DO NOT include full tokens in documentation
+git log --all --full-history -p -S "[partial-token-pattern]" 
 ```
 
 **Check Current Files:**
 ```bash
 # Verify no credentials in current codebase
-grep -r "AWgZAAIncDI4MzRkMDdjNGFjNWI0Yjc0OTk4MzUyMjYxN2NmNmY2YXAyMjY2NDk" .
-grep -r "AmgZAAIgcDLTxtWdTkSLUB-S9LJQIlt9xNd5ilvcscWiVcRYpF65wQ" .
+# Use partial matches or grep for token patterns, not full tokens
+grep -r "KV_REST_API_TOKEN" . | grep -v "YOUR_TOKEN_HERE"
 ```
 
 ---
