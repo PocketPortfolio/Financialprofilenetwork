@@ -405,19 +405,86 @@ async function main() {
     console.log('✅ Calendar updated');
     console.log(`📊 Summary: ${successCount} published, ${failureCount} failed`);
 
+    // CRITICAL: Verify posts scheduled for TODAY were actually generated
+    const todayExpectedPosts = calendar.filter(
+      post => post.date === today && post.status === 'pending'
+    );
+    
+    if (todayExpectedPosts.length > 0) {
+      console.error('\n❌ CRITICAL ERROR: Posts scheduled for TODAY were not generated!');
+      console.error(`   Expected ${todayExpectedPosts.length} post(s) for ${today}:`);
+      todayExpectedPosts.forEach(post => {
+        console.error(`   - ${post.title} (ID: ${post.id})`);
+        console.error(`     Status: ${post.status} (should be 'published')`);
+        
+        // Check if file exists
+        const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+        const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
+        const mdxExists = fs.existsSync(mdxPath);
+        const imageExists = fs.existsSync(imagePath);
+        
+        console.error(`     MDX file exists: ${mdxExists ? '✅' : '❌'}`);
+        console.error(`     Image file exists: ${imageExists ? '✅' : '❌'}`);
+      });
+      console.error('\n   This is a CRITICAL FAILURE - posts for today were not generated!');
+      console.error('   The workflow will fail to alert you immediately.');
+      process.exit(1);
+    }
+
+    // Verify generated posts actually have files on disk
+    const generatedPosts = duePosts.filter(post => post.status === 'published');
+    const missingFiles: string[] = [];
+    
+    for (const post of generatedPosts) {
+      const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+      const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
+      
+      if (!fs.existsSync(mdxPath)) {
+        missingFiles.push(`MDX: ${post.slug}.mdx`);
+      }
+      if (!fs.existsSync(imagePath)) {
+        missingFiles.push(`Image: ${post.slug}.png`);
+      }
+    }
+    
+    if (missingFiles.length > 0) {
+      console.error('\n❌ CRITICAL ERROR: Generated posts are missing files!');
+      console.error('   Missing files:');
+      missingFiles.forEach(file => console.error(`   - ${file}`));
+      console.error('   This indicates a file write failure.');
+      process.exit(1);
+    }
+
+    // Check if any posts scheduled for TODAY failed
+    const todayFailedPosts = calendar.filter(
+      post => post.date === today && post.status === 'failed'
+    );
+    
+    if (todayFailedPosts.length > 0) {
+      console.error('\n❌ CRITICAL ERROR: Posts scheduled for TODAY failed to generate!');
+      console.error(`   Failed ${todayFailedPosts.length} post(s) for ${today}:`);
+      todayFailedPosts.forEach(post => {
+        console.error(`   - ${post.title} (ID: ${post.id})`);
+      });
+      console.error('   The workflow will fail to alert you immediately.');
+      process.exit(1);
+    }
+
     // Exit with error code if all posts failed
     if (failureCount > 0 && successCount === 0) {
       console.error('❌ All posts failed to generate');
       process.exit(1);
     }
 
-    // Exit with warning code if some posts failed
+    // Exit with warning code if some posts failed (but not today's posts)
     if (failureCount > 0) {
       console.warn(`⚠️ ${failureCount} post(s) failed, but ${successCount} succeeded`);
+      console.warn('   Note: Failed posts were not scheduled for today, so workflow continues.');
       process.exit(0); // Still exit successfully to allow deployment
     }
 
     console.log('✅ All posts generated successfully');
+    console.log('✅ All expected posts for today were generated and verified');
     process.exit(0);
   } catch (error: any) {
     console.error('❌ Fatal error in blog generation:', error);

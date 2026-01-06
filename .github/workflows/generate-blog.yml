@@ -180,13 +180,14 @@ jobs:
         run: |
           node -e "
           const fs = require('fs');
+          const path = require('path');
           const calendar = JSON.parse(fs.readFileSync('content/blog-calendar.json', 'utf-8'));
           const today = new Date().toISOString().split('T')[0];
           const expectedPosts = calendar.filter(p => p.date === today && p.status === 'pending');
           
           if (expectedPosts.length > 0) {
             console.log('EXPECTED_POSTS=' + expectedPosts.length);
-            console.log('EXPECTED_POSTS_LIST=' + JSON.stringify(expectedPosts.map(p => ({id: p.id, title: p.title, date: p.date}))));
+            console.log('EXPECTED_POSTS_LIST=' + JSON.stringify(expectedPosts.map(p => ({id: p.id, title: p.title, date: p.date, slug: p.slug}))));
             process.exit(0);
           } else {
             console.log('EXPECTED_POSTS=0');
@@ -196,8 +197,63 @@ jobs:
           echo "expected_posts=${{ env.EXPECTED_POSTS }}" >> $GITHUB_OUTPUT
           echo "expected_posts_list=${{ env.EXPECTED_POSTS_LIST }}" >> $GITHUB_OUTPUT
 
+      - name: Verify expected posts were generated
+        if: always() && steps.expected-posts.outputs.expected_posts > 0
+        id: verify-posts
+        continue-on-error: false
+        run: |
+          echo "🔍 Verifying expected posts were actually generated..."
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+          const expectedPosts = JSON.parse('${{ steps.expected-posts.outputs.expected_posts_list }}');
+          const missingPosts = [];
+          
+          console.log('Checking ' + expectedPosts.length + ' expected post(s)...');
+          
+          for (const post of expectedPosts) {
+            const mdxPath = path.join('content', 'posts', post.slug + '.mdx');
+            const imagePath = path.join('public', 'images', 'blog', post.slug + '.png');
+            
+            const mdxExists = fs.existsSync(mdxPath);
+            const imageExists = fs.existsSync(imagePath);
+            
+            if (!mdxExists || !imageExists) {
+              missingPosts.push({
+                id: post.id,
+                title: post.title,
+                slug: post.slug,
+                mdxExists: mdxExists,
+                imageExists: imageExists
+              });
+              console.error('❌ Missing: ' + post.title);
+              console.error('   MDX: ' + (mdxExists ? '✅' : '❌') + ' ' + mdxPath);
+              console.error('   Image: ' + (imageExists ? '✅' : '❌') + ' ' + imagePath);
+            } else {
+              console.log('✅ Found: ' + post.title);
+            }
+          }
+          
+          if (missingPosts.length > 0) {
+            console.error('❌ CRITICAL: ' + missingPosts.length + ' expected post(s) were NOT generated!');
+            console.log('MISSING_POSTS=' + missingPosts.length);
+            console.log('MISSING_POSTS_LIST=' + JSON.stringify(missingPosts));
+            process.exit(1);
+          } else {
+            console.log('✅ All expected posts verified successfully');
+            console.log('MISSING_POSTS=0');
+            process.exit(0);
+          }
+          "
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "❌ CRITICAL FAILURE: Expected posts were not generated!"
+            echo "The workflow will fail to alert you immediately."
+            exit 1
+          fi
+
       - name: Create issue if expected posts not generated
-        if: always() && steps.expected-posts.outputs.expected_posts > 0 && steps.changes.outputs.changes != 'true'
+        if: always() && steps.expected-posts.outputs.expected_posts > 0 && (steps.verify-posts.outcome == 'failure' || steps.changes.outputs.changes != 'true')
         uses: actions/github-script@v7
         with:
           script: |
@@ -242,6 +298,17 @@ jobs:
             echo "- New blog posts have been generated" >> $GITHUB_STEP_SUMMARY
             echo "- Changes have been pushed to main branch" >> $GITHUB_STEP_SUMMARY
             echo "- Deployment will trigger automatically" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.expected-posts.outputs.expected_posts }}" != "0" ]; then
+              if [ "${{ steps.verify-posts.outcome }}" == "success" ]; then
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "✅ **All expected posts verified** - Files exist and are correct" >> $GITHUB_STEP_SUMMARY
+              elif [ "${{ steps.verify-posts.outcome }}" == "failure" ]; then
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "❌ **CRITICAL: Expected posts were NOT generated despite changes!**" >> $GITHUB_STEP_SUMMARY
+                echo "- Some files may be missing" >> $GITHUB_STEP_SUMMARY
+                echo "- GitHub issue created automatically" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
           else
             echo "ℹ️ **No changes detected**" >> $GITHUB_STEP_SUMMARY
             if [ "${{ steps.expected-posts.outputs.expected_posts }}" != "0" ]; then
