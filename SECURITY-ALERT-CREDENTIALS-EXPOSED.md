@@ -31,7 +31,7 @@
 
 **Steps:**
 1. Go to [Upstash Console](https://console.upstash.com/)
-2. Navigate to your database: `upstash-kv-lime-window` (or `maximum-stallion-26649`)
+2. Navigate to your database: `upstash-kv-lime-window` (or check your Vercel dashboard for the database name)
 3. Go to **Settings** → **Tokens**
 4. **Revoke** the following tokens:
    - `KV_REST_API_TOKEN` (ends with `...YXAyMjY2NDk`)
