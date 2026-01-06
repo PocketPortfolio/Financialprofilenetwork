@@ -3,8 +3,8 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
 
-  // Skip middleware entirely for sitemap and robots to avoid CSP issues
-  if (request.nextUrl.pathname === '/sitemap.xml' || request.nextUrl.pathname === '/robots.txt') {
+  // Skip middleware entirely for sitemap, robots, and llms.txt to avoid CSP issues
+  if (request.nextUrl.pathname === '/sitemap.xml' || request.nextUrl.pathname === '/robots.txt' || request.nextUrl.pathname === '/llms.txt') {
     return NextResponse.next();
   }
   
@@ -49,8 +49,9 @@ export const config = {
      * - api/ (API routes)
      * - sitemap.xml (sitemap file)
      * - robots.txt (robots file)
+     * - llms.txt (LLM context file)
      */
-    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|sitemap\\.xml|robots\\.txt).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|sitemap\\.xml|robots\\.txt|llms\\.txt).*)',
   ],
 };
 
