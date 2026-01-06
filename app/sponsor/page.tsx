@@ -60,6 +60,12 @@ export default function SponsorPage() {
 
   // Verify Stripe loads correctly
   useEffect(() => {
+    if (!stripePromise) {
+      console.error('❌ SECURITY: Stripe publishable key not configured');
+      setStripeStatus('error');
+      return;
+    }
+    
     stripePromise
       .then((stripe) => {
         if (stripe) {
@@ -129,6 +135,10 @@ export default function SponsorPage() {
     setLoading(finalPriceId);
 
     try {
+      if (!stripePromise) {
+        throw new Error('Stripe publishable key not configured');
+      }
+      
       const stripe = await stripePromise;
       
       if (!stripe) {
