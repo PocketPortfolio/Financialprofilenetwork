@@ -128,15 +128,34 @@ export async function GET(
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
   
+  // Log for debugging (production-safe)
+  console.warn(`[TICKERS_JSON_API] Route handler ENTRY | Path: ${request.nextUrl.pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
+  
   // Catch-all route: ticker is an array like ["AAPL", "json"]
   // Extract ticker symbol (first element) and ignore "json" suffix
   const tickerArray = resolvedParams.ticker || [];
   const ticker = tickerArray[0]?.toUpperCase();
   
+  console.warn(`[TICKERS_JSON_API] Ticker array: ${JSON.stringify(tickerArray)} | Extracted ticker: ${ticker}`);
+  
   if (!ticker) {
+    console.warn(`[TICKERS_JSON_API] No ticker found in params: ${JSON.stringify(resolvedParams)}`);
     return NextResponse.json(
-      { error: 'Ticker parameter required. Use /api/tickers/{SYMBOL}/json' },
-      { status: 400 }
+      { 
+        error: 'Ticker parameter required. Use /api/tickers/{SYMBOL}/json',
+        diagnostic: {
+          params: resolvedParams,
+          pathname: request.nextUrl.pathname,
+          url: request.url
+        }
+      },
+      { 
+        status: 400,
+        headers: {
+          'X-Tickers-Route': 'called',
+          'X-Tickers-Error': 'missing-ticker'
+        }
+      }
     );
   }
   
