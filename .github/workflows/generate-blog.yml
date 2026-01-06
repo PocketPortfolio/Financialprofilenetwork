@@ -13,6 +13,8 @@ on:
     - cron: '30 18 31 12 *'
     # One-time: Building Production-Ready Systems post at 10:00 UTC on Jan 6, 2026 (TEST - verify fixes)
     - cron: '0 10 6 1 *'  # 10:00 UTC on Jan 6, 2026 - Test autonomous engine with fixes
+    # One-time: AI-Powered Financial Analysis post at 12:30 UTC on Jan 6, 2026 (STRESS TEST - verify cron reliability)
+    - cron: '30 12 6 1 *'  # 12:30 UTC on Jan 6, 2026 - Stress test AI post (rescheduled from 12:00 to test system)
   workflow_dispatch: # Allow manual triggering (for testing/debugging only)
 
 jobs:
