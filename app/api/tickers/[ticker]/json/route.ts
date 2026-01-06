@@ -11,7 +11,7 @@ import { getTickerMetadata } from '@/app/lib/pseo/data';
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 0; // Force no caching to ensure Next.js recognizes the route
 
 // Rate limiting storage (in production, use Redis or Vercel KV)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
