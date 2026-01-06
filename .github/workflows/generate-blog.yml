@@ -2,6 +2,9 @@ name: Generate Blog Posts
 
 on:
   schedule:
+    # SELF-HEALING: Run every hour to catch missed posts (GitHub Actions cron is unreliable)
+    # This ensures posts are generated even if scheduled runs fail
+    - cron: '0 * * * *'  # Every hour at :00 minutes - Self-healing check for missed posts
     # Run every 2 hours for maximum reliability (12 checks per day)
     # Posts are generated when their date <= today and status is "pending"
     - cron: '0 */2 * * *'  # Every 2 hours: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
