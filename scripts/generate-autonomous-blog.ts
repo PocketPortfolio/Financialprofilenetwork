@@ -297,6 +297,17 @@ async function main() {
     console.log(`📋 Total posts in calendar: ${calendar.length}`);
     console.log(`📋 Posts with status "pending": ${calendar.filter(p => p.status === 'pending').length}`);
     console.log(`📋 Posts with date <= today: ${calendar.filter(p => p.date <= today).length}`);
+    console.log(`📋 Posts with date === today: ${calendar.filter(p => p.date === today).length}`);
+    console.log(`📋 Posts with date === today AND status === 'pending': ${calendar.filter(p => p.date === today && p.status === 'pending').length}`);
+    
+    // Show which posts have date <= today (for debugging)
+    const postsWithDateLeToday = calendar.filter(p => p.date <= today);
+    if (postsWithDateLeToday.length > 0) {
+      console.log(`\n📋 Posts with date <= today (${postsWithDateLeToday.length}):`);
+      postsWithDateLeToday.forEach(p => {
+        console.log(`   - ${p.title} (${p.date}) - Status: ${p.status} - ${p.status === 'pending' ? '✅ Should generate' : '❌ Already published/failed'}`);
+      });
+    }
     
     // Log NYE post specifically if it exists
     const nyePost = calendar.find(p => p.id === 'nye-2025-review');
@@ -307,6 +318,17 @@ async function main() {
       console.log(`   - Date <= today: ${nyePost.date <= today}`);
       console.log(`   - Status === 'pending': ${nyePost.status === 'pending'}`);
       console.log(`   - Should be included: ${nyePost.date <= today && nyePost.status === 'pending'}`);
+    }
+    
+    // Log Jan 6 post specifically if it exists
+    const jan6Post = calendar.find(p => p.id === 'engine-verification-test-jan-6');
+    if (jan6Post) {
+      console.log(`\n🔍 Jan 6 Post Debug:`);
+      console.log(`   - Date: ${jan6Post.date}`);
+      console.log(`   - Status: ${jan6Post.status}`);
+      console.log(`   - Date <= today: ${jan6Post.date <= today}`);
+      console.log(`   - Status === 'pending': ${jan6Post.status === 'pending'}`);
+      console.log(`   - Should be included: ${jan6Post.date <= today && jan6Post.status === 'pending'}`);
     }
     
     // Find all posts that are due (date <= today) or overdue (date < today)
@@ -327,8 +349,31 @@ async function main() {
     }
 
     if (duePosts.length === 0) {
-      console.log('\n✅ No posts due for generation');
+      console.log('\n⚠️  No posts due for generation');
       console.log('💡 Debug: Check if any posts have date <= today and status === "pending"');
+      
+      // Check for posts with date === today (exact match) - these SHOULD be generated
+      const todayPosts = calendar.filter(
+        post => post.date === today && post.status === 'pending'
+      );
+      
+      if (todayPosts.length > 0) {
+        console.error('\n❌ CRITICAL ERROR: Found posts scheduled for TODAY but they were not detected as due!');
+        console.error(`   Expected ${todayPosts.length} post(s) for ${today}:`);
+        todayPosts.forEach(post => {
+          console.error(`   - ${post.title} (ID: ${post.id})`);
+          console.error(`     Date: ${post.date}, Status: ${post.status}`);
+          console.error(`     Date === today: ${post.date === today}`);
+          console.error(`     Date <= today: ${post.date <= today}`);
+          console.error(`     Status === 'pending': ${post.status === 'pending'}`);
+        });
+        console.error('\n   This is a BUG in the date comparison logic!');
+        console.error('   The posts exist and should be generated, but the filter is not finding them.');
+        process.exit(1);
+      }
+      
+      // If no posts for today, that's fine - exit normally
+      console.log(`\n✅ No posts scheduled for ${today} (or all already generated)`);
       process.exit(0);
     }
 

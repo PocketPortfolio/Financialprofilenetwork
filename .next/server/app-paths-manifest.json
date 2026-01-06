@@ -1,5 +1,17 @@
 {
-  "/blog/[slug]/page": "app/blog/[slug]/page.js",
-  "/features/google-drive-sync/page": "app/features/google-drive-sync/page.js",
-  "/blog/page": "app/blog/page.js"
+  "/api/health-price/route": "app/api/health-price/route.js",
+  "/api/api-keys/route": "app/api/api-keys/route.js",
+  "/api/news/route": "app/api/news/route.js",
+  "/api/api-keys/user/route": "app/api/api-keys/user/route.js",
+  "/api/portfolio/history/route": "app/api/portfolio/history/route.js",
+  "/api/portfolio/market-context/route": "app/api/portfolio/market-context/route.js",
+  "/api/most-traded/route": "app/api/most-traded/route.js",
+  "/api/portfolio/sector-classification/batch/route": "app/api/portfolio/sector-classification/batch/route.js",
+  "/api/quote/route": "app/api/quote/route.js",
+  "/sponsor/page": "app/sponsor/page.js",
+  "/page": "app/page.js",
+  "/landing/page": "app/landing/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/s/[symbol]/dividend-history/page": "app/s/[symbol]/dividend-history/page.js"
 }

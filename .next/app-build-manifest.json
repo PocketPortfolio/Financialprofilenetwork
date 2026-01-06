@@ -16,10 +16,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/blog/[slug]/page": [
+    "/sponsor/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/blog/[slug]/page.js"
+      "static/chunks/app/sponsor/page.js"
     ],
     "/api/api-keys/route": [
       "static/chunks/webpack.js",
@@ -31,6 +31,47 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/api-keys/user/route.js"
     ],
+    "/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/dashboard/page.css",
+      "static/chunks/app/dashboard/page.js"
+    ],
+    "/api/news/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/news/route.js"
+    ],
+    "/api/most-traded/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/most-traded/route.js"
+    ],
+    "/api/portfolio/history/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/portfolio/history/route.js"
+    ],
+    "/api/health-price/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/health-price/route.js"
+    ],
+    "/api/quote/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/quote/route.js"
+    ],
+    "/api/portfolio/sector-classification/batch/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/portfolio/sector-classification/batch/route.js"
+    ],
+    "/settings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/settings/page.js"
+    ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -41,35 +82,45 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/npm-stats/route.js"
     ],
-    "/api/blog/external-posts/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/blog/external-posts/route.js"
-    ],
     "/api/blog/posts/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/blog/posts/route.js"
     ],
-    "/features/google-drive-sync/page": [
+    "/api/blog/external-posts/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/features/google-drive-sync/page.js"
+      "static/chunks/app/api/blog/external-posts/route.js"
     ],
-    "/blog/page": [
+    "/api/portfolio/market-context/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/blog/page.js"
+      "static/chunks/app/api/portfolio/market-context/route.js"
+    ],
+    "/landing/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/landing/page.js"
+    ],
+    "/s/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/s/layout.js"
+    ],
+    "/s/[symbol]/dividend-history/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/s/[symbol]/dividend-history/page.js"
+    ],
+    "/api/dividend/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/dividend/route.js"
     ],
     "/api/page-views/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/page-views/route.js"
-    ],
-    "/sponsor/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/sponsor/page.js"
     ]
   }
 }
