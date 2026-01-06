@@ -11,6 +11,8 @@ on:
     - cron: '0 16 5 1 *'  # 16:00 UTC on Jan 5, 2026
     # One-time: NYE 2025 Year in Review post at 18:30 GMT (Dec 31, 2025)
     - cron: '30 18 31 12 *'
+    # One-time: Building Production-Ready Systems post at 10:00 UTC on Jan 6, 2026 (TEST - verify fixes)
+    - cron: '0 10 6 1 *'  # 10:00 UTC on Jan 6, 2026 - Test autonomous engine with fixes
   workflow_dispatch: # Allow manual triggering (for testing/debugging only)
 
 jobs:
@@ -18,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,13 +50,19 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
+          echo "🕐 Workflow started at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "📅 Checking for posts due today..."
+          echo ""
+          
           MAX_RETRIES=3
           RETRY_COUNT=0
           EXIT_CODE=0
           
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             echo "🚀 Attempt $((RETRY_COUNT + 1))/$MAX_RETRIES"
-            if npm run generate-blog; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            if npm run generate-blog 2>&1 | tee /tmp/generate-output.log; then
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               echo "✅ Blog generation completed successfully"
               echo "error=false" >> $GITHUB_OUTPUT
               EXIT_CODE=0
@@ -61,11 +70,16 @@ jobs:
             else
               EXIT_CODE=$?
               RETRY_COUNT=$((RETRY_COUNT + 1))
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
               if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
                 echo "⚠️ Attempt $RETRY_COUNT failed, waiting 5 minutes before retry..."
+                echo "Last error output:"
+                tail -20 /tmp/generate-output.log || echo "No output log available"
                 sleep 300
               else
                 echo "❌ Blog generation failed after $MAX_RETRIES attempts"
+                echo "Final error output:"
+                tail -50 /tmp/generate-output.log || echo "No output log available"
                 echo "error=true" >> $GITHUB_OUTPUT
               fi
             fi
@@ -160,10 +174,68 @@ jobs:
               console.log('ℹ️ Issue already exists for overdue posts');
             }
 
+      - name: Check for expected posts
+        if: always()
+        id: expected-posts
+        run: |
+          node -e "
+          const fs = require('fs');
+          const calendar = JSON.parse(fs.readFileSync('content/blog-calendar.json', 'utf-8'));
+          const today = new Date().toISOString().split('T')[0];
+          const expectedPosts = calendar.filter(p => p.date === today && p.status === 'pending');
+          
+          if (expectedPosts.length > 0) {
+            console.log('EXPECTED_POSTS=' + expectedPosts.length);
+            console.log('EXPECTED_POSTS_LIST=' + JSON.stringify(expectedPosts.map(p => ({id: p.id, title: p.title, date: p.date}))));
+            process.exit(0);
+          } else {
+            console.log('EXPECTED_POSTS=0');
+            process.exit(0);
+          }
+          " >> $GITHUB_ENV
+          echo "expected_posts=${{ env.EXPECTED_POSTS }}" >> $GITHUB_OUTPUT
+          echo "expected_posts_list=${{ env.EXPECTED_POSTS_LIST }}" >> $GITHUB_OUTPUT
+
+      - name: Create issue if expected posts not generated
+        if: always() && steps.expected-posts.outputs.expected_posts > 0 && steps.changes.outputs.changes != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const expectedPosts = JSON.parse('${{ steps.expected-posts.outputs.expected_posts_list }}');
+            const postList = expectedPosts.map(p => `- **${p.title}** (ID: ${p.id}, Date: ${p.date})`).join('\n');
+            
+            // Check if issue already exists
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'blog-expected-not-generated',
+              since: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+            });
+            
+            const today = new Date().toISOString().split('T')[0];
+            const todayIssues = issues.filter(i => i.title.includes(today));
+            
+            if (todayIssues.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Expected Posts Not Generated: ${expectedPosts.length} post(s) for ${today}`,
+                body: `## ⚠️ Expected Posts Not Generated\n\n**Date**: ${today}\n**Expected Posts**: ${expectedPosts.length}\n\n### Posts That Should Have Been Generated:\n\n${postList}\n\n**Workflow Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\n**Possible Causes:**\n1. Workflow ran but script didn't detect posts (check logs)\n2. Workflow ran but generation failed silently\n3. Workflow didn't run at all (check schedule)\n\n**Action Required:**\n1. Check workflow logs for errors\n2. Verify post dates in calendar match today\n3. Manually trigger workflow if needed\n4. Close this issue once posts are generated`,
+                labels: ['bug', 'urgent', 'blog-expected-not-generated']
+              });
+              console.log('🚨 Created GitHub issue for expected posts not generated');
+            } else {
+              console.log('ℹ️ Issue already exists for today');
+            }
+
       - name: Workflow Summary
         if: always()
         run: |
           echo "## 📊 Blog Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.changes.outputs.changes }}" == "true" ]; then
             echo "✅ **Changes committed and pushed**" >> $GITHUB_STEP_SUMMARY
@@ -172,8 +244,14 @@ jobs:
             echo "- Deployment will trigger automatically" >> $GITHUB_STEP_SUMMARY
           else
             echo "ℹ️ **No changes detected**" >> $GITHUB_STEP_SUMMARY
-            echo "- No posts were due for generation" >> $GITHUB_STEP_SUMMARY
-            echo "- Or all posts were already generated" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.expected-posts.outputs.expected_posts }}" != "0" ]; then
+              echo "⚠️ **WARNING: Expected ${{ steps.expected-posts.outputs.expected_posts }} post(s) for today but none were generated!**" >> $GITHUB_STEP_SUMMARY
+              echo "- Check logs above for errors" >> $GITHUB_STEP_SUMMARY
+              echo "- GitHub issue created automatically" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- No posts were due for generation today" >> $GITHUB_STEP_SUMMARY
+              echo "- Or all posts were already generated" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.generate.outputs.error }}" == "true" ]; then
@@ -182,5 +260,7 @@ jobs:
               echo "🚨 **${{ steps.overdue-check.outputs.overdue_count }} overdue post(s) detected** - GitHub issue created" >> $GITHUB_STEP_SUMMARY
             fi
           fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next Scheduled Run:** Check workflow schedule for next execution time" >> $GITHUB_STEP_SUMMARY
 
 
