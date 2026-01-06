@@ -10,18 +10,16 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTickerMetadata } from '@/app/lib/pseo/data';
+import { kv } from '@vercel/kv';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
 export const revalidate = 0; // Force no caching to ensure Next.js recognizes the route
 
-// Rate limiting storage (in production, use Redis or Vercel KV)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-
 // Free tier: 50 calls per hour per IP (more generous than price API since this is historical data)
 const FREE_TIER_LIMIT = 50;
-const FREE_TIER_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
+const FREE_TIER_WINDOW_SECONDS = 3600; // 1 hour in seconds (for KV TTL)
 
 // Cache for historical data (1 hour TTL)
 const dataCache = new Map<string, { data: any; expiresAt: number }>();
@@ -122,6 +120,60 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
   }
 }
 
+/**
+ * Distributed rate limiting using Vercel KV (Upstash Redis)
+ * Returns: { allowed: boolean, remaining: number, resetTime: number }
+ */
+async function checkRateLimit(ip: string): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
+  const key = `ratelimit:tickers:free:${ip}`;
+  const now = Math.floor(Date.now() / 1000); // Current time in seconds
+  const resetTime = now + FREE_TIER_WINDOW_SECONDS;
+
+  try {
+    // Get current count
+    const currentCount = await kv.get<number>(key) || 0;
+    
+    // Check if limit exceeded
+    if (currentCount >= FREE_TIER_LIMIT) {
+      // Get TTL to calculate actual reset time
+      const ttl = await kv.ttl(key);
+      const actualResetTime = ttl > 0 ? now + ttl : resetTime;
+      
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: actualResetTime
+      };
+    }
+
+    // Increment counter
+    const newCount = currentCount + 1;
+    
+    if (currentCount === 0) {
+      // First request - set with expiration
+      await kv.set(key, newCount, { ex: FREE_TIER_WINDOW_SECONDS });
+    } else {
+      // Update existing counter (TTL is preserved)
+      await kv.set(key, newCount);
+    }
+
+    return {
+      allowed: true,
+      remaining: FREE_TIER_LIMIT - newCount,
+      resetTime: resetTime
+    };
+  } catch (error) {
+    // If KV fails, fail open (allow request) but log error
+    // In production, you might want to fail closed instead
+    console.error('[RATE_LIMIT_ERROR] KV operation failed:', error);
+    return {
+      allowed: true, // Fail open to avoid blocking legitimate users
+      remaining: FREE_TIER_LIMIT - 1,
+      resetTime: resetTime
+    };
+  }
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ ticker: string[] }> }
@@ -196,48 +248,32 @@ export async function GET(
   }
   
   // Get client IP for rate limiting
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
              request.headers.get('x-real-ip') || 
              'unknown';
   
-  // Rate limiting for free tier
-  const now = Date.now();
-  const key = `free:${ip}`;
-  const limit = rateLimitMap.get(key);
+  // Check rate limit using distributed KV storage
+  const rateLimitResult = await checkRateLimit(ip);
   
-  if (limit) {
-    // Check if window has expired
-    if (now > limit.resetTime) {
-      // Reset counter
-      rateLimitMap.set(key, { count: 1, resetTime: now + FREE_TIER_WINDOW });
-    } else {
-      // Check if limit exceeded
-      if (limit.count >= FREE_TIER_LIMIT) {
-        return NextResponse.json(
-          { 
-            error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
-            limit: FREE_TIER_LIMIT,
-            window: '1 hour',
-            retryAfter: Math.ceil((limit.resetTime - now) / 1000)
-          },
-          { 
-            status: 429,
-            headers: {
-              'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
-              'X-RateLimit-Remaining': '0',
-              'X-RateLimit-Reset': new Date(limit.resetTime).toISOString(),
-              'Retry-After': String(Math.ceil((limit.resetTime - now) / 1000))
-            }
-          }
-        );
+  if (!rateLimitResult.allowed) {
+    const retryAfter = Math.max(0, rateLimitResult.resetTime - Math.floor(Date.now() / 1000));
+    return NextResponse.json(
+      { 
+        error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
+        limit: FREE_TIER_LIMIT,
+        window: '1 hour',
+        retryAfter: retryAfter
+      },
+      { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
+          'Retry-After': String(retryAfter)
+        }
       }
-      // Increment counter
-      limit.count++;
-      rateLimitMap.set(key, limit);
-    }
-  } else {
-    // First request from this IP
-    rateLimitMap.set(key, { count: 1, resetTime: now + FREE_TIER_WINDOW });
+    );
   }
 
   // Get optional query parameters
@@ -281,8 +317,8 @@ export async function GET(
         'Content-Type': 'application/json',
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200', // Cache for 1 hour, stale for 2 hours
         'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
-        'X-RateLimit-Remaining': String(FREE_TIER_LIMIT - (rateLimitMap.get(key)?.count || 1)),
-        'X-RateLimit-Reset': new Date(rateLimitMap.get(key)?.resetTime || now + FREE_TIER_WINDOW).toISOString(),
+        'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+        'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
       },
     });
   } catch (error: any) {

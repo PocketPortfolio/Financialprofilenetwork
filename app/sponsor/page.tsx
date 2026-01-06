@@ -9,8 +9,11 @@ import SponsorModal from '../components/SponsorModal';
 import AlertModal from '../components/modals/AlertModal';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 
-// Get publishable key with fallback
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_live_51SeZTKD4sftWa1WtU6oGAzAVSAp6qTLUOPMbK5gaetspAelBzAou1epdTwj9ngybvv8ZiSWJgdbSfSeaRCTezO9T00OzhxwstL';
+// Get publishable key - REQUIRED (no fallback for security)
+const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+if (!publishableKey) {
+  console.error('❌ SECURITY: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable is required');
+}
 
 // Debug: Log key info (only in browser)
 if (typeof window !== 'undefined') {
@@ -22,7 +25,8 @@ if (typeof window !== 'undefined') {
   });
 }
 
-const stripePromise = loadStripe(publishableKey);
+// Only initialize Stripe if key is present (prevents runtime errors)
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
 // Price IDs from Stripe Dashboard
 const PRICE_IDS = {
