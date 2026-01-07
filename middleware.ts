@@ -4,14 +4,15 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
 
   // Skip middleware entirely for sitemap, robots, and llms.txt to avoid CSP issues
-  // Skip all sitemap files (main index + all sub-sitemaps)
+  // Skip all sitemap files (main index + all sub-sitemaps, including gzipped versions)
   // Also skip the API route that handles sitemaps
   if (
     request.nextUrl.pathname === '/sitemap.xml' || 
     request.nextUrl.pathname === '/robots.txt' || 
     request.nextUrl.pathname === '/llms.txt' ||
     request.nextUrl.pathname.startsWith('/api/sitemap/') ||
-    (request.nextUrl.pathname.startsWith('/sitemap-') && request.nextUrl.pathname.endsWith('.xml'))
+    (request.nextUrl.pathname.startsWith('/sitemap-') && 
+     (request.nextUrl.pathname.endsWith('.xml') || request.nextUrl.pathname.endsWith('.xml.gz')))
   ) {
     return NextResponse.next();
   }
@@ -59,7 +60,7 @@ export const config = {
      * - robots.txt (robots file)
      * - llms.txt (LLM context file)
      */
-    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|sitemap.*\\.xml|robots\\.txt|llms\\.txt).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|sitemap.*\\.xml|sitemap.*\\.xml\\.gz|robots\\.txt|llms\\.txt).*)',
   ],
 };
 
