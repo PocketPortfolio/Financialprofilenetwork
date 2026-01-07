@@ -91,7 +91,11 @@ import {
   ADDITIONAL_CRYPTO_EXPANDED,
   ADDITIONAL_INTERNATIONAL_EXPANDED,
   OTC_STOCKS,
-  ADDITIONAL_REAL_TICKERS
+  ADDITIONAL_REAL_TICKERS,
+  MUTUAL_FUNDS,
+  FOREX_PAIRS,
+  ALTCOIN_GEMS,
+  OTC_ADRS
 } from './real-tickers';
 
 // Generate REAL ticker list only - no generated patterns
@@ -136,6 +140,18 @@ function generateTickerList(): string[] {
   
   // Add Additional Real Tickers (8,000+ more unique real tickers)
   ADDITIONAL_REAL_TICKERS?.forEach(t => tickers.add(t));
+  
+  // Add Mutual Funds (~6,000 real mutual fund tickers)
+  MUTUAL_FUNDS?.forEach(t => tickers.add(t));
+  
+  // Add Forex Pairs (~150 major currency pairs)
+  FOREX_PAIRS?.forEach(t => tickers.add(t));
+  
+  // Add Expanded Crypto (~500 additional crypto pairs)
+  ALTCOIN_GEMS?.forEach(t => tickers.add(t));
+  
+  // Add OTC ADRs (~1,000 real OTC/ADR tickers)
+  OTC_ADRS?.forEach(t => tickers.add(t));
   
   // NO GENERATED PATTERNS - Only real, tradeable securities
   // This ensures: Real pages for real searches = Real traffic
