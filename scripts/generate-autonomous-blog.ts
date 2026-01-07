@@ -57,6 +57,7 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 interface BlogPost {
   id: string;
   date: string;
+  scheduledTime?: string; // Optional: "09:00" or "16:00" (UTC) - if not set, post can be generated anytime on the scheduled date
   title: string;
   slug: string;
   status: 'pending' | 'published' | 'failed';
@@ -65,6 +66,7 @@ interface BlogPost {
   type?: 'ai-generated' | 'syndicated' | 'manual';
   source?: 'dev.to' | 'coderlegion_profile' | 'coderlegion_group' | null;
   ritual?: 'ship-friday' | 'spec-clinic' | 'paper-club' | null;
+  publishedAt?: string; // ISO timestamp when post was actually published
 }
 
 async function generateBlogPost(post: BlogPost, retryCount = 0): Promise<void> {
@@ -291,9 +293,14 @@ async function main() {
     const calendar: BlogPost[] = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
     
     const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const currentHour = now.getUTCHours();
+    const currentMinute = now.getUTCMinutes();
+    const currentTimeMinutes = currentHour * 60 + currentMinute;
     
     // Debug logging
     console.log(`📅 Today's date: ${today}`);
+    console.log(`🕐 Current UTC time: ${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`);
     console.log(`📋 Total posts in calendar: ${calendar.length}`);
     console.log(`📋 Posts with status "pending": ${calendar.filter(p => p.status === 'pending').length}`);
     console.log(`📋 Posts with date <= today: ${calendar.filter(p => p.date <= today).length}`);
@@ -347,9 +354,37 @@ async function main() {
     }
     
     // Find all posts that are due (date <= today) or overdue (date < today)
-    const duePosts = calendar.filter(
-      post => post.date <= today && post.status === 'pending'
-    );
+    // If scheduledTime is set, only include if current time >= scheduled time
+    const duePosts = calendar.filter(post => {
+      if (post.status !== 'pending') return false;
+      
+      const postDate = new Date(post.date + 'T00:00:00Z');
+      const todayDate = new Date(today + 'T00:00:00Z');
+      
+      // If post date is in the past, always include (overdue)
+      if (postDate < todayDate) return true;
+      
+      // If post date is in the future, exclude
+      if (postDate > todayDate) return false;
+      
+      // Post date is today - check scheduled time
+      if (post.scheduledTime) {
+        const [hour, minute] = post.scheduledTime.split(':').map(Number);
+        const scheduledTimeMinutes = hour * 60 + minute;
+        
+        // Only include if current time >= scheduled time
+        const isTimeReached = currentTimeMinutes >= scheduledTimeMinutes;
+        
+        if (!isTimeReached) {
+          console.log(`⏰ Post "${post.title}" scheduled for ${post.scheduledTime} UTC - current time ${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')} UTC (not yet due)`);
+        }
+        
+        return isTimeReached;
+      }
+      
+      // No scheduled time - can be generated anytime today
+      return true;
+    });
 
     // Check for overdue posts (past their date but still pending) for logging
     const overduePosts = duePosts.filter(post => post.date < today);
@@ -373,18 +408,42 @@ async function main() {
       );
       
       if (todayPosts.length > 0) {
-        console.error('\n❌ CRITICAL ERROR: Found posts scheduled for TODAY but they were not detected as due!');
-        console.error(`   Expected ${todayPosts.length} post(s) for ${today}:`);
-        todayPosts.forEach(post => {
-          console.error(`   - ${post.title} (ID: ${post.id})`);
-          console.error(`     Date: ${post.date}, Status: ${post.status}`);
-          console.error(`     Date === today: ${post.date === today}`);
-          console.error(`     Date <= today: ${post.date <= today}`);
-          console.error(`     Status === 'pending': ${post.status === 'pending'}`);
+        // Check if any are waiting for scheduled time
+        const waitingForTime = todayPosts.filter(post => {
+          if (!post.scheduledTime) return false;
+          const [hour, minute] = post.scheduledTime.split(':').map(Number);
+          const scheduledTimeMinutes = hour * 60 + minute;
+          return currentTimeMinutes < scheduledTimeMinutes;
         });
-        console.error('\n   This is a BUG in the date comparison logic!');
-        console.error('   The posts exist and should be generated, but the filter is not finding them.');
-        process.exit(1);
+        
+        const shouldBeGenerated = todayPosts.filter(post => {
+          if (!post.scheduledTime) return true; // No time = should be generated
+          const [hour, minute] = post.scheduledTime.split(':').map(Number);
+          const scheduledTimeMinutes = hour * 60 + minute;
+          return currentTimeMinutes >= scheduledTimeMinutes;
+        });
+        
+        if (shouldBeGenerated.length > 0) {
+          console.error('\n❌ CRITICAL ERROR: Found posts scheduled for TODAY that should be generated NOW but were not detected!');
+          console.error(`   Expected ${shouldBeGenerated.length} post(s) for ${today} at ${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')} UTC:`);
+          shouldBeGenerated.forEach(post => {
+            console.error(`   - ${post.title} (ID: ${post.id})`);
+            console.error(`     Date: ${post.date}, Status: ${post.status}`);
+            console.error(`     Scheduled Time: ${post.scheduledTime || 'anytime'}`);
+            console.error(`     Date === today: ${post.date === today}`);
+            console.error(`     Status === 'pending': ${post.status === 'pending'}`);
+          });
+          console.error('\n   This is a BUG in the date/time comparison logic!');
+          console.error('   The posts exist and should be generated, but the filter is not finding them.');
+          process.exit(1);
+        }
+        
+        if (waitingForTime.length > 0) {
+          console.log(`\n⏰ ${waitingForTime.length} post(s) scheduled for today but waiting for scheduled time:`);
+          waitingForTime.forEach(post => {
+            console.log(`   - ${post.title} - scheduled for ${post.scheduledTime} UTC`);
+          });
+        }
       }
       
       // If no posts for today, that's fine - exit normally
@@ -432,9 +491,11 @@ async function main() {
 
     // ✅ UPDATE STATUS ONLY FOR POSTS WITH VERIFIED FILES
     // This ensures status is only 'published' when files actually exist
+    const publishTimestamp = new Date().toISOString();
     for (const post of postsToUpdate) {
       post.status = 'published';
-      console.log(`📝 Status updated to 'published': ${post.slug}`);
+      post.publishedAt = publishTimestamp; // Store actual publish time
+      console.log(`📝 Status updated to 'published': ${post.slug} (published at ${publishTimestamp})`);
     }
 
     // Update calendar (always save, even if some posts failed)
@@ -444,16 +505,26 @@ async function main() {
     console.log(`📊 Summary: ${successCount} published, ${failureCount} failed`);
 
     // CRITICAL: Verify posts scheduled for TODAY were actually generated
-    const todayExpectedPosts = calendar.filter(
-      post => post.date === today && post.status === 'pending'
-    );
+    // Only check posts that should have been generated (time has passed or no scheduled time)
+    const todayExpectedPosts = calendar.filter(post => {
+      if (post.date !== today || post.status !== 'pending') return false;
+      
+      // If no scheduled time, should have been generated
+      if (!post.scheduledTime) return true;
+      
+      // If scheduled time, only check if time has passed
+      const [hour, minute] = post.scheduledTime.split(':').map(Number);
+      const scheduledTimeMinutes = hour * 60 + minute;
+      return currentTimeMinutes >= scheduledTimeMinutes;
+    });
     
     if (todayExpectedPosts.length > 0) {
       console.error('\n❌ CRITICAL ERROR: Posts scheduled for TODAY were not generated!');
-      console.error(`   Expected ${todayExpectedPosts.length} post(s) for ${today}:`);
+      console.error(`   Expected ${todayExpectedPosts.length} post(s) for ${today} at ${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')} UTC:`);
       todayExpectedPosts.forEach(post => {
         console.error(`   - ${post.title} (ID: ${post.id})`);
         console.error(`     Status: ${post.status} (should be 'published')`);
+        console.error(`     Scheduled Time: ${post.scheduledTime || 'anytime'}`);
         
         // Check if file exists
         const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);

@@ -752,13 +752,20 @@ async function getBlogPostsData() {
       const todayDate = new Date(today);
       const isOverdue = postDate < todayDate && post.status === 'pending';
       
-      // Get published time from file if it exists
+      // Get published time from calendar (publishedAt) - this is the actual publish time
+      // Fall back to file mtime only if publishedAt is not available (for backwards compatibility)
       let publishedTime: string | null = null;
       if (hasFiles && post.status === 'published') {
-        const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
-        if (fs.existsSync(mdxPath)) {
-          const stats = fs.statSync(mdxPath);
-          publishedTime = stats.mtime.toISOString();
+        // Prefer publishedAt from calendar (actual publish time)
+        if (post.publishedAt) {
+          publishedTime = post.publishedAt;
+        } else {
+          // Fallback to file mtime for older posts that don't have publishedAt
+          const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
+          if (fs.existsSync(mdxPath)) {
+            const stats = fs.statSync(mdxPath);
+            publishedTime = stats.mtime.toISOString();
+          }
         }
       }
       
