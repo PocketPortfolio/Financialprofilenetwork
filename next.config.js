@@ -31,31 +31,8 @@ const nextConfig = {
         source: '/api/tickers/:ticker/json',
         destination: '/api/tickers/:ticker/json',
       },
-      // Map sitemap XML URLs to API route handler
-      {
-        source: '/sitemap-static.xml',
-        destination: '/api/sitemap/static',
-      },
-      {
-        source: '/sitemap-imports.xml',
-        destination: '/api/sitemap/imports',
-      },
-      {
-        source: '/sitemap-tools.xml',
-        destination: '/api/sitemap/tools',
-      },
-      {
-        source: '/sitemap-blog.xml',
-        destination: '/api/sitemap/blog',
-      },
-      {
-        source: '/sitemap-tickers-1.xml',
-        destination: '/api/sitemap/tickers-1',
-      },
-      {
-        source: '/sitemap-tickers-2.xml',
-        destination: '/api/sitemap/tickers-2',
-      },
+      // Sitemap rewrites removed - now using static files in public/ folder
+      // Static files are served automatically by Next.js from public/ directory
     ];
   },
   // Comprehensive redirects for canonicalization and legacy routes
