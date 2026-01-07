@@ -7,6 +7,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sitemapToXml } from '@/app/lib/sitemap-xml-helper';
 
+// Route segment config - required for Next.js 15 dynamic routes
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true; // Explicitly allow dynamic params
+export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
+export const revalidate = 0; // Force no caching - ensure fresh data
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ name: string }> }
