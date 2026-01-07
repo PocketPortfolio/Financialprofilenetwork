@@ -1,6 +1,6 @@
 {
+  "/api/api-keys/route": "app/api/api-keys/route.js",
+  "/api/api-keys/user/route": "app/api/api-keys/user/route.js",
   "/api/admin/analytics/route": "app/api/admin/analytics/route.js",
-  "/blog/page": "app/blog/page.js",
-  "/admin/analytics/page": "app/admin/analytics/page.js",
-  "/s/[symbol]/dividend-history/page": "app/s/[symbol]/dividend-history/page.js"
+  "/admin/analytics/page": "app/admin/analytics/page.js"
 }

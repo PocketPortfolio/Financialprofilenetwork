@@ -13,6 +13,8 @@ export interface ToolUsageMetadata {
   targetSoftware?: string;
   ticker?: string;
   fileSize?: number;
+  fileType?: string;
+  maxSize?: number;
   tradeCount?: number;
   conversionPair?: string;
   apiKeyType?: 'demo' | 'custom';
