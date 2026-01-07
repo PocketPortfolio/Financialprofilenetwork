@@ -72,6 +72,16 @@ jobs:
             content/external-audit.json
             public/images/blog/**/*.png
 
+      - name: Deploy to Vercel Production
+        if: steps.changes.outputs.changes == 'true'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
       - name: Workflow Summary
         if: always()
         run: |
@@ -83,6 +93,7 @@ jobs:
             echo "- Markdown sanitized and tables fixed" >> $GITHUB_STEP_SUMMARY
             echo "- Images generated for new posts" >> $GITHUB_STEP_SUMMARY
             echo "- Changes pushed to main branch" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Deployed to Vercel Production** (autonomous deployment)" >> $GITHUB_STEP_SUMMARY
           else
             echo "ℹ️ **No changes detected**" >> $GITHUB_STEP_SUMMARY
             echo "- No new posts found to import" >> $GITHUB_STEP_SUMMARY
