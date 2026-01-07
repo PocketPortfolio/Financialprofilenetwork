@@ -70,6 +70,7 @@ interface AnalyticsData {
       slug: string;
       date: string;
       scheduledDate: string;
+      scheduledTime: string | null;
       status: 'pending' | 'published' | 'failed';
       pillar: string;
       category?: string; // ✅ ADD CATEGORY
@@ -810,11 +811,22 @@ export default function AdminAnalyticsPage() {
                           )}
                         </td>
                         <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
-                          {new Date(post.scheduledDate).toLocaleDateString('en-GB', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
+                          <div>
+                            {new Date(post.scheduledDate).toLocaleDateString('en-GB', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </div>
+                          {post.scheduledTime && (
+                            <div style={{ 
+                              fontSize: '12px', 
+                              color: 'var(--text-tertiary)',
+                              marginTop: '2px'
+                            }}>
+                              {post.scheduledTime} UTC
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
                           {post.publishedTime 
