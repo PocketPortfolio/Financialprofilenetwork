@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         description: data.description,
         images: [data.image || 'https://www.pocketportfolio.app/brand/og-base.svg'],
         type: 'article',
-        publishedTime: data.date,
+        publishedTime: data.date, // Will be updated below if publishedAt exists
         authors: [data.author || 'Pocket Portfolio Team'],
       },
       alternates: {
@@ -130,14 +130,58 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     throw new Error(`Failed to parse blog post: ${error.message}`);
   }
 
+  // ✅ Load publishedAt from calendar files
+  let publishedAt: string | null = null;
+  try {
+    // Try main calendar first
+    const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+    if (fs.existsSync(mainCalendarPath)) {
+      const mainCalendar = JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'));
+      const postInCalendar = mainCalendar.find((p: any) => p.slug === resolvedParams.slug);
+      if (postInCalendar?.publishedAt) {
+        publishedAt = postInCalendar.publishedAt;
+      }
+    }
+    
+    // If not found, try how-to calendar
+    if (!publishedAt) {
+      const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
+      if (fs.existsSync(howToCalendarPath)) {
+        const howToCalendar = JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'));
+        const postInCalendar = howToCalendar.find((p: any) => p.slug === resolvedParams.slug);
+        if (postInCalendar?.publishedAt) {
+          publishedAt = postInCalendar.publishedAt;
+        }
+      }
+    }
+  } catch (error) {
+    // Silently fail - publishedAt is optional
+    console.warn('Could not load publishedAt from calendar:', error);
+  }
+
+  // Format date and time for display
+  const dateDisplay = new Date(data.date).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
+  const timeDisplay = publishedAt 
+    ? new Date(publishedAt).toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        timeZoneName: 'short'
+      })
+    : null;
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: data.title,
     description: data.description,
     image: data.image ? `https://www.pocketportfolio.app${data.image}` : 'https://www.pocketportfolio.app/brand/og-base.svg',
-    datePublished: data.date,
-    dateModified: data.dateModified || data.date,
+    datePublished: publishedAt || data.date,
+    dateModified: data.dateModified || publishedAt || data.date,
     author: {
       '@type': 'Organization',
       name: data.author || 'Pocket Portfolio Team',
@@ -215,7 +259,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               alignItems: 'center'
             }}
           >
-            <span>{new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span>
+              {dateDisplay}
+              {timeDisplay && (
+                <span style={{ marginLeft: '8px', opacity: 0.8 }}>
+                  at {timeDisplay}
+                </span>
+              )}
+            </span>
             <span>By {data.author || 'Pocket Portfolio Team'}</span>
             {data.pillar && (
               <span style={{
