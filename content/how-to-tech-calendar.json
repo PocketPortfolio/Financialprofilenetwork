@@ -23,7 +23,7 @@
     "scheduledTime": "14:00",
     "title": "How to Audit Your GitHub Repo for Leaked Secrets",
     "slug": "how-to-audit-your-github-repo-for-leaked-secrets",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -32,7 +32,8 @@
       "secrets",
       "audit",
       "your"
-    ]
+    ],
+    "publishedAt": "2026-01-07T14:16:52.091Z"
   },
   {
     "id": "how-to-the-3-minute-guide-to-robots-txt-for-ai-agents-jan-8",
