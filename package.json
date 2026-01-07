@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
+    "build:sitemaps": "tsx scripts/build-static-sitemaps.ts",
+    "build": "npm run build:sitemaps && next build",
     "start": "next start",
     "preview": "next start -p 3001",
     "typecheck": "tsc --noEmit",

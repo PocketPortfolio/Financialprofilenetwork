@@ -1,14 +1,37 @@
 /**
- * Sitemap Index Route
- * Google requires sitemap index when URLs exceed 50,000
- * This route returns proper sitemap index XML format
+ * Sitemap Index Route (Fallback)
+ * Static file in public/sitemap.xml takes precedence
+ * This route only serves if static file is missing (fallback)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 export async function GET(request: NextRequest) {
+  try {
+    // Try to read static file first (preferred)
+    const staticPath = join(process.cwd(), 'public', 'sitemap.xml');
+    
+    if (existsSync(staticPath)) {
+      const staticFile = readFileSync(staticPath, 'utf-8');
+      
+      return new NextResponse(staticFile, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml',
+          'Cache-Control': 'public, max-age=3600',
+        },
+      });
+    }
+  } catch (error) {
+    // Fall through to fallback generation
+    console.warn('[Sitemap] Static file not found, using fallback generation');
+  }
+  
+  // Fallback: generate on-the-fly if static file missing
   const baseUrl = 'https://www.pocketportfolio.app';
-  const now = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+  const now = new Date().toISOString().split('T')[0];
   
   const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -42,7 +65,7 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers: {
       'Content-Type': 'application/xml',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      'Cache-Control': 'public, max-age=3600',
     },
   });
 }
