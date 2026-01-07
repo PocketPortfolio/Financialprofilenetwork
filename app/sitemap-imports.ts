@@ -4,7 +4,7 @@
  */
 
 import { MetadataRoute } from 'next';
-import { SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
+import { SUPPORTED_BROKERS } from './lib/brokers/config';
 
 export default async function sitemapImports(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.pocketportfolio.app';
