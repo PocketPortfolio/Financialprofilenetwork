@@ -17,10 +17,11 @@ interface GeneratedPost {
   tags: string[];
   image?: string;
   pillar?: string;
+  category?: string; // ✅ ADD CATEGORY
 }
 
 export default function BlogPage() {
-  const [filter, setFilter] = useState<'all' | 'dev.to' | 'coderlegion' | 'generated'>('all');
+  const [filter, setFilter] = useState<'all' | 'dev.to' | 'coderlegion' | 'generated' | 'how-to-in-tech'>('all');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
 
   useEffect(() => {
@@ -31,8 +32,12 @@ export default function BlogPage() {
       .catch(() => setGeneratedPosts([]));
   }, []);
 
-  const showGenerated = filter === 'all' || filter === 'generated';
-  const showExternal = filter === 'all' || (filter !== 'generated');
+  // ✅ SEPARATE HOW-TO POSTS FROM REGULAR POSTS
+  const howToPosts = generatedPosts.filter(post => post.category === 'how-to-in-tech');
+  const regularPosts = generatedPosts.filter(post => post.category !== 'how-to-in-tech');
+  
+  const showGenerated = filter === 'all' || filter === 'generated' || filter === 'how-to-in-tech';
+  const showExternal = filter === 'all' || (filter !== 'generated' && filter !== 'how-to-in-tech');
   
   const filteredArticles = showExternal
     ? (filter === 'all' ? featuredArticles : featuredArticles.filter(article => article.platform === filter))
@@ -145,6 +150,22 @@ export default function BlogPage() {
           >
             Pocket Portfolio Posts
           </button>
+          <button
+            onClick={() => setFilter('how-to-in-tech')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: `2px solid ${filter === 'how-to-in-tech' ? '#00ff41' : 'var(--border)'}`,
+              background: filter === 'how-to-in-tech' ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
+              color: filter === 'how-to-in-tech' ? '#00ff41' : 'var(--text)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            How to in Tech
+          </button>
         </div>
       </header>
 
@@ -155,8 +176,8 @@ export default function BlogPage() {
         gap: '24px',
         marginBottom: '48px'
       }}>
-        {/* Pocket Portfolio Posts */}
-        {(filter === 'all' || filter === 'generated') && generatedPosts.map((post, index) => (
+        {/* Pocket Portfolio Posts (Regular Deep Dives) */}
+        {(filter === 'all' || filter === 'generated') && regularPosts.map((post, index) => (
           <Link
             key={`generated-${index}`}
             href={`/blog/${post.slug}`}

@@ -62,6 +62,7 @@ interface BlogPost {
   slug: string;
   status: 'pending' | 'published' | 'failed';
   pillar: 'philosophy' | 'technical' | 'market' | 'product';
+  category?: 'how-to-in-tech' | 'deep-dive'; // Content category: short-form daily posts vs long-form deep dives
   keywords: string[];
   type?: 'ai-generated' | 'syndicated' | 'manual';
   source?: 'dev.to' | 'coderlegion_profile' | 'coderlegion_group' | null;
@@ -71,7 +72,8 @@ interface BlogPost {
 
 async function generateBlogPost(post: BlogPost, retryCount = 0): Promise<void> {
   const MAX_RETRIES = 2;
-  console.log(`📝 Generating: ${post.title}${retryCount > 0 ? ` (Retry ${retryCount}/${MAX_RETRIES})` : ''}`);
+  const isHowTo = post.category === 'how-to-in-tech';
+  console.log(`📝 Generating: ${post.title}${isHowTo ? ' [How-to Mode]' : ''}${retryCount > 0 ? ` (Retry ${retryCount}/${MAX_RETRIES})` : ''}`);
   
   // Determine homepage anchor text and route based on pillar
   const homepageAnchors = [
@@ -194,8 +196,10 @@ pillar: "${post.pillar}"
       throw new Error('Failed to generate content after all retries');
     }
 
-    // Generate image with retry logic
-    const imagePrompt = `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. No text. Theme: ${post.title}. Professional, modern, technical aesthetic.`;
+    // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO POSTS
+    const imagePrompt = isHowTo
+      ? `Minimalist terminal interface, dark mode, bright green (#00ff41) text on black background, hacker aesthetic, code-focused, 8k resolution. No text. Theme: ${post.title}. Clean, technical, command-line style.`
+      : `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. No text. Theme: ${post.title}. Professional, modern, technical aesthetic.`;
     
     console.log(`🎨 Generating image for: ${post.slug}`);
     let imageUrl: string | null = null;

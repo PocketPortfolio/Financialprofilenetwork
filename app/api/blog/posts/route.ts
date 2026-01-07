@@ -32,6 +32,7 @@ export async function GET() {
           tags: data.tags || [],
           image: data.image,
           pillar: data.pillar,
+          category: data.category || 'deep-dive', // ✅ ADD CATEGORY
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
