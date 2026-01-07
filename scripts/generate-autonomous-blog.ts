@@ -398,12 +398,28 @@ async function main() {
 
     let successCount = 0;
     let failureCount = 0;
+    const postsToUpdate: BlogPost[] = [];
 
     for (const post of duePosts) {
       try {
         await generateBlogPost(post);
-        post.status = 'published';
+        
+        // ✅ CRITICAL: Verify files exist BEFORE updating status
+        const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+        const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
+        
+        if (!fs.existsSync(mdxPath)) {
+          throw new Error(`MDX file not created: ${mdxPath}`);
+        }
+        if (!fs.existsSync(imagePath)) {
+          throw new Error(`Image file not created: ${imagePath}`);
+        }
+        
+        // ✅ Only mark for status update if files are verified to exist
+        postsToUpdate.push(post);
         successCount++;
+        console.log(`✅ Verified: ${post.slug} - Both MDX and image files exist`);
+        
         // Delay to avoid rate limits (2 seconds between posts)
         await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (error: any) {
@@ -412,6 +428,13 @@ async function main() {
         console.error(`❌ Failed to generate ${post.id}:`, error.message || error);
         // Continue with next post even if one fails
       }
+    }
+
+    // ✅ UPDATE STATUS ONLY FOR POSTS WITH VERIFIED FILES
+    // This ensures status is only 'published' when files actually exist
+    for (const post of postsToUpdate) {
+      post.status = 'published';
+      console.log(`📝 Status updated to 'published': ${post.slug}`);
     }
 
     // Update calendar (always save, even if some posts failed)
