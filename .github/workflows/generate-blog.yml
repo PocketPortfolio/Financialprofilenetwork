@@ -114,6 +114,7 @@ jobs:
           find content/posts -name "*.mdx" -type f -exec git add -f {} + || true
           find public/images/blog -name "*.png" -type f -exec git add -f {} + || true
           git add -f content/blog-calendar.json || true
+          git add -f content/how-to-tech-calendar.json || true
           echo "✅ Files staged:"
           git status --short
           

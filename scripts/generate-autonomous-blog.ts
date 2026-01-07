@@ -312,15 +312,29 @@ async function main() {
   try {
     // ✅ Load main calendar (deep dives)
     const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
-    const mainCalendar: BlogPost[] = fs.existsSync(mainCalendarPath)
-      ? JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'))
-      : [];
+    let mainCalendar: BlogPost[] = [];
+    if (fs.existsSync(mainCalendarPath)) {
+      try {
+        mainCalendar = JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'));
+      } catch (error: any) {
+        console.error(`❌ Error parsing ${mainCalendarPath}:`, error.message);
+        console.error('   Using empty calendar as fallback');
+        mainCalendar = [];
+      }
+    }
 
     // ✅ Load "How to in Tech" calendar (daily posts)
     const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
-    const howToCalendar: BlogPost[] = fs.existsSync(howToCalendarPath)
-      ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
-      : [];
+    let howToCalendar: BlogPost[] = [];
+    if (fs.existsSync(howToCalendarPath)) {
+      try {
+        howToCalendar = JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'));
+      } catch (error: any) {
+        console.error(`❌ Error parsing ${howToCalendarPath}:`, error.message);
+        console.error('   Using empty calendar as fallback');
+        howToCalendar = [];
+      }
+    }
 
     // ✅ Merge calendars and mark categories
     const calendar: BlogPost[] = [
@@ -539,7 +553,8 @@ async function main() {
     const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
     
     fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
-    if (howToPosts.length > 0) {
+    // ✅ Always save if file exists or if we have posts (ensures status updates are persisted)
+    if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
       fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
     }
     console.log('');
