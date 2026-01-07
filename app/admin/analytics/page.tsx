@@ -81,6 +81,7 @@ interface AnalyticsData {
     error?: string;
   };
   timeRange: '7d' | '30d' | '90d' | 'all';
+  lastUpdated?: string;
 }
 
 export default function AdminAnalyticsPage() {
@@ -248,9 +249,37 @@ export default function AdminAnalyticsPage() {
             }}>
               Analytics Dashboard
             </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: 'var(--space-1)' }}>
               Track SEO pages, monetization, and tool usage
             </p>
+            {analyticsData?.lastUpdated && (
+              <p style={{ 
+                color: 'var(--text-secondary)', 
+                fontSize: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: loadingData ? 'var(--warning)' : 'var(--signal)',
+                  display: 'inline-block',
+                  animation: loadingData ? 'pulse 2s infinite' : 'none'
+                }} />
+                Last updated: {new Date(analyticsData.lastUpdated).toLocaleString()}
+                {!loadingData && (
+                  <span style={{ 
+                    fontSize: '11px',
+                    color: 'var(--text-tertiary)',
+                    marginLeft: '4px'
+                  }}>
+                    (Auto-refreshes every 5 minutes)
+                  </span>
+                )}
+              </p>
+            )}
           </div>
           
           {/* Time Range Selector */}

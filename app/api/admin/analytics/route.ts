@@ -347,8 +347,27 @@ async function getToolUsageData(startDate: Date) {
 
     snapshot.docs.forEach(doc => {
       const data = doc.data();
+      
+      // Validate data structure
+      if (!data || typeof data !== 'object') {
+        console.warn('Invalid tool usage record:', doc.id);
+        return;
+      }
+      
+      // Validate timestamp
       const eventTimestamp = data.timestamp as Timestamp;
-      const isLast7Days = eventTimestamp && eventTimestamp >= sevenDaysAgoTimestamp;
+      if (!eventTimestamp || !(eventTimestamp instanceof Timestamp)) {
+        console.warn('Invalid timestamp in tool usage record:', doc.id);
+        return;
+      }
+      
+      // Validate toolType
+      if (!data.toolType || typeof data.toolType !== 'string') {
+        console.warn('Invalid toolType in tool usage record:', doc.id);
+        return;
+      }
+      
+      const isLast7Days = eventTimestamp >= sevenDaysAgoTimestamp;
 
       switch (data.toolType) {
         case 'tax_converter':
@@ -357,7 +376,7 @@ async function getToolUsageData(startDate: Date) {
           if (data.action === 'success' || data.metadata?.success === true) {
             taxConverter.successful++;
           }
-          if (data.metadata?.conversionPair) {
+          if (data.metadata?.conversionPair && typeof data.metadata.conversionPair === 'string') {
             const pair = data.metadata.conversionPair;
             taxConverter.byPair[pair] = (taxConverter.byPair[pair] || 0) + 1;
           }
@@ -378,6 +397,11 @@ async function getToolUsageData(startDate: Date) {
             advisorTool.pdfsGenerated++;
           }
           if (isLast7Days) advisorTool.last7Days++;
+          break;
+        
+        default:
+          // Unknown tool type - log but don't break
+          console.warn('Unknown tool type:', data.toolType, 'in record:', doc.id);
           break;
       }
     });
@@ -421,17 +445,36 @@ async function getSEOPageData(startDate: Date) {
 
     snapshot.docs.forEach(doc => {
       const data = doc.data();
-      const path = data.path || 'unknown';
-      const sessionId = data.sessionId;
+      
+      // Validate data structure
+      if (!data || typeof data !== 'object') {
+        console.warn('Invalid page view record:', doc.id);
+        return;
+      }
+      
+      // Validate path
+      const path = data.path;
+      if (!path || typeof path !== 'string' || path.trim() === '') {
+        console.warn('Invalid path in page view record:', doc.id);
+        return;
+      }
+      
+      // Validate timestamp
       const timestamp = data.timestamp as Timestamp;
+      if (!timestamp || !(timestamp instanceof Timestamp)) {
+        console.warn('Invalid timestamp in page view record:', doc.id);
+        return;
+      }
+      
+      const sessionId = data.sessionId;
       const converted = data.converted === true;
 
       // Handle old records (no sessionId) - will deduplicate by path only
-      if (!sessionId || sessionId === null) {
+      if (!sessionId || sessionId === null || typeof sessionId !== 'string') {
         oldRecords.push({ 
           path, 
           converted, 
-          timestamp: timestamp || Timestamp.now() 
+          timestamp
         });
         return;
       }
@@ -445,7 +488,7 @@ async function getSEOPageData(startDate: Date) {
           path, 
           sessionId, 
           converted, 
-          timestamp: timestamp || Timestamp.now() 
+          timestamp
         });
       } else {
         // Update if this record is newer OR if it's converted and existing isn't
@@ -540,120 +583,173 @@ async function getSEOPageData(startDate: Date) {
   }
 }
 
+/**
+ * Retry helper with exponential backoff
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<Response> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        return response;
+      }
+      
+      // Don't retry on 4xx errors (client errors)
+      if (response.status >= 400 && response.status < 500) {
+        return response;
+      }
+      
+      lastError = new Error(`HTTP ${response.status}`);
+    } catch (error: any) {
+      lastError = error;
+      
+      // Don't retry on abort errors (timeouts)
+      if (error.name === 'AbortError' && attempt < maxRetries - 1) {
+        const delay = baseDelay * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Retry on network errors
+      if (attempt < maxRetries - 1) {
+        const delay = baseDelay * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+    }
+  }
+  
+  throw lastError || new Error('Max retries exceeded');
+}
+
+/**
+ * Process packages in batches with concurrency limit
+ */
+async function processBatch<T, R>(
+  items: T[],
+  processor: (item: T) => Promise<R>,
+  concurrency: number = 5
+): Promise<R[]> {
+  const results: R[] = [];
+  
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = items.slice(i, i + concurrency);
+    const batchResults = await Promise.all(batch.map(processor));
+    results.push(...batchResults);
+  }
+  
+  return results;
+}
+
 async function getNPMData() {
   try {
-    const packageStats = await Promise.all(
-      NPM_PACKAGES.map(async (packageName) => {
+    const packageStats = await processBatch(
+      NPM_PACKAGES,
+      async (packageName) => {
         try {
-          // Use official NPM registry API for download stats
-          // Fetch last week downloads
-          // Create timeout controller
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 10000);
-          
-          // Fetch last 7 days downloads
-          const weeklyResponse = await fetch(
-            `https://api.npmjs.org/downloads/point/last-week/${encodeURIComponent(packageName)}`,
-            {
-              headers: {
-                'Accept': 'application/json',
-              },
-              signal: controller.signal,
-            }
-          );
-          
-          clearTimeout(timeoutId);
-
           let last7Days = 0;
           let monthlyDownloads = 0;
-
-          if (weeklyResponse.ok) {
-            const weeklyData = await weeklyResponse.json();
-            last7Days = weeklyData.downloads || 0;
-          } else {
-            console.warn(`Failed to fetch weekly stats for ${packageName}: ${weeklyResponse.status}`);
-          }
-
-          // Fetch last 30 days (monthly) downloads using date range
-          const monthlyController = new AbortController();
-          const monthlyTimeoutId = setTimeout(() => monthlyController.abort(), 10000);
-          
-          // Calculate date range for last 30 days
-          const endDate = new Date();
-          const startDate = new Date();
-          startDate.setDate(startDate.getDate() - 30);
-          const startDateStr = startDate.toISOString().split('T')[0]; // YYYY-MM-DD
-          const endDateStr = endDate.toISOString().split('T')[0]; // YYYY-MM-DD
-          
-          const monthlyResponse = await fetch(
-            `https://api.npmjs.org/downloads/range/${startDateStr}:${endDateStr}/${encodeURIComponent(packageName)}`,
-            {
-              headers: {
-                'Accept': 'application/json',
-              },
-              signal: monthlyController.signal,
-            }
-          );
-          
-          clearTimeout(monthlyTimeoutId);
-
-          if (monthlyResponse.ok) {
-            const monthlyData = await monthlyResponse.json();
-            // The range endpoint returns an array of daily downloads
-            // Sum them up to get total monthly downloads
-            if (monthlyData.downloads && Array.isArray(monthlyData.downloads)) {
-              monthlyDownloads = monthlyData.downloads.reduce((sum: number, day: any) => sum + (day.downloads || 0), 0);
-            } else {
-              monthlyDownloads = 0;
-            }
-            console.log(`✅ Monthly stats for ${packageName}: ${monthlyDownloads} downloads (from ${startDateStr} to ${endDateStr})`);
-          } else {
-            const errorText = await monthlyResponse.text().catch(() => 'Unable to read error');
-            console.warn(`❌ Failed to fetch monthly stats for ${packageName}: ${monthlyResponse.status} - ${errorText}`);
-            // Fallback: try the point endpoint (though it may not exist)
-            try {
-              const altController = new AbortController();
-              const altTimeoutId = setTimeout(() => altController.abort(), 5000);
-              const altResponse = await fetch(
-                `https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(packageName)}`,
-                {
-                  headers: { 'Accept': 'application/json' },
-                  signal: altController.signal,
-                }
-              );
-              clearTimeout(altTimeoutId);
-              if (altResponse.ok) {
-                const altData = await altResponse.json();
-                monthlyDownloads = altData.downloads || 0;
-                console.log(`✅ Monthly stats (fallback endpoint) for ${packageName}: ${monthlyDownloads} downloads`);
-              }
-            } catch (altError) {
-              console.warn(`❌ Fallback monthly endpoint also failed for ${packageName}`);
-            }
-          }
-
-          // Fetch package metadata for version info
-          const metaController = new AbortController();
-          const metaTimeoutId = setTimeout(() => metaController.abort(), 10000);
-          
-          const metaResponse = await fetch(
-            `https://registry.npmjs.org/${encodeURIComponent(packageName)}`,
-            {
-              headers: {
-                'Accept': 'application/json',
-              },
-              signal: metaController.signal,
-            }
-          );
-          
-          clearTimeout(metaTimeoutId);
-
           let version = 'unknown';
-          if (metaResponse.ok) {
-            const metaData = await metaResponse.json();
-            version = metaData['dist-tags']?.latest || 'unknown';
-          } else {
-            console.warn(`Failed to fetch metadata for ${packageName}: ${metaResponse.status}`);
+
+          // Fetch last 7 days downloads with retry
+          try {
+            const weeklyResponse = await fetchWithRetry(
+              `https://api.npmjs.org/downloads/point/last-week/${encodeURIComponent(packageName)}`,
+              {
+                headers: { 'Accept': 'application/json' },
+              },
+              3,
+              1000
+            );
+
+            if (weeklyResponse.ok) {
+              const weeklyData = await weeklyResponse.json();
+              last7Days = weeklyData.downloads || 0;
+            } else {
+              console.warn(`Failed to fetch weekly stats for ${packageName}: ${weeklyResponse.status}`);
+            }
+          } catch (error: any) {
+            console.warn(`Error fetching weekly stats for ${packageName}:`, error.message);
+          }
+
+          // Fetch last 30 days (monthly) downloads with retry
+          try {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+            
+            const monthlyResponse = await fetchWithRetry(
+              `https://api.npmjs.org/downloads/range/${startDateStr}:${endDateStr}/${encodeURIComponent(packageName)}`,
+              {
+                headers: { 'Accept': 'application/json' },
+              },
+              3,
+              1000
+            );
+
+            if (monthlyResponse.ok) {
+              const monthlyData = await monthlyResponse.json();
+              if (monthlyData.downloads && Array.isArray(monthlyData.downloads)) {
+                monthlyDownloads = monthlyData.downloads.reduce((sum: number, day: any) => sum + (day.downloads || 0), 0);
+              }
+            } else {
+              // Fallback: try the point endpoint
+              try {
+                const altResponse = await fetchWithRetry(
+                  `https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(packageName)}`,
+                  {
+                    headers: { 'Accept': 'application/json' },
+                  },
+                  2,
+                  500
+                );
+                if (altResponse.ok) {
+                  const altData = await altResponse.json();
+                  monthlyDownloads = altData.downloads || 0;
+                }
+              } catch (altError) {
+                console.warn(`Fallback monthly endpoint failed for ${packageName}`);
+              }
+            }
+          } catch (error: any) {
+            console.warn(`Error fetching monthly stats for ${packageName}:`, error.message);
+          }
+
+          // Fetch package metadata for version info with retry
+          try {
+            const metaResponse = await fetchWithRetry(
+              `https://registry.npmjs.org/${encodeURIComponent(packageName)}`,
+              {
+                headers: { 'Accept': 'application/json' },
+              },
+              3,
+              1000
+            );
+
+            if (metaResponse.ok) {
+              const metaData = await metaResponse.json();
+              version = metaData['dist-tags']?.latest || 'unknown';
+            }
+          } catch (error: any) {
+            console.warn(`Error fetching metadata for ${packageName}:`, error.message);
           }
 
           return {
@@ -664,12 +760,7 @@ async function getNPMData() {
             error: false,
           };
         } catch (error: any) {
-          // Handle timeout and other errors
-          if (error.name === 'AbortError') {
-            console.error(`Timeout fetching ${packageName}`);
-          } else {
-            console.error(`Error fetching ${packageName}:`, error.message || error);
-          }
+          console.error(`Error fetching ${packageName}:`, error.message || error);
           return {
             name: packageName,
             version: 'unknown',
@@ -678,7 +769,8 @@ async function getNPMData() {
             error: true,
           };
         }
-      })
+      },
+      5 // Process 5 packages concurrently
     );
 
     // Calculate totals

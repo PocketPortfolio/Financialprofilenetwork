@@ -7,7 +7,8 @@ import {
   trackToolPageView, 
   trackToolInteraction, 
   trackToolSuccess,
-  trackToolDownload 
+  trackToolDownload,
+  trackToolError 
 } from '@/app/lib/analytics/tools';
 
 interface PortfolioData {
@@ -165,12 +166,20 @@ export default function AdvisorTool() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
+      trackToolError('advisor_tool', 'invalid_file_type', {
+        fileType: file.type,
+        fileSize: file.size
+      });
       alert('Please upload an image file');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
+      trackToolError('advisor_tool', 'file_too_large', {
+        fileSize: file.size,
+        maxSize: 5 * 1024 * 1024
+      });
       alert('Logo file must be less than 5MB');
       return;
     }
@@ -192,6 +201,9 @@ export default function AdvisorTool() {
 
   const handleDownload = useCallback(() => {
     if (!hasCorporateLicense) {
+      trackToolError('advisor_tool', 'license_required', {
+        hasLogo: !!logo
+      });
       alert('To generate high-res PDFs for clients without watermarks, requires a Corporate License ($100/mo).\n\nPreview is available for free. Get your Corporate License at pocketportfolio.app/sponsor');
       return;
     }
