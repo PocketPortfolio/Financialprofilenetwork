@@ -5,7 +5,7 @@
  */
 
 import { MetadataRoute } from 'next';
-import { getAllTickers } from '@/app/lib/pseo/data';
+import { getAllTickers } from './lib/pseo/data';
 
 export default async function sitemapTickers1(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.pocketportfolio.app';
