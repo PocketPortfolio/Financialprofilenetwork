@@ -107,6 +107,24 @@ const nextConfig = {
     }
     
     return [
+      // Gzip sitemap headers (must come before catch-all)
+      {
+        source: '/sitemap-:name*.xml.gz',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/xml',
+          },
+          {
+            key: 'Content-Encoding',
+            value: 'gzip',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600',
+          },
+        ],
+      },
       {
         source: '/(.*)',
         headers: [
