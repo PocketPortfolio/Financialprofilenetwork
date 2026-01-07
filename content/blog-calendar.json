@@ -12,7 +12,8 @@
       "Local-First",
       "Financial Independence",
       "2026 Outlook"
-    ]
+    ],
+    "publishedAt": "2026-01-05T17:12:00.874Z"
   },
   {
     "id": "week-1-post-1",
@@ -27,7 +28,8 @@
       "vendor lock-in",
       "financial freedom",
       "death"
-    ]
+    ],
+    "publishedAt": "2026-01-05T17:08:33.961Z"
   },
   {
     "id": "real-time-portfolio-tracking-jan-5",
@@ -42,7 +44,8 @@
       "financial technology",
       "performance optimization",
       "data sovereignty"
-    ]
+    ],
+    "publishedAt": "2026-01-05T17:12:00.874Z"
   },
   {
     "id": "engine-verification-test-jan-6",
@@ -57,7 +60,8 @@
       "infrastructure as code",
       "continuous deployment",
       "system architecture"
-    ]
+    ],
+    "publishedAt": "2026-01-06T10:00:59.295Z"
   },
   {
     "id": "stress-test-ai-jan-6-noon",
@@ -73,7 +77,8 @@
       "portfolio management",
       "data science",
       "AI"
-    ]
+    ],
+    "publishedAt": "2026-01-06T12:35:09.560Z"
   },
   {
     "id": "stress-test-self-healing-jan-6-2pm",
@@ -89,11 +94,13 @@
       "automated recovery",
       "fault tolerance",
       "system resilience"
-    ]
+    ],
+    "publishedAt": "2026-01-06T14:31:26.433Z"
   },
   {
     "id": "stress-test-finance-jan-7-9am",
     "date": "2026-01-07",
+    "scheduledTime": "09:00",
     "title": "The Fundamentals of Wealth Building: Principles That Stand the Test of Time",
     "slug": "the-fundamentals-of-wealth-building-principles-that-stand-the-test-of-time",
     "status": "published",
@@ -105,11 +112,13 @@
       "asset allocation",
       "long-term investing",
       "finance"
-    ]
+    ],
+    "publishedAt": "2026-01-07T10:19:53.645Z"
   },
   {
     "id": "stress-test-fintech-jan-7-4pm",
     "date": "2026-01-07",
+    "scheduledTime": "16:00",
     "title": "Building Financial Systems with Modern Software: Architecture Patterns for Fintech Applications",
     "slug": "building-financial-systems-with-modern-software-architecture-patterns-for-fintech-applications",
     "status": "published",
@@ -121,7 +130,8 @@
       "system architecture",
       "financial systems",
       "application development"
-    ]
+    ],
+    "publishedAt": "2026-01-07T10:19:53.645Z"
   },
   {
     "id": "week-1-post-2",
