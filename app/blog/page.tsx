@@ -270,6 +270,101 @@ export default function BlogPage() {
             )}
           </Link>
         ))}
+
+        {/* How to in Tech Posts */}
+        {(filter === 'all' || filter === 'how-to-in-tech') && howToPosts.map((post, index) => (
+          <Link
+            key={`how-to-${index}`}
+            href={`/blog/${post.slug}`}
+            onClick={() => trackBlogPostClick(post.title, 'how-to-in-tech', `/blog/${post.slug}`)}
+            style={{
+              display: 'block',
+              padding: '24px',
+              background: 'var(--card)',
+              border: '1px solid var(--card-border)',
+              borderRadius: '12px',
+              transition: 'all 0.2s ease',
+              textDecoration: 'none',
+              color: 'inherit',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 255, 65, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(0, 255, 65, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.borderColor = 'var(--card-border)';
+            }}
+          >
+            <div style={{ marginBottom: '12px' }}>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 12px',
+                fontSize: '12px',
+                fontWeight: '600',
+                borderRadius: '6px',
+                background: 'rgba(0, 255, 65, 0.1)',
+                color: '#00ff41',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                HOW TO
+              </span>
+            </div>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              marginBottom: '8px',
+              lineHeight: '1.4'
+            }}>
+              {post.title}
+            </h2>
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--text-muted)',
+              marginBottom: '16px',
+              lineHeight: '1.6'
+            }}>
+              {post.description}
+            </p>
+            <div style={{
+              fontSize: '12px',
+              color: 'var(--text-muted)',
+              marginBottom: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px'
+            }}>
+              <div>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div>By {post.author}</div>
+            </div>
+            {post.tags && post.tags.length > 0 && (
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '6px'
+              }}>
+                {post.tags.slice(0, 3).map((tag, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      fontSize: '11px',
+                      padding: '2px 8px',
+                      background: 'var(--muted)',
+                      borderRadius: '4px',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </Link>
+        ))}
         
         {/* External Articles */}
         {showExternal && filteredArticles.map((article, index) => (
