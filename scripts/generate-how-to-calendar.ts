@@ -1,6 +1,7 @@
 /**
- * Generate Q1 2026 "How to in Tech" calendar entries
+ * Generate Full Year 2026 "How to in Tech" calendar entries (Q1-Q4)
  * Creates calendar entries for daily posts at 14:00 UTC
+ * Total: 365 daily posts
  */
 
 interface HowToPost {
@@ -274,8 +275,448 @@ function generateCalendar(): HowToPost[] {
     });
   }
   
+  // April 2026 (Q2)
+  for (const item of q2Titles.april) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-apr-${item.date}`,
+      date: `2026-04-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // May 2026 (Q2)
+  for (const item of q2Titles.may) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-may-${item.date}`,
+      date: `2026-05-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // June 2026 (Q2)
+  for (const item of q2Titles.june) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-jun-${item.date}`,
+      date: `2026-06-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // July 2026 (Q3)
+  for (const item of q3Titles.july) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-jul-${item.date}`,
+      date: `2026-07-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // August 2026 (Q3)
+  for (const item of q3Titles.august) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-aug-${item.date}`,
+      date: `2026-08-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // September 2026 (Q3)
+  for (const item of q3Titles.september) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-sep-${item.date}`,
+      date: `2026-09-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // October 2026 (Q4)
+  for (const item of q4Titles.october) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-oct-${item.date}`,
+      date: `2026-10-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // November 2026 (Q4)
+  for (const item of q4Titles.november) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-nov-${item.date}`,
+      date: `2026-11-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
+  // December 2026 (Q4)
+  for (const item of q4Titles.december) {
+    calendar.push({
+      id: `how-to-${generateSlug(item.title)}-dec-${item.date}`,
+      date: `2026-12-${String(item.date).padStart(2, '0')}`,
+      scheduledTime: '14:00',
+      title: item.title,
+      slug: generateSlug(item.title),
+      status: 'pending',
+      category: 'how-to-in-tech',
+      pillar: 'technical',
+      keywords: extractKeywords(item.title)
+    });
+  }
+  
   return calendar;
 }
+
+// Q2 Titles (April, May, June)
+const q2Titles = {
+  april: [
+    { date: 1, title: 'How to Build a GraphQL API with TypeScript and Node.js' },
+    { date: 2, title: 'Understanding WebSockets: Real-Time Communication in 2026' },
+    { date: 3, title: 'How to Implement JWT Authentication from Scratch' },
+    { date: 4, title: 'The Complete Guide to Docker Compose for Development' },
+    { date: 5, title: 'How to Use Zod for Runtime Type Validation' },
+    { date: 6, title: 'Building a RESTful API with Express and TypeScript' },
+    { date: 7, title: 'How to Set Up CI/CD with GitHub Actions' },
+    { date: 8, title: 'Understanding Microservices Architecture Patterns' },
+    { date: 9, title: 'How to Deploy a Next.js App to Vercel' },
+    { date: 10, title: 'The Developer\'s Guide to PostgreSQL Indexes' },
+    { date: 11, title: 'How to Use Redis for Caching in Node.js' },
+    { date: 12, title: 'Building a CLI Tool with Node.js and Commander' },
+    { date: 13, title: 'How to Implement OAuth 2.0 in Your Application' },
+    { date: 14, title: 'Understanding Event-Driven Architecture' },
+    { date: 15, title: 'How to Write Unit Tests with Jest' },
+    { date: 16, title: 'The Complete Guide to Error Handling in TypeScript' },
+    { date: 17, title: 'How to Use Prisma ORM with Next.js' },
+    { date: 18, title: 'Building a Real-Time Chat Application' },
+    { date: 19, title: 'How to Optimize Database Queries' },
+    { date: 20, title: 'Understanding Serverless Functions' },
+    { date: 21, title: 'How to Implement Rate Limiting with Redis' },
+    { date: 22, title: 'The Guide to API Versioning Best Practices' },
+    { date: 23, title: 'How to Use Webhooks for Event Notifications' },
+    { date: 24, title: 'Building a File Upload System with Multer' },
+    { date: 25, title: 'How to Implement Search Functionality with Elasticsearch' },
+    { date: 26, title: 'Understanding Message Queues: RabbitMQ vs Kafka' },
+    { date: 27, title: 'How to Set Up Monitoring with Prometheus' },
+    { date: 28, title: 'The Complete Guide to Environment Variables' },
+    { date: 29, title: 'How to Build a GraphQL Subscription Server' },
+    { date: 30, title: 'April Retro: API Design Patterns We Learned' },
+  ],
+  may: [
+    { date: 1, title: 'How to Implement Pagination in REST APIs' },
+    { date: 2, title: 'Understanding Database Transactions' },
+    { date: 3, title: 'How to Use Docker for Local Development' },
+    { date: 4, title: 'Building a Microservices Gateway with Kong' },
+    { date: 5, title: 'How to Implement File Compression in Node.js' },
+    { date: 6, title: 'The Guide to API Documentation with OpenAPI' },
+    { date: 7, title: 'How to Use Message Brokers for Async Processing' },
+    { date: 8, title: 'Understanding CQRS Pattern' },
+    { date: 9, title: 'How to Implement Background Jobs with Bull' },
+    { date: 10, title: 'Building a Multi-Tenant Application' },
+    { date: 11, title: 'How to Use TypeScript Generics Effectively' },
+    { date: 12, title: 'The Complete Guide to API Security' },
+    { date: 13, title: 'How to Implement Caching Strategies' },
+    { date: 14, title: 'Understanding Domain-Driven Design' },
+    { date: 15, title: 'How to Build a GraphQL Resolver' },
+    { date: 16, title: 'The Developer\'s Guide to API Testing' },
+    { date: 17, title: 'How to Use Docker Swarm for Orchestration' },
+    { date: 18, title: 'Building a Notification System' },
+    { date: 19, title: 'How to Implement Data Validation with Yup' },
+    { date: 20, title: 'Understanding API Gateway Patterns' },
+    { date: 21, title: 'How to Use Kubernetes for Container Orchestration' },
+    { date: 22, title: 'The Guide to Database Migrations' },
+    { date: 23, title: 'How to Implement API Throttling' },
+    { date: 24, title: 'Building a Task Queue System' },
+    { date: 25, title: 'How to Use gRPC for High-Performance APIs' },
+    { date: 26, title: 'Understanding Event Sourcing' },
+    { date: 27, title: 'How to Implement API Authentication with Passport' },
+    { date: 28, title: 'The Complete Guide to API Error Responses' },
+    { date: 29, title: 'How to Build a GraphQL DataLoader' },
+    { date: 30, title: 'May Retro: Backend Architecture Insights' },
+    { date: 31, title: 'How to Optimize API Response Times' },
+  ],
+  june: [
+    { date: 1, title: 'How to Implement API Rate Limiting per User' },
+    { date: 2, title: 'Understanding Database Connection Pooling' },
+    { date: 3, title: 'How to Use Nginx as a Reverse Proxy' },
+    { date: 4, title: 'Building a REST API with Fastify' },
+    { date: 5, title: 'How to Implement API Request Logging' },
+    { date: 6, title: 'The Guide to API Design Principles' },
+    { date: 7, title: 'How to Use MongoDB with Mongoose' },
+    { date: 8, title: 'Understanding API Gateway vs Service Mesh' },
+    { date: 9, title: 'How to Implement API Health Checks' },
+    { date: 10, title: 'Building a GraphQL Federation Server' },
+    { date: 11, title: 'How to Use PostgreSQL Full-Text Search' },
+    { date: 12, title: 'The Complete Guide to API Pagination Strategies' },
+    { date: 13, title: 'How to Implement API Request Validation' },
+    { date: 14, title: 'Understanding API Gateway Authentication' },
+    { date: 15, title: 'How to Build a Microservices Communication Layer' },
+    { date: 16, title: 'The Developer\'s Guide to API Mocking' },
+    { date: 17, title: 'How to Use Redis Pub/Sub for Real-Time Updates' },
+    { date: 18, title: 'Building an API Gateway with Express' },
+    { date: 19, title: 'How to Implement API Request Batching' },
+    { date: 20, title: 'Understanding API Circuit Breaker Pattern' },
+    { date: 21, title: 'How to Use Docker Networking' },
+    { date: 22, title: 'The Guide to API Response Compression' },
+    { date: 23, title: 'How to Implement API Request Queuing' },
+    { date: 24, title: 'Building a GraphQL API with Apollo Server' },
+    { date: 25, title: 'How to Use PostgreSQL JSONB for Flexible Data' },
+    { date: 26, title: 'Understanding API Load Balancing' },
+    { date: 27, title: 'How to Implement API Request Deduplication' },
+    { date: 28, title: 'The Complete Guide to API Monitoring' },
+    { date: 29, title: 'How to Build a Microservices Registry' },
+    { date: 30, title: 'June Retro: Scaling APIs for Growth' },
+  ]
+};
+
+// Q3 Titles (July, August, September)
+const q3Titles = {
+  july: [
+    { date: 1, title: 'How to Implement API Request Transformation' },
+    { date: 2, title: 'Understanding API Gateway Routing' },
+    { date: 3, title: 'How to Use Docker Volumes for Data Persistence' },
+    { date: 4, title: 'Building a REST API with Koa.js' },
+    { date: 5, title: 'How to Implement API Request Enrichment' },
+    { date: 6, title: 'The Guide to API Response Transformation' },
+    { date: 7, title: 'How to Use PostgreSQL Views for Complex Queries' },
+    { date: 8, title: 'Understanding API Gateway Rate Limiting' },
+    { date: 9, title: 'How to Implement API Request Aggregation' },
+    { date: 10, title: 'Building a GraphQL API with GraphQL Yoga' },
+    { date: 11, title: 'How to Use Redis for Session Management' },
+    { date: 12, title: 'The Complete Guide to API Security Headers' },
+    { date: 13, title: 'How to Implement API Request Filtering' },
+    { date: 14, title: 'Understanding API Gateway Caching' },
+    { date: 15, title: 'How to Build a Microservices Discovery Service' },
+    { date: 16, title: 'The Developer\'s Guide to API Contract Testing' },
+    { date: 17, title: 'How to Use Docker Compose for Multi-Container Apps' },
+    { date: 18, title: 'Building an API Gateway with Kong' },
+    { date: 19, title: 'How to Implement API Request Routing' },
+    { date: 20, title: 'Understanding API Gateway Load Balancing' },
+    { date: 21, title: 'How to Use PostgreSQL Triggers' },
+    { date: 22, title: 'The Guide to API Response Caching' },
+    { date: 23, title: 'How to Implement API Request Batching' },
+    { date: 24, title: 'Building a GraphQL API with GraphQL Tools' },
+    { date: 25, title: 'How to Use Redis for Distributed Locking' },
+    { date: 26, title: 'Understanding API Gateway Authentication' },
+    { date: 27, title: 'How to Implement API Request Validation Middleware' },
+    { date: 28, title: 'The Complete Guide to API Error Handling' },
+    { date: 29, title: 'How to Build a Microservices Config Service' },
+    { date: 30, title: 'July Retro: API Gateway Patterns' },
+    { date: 31, title: 'How to Optimize API Database Queries' },
+  ],
+  august: [
+    { date: 1, title: 'How to Implement API Request Logging Middleware' },
+    { date: 2, title: 'Understanding API Gateway Service Discovery' },
+    { date: 3, title: 'How to Use Docker Secrets for Sensitive Data' },
+    { date: 4, title: 'Building a REST API with Hapi.js' },
+    { date: 5, title: 'How to Implement API Request Rate Limiting' },
+    { date: 6, title: 'The Guide to API Response Serialization' },
+    { date: 7, title: 'How to Use PostgreSQL Stored Procedures' },
+    { date: 8, title: 'Understanding API Gateway Request Transformation' },
+    { date: 9, title: 'How to Implement API Request Compression' },
+    { date: 10, title: 'Building a GraphQL API with GraphQL Helix' },
+    { date: 11, title: 'How to Use Redis for Rate Limiting' },
+    { date: 12, title: 'The Complete Guide to API Authentication Methods' },
+    { date: 13, title: 'How to Implement API Request Sanitization' },
+    { date: 14, title: 'Understanding API Gateway Response Transformation' },
+    { date: 15, title: 'How to Build a Microservices Tracing Service' },
+    { date: 16, title: 'The Developer\'s Guide to API Performance Testing' },
+    { date: 17, title: 'How to Use Docker Networks for Service Communication' },
+    { date: 18, title: 'Building an API Gateway with Traefik' },
+    { date: 19, title: 'How to Implement API Request Validation Rules' },
+    { date: 20, title: 'Understanding API Gateway Request Aggregation' },
+    { date: 21, title: 'How to Use PostgreSQL Materialized Views' },
+    { date: 22, title: 'The Guide to API Response Formatting' },
+    { date: 23, title: 'How to Implement API Request Throttling' },
+    { date: 24, title: 'Building a GraphQL API with Mercurius' },
+    { date: 25, title: 'How to Use Redis for Caching API Responses' },
+    { date: 26, title: 'Understanding API Gateway Request Routing' },
+    { date: 27, title: 'How to Implement API Request Enrichment Middleware' },
+    { date: 28, title: 'The Complete Guide to API Response Validation' },
+    { date: 29, title: 'How to Build a Microservices Health Check Service' },
+    { date: 30, title: 'August Retro: Advanced API Patterns' },
+    { date: 31, title: 'How to Optimize API Response Payloads' },
+  ],
+  september: [
+    { date: 1, title: 'How to Implement API Request Authentication Middleware' },
+    { date: 2, title: 'Understanding API Gateway Request Filtering' },
+    { date: 3, title: 'How to Use Docker Health Checks' },
+    { date: 4, title: 'Building a REST API with NestJS' },
+    { date: 5, title: 'How to Implement API Request Authorization' },
+    { date: 6, title: 'The Guide to API Response Pagination' },
+    { date: 7, title: 'How to Use PostgreSQL Partitioning' },
+    { date: 8, title: 'Understanding API Gateway Request Enrichment' },
+    { date: 9, title: 'How to Implement API Request Transformation Middleware' },
+    { date: 10, title: 'Building a GraphQL API with Pothos' },
+    { date: 11, title: 'How to Use Redis for API Session Storage' },
+    { date: 12, title: 'The Complete Guide to API Response Compression' },
+    { date: 13, title: 'How to Implement API Request Validation Schemas' },
+    { date: 14, title: 'Understanding API Gateway Request Aggregation Patterns' },
+    { date: 15, title: 'How to Build a Microservices Logging Service' },
+    { date: 16, title: 'The Developer\'s Guide to API Load Testing' },
+    { date: 17, title: 'How to Use Docker Compose Overrides' },
+    { date: 18, title: 'Building an API Gateway with Ambassador' },
+    { date: 19, title: 'How to Implement API Request Rate Limiting Strategies' },
+    { date: 20, title: 'Understanding API Gateway Request Routing Rules' },
+    { date: 21, title: 'How to Use PostgreSQL Replication' },
+    { date: 22, title: 'The Guide to API Response Caching Strategies' },
+    { date: 23, title: 'How to Implement API Request Batching Middleware' },
+    { date: 24, title: 'Building a GraphQL API with TypeGraphQL' },
+    { date: 25, title: 'How to Use Redis for API Request Queuing' },
+    { date: 26, title: 'Understanding API Gateway Request Transformation Rules' },
+    { date: 27, title: 'How to Implement API Request Validation Middleware Chain' },
+    { date: 28, title: 'The Complete Guide to API Response Serialization' },
+    { date: 29, title: 'How to Build a Microservices Metrics Service' },
+    { date: 30, title: 'September Retro: Production-Ready APIs' },
+  ]
+};
+
+// Q4 Titles (October, November, December)
+const q4Titles = {
+  october: [
+    { date: 1, title: 'How to Implement API Request Authentication Strategies' },
+    { date: 2, title: 'Understanding API Gateway Request Filtering Rules' },
+    { date: 3, title: 'How to Use Docker Multi-Stage Builds' },
+    { date: 4, title: 'Building a REST API with AdonisJS' },
+    { date: 5, title: 'How to Implement API Request Authorization Policies' },
+    { date: 6, title: 'The Guide to API Response Formatting Standards' },
+    { date: 7, title: 'How to Use PostgreSQL Full-Text Search with tsvector' },
+    { date: 8, title: 'Understanding API Gateway Request Enrichment Patterns' },
+    { date: 9, title: 'How to Implement API Request Transformation Pipelines' },
+    { date: 10, title: 'Building a GraphQL API with Nexus' },
+    { date: 11, title: 'How to Use Redis for API Response Caching' },
+    { date: 12, title: 'The Complete Guide to API Response Compression Algorithms' },
+    { date: 13, title: 'How to Implement API Request Validation Pipelines' },
+    { date: 14, title: 'Understanding API Gateway Request Aggregation Strategies' },
+    { date: 15, title: 'How to Build a Microservices Monitoring Service' },
+    { date: 16, title: 'The Developer\'s Guide to API Stress Testing' },
+    { date: 17, title: 'How to Use Docker BuildKit for Faster Builds' },
+    { date: 18, title: 'Building an API Gateway with Gloo' },
+    { date: 19, title: 'How to Implement API Request Rate Limiting Algorithms' },
+    { date: 20, title: 'Understanding API Gateway Request Routing Strategies' },
+    { date: 21, title: 'How to Use PostgreSQL JSON Functions' },
+    { date: 22, title: 'The Guide to API Response Caching Headers' },
+    { date: 23, title: 'How to Implement API Request Batching Strategies' },
+    { date: 24, title: 'Building a GraphQL API with GraphQL Code Generator' },
+    { date: 25, title: 'How to Use Redis for API Request Deduplication' },
+    { date: 26, title: 'Understanding API Gateway Request Transformation Pipelines' },
+    { date: 27, title: 'How to Implement API Request Validation Pipelines' },
+    { date: 28, title: 'The Complete Guide to API Response Serialization Formats' },
+    { date: 29, title: 'How to Build a Microservices Alerting Service' },
+    { date: 30, title: 'October Retro: API Architecture Evolution' },
+    { date: 31, title: 'How to Optimize API Database Connection Pools' },
+  ],
+  november: [
+    { date: 1, title: 'How to Implement API Request Authentication Flows' },
+    { date: 2, title: 'Understanding API Gateway Request Filtering Pipelines' },
+    { date: 3, title: 'How to Use Docker Compose Profiles' },
+    { date: 4, title: 'Building a REST API with FeathersJS' },
+    { date: 5, title: 'How to Implement API Request Authorization Flows' },
+    { date: 6, title: 'The Guide to API Response Formatting Pipelines' },
+    { date: 7, title: 'How to Use PostgreSQL Array Functions' },
+    { date: 8, title: 'Understanding API Gateway Request Enrichment Pipelines' },
+    { date: 9, title: 'How to Implement API Request Transformation Strategies' },
+    { date: 10, title: 'Building a GraphQL API with GraphQL Shield' },
+    { date: 11, title: 'How to Use Redis for API Request Rate Limiting' },
+    { date: 12, title: 'The Complete Guide to API Response Compression Strategies' },
+    { date: 13, title: 'How to Implement API Request Validation Strategies' },
+    { date: 14, title: 'Understanding API Gateway Request Aggregation Pipelines' },
+    { date: 15, title: 'How to Build a Microservices Configuration Service' },
+    { date: 16, title: 'The Developer\'s Guide to API Endurance Testing' },
+    { date: 17, title: 'How to Use Docker Compose Extensions' },
+    { date: 18, title: 'Building an API Gateway with Zuul' },
+    { date: 19, title: 'How to Implement API Request Rate Limiting Policies' },
+    { date: 20, title: 'Understanding API Gateway Request Routing Pipelines' },
+    { date: 21, title: 'How to Use PostgreSQL Window Functions' },
+    { date: 22, title: 'The Guide to API Response Caching Policies' },
+    { date: 23, title: 'How to Implement API Request Batching Policies' },
+    { date: 24, title: 'Building a GraphQL API with GraphQL Modules' },
+    { date: 25, title: 'How to Use Redis for API Request Queuing Strategies' },
+    { date: 26, title: 'Understanding API Gateway Request Transformation Strategies' },
+    { date: 27, title: 'How to Implement API Request Validation Policies' },
+    { date: 28, title: 'The Complete Guide to API Response Serialization Strategies' },
+    { date: 29, title: 'How to Build a Microservices Service Mesh' },
+    { date: 30, title: 'November Retro: Enterprise API Patterns' },
+  ],
+  december: [
+    { date: 1, title: 'How to Implement API Request Authentication Policies' },
+    { date: 2, title: 'Understanding API Gateway Request Filtering Strategies' },
+    { date: 3, title: 'How to Use Docker Compose Watch Mode' },
+    { date: 4, title: 'Building a REST API with LoopBack' },
+    { date: 5, title: 'How to Implement API Request Authorization Policies' },
+    { date: 6, title: 'The Guide to API Response Formatting Strategies' },
+    { date: 7, title: 'How to Use PostgreSQL Common Table Expressions' },
+    { date: 8, title: 'Understanding API Gateway Request Enrichment Strategies' },
+    { date: 9, title: 'How to Implement API Request Transformation Policies' },
+    { date: 10, title: 'Building a GraphQL API with GraphQL Scalars' },
+    { date: 11, title: 'How to Use Redis for API Request Deduplication Strategies' },
+    { date: 12, title: 'The Complete Guide to API Response Compression Policies' },
+    { date: 13, title: 'How to Implement API Request Validation Policies' },
+    { date: 14, title: 'Understanding API Gateway Request Aggregation Policies' },
+    { date: 15, title: 'How to Build a Microservices Event Bus' },
+    { date: 16, title: 'The Developer\'s Guide to API Chaos Testing' },
+    { date: 17, title: 'How to Use Docker Compose Dependencies' },
+    { date: 18, title: 'Building an API Gateway with Tyk' },
+    { date: 19, title: 'How to Implement API Request Rate Limiting Policies' },
+    { date: 20, title: 'Understanding API Gateway Request Routing Policies' },
+    { date: 21, title: 'How to Use PostgreSQL Recursive Queries' },
+    { date: 22, title: 'The Guide to API Response Caching Strategies' },
+    { date: 23, title: 'How to Implement API Request Batching Policies' },
+    { date: 24, title: 'Building a GraphQL API with GraphQL Directives' },
+    { date: 25, title: 'Christmas Special: How to Build a Holiday API' },
+    { date: 26, title: 'How to Use Redis for API Request Queuing Policies' },
+    { date: 27, title: 'Understanding API Gateway Request Transformation Policies' },
+    { date: 28, title: 'How to Implement API Request Validation Policies' },
+    { date: 29, title: 'The Complete Guide to API Response Serialization Policies' },
+    { date: 30, title: 'How to Build a Microservices API Gateway' },
+    { date: 31, title: 'December Retro: Year in Review - API Best Practices 2026' },
+  ]
+};
 
 // Generate and save calendar
 import fs from 'fs';
