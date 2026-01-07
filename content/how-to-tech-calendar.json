@@ -5,7 +5,7 @@
     "scheduledTime": "12:15",
     "title": "How to Implement Early Detection Systems for Production Monitoring",
     "slug": "how-to-implement-early-detection-systems-for-production-monitoring",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -14,7 +14,8 @@
       "early detection",
       "alerting",
       "system health"
-    ]
+    ],
+    "publishedAt": "2026-01-07T12:25:17.739Z"
   },
   {
     "id": "how-to-how-to-audit-your-github-repo-for-leaked-secrets-jan-7",
