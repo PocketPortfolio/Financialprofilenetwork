@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build:sitemaps": "tsx scripts/build-static-sitemaps.ts",
+    "build:sitemaps": "ts-node --project scripts/tsconfig.json scripts/build-static-sitemaps.ts",
     "build": "npm run build:sitemaps && next build",
     "start": "next start",
     "preview": "next start -p 3001",
@@ -106,6 +106,7 @@
     "openai": "^6.15.0",
     "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"
   },
