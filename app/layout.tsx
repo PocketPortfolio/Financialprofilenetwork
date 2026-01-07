@@ -27,11 +27,11 @@ export const metadata: Metadata = brandEnabled
     })
   : {
       title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
-      description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
+      description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
       robots: 'index,follow,max-image-preview:large',
         openGraph: {
           title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
-          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
+          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
           url: 'https://www.pocketportfolio.app/',
           siteName: 'Pocket Portfolio',
           images: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = brandEnabled
         twitter: {
           card: 'summary_large_image',
           title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
-          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
+          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
           images: ['https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123'],
         },
     };

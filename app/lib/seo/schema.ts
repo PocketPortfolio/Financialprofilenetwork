@@ -29,7 +29,7 @@ export function getHomePageSchema(): HomePageSchema {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Pocket Portfolio',
-    description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON/Excel, own your data, and sync bidirectionally. No vendor lock-in.',
+    description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
     url: 'https://www.pocketportfolio.app',
     logo: {
       '@type': 'ImageObject',
