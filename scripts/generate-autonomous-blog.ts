@@ -127,7 +127,31 @@ ${crossLink ? `- If relevant to the content, include a contextual link to "${cro
 - Sponsor links must use: [Learn more about our Corporate and Founder Tiers](/sponsor) or [sponsor page](/sponsor)
 - Feature links must use: [Set up Google Drive Sync](/features/google-drive-sync) or [Google Drive Sync](/features/google-drive-sync)`;
 
-  const userPrompt = `Write a comprehensive blog post titled "${post.title}".
+  const userPrompt = isHowTo
+    ? `Write a concise, hacker-style technical guide titled "${post.title}".
+
+Keywords: ${post.keywords.join(', ')}
+
+Structure (300-500 words):
+1. Brief problem statement (1-2 sentences)
+2. Direct solution with code (the main content)
+3. Explanation of key concepts (if needed)
+4. Quick tip or gotcha (optional)
+
+Format as MDX with frontmatter:
+---
+title: "${post.title}"
+date: "${post.date}"
+description: "[SEO-optimized description, 120-140 characters, include keywords]"
+tags: [${post.keywords.map(k => `"${k}"`).join(', ')}]
+author: "Pocket Portfolio Team"
+image: "/images/blog/${post.slug}.png"
+pillar: "${post.pillar}"
+category: "how-to-in-tech"
+---
+
+[Your concise, code-first content here]`
+    : `Write a comprehensive blog post titled "${post.title}".
 
 Pillar: ${post.pillar}
 Keywords: ${post.keywords.join(', ')}
@@ -286,15 +310,23 @@ pillar: "${post.pillar}"
 
 async function main() {
   try {
-    const calendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
-    
-    if (!fs.existsSync(calendarPath)) {
-      console.error(`❌ Calendar not found: ${calendarPath}`);
-      console.log('💡 Run: npm run generate-blog-calendar');
-      process.exit(1);
-    }
+    // ✅ Load main calendar (deep dives)
+    const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+    const mainCalendar: BlogPost[] = fs.existsSync(mainCalendarPath)
+      ? JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'))
+      : [];
 
-    const calendar: BlogPost[] = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
+    // ✅ Load "How to in Tech" calendar (daily posts)
+    const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
+    const howToCalendar: BlogPost[] = fs.existsSync(howToCalendarPath)
+      ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
+      : [];
+
+    // ✅ Merge calendars and mark categories
+    const calendar: BlogPost[] = [
+      ...mainCalendar.map(p => ({ ...p, category: (p.category || 'deep-dive') as 'how-to-in-tech' | 'deep-dive' })),
+      ...howToCalendar.map(p => ({ ...p, category: 'how-to-in-tech' as const }))
+    ];
     
     const today = new Date().toISOString().split('T')[0];
     const now = new Date();
@@ -502,8 +534,14 @@ async function main() {
       console.log(`📝 Status updated to 'published': ${post.slug} (published at ${publishTimestamp})`);
     }
 
-    // Update calendar (always save, even if some posts failed)
-    fs.writeFileSync(calendarPath, JSON.stringify(calendar, null, 2));
+    // ✅ Update calendars (save to appropriate files)
+    const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech');
+    const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+    
+    fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
+    if (howToPosts.length > 0) {
+      fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+    }
     console.log('');
     console.log('✅ Calendar updated');
     console.log(`📊 Summary: ${successCount} published, ${failureCount} failed`);
