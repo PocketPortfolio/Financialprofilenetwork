@@ -1,6 +1,6 @@
 {
   "name": "@pocket-portfolio/fidelity-csv-export",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Parse Fidelity CSV exports for portfolio tracking. Free & open-source. Support: pocketportfolio.app/sponsor",
   "main": "index.js",
   "scripts": {

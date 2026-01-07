@@ -1,6 +1,6 @@
 {
   "name": "@pocket-portfolio/etoro-history-importer",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Import eToro transaction history from CSV. Free & open-source. Support: pocketportfolio.app/sponsor",
   "main": "index.js",
   "scripts": {

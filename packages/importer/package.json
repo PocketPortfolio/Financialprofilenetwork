@@ -1,6 +1,6 @@
 {
   "name": "@pocket-portfolio/importer",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Universal CSV parser for 19+ brokers (Robinhood, Fidelity, eToro, Koinly, TurboTax, Ghostfolio, Sharesight, etc.) - TypeScript, privacy-first. Free & open-source. Support: pocketportfolio.app/sponsor",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
