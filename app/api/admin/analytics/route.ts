@@ -871,6 +871,7 @@ async function getBlogPostsData() {
         slug: post.slug,
         date: post.date,
         scheduledDate: post.date,
+        scheduledTime: post.scheduledTime || null,
         status: post.status,
         pillar: post.pillar,
         category: post.category || 'deep-dive', // ✅ ADD CATEGORY
