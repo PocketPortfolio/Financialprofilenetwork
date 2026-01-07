@@ -139,6 +139,16 @@ jobs:
           skip_dirty_check: true
           # Don't use file_pattern - files are already staged above
 
+      - name: Deploy to Vercel Production
+        if: steps.changes.outputs.changes == 'true'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
       - name: Check for overdue posts
         if: failure()
         id: overdue-check
@@ -313,7 +323,7 @@ jobs:
             echo "✅ **Changes committed and pushed**" >> $GITHUB_STEP_SUMMARY
             echo "- New blog posts have been generated" >> $GITHUB_STEP_SUMMARY
             echo "- Changes have been pushed to main branch" >> $GITHUB_STEP_SUMMARY
-            echo "- Deployment will trigger automatically" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Deployed to Vercel Production** (autonomous deployment)" >> $GITHUB_STEP_SUMMARY
             if [ "${{ steps.expected-posts.outputs.expected_posts }}" != "0" ]; then
               if [ "${{ steps.verify-posts.outcome }}" == "success" ]; then
                 echo "" >> $GITHUB_STEP_SUMMARY
