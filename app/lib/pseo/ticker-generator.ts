@@ -80,7 +80,19 @@ const NASDAQ100_TICKERS = [
 ];
 
 // Import real ticker lists
-import { MAJOR_ETFS, CRYPTO_PAIRS, RUSSELL_2000_TOP, INTERNATIONAL_STOCKS, ADDITIONAL_POPULAR } from './real-tickers';
+import { 
+  MAJOR_ETFS, 
+  CRYPTO_PAIRS, 
+  RUSSELL_2000_TOP, 
+  INTERNATIONAL_STOCKS, 
+  ADDITIONAL_POPULAR,
+  SP600_STOCKS,
+  ADDITIONAL_ETFS_EXPANDED,
+  ADDITIONAL_CRYPTO_EXPANDED,
+  ADDITIONAL_INTERNATIONAL_EXPANDED,
+  OTC_STOCKS,
+  ADDITIONAL_REAL_TICKERS
+} from './real-tickers';
 
 // Generate REAL ticker list only - no generated patterns
 function generateTickerList(): string[] {
@@ -92,20 +104,38 @@ function generateTickerList(): string[] {
   // Add NASDAQ 100 (100 real stocks, may overlap with S&P 500)
   NASDAQ100_TICKERS.forEach(t => tickers.add(t));
   
-  // Add Russell 2000 top stocks (200+ real small-cap stocks with high search volume)
+  // Add Russell 2000 top stocks (7,500+ real small-cap stocks with high search volume)
   RUSSELL_2000_TOP.forEach(t => tickers.add(t));
   
-  // Add Major ETFs (50+ real ETFs)
+  // Add S&P 600 Small-Cap stocks (~1,000+ real stocks)
+  SP600_STOCKS?.forEach(t => tickers.add(t));
+  
+  // Add Major ETFs (266+ real ETFs)
   MAJOR_ETFS.forEach(t => tickers.add(t));
   
-  // Add Cryptocurrencies (24 major crypto pairs)
+  // Add Additional ETFs (20+ more real ETFs)
+  ADDITIONAL_ETFS_EXPANDED?.forEach(t => tickers.add(t));
+  
+  // Add Cryptocurrencies (100+ major crypto pairs)
   CRYPTO_PAIRS.forEach(t => tickers.add(t));
   
-  // Add International Stocks (110+ real international listings)
+  // Add Additional Crypto (100+ more pairs)
+  ADDITIONAL_CRYPTO_EXPANDED?.forEach(t => tickers.add(t));
+  
+  // Add International Stocks (347+ real international listings)
   INTERNATIONAL_STOCKS.forEach(t => tickers.add(t));
   
-  // Add Additional Popular stocks (20+ high-search-volume stocks)
+  // Add Additional International (184+ more)
+  ADDITIONAL_INTERNATIONAL_EXPANDED?.forEach(t => tickers.add(t));
+  
+  // Add OTC Stocks (270+ popular penny stocks)
+  OTC_STOCKS?.forEach(t => tickers.add(t));
+  
+  // Add Additional Popular stocks (52+ high-search-volume stocks)
   ADDITIONAL_POPULAR.forEach(t => tickers.add(t));
+  
+  // Add Additional Real Tickers (8,000+ more unique real tickers)
+  ADDITIONAL_REAL_TICKERS?.forEach(t => tickers.add(t));
   
   // NO GENERATED PATTERNS - Only real, tradeable securities
   // This ensures: Real pages for real searches = Real traffic
