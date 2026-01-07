@@ -1,6 +1,6 @@
 {
   "name": "@pocket-portfolio/trading212-to-json",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Convert Trading212 CSV exports to JSON format. Free & open-source. Support: pocketportfolio.app/sponsor",
   "main": "index.js",
   "scripts": {

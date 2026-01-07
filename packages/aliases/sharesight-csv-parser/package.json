@@ -1,6 +1,6 @@
 {
   "name": "@pocket-portfolio/sharesight-csv-parser",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Parse Sharesight CSV exports into normalized format. Free & open-source. Support: pocketportfolio.app/sponsor",
   "main": "index.js",
   "scripts": {
