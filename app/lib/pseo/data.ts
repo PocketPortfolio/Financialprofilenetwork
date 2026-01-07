@@ -7,6 +7,7 @@
  */
 
 import { TickerMetadata, ExchangeMetadata, SectorMetadata } from './types';
+import { getAllTickersExpanded } from './ticker-generator';
 
 // Popular tickers - can be expanded to 10K+
 // In production, this would be fetched from Firestore or external API
@@ -244,16 +245,24 @@ export function getSectorMetadata(sectorName: string): SectorMetadata | null {
 export function getAllTickers(): string[] {
   // Use expanded ticker list for real tickers only
   try {
-    // Import ticker generator
-    const { getAllTickersExpanded } = require('./ticker-generator');
-    if (getAllTickersExpanded) {
-      return getAllTickersExpanded();
+    if (getAllTickersExpanded && typeof getAllTickersExpanded === 'function') {
+      const tickers = getAllTickersExpanded();
+      if (Array.isArray(tickers) && tickers.length > 0) {
+        console.log(`[pSEO] Loaded ${tickers.length} tickers from ticker-generator`);
+        return tickers;
+      } else {
+        console.warn(`[pSEO] getAllTickersExpanded returned empty or invalid array:`, typeof tickers);
+      }
+    } else {
+      console.warn('[pSEO] getAllTickersExpanded is not a function');
     }
   } catch (error) {
-    // Silently fallback to static list
-    console.warn('[pSEO] Failed to load ticker generator, using fallback');
+    // Log the error for debugging
+    console.error('[pSEO] Failed to load ticker generator:', error);
+    console.warn('[pSEO] Falling back to static POPULAR_TICKERS list');
   }
   // Fallback to popular tickers if generator not available
+  console.warn(`[pSEO] Using fallback: ${POPULAR_TICKERS.length} popular tickers`);
   return POPULAR_TICKERS;
 }
 
