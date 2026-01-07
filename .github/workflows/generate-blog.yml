@@ -110,12 +110,22 @@ jobs:
         if: steps.changes.outputs.changes == 'true'
         run: |
           echo "📦 Staging generated files..."
-          # Use find to expand glob patterns properly
-          find content/posts -name "*.mdx" -type f -exec git add {} + || true
-          find public/images/blog -name "*.png" -type f -exec git add {} + || true
-          git add content/blog-calendar.json || true
+          # Force add files to ensure they're staged even if git thinks they're unchanged
+          find content/posts -name "*.mdx" -type f -exec git add -f {} + || true
+          find public/images/blog -name "*.png" -type f -exec git add -f {} + || true
+          git add -f content/blog-calendar.json || true
           echo "✅ Files staged:"
           git status --short
+          
+          # Verify files are actually in the index
+          if [ -n "$(git diff --cached --name-only)" ]; then
+            echo "✅ Changes confirmed in index - will commit"
+          else
+            echo "⚠️ No changes in index - checking if files exist..."
+            # List files that should exist
+            find content/posts -name "*.mdx" -type f | head -5
+            find public/images/blog -name "*.png" -type f | head -5
+          fi
 
       - name: Commit and push changes
         if: steps.changes.outputs.changes == 'true'
