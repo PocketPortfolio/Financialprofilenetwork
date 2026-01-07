@@ -147,7 +147,7 @@
     "scheduledTime": "16:00",
     "title": "The Ultimate test: Verifying time-based Autonomous systems",
     "slug": "the-ultimate-test-verifying-time-based-autonomous-systems",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "autonomous systems",
@@ -157,7 +157,8 @@
       "production architecture",
       "system verification"
     ],
-    "category": "deep-dive"
+    "category": "deep-dive",
+    "publishedAt": "2026-01-07T16:19:13.788Z"
   },
   {
     "id": "week-1-post-2",
