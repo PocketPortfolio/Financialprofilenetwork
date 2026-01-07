@@ -5,10 +5,12 @@ export function middleware(request: NextRequest) {
 
   // Skip middleware entirely for sitemap, robots, and llms.txt to avoid CSP issues
   // Skip all sitemap files (main index + all sub-sitemaps)
+  // Also skip the API route that handles sitemaps
   if (
     request.nextUrl.pathname === '/sitemap.xml' || 
     request.nextUrl.pathname === '/robots.txt' || 
     request.nextUrl.pathname === '/llms.txt' ||
+    request.nextUrl.pathname.startsWith('/api/sitemap/') ||
     (request.nextUrl.pathname.startsWith('/sitemap-') && request.nextUrl.pathname.endsWith('.xml'))
   ) {
     return NextResponse.next();
