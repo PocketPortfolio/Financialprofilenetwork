@@ -16,7 +16,7 @@ ${cyan}║                                                              ║${res
 ${cyan}║   ${yellow}We remain 100% Free & Open Source because of you.${reset}${cyan}          ║${reset}
 ${cyan}║                                                              ║${reset}
 ${cyan}║   ${bgOrange}${black} UK FOUNDER'S CLUB - BATCH 1 ${reset}${cyan}                             ║${reset}
-${cyan}║   ${red}🔥 Only 12/50 Lifetime Spots Remaining${reset}${cyan}                     ║${reset}
+${cyan}║   ${red}🔥 Only 42/50 Lifetime Spots Remaining${reset}${cyan}                     ║${reset}
 ${cyan}║                                                              ║${reset}
 ${cyan}║   ${bright}Claim your Badge & Lifetime Access here:${reset}${cyan}                   ║${reset}
 ${cyan}║   👉 https://www.pocketportfolio.app/sponsor?ref=npm         ║${reset}

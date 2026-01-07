@@ -47,7 +47,7 @@ export async function parseCSV(
         console.log(
           "%c 🚀 Pocket Portfolio Importer %c \n" + 
           "You are using the Open Source version.\n" +
-          "Only 12/50 Founder's Club spots remain: https://pocketportfolio.app/sponsor?ref=console_log", 
+          "Only 42/50 Founder's Club spots remain: https://pocketportfolio.app/sponsor?ref=console_log", 
           "background: #f97316; color: white; font-weight: bold; padding: 2px 4px; border-radius: 2px;",
           "color: #f97316;"
         );
