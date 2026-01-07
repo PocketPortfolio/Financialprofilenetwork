@@ -72,6 +72,7 @@ interface AnalyticsData {
       scheduledDate: string;
       status: 'pending' | 'published' | 'failed';
       pillar: string;
+      category?: string; // ✅ ADD CATEGORY
       isOverdue: boolean;
       hasFiles: boolean;
       publishedTime: string | null;

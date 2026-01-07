@@ -724,20 +724,24 @@ async function getNPMData() {
 
 async function getBlogPostsData() {
   try {
-    const calendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
-    
-    if (!fs.existsSync(calendarPath)) {
-      return {
-        total: 0,
-        published: 0,
-        pending: 0,
-        overdue: 0,
-        failed: 0,
-        posts: []
-      };
-    }
+    // ✅ Load main calendar (deep dives)
+    const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+    const mainCalendar = fs.existsSync(mainCalendarPath)
+      ? JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'))
+      : [];
 
-    const calendar = JSON.parse(fs.readFileSync(calendarPath, 'utf-8'));
+    // ✅ Load "How to in Tech" calendar (daily posts)
+    const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
+    const howToCalendar = fs.existsSync(howToCalendarPath)
+      ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
+      : [];
+
+    // ✅ Merge calendars (mark how-to posts with category)
+    const calendar = [
+      ...mainCalendar.map((p: any) => ({ ...p, category: p.category || 'deep-dive' })),
+      ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech' }))
+    ];
+
     const today = new Date().toISOString().split('T')[0];
     
     // Check which posts have actual files
@@ -777,6 +781,7 @@ async function getBlogPostsData() {
         scheduledDate: post.date,
         status: post.status,
         pillar: post.pillar,
+        category: post.category || 'deep-dive', // ✅ ADD CATEGORY
         isOverdue,
         hasFiles,
         publishedTime,
