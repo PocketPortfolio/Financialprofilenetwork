@@ -331,6 +331,21 @@ async function main() {
       console.log(`   - Should be included: ${jan6Post.date <= today && jan6Post.status === 'pending'}`);
     }
     
+    // Log Jan 7 posts specifically if they exist
+    const jan7Posts = calendar.filter(p => p.id.includes('jan-7'));
+    if (jan7Posts.length > 0) {
+      console.log(`\n🔍 Jan 7 Posts Debug (${jan7Posts.length} found):`);
+      jan7Posts.forEach(post => {
+        console.log(`   - ${post.id}:`);
+        console.log(`     Date: ${post.date}`);
+        console.log(`     Status: ${post.status}`);
+        console.log(`     Date <= today: ${post.date <= today}`);
+        console.log(`     Date === today: ${post.date === today}`);
+        console.log(`     Status === 'pending': ${post.status === 'pending'}`);
+        console.log(`     Should be included: ${post.date <= today && post.status === 'pending'}`);
+      });
+    }
+    
     // Find all posts that are due (date <= today) or overdue (date < today)
     const duePosts = calendar.filter(
       post => post.date <= today && post.status === 'pending'
