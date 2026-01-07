@@ -1,6 +1,6 @@
 {
   "/api/admin/analytics/route": "app/api/admin/analytics/route.js",
-  "/admin/analytics/page": "app/admin/analytics/page.js",
   "/blog/page": "app/blog/page.js",
-  "/landing/page": "app/landing/page.js"
+  "/admin/analytics/page": "app/admin/analytics/page.js",
+  "/s/[symbol]/dividend-history/page": "app/s/[symbol]/dividend-history/page.js"
 }
