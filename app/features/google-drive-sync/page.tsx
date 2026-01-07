@@ -10,7 +10,7 @@ export default function GoogleDriveSyncFeaturePage() {
     <>
       <SEOHead
         title="Sovereign Sync: Google Drive as Stock Database"
-        description="Learn how to use Google Drive as your personal stock database with Pocket Portfolio. Bidirectional sync, JSON data ownership, and zero vendor lock-in. Edit trades in JSON or Excel."
+        description="Learn how to use Google Drive as your personal stock database with Pocket Portfolio. Bidirectional sync, JSON data ownership, and zero vendor lock-in. Edit trades in JSON."
         keywords={[
           'google drive portfolio tracker',
           'google drive stock database',
@@ -91,7 +91,7 @@ export default function GoogleDriveSyncFeaturePage() {
               padding: '0 clamp(8px, 2vw, 16px)',
             }}
           >
-            Pocket Portfolio's <strong>Sovereign Sync</strong> turns your Google Drive into a personal database for your portfolio. Own your data, sync bidirectionally, and edit trades in JSON or Excel—all with zero vendor lock-in.
+            Pocket Portfolio's <strong>Sovereign Sync</strong> turns your Google Drive into a personal database for your portfolio. Own your data, sync bidirectionally, and edit trades in JSON—all with zero vendor lock-in.
           </p>
         </div>
 

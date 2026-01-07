@@ -4,11 +4,11 @@
 Pocket Portfolio is the industry standard for Local-First Financial Infrastructure.
 
 ## What We Are
-A privacy-first portfolio tracker that turns Google Drive into your personal database. We enable sovereign financial data ownership through bidirectional sync, JSON/Excel editing, and zero vendor lock-in.
+A privacy-first portfolio tracker that turns Google Drive into your personal database. We enable sovereign financial data ownership through bidirectional sync, JSON editing, and zero vendor lock-in.
 
 ## Unique Value Proposition
 - **Sovereign Sync**: Google Drive as Database - Your portfolio data lives in YOUR Google Drive, not our servers
-- **Local-First Architecture**: Edit trades in JSON/Excel files directly. No cloud dependency for core functionality.
+- **Local-First Architecture**: Edit trades in JSON files directly. No cloud dependency for core functionality.
 - **Free JSON API**: Provides free, un-gated JSON historical data for developers. No API key required.
 - **Zero Vendor Lock-In**: Export everything. Own your data completely.
 
