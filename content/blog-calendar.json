@@ -13,7 +13,8 @@
       "Financial Independence",
       "2026 Outlook"
     ],
-    "publishedAt": "2026-01-05T17:12:00.874Z"
+    "publishedAt": "2026-01-05T17:12:00.874Z",
+    "category": "deep-dive"
   },
   {
     "id": "week-1-post-1",
@@ -29,7 +30,8 @@
       "financial freedom",
       "death"
     ],
-    "publishedAt": "2026-01-05T17:08:33.961Z"
+    "publishedAt": "2026-01-05T17:08:33.961Z",
+    "category": "deep-dive"
   },
   {
     "id": "real-time-portfolio-tracking-jan-5",
@@ -45,7 +47,8 @@
       "performance optimization",
       "data sovereignty"
     ],
-    "publishedAt": "2026-01-05T17:12:00.874Z"
+    "publishedAt": "2026-01-05T17:12:00.874Z",
+    "category": "deep-dive"
   },
   {
     "id": "engine-verification-test-jan-6",
@@ -61,7 +64,8 @@
       "continuous deployment",
       "system architecture"
     ],
-    "publishedAt": "2026-01-06T10:00:59.295Z"
+    "publishedAt": "2026-01-06T10:00:59.295Z",
+    "category": "deep-dive"
   },
   {
     "id": "stress-test-ai-jan-6-noon",
@@ -78,7 +82,8 @@
       "data science",
       "AI"
     ],
-    "publishedAt": "2026-01-06T12:35:09.560Z"
+    "publishedAt": "2026-01-06T12:35:09.560Z",
+    "category": "deep-dive"
   },
   {
     "id": "stress-test-self-healing-jan-6-2pm",
@@ -95,7 +100,8 @@
       "fault tolerance",
       "system resilience"
     ],
-    "publishedAt": "2026-01-06T14:31:26.433Z"
+    "publishedAt": "2026-01-06T14:31:26.433Z",
+    "category": "deep-dive"
   },
   {
     "id": "stress-test-finance-jan-7-9am",
@@ -113,7 +119,8 @@
       "long-term investing",
       "finance"
     ],
-    "publishedAt": "2026-01-07T10:19:53.645Z"
+    "publishedAt": "2026-01-07T10:19:53.645Z",
+    "category": "deep-dive"
   },
   {
     "id": "stress-test-fintech-jan-7-4pm",
@@ -131,7 +138,8 @@
       "financial systems",
       "application development"
     ],
-    "publishedAt": "2026-01-07T10:19:53.645Z"
+    "publishedAt": "2026-01-07T10:19:53.645Z",
+    "category": "deep-dive"
   },
   {
     "id": "ultimate-test-4pm-jan-7",
@@ -148,7 +156,8 @@
       "automated systems",
       "production architecture",
       "system verification"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-1-post-2",
@@ -163,7 +172,8 @@
       "market analysis",
       "data-driven",
       "dollar"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-2-post-1",
@@ -178,7 +188,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-2-post-2",
@@ -193,7 +204,8 @@
       "json finance",
       "local-first finance",
       "roadmap"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-3-post-1",
@@ -208,7 +220,8 @@
       "market analysis",
       "data-driven",
       "investors"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-3-post-2",
@@ -223,7 +236,8 @@
       "vendor lock-in",
       "financial freedom",
       "finance:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-4-post-1",
@@ -238,7 +252,8 @@
       "json finance",
       "local-first finance",
       "future"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-4-post-2",
@@ -253,7 +268,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-5-post-1",
@@ -268,7 +284,8 @@
       "vendor lock-in",
       "financial freedom",
       "breaking"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-5-post-2",
@@ -283,7 +300,8 @@
       "market analysis",
       "data-driven",
       "power"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-6-post-1",
@@ -298,7 +316,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-6-post-2",
@@ -313,7 +332,8 @@
       "json finance",
       "local-first finance",
       "security"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-7-post-1",
@@ -328,7 +348,8 @@
       "market analysis",
       "data-driven",
       "dividend"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-7-post-2",
@@ -343,7 +364,8 @@
       "vendor lock-in",
       "financial freedom",
       "source"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-8-post-1",
@@ -358,7 +380,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-8-post-2",
@@ -373,7 +396,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-9-post-1",
@@ -388,7 +412,8 @@
       "vendor lock-in",
       "financial freedom",
       "privacy"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-9-post-2",
@@ -403,7 +428,8 @@
       "market analysis",
       "data-driven",
       "small-cap"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-10-post-1",
@@ -418,7 +444,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-10-post-2",
@@ -433,7 +460,8 @@
       "json finance",
       "local-first finance",
       "community"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-11-post-1",
@@ -448,7 +476,8 @@
       "market analysis",
       "data-driven",
       "impact"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-11-post-2",
@@ -463,7 +492,8 @@
       "vendor lock-in",
       "financial freedom",
       "local-first"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-12-post-1",
@@ -478,7 +508,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-12-post-2",
@@ -493,7 +524,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-13-post-1",
@@ -508,7 +540,8 @@
       "vendor lock-in",
       "financial freedom",
       "developer's"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-13-post-2",
@@ -523,7 +556,8 @@
       "market analysis",
       "data-driven",
       "low-volatility"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-14-post-1",
@@ -538,7 +572,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-14-post-2",
@@ -553,7 +588,8 @@
       "json finance",
       "local-first finance",
       "introducing"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-15-post-1",
@@ -568,7 +604,8 @@
       "market analysis",
       "data-driven",
       "market"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-15-post-2",
@@ -583,7 +620,8 @@
       "vendor lock-in",
       "financial freedom",
       "sovereignty:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-16-post-1",
@@ -598,7 +636,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-16-post-2",
@@ -613,7 +652,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-17-post-1",
@@ -628,7 +668,8 @@
       "vendor lock-in",
       "financial freedom",
       "sovereignty:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-17-post-2",
@@ -643,7 +684,8 @@
       "market analysis",
       "data-driven",
       "hidden"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-18-post-1",
@@ -658,7 +700,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-18-post-2",
@@ -673,7 +716,8 @@
       "json finance",
       "local-first finance",
       "evolution"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-19-post-1",
@@ -688,7 +732,8 @@
       "market analysis",
       "data-driven",
       "sector"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-19-post-2",
@@ -703,7 +748,8 @@
       "vendor lock-in",
       "financial freedom",
       "decentralized"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-20-post-1",
@@ -718,7 +764,8 @@
       "json finance",
       "local-first finance",
       "migrate"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-20-post-2",
@@ -733,7 +780,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-21-post-1",
@@ -748,7 +796,8 @@
       "vendor lock-in",
       "financial freedom",
       "prisoner"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-21-post-2",
@@ -763,7 +812,8 @@
       "market analysis",
       "data-driven",
       "efficient"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-22-post-1",
@@ -778,7 +828,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-22-post-2",
@@ -793,7 +844,8 @@
       "json finance",
       "local-first finance",
       "developer"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-23-post-1",
@@ -808,7 +860,8 @@
       "market analysis",
       "data-driven",
       "international"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-23-post-2",
@@ -823,7 +876,8 @@
       "vendor lock-in",
       "financial freedom",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-24-post-1",
@@ -838,7 +892,8 @@
       "json finance",
       "local-first finance",
       "makes"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-24-post-2",
@@ -853,7 +908,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-25-post-1",
@@ -868,7 +924,8 @@
       "vendor lock-in",
       "financial freedom",
       "proprietary:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-25-post-2",
@@ -883,7 +940,8 @@
       "market analysis",
       "data-driven",
       "weekend"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-26-post-1",
@@ -898,7 +956,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-26-post-2",
@@ -913,7 +972,8 @@
       "json finance",
       "local-first finance",
       "future"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-27-post-1",
@@ -928,7 +988,8 @@
       "market analysis",
       "data-driven",
       "psychology"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-27-post-2",
@@ -943,7 +1004,8 @@
       "vendor lock-in",
       "financial freedom",
       "local-first"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-28-post-1",
@@ -958,7 +1020,8 @@
       "json finance",
       "local-first finance",
       "built"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-28-post-2",
@@ -973,7 +1036,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-29-post-1",
@@ -988,7 +1052,8 @@
       "vendor lock-in",
       "financial freedom",
       "psychology"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-29-post-2",
@@ -1003,7 +1068,8 @@
       "market analysis",
       "data-driven",
       "rebalancing"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-30-post-1",
@@ -1018,7 +1084,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-30-post-2",
@@ -1033,7 +1100,8 @@
       "json finance",
       "local-first finance",
       "building"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-31-post-1",
@@ -1048,7 +1116,8 @@
       "market analysis",
       "data-driven",
       "market"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-31-post-2",
@@ -1063,7 +1132,8 @@
       "vendor lock-in",
       "financial freedom",
       "cloud"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-32-post-1",
@@ -1078,7 +1148,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-32-post-2",
@@ -1093,7 +1164,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-33-post-1",
@@ -1108,7 +1180,8 @@
       "vendor lock-in",
       "financial freedom",
       "financial"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-33-post-2",
@@ -1123,7 +1196,8 @@
       "market analysis",
       "data-driven",
       "psychology"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-34-post-1",
@@ -1138,7 +1212,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-34-post-2",
@@ -1153,7 +1228,8 @@
       "json finance",
       "local-first finance",
       "philosophy"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-35-post-1",
@@ -1168,7 +1244,8 @@
       "market analysis",
       "data-driven",
       "value"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-35-post-2",
@@ -1183,7 +1260,8 @@
       "vendor lock-in",
       "financial freedom",
       "cloud"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-36-post-1",
@@ -1198,7 +1276,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-36-post-2",
@@ -1213,7 +1292,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-37-post-1",
@@ -1228,7 +1308,8 @@
       "vendor lock-in",
       "financial freedom",
       "beyond"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-37-post-2",
@@ -1243,7 +1324,8 @@
       "market analysis",
       "data-driven",
       "market"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-38-post-1",
@@ -1258,7 +1340,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-38-post-2",
@@ -1273,7 +1356,8 @@
       "json finance",
       "local-first finance",
       "api-first"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-39-post-1",
@@ -1288,7 +1372,8 @@
       "market analysis",
       "data-driven",
       "momentum"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-39-post-2",
@@ -1303,7 +1388,8 @@
       "vendor lock-in",
       "financial freedom",
       "standard"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-40-post-1",
@@ -1318,7 +1404,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-40-post-2",
@@ -1333,7 +1420,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-41-post-1",
@@ -1348,7 +1436,8 @@
       "vendor lock-in",
       "financial freedom",
       "cloud"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-41-post-2",
@@ -1363,7 +1452,8 @@
       "market analysis",
       "data-driven",
       "behavioral"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-42-post-1",
@@ -1378,7 +1468,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-42-post-2",
@@ -1393,7 +1484,8 @@
       "json finance",
       "local-first finance",
       "sovereign"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-43-post-1",
@@ -1408,7 +1500,8 @@
       "market analysis",
       "data-driven",
       "tax-loss"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-43-post-2",
@@ -1423,7 +1516,8 @@
       "vendor lock-in",
       "financial freedom",
       "local-first"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-44-post-1",
@@ -1438,7 +1532,8 @@
       "json finance",
       "local-first finance",
       "json?"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-44-post-2",
@@ -1453,7 +1548,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-45-post-1",
@@ -1468,7 +1564,8 @@
       "vendor lock-in",
       "financial freedom",
       "vendor"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-45-post-2",
@@ -1483,7 +1580,8 @@
       "market analysis",
       "data-driven",
       "impact"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-46-post-1",
@@ -1498,7 +1596,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-46-post-2",
@@ -1513,7 +1612,8 @@
       "json finance",
       "local-first finance",
       "benefits"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-47-post-1",
@@ -1528,7 +1628,8 @@
       "market analysis",
       "data-driven",
       "market"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-47-post-2",
@@ -1543,7 +1644,8 @@
       "vendor lock-in",
       "financial freedom",
       "revolution:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-48-post-1",
@@ -1558,7 +1660,8 @@
       "json finance",
       "local-first finance",
       "chose"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-48-post-2",
@@ -1573,7 +1676,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-49-post-1",
@@ -1588,7 +1692,8 @@
       "vendor lock-in",
       "financial freedom",
       "portability:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-49-post-2",
@@ -1603,7 +1708,8 @@
       "market analysis",
       "data-driven",
       "bond-equity"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-50-post-1",
@@ -1618,7 +1724,8 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-50-post-2",
@@ -1633,7 +1740,8 @@
       "json finance",
       "local-first finance",
       "we've"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-51-post-1",
@@ -1648,7 +1756,8 @@
       "market analysis",
       "data-driven",
       "january"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-51-post-2",
@@ -1663,7 +1772,8 @@
       "vendor lock-in",
       "financial freedom",
       "convenience:"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-52-post-1",
@@ -1678,7 +1788,8 @@
       "json finance",
       "local-first finance",
       "source"
-    ]
+    ],
+    "category": "deep-dive"
   },
   {
     "id": "week-52-post-2",
@@ -1693,6 +1804,7 @@
       "local-first",
       "financial data",
       "developer tools"
-    ]
+    ],
+    "category": "deep-dive"
   }
 ]
