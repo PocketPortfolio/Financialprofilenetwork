@@ -139,6 +139,23 @@ jobs:
           skip_dirty_check: true
           # Don't use file_pattern - files are already staged above
 
+      - name: Verify Vercel Secrets
+        if: steps.changes.outputs.changes == 'true'
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "❌ ERROR: VERCEL_TOKEN secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
+            echo "❌ ERROR: VERCEL_ORG_ID secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "❌ ERROR: VERCEL_PROJECT_ID secret is not set"
+            exit 1
+          fi
+          echo "✅ All Vercel secrets are configured"
+
       - name: Deploy to Vercel Production
         if: steps.changes.outputs.changes == 'true'
         uses: amondnet/vercel-action@v25
