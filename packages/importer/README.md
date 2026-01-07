@@ -3,7 +3,7 @@
 # Pocket Portfolio
 ### The Local-First Investment Tracker
 
-[![Founder's Club](https://img.shields.io/badge/UK%20FOUNDER'S%20CLUB-12%2F50%20Left-red?style=for-the-badge&logo=github&labelColor=black)](https://www.pocketportfolio.app/sponsor?ref=readme_badge)
+[![Founder's Club](https://img.shields.io/badge/UK%20FOUNDER'S%20CLUB-42%2F50%20Left-red?style=for-the-badge&logo=github&labelColor=black)](https://www.pocketportfolio.app/sponsor?ref=readme_badge)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 [![NPM Downloads](https://img.shields.io/npm/dw/@pocket-portfolio/importer?style=for-the-badge&color=orange)](https://www.npmjs.com/package/@pocket-portfolio/importer)
 
