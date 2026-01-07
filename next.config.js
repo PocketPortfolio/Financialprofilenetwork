@@ -31,6 +31,31 @@ const nextConfig = {
         source: '/api/tickers/:ticker/json',
         destination: '/api/tickers/:ticker/json',
       },
+      // Map sitemap XML URLs to API route handler
+      {
+        source: '/sitemap-static.xml',
+        destination: '/api/sitemap/static',
+      },
+      {
+        source: '/sitemap-imports.xml',
+        destination: '/api/sitemap/imports',
+      },
+      {
+        source: '/sitemap-tools.xml',
+        destination: '/api/sitemap/tools',
+      },
+      {
+        source: '/sitemap-blog.xml',
+        destination: '/api/sitemap/blog',
+      },
+      {
+        source: '/sitemap-tickers-1.xml',
+        destination: '/api/sitemap/tickers-1',
+      },
+      {
+        source: '/sitemap-tickers-2.xml',
+        destination: '/api/sitemap/tickers-2',
+      },
     ];
   },
   // Comprehensive redirects for canonicalization and legacy routes
