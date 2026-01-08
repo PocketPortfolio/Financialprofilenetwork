@@ -57,11 +57,12 @@ async function buildSitemap(
     let finalBuffer: Buffer;
     let shouldCompress = compress;
     
-    // Auto-compress if file is large (even if compress flag not set)
-    if (!shouldCompress && xmlBuffer.length > COMPRESS_THRESHOLD_KB * 1024) {
-      shouldCompress = true;
-      console.log(`   📦 Auto-compressing large file (${originalSizeKB}KB)`);
-    }
+    // Auto-compression disabled - Googlebot has issues with pre-compressed .gz files
+    // Even large files are served uncompressed for reliability
+    // if (!shouldCompress && xmlBuffer.length > COMPRESS_THRESHOLD_KB * 1024) {
+    //   shouldCompress = true;
+    //   console.log(`   📦 Auto-compressing large file (${originalSizeKB}KB)`);
+    // }
     
     if (shouldCompress) {
       // Compress with gzip
@@ -126,15 +127,15 @@ async function main() {
     mkdirSync(SITEMAP_DIR, { recursive: true });
     
     // Build all sub-sitemaps
-    // Small files: no compression (blog, static, imports, tools)
-    // Large files: compression (tickers)
+    // All files: no compression (Googlebot has issues with pre-compressed .gz files)
+    // Uncompressed XML files work reliably, even for large files
     const results: BuildResult[] = [
       await buildSitemap('sitemap-static', sitemapStatic, false),
       await buildSitemap('sitemap-imports', sitemapImports, false),
       await buildSitemap('sitemap-tools', sitemapTools, false),
       await buildSitemap('sitemap-blog', sitemapBlog, false),
-      await buildSitemap('sitemap-tickers-1', sitemapTickers1, true), // Compress large files
-      await buildSitemap('sitemap-tickers-2', sitemapTickers2, true), // Compress large files
+      await buildSitemap('sitemap-tickers-1', sitemapTickers1, false), // No compression - reliability over size
+      await buildSitemap('sitemap-tickers-2', sitemapTickers2, false), // No compression - reliability over size
     ];
     
     // Build main sitemap index
