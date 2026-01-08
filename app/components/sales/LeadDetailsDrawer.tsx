@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { OptimizedTooltip } from '@/app/components/shared/OptimizedTooltip';
 
 interface LeadDetails {
   id: string;
@@ -133,9 +134,52 @@ export function LeadDetailsDrawer({ lead, isOpen, onClose }: LeadDetailsDrawerPr
 
         {/* Confidence Score */}
         <div className="brand-card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-4)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
-            <span style={{ color: 'var(--text)', fontWeight: 'var(--font-semibold)' }}>Confidence Score</span>
-            <span style={{ color: 'var(--text)', fontWeight: 'var(--font-bold)' }}>{lead.score}/100</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <span style={{ color: 'var(--text)', fontWeight: 'var(--font-semibold)' }}>Confidence Score</span>
+              <OptimizedTooltip
+                content={`Confidence Score Calculation (0-100 points):
+
+• Tech Stack Match (40 pts)
+  Matches against: React, Next.js, TypeScript, Node.js
+  Formula: (matches / 4) × 40
+
+• Company Size (20 pts)
+  10-500 employees: 20 pts
+  Outside range: 10 pts
+
+• Recent Engineering Hires (20 pts)
+  5 pts per hire, max 20 pts
+
+• Funding Stage (20 pts)
+  Series A: 20 | Series B: 18 | Series C: 15
+  Seed: 10 | Other: 5
+
+Score is calculated automatically during lead enrichment.`}
+                placement="bottom"
+                maxWidth={400}
+              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--surface-elevated)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-secondary)',
+                    fontSize: 'var(--font-size-xs)',
+                    cursor: 'help',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  ?
+                </span>
+              </OptimizedTooltip>
+            </div>
+            <span style={{ color: 'var(--text)', fontWeight: 'var(--font-bold)' }}>{lead.score || 0}/100</span>
           </div>
           <div
             style={{
@@ -148,9 +192,9 @@ export function LeadDetailsDrawer({ lead, isOpen, onClose }: LeadDetailsDrawerPr
           >
             <div
               style={{
-                width: `${lead.score}%`,
+                width: `${lead.score || 0}%`,
                 height: '100%',
-                backgroundColor: lead.score >= 80 ? 'var(--signal)' : lead.score >= 50 ? 'var(--warning)' : 'var(--muted)',
+                backgroundColor: (lead.score || 0) >= 80 ? 'var(--signal)' : (lead.score || 0) >= 50 ? 'var(--warning)' : 'var(--muted)',
                 transition: 'width 0.3s ease',
               }}
             />

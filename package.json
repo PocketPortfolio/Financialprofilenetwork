@@ -66,6 +66,10 @@
     "source-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/source-leads-autonomous.ts",
     "process-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-leads-autonomous.ts",
     "process-inbound-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-inbound-autonomous.ts",
+    "purge-placeholders": "ts-node --project scripts/tsconfig.json scripts/purge-placeholder-leads.ts",
+    "resolve-placeholders": "ts-node --project scripts/tsconfig.json scripts/resolve-placeholder-emails.ts",
+    "seed-lookalikes": "ts-node --project scripts/tsconfig.json scripts/seed-lookalikes-enhanced.ts",
+    "generate-expansion": "ts-node --project scripts/tsconfig.json scripts/generate-expansion-leads.ts",
     "test-sales-setup": "ts-node --project scripts/tsconfig.json scripts/test-sales-setup.ts"
   },
   "dependencies": {

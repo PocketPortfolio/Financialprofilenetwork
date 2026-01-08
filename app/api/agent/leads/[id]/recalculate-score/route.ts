@@ -4,6 +4,11 @@ import { leads } from '@/db/sales/schema';
 import { eq } from 'drizzle-orm';
 import { recalculateLeadScore } from '@/app/agent/researcher';
 
+// Next.js route configuration
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const runtime = 'nodejs';
+
 /**
  * POST /api/agent/leads/[id]/recalculate-score
  * Recalculate confidence score for an existing lead

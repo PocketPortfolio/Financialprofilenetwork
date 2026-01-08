@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { classifyDealTier } from '@/lib/sales/revenueCalculator';
 import { detectCultureAndLanguage } from '@/lib/sales/cultural-intelligence';
 import { resolveLocationToTimezone } from '@/lib/sales/timezone-utils';
+import { resolveEmailFromGitHub, isPlaceholderEmail } from '@/lib/sales/email-resolution';
 
 export interface LeadResearchData {
   companyName: string;
@@ -39,6 +40,51 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
 
   if (!lead) {
     throw new Error(`Lead ${leadId} not found`);
+  }
+
+  // NEW: Resolve placeholder emails before enrichment
+  if (isPlaceholderEmail(lead.email)) {
+    console.log(`   🔍 Attempting to resolve placeholder email for ${lead.companyName}...`);
+    
+    // Extract GitHub username from placeholder email or company name
+    const githubUsername = lead.email.includes('@github-hiring.placeholder')
+      ? lead.email.split('@')[0]
+      : lead.companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    const resolution = await resolveEmailFromGitHub(
+      githubUsername,
+      lead.companyName,
+      process.env.GITHUB_TOKEN
+    );
+
+    if (resolution.email && resolution.confidence >= 50) {
+      // Update lead with resolved email
+      await db.update(leads)
+        .set({ email: resolution.email, updatedAt: new Date() })
+        .where(eq(leads.id, leadId));
+      console.log(`   ✅ Resolved email: ${resolution.email} (confidence: ${resolution.confidence}%, source: ${resolution.source})`);
+      
+      // Reload lead with new email
+      const [updatedLead] = await db
+        .select()
+        .from(leads)
+        .where(eq(leads.id, leadId))
+        .limit(1);
+      if (updatedLead) {
+        Object.assign(lead, updatedLead);
+      }
+    } else {
+      // Cannot resolve - mark as DO_NOT_CONTACT
+      console.log(`   ❌ Cannot resolve email for ${lead.companyName}, marking as DO_NOT_CONTACT`);
+      await db.update(leads)
+        .set({ 
+          status: 'DO_NOT_CONTACT',
+          researchSummary: 'Email could not be resolved from placeholder',
+          updatedAt: new Date()
+        })
+        .where(eq(leads.id, leadId));
+      throw new Error(`Email resolution failed for ${lead.companyName} - marked as DO_NOT_CONTACT`);
+    }
   }
 
   // TODO: Integrate with Apollo API or Proxycurl

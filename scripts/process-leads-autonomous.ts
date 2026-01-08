@@ -8,6 +8,11 @@
  * Runs every 2 hours via GitHub Actions
  */
 
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), '.env.local') });
+config({ path: resolve(process.cwd(), '.env') });
+
 import { db } from '@/db/sales/client';
 import { leads, auditLogs, conversations } from '@/db/sales/schema';
 import { eq, and, inArray } from 'drizzle-orm';
@@ -46,9 +51,9 @@ async function processNewLeads() {
       // Log error
       await db.insert(auditLogs).values({
         leadId: lead.id,
-        action: 'ENRICHMENT_FAILED',
+        action: 'STATUS_CHANGED',
         aiReasoning: `Enrichment failed: ${error.message}`,
-        metadata: { error: error.message },
+        metadata: { error: error.message, originalAction: 'ENRICHMENT_FAILED' },
       });
     }
   }
@@ -106,7 +111,7 @@ async function processResearchingLeads() {
       // Sprint 4: Calculate optimal send time (timezone awareness)
       const timezone = lead.timezone || researchData.timezone;
       let optimalSendTime: Date | undefined;
-      let shouldSendNow = true;
+      let shouldSendNow = false; // Changed: Default to false for safety (never send at night)
       
       if (timezone) {
         optimalSendTime = calculateOptimalSendTime(timezone);
@@ -115,11 +120,23 @@ async function processResearchingLeads() {
         if (!shouldSendNow && optimalSendTime) {
           // Schedule for optimal time
           await db.update(leads)
-            .set({ scheduledSendAt: optimalSendTime })
+            .set({ scheduledSendAt: optimalSendTime, updatedAt: new Date() })
             .where(eq(leads.id, lead.id));
           console.log(`   ⏰ Scheduled ${lead.email} for ${optimalSendTime.toISOString()} (timezone: ${timezone})`);
           continue; // Skip sending now, will be sent at optimal time
         }
+      } else {
+        // Safety: If no timezone, schedule for 09:00 UTC tomorrow (never send at night)
+        const tomorrow = new Date();
+        tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+        tomorrow.setUTCHours(9, 0, 0, 0);
+        optimalSendTime = tomorrow;
+        
+        await db.update(leads)
+          .set({ scheduledSendAt: optimalSendTime, updatedAt: new Date() })
+          .where(eq(leads.id, lead.id));
+        console.log(`   ⏰ Scheduled ${lead.email} for ${optimalSendTime.toISOString()} (no timezone, defaulting to 09:00 UTC)`);
+        continue;
       }
       
       // Sprint 4: Get cultural context from lead data
@@ -169,7 +186,7 @@ async function processResearchingLeads() {
       // Save conversation
       await db.insert(conversations).values({
         leadId: lead.id,
-        type: 'INITIAL',
+        type: 'INITIAL_OUTREACH',
         subject: email.subject,
         body: email.body,
         direction: 'outbound',
@@ -207,9 +224,9 @@ async function processResearchingLeads() {
       // Log error
       await db.insert(auditLogs).values({
         leadId: lead.id,
-        action: 'EMAIL_FAILED',
+        action: 'STATUS_CHANGED',
         aiReasoning: `Email generation/sending failed: ${error.message}`,
-        metadata: { error: error.message },
+        metadata: { error: error.message, originalAction: 'EMAIL_FAILED' },
       });
     }
   }
