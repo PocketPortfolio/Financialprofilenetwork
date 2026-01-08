@@ -178,6 +178,25 @@
     "publishedAt": "2026-01-08T02:06:55.853Z"
   },
   {
+    "id": "how-ai-can-revolutionize-b2b-saas-jan-8-9am",
+    "date": "2026-01-08",
+    "scheduledTime": "09:00",
+    "title": "How AI Can Revolutionize B2B SaaS: A Practical Guide",
+    "slug": "how-ai-can-revolutionize-b2b-saas",
+    "status": "pending",
+    "pillar": "technical",
+    "keywords": [
+      "AI",
+      "B2B SaaS",
+      "artificial intelligence",
+      "SaaS",
+      "automation",
+      "productivity",
+      "business transformation"
+    ],
+    "category": "deep-dive"
+  },
+  {
     "id": "week-2-post-1",
     "date": "2026-01-12",
     "title": "Optimizing JSON Parsing: From 10s to 10ms",
