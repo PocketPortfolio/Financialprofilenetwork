@@ -761,6 +761,7 @@ export default function AdminAnalyticsPage() {
                   <tr>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Status</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Title</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Category</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Scheduled Date</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Published Time</th>
                     <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Pillar</th>
@@ -809,6 +810,25 @@ export default function AdminAnalyticsPage() {
                               ⚠️ Files missing
                             </div>
                           )}
+                        </td>
+                        <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                          <span style={{
+                            fontSize: '12px',
+                            padding: '4px 8px',
+                            background: post.category === 'how-to-in-tech' 
+                              ? 'rgba(34, 197, 94, 0.1)' 
+                              : 'var(--surface-elevated)',
+                            color: post.category === 'how-to-in-tech' 
+                              ? '#22c55e' 
+                              : 'var(--text)',
+                            borderRadius: '4px',
+                            fontWeight: '600',
+                            border: post.category === 'how-to-in-tech' 
+                              ? '1px solid #22c55e' 
+                              : '1px solid var(--border)'
+                          }}>
+                            {post.category === 'how-to-in-tech' ? '📝 How to' : '📚 Deep Dive'}
+                          </span>
                         </td>
                         <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
                           <div>
