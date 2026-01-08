@@ -1,6 +1,6 @@
 /**
- * Sitemap: Ticker Pages (Part 1)
- * First eighth of ticker pages + data intent routes
+ * Sitemap: Ticker Pages (Part 7)
+ * Seventh eighth of ticker pages + data intent routes
  * Max 50,000 URLs per sitemap (Google limit)
  * Target: ~1MB per sitemap (under Google's recommended 1MB limit)
  */
@@ -8,7 +8,7 @@
 import { MetadataRoute } from 'next';
 import { getAllTickers } from './lib/pseo/data';
 
-export default async function sitemapTickers1(): Promise<MetadataRoute.Sitemap> {
+export default async function sitemapTickers7(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.pocketportfolio.app';
   const now = new Date();
   const MAX_URLS_PER_SITEMAP = 50000;
@@ -18,12 +18,12 @@ export default async function sitemapTickers1(): Promise<MetadataRoute.Sitemap> 
     const tickerPages: MetadataRoute.Sitemap = [];
     
     if (!Array.isArray(tickers)) {
-      console.error('[Sitemap Tickers-1] getAllTickers() did not return an array:', typeof tickers);
+      console.error('[Sitemap Tickers-7] getAllTickers() did not return an array:', typeof tickers);
       return [];
     }
     
     if (tickers.length === 0) {
-      console.warn('[Sitemap Tickers-1] No tickers returned from getAllTickers()');
+      console.warn('[Sitemap Tickers-7] No tickers returned from getAllTickers()');
       return [];
     }
     
@@ -32,14 +32,14 @@ export default async function sitemapTickers1(): Promise<MetadataRoute.Sitemap> 
       new Map(tickers.map(t => [t.toLowerCase().replace(/-/g, ''), t])).values()
     );
     
-    // Split tickers: first eighth goes to sitemap-1
+    // Split tickers: seventh eighth goes to sitemap-7
     const eighth = Math.floor(uniqueTickers.length / 8);
-    const firstEighth = uniqueTickers.slice(0, eighth);
+    const seventhEighth = uniqueTickers.slice(eighth * 6, eighth * 7);
     
     // Track URLs to prevent duplicates within sitemap
     const seenUrls = new Set<string>();
     
-    firstEighth.forEach((ticker) => {
+    seventhEighth.forEach((ticker) => {
       if (ticker && typeof ticker === 'string') {
         const tickerLower = ticker.toLowerCase().replace(/-/g, '');
         
@@ -91,15 +91,15 @@ export default async function sitemapTickers1(): Promise<MetadataRoute.Sitemap> 
       }
     });
     
-    console.log(`[Sitemap Tickers-1] Generated ${tickerPages.length} ticker-related pages from ${firstEighth.length} tickers (first eighth)`);
+    console.log(`[Sitemap Tickers-7] Generated ${tickerPages.length} ticker-related pages from ${seventhEighth.length} tickers (seventh eighth)`);
     
     if (tickerPages.length > MAX_URLS_PER_SITEMAP) {
-      console.warn(`[Sitemap Tickers-1] WARNING: ${tickerPages.length} URLs exceeds Google's 50,000 limit!`);
+      console.warn(`[Sitemap Tickers-7] WARNING: ${tickerPages.length} URLs exceeds Google's 50,000 limit!`);
     }
     
     return tickerPages;
   } catch (error) {
-    console.error('[Sitemap Tickers-1] Error generating ticker sitemap:', error);
+    console.error('[Sitemap Tickers-7] Error generating ticker sitemap:', error);
     return [];
   }
 }
