@@ -1,5 +1,22 @@
 [
   {
+    "id": "test-how-to-early-detection-jan-7-1215",
+    "date": "2026-01-07",
+    "scheduledTime": "12:15",
+    "title": "How to Implement Early Detection Systems for Production Monitoring",
+    "slug": "how-to-implement-early-detection-systems-for-production-monitoring",
+    "status": "pending",
+    "category": "how-to-in-tech",
+    "pillar": "technical",
+    "keywords": [
+      "monitoring",
+      "production",
+      "early detection",
+      "alerting",
+      "system health"
+    ]
+  },
+  {
     "id": "how-to-how-to-audit-your-github-repo-for-leaked-secrets-jan-7",
     "date": "2026-01-07",
     "scheduledTime": "14:00",
