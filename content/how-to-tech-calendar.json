@@ -41,7 +41,7 @@
     "scheduledTime": "14:00",
     "title": "The 3-Minute Guide to robots.txt for AI Agents",
     "slug": "the-3-minute-guide-to-robots-txt-for-ai-agents",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -49,7 +49,8 @@
       "minute",
       "guide",
       "robots"
-    ]
+    ],
+    "publishedAt": "2026-01-08T14:16:51.027Z"
   },
   {
     "id": "how-to-how-to-use-curl-to-test-json-endpoints-like-a-pro-jan-9",
