@@ -1,16 +1,15 @@
 /**
- * Build Static Sitemaps - Operation Fresh Start
+ * Build Static Sitemaps - Plain XML (No Compression)
  * Generates all sitemap XML files as static assets in public/ folder
- * Implements versioning (-v1) and gzip compression for large files
- * Runs during build process to ensure Googlebot gets reliable static files
+ * No compression - Googlebot has issues with pre-compressed .gz files
+ * Plain XML files work reliably, even for large files (5.5MB is well under 50MB limit)
  */
 
 import { writeFileSync, mkdirSync } from 'fs';
-import { gzipSync } from 'zlib';
 import { join } from 'path';
 import { sitemapToXml } from '../app/lib/sitemap-xml-helper';
 
-// Import sitemap generators
+// Import sitemap generators (these already handle ticker data correctly)
 import sitemapStatic from '../app/sitemap-static';
 import sitemapImports from '../app/sitemap-imports';
 import sitemapTools from '../app/sitemap-tools';
@@ -19,26 +18,55 @@ import sitemapTickers1 from '../app/sitemap-tickers-1';
 import sitemapTickers2 from '../app/sitemap-tickers-2';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
-const SITEMAP_DIR = PUBLIC_DIR; // Files go directly in public/
-const VERSION = 'v2'; // Cache-bust version suffix (bumped to force fresh fetch)
-const COMPRESS_THRESHOLD_KB = 100; // Compress files larger than 100KB
+const VERSION = 'v2'; // Cache-bust version suffix
 
 interface BuildResult {
   name: string;
   url: string;
   urlCount: number;
-  compressed: boolean;
+  filePath: string;
+  uniqueUrls: Set<string>;
+}
+
+/**
+ * Check for duplicates across all sitemaps
+ */
+function checkForDuplicates(results: BuildResult[]): { hasDuplicates: boolean; duplicates: Map<string, string[]> } {
+  const urlToSitemaps = new Map<string, string[]>();
+  const duplicates = new Map<string, string[]>();
+  
+  // Collect all URLs and track which sitemaps they appear in
+  results.forEach(result => {
+    result.uniqueUrls.forEach(url => {
+      if (!urlToSitemaps.has(url)) {
+        urlToSitemaps.set(url, []);
+      }
+      urlToSitemaps.get(url)!.push(result.name);
+    });
+  });
+  
+  // Find duplicates (URLs appearing in multiple sitemaps)
+  urlToSitemaps.forEach((sitemaps, url) => {
+    if (sitemaps.length > 1) {
+      duplicates.set(url, sitemaps);
+    }
+  });
+  
+  return {
+    hasDuplicates: duplicates.size > 0,
+    duplicates
+  };
 }
 
 async function buildSitemap(
   baseName: string, 
-  generator: () => Promise<any>,
-  compress: boolean = false
+  generator: () => Promise<any>
 ): Promise<BuildResult> {
   const versionedName = `${baseName}-${VERSION}`;
   console.log(`📝 Building ${versionedName}...`);
   
   try {
+    // Use existing generator (handles ticker data, URL structure, etc.)
     const sitemap = await generator();
     
     if (!Array.isArray(sitemap)) {
@@ -49,47 +77,49 @@ async function buildSitemap(
       console.warn(`⚠️  ${versionedName}: Empty sitemap (0 URLs)`);
     }
     
-    const xml = sitemapToXml(sitemap);
-    const xmlBuffer = Buffer.from(xml, 'utf-8');
-    const originalSizeKB = (xmlBuffer.length / 1024).toFixed(1);
+    // Check for duplicates within this sitemap
+    const urlSet = new Set<string>();
+    const duplicatesInSitemap: string[] = [];
     
-    let filePath: string;
-    let finalBuffer: Buffer;
-    let shouldCompress = compress;
+    sitemap.forEach((entry: any) => {
+      if (entry.url) {
+        if (urlSet.has(entry.url)) {
+          duplicatesInSitemap.push(entry.url);
+        } else {
+          urlSet.add(entry.url);
+        }
+      }
+    });
     
-    // Auto-compression disabled - Googlebot has issues with pre-compressed .gz files
-    // Even large files are served uncompressed for reliability
-    // if (!shouldCompress && xmlBuffer.length > COMPRESS_THRESHOLD_KB * 1024) {
-    //   shouldCompress = true;
-    //   console.log(`   📦 Auto-compressing large file (${originalSizeKB}KB)`);
-    // }
-    
-    if (shouldCompress) {
-      // Compress with gzip
-      finalBuffer = gzipSync(xmlBuffer);
-      filePath = join(SITEMAP_DIR, `${versionedName}.xml.gz`);
-      const compressedSizeKB = (finalBuffer.length / 1024).toFixed(1);
-      const compressionRatio = ((1 - finalBuffer.length / xmlBuffer.length) * 100).toFixed(1);
-      console.log(`   🗜️  Compressed: ${originalSizeKB}KB → ${compressedSizeKB}KB (${compressionRatio}% reduction)`);
-    } else {
-      finalBuffer = xmlBuffer;
-      filePath = join(SITEMAP_DIR, `${versionedName}.xml`);
+    if (duplicatesInSitemap.length > 0) {
+      console.warn(`⚠️  ${versionedName}: Found ${duplicatesInSitemap.length} duplicate URLs within sitemap:`);
+      duplicatesInSitemap.slice(0, 10).forEach(url => {
+        console.warn(`     - ${url}`);
+      });
+      if (duplicatesInSitemap.length > 10) {
+        console.warn(`     ... and ${duplicatesInSitemap.length - 10} more`);
+      }
     }
     
-    writeFileSync(filePath, finalBuffer);
+    // Convert to XML using existing helper
+    const xml = sitemapToXml(sitemap);
+    const filePath = join(PUBLIC_DIR, `${versionedName}.xml`);
     
+    // Write plain XML file (no compression)
+    writeFileSync(filePath, xml, 'utf-8');
+    
+    const sizeKB = (Buffer.byteLength(xml, 'utf-8') / 1024).toFixed(1);
     const baseUrl = 'https://www.pocketportfolio.app';
-    const url = shouldCompress 
-      ? `${baseUrl}/${versionedName}.xml.gz`
-      : `${baseUrl}/${versionedName}.xml`;
+    const url = `${baseUrl}/${versionedName}.xml`;
     
-    console.log(`✅ ${versionedName}: ${sitemap.length} URLs → ${filePath}`);
+    console.log(`✅ ${versionedName}: ${urlSet.size} unique URLs (${sitemap.length} total), ${sizeKB}KB → ${filePath}`);
     
     return {
       name: versionedName,
       url,
-      urlCount: sitemap.length,
-      compressed: shouldCompress
+      urlCount: urlSet.size, // Use unique count
+      filePath,
+      uniqueUrls: urlSet
     };
   } catch (error) {
     console.error(`❌ ${versionedName}: Error building sitemap:`, error);
@@ -110,13 +140,13 @@ async function buildSitemapIndex(results: BuildResult[], lastmod: string): Promi
 ${sitemapEntries}
 </sitemapindex>`;
 
-  const filePath = join(SITEMAP_DIR, 'sitemap.xml');
+  const filePath = join(PUBLIC_DIR, 'sitemap.xml');
   writeFileSync(filePath, sitemapIndex, 'utf-8');
   console.log(`✅ sitemap.xml (index) → ${filePath}`);
 }
 
 async function main() {
-  console.log('🚀 Building static sitemaps (Operation Fresh Start)...\n');
+  console.log('🚀 Building static sitemaps (Plain XML - No Compression)...\n');
   console.log(`📌 Version: ${VERSION} (cache-bust)\n`);
   
   const startTime = Date.now();
@@ -124,39 +154,60 @@ async function main() {
   
   try {
     // Ensure public directory exists
-    mkdirSync(SITEMAP_DIR, { recursive: true });
+    mkdirSync(PUBLIC_DIR, { recursive: true });
     
-    // Build all sub-sitemaps
-    // All files: no compression (Googlebot has issues with pre-compressed .gz files)
-    // Uncompressed XML files work reliably, even for large files
+    // Build all sub-sitemaps (plain XML, no compression)
     const results: BuildResult[] = [
-      await buildSitemap('sitemap-static', sitemapStatic, false),
-      await buildSitemap('sitemap-imports', sitemapImports, false),
-      await buildSitemap('sitemap-tools', sitemapTools, false),
-      await buildSitemap('sitemap-blog', sitemapBlog, false),
-      await buildSitemap('sitemap-tickers-1', sitemapTickers1, false), // No compression - reliability over size
-      await buildSitemap('sitemap-tickers-2', sitemapTickers2, false), // No compression - reliability over size
+      await buildSitemap('sitemap-static', sitemapStatic),
+      await buildSitemap('sitemap-imports', sitemapImports),
+      await buildSitemap('sitemap-tools', sitemapTools),
+      await buildSitemap('sitemap-blog', sitemapBlog),
+      await buildSitemap('sitemap-tickers-1', sitemapTickers1),
+      await buildSitemap('sitemap-tickers-2', sitemapTickers2),
     ];
+    
+    // Check for duplicates across sitemaps
+    console.log(`\n🔍 Checking for duplicates across all sitemaps...`);
+    const duplicateCheck = checkForDuplicates(results);
+    
+    if (duplicateCheck.hasDuplicates) {
+      console.warn(`\n⚠️  WARNING: Found ${duplicateCheck.duplicates.size} URLs appearing in multiple sitemaps:`);
+      let count = 0;
+      duplicateCheck.duplicates.forEach((sitemaps, url) => {
+        if (count < 20) { // Show first 20
+          console.warn(`   - ${url}`);
+          console.warn(`     Appears in: ${sitemaps.join(', ')}`);
+          count++;
+        }
+      });
+      if (duplicateCheck.duplicates.size > 20) {
+        console.warn(`   ... and ${duplicateCheck.duplicates.size - 20} more duplicates`);
+      }
+      console.warn(`\n⚠️  This may cause issues with Google Search Console indexing.`);
+    } else {
+      console.log(`✅ No duplicates found across sitemaps - all URLs are unique!`);
+    }
     
     // Build main sitemap index
     await buildSitemapIndex(results, lastmod);
     
     const duration = Date.now() - startTime;
     const totalUrls = results.reduce((sum, r) => sum + r.urlCount, 0);
-    const compressedCount = results.filter(r => r.compressed).length;
     
     console.log(`\n📊 Build Summary:`);
-    console.log(`   Total URLs: ${totalUrls.toLocaleString()}`);
-    console.log(`   Compressed files: ${compressedCount}/${results.length}`);
+    console.log(`   Total unique URLs: ${totalUrls.toLocaleString()}`);
+    console.log(`   Duplicates across sitemaps: ${duplicateCheck.duplicates.size}`);
     console.log(`   Duration: ${duration}ms`);
-    console.log(`   Files: ${results.length + 1} files in ${SITEMAP_DIR}`);
+    console.log(`   Files: ${results.length + 1} files in ${PUBLIC_DIR}`);
+    console.log(`   Format: Plain XML (no compression)`);
     console.log(`\n✅ All static sitemaps built successfully!`);
     console.log(`\n🔄 Next Steps:`);
-    console.log(`   1. Wait for Vercel deployment`);
-    console.log(`   2. In Google Search Console:`);
+    console.log(`   1. Verify files in ${PUBLIC_DIR}/`);
+    console.log(`   2. Deploy to Vercel`);
+    console.log(`   3. In Google Search Console:`);
     console.log(`      - Delete old sitemap.xml`);
     console.log(`      - Submit: https://www.pocketportfolio.app/sitemap.xml`);
-    console.log(`   3. Googlebot will see new filenames (-v1) and fetch fresh`);
+    console.log(`   4. Googlebot will see new filenames (-v2) and fetch fresh`);
     
   } catch (error) {
     console.error('\n❌ Failed to build static sitemaps:', error);
