@@ -27,34 +27,49 @@ export async function GET(
       );
     }
 
-    // Fetch conversations with AI reasoning
-    const leadConversations = await db
-      .select()
-      .from(conversations)
-      .where(eq(conversations.leadId, leadId))
-      .orderBy(desc(conversations.createdAt));
+    // Fetch conversations with AI reasoning (handle empty/null gracefully)
+    let leadConversations: any[] = [];
+    try {
+      leadConversations = await db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.leadId, leadId))
+        .orderBy(desc(conversations.createdAt));
+    } catch (err: any) {
+      console.warn(`[LEAD-DETAILS] Non-critical error fetching conversations for ${leadId}:`, err.message);
+      // Continue with empty array - not a fatal error
+    }
 
-    // Fetch audit logs
-    const logs = await db
-      .select()
-      .from(auditLogs)
-      .where(eq(auditLogs.leadId, leadId))
-      .orderBy(desc(auditLogs.createdAt))
-      .limit(50);
+    // Fetch audit logs (handle empty/null gracefully)
+    let logs: any[] = [];
+    try {
+      logs = await db
+        .select()
+        .from(auditLogs)
+        .where(eq(auditLogs.leadId, leadId))
+        .orderBy(desc(auditLogs.createdAt))
+        .limit(50);
+    } catch (err: any) {
+      console.warn(`[LEAD-DETAILS] Non-critical error fetching audit logs for ${leadId}:`, err.message);
+      // Continue with empty array - not a fatal error
+    }
 
     return NextResponse.json({
       lead,
-      conversations: leadConversations,
-      auditLogs: logs,
+      conversations: leadConversations || [],
+      auditLogs: logs || [],
       // Latest AI reasoning from most recent conversation
-      latestReasoning: leadConversations[0]?.aiReasoning || null,
-      researchSummary: lead.researchSummary,
-      researchData: lead.researchData,
+      latestReasoning: leadConversations?.[0]?.aiReasoning || null,
+      researchSummary: lead.researchSummary || null,
+      researchData: lead.researchData || null,
     });
   } catch (error: any) {
-    console.error('Error fetching lead details:', error);
+    console.error('[LEAD-DETAILS] Critical error fetching lead details:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch lead details' },
+      { 
+        error: error.message || 'Failed to fetch lead details',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

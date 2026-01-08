@@ -99,6 +99,43 @@ export default function AdminSalesPage() {
   const [selectedLead, setSelectedLead] = useState<LeadDetails | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [emergencyStop, setEmergencyStop] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [loadingLeadDetails, setLoadingLeadDetails] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'fresh' | 'active' | 'archive'>('fresh');
+
+  // Tab configuration
+  const tabConfig = {
+    fresh: {
+      label: 'Fresh',
+      statuses: ['NEW', 'RESEARCHING'],
+      color: 'var(--signal)',
+      emoji: '🟢',
+    },
+    active: {
+      label: 'Active',
+      statuses: ['CONTACTED', 'REPLIED', 'INTERESTED', 'NEGOTIATING'],
+      color: 'var(--warning)',
+      emoji: '🟡',
+    },
+    archive: {
+      label: 'Archive',
+      statuses: ['CONVERTED', 'NOT_INTERESTED', 'DO_NOT_CONTACT'],
+      color: 'var(--muted)',
+      emoji: '⚪',
+    },
+  };
+
+  // Calculate badge counts from all leads
+  const getTabCount = (tab: 'fresh' | 'active' | 'archive'): number => {
+    if (!leads.length) return 0;
+    const statuses = tabConfig[tab].statuses;
+    return leads.filter(lead => statuses.includes(lead.status)).length;
+  };
+
+  // Filter leads based on active tab
+  const filteredLeads = leads.filter(lead => 
+    tabConfig[activeTab].statuses.includes(lead.status)
+  );
 
   // Check admin status
   useEffect(() => {
@@ -153,7 +190,8 @@ export default function AdminSalesPage() {
     try {
       setLoading(true);
       setError(null); // Clear previous errors
-      const response = await fetch('/api/agent/leads?limit=100');
+      // Load all leads (higher limit) for accurate tab counts
+      const response = await fetch('/api/agent/leads?limit=1000');
       
       if (!response.ok) {
         // Try to get error message from response
@@ -215,21 +253,52 @@ export default function AdminSalesPage() {
       });
       if (!response.ok) throw new Error('Failed to toggle kill switch');
       setEmergencyStop(!emergencyStop);
-      alert(`Emergency stop ${emergencyStop ? 'deactivated' : 'activated'}`);
+      setToast({ 
+        message: `Emergency stop ${emergencyStop ? 'deactivated' : 'activated'}`, 
+        type: 'success' 
+      });
+      setTimeout(() => setToast(null), 3000);
     } catch (err: any) {
-      alert(`Error: ${err.message}`);
+      setToast({ 
+        message: err.message || 'Failed to toggle emergency stop', 
+        type: 'error' 
+      });
+      setTimeout(() => setToast(null), 5000);
     }
   };
 
   const handleViewLead = async (leadId: string) => {
+    setLoadingLeadDetails(leadId);
     try {
       const response = await fetch(`/api/agent/leads/${leadId}`);
-      if (!response.ok) throw new Error('Failed to load lead details');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to load lead details' }));
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to load lead details`);
+      }
       const data = await response.json();
-      setSelectedLead(data);
+      
+      // Merge lead data with additional fields from API response
+      // The API returns { lead, conversations, latestReasoning, researchSummary, researchData }
+      // But the component expects a flat LeadDetails object
+      const leadDetails: LeadDetails = {
+        ...data.lead,
+        conversations: data.conversations || [],
+        latestReasoning: data.latestReasoning || null,
+        researchSummary: data.researchSummary || data.lead?.researchSummary || null,
+        researchData: data.researchData || data.lead?.researchData || null,
+      };
+      
+      setSelectedLead(leadDetails);
       setDrawerOpen(true);
     } catch (err: any) {
-      alert(`Error: ${err.message}`);
+      console.error('Error loading lead details:', err);
+      setToast({ 
+        message: err.message || 'Failed to load lead details. Please try again.', 
+        type: 'error' 
+      });
+      setTimeout(() => setToast(null), 5000);
+    } finally {
+      setLoadingLeadDetails(null);
     }
   };
 
@@ -538,20 +607,83 @@ export default function AdminSalesPage() {
         }}>
           {/* Leads Table */}
           <div className="brand-card" style={{ padding: 'var(--space-5)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-5)' }}>
-              <h2 style={{ margin: 0, color: 'var(--text)', fontSize: 'var(--font-size-xl)' }}>
-                Leads Pipeline
-              </h2>
-              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                <span style={{ 
-                  padding: 'var(--space-1) var(--space-3)', 
-                  backgroundColor: 'var(--surface-elevated)',
-                  borderRadius: 'var(--radius-sm)',
-                  fontSize: 'var(--font-size-xs)',
-                  color: 'var(--text-secondary)',
-                }}>
-                  {leads.length} total
-                </span>
+            <div style={{ marginBottom: 'var(--space-5)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+                <h2 style={{ margin: 0, color: 'var(--text)', fontSize: 'var(--font-size-xl)' }}>
+                  Leads Pipeline
+                </h2>
+                <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                  <span style={{ 
+                    padding: 'var(--space-1) var(--space-3)', 
+                    backgroundColor: 'var(--surface-elevated)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: 'var(--font-size-xs)',
+                    color: 'var(--text-secondary)',
+                  }}>
+                    {filteredLeads.length} {activeTab === 'fresh' ? 'pending' : activeTab === 'active' ? 'active' : 'archived'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Pipeline Tabs */}
+              <div style={{ 
+                borderBottom: '2px solid var(--border)',
+                display: 'flex',
+                gap: 'var(--space-2)',
+              }}>
+                {(Object.keys(tabConfig) as Array<'fresh' | 'active' | 'archive'>).map((tabKey) => {
+                  const tab = tabConfig[tabKey];
+                  const count = getTabCount(tabKey);
+                  const isActive = activeTab === tabKey;
+                  
+                  return (
+                    <button
+                      key={tabKey}
+                      onClick={() => setActiveTab(tabKey)}
+                      style={{
+                        padding: 'var(--space-3) var(--space-4)',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom: isActive ? `3px solid ${tab.color}` : '3px solid transparent',
+                        color: isActive ? 'var(--text)' : 'var(--text-secondary)',
+                        fontSize: 'var(--font-size-sm)',
+                        fontWeight: isActive ? 'var(--font-semibold)' : 'var(--font-medium)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        transition: 'all 0.2s ease',
+                        position: 'relative',
+                        bottom: '-2px',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.color = 'var(--text)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.color = 'var(--text-secondary)';
+                        }
+                      }}
+                    >
+                      <span>{tab.emoji}</span>
+                      <span>{tab.label}</span>
+                      <span style={{
+                        padding: '2px 8px',
+                        backgroundColor: isActive ? tab.color : 'var(--surface-elevated)',
+                        color: isActive ? 'white' : 'var(--text-secondary)',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 'var(--font-size-xs)',
+                        fontWeight: 'var(--font-bold)',
+                        minWidth: '24px',
+                        textAlign: 'center',
+                      }}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -618,18 +750,21 @@ export default function AdminSalesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {leads.length === 0 ? (
+                  {filteredLeads.length === 0 ? (
                     <tr>
                       <td colSpan={4} style={{ 
                         padding: 'var(--space-6)', 
                         textAlign: 'center', 
                         color: 'var(--text-secondary)',
                       }}>
-                        No leads yet. Create your first lead to get started.
+                        {activeTab === 'fresh' && 'No fresh leads. All caught up! 🎉'}
+                        {activeTab === 'active' && 'No active conversations.'}
+                        {activeTab === 'archive' && 'No archived leads.'}
+                        {leads.length === 0 && 'No leads yet. Create your first lead to get started.'}
                       </td>
                     </tr>
                   ) : (
-                    leads.map((lead) => (
+                    filteredLeads.map((lead) => (
                       <tr 
                         key={lead.id}
                         style={{ 
@@ -696,17 +831,20 @@ export default function AdminSalesPage() {
                               e.stopPropagation();
                               handleViewLead(lead.id);
                             }}
+                            disabled={loadingLeadDetails === lead.id}
                             style={{
                               padding: 'var(--space-1) var(--space-2)',
                               backgroundColor: 'var(--surface-elevated)',
                               color: 'var(--text)',
                               border: '1px solid var(--border)',
                               borderRadius: 'var(--radius-sm)',
-                              cursor: 'pointer',
+                              cursor: loadingLeadDetails === lead.id ? 'wait' : 'pointer',
                               fontSize: 'var(--font-size-xs)',
+                              opacity: loadingLeadDetails === lead.id ? 0.6 : 1,
+                              transition: 'opacity 0.2s ease',
                             }}
                           >
-                            View
+                            {loadingLeadDetails === lead.id ? 'Loading...' : 'View'}
                           </button>
                         </td>
                       </tr>
@@ -766,6 +904,59 @@ export default function AdminSalesPage() {
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            padding: 'var(--space-4)',
+            backgroundColor: toast.type === 'error' ? 'var(--error)' : 'var(--signal)',
+            color: 'white',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-xl)',
+            zIndex: 10000,
+            maxWidth: '400px',
+            minWidth: '300px',
+            animation: 'slideIn 0.3s ease-out',
+          }}
+          onClick={() => setToast(null)}
+        >
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-start', 
+            gap: 'var(--space-3)' 
+          }}>
+            <span style={{ flex: 1, lineHeight: 'var(--line-normal)' }}>{toast.message}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setToast(null);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: 'var(--font-size-lg)',
+                padding: 0,
+                width: '24px',
+                height: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Lead Details Drawer */}
       <LeadDetailsDrawer

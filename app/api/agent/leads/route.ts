@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { leads } from '@/db/sales/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, inArray, sql } from 'drizzle-orm';
 import { withRetry } from '@/lib/sales/db-retry';
 
 /**
@@ -13,28 +13,66 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const status = searchParams.get('status');
+    const statusParam = searchParams.get('status'); // Can be comma-separated
 
     const offset = (page - 1) * limit;
 
     // Use retry logic for database operations
     const results = await withRetry(async () => {
-      const baseQuery = db.select().from(leads);
-      const filteredQuery = status 
-        ? baseQuery.where(eq(leads.status, status as any))
-        : baseQuery;
+      // Handle multiple statuses (comma-separated)
+      if (statusParam) {
+        const statuses = statusParam.split(',').map(s => s.trim()).filter(Boolean);
+        if (statuses.length === 1) {
+          return await db.select().from(leads)
+            .where(eq(leads.status, statuses[0] as any))
+            .orderBy(desc(leads.createdAt))
+            .limit(limit)
+            .offset(offset);
+        } else if (statuses.length > 1) {
+          // Multiple statuses: use inArray
+          return await db.select().from(leads)
+            .where(inArray(leads.status, statuses as any[]))
+            .orderBy(desc(leads.createdAt))
+            .limit(limit)
+            .offset(offset);
+        }
+      }
 
-      return await filteredQuery
+      // No status filter
+      return await db.select().from(leads)
         .orderBy(desc(leads.createdAt))
         .limit(limit)
         .offset(offset);
+    });
+
+    // Get total count for pagination
+    const totalCount = await withRetry(async () => {
+      if (statusParam) {
+        const statuses = statusParam.split(',').map(s => s.trim()).filter(Boolean);
+        if (statuses.length === 1) {
+          const result = await db.select({ count: sql<number>`count(*)` }).from(leads)
+            .where(eq(leads.status, statuses[0] as any));
+          const count = result[0]?.count;
+          return typeof count === 'number' ? count : parseInt(String(count || '0'), 10);
+        } else if (statuses.length > 1) {
+          const result = await db.select({ count: sql<number>`count(*)` }).from(leads)
+            .where(inArray(leads.status, statuses as any[]));
+          const count = result[0]?.count;
+          return typeof count === 'number' ? count : parseInt(String(count || '0'), 10);
+        }
+      }
+      
+      // No status filter
+      const result = await db.select({ count: sql<number>`count(*)` }).from(leads);
+      const count = result[0]?.count;
+      return typeof count === 'number' ? count : parseInt(String(count || '0'), 10);
     });
 
     return NextResponse.json({
       leads: results,
       page,
       limit,
-      total: results.length,
+      total: totalCount,
     });
   } catch (error: any) {
     console.error('Error fetching leads:', error);
