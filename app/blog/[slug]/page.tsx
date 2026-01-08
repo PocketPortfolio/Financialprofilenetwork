@@ -174,6 +174,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       })
     : null;
 
+  // Extract AEO schemas from content
+  const { extractFAQsFromContent, extractHowToSteps, generateFAQPageSchema, generateHowToSchema, generateQAPageSchema } = await import('@/app/lib/blog/aeoSchema');
+  const faqs = extractFAQsFromContent(content);
+  const howToSteps = extractHowToSteps(content, data.title);
+  const postUrl = `https://www.pocketportfolio.app/blog/${resolvedParams.slug}`;
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -196,9 +202,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://www.pocketportfolio.app/blog/${resolvedParams.slug}`,
+      '@id': postUrl,
     },
   };
+
+  // Generate AEO schemas
+  const faqSchema = generateFAQPageSchema(faqs, postUrl);
+  const howToSchema = generateHowToSchema(data.title, data.description, howToSteps, postUrl);
+  const qaSchema = generateQAPageSchema(data.title, data.description, faqs, postUrl);
 
   return (
     <>
@@ -214,6 +225,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+      {howToSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+        />
+      )}
+      {qaSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(qaSchema) }}
+        />
+      )}
       <ProductionNavbar />
       <article 
         style={{ 

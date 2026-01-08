@@ -60,8 +60,8 @@ export function useDynamicRecommendations(
         // Fetch fresh market context
         const marketContext = await getCachedMarketContext();
 
-        // Generate recommendations
-        const newRecommendations = generateDynamicRecommendations(
+        // Generate recommendations (now async for blog recommendations)
+        const newRecommendations = await generateDynamicRecommendations(
           positions,
           marketContext,
           portfolioAnalytics || {

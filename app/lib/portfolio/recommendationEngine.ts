@@ -13,13 +13,19 @@ export type RecommendationSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type RecommendationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface RecommendationFactor {
-  type: 'concentration' | 'correlation' | 'sector' | 'volatility' | 'momentum' | 'diversification';
+  type: 'concentration' | 'correlation' | 'sector' | 'volatility' | 'momentum' | 'diversification' | 'blog';
   severity: RecommendationSeverity;
   score: number; // 0-100
   message: string;
   action: string;
   ticker?: string; // For position-specific recommendations
   sector?: GICSSector; // For sector-specific recommendations
+  blogPost?: { // For blog-based recommendations
+    slug: string;
+    title: string;
+    url: string;
+    relevanceScore: number;
+  };
 }
 
 export interface DynamicThresholds {
@@ -36,6 +42,14 @@ export interface EnhancedRecommendation {
   marketContext: MarketContext;
   thresholds: DynamicThresholds;
   lastUpdated: Date;
+  blogRecommendations?: Array<{ // AEO blog recommendations
+    slug: string;
+    title: string;
+    description: string;
+    url: string;
+    relevanceScore: number;
+    matchingKeywords: string[];
+  }>;
 }
 
 /**
@@ -194,15 +208,98 @@ function calculatePortfolioVolatility(
 }
 
 /**
+ * Generate blog recommendations based on portfolio context
+ */
+async function generateBlogRecommendations(
+  positions: Position[],
+  marketContext: MarketContext,
+  portfolioAnalytics: PortfolioAnalytics,
+  sectorAllocations: Record<string, number>
+): Promise<Array<{
+  slug: string;
+  title: string;
+  description: string;
+  url: string;
+  relevanceScore: number;
+  matchingKeywords: string[];
+}>> {
+  try {
+    // Build query from portfolio context
+    const queries: string[] = [];
+    
+    // Add queries based on portfolio characteristics
+    if (positions.length < 5) {
+      queries.push('portfolio diversification');
+    }
+    
+    if (portfolioAnalytics.volatility && portfolioAnalytics.volatility > 20) {
+      queries.push('portfolio volatility risk management');
+    }
+    
+    // Add sector-based queries
+    const topSectors = Object.entries(sectorAllocations)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 2)
+      .map(([sector]) => GICS_SECTOR_INFO[sector as GICSSector]?.name)
+      .filter(Boolean);
+    
+    topSectors.forEach(sector => {
+      queries.push(`${sector} investment strategy`);
+    });
+    
+    // Add market regime queries
+    if (marketContext.regime === 'bear' || marketContext.regime === 'volatile') {
+      queries.push('bear market strategy defensive investing');
+    }
+    
+    // Fetch blog recommendations (use dynamic import to avoid circular dependencies)
+    const { searchBlogPosts } = await import('@/app/lib/blog/blogSearch');
+    const allMatches = new Map<string, {
+      slug: string;
+      title: string;
+      description: string;
+      url: string;
+      relevanceScore: number;
+      matchingKeywords: string[];
+    }>();
+    
+    // Search for each query and aggregate results
+    for (const query of queries) {
+      const results = searchBlogPosts(query, 3);
+      results.matches.forEach(match => {
+        const existing = allMatches.get(match.slug);
+        if (!existing || match.relevanceScore > existing.relevanceScore) {
+          allMatches.set(match.slug, {
+            slug: match.slug,
+            title: match.title,
+            description: match.description,
+            url: match.url,
+            relevanceScore: match.relevanceScore,
+            matchingKeywords: match.matchingKeywords,
+          });
+        }
+      });
+    }
+    
+    return Array.from(allMatches.values())
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, 5); // Top 5 blog recommendations
+  } catch (error) {
+    console.error('[Recommendation Engine] Error fetching blog recommendations:', error);
+    return [];
+  }
+}
+
+/**
  * Generate dynamic recommendations with multi-factor analysis
  * Note: Currently synchronous, but structured as async for future API calls
  */
-export function generateDynamicRecommendations(
+export async function generateDynamicRecommendations(
   positions: Position[],
   marketContext: MarketContext,
   portfolioAnalytics: PortfolioAnalytics,
   historicalSnapshots: PortfolioSnapshot[]
-): EnhancedRecommendation {
+): Promise<EnhancedRecommendation> {
   const factors: RecommendationFactor[] = [];
   const thresholds = calculateDynamicThresholds(marketContext);
   
@@ -210,6 +307,36 @@ export function generateDynamicRecommendations(
     (sum, pos) => sum + (pos.currentValue || pos.avgCost * pos.shares),
     0
   );
+
+  // Calculate sector allocations (needed for blog recommendations)
+  const sectorAllocations = calculateSectorAllocations(positions);
+
+  // Generate blog recommendations (async)
+  const blogRecommendations = await generateBlogRecommendations(
+    positions,
+    marketContext,
+    portfolioAnalytics,
+    sectorAllocations
+  );
+  
+  // Add blog recommendations as factors
+  blogRecommendations.slice(0, 2).forEach(blog => {
+    if (blog.relevanceScore > 30) { // Only include highly relevant posts
+      factors.push({
+        type: 'blog',
+        severity: 'low',
+        score: blog.relevanceScore,
+        message: `Relevant article: "${blog.title}"`,
+        action: `Read more about ${blog.matchingKeywords.join(', ')}`,
+        blogPost: {
+          slug: blog.slug,
+          title: blog.title,
+          url: blog.url,
+          relevanceScore: blog.relevanceScore,
+        },
+      });
+    }
+  });
 
   if (positions.length === 0 || totalValue === 0) {
     return {
@@ -219,6 +346,7 @@ export function generateDynamicRecommendations(
       marketContext,
       thresholds,
       lastUpdated: new Date(),
+      blogRecommendations: blogRecommendations.length > 0 ? blogRecommendations : undefined,
     };
   }
 
@@ -247,7 +375,7 @@ export function generateDynamicRecommendations(
   });
 
   // Factor 2: Sector Concentration (with sector momentum)
-  const sectorAllocations = calculateSectorAllocations(positions);
+  // (sectorAllocations already calculated above)
   Object.entries(sectorAllocations).forEach(([sectorEnum, allocation]) => {
     const sector = sectorEnum as GICSSector;
     if (sector === GICSSector.UNCLASSIFIED) return;
@@ -358,6 +486,7 @@ export function generateDynamicRecommendations(
     marketContext,
     thresholds,
     lastUpdated: new Date(),
+    blogRecommendations: blogRecommendations.length > 0 ? blogRecommendations : undefined,
   };
 }
 

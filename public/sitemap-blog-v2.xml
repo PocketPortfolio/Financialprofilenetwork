@@ -43,6 +43,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/dollar-cost-averaging-vs-lump-sum-a-data-driven-analysis</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/hello-dev-we-re-building-pocket-portfolio-in-public</loc>
     <lastmod>2025-09-22</lastmod>
     <changefreq>weekly</changefreq>
