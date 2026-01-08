@@ -1,7 +1,10 @@
 {
-  "/admin/sales/page": "app/admin/sales/page.js",
-  "/landing/page": "app/landing/page.js",
-  "/blog/[slug]/page": "app/blog/[slug]/page.js",
-  "/blog/page": "app/blog/page.js",
-  "/admin/sales/strategy/page": "app/admin/sales/strategy/page.js"
+  "/api/agent/audit-feed/route": "app/api/agent/audit-feed/route.js",
+  "/api/agent/metrics/route": "app/api/agent/metrics/route.js",
+  "/api/api-keys/route": "app/api/api-keys/route.js",
+  "/api/agent/health/route": "app/api/agent/health/route.js",
+  "/api/api-keys/user/route": "app/api/api-keys/user/route.js",
+  "/api/agent/leads/route": "app/api/agent/leads/route.js",
+  "/admin/sales/strategy/page": "app/admin/sales/strategy/page.js",
+  "/admin/sales/page": "app/admin/sales/page.js"
 }
