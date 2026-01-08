@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>https://www.pocketportfolio.app/sitemap-static-v1.xml</loc>
+    <loc>https://www.pocketportfolio.app/sitemap-static-v2.xml</loc>
     <lastmod>2026-01-08</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.pocketportfolio.app/sitemap-imports-v1.xml</loc>
+    <loc>https://www.pocketportfolio.app/sitemap-imports-v2.xml</loc>
     <lastmod>2026-01-08</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.pocketportfolio.app/sitemap-tools-v1.xml</loc>
+    <loc>https://www.pocketportfolio.app/sitemap-tools-v2.xml</loc>
     <lastmod>2026-01-08</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.pocketportfolio.app/sitemap-blog-v1.xml</loc>
+    <loc>https://www.pocketportfolio.app/sitemap-blog-v2.xml</loc>
     <lastmod>2026-01-08</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.pocketportfolio.app/sitemap-tickers-1-v1.xml.gz</loc>
+    <loc>https://www.pocketportfolio.app/sitemap-tickers-1-v2.xml.gz</loc>
     <lastmod>2026-01-08</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.pocketportfolio.app/sitemap-tickers-2-v1.xml.gz</loc>
+    <loc>https://www.pocketportfolio.app/sitemap-tickers-2-v2.xml.gz</loc>
     <lastmod>2026-01-08</lastmod>
   </sitemap>
 </sitemapindex>
