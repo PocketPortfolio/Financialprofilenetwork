@@ -183,8 +183,9 @@ git push origin main
 
 ### 4. Production 404 on Dynamic Routes
 - **Issue**: `/api/agent/leads/[id]` returning 404 in production
-- **Solution**: Added route segment configuration (`dynamic`, `dynamicParams`, `runtime`)
-- **Status**: ✅ Fixed (commit: 8a20a67)
+- **Solution**: Added route segment configuration (`dynamic`, `dynamicParams`, `runtime`, `fetchCache`)
+- **Status**: ✅ Fixed (commits: 8a20a67, 0088914)
+- **Note**: Added `fetchCache = 'force-no-store'` to match working dynamic routes pattern
 
 ---
 
@@ -229,10 +230,11 @@ If issues occur after deployment:
 **Production Ready:** ✅ **YES**
 
 **Next Steps:**
-1. ✅ Commit and push to `main` (Completed: commit 8a20a67)
-2. ⏳ Monitor Vercel deployment (In Progress)
+1. ✅ Commit and push to `main` (Completed: commits 8a20a67, 0088914)
+2. ⏳ Monitor Vercel deployment (In Progress - Latest: commit 0088914)
 3. ⏳ Verify environment variables
 4. ⏳ Execute post-deployment verification checklist
+5. ⏳ **CRITICAL**: Test `/api/agent/leads/[id]` endpoint in production after deployment
 
 ---
 
