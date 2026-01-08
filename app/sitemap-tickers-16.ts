@@ -91,7 +91,7 @@ export default async function sitemapTickers16(): Promise<MetadataRoute.Sitemap>
       }
     });
     
-    console.log(sixteenth sixteenth)`);
+    console.log(`[Sitemap Tickers-16] Generated ${tickerPages.length} ticker-related pages from ${sixteenthSixteenth.length} tickers (sixteenth sixteenth)`);
     
     if (tickerPages.length > MAX_URLS_PER_SITEMAP) {
       console.warn(`[Sitemap Tickers-16] WARNING: ${tickerPages.length} URLs exceeds Google's 50,000 limit!`);
