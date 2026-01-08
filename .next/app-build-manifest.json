@@ -1,5 +1,20 @@
 {
   "pages": {
+    "/api/agent/metrics/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/agent/metrics/route.js"
+    ],
+    "/api/agent/audit-feed/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/agent/audit-feed/route.js"
+    ],
+    "/api/agent/health/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/agent/health/route.js"
+    ],
     "/global-error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -21,6 +36,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/sales/page.js"
     ],
+    "/api/agent/leads/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/agent/leads/route.js"
+    ],
+    "/admin/sales/strategy/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/sales/strategy/page.js"
+    ],
     "/api/api-keys/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -30,71 +55,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/api-keys/user/route.js"
-    ],
-    "/api/agent/health/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/health/route.js"
-    ],
-    "/api/agent/leads/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/leads/route.js"
-    ],
-    "/api/agent/metrics/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/metrics/route.js"
-    ],
-    "/api/agent/audit-feed/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/audit-feed/route.js"
-    ],
-    "/api/agent/leads/[id]/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/leads/[id]/route.js"
-    ],
-    "/api/npm-stats/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/npm-stats/route.js"
-    ],
-    "/landing/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/landing/page.js"
-    ],
-    "/api/blog/posts/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/blog/posts/route.js"
-    ],
-    "/api/blog/external-posts/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/blog/external-posts/route.js"
-    ],
-    "/blog/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/blog/page.js"
-    ],
-    "/api/page-views/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/page-views/route.js"
-    ],
-    "/blog/[slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/blog/[slug]/page.js"
-    ],
-    "/admin/sales/strategy/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/sales/strategy/page.js"
     ]
   }
 }
