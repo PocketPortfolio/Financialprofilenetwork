@@ -107,24 +107,9 @@ const nextConfig = {
     }
     
     return [
-      // Gzip sitemap headers (must come before catch-all)
-      {
-        source: '/sitemap-:name*.xml.gz',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/xml',
-          },
-          {
-            key: 'Content-Encoding',
-            value: 'gzip',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=3600',
-          },
-        ],
-      },
+      // Note: Gzip sitemap files are served from public/ folder
+      // Vercel automatically sets Content-Encoding: gzip for .gz files
+      // No explicit headers needed for static files
       {
         source: '/(.*)',
         headers: [
