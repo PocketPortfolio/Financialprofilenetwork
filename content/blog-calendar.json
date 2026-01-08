@@ -165,7 +165,7 @@
     "date": "2026-01-08",
     "title": "Dollar Cost Averaging vs. Lump Sum: A Data-Driven Analysis",
     "slug": "dollar-cost-averaging-vs-lump-sum-a-data-driven-analysis",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -174,7 +174,8 @@
       "data-driven",
       "dollar"
     ],
-    "category": "deep-dive"
+    "category": "deep-dive",
+    "publishedAt": "2026-01-08T02:06:55.853Z"
   },
   {
     "id": "week-2-post-1",
