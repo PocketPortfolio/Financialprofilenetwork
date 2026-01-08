@@ -37,7 +37,7 @@
 - Restart dev server after adding
 
 ### 2. Supabase Connection String Issue
-**Problem**: DNS resolution failed for `db.uneabwwwxnltjlrmdows.supabase.co`
+**Problem**: DNS resolution failed for `db.[YOUR-PROJECT-REF].supabase.co`
 
 **Possible Causes**:
 1. Supabase project was deleted or paused

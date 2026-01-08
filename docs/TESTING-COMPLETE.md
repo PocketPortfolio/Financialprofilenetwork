@@ -129,7 +129,7 @@
 Add these to GitHub repository secrets for autonomous workflows:
 
 ```
-SUPABASE_SALES_DATABASE_URL=postgresql://postgres.uneabwwwxnltjlrmdows:Chifeholdings42@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require
+SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
 OPENAI_API_KEY=sk-...
 RESEND_API_KEY=re_...
 GITHUB_TOKEN=ghp_... (for lead sourcing)

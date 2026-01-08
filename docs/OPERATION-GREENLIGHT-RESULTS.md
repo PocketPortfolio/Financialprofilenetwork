@@ -126,7 +126,7 @@ SELECT COUNT(*) FROM leads WHERE status = 'NEW' AND created_at > NOW() - INTERVA
 
 **Vercel Production:**
 ```bash
-SUPABASE_SALES_DATABASE_URL=postgresql://postgres.uneabwwwxnltjlrmdows:Chifeholdings42@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
+SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
 OPENAI_API_KEY=sk-... (your key)
 RESEND_API_KEY=re_... (your key)
 SALES_RATE_LIMIT_PER_DAY=20  # Start slow for warmup
@@ -135,7 +135,7 @@ EMERGENCY_STOP=false  # System is LIVE
 
 **GitHub Secrets (for GitHub Actions):**
 ```bash
-SUPABASE_SALES_DATABASE_URL=postgresql://postgres.uneabwwwxnltjlrmdows:Chifeholdings42@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
+SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
 OPENAI_API_KEY=sk-... (your key)
 RESEND_API_KEY=re_... (your key)
 SALES_RATE_LIMIT_PER_DAY=20
