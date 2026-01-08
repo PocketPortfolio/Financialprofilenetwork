@@ -10,7 +10,7 @@ export default async function sitemapTools(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   
   try {
-    const { CONVERSION_PAIRS } = await import('@/app/lib/tax-formats/conversion-pairs');
+    const { CONVERSION_PAIRS } = await import('./lib/tax-formats/conversion-pairs');
     const toolPages: MetadataRoute.Sitemap = CONVERSION_PAIRS.map((pair) => ({
       url: `${baseUrl}/tools/${pair.id}`,
       lastModified: now,
