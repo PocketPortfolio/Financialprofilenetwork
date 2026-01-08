@@ -1,3 +1,5 @@
 {
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
+  "/api/sitemap/[name]/route": "app/api/sitemap/[name]/route.js",
   "/api/admin/analytics/route": "app/api/admin/analytics/route.js"
 }

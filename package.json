@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3001",
     "build:sitemaps": "ts-node --project scripts/tsconfig.json scripts/build-static-sitemaps.ts",
-    "build": "npm run build:sitemaps && next build",
+    "build": "next build",
     "start": "next start",
     "preview": "next start -p 3001",
     "typecheck": "tsc --noEmit",
