@@ -20,7 +20,7 @@ import sitemapTickers2 from '../app/sitemap-tickers-2';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
 const SITEMAP_DIR = PUBLIC_DIR; // Files go directly in public/
-const VERSION = 'v1'; // Cache-bust version suffix
+const VERSION = 'v2'; // Cache-bust version suffix (bumped to force fresh fetch)
 const COMPRESS_THRESHOLD_KB = 100; // Compress files larger than 100KB
 
 interface BuildResult {
