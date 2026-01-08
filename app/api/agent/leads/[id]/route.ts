@@ -3,6 +3,11 @@ import { db } from '@/db/sales/client';
 import { leads, conversations, auditLogs } from '@/db/sales/schema';
 import { eq, desc } from 'drizzle-orm';
 
+// Next.js route configuration for dynamic routes in production
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const runtime = 'nodejs';
+
 /**
  * GET /api/agent/leads/[id]
  * Get a single lead with full context (conversations, audit logs, reasoning)
