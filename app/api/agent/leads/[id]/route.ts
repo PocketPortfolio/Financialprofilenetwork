@@ -7,6 +7,7 @@ import { eq, desc } from 'drizzle-orm';
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
+export const revalidate = 0; // Force no caching - ensure fresh data
 
 /**
  * GET /api/agent/leads/[id]
@@ -16,7 +17,12 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Add logging to verify route is being called
+  console.log('[LEAD-DETAILS] Route handler invoked');
+  
   const { id: leadId } = await params;
+  console.log(`[LEAD-DETAILS] Extracted leadId: ${leadId}`);
+  
   try {
     // Fetch lead
     const [lead] = await db
@@ -26,11 +32,14 @@ export async function GET(
       .limit(1);
 
     if (!lead) {
+      console.log(`[LEAD-DETAILS] Lead not found: ${leadId}`);
       return NextResponse.json(
         { error: 'Lead not found' },
         { status: 404 }
       );
     }
+
+    console.log(`[LEAD-DETAILS] Lead found: ${lead.companyName}`);
 
     // Fetch conversations with AI reasoning (handle empty/null gracefully)
     let leadConversations: any[] = [];
@@ -59,6 +68,7 @@ export async function GET(
       // Continue with empty array - not a fatal error
     }
 
+    console.log(`[LEAD-DETAILS] Returning data for ${leadId}`);
     return NextResponse.json({
       lead,
       conversations: leadConversations || [],
