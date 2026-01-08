@@ -18,6 +18,10 @@ import sitemapTickers1 from '../app/sitemap-tickers-1';
 import sitemapTickers2 from '../app/sitemap-tickers-2';
 import sitemapTickers3 from '../app/sitemap-tickers-3';
 import sitemapTickers4 from '../app/sitemap-tickers-4';
+import sitemapTickers5 from '../app/sitemap-tickers-5';
+import sitemapTickers6 from '../app/sitemap-tickers-6';
+import sitemapTickers7 from '../app/sitemap-tickers-7';
+import sitemapTickers8 from '../app/sitemap-tickers-8';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
 const VERSION = 'v2'; // Cache-bust version suffix
@@ -159,7 +163,7 @@ async function main() {
     mkdirSync(PUBLIC_DIR, { recursive: true });
     
     // Build all sub-sitemaps (plain XML, no compression)
-    // Split tickers into 4 sitemaps to reduce file size (~2.5MB each instead of ~5.5MB)
+    // Split tickers into 8 sitemaps to reduce file size (~1MB each, under Google's recommended 1MB limit)
     const results: BuildResult[] = [
       await buildSitemap('sitemap-static', sitemapStatic),
       await buildSitemap('sitemap-imports', sitemapImports),
@@ -169,6 +173,10 @@ async function main() {
       await buildSitemap('sitemap-tickers-2', sitemapTickers2),
       await buildSitemap('sitemap-tickers-3', sitemapTickers3),
       await buildSitemap('sitemap-tickers-4', sitemapTickers4),
+      await buildSitemap('sitemap-tickers-5', sitemapTickers5),
+      await buildSitemap('sitemap-tickers-6', sitemapTickers6),
+      await buildSitemap('sitemap-tickers-7', sitemapTickers7),
+      await buildSitemap('sitemap-tickers-8', sitemapTickers8),
     ];
     
     // Check for duplicates across sitemaps
