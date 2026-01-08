@@ -12,7 +12,7 @@
 
 **Problem**: DNS resolution returns IPv6 only (`2a05:d018:135e:163f:df02:c34c:d66b:fc5c`), but Node.js postgres library may not be handling IPv6 correctly.
 
-**Error**: `getaddrinfo ENOTFOUND db.uneabwwwxnltjlrmdows.supabase.co`
+**Error**: `getaddrinfo ENOTFOUND db.[YOUR-PROJECT-REF].supabase.co`
 
 ### 🔧 Solutions to Try
 
@@ -24,7 +24,7 @@ Supabase provides a connection pooler on port **6543** that may have better IPv4
 3. Copy the pooler connection string
 4. Update `.env.local`:
    ```bash
-   SUPABASE_SALES_DATABASE_URL=postgresql://postgres:Chifeholdings42@db.uneabwwwxnltjlrmdows.supabase.co:6543/postgres?pgbouncer=true&sslmode=require
+   SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true&sslmode=require
    ```
 
 #### Option 2: Enable IPv6 in Node.js

@@ -13,7 +13,7 @@
 ### ⚠️ Issues Found
 
 #### 1. Supabase Connection String DNS Error
-**Error**: `getaddrinfo ENOTFOUND db.uneabwwwxnltjlrmdows.supabase.co`
+**Error**: `getaddrinfo ENOTFOUND db.[YOUR-PROJECT-REF].supabase.co`
 
 **Diagnosis**: The Supabase project hostname cannot be resolved. This could mean:
 - Project was deleted or paused
@@ -22,7 +22,7 @@
 
 **Fix Steps**:
 1. Go to https://supabase.com/dashboard
-2. Check if project `uneabwwwxnltjlrmdows` exists and is active
+2. Check if project `[YOUR-PROJECT-REF]` exists and is active
 3. If project doesn't exist:
    - Create a new Supabase project
    - Name it "Pocket Portfolio Sales"

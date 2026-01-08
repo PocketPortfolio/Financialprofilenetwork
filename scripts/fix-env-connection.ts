@@ -52,7 +52,7 @@ try {
     
     newLines.splice(insertIndex, 0, '');
     newLines.splice(insertIndex + 1, 0, '# Session Pooler (IPv4 compatible)');
-    newLines.splice(insertIndex + 2, 0, 'SUPABASE_SALES_DATABASE_URL=postgresql://postgres.uneabwwwxnltjlrmdows:Chifeholdings42@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require');
+    newLines.splice(insertIndex + 2, 0, 'SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require');
   }
   
   writeFileSync(envPath, newLines.join('\n'), 'utf-8');

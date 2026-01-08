@@ -2,7 +2,7 @@
 
 ## Issue: DNS Resolution Failure
 
-**Error**: `getaddrinfo ENOTFOUND db.uneabwwwxnltjlrmdows.supabase.co`
+**Error**: `getaddrinfo ENOTFOUND db.[YOUR-PROJECT-REF].supabase.co`
 
 **Observation**: Supabase logs show successful connections, but local machine cannot resolve DNS.
 
@@ -20,7 +20,7 @@ Supabase provides two connection strings:
 3. Use the pooler connection string (port 6543)
 4. Update `.env.local`:
    ```bash
-   SUPABASE_SALES_DATABASE_URL=postgresql://postgres:Chifeholdings42@db.uneabwwwxnltjlrmdows.supabase.co:6543/postgres?pgbouncer=true
+   SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true
    ```
 
 ### 2. Network/Firewall Issue
@@ -36,7 +36,7 @@ Supabase provides two connection strings:
 ipconfig /flushdns
 
 # Test DNS resolution
-nslookup db.uneabwwwxnltjlrmdows.supabase.co
+nslookup db.[YOUR-PROJECT-REF].supabase.co
 ```
 
 ### 3. IP Allowlisting
@@ -72,7 +72,7 @@ This uses HTTPS API instead of direct postgres connection.
 
 Try connecting via psql command line:
 ```bash
-psql "postgresql://postgres:Chifeholdings42@db.uneabwwwxnltjlrmdows.supabase.co:5432/postgres?sslmode=require"
+psql "postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres?sslmode=require"
 ```
 
 If this works, the issue is with the Node.js postgres library configuration.
