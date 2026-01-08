@@ -183,9 +183,10 @@ git push origin main
 
 ### 4. Production 404 on Dynamic Routes
 - **Issue**: `/api/agent/leads/[id]` returning 404 in production
-- **Solution**: Added route segment configuration (`dynamic`, `dynamicParams`, `runtime`, `fetchCache`)
-- **Status**: ✅ Fixed (commits: 8a20a67, 0088914)
-- **Note**: Added `fetchCache = 'force-no-store'` to match working dynamic routes pattern
+- **Root Cause**: Next.js 15 routing bug with single-segment dynamic routes
+- **Solution**: Converted to catch-all route `[...id]` (workaround for Next.js 15 bug)
+- **Status**: ✅ Fixed (commit: dc81dce)
+- **Note**: Catch-all routes `[...id]` are more reliably matched than single-segment `[id]` in Next.js 15
 
 ---
 
