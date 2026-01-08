@@ -183,7 +183,7 @@
     "scheduledTime": "09:00",
     "title": "How AI Can Revolutionize B2B SaaS: A Practical Guide",
     "slug": "how-ai-can-revolutionize-b2b-saas",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "AI",
@@ -194,7 +194,8 @@
       "productivity",
       "business transformation"
     ],
-    "category": "deep-dive"
+    "category": "deep-dive",
+    "publishedAt": "2026-01-08T09:34:08.344Z"
   },
   {
     "id": "week-2-post-1",
