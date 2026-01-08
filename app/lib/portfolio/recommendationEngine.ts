@@ -252,8 +252,7 @@ async function generateBlogRecommendations(
       queries.push('bear market strategy defensive investing');
     }
     
-    // Fetch blog recommendations (use dynamic import to avoid circular dependencies)
-    const { searchBlogPosts } = await import('@/app/lib/blog/blogSearch');
+    // Fetch blog recommendations via API (server-side only, avoids fs in client bundle)
     const allMatches = new Map<string, {
       slug: string;
       title: string;
@@ -263,22 +262,42 @@ async function generateBlogRecommendations(
       matchingKeywords: string[];
     }>();
     
-    // Search for each query and aggregate results
-    for (const query of queries) {
-      const results = searchBlogPosts(query, 3);
-      results.matches.forEach(match => {
-        const existing = allMatches.get(match.slug);
-        if (!existing || match.relevanceScore > existing.relevanceScore) {
-          allMatches.set(match.slug, {
-            slug: match.slug,
-            title: match.title,
-            description: match.description,
-            url: match.url,
-            relevanceScore: match.relevanceScore,
-            matchingKeywords: match.matchingKeywords,
+    // Search for each query via API endpoint (works in both server and client contexts)
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app';
+      
+      for (const query of queries) {
+        try {
+          const response = await fetch(`${baseUrl}/api/aeo/blog?q=${encodeURIComponent(query)}&limit=3`, {
+            next: { revalidate: 3600 } // Cache for 1 hour
           });
+          
+          if (response.ok) {
+            const results = await response.json();
+            if (results.matches) {
+              results.matches.forEach((match: any) => {
+                const existing = allMatches.get(match.slug);
+                if (!existing || match.relevanceScore > existing.relevanceScore) {
+                  allMatches.set(match.slug, {
+                    slug: match.slug,
+                    title: match.title,
+                    description: match.description,
+                    url: match.url,
+                    relevanceScore: match.relevanceScore,
+                    matchingKeywords: match.matchingKeywords || [],
+                  });
+                }
+              });
+            }
+          }
+        } catch (fetchError) {
+          // Silently skip failed queries, continue with others
+          console.warn(`[Recommendation Engine] Failed to fetch blog recommendations for query "${query}":`, fetchError);
         }
-      });
+      }
+    } catch (error) {
+      // If all queries fail, return empty array
+      console.warn('[Recommendation Engine] Blog recommendation fetch failed:', error);
     }
     
     return Array.from(allMatches.values())

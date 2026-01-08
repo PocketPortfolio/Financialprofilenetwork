@@ -82,7 +82,7 @@ export function extractFAQsFromContent(content: string): FAQItem[] {
     // Get content after the header until next header
     const answerStart = headerMatch.index + headerMatch[0].length;
     const nextHeaderMatch = content.substring(answerStart).match(/^##+\s+/m);
-    const answerEnd = nextHeaderMatch 
+    const answerEnd = (nextHeaderMatch && typeof nextHeaderMatch.index === 'number')
       ? answerStart + nextHeaderMatch.index 
       : content.length;
     
