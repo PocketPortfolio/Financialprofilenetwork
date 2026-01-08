@@ -1,6 +1,7 @@
 /**
- * Dynamic Sitemap API Route (Industry Standard)
+ * Dynamic Sitemap API Route (Industry Standard) - Catch-All Version
  * Generates sitemaps on-demand via API routes - no static files needed
+ * Uses catch-all route [...name] to work around Next.js 15 dynamic route bug
  * This is how large websites (Shopify, WordPress, etc.) handle sitemaps
  */
 
@@ -33,12 +34,32 @@ const SITEMAP_GENERATORS: Record<string, () => Promise<any>> = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ name: string }> }
+  { params }: { params: Promise<{ name: string[] }> }
 ) {
   try {
     // Next.js 15: params is always a Promise
+    // Catch-all route: name is an array
     const resolvedParams = await params;
-    const sitemapName = resolvedParams.name;
+    const nameArray = resolvedParams.name || [];
+    
+    // Extract sitemap name from array (first element)
+    // Matches: /api/sitemap/sitemap-static -> name = ["sitemap-static"]
+    const sitemapName = nameArray[0] || '';
+    
+    if (!sitemapName) {
+      return new NextResponse(
+        `<?xml version="1.0" encoding="UTF-8"?>
+<error>
+  <message>Sitemap name parameter required</message>
+</error>`,
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/xml',
+          },
+        }
+      );
+    }
     
     // Remove .xml extension if present
     const cleanName = sitemapName.replace(/\.xml$/, '');
