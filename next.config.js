@@ -107,36 +107,10 @@ const nextConfig = {
     }
     
     return [
-      // Sitemap files: Long cache, no revalidation (Googlebot-friendly)
-      {
-        source: '/sitemap.xml',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/xml; charset=utf-8',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400, s-maxage=86400', // 24 hours cache
-          },
-        ],
-      },
-      {
-        source: '/sitemap-:name*.xml',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/xml; charset=utf-8',
-          },
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=86400, s-maxage=86400', // 24 hours cache - no revalidation
-          },
-        ],
-      },
-      // Note: Gzip sitemap files are served from public/ folder
-      // Vercel automatically sets Content-Encoding: gzip for .gz files
-      // No explicit headers needed for static files
+      // Note: Static sitemap files in public/ folder are served by Vercel CDN
+      // Vercel automatically sets proper Content-Type and Cache-Control headers
+      // No explicit headers needed - Vercel handles static file headers optimally
+      // The smaller file sizes (2.7MB vs 5.5MB) should prevent Googlebot timeouts
       {
         source: '/(.*)',
         headers: [
