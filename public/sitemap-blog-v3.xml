@@ -103,6 +103,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/the-3-minute-guide-to-robots-txt-for-ai-agents</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/the-death-of-the-cloud-portfolio-why-vendor-lock-in-kills-fi</loc>
     <lastmod>2026-01-05</lastmod>
     <changefreq>weekly</changefreq>
