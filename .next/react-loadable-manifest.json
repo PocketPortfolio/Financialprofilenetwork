@@ -1,32 +1,8 @@
 {
-  "app\\hooks\\useGoogleDrive.ts -> ../lib/analytics/events": {
-    "id": 99571,
-    "files": []
-  },
-  "app\\lib\\waitlist\\analytics.ts -> firebase/analytics": {
-    "id": 68871,
-    "files": []
-  },
-  "app\\tools\\[conversion_pair]\\TaxConverter.tsx -> @pocket-portfolio/importer": {
-    "id": 23923,
+  "node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
+    "id": "node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",
     "files": [
-      "static/chunks/2170a4aa-f8d3849cdb97c01f.js",
-      "static/chunks/aaea2bcf-cf0380b469290346.js",
-      "static/chunks/5376-04a3d57f5f04927f.js",
-      "static/chunks/6302-f2f6f29974580589.js",
-      "static/chunks/9360-55669ad2e3180586.js"
-    ]
-  },
-  "node_modules\\next\\dist\\client\\index.js -> ../pages/_app": {
-    "id": 45139,
-    "files": [
-      "static/chunks/5139.e4ff9cc3669129ed.js"
-    ]
-  },
-  "node_modules\\next\\dist\\client\\index.js -> ../pages/_error": {
-    "id": 31646,
-    "files": [
-      "static/chunks/1646.a93085a0445ba909.js"
+      "static/chunks/_app-pages-browser_node_modules_next_dist_client_dev_noop-turbopack-hmr_js.js"
     ]
   }
 }

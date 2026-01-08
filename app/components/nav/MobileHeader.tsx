@@ -570,44 +570,87 @@ export default function MobileHeader({
                 Settings
               </Link>
               
-              {/* Admin Link - Only show if user is admin */}
+              {/* Admin Links - Only show if user is admin */}
               {isAdmin && (
-                <Link 
-                  href="/admin/analytics"
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{
-                    padding: 'var(--space-md) var(--space-lg)',
-                    borderRadius: 'var(--radius-md)',
-                    color: pathname === '/admin/analytics' ? 'var(--text-inverse)' : 'var(--text)',
-                    textDecoration: 'none',
-                    fontSize: 'var(--text-md)',
-                    fontWeight: pathname === '/admin/analytics' ? '600' : '500',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-md)',
-                    background: pathname === '/admin/analytics' 
-                      ? 'var(--signal)' 
-                      : 'transparent',
-                    border: 'none',
-                    margin: '0'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (pathname !== '/admin/analytics') {
-                      e.currentTarget.style.background = 'var(--surface)';
-                      e.currentTarget.style.transform = 'translateX(4px)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (pathname !== '/admin/analytics') {
-                      e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }
-                  }}
-                >
-                  <AdminIcon />
-                  Admin
-                </Link>
+                <>
+                  <Link 
+                    href="/admin/analytics"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                      padding: 'var(--space-md) var(--space-lg)',
+                      borderRadius: 'var(--radius-md)',
+                      color: pathname === '/admin/analytics' ? 'var(--text-inverse)' : 'var(--text)',
+                      textDecoration: 'none',
+                      fontSize: 'var(--text-md)',
+                      fontWeight: pathname === '/admin/analytics' ? '600' : '500',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-md)',
+                      background: pathname === '/admin/analytics' 
+                        ? 'var(--signal)' 
+                        : 'transparent',
+                      border: 'none',
+                      margin: '0'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (pathname !== '/admin/analytics') {
+                        e.currentTarget.style.background = 'var(--surface)';
+                        e.currentTarget.style.transform = 'translateX(4px)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (pathname !== '/admin/analytics') {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }
+                    }}
+                  >
+                    <AdminIcon />
+                    Analytics
+                  </Link>
+                  
+                  <Link 
+                    href="/admin/sales"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                      padding: 'var(--space-md) var(--space-lg)',
+                      borderRadius: 'var(--radius-md)',
+                      color: pathname === '/admin/sales' ? 'var(--text-inverse)' : 'var(--text)',
+                      textDecoration: 'none',
+                      fontSize: 'var(--text-md)',
+                      fontWeight: pathname === '/admin/sales' ? '600' : '500',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-md)',
+                      background: pathname === '/admin/sales' 
+                        ? 'var(--signal)' 
+                        : 'transparent',
+                      border: 'none',
+                      margin: '0'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (pathname !== '/admin/sales') {
+                        e.currentTarget.style.background = 'var(--surface)';
+                        e.currentTarget.style.transform = 'translateX(4px)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (pathname !== '/admin/sales') {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="2.5">
+                      <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="8.5" cy="7" r="4" stroke="currentColor"/>
+                      <path d="M17 11V9M20 14H14" stroke="currentColor" strokeLinecap="round"/>
+                    </svg>
+                    Sales Pilot
+                  </Link>
+                </>
               )}
               
               {/* Divider */}

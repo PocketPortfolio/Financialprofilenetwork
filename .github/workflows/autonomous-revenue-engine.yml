@@ -1,0 +1,120 @@
+name: Autonomous Revenue Engine
+
+on:
+  schedule:
+    # Daily at 6 AM UTC - Lead Sourcing (find 50 new CTOs)
+    - cron: '0 6 * * *'
+    # Every 2 hours - Lead Enrichment & Email Generation
+    - cron: '0 */2 * * *'
+    # Every hour - Process inbound emails and generate replies
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allow manual triggering for testing
+
+jobs:
+  source-leads:
+    name: Source New Leads
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Database Schema
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔍 Verifying database schema before sourcing..."
+          npm run db:verify || (echo "❌ Schema verification failed" && exit 1)
+
+      - name: Source leads autonomously
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Autonomous Lead Sourcing Started"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          npm run source-leads-autonomous || echo "⚠️ Lead sourcing completed with warnings"
+
+  enrich-and-email:
+    name: Enrich Leads & Send Emails
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Database Schema
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔍 Verifying database schema before processing..."
+          npm run db:verify || (echo "❌ Schema verification failed" && exit 1)
+
+      - name: Enrich leads and send emails
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SALES_RATE_LIMIT_PER_DAY: ${{ secrets.SALES_RATE_LIMIT_PER_DAY || '50' }}
+        run: |
+          echo "📧 Autonomous Email Generation Started"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          npm run process-leads-autonomous || echo "⚠️ Lead processing completed with warnings"
+
+  process-inbound:
+    name: Process Inbound Emails
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Database Schema
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔍 Verifying database schema before processing inbound..."
+          npm run db:verify || (echo "❌ Schema verification failed" && exit 1)
+
+      - name: Process inbound emails and generate replies
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          echo "📬 Processing Inbound Emails"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          npm run process-inbound-autonomous || echo "⚠️ Inbound processing completed with warnings"
+
+

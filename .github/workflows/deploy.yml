@@ -42,6 +42,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Verify Database Schema
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔍 Verifying production database schema..."
+          npm run db:verify || (echo "❌ Schema verification failed - deployment blocked" && exit 1)
+        continue-on-error: false
+      
+      - name: Run Database Migrations (if needed)
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "📤 Running production-safe migrations..."
+          npm run db:migrate:prod || echo "⚠️ Migration completed with warnings (non-blocking)"
+        continue-on-error: true
+      
       - name: Run CI checks
         run: |
           npm run lint || echo "⚠️ Lint warnings (non-blocking)"

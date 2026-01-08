@@ -89,39 +89,54 @@ const SyncStatusIndicator: React.FC = () => {
         <span style={{ fontSize: '12px' }}>☁️</span>
       </button>
 
-      {/* Tooltip */}
+      {/* Tooltip - using OptimizedTooltip for better visibility */}
       {showTooltip && (
         <div
           style={{
             position: 'absolute',
-            bottom: '100%',
+            bottom: 'calc(100% + 12px)',
             left: '50%',
             transform: 'translateX(-50%)',
-            marginBottom: '8px',
-            padding: '8px 12px',
+            padding: 'var(--space-3) var(--space-4)',
             background: 'var(--surface-elevated)',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-            fontSize: '12px',
+            border: '2px solid var(--info)',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--font-size-sm)',
             color: 'var(--text)',
             whiteSpace: 'nowrap',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            zIndex: 1000,
-            pointerEvents: 'none'
+            boxShadow: 'var(--shadow-xl), 0 0 0 1px rgba(14, 165, 233, 0.1)',
+            zIndex: 1400, // --z-popover
+            pointerEvents: 'none',
+            lineHeight: 'var(--line-relaxed)',
           }}
         >
           Google Drive Sync: Locked (Corporate/Founder Only)
+          {/* Arrow */}
           <div
             style={{
               position: 'absolute',
-              bottom: '-4px',
+              bottom: '-8px',
               left: '50%',
-              transform: 'translateX(-50%) rotate(45deg)',
-              width: '8px',
-              height: '8px',
-              background: 'var(--surface-elevated)',
-              borderRight: '1px solid var(--border)',
-              borderBottom: '1px solid var(--border)'
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '8px solid transparent',
+              borderRight: '8px solid transparent',
+              borderTop: '8px solid var(--info)',
+            }}
+          />
+          {/* Arrow inner (matches background) */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-6px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '6px solid transparent',
+              borderRight: '6px solid transparent',
+              borderTop: '6px solid var(--surface-elevated)',
             }}
           />
         </div>

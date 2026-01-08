@@ -2,7 +2,7 @@
  * Sitemap: Ticker Pages (Part 5)
  * Fifth eighth of ticker pages + data intent routes
  * Max 50,000 URLs per sitemap (Google limit)
- * Target: ~1MB per sitemap (under Google's recommended 1MB limit)
+ * Target: ~650KB per sitemap (to prevent Googlebot timeouts) (under Google's recommended 1MB limit)
  */
 
 import { MetadataRoute } from 'next';
@@ -32,14 +32,14 @@ export default async function sitemapTickers5(): Promise<MetadataRoute.Sitemap> 
       new Map(tickers.map(t => [t.toLowerCase().replace(/-/g, ''), t])).values()
     );
     
-    // Split tickers: fifth eighth goes to sitemap-5
-    const eighth = Math.floor(uniqueTickers.length / 8);
-    const fifthEighth = uniqueTickers.slice(eighth * 4, eighth * 5);
+    // Split tickers: fifth sixteenth goes to sitemap-5
+    const sixteenth = Math.floor(uniqueTickers.length / 16);
+    const fifthSixteenth = uniqueTickers.slice(sixteenth * 4, sixteenth * 5);
     
     // Track URLs to prevent duplicates within sitemap
     const seenUrls = new Set<string>();
     
-    fifthEighth.forEach((ticker) => {
+    fifthSixteenth.forEach((ticker) => {
       if (ticker && typeof ticker === 'string') {
         const tickerLower = ticker.toLowerCase().replace(/-/g, '');
         
@@ -91,7 +91,7 @@ export default async function sitemapTickers5(): Promise<MetadataRoute.Sitemap> 
       }
     });
     
-    console.log(`[Sitemap Tickers-5] Generated ${tickerPages.length} ticker-related pages from ${fifthEighth.length} tickers (fifth eighth)`);
+    console.log(`[Sitemap Tickers-5] Generated ${tickerPages.length} ticker-related pages from ${fifthSixteenth.length} tickers (fifth eighth)`);
     
     if (tickerPages.length > MAX_URLS_PER_SITEMAP) {
       console.warn(`[Sitemap Tickers-5] WARNING: ${tickerPages.length} URLs exceeds Google's 50,000 limit!`);

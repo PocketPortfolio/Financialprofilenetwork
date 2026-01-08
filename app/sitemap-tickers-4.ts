@@ -2,7 +2,7 @@
  * Sitemap: Ticker Pages (Part 4)
  * Fourth eighth of ticker pages + data intent routes
  * Max 50,000 URLs per sitemap (Google limit)
- * Target: ~1MB per sitemap (under Google's recommended 1MB limit)
+ * Target: ~650KB per sitemap (to prevent Googlebot timeouts) (under Google's recommended 1MB limit)
  */
 
 import { MetadataRoute } from 'next';
@@ -32,14 +32,14 @@ export default async function sitemapTickers4(): Promise<MetadataRoute.Sitemap> 
       new Map(tickers.map(t => [t.toLowerCase().replace(/-/g, ''), t])).values()
     );
     
-    // Split tickers: fourth eighth goes to sitemap-4
-    const eighth = Math.floor(uniqueTickers.length / 8);
-    const fourthEighth = uniqueTickers.slice(eighth * 3, eighth * 4);
+    // Split tickers: fourth sixteenth goes to sitemap-4
+    const sixteenth = Math.floor(uniqueTickers.length / 16);
+    const fourthSixteenth = uniqueTickers.slice(sixteenth * 3, sixteenth * 4);
     
     // Track URLs to prevent duplicates within sitemap
     const seenUrls = new Set<string>();
     
-    fourthEighth.forEach((ticker) => {
+    fourthSixteenth.forEach((ticker) => {
       if (ticker && typeof ticker === 'string') {
         const tickerLower = ticker.toLowerCase().replace(/-/g, '');
         
@@ -91,7 +91,7 @@ export default async function sitemapTickers4(): Promise<MetadataRoute.Sitemap> 
       }
     });
     
-    console.log(`[Sitemap Tickers-4] Generated ${tickerPages.length} ticker-related pages from ${fourthEighth.length} tickers (fourth eighth)`);
+    console.log(`[Sitemap Tickers-4] Generated ${tickerPages.length} ticker-related pages from ${fourthSixteenth.length} tickers (fourth eighth)`);
     
     if (tickerPages.length > MAX_URLS_PER_SITEMAP) {
       console.warn(`[Sitemap Tickers-4] WARNING: ${tickerPages.length} URLs exceeds Google's 50,000 limit!`);
