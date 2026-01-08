@@ -4,7 +4,17 @@
     "module": "commonjs",
     "target": "ES2022",
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./app/*"],
+      "@/app/*": ["./app/*"],
+      "@/components/*": ["./app/components/*"],
+      "@/lib/*": ["./app/lib/*"]
+    }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   },
   "include": ["*.ts"]
 }
