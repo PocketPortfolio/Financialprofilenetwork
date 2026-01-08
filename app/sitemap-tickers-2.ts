@@ -31,14 +31,14 @@ export default async function sitemapTickers2(): Promise<MetadataRoute.Sitemap> 
       new Map(tickers.map(t => [t.toLowerCase().replace(/-/g, ''), t])).values()
     );
     
-    // Split tickers: second half goes to sitemap-2
-    const midpoint = Math.floor(uniqueTickers.length / 2);
-    const secondHalf = uniqueTickers.slice(midpoint);
+    // Split tickers: second quarter goes to sitemap-2
+    const quarter = Math.floor(uniqueTickers.length / 4);
+    const secondQuarter = uniqueTickers.slice(quarter, quarter * 2);
     
     // Track URLs to prevent duplicates within sitemap
     const seenUrls = new Set<string>();
     
-    secondHalf.forEach((ticker) => {
+    secondQuarter.forEach((ticker) => {
       if (ticker && typeof ticker === 'string') {
         const tickerLower = ticker.toLowerCase().replace(/-/g, '');
         
@@ -90,7 +90,7 @@ export default async function sitemapTickers2(): Promise<MetadataRoute.Sitemap> 
       }
     });
     
-    console.log(`[Sitemap Tickers-2] Generated ${tickerPages.length} ticker-related pages from ${secondHalf.length} tickers (second half)`);
+    console.log(`[Sitemap Tickers-2] Generated ${tickerPages.length} ticker-related pages from ${secondQuarter.length} tickers (second quarter)`);
     
     if (tickerPages.length > MAX_URLS_PER_SITEMAP) {
       console.warn(`[Sitemap Tickers-2] WARNING: ${tickerPages.length} URLs exceeds Google's 50,000 limit!`);

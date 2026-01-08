@@ -16,6 +16,8 @@ import sitemapTools from '../app/sitemap-tools';
 import sitemapBlog from '../app/sitemap-blog';
 import sitemapTickers1 from '../app/sitemap-tickers-1';
 import sitemapTickers2 from '../app/sitemap-tickers-2';
+import sitemapTickers3 from '../app/sitemap-tickers-3';
+import sitemapTickers4 from '../app/sitemap-tickers-4';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
 const VERSION = 'v2'; // Cache-bust version suffix
@@ -157,6 +159,7 @@ async function main() {
     mkdirSync(PUBLIC_DIR, { recursive: true });
     
     // Build all sub-sitemaps (plain XML, no compression)
+    // Split tickers into 4 sitemaps to reduce file size (~2.5MB each instead of ~5.5MB)
     const results: BuildResult[] = [
       await buildSitemap('sitemap-static', sitemapStatic),
       await buildSitemap('sitemap-imports', sitemapImports),
@@ -164,6 +167,8 @@ async function main() {
       await buildSitemap('sitemap-blog', sitemapBlog),
       await buildSitemap('sitemap-tickers-1', sitemapTickers1),
       await buildSitemap('sitemap-tickers-2', sitemapTickers2),
+      await buildSitemap('sitemap-tickers-3', sitemapTickers3),
+      await buildSitemap('sitemap-tickers-4', sitemapTickers4),
     ];
     
     // Check for duplicates across sitemaps
