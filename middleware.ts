@@ -3,16 +3,26 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
 
-  // Skip middleware entirely for sitemap, robots, and llms.txt to avoid CSP issues
-  // Skip all sitemap files (main index + all sub-sitemaps, including gzipped versions)
-  // Also skip the API route that handles sitemaps
+  // Handle sitemap files: Set proper cache headers (Googlebot-friendly)
+  // Skip CSP and security headers, but add Cache-Control for sitemaps
   if (
     request.nextUrl.pathname === '/sitemap.xml' || 
-    request.nextUrl.pathname === '/robots.txt' || 
-    request.nextUrl.pathname === '/llms.txt' ||
-    request.nextUrl.pathname.startsWith('/api/sitemap/') ||
     (request.nextUrl.pathname.startsWith('/sitemap-') && 
      (request.nextUrl.pathname.endsWith('.xml') || request.nextUrl.pathname.endsWith('.xml.gz')))
+  ) {
+    const response = NextResponse.next();
+    // Set proper cache headers for sitemaps (24h cache, no revalidation)
+    // This prevents Googlebot timeouts on large files
+    response.headers.set('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+    response.headers.set('Content-Type', 'application/xml; charset=utf-8');
+    return response;
+  }
+  
+  // Skip middleware for robots.txt and llms.txt (no cache headers needed)
+  if (
+    request.nextUrl.pathname === '/robots.txt' || 
+    request.nextUrl.pathname === '/llms.txt' ||
+    request.nextUrl.pathname.startsWith('/api/sitemap/')
   ) {
     return NextResponse.next();
   }
