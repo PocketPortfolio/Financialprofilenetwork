@@ -34,6 +34,11 @@
 - ✅ Placeholder email cleanup scripts
 - ✅ Lookalike seeding for lead expansion
 
+### 4. Production Route Fix
+- ✅ Fixed `/api/agent/leads/[id]` 404 error in production
+- ✅ Added Next.js route segment configuration for dynamic routes
+- ✅ Verified build and deployment readiness
+
 ---
 
 ## 🔐 Required Environment Variables (Production)
@@ -141,7 +146,7 @@ git push origin main
 - [ ] Verify dashboard loads without errors
 - [ ] Check all three pipeline tabs (Fresh/Active/Archive)
 - [ ] Verify tab counts display correctly
-- [ ] Test Lead Details drawer on a lead
+- [ ] Test Lead Details drawer on a lead (✅ **CRITICAL**: Verify `/api/agent/leads/[id]` returns 200, not 404)
 - [ ] Verify confidence score tooltip appears
 
 ### Functional Tests (Within 30 minutes)
@@ -175,6 +180,11 @@ git push origin main
 - **Issue**: Next.js workspace root warning
 - **Impact**: Non-critical, build still succeeds
 - **Status**: ⚠️ Can be ignored or fixed later
+
+### 4. Production 404 on Dynamic Routes
+- **Issue**: `/api/agent/leads/[id]` returning 404 in production
+- **Solution**: Added route segment configuration (`dynamic`, `dynamicParams`, `runtime`)
+- **Status**: ✅ Fixed (commit: 8a20a67)
 
 ---
 
@@ -219,10 +229,10 @@ If issues occur after deployment:
 **Production Ready:** ✅ **YES**
 
 **Next Steps:**
-1. Commit and push to `main`
-2. Monitor Vercel deployment
-3. Verify environment variables
-4. Execute post-deployment verification checklist
+1. ✅ Commit and push to `main` (Completed: commit 8a20a67)
+2. ⏳ Monitor Vercel deployment (In Progress)
+3. ⏳ Verify environment variables
+4. ⏳ Execute post-deployment verification checklist
 
 ---
 
