@@ -1,10 +1,5 @@
 {
   "pages": {
-    "/api/sitemap/[name]/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/sitemap/[name]/route.js"
-    ],
     "/global-error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -35,6 +30,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/admin/analytics/route.js"
+    ],
+    "/api/sitemap/[...name]/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/sitemap/[...name]/route.js"
     ]
   }
 }
