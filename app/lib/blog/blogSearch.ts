@@ -1,6 +1,9 @@
 /**
  * Blog Content Search & Matching System
  * AEO (Answer Engine Optimization) - Matches user queries to relevant blog posts
+ * 
+ * NOTE: This module uses Node.js fs module and must only be used server-side
+ * For client-side usage, use the /api/aeo/blog endpoint instead
  */
 
 import fs from 'fs';

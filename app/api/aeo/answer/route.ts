@@ -53,7 +53,7 @@ function extractAnswerFromPost(
       // Extract content after this header until next header
       const sectionStart = match.index + match[0].length;
       const nextHeaderMatch = postContent.substring(sectionStart).match(/^##+\s+/m);
-      const sectionEnd = nextHeaderMatch 
+      const sectionEnd = (nextHeaderMatch && typeof nextHeaderMatch.index === 'number')
         ? sectionStart + nextHeaderMatch.index 
         : postContent.length;
       

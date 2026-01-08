@@ -55,6 +55,7 @@ export default function AllocationRecommendations({
         volatility: 'High Volatility',
         momentum: 'Market Regime Awareness',
         diversification: 'Low Diversification',
+        blog: 'Relevant Article',
       };
 
       return {

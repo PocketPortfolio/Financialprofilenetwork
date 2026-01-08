@@ -19,7 +19,7 @@ export function useDynamicRecommendations(
   portfolioAnalytics: PortfolioAnalytics | null,
   historicalSnapshots: PortfolioSnapshot[]
 ): {
-  recommendations: ReturnType<typeof generateDynamicRecommendations> | null;
+  recommendations: Awaited<ReturnType<typeof generateDynamicRecommendations>> | null;
   isLoading: boolean;
   error: Error | null;
   lastUpdated: Date | null;
