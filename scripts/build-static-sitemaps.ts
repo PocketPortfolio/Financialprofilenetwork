@@ -24,7 +24,7 @@ import sitemapTickers7 from '../app/sitemap-tickers-7';
 import sitemapTickers8 from '../app/sitemap-tickers-8';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
-const VERSION = 'v3'; // Cache-bust version suffix - bumped to force Googlebot fresh fetch
+const VERSION = 'v3'; // Current version - keep in sync with deployed version
 
 interface BuildResult {
   name: string;
