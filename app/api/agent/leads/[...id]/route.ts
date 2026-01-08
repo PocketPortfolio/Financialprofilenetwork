@@ -13,15 +13,29 @@ export const fetchCache = 'force-no-store'; // Force no fetch caching - workarou
 /**
  * GET /api/agent/leads/[id]
  * Get a single lead with full context (conversations, audit logs, reasoning)
+ * 
+ * Note: Using catch-all route [...id] instead of [id] to work around Next.js 15 routing bug
+ * where single-segment dynamic routes return 404 in production.
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string[] }> } // Changed: id is now string[] for catch-all route
 ) {
   // Add logging to verify route is being called
   console.log('[LEAD-DETAILS] Route handler invoked');
   
-  const { id: leadId } = await params;
+  const resolvedParams = await params;
+  // Extract id from array (first element) - catch-all route workaround for Next.js 15
+  const leadId = resolvedParams.id?.[0];
+  
+  if (!leadId) {
+    console.log('[LEAD-DETAILS] No lead ID provided');
+    return NextResponse.json(
+      { error: 'Lead ID is required' },
+      { status: 400 }
+    );
+  }
+  
   console.log(`[LEAD-DETAILS] Extracted leadId: ${leadId}`);
   
   try {
