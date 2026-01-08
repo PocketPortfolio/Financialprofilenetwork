@@ -1,0 +1,50 @@
+---
+title: "The 3-Minute Guide to robots.txt for AI Agents"
+date: "2026-01-08"
+description: "Learn the essentials of robots.txt in minutes to ensure your AI agents respect web crawling rules and ethics."
+tags: ["robots.txt", "minute", "guide", "robots"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/the-3-minute-guide-to-robots-txt-for-ai-agents.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+Navigating the web without stepping over boundaries is critical for AI agents. The `robots.txt` file serves as the gatekeeper, telling your AI which paths are open and which are off-limits. Understanding and respecting these rules is paramount for ethical web scraping and AI behavior.
+
+### Direct Solution with Code
+
+At its simplest, a `robots.txt` file might look like this:
+
+```plaintext
+User-agent: *
+Disallow: /private/
+Allow: /public/
+```
+
+This snippet tells all (`*`) user agents (web crawlers) that they are not allowed to access anything under `/private/` but can access everything under `/public/`.
+
+### Explanation of Key Concepts
+
+- **User-agent**: This is the specific web crawler that the rule applies to. The wildcard `*` applies the rule to all crawlers.
+- **Disallow**: This directive specifies paths that are not allowed to be crawled.
+- **Allow**: This directive specifies paths that are allowed to be crawled. It is not part of the standard protocol but is supported by major search engines like Google.
+
+Rules are read in order, and the most specific rule for a given crawler applies. If there is no `Allow` directive, the default assumption is that everything not explicitly `Disallow`ed is allowed.
+
+### Quick Tip
+
+**Crawl Delay**: Not part of the standard but widely respected, the `Crawl-Delay` directive tells crawlers how many seconds to wait between hits to your server. This can be crucial for not overwhelming your site with requests.
+
+```plaintext
+User-agent: *
+Disallow: /sensitive-data/
+Crawl-Delay: 10
+```
+
+This tells all crawlers to wait 10 seconds between requests, helping to prevent server overload.
+
+### Gotcha
+
+Remember, `robots.txt` is more of a guideline than an enforced rule. Malicious bots can and will ignore it. Ensure sensitive data is protected by more than just `robots.txt` directives.
+
+Understanding `robots.txt` is essential for building ethical, efficient, and effective AI agents that navigate the web. It's about respecting the rules set by website owners and ensuring your bots do not inadvertently cause harm or inconvenience.
