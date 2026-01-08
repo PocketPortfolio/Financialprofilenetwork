@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
 export const revalidate = 0; // Force no caching - ensure fresh data
+export const fetchCache = 'force-no-store'; // Force no fetch caching - workaround for Next.js 15 routing bug
 
 /**
  * GET /api/agent/leads/[id]
