@@ -31,10 +31,12 @@ const SITEMAP_GENERATORS: Record<string, () => Promise<any>> = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { name: string } }
+  { params }: { params: Promise<{ name: string }> }
 ) {
   try {
-    const sitemapName = params.name;
+    // Next.js 15: params is always a Promise
+    const resolvedParams = await params;
+    const sitemapName = resolvedParams.name;
     
     // Remove .xml extension if present
     const cleanName = sitemapName.replace(/\.xml$/, '');
