@@ -28,12 +28,7 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
+    // Blog page removed - included in sitemap-blog.ts
     {
       url: `${baseUrl}/positions`,
       lastModified: now,
@@ -76,12 +71,7 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
-    {
-      url: `${baseUrl}/static/csv-etoro-to-openbrokercsv`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
+    // CSV conversion guide removed - included in sitemap-imports.ts
     {
       url: `${baseUrl}/tools/google-sheets-formula`,
       lastModified: now,

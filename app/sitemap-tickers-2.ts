@@ -26,43 +26,67 @@ export default async function sitemapTickers2(): Promise<MetadataRoute.Sitemap> 
       return [];
     }
     
+    // Deduplicate tickers first (case-insensitive)
+    const uniqueTickers = Array.from(
+      new Map(tickers.map(t => [t.toLowerCase().replace(/-/g, ''), t])).values()
+    );
+    
     // Split tickers: second half goes to sitemap-2
-    const midpoint = Math.floor(tickers.length / 2);
-    const secondHalf = tickers.slice(midpoint);
+    const midpoint = Math.floor(uniqueTickers.length / 2);
+    const secondHalf = uniqueTickers.slice(midpoint);
+    
+    // Track URLs to prevent duplicates within sitemap
+    const seenUrls = new Set<string>();
     
     secondHalf.forEach((ticker) => {
       if (ticker && typeof ticker === 'string') {
         const tickerLower = ticker.toLowerCase().replace(/-/g, '');
         
         // Main ticker page
-        tickerPages.push({
-          url: `${baseUrl}/s/${tickerLower}`,
-          lastModified: now,
-          changeFrequency: 'daily' as const,
-          priority: 0.6,
-        });
+        const mainUrl = `${baseUrl}/s/${tickerLower}`;
+        if (!seenUrls.has(mainUrl)) {
+          tickerPages.push({
+            url: mainUrl,
+            lastModified: now,
+            changeFrequency: 'daily' as const,
+            priority: 0.6,
+          });
+          seenUrls.add(mainUrl);
+        }
         
         // Data intent routes (Operation Velocity)
-        tickerPages.push({
-          url: `${baseUrl}/s/${tickerLower}/json-api`,
-          lastModified: now,
-          changeFrequency: 'weekly' as const,
-          priority: 0.7,
-        });
+        const jsonUrl = `${baseUrl}/s/${tickerLower}/json-api`;
+        if (!seenUrls.has(jsonUrl)) {
+          tickerPages.push({
+            url: jsonUrl,
+            lastModified: now,
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+          });
+          seenUrls.add(jsonUrl);
+        }
         
-        tickerPages.push({
-          url: `${baseUrl}/s/${tickerLower}/dividend-history`,
-          lastModified: now,
-          changeFrequency: 'weekly' as const,
-          priority: 0.7,
-        });
+        const dividendUrl = `${baseUrl}/s/${tickerLower}/dividend-history`;
+        if (!seenUrls.has(dividendUrl)) {
+          tickerPages.push({
+            url: dividendUrl,
+            lastModified: now,
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+          });
+          seenUrls.add(dividendUrl);
+        }
         
-        tickerPages.push({
-          url: `${baseUrl}/s/${tickerLower}/insider-trading`,
-          lastModified: now,
-          changeFrequency: 'weekly' as const,
-          priority: 0.7,
-        });
+        const insiderUrl = `${baseUrl}/s/${tickerLower}/insider-trading`;
+        if (!seenUrls.has(insiderUrl)) {
+          tickerPages.push({
+            url: insiderUrl,
+            lastModified: now,
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+          });
+          seenUrls.add(insiderUrl);
+        }
       }
     });
     
