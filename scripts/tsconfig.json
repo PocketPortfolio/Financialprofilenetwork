@@ -7,10 +7,11 @@
     "moduleResolution": "node",
     "baseUrl": "..",
     "paths": {
-      "@/*": ["./app/*"],
+      "@/*": ["./*"],
       "@/app/*": ["./app/*"],
       "@/components/*": ["./app/components/*"],
-      "@/lib/*": ["./app/lib/*"]
+      "@/lib/*": ["./lib/*"],
+      "@/db/*": ["./db/*"]
     }
   },
   "ts-node": {

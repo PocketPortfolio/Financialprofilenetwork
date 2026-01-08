@@ -55,6 +55,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/how-ai-can-revolutionize-b2b-saas</loc>
+    <lastmod>2026-01-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/how-to-audit-your-github-repo-for-leaked-secrets</loc>
     <lastmod>2026-01-07</lastmod>
     <changefreq>weekly</changefreq>
