@@ -17,6 +17,8 @@ import sitemapTickers2 from '../../../sitemap-tickers-2';
 
 // Route segment config for Vercel
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true; // Explicitly allow dynamic params (Next.js 15 requirement)
+export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
 export const revalidate = 3600; // Revalidate every hour
 export const maxDuration = 60; // 60 second timeout for large sitemaps
 
