@@ -6,6 +6,12 @@ import { generateEmail, sendEmail } from '@/app/agent/outreach';
 import { canContactLead } from '@/lib/sales/compliance';
 import { kv } from '@vercel/kv';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * POST /api/agent/send-email
  * Send an AI-generated email to a lead

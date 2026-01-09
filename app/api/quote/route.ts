@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 // Rate limiting temporarily disabled for production compatibility
 // import { take } from '@/src/lib/ratelimit/memory';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 const JUA = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
   Accept: "application/json",
