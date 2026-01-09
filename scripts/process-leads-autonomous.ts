@@ -24,7 +24,7 @@ import { calculateOptimalSendTime, isOptimalSendWindow } from '@/lib/sales/timez
 import { getBestProductForLead } from '@/lib/stripe/product-catalog';
 import { isRealFirstName } from '@/lib/sales/name-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
-import { canWeEmail, getRegionLockReason, isStrictRegion } from '@/lib/sales/cultural-guardrails';
+import { determineOutreachLanguage } from '@/lib/sales/cultural-guardrails';
 
 const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be limited by rate limit)
 
@@ -324,38 +324,14 @@ async function processResearchingLeads() {
       continue;
     }
     
-    // Execution Order 010: Cultural Guardrails - Check region lock
+    // Execution Order 010 v2: Cultural Guardrails - Enforce native language (don't block)
     const detectedRegion = lead.detectedRegion || (lead.researchData as any)?.detectedRegion;
+    let requiredLanguage: string | null = null;
     if (detectedRegion) {
-      // Currently, we only support English ('en-US')
-      const supportedLanguages = ['en-US'];
-      const canEmail = canWeEmail(detectedRegion, supportedLanguages);
-      
-      if (!canEmail) {
-        const reason = getRegionLockReason(detectedRegion, supportedLanguages);
-        console.log(`   🚫 Region Lock: ${lead.email} (${detectedRegion}) - ${reason}`);
-        
-        // Mark as UNQUALIFIED with region lock reason
-        await db.update(leads)
-          .set({
-            status: 'UNQUALIFIED',
-            updatedAt: new Date(),
-          })
-          .where(eq(leads.id, lead.id));
-        
-        await db.insert(auditLogs).values({
-          leadId: lead.id,
-          action: 'STATUS_CHANGED',
-          aiReasoning: `Region Lock: Cannot contact ${detectedRegion} - requires native language but system only supports English`,
-          metadata: {
-            previousStatus: lead.status,
-            newStatus: 'UNQUALIFIED',
-            regionLockReason: reason,
-            detectedRegion: detectedRegion,
-          },
-        });
-        
-        continue; // Skip this lead
+      requiredLanguage = determineOutreachLanguage(detectedRegion);
+      // Log if we're using native language
+      if (requiredLanguage && requiredLanguage !== 'en-US') {
+        console.log(`   🌏 Using native language: ${requiredLanguage} for ${detectedRegion} (${lead.email})`);
       }
     }
     
@@ -413,6 +389,7 @@ async function processResearchingLeads() {
           newsSignals: researchData.newsSignals, // Sprint 4: Event-based triggers
           selectedProduct, // Sprint 4: Smart links
           employeeCount: researchData.employeeCount,
+          requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
         },
         sequence.emailType
       );
@@ -582,38 +559,14 @@ async function processContactedLeads() {
       continue;
     }
     
-    // Execution Order 010: Cultural Guardrails - Check region lock (for follow-ups too)
+    // Execution Order 010 v2: Cultural Guardrails - Enforce native language (for follow-ups too)
     const detectedRegion = lead.detectedRegion || (lead.researchData as any)?.detectedRegion;
+    let requiredLanguage: string | null = null;
     if (detectedRegion) {
-      const supportedLanguages = ['en-US'];
-      const canEmail = canWeEmail(detectedRegion, supportedLanguages);
-      
-      if (!canEmail) {
-        const reason = getRegionLockReason(detectedRegion, supportedLanguages);
-        console.log(`   🚫 Region Lock: ${lead.email} (${detectedRegion}) - ${reason}`);
-        
-        // Mark as UNQUALIFIED
-        await db.update(leads)
-          .set({
-            status: 'UNQUALIFIED',
-            updatedAt: new Date(),
-          })
-          .where(eq(leads.id, lead.id));
-        
-        await db.insert(auditLogs).values({
-          leadId: lead.id,
-          action: 'STATUS_CHANGED',
-          aiReasoning: `Region Lock: Cannot contact ${detectedRegion} - requires native language but system only supports English`,
-          metadata: {
-            previousStatus: lead.status,
-            newStatus: 'UNQUALIFIED',
-            regionLockReason: reason,
-            detectedRegion: detectedRegion,
-          },
-        });
-        
-        skipped++;
-        continue;
+      requiredLanguage = determineOutreachLanguage(detectedRegion);
+      // Log if we're using native language
+      if (requiredLanguage && requiredLanguage !== 'en-US') {
+        console.log(`   🌏 Using native language: ${requiredLanguage} for ${detectedRegion} (${lead.email})`);
       }
     }
     
@@ -666,6 +619,7 @@ async function processContactedLeads() {
           newsSignals: researchData.newsSignals,
           selectedProduct,
           employeeCount: researchData.employeeCount,
+          requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
         },
         sequence.step === 4 ? 'follow_up' : sequence.emailType // Step 4 is breakup
       );

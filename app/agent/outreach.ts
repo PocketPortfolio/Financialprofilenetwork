@@ -32,6 +32,7 @@ export async function generateEmail(
     newsSignals?: Array<{ type: string; description: string }>;
     selectedProduct?: { id: string; name: string };
     employeeCount?: number;
+    requiredLanguage?: string | null; // Execution Order 010 v2: Required language for strict regions
   },
   emailType: 'initial' | 'follow_up' | 'objection_handling' = 'initial'
 ): Promise<{ email: any; reasoning: string }> {
@@ -107,12 +108,17 @@ function buildPrompt(
     ? `\n\nRECENT NEWS SIGNAL: ${leadData.newsSignals[0].description}\nUse this as opening hook - be timely and relevant. Example: "Hi, congratulations on the ${leadData.newsSignals[0].type} last week..."`
     : '';
 
+  // Execution Order 010 v2: Language Enforcement for Strict Regions
+  const languageEnforcement = leadData.requiredLanguage && leadData.requiredLanguage !== 'en-US'
+    ? `\n\n🌏 CRITICAL LANGUAGE REQUIREMENT:\nYou MUST write this email ENTIRELY in ${leadData.requiredLanguage} (${getLanguageName(leadData.requiredLanguage)}).\n- Do NOT use English at all - every word must be in ${leadData.requiredLanguage}\n- Use the appropriate greeting for this language (from cultural context)\n- Maintain professional tone in the native language\n- All content, including product descriptions and CTAs, must be in ${leadData.requiredLanguage}\n- This is a strict requirement for cultural respect - failure to use native language is disrespectful\n- Translate all technical terms appropriately for the target language`
+    : '';
+
   // Add cultural context (Sprint 4: Cultural Intelligence)
   const culturalContext = leadData.culturalContext && leadData.culturalContext.confidence > 90
-    ? `\n\nCULTURAL CONTEXT (High Confidence: ${leadData.culturalContext.confidence}%):\n${leadData.culturalContext.culturalPrompt}\nGreeting: ${leadData.culturalContext.greeting}\nIMPORTANT: If confidence > 90%, consider using the detected language. Otherwise, use "International English" (simple grammar, no idioms, clear value prop).`
+    ? `\n\nCULTURAL CONTEXT (High Confidence: ${leadData.culturalContext.confidence}%):\n${leadData.culturalContext.culturalPrompt}\nGreeting: ${leadData.culturalContext.greeting}${languageEnforcement}`
     : leadData.culturalContext
-    ? `\n\nCULTURAL CONTEXT (Low Confidence: ${leadData.culturalContext.confidence}%):\nUse "International English" - simple grammar, no idioms, clear value proposition.`
-    : '';
+    ? `\n\nCULTURAL CONTEXT (Low Confidence: ${leadData.culturalContext.confidence}%):\n${languageEnforcement || 'Use "International English" - simple grammar, no idioms, clear value proposition.'}`
+    : languageEnforcement || '';
 
   // Determine if we should use firstName in greeting
   const firstNameReliable = leadData.firstNameReliable !== false && leadData.firstName && isRealFirstName(leadData.firstName);
@@ -237,6 +243,31 @@ function convertMarkdownLinksToHtml(text: string): string {
   // Convert Markdown links [text](url) to HTML <a> tags
   const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   return text.replace(markdownLinkRegex, '<a href="$2" style="color: #0066cc; text-decoration: underline;">$1</a>');
+}
+
+/**
+ * Get human-readable language name from language code
+ * Execution Order 010 v2: Helper for language enforcement
+ */
+function getLanguageName(langCode: string): string {
+  const names: Record<string, string> = {
+    'zh-CN': 'Simplified Chinese',
+    'es-ES': 'Spanish',
+    'ja-JP': 'Japanese',
+    'ko-KR': 'Korean',
+    'it-IT': 'Italian',
+    'ru-RU': 'Russian',
+    'ar-SA': 'Arabic',
+    'fr-FR': 'French',
+    'de-DE': 'German',
+    'pt-BR': 'Portuguese (Brazil)',
+    'nl-NL': 'Dutch',
+    'sv-SE': 'Swedish',
+    'no-NO': 'Norwegian',
+    'da-DK': 'Danish',
+    'fi-FI': 'Finnish',
+  };
+  return names[langCode] || langCode;
 }
 
 /**
