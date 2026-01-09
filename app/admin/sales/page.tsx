@@ -108,13 +108,13 @@ export default function AdminSalesPage() {
   const tabConfig = {
     fresh: {
       label: 'Fresh',
-      statuses: ['NEW', 'RESEARCHING'],
+      statuses: ['NEW', 'RESEARCHING'], // Only uncontacted leads
       color: 'var(--signal)',
       emoji: '🟢',
     },
     active: {
       label: 'Active',
-      statuses: ['CONTACTED', 'REPLIED', 'INTERESTED', 'NEGOTIATING'],
+      statuses: ['SCHEDULED', 'CONTACTED', 'REPLIED', 'INTERESTED', 'NEGOTIATING'], // All contacted/active leads
       color: 'var(--warning)',
       emoji: '🟡',
     },
