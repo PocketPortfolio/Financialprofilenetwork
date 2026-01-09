@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCachedMarketContext } from '@/app/lib/portfolio/marketContext';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * GET /api/portfolio/market-context
  * Get current market context (VIX, sector performance, market regime)
