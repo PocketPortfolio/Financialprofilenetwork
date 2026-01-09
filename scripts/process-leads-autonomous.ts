@@ -15,7 +15,7 @@ config({ path: resolve(process.cwd(), '.env') });
 
 import { db } from '@/db/sales/client';
 import { leads, auditLogs, conversations } from '@/db/sales/schema';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, or, sql } from 'drizzle-orm';
 import { enrichLead } from '@/app/agent/researcher';
 import { generateEmail, sendEmail } from '@/app/agent/outreach';
 import { canContactLead } from '@/lib/sales/compliance';
@@ -32,6 +32,35 @@ const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be li
  */
 async function processNewLeads() {
   console.log('🔍 Processing NEW leads (enrichment)...');
+  
+  // First, clean up any placeholder emails that slipped through
+  const placeholderLeads = await db
+    .select()
+    .from(leads)
+    .where(
+      and(
+        eq(leads.status, 'NEW'),
+        or(
+          sql`${leads.email} LIKE '%.placeholder'`,
+          sql`${leads.email} LIKE '%@similar.%'`,
+          sql`${leads.email} LIKE '%@github-hiring.%'`
+        )
+      )
+    );
+  
+  if (placeholderLeads.length > 0) {
+    console.log(`   🧹 Cleaning up ${placeholderLeads.length} placeholder emails...`);
+    for (const lead of placeholderLeads) {
+      await db.update(leads)
+        .set({
+          status: 'DO_NOT_CONTACT',
+          researchSummary: 'Placeholder email detected - cannot contact',
+          updatedAt: new Date(),
+        })
+        .where(eq(leads.id, lead.id));
+    }
+    console.log(`   ✅ Marked ${placeholderLeads.length} placeholder leads as DO_NOT_CONTACT`);
+  }
   
   const newLeads = await db
     .select()
@@ -89,6 +118,35 @@ async function processNewLeads() {
  */
 async function processResearchingLeads() {
   console.log('📧 Processing RESEARCHING leads (email generation)...');
+  
+  // First, clean up any placeholder emails in RESEARCHING status
+  const placeholderResearching = await db
+    .select()
+    .from(leads)
+    .where(
+      and(
+        eq(leads.status, 'RESEARCHING'),
+        or(
+          sql`${leads.email} LIKE '%.placeholder'`,
+          sql`${leads.email} LIKE '%@similar.%'`,
+          sql`${leads.email} LIKE '%@github-hiring.%'`
+        )
+      )
+    );
+  
+  if (placeholderResearching.length > 0) {
+    console.log(`   🧹 Cleaning up ${placeholderResearching.length} placeholder emails in RESEARCHING status...`);
+    for (const lead of placeholderResearching) {
+      await db.update(leads)
+        .set({
+          status: 'DO_NOT_CONTACT',
+          researchSummary: 'Placeholder email detected - cannot contact',
+          updatedAt: new Date(),
+        })
+        .where(eq(leads.id, lead.id));
+    }
+    console.log(`   ✅ Marked ${placeholderResearching.length} placeholder leads as DO_NOT_CONTACT`);
+  }
   
   // Check rate limit FIRST to calculate dynamic limit
   const rateLimitKey = `sales:rate-limit:${new Date().toISOString().split('T')[0]}`;
