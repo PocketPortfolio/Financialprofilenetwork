@@ -5,6 +5,7 @@ import { relations } from 'drizzle-orm';
 export const leadStatusEnum = pgEnum('lead_status', [
   'NEW',
   'RESEARCHING',
+  'SCHEDULED',
   'CONTACTED',
   'REPLIED',
   'INTERESTED',
@@ -24,6 +25,7 @@ export const conversationTypeEnum = pgEnum('conversation_type', [
 
 export const auditActionEnum = pgEnum('audit_action', [
   'EMAIL_SENT',
+  'EMAIL_SCHEDULED',
   'EMAIL_RECEIVED',
   'RESEARCH_DONE',
   'LEAD_SCORED',

@@ -119,33 +119,21 @@ async function processResearchingLeads() {
       // Sprint 4: Calculate optimal send time (timezone awareness)
       const timezone = lead.timezone || researchData.timezone;
       let optimalSendTime: Date | undefined;
-      let shouldSendNow = false; // Changed: Default to false for safety (never send at night)
+      let shouldSendNow = false;
       
       if (timezone) {
         optimalSendTime = calculateOptimalSendTime(timezone);
         shouldSendNow = isOptimalSendWindow(timezone);
-        
-        if (!shouldSendNow && optimalSendTime) {
-          // Schedule for optimal time
-          await db.update(leads)
-            .set({ scheduledSendAt: optimalSendTime, updatedAt: new Date() })
-            .where(eq(leads.id, lead.id));
-          console.log(`   ⏰ Scheduled ${lead.email} for ${optimalSendTime.toISOString()} (timezone: ${timezone})`);
-          continue; // Skip sending now, will be sent at optimal time
-        }
       } else {
         // Safety: If no timezone, schedule for 09:00 UTC tomorrow (never send at night)
         const tomorrow = new Date();
         tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
         tomorrow.setUTCHours(9, 0, 0, 0);
         optimalSendTime = tomorrow;
-        
-        await db.update(leads)
-          .set({ scheduledSendAt: optimalSendTime, updatedAt: new Date() })
-          .where(eq(leads.id, lead.id));
-        console.log(`   ⏰ Scheduled ${lead.email} for ${optimalSendTime.toISOString()} (no timezone, defaulting to 09:00 UTC)`);
-        continue;
       }
+      
+      // Determine if email will be scheduled or sent immediately
+      const isScheduled = optimalSendTime && optimalSendTime > new Date();
       
       // Sprint 4: Get cultural context from lead data
       // Note: Full cultural context (greeting, prompt) is stored in researchData during enrichment
@@ -180,17 +168,19 @@ async function processResearchingLeads() {
         'initial'
       );
       
-      // Sprint 4: Send email (with optional scheduling for timezone awareness)
+      // Sprint 4: Send email (Resend handles scheduling automatically via scheduledAt)
       const { emailId, threadId } = await sendEmail(
         lead.email,
         email.subject,
         email.body,
         lead.id,
-        optimalSendTime // Will schedule if provided
+        isScheduled ? optimalSendTime : undefined // Only pass if scheduling
       );
       
-      // Update rate limit
-      await kv.set(rateLimitKey, currentCount + sent + 1);
+      // Update rate limit (only if sending immediately, not if scheduled)
+      if (!isScheduled) {
+        await kv.set(rateLimitKey, currentCount + sent + 1);
+      }
       
       // Save conversation
       await db.insert(conversations).values({
@@ -204,11 +194,12 @@ async function processResearchingLeads() {
         aiReasoning: reasoning,
       });
       
-      // Update lead status
+      // Update lead status: SCHEDULED if scheduled, CONTACTED if sent immediately
       await db.update(leads)
         .set({
-          status: 'CONTACTED',
-          lastContactedAt: new Date(),
+          status: isScheduled ? 'SCHEDULED' : 'CONTACTED',
+          lastContactedAt: isScheduled ? optimalSendTime : new Date(),
+          scheduledSendAt: isScheduled ? optimalSendTime : null,
           updatedAt: new Date(),
         })
         .where(eq(leads.id, lead.id));
@@ -216,17 +207,22 @@ async function processResearchingLeads() {
       // Log action
       await db.insert(auditLogs).values({
         leadId: lead.id,
-        action: 'EMAIL_SENT',
+        action: isScheduled ? 'EMAIL_SCHEDULED' : 'EMAIL_SENT',
         aiReasoning: reasoning,
         metadata: {
           emailId,
           threadId,
           subject: email.subject,
+          scheduledFor: isScheduled ? optimalSendTime?.toISOString() : undefined,
         },
       });
       
       sent++;
-      console.log(`   ✅ Sent email to: ${lead.email}`);
+      if (isScheduled) {
+        console.log(`   ✅ Scheduled email to: ${lead.email} for ${optimalSendTime?.toISOString()}`);
+      } else {
+        console.log(`   ✅ Sent email to: ${lead.email}`);
+      }
     } catch (error: any) {
       console.error(`   ❌ Failed to send email to ${lead.email}:`, error.message);
       
