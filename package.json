@@ -73,6 +73,7 @@
     "audit-email-validity": "ts-node --project scripts/tsconfig.json scripts/audit-email-validity.ts",
     "validate-workflow-safety": "ts-node --project scripts/tsconfig.json scripts/validate-workflow-safety.ts",
     "sabotage-test": "ts-node --project scripts/tsconfig.json scripts/sabotage-test.ts",
+    "test-cultural-guardrails": "ts-node --project scripts/tsconfig.json scripts/test-cultural-guardrails.ts",
     "purge-placeholders": "ts-node --project scripts/tsconfig.json scripts/purge-placeholder-leads.ts",
     "resolve-placeholders": "ts-node --project scripts/tsconfig.json scripts/resolve-placeholder-emails.ts",
     "seed-lookalikes": "ts-node --project scripts/tsconfig.json scripts/seed-lookalikes-enhanced.ts",

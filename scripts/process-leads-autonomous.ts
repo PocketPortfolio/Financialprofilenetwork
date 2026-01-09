@@ -24,6 +24,7 @@ import { calculateOptimalSendTime, isOptimalSendWindow } from '@/lib/sales/timez
 import { getBestProductForLead } from '@/lib/stripe/product-catalog';
 import { isRealFirstName } from '@/lib/sales/name-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
+import { canWeEmail, getRegionLockReason, isStrictRegion } from '@/lib/sales/cultural-guardrails';
 
 const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be limited by rate limit)
 
@@ -323,6 +324,41 @@ async function processResearchingLeads() {
       continue;
     }
     
+    // Execution Order 010: Cultural Guardrails - Check region lock
+    const detectedRegion = lead.detectedRegion || (lead.researchData as any)?.detectedRegion;
+    if (detectedRegion) {
+      // Currently, we only support English ('en-US')
+      const supportedLanguages = ['en-US'];
+      const canEmail = canWeEmail(detectedRegion, supportedLanguages);
+      
+      if (!canEmail) {
+        const reason = getRegionLockReason(detectedRegion, supportedLanguages);
+        console.log(`   🚫 Region Lock: ${lead.email} (${detectedRegion}) - ${reason}`);
+        
+        // Mark as UNQUALIFIED with region lock reason
+        await db.update(leads)
+          .set({
+            status: 'UNQUALIFIED',
+            updatedAt: new Date(),
+          })
+          .where(eq(leads.id, lead.id));
+        
+        await db.insert(auditLogs).values({
+          leadId: lead.id,
+          action: 'STATUS_CHANGED',
+          aiReasoning: `Region Lock: Cannot contact ${detectedRegion} - requires native language but system only supports English`,
+          metadata: {
+            previousStatus: lead.status,
+            newStatus: 'UNQUALIFIED',
+            regionLockReason: reason,
+            detectedRegion: detectedRegion,
+          },
+        });
+        
+        continue; // Skip this lead
+      }
+    }
+    
     try {
       console.log(`   Generating initial email (Step ${sequence.step}) for: ${lead.email}`);
       
@@ -544,6 +580,41 @@ async function processContactedLeads() {
       console.log(`   ⏭️  Skipping ${lead.email}: ${contactCheck.reason}`);
       skipped++;
       continue;
+    }
+    
+    // Execution Order 010: Cultural Guardrails - Check region lock (for follow-ups too)
+    const detectedRegion = lead.detectedRegion || (lead.researchData as any)?.detectedRegion;
+    if (detectedRegion) {
+      const supportedLanguages = ['en-US'];
+      const canEmail = canWeEmail(detectedRegion, supportedLanguages);
+      
+      if (!canEmail) {
+        const reason = getRegionLockReason(detectedRegion, supportedLanguages);
+        console.log(`   🚫 Region Lock: ${lead.email} (${detectedRegion}) - ${reason}`);
+        
+        // Mark as UNQUALIFIED
+        await db.update(leads)
+          .set({
+            status: 'UNQUALIFIED',
+            updatedAt: new Date(),
+          })
+          .where(eq(leads.id, lead.id));
+        
+        await db.insert(auditLogs).values({
+          leadId: lead.id,
+          action: 'STATUS_CHANGED',
+          aiReasoning: `Region Lock: Cannot contact ${detectedRegion} - requires native language but system only supports English`,
+          metadata: {
+            previousStatus: lead.status,
+            newStatus: 'UNQUALIFIED',
+            regionLockReason: reason,
+            detectedRegion: detectedRegion,
+          },
+        });
+        
+        skipped++;
+        continue;
+      }
     }
     
     try {
