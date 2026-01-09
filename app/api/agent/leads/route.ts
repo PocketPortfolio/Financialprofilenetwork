@@ -27,11 +27,24 @@ export async function GET(request: NextRequest) {
 
     // Use retry logic for database operations
     const results = await withRetry(async () => {
-      // CRITICAL: Always exclude placeholder emails from dashboard
+      // CRITICAL: Always exclude placeholder emails and test domains from dashboard
       const excludePlaceholders = and(
         not(like(leads.email, '%.placeholder')),
         not(like(leads.email, '%@similar.%')),
-        not(like(leads.email, '%@github-hiring.%'))
+        not(like(leads.email, '%@github-hiring.%')),
+        // Exclude test/invalid domains (RFC 2606)
+        not(like(leads.email, '%@example.com')),
+        not(like(leads.email, '%@example.org')),
+        not(like(leads.email, '%@example.net')),
+        not(like(leads.email, '%@test.com')),
+        not(like(leads.email, '%@test.local')),
+        not(like(leads.email, '%@invalid.com')),
+        not(like(leads.email, '%@fake.com')),
+        not(like(leads.email, '%@dummy.com')),
+        not(like(leads.email, '%@sample.com')),
+        // Exclude test company names
+        not(like(leads.companyName, '%Test%')),
+        not(like(leads.companyName, '%test%')),
       );
       
       // Handle multiple statuses (comma-separated)
@@ -61,12 +74,25 @@ export async function GET(request: NextRequest) {
         .offset(offset);
     });
 
-    // Get total count for pagination (excluding placeholders)
+    // Get total count for pagination (excluding placeholders and test domains)
     const totalCount = await withRetry(async () => {
       const excludePlaceholders = and(
         not(like(leads.email, '%.placeholder')),
         not(like(leads.email, '%@similar.%')),
-        not(like(leads.email, '%@github-hiring.%'))
+        not(like(leads.email, '%@github-hiring.%')),
+        // Exclude test/invalid domains (RFC 2606)
+        not(like(leads.email, '%@example.com')),
+        not(like(leads.email, '%@example.org')),
+        not(like(leads.email, '%@example.net')),
+        not(like(leads.email, '%@test.com')),
+        not(like(leads.email, '%@test.local')),
+        not(like(leads.email, '%@invalid.com')),
+        not(like(leads.email, '%@fake.com')),
+        not(like(leads.email, '%@dummy.com')),
+        not(like(leads.email, '%@sample.com')),
+        // Exclude test company names
+        not(like(leads.companyName, '%Test%')),
+        not(like(leads.companyName, '%test%')),
       );
       
       if (statusParam) {

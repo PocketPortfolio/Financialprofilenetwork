@@ -15,6 +15,21 @@ export interface EmailValidationResult {
 }
 
 /**
+ * Invalid domains that should never be accepted (RFC 2606 + common test domains)
+ */
+const INVALID_DOMAINS = [
+  'example.com',
+  'example.org',
+  'example.net',
+  'test.com',
+  'test.local',
+  'invalid.com',
+  'fake.com',
+  'dummy.com',
+  'sample.com',
+];
+
+/**
  * Validate email with MX record check
  * Returns false if:
  * - Placeholder email detected
@@ -36,9 +51,14 @@ export async function validateEmail(email: string): Promise<EmailValidationResul
   }
 
   // 3. Extract domain
-  const domain = email.split('@')[1];
+  const domain = email.split('@')[1]?.toLowerCase();
   if (!domain) {
     return { isValid: false, reason: 'Invalid domain' };
+  }
+
+  // 3.5. Block test/invalid domains (before MX check to save DNS queries)
+  if (INVALID_DOMAINS.includes(domain)) {
+    return { isValid: false, reason: 'Test/invalid domain not allowed' };
   }
 
   // 4. Check MX records (with timeout)
