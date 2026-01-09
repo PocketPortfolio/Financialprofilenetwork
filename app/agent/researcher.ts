@@ -138,8 +138,11 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
     researchData.dealTier = classifyDealTier(researchData.employeeCount);
   }
 
-  // Calculate confidence score
-  const calculatedScore = scoreLead(researchData);
+  // Calculate confidence score - pass lead context for baseline scoring
+  const calculatedScore = scoreLead(researchData, {
+    hasJobTitle: !!lead.jobTitle,
+    hasValidEmail: !isPlaceholderEmail(lead.email),
+  });
 
   // CRITICAL: Don't change status if lead is already CONTACTED/SCHEDULED
   // Only update status if lead is NEW or RESEARCHING
@@ -170,16 +173,46 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
 
 /**
  * Score a lead (0-100) based on fit
+ * @param research Research data for the lead
+ * @param context Additional context about the lead (optional)
  */
-export function scoreLead(research: LeadResearchData): number {
+export function scoreLead(
+  research: LeadResearchData,
+  context?: { hasJobTitle?: boolean; hasValidEmail?: boolean }
+): number {
   let score = 0;
 
-  // Tech stack match (40 points)
+  // BASELINE SCORING: Give points for having basic information
+  // This ensures leads get at least some score even without full enrichment data
+  
+  // Company name exists (5 points)
+  if (research.companyName && research.companyName.length > 0) {
+    score += 5;
+  }
+
+  // Valid email (not placeholder) (5 points)
+  if (context?.hasValidEmail !== false) {
+    score += 5;
+  }
+
+  // Job title exists (5 points) - indicates real person
+  if (context?.hasJobTitle) {
+    score += 5;
+  }
+
+  // Tech stack exists (even if no matches) (5 points)
+  if (research.techStack && research.techStack.length > 0) {
+    score += 5;
+  }
+
+  // Tech stack match (30 points) - reduced from 40 to make room for baseline
   const targetTech = ['React', 'Next.js', 'TypeScript', 'Node.js'];
-  const matches = research.techStack.filter(tech => 
-    targetTech.some(target => tech.toLowerCase().includes(target.toLowerCase()))
-  );
-  score += (matches.length / targetTech.length) * 40;
+  if (research.techStack && research.techStack.length > 0) {
+    const matches = research.techStack.filter(tech => 
+      targetTech.some(target => tech.toLowerCase().includes(target.toLowerCase()))
+    );
+    score += (matches.length / targetTech.length) * 30;
+  }
 
   // Company size (20 points) - prefer 10-500 employees
   if (research.employeeCount) {
@@ -234,7 +267,10 @@ export async function recalculateLeadScore(leadId: string): Promise<number> {
     fundingStage: existingResearch.fundingStage,
   };
 
-  const calculatedScore = scoreLead(researchData);
+  const calculatedScore = scoreLead(researchData, {
+    hasJobTitle: !!lead.jobTitle,
+    hasValidEmail: !isPlaceholderEmail(lead.email),
+  });
 
   await db.update(leads)
     .set({
