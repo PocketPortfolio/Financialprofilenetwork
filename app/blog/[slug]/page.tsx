@@ -35,18 +35,24 @@ async function MDXContent({ content, slug }: { content: string; slug: string }) 
       },
     });
     
+    // ✅ Validate serialization result
+    if (!mdxSource) {
+      throw new Error('MDX serialization returned null or undefined');
+    }
+    
     return <MDXRenderer source={mdxSource} />;
   } catch (error: any) {
-    // ✅ CRITICAL: Log error in production for debugging (always log, not just dev)
+    // ✅ CRITICAL: Log error in production for debugging (Vercel function logs)
     console.error('[Blog Post MDX Error]', {
       slug,
       error: error.message,
       errorName: error.name,
-      stack: error.stack,
+      stack: error.stack?.substring(0, 1000), // Limit stack trace length
       contentLength: content?.length || 0,
       contentType: typeof content,
       contentPreview: content?.substring(0, 200) || 'N/A',
       nodeEnv: process.env.NODE_ENV,
+      timestamp: new Date().toISOString(),
     });
     
     return (
@@ -82,7 +88,7 @@ async function MDXContent({ content, slug }: { content: string; slug: string }) 
             {error.stack && (
               <>
                 {'\n\nStack Trace:\n'}
-                {error.stack}
+                {error.stack.substring(0, 1000)}
               </>
             )}
             {content && (
