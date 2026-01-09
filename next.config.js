@@ -31,6 +31,12 @@ const nextConfig = {
         source: '/api/tickers/:ticker/json',
         destination: '/api/tickers/:ticker/json',
       },
+      // Rewrite RESTful lead detail URL to nested structure (avoids Next.js routing conflict)
+      // Industry-standard fix: Catch-all route cannot coexist with sibling route.ts
+      {
+        source: '/api/agent/leads/:id',
+        destination: '/api/agent/leads/detail/:id',
+      },
       // Sitemap rewrites removed - now using static files in public/ folder
       // Static files are served automatically by Next.js from public/ directory
     ];
