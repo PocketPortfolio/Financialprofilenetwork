@@ -374,7 +374,8 @@ async function processResearchingLeads() {
           employeeCount: researchData.employeeCount,
           requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
         },
-        sequence.emailType
+        sequence.emailType,
+        1 // Step 1: Initial contact
       );
       
       // Sprint 4: Send email (Resend handles scheduling automatically via scheduledAt)
@@ -588,7 +589,8 @@ async function processContactedLeads() {
           employeeCount: researchData.employeeCount,
           requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
         },
-        sequence.step === 4 ? 'follow_up' : sequence.emailType // Step 4 is breakup
+        sequence.step === 4 ? 'follow_up' : sequence.emailType, // Step 4 is breakup
+        sequence.step // Pass sequence step for Step 4 detection
       );
       
       // Send email
