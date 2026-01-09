@@ -141,13 +141,19 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
   // Calculate confidence score
   const calculatedScore = scoreLead(researchData);
 
+  // CRITICAL: Don't change status if lead is already CONTACTED/SCHEDULED
+  // Only update status if lead is NEW or RESEARCHING
+  const currentStatus = lead.status;
+  const shouldUpdateStatus = currentStatus === 'NEW' || currentStatus === 'RESEARCHING';
+  const newStatus = shouldUpdateStatus ? 'RESEARCHING' : currentStatus;
+
   // Update lead with research, score, and cultural intelligence
   await db.update(leads)
     .set({
       researchData: researchData as any,
       researchSummary: researchData.summary,
       techStackTags: researchData.techStack,
-      status: 'RESEARCHING',
+      status: newStatus, // Preserve CONTACTED/SCHEDULED status
       score: calculatedScore,
       // NEW: Save cultural intelligence and timezone
       location: researchData.location,
