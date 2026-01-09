@@ -166,9 +166,9 @@ async function sourceLeadsAutonomous() {
     researchData: lead.researchData as any,
   })));
   
-  // Use dynamic target (clamped to safety limits)
+  // WAR MODE: Unlimited sourcing (Directive 011)
   const MIN_LEADS_PER_DAY = 20;
-  const MAX_LEADS_PER_DAY = 200;
+  const MAX_LEADS_PER_DAY = 10000; // Effectively unlimited (was 200)
   const DYNAMIC_TARGET = Math.max(
     MIN_LEADS_PER_DAY,
     Math.min(MAX_LEADS_PER_DAY, revenueDecisions.requiredLeadVolume)

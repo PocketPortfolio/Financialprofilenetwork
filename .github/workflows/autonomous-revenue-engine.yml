@@ -2,8 +2,8 @@ name: Autonomous Revenue Engine
 
 on:
   schedule:
-    # Daily at 6 AM UTC - Lead Sourcing (find 50 new CTOs)
-    - cron: '0 6 * * *'
+    # WAR MODE: Every 4 hours - Lead Sourcing (Directive 011)
+    - cron: '0 */4 * * *'
     # Every 2 hours - Lead Enrichment & Email Generation
     - cron: '0 */2 * * *'
     # Every hour - Process inbound emails and generate replies
