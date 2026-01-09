@@ -12,15 +12,17 @@ export const revalidate = 0;
 // Working routes (sitemap/[...name], tickers/[...ticker]) don't use fetchCache
 
 /**
- * GET /api/agent/leads/[id]
+ * GET /api/agent/leads/{id}
  * Get a single lead with full context (conversations, audit logs, reasoning)
  * 
- * Note: Using catch-all route [...id] instead of [id] to work around Next.js 15 routing bug
- * where single-segment dynamic routes return 404 in production.
+ * Note: Route is at /api/agent/leads/detail/[...id] but rewritten to /api/agent/leads/{id}
+ * This avoids Next.js routing conflict with sibling route.ts at /api/agent/leads/route.ts
+ * 
+ * Industry-standard fix: Nested catch-all route with rewrite to maintain RESTful URL
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string[] }> } // Changed: id is now string[] for catch-all route
+  { params }: { params: Promise<{ id: string[] }> }
 ) {
   // Add logging to verify route is being called
   console.log('[LEAD-DETAILS] Route handler invoked');
