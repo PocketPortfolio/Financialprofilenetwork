@@ -24,7 +24,7 @@ import { calculateOptimalSendTime, isOptimalSendWindow } from '@/lib/sales/timez
 import { getBestProductForLead } from '@/lib/stripe/product-catalog';
 import { isRealFirstName } from '@/lib/sales/name-validation';
 
-const MAX_LEADS_TO_PROCESS = 10; // Process 10 leads per run to avoid rate limits
+const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be limited by rate limit)
 
 /**
  * Process NEW leads (enrichment)
@@ -68,16 +68,7 @@ async function processNewLeads() {
 async function processResearchingLeads() {
   console.log('📧 Processing RESEARCHING leads (email generation)...');
   
-  const researchingLeads = await db
-    .select()
-    .from(leads)
-    .where(eq(leads.status, 'RESEARCHING'))
-    .limit(MAX_LEADS_TO_PROCESS)
-    .orderBy(leads.updatedAt);
-  
-  console.log(`   Found ${researchingLeads.length} RESEARCHING leads to contact`);
-  
-  // Check rate limit
+  // Check rate limit FIRST to calculate dynamic limit
   const rateLimitKey = `sales:rate-limit:${new Date().toISOString().split('T')[0]}`;
   const currentCount = (await kv.get<number>(rateLimitKey)) || 0;
   const maxPerDay = parseInt(process.env.SALES_RATE_LIMIT_PER_DAY || '50', 10);
@@ -87,10 +78,26 @@ async function processResearchingLeads() {
     return 0;
   }
   
+  // Calculate dynamic limit based on remaining quota
+  const remainingQuota = maxPerDay - currentCount;
+  const leadsToProcess = Math.min(MAX_LEADS_TO_PROCESS, remainingQuota);
+  
+  console.log(`   📊 Rate limit status: ${currentCount}/${maxPerDay} sent today, ${remainingQuota} remaining`);
+  console.log(`   🔢 Processing up to ${leadsToProcess} leads (limited by remaining quota)`);
+  
+  const researchingLeads = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.status, 'RESEARCHING'))
+    .limit(leadsToProcess)
+    .orderBy(leads.updatedAt);
+  
+  console.log(`   Found ${researchingLeads.length} RESEARCHING leads to contact`);
+  
   let sent = 0;
   
   for (const lead of researchingLeads) {
-    // Check if we've hit rate limit
+    // Double-check rate limit (safety check)
     if (currentCount + sent >= maxPerDay) {
       console.log(`   ⚠️  Rate limit reached, stopping`);
       break;
