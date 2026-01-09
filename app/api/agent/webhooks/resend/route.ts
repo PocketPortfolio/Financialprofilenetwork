@@ -3,6 +3,12 @@ import { db } from '@/db/sales/client';
 import { conversations, leads, auditLogs } from '@/db/sales/schema';
 import { eq } from 'drizzle-orm';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * POST /api/agent/webhooks/resend
  * Handle inbound email webhooks from Resend
