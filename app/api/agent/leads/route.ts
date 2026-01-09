@@ -4,6 +4,13 @@ import { leads } from '@/db/sales/schema';
 import { eq, desc, inArray, sql } from 'drizzle-orm';
 import { withRetry } from '@/lib/sales/db-retry';
 
+// Next.js route configuration for dynamic routes in production
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * GET /api/agent/leads
  * List all leads with pagination
