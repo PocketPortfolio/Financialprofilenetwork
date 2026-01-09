@@ -52,13 +52,13 @@ export function RevenueWidget({ metrics }: RevenueWidgetProps) {
         <h2 style={{ margin: 0, color: 'var(--text)', fontSize: 'var(--font-size-xl)' }}>
           Revenue Target
         </h2>
-        <Tooltip content="Current Revenue: Sum of all CONVERTED leads' deal values (from Stripe webhooks). This is real cash, not projections.">
+        <Tooltip content="Target Revenue: The monthly goal for the AI Sales Pilot (£8,333/month = £100k/year).">
           <span style={{ 
             fontSize: 'var(--font-size-2xl)', 
             fontWeight: 'var(--font-bold)',
             color: 'var(--signal)',
           }}>
-            £{metrics.currentRevenue.toLocaleString()}
+            £{metrics.targetRevenue.toLocaleString()}
           </span>
         </Tooltip>
       </div>
@@ -100,7 +100,7 @@ export function RevenueWidget({ metrics }: RevenueWidgetProps) {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--space-1)' }}>
           <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-xs)' }}>
-            £0
+            £{metrics.currentRevenue.toLocaleString()}
           </span>
           <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-xs)' }}>
             £{metrics.targetRevenue.toLocaleString()}

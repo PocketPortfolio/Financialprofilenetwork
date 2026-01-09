@@ -26,6 +26,10 @@ import { eq, ilike } from 'drizzle-orm';
 import { sourceFromGitHubHiring } from '@/lib/sales/sourcing/github-hiring-scraper';
 import { sourceFromYC as sourceFromYCScraper } from '@/lib/sales/sourcing/yc-scraper';
 import { sourceFromHiringPosts as sourceFromHNScraper } from '@/lib/sales/sourcing/hiring-posts-scraper';
+import { sourceFromCrunchbase } from '@/lib/sales/sourcing/crunchbase-scraper';
+import { sourceFromProductHunt } from '@/lib/sales/sourcing/producthunt-scraper';
+import { sourceFromReddit } from '@/lib/sales/sourcing/reddit-scraper';
+import { sourceFromTwitter } from '@/lib/sales/sourcing/twitter-scraper';
 import { generateLookalikeLeads } from '@/lib/sales/sourcing/lookalike-seeding';
 import { isPlaceholderEmail, resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
 import { validateEmail } from '@/lib/sales/email-validation';
@@ -124,6 +128,86 @@ async function sourceFromHiringPosts(maxLeads?: number): Promise<LeadCandidate[]
 }
 
 /**
+ * Source leads from Crunchbase
+ * v2.1: Strategic Diversification - Channel 4
+ */
+async function sourceFromCrunchbaseWrapper(maxLeads?: number): Promise<LeadCandidate[]> {
+  console.log('🔍 Searching Crunchbase for Fintech/DevTools companies...');
+  
+  const crunchbaseLeads = await sourceFromCrunchbase(maxLeads);
+  
+  return crunchbaseLeads.map(lead => ({
+    email: lead.email,
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    companyName: lead.companyName,
+    jobTitle: lead.jobTitle,
+    linkedinUrl: undefined,
+    dataSource: lead.dataSource,
+  }));
+}
+
+/**
+ * Source leads from Product Hunt
+ * v2.1: Strategic Diversification - Channel 5
+ */
+async function sourceFromProductHuntWrapper(maxLeads?: number): Promise<LeadCandidate[]> {
+  console.log('🔍 Searching Product Hunt for Fintech/DevTools products...');
+  
+  const producthuntLeads = await sourceFromProductHunt(maxLeads);
+  
+  return producthuntLeads.map(lead => ({
+    email: lead.email,
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    companyName: lead.companyName,
+    jobTitle: lead.jobTitle,
+    linkedinUrl: undefined,
+    dataSource: lead.dataSource,
+  }));
+}
+
+/**
+ * Source leads from Reddit
+ * v2.1: Strategic Diversification - Channel 6
+ */
+async function sourceFromRedditWrapper(maxLeads?: number): Promise<LeadCandidate[]> {
+  console.log('🔍 Searching Reddit for Fintech/DevTools hiring posts...');
+  
+  const redditLeads = await sourceFromReddit(maxLeads);
+  
+  return redditLeads.map(lead => ({
+    email: lead.email,
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    companyName: lead.companyName,
+    jobTitle: lead.jobTitle,
+    linkedinUrl: undefined,
+    dataSource: lead.dataSource,
+  }));
+}
+
+/**
+ * Source leads from Twitter/X
+ * v2.1: Strategic Diversification - Channel 7
+ */
+async function sourceFromTwitterWrapper(maxLeads?: number): Promise<LeadCandidate[]> {
+  console.log('🔍 Searching Twitter/X for Fintech/DevTools hiring posts...');
+  
+  const twitterLeads = await sourceFromTwitter(maxLeads);
+  
+  return twitterLeads.map(lead => ({
+    email: lead.email,
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    companyName: lead.companyName,
+    jobTitle: lead.jobTitle,
+    linkedinUrl: undefined,
+    dataSource: lead.dataSource,
+  }));
+}
+
+/**
  * Check if lead already exists
  */
 async function leadExists(email: string, companyName: string): Promise<boolean> {
@@ -186,8 +270,12 @@ async function sourceLeadsAutonomous() {
   let created = 0;
   let skipped = 0;
   let rejected = 0;
-  const MAX_ROUNDS = 5; // Maximum sourcing rounds to prevent infinite loops
+  // WAR MODE: Scale rounds dynamically based on target (Directive 011 - 10K/day)
+  // For 10K target: ~10 rounds needed (1000 leads/round with 3 channels)
+  const MAX_ROUNDS = Math.max(5, Math.ceil(DYNAMIC_TARGET / 1000)); // Scale with target, min 5
   const ROUND_DELAY_MS = 2000; // 2 second delay between rounds
+
+  console.log(`🔄 Sourcing Strategy: ${MAX_ROUNDS} rounds max, target: ${DYNAMIC_TARGET} leads/day`);
 
   // v2.1: Retry logic - Keep sourcing until target is met or max rounds reached
   for (let round = 1; round <= MAX_ROUNDS && created < DYNAMIC_TARGET; round++) {
@@ -200,18 +288,32 @@ async function sourceLeadsAutonomous() {
     const remainingNeeded = DYNAMIC_TARGET - created;
     
     // Source from multiple channels
-    // v2.1: Request more leads than needed to account for rejections
-    const targetToRequest = Math.min(remainingNeeded * 3, 300); // Request 3x needed, max 300
+    // WAR MODE: Remove 300 cap, scale with target (Directive 011 - 10K/day)
+    // Request 3x needed to account for rejections/deduplication, but scale up to 10K
+    const targetToRequest = Math.min(remainingNeeded * 3, Math.max(300, DYNAMIC_TARGET / MAX_ROUNDS));
     
     console.log(`📡 Round ${round}: Sourcing up to ${targetToRequest} candidates...`);
     
-    const [githubLeads, ycLeads, hiringLeads] = await Promise.all([
-      sourceFromGitHub(targetToRequest), // Pass maxLeads for this round
-      sourceFromYC(targetToRequest), // v2.1: Pass maxLeads for YC scraper
-      sourceFromHiringPosts(targetToRequest), // v2.1: Pass maxLeads for HN scraper
+    // WAR MODE: Multi-channel sourcing for 10K/day capacity
+    const [githubLeads, ycLeads, hiringLeads, crunchbaseLeads, producthuntLeads, redditLeads, twitterLeads] = await Promise.all([
+      sourceFromGitHub(targetToRequest), // Channel 1: GitHub
+      sourceFromYC(targetToRequest), // Channel 2: YC
+      sourceFromHiringPosts(targetToRequest), // Channel 3: HN
+      sourceFromCrunchbaseWrapper(targetToRequest), // Channel 4: Crunchbase
+      sourceFromProductHuntWrapper(targetToRequest), // Channel 5: Product Hunt
+      sourceFromRedditWrapper(targetToRequest), // Channel 6: Reddit
+      sourceFromTwitterWrapper(targetToRequest), // Channel 7: Twitter
     ]);
     
-    allCandidates.push(...githubLeads, ...ycLeads, ...hiringLeads);
+    allCandidates.push(
+      ...githubLeads, 
+      ...ycLeads, 
+      ...hiringLeads,
+      ...crunchbaseLeads,
+      ...producthuntLeads,
+      ...redditLeads,
+      ...twitterLeads
+    );
     
     // Sprint 4: Lookalike Seeding (if we have good leads and still need more)
     if (allCandidates.length < remainingNeeded) {

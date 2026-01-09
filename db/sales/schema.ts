@@ -36,7 +36,8 @@ export const auditActionEnum = pgEnum('audit_action', [
   'KILL_SWITCH_ACTIVATED',
   'AUTONOMOUS_REPLY_SENT',
   'AUTONOMOUS_REPLY_FAILED',
-  'AI_REPLY_SENT'
+  'AI_REPLY_SENT',
+  'LEAD_SUBMITTED' // Neuron API: External lead submissions
 ]);
 
 // Leads Table
