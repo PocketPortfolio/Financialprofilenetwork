@@ -10,8 +10,11 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
+// Next.js route configuration for production
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 interface AnswerResult {
   question: string;

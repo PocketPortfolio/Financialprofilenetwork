@@ -6,8 +6,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchBlogPosts, getBlogPostsByPillar, getBlogPostsByTag } from '@/app/lib/blog/blogSearch';
 
+// Next.js route configuration for production
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 export async function GET(request: NextRequest) {
   try {
