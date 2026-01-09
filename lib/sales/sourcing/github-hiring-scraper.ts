@@ -37,11 +37,10 @@ export async function sourceFromGitHubHiring(
   const maxResults = maxLeads || 100; // Default to 100, but can be higher for retries
 
   try {
-    // v2.1: Fintech-focused queries (Sniper approach - industry-aligned)
-    // Strategy: Target Fintech/Finance companies using TypeScript
-    // Note: React preference handled in enrichment scoring, not search query
-    const searchQueries = [
-      // Core Fintech keywords
+    // v2.2: Tiered query expansion (narrow → broad for wider coverage)
+    // Strategy: Start with focused queries, expand if results insufficient
+    // Tier 1: Narrow (Fintech + TypeScript) - Highest quality
+    const tier1Queries = [
       'hiring in:readme language:TypeScript "fintech"',
       'hiring in:readme language:TypeScript "finance"',
       'hiring in:readme language:TypeScript "wealth"',
@@ -49,22 +48,54 @@ export async function sourceFromGitHubHiring(
       'hiring in:readme language:TypeScript "blockchain"',
       'hiring in:readme language:TypeScript "payment"',
       'hiring in:readme language:TypeScript "trading"',
-      // Location-specific Fintech queries (high-value markets)
+    ];
+
+    // Tier 2: Medium (Fintech + JavaScript, or TypeScript + broader finance terms)
+    const tier2Queries = [
+      'hiring in:readme language:JavaScript "fintech"',
+      'hiring in:readme language:JavaScript "finance"',
+      'hiring in:readme language:TypeScript "banking"',
+      'hiring in:readme language:TypeScript "investment"',
+      'hiring in:readme language:TypeScript "financial"',
       'hiring in:readme language:TypeScript "fintech" location:London',
       'hiring in:readme language:TypeScript "finance" location:Remote',
       'hiring in:readme language:TypeScript "crypto" location:US',
-      // Alternative: JavaScript for broader coverage (still Fintech-filtered)
-      'hiring in:readme language:JavaScript "fintech"',
-      'hiring in:readme language:JavaScript "finance"',
     ];
+
+    // Tier 3: Broad (TypeScript/JavaScript + DevTools/Startups, or remove industry filter)
+    const tier3Queries = [
+      'hiring in:readme language:TypeScript "startup"',
+      'hiring in:readme language:TypeScript "devtools"',
+      'hiring in:readme language:TypeScript "saas"',
+      'hiring in:readme language:JavaScript "startup"',
+      'hiring in:readme language:JavaScript "devtools"',
+      'hiring in:readme language:TypeScript', // No industry filter
+      'hiring in:readme language:JavaScript', // No industry filter
+    ];
+
+    // Tier 4: Very broad (any language, any industry, just "hiring")
+    const tier4Queries = [
+      'hiring in:readme language:TypeScript OR language:JavaScript',
+      'hiring in:readme',
+    ];
+
+    // Determine which tiers to use based on results needed
+    const resultsThreshold = Math.max(10, maxResults * 0.3); // Expand if we have <30% of target
+    let currentTier = 1;
+    let allQueries: string[] = [];
+
+    // Start with Tier 1 (narrow)
+    allQueries = [...tier1Queries];
+    console.log(`📡 Using Tier ${currentTier} queries (narrow, Fintech-focused)`);
 
     let totalProcessed = 0;
     let totalSkipped = 0;
+    let queryIndex = 0;
 
-    for (const query of searchQueries) {
-      if (leads.length >= maxResults) {
-        break; // Stop if we've reached the target
-      }
+    // Process queries with expansion logic
+    while (queryIndex < allQueries.length && leads.length < maxResults) {
+      const query = allQueries[queryIndex];
+      queryIndex++;
 
       try {
         const response = await fetch(
@@ -142,9 +173,30 @@ export async function sourceFromGitHubHiring(
         console.error(`Error processing GitHub query "${query}":`, error.message);
         continue;
       }
+
+      // Query expansion: Check if we need to expand to next tier
+      // Expand after processing all queries in current tier if results insufficient
+      if (queryIndex >= allQueries.length && leads.length < resultsThreshold && currentTier < 4) {
+        console.log(`⚠️  Only found ${leads.length} leads (target: ${maxResults}). Expanding to Tier ${currentTier + 1} queries...`);
+        
+        // Add next tier queries
+        if (currentTier === 1) {
+          allQueries = [...tier1Queries, ...tier2Queries];
+          currentTier = 2;
+          console.log(`📡 Expanded to Tier 2: Added JavaScript + broader finance terms`);
+        } else if (currentTier === 2) {
+          allQueries = [...tier1Queries, ...tier2Queries, ...tier3Queries];
+          currentTier = 3;
+          console.log(`📡 Expanded to Tier 3: Added DevTools/Startups, removed industry filters`);
+        } else if (currentTier === 3) {
+          allQueries = [...tier1Queries, ...tier2Queries, ...tier3Queries, ...tier4Queries];
+          currentTier = 4;
+          console.log(`📡 Expanded to Tier 4: Very broad queries (any industry)`);
+        }
+      }
     }
 
-    console.log(`✅ GitHub sourcing: Found ${leads.length} valid leads (processed ${totalProcessed}, skipped ${totalSkipped})`);
+    console.log(`✅ GitHub sourcing: Found ${leads.length} valid leads (processed ${totalProcessed}, skipped ${totalSkipped}, tier: ${currentTier})`);
   } catch (error: any) {
     console.error('GitHub sourcing error:', error.message);
   }
