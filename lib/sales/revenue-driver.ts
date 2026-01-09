@@ -9,7 +9,7 @@ import { getRevenueMetrics } from './revenueCalculator';
 import type { Lead } from './revenueCalculator';
 import { getBestProductForLead, getMonthlyRevenueValue } from '@/lib/stripe/product-catalog';
 
-const TARGET_REVENUE = 5000; // £5,000/month
+const TARGET_REVENUE = 8333; // £8,333/month (£100k/year) - v2.1
 const BASE_LEADS_PER_DAY = 50;
 const MAX_LEADS_PER_DAY = 200; // Safety limit
 const MIN_LEADS_PER_DAY = 20; // Minimum to maintain pipeline

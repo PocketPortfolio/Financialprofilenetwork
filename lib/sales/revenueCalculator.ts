@@ -36,7 +36,7 @@ const STAGE_PROBABILITIES = {
   'DO_NOT_CONTACT': 0,
 } as const;
 
-const TARGET_REVENUE = 5000; // £5,000/month
+const TARGET_REVENUE = 8333; // £8,333/month (£100k/year) - v2.1
 
 /**
  * Classify deal tier based on company size (returns product catalog ID)
@@ -78,11 +78,13 @@ export function getDealSize(lead: Lead): number {
  * Calculate projected revenue from leads
  */
 export function calculateProjectedRevenue(leads: Lead[]): number {
-  return leads.reduce((total, lead) => {
-    const dealSize = getDealSize(lead);
-    const probability = STAGE_PROBABILITIES[lead.status as keyof typeof STAGE_PROBABILITIES] || 0;
-    return total + (dealSize * probability);
-  }, 0);
+  return leads
+    .filter(lead => lead.status !== 'UNQUALIFIED') // v2.1: Exclude invalid emails
+    .reduce((total, lead) => {
+      const dealSize = getDealSize(lead);
+      const probability = STAGE_PROBABILITIES[lead.status as keyof typeof STAGE_PROBABILITIES] || 0;
+      return total + (dealSize * probability);
+    }, 0);
 }
 
 /**
@@ -105,7 +107,8 @@ export function calculatePipelineValue(leads: Lead[]): number {
     .filter(lead => 
       lead.status !== 'NOT_INTERESTED' && 
       lead.status !== 'DO_NOT_CONTACT' &&
-      lead.status !== 'CONVERTED'
+      lead.status !== 'CONVERTED' &&
+      lead.status !== 'UNQUALIFIED' // v2.1: Exclude invalid emails from pipeline
     )
     .reduce((total, lead) => {
       const dealSize = getDealSize(lead);

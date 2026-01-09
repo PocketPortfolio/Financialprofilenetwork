@@ -32,7 +32,7 @@ async function createTables() {
     console.log('Creating enums...');
     await sql`
       DO $$ BEGIN
-        CREATE TYPE lead_status AS ENUM ('NEW', 'RESEARCHING', 'SCHEDULED', 'CONTACTED', 'REPLIED', 'INTERESTED', 'NOT_INTERESTED', 'DO_NOT_CONTACT', 'CONVERTED');
+        CREATE TYPE lead_status AS ENUM ('NEW', 'RESEARCHING', 'SCHEDULED', 'CONTACTED', 'REPLIED', 'INTERESTED', 'NOT_INTERESTED', 'UNQUALIFIED', 'DO_NOT_CONTACT', 'CONVERTED');
       EXCEPTION
         WHEN duplicate_object THEN null;
       END $$;
@@ -79,6 +79,7 @@ async function createTables() {
         detected_region TEXT,
         news_signals JSONB,
         scheduled_send_at TIMESTAMP,
+        sequence_step INTEGER DEFAULT 0,
         opt_out BOOLEAN DEFAULT false NOT NULL,
         data_source TEXT,
         data_source_date TIMESTAMP,

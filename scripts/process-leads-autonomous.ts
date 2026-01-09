@@ -36,7 +36,8 @@ const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be li
  */
 
 /**
- * Get email sequence step for a lead based on outbound email count
+ * Get email sequence step for a lead (v2.1: Uses stored sequence_step from DB)
+ * Iron Rail State Machine: Step 1 -> 2 -> 3 -> 4
  */
 async function getEmailSequenceStep(leadId: string): Promise<{
   step: 1 | 2 | 3 | 4;
@@ -46,7 +47,21 @@ async function getEmailSequenceStep(leadId: string): Promise<{
   daysSinceLastContact: number;
   emailCount: number;
 }> {
-  // Count outbound emails for this lead
+  // Get lead with stored sequence_step
+  const [lead] = await db
+    .select({ 
+      lastContactedAt: leads.lastContactedAt,
+      sequenceStep: leads.sequenceStep,
+    })
+    .from(leads)
+    .where(eq(leads.id, leadId))
+    .limit(1);
+
+  if (!lead) {
+    throw new Error(`Lead ${leadId} not found`);
+  }
+
+  // Count outbound emails for verification
   const outboundEmails = await db
     .select()
     .from(conversations)
@@ -59,44 +74,41 @@ async function getEmailSequenceStep(leadId: string): Promise<{
 
   const emailCount = outboundEmails.length;
   
+  // Use stored sequence_step (default to 0 if null)
+  const storedStep = lead.sequenceStep ?? 0;
+  
   // Get last contacted date
-  const [lead] = await db
-    .select({ lastContactedAt: leads.lastContactedAt })
-    .from(leads)
-    .where(eq(leads.id, leadId))
-    .limit(1);
-
-  const lastContacted = lead?.lastContactedAt ? new Date(lead.lastContactedAt) : null;
+  const lastContacted = lead.lastContactedAt ? new Date(lead.lastContactedAt) : null;
   const now = new Date();
   const daysSinceLastContact = lastContacted 
     ? Math.floor((now.getTime() - lastContacted.getTime()) / (1000 * 60 * 60 * 24))
     : 999; // Never contacted
 
-  // Determine sequence step based on email count
+  // Determine sequence step based on stored value (v2.1: State Machine)
   let step: 1 | 2 | 3 | 4;
   let emailType: 'initial' | 'follow_up' | 'objection_handling';
   let waitDays: number;
   let canSend: boolean;
 
-  if (emailCount === 0) {
+  if (storedStep === 0 || emailCount === 0) {
     // Step 1: Cold Open (Initial Contact)
     step = 1;
     emailType = 'initial';
     waitDays = 0; // Can send immediately
     canSend = true;
-  } else if (emailCount === 1) {
+  } else if (storedStep === 1 || emailCount === 1) {
     // Step 2: Value Add (Follow-Up) - Wait 3 days
     step = 2;
     emailType = 'follow_up';
     waitDays = 3;
     canSend = daysSinceLastContact >= 3;
-  } else if (emailCount === 2) {
+  } else if (storedStep === 2 || emailCount === 2) {
     // Step 3: Objection Killer - Wait 4 days
     step = 3;
     emailType = 'objection_handling';
     waitDays = 4;
     canSend = daysSinceLastContact >= 4;
-  } else if (emailCount === 3) {
+  } else if (storedStep === 3 || emailCount === 3) {
     // Step 4: Breakup (Soft Close) - Wait 7 days
     step = 4;
     emailType = 'follow_up'; // Will be handled as breakup in prompt
@@ -396,16 +408,18 @@ async function processResearchingLeads() {
       });
       
       // Update lead status: SCHEDULED if scheduled, CONTACTED if sent immediately
+      // v2.1: Update sequence_step to 1 (Step 1: Cold Open)
       await db.update(leads)
         .set({
           status: isScheduled ? 'SCHEDULED' : 'CONTACTED',
+          sequenceStep: 1, // v2.1: Set to Step 1 (Cold Open)
           lastContactedAt: isScheduled ? optimalSendTime : new Date(),
           scheduledSendAt: isScheduled ? optimalSendTime : null,
           updatedAt: new Date(),
         })
         .where(eq(leads.id, lead.id));
       
-      // Log action
+      // Log action with sequence step
       await db.insert(auditLogs).values({
         leadId: lead.id,
         action: isScheduled ? 'EMAIL_SCHEDULED' : 'EMAIL_SENT',
@@ -415,6 +429,7 @@ async function processResearchingLeads() {
           threadId,
           subject: email.subject,
           scheduledFor: isScheduled ? optimalSendTime?.toISOString() : undefined,
+          sequenceStep: 1, // v2.1: Log sequence step
         },
       });
       
@@ -610,10 +625,12 @@ async function processContactedLeads() {
         aiReasoning: reasoning,
       });
       
-      // Update lead status
+      // Update lead status and sequence_step (v2.1: State Machine)
+      const nextStep = sequence.step + 1 as 2 | 3 | 4;
       await db.update(leads)
         .set({
           status: isScheduled ? 'SCHEDULED' : 'CONTACTED',
+          sequenceStep: nextStep, // v2.1: Advance to next step
           lastContactedAt: isScheduled ? optimalSendTime : new Date(),
           scheduledSendAt: isScheduled ? optimalSendTime : null,
           updatedAt: new Date(),
@@ -625,16 +642,18 @@ async function processContactedLeads() {
         console.log(`   📝 Step 4 (breakup) sent - will mark as DO_NOT_CONTACT if no response`);
       }
       
-      // Log action
+      // Log action with sequence step transition
       await db.insert(auditLogs).values({
         leadId: lead.id,
         action: isScheduled ? 'EMAIL_SCHEDULED' : 'EMAIL_SENT',
-        aiReasoning: `Sequence Step ${sequence.step}: ${reasoning}`,
+        aiReasoning: `Sequence Step ${sequence.step} -> ${nextStep}: ${reasoning}`,
         metadata: {
           emailId,
+          sequenceStep: nextStep, // v2.1: Log new sequence step
           threadId,
           subject: email.subject,
-          sequenceStep: sequence.step,
+          previousSequenceStep: sequence.step,
+          newSequenceStep: nextStep,
           emailType: sequence.emailType,
           scheduledFor: isScheduled ? optimalSendTime?.toISOString() : undefined,
         },
