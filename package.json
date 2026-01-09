@@ -61,6 +61,7 @@
     "db:create": "ts-node --project scripts/tsconfig.json scripts/create-sales-tables.ts",
     "db:push": "ts-node --project scripts/tsconfig.json scripts/run-manual-migration.ts",
     "db:migrate:prod": "ts-node --project scripts/tsconfig.json scripts/production-migration.ts",
+    "db:add-scheduled-status": "ts-node --project scripts/tsconfig.json scripts/add-scheduled-status-migration.ts",
     "db:verify": "ts-node --project scripts/tsconfig.json scripts/verify-schema.ts",
     "db:studio": "drizzle-kit studio",
     "source-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/source-leads-autonomous.ts",

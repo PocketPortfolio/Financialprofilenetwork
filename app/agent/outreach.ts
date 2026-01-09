@@ -136,24 +136,39 @@ ${productList}
 
 CRITICAL REQUIREMENTS (Sprint 4: Humanity & Precision):
 1. MUST include exactly ONE call-to-action link: ${trackedLink}
-   - Link should be naturally integrated (e.g., "Learn more: [link]" or "Check it out: [link]")
-   - Do NOT just paste the link - integrate it into the flow
+   - Format as Markdown: [Learn more about the Founder's Club](${trackedLink})
+   - OR format as: "Learn more: ${trackedLink}" (will be auto-converted to clickable link)
+   - Make the link text friendly and inviting (e.g., "Learn more", "Check it out", "Explore the Founder's Club")
+   - NEVER just paste the raw URL - always use descriptive link text
+   - Example: "If you're curious, [learn more about the Founder's Club](${trackedLink})"
 
 2. GREETING: ${firstNameReliable 
-    ? `Use their first name (${leadData.firstName}) in the greeting. Start with "Hi ${leadData.firstName}," or similar.`
-    : `DO NOT use a first name - we don't have a reliable name. Use a company-based greeting like "Hi team at ${leadData.companyName}," or "Hello ${leadData.companyName},"`}
+    ? `Use their first name warmly: "Hi ${leadData.firstName}!" or "Hello ${leadData.firstName}," - be friendly and personal`
+    : `Use a friendly company greeting: "Hi team at ${leadData.companyName}!" or "Hello ${leadData.companyName}," - be warm and approachable`}
 
-3. TONE: Write as a fellow Engineer asking for a code review, NOT a Sales Rep asking for a meeting
-   - Be humble: "I'm mostly reaching out to see if our local-first approach aligns with your privacy goals. If not, tell me to get lost—I won't be offended."
+3. TONE: Write as a warm, friendly fellow Engineer, NOT a cold Sales Rep
+   - Be genuinely friendly: "Hi! I'm reaching out because..." instead of "I am reaching out to..."
+   - Use conversational language: "I thought you might find this interesting" vs "You may be interested"
+   - Be warm but professional: "Hope you're doing well!" or "Hope this finds you well!"
+   - Show genuine curiosity: "I'm curious if..." vs "I want to know if..."
+   - Be humble and peer-to-peer: "I'm mostly reaching out to see if our local-first approach aligns with your privacy goals. If not, tell me to get lost—I won't be offended."
    - Avoid "Sales Breath": No false urgency, no aggressive language, no "I have a great solution for you!"
-   - Focus on peer-to-peer curiosity and technical alignment
    - Examples:
+     * ❌ "I am reaching out to introduce..."
+     * ✅ "Hi! I'm reaching out because I thought you might appreciate..."
      * ❌ "I have a great solution that will transform your business!"
      * ✅ "I'm mostly reaching out to see if our local-first approach aligns with your privacy goals."
      * ❌ "This is a limited-time offer!"
      * ✅ "If this isn't a fit, no worries—just let me know."
      * ❌ "As a CTO, you need this!"
      * ✅ "As a fellow engineer, I thought you might appreciate our local-state architecture..."
+
+4. FRIENDLINESS CHECKLIST:
+   - Start with a warm greeting (use exclamation marks sparingly but naturally)
+   - Use "I" and "you" (conversational, not formal)
+   - Include a friendly closing ("Looking forward to your thoughts!" or "Hope to hear from you!")
+   - Be genuine, not robotic - show personality while staying professional
+   - Use contractions naturally ("I'm", "you're", "we're") for a conversational feel
 
 4. Subject line: 10-100 characters
 5. Body: 100-2000 characters
@@ -210,6 +225,37 @@ Automated outreach • Human supervisor monitoring this thread.`;
 }
 
 /**
+ * Convert Markdown links [text](url) to HTML anchor tags
+ */
+function convertMarkdownLinksToHtml(text: string): string {
+  // Convert Markdown links [text](url) to HTML <a> tags
+  const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  return text.replace(markdownLinkRegex, '<a href="$2" style="color: #0066cc; text-decoration: underline;">$1</a>');
+}
+
+/**
+ * Convert plain URLs to clickable HTML links (fallback for URLs not in Markdown format)
+ */
+function convertUrlsToClickableLinks(text: string): string {
+  // Match URLs that aren't already inside <a> tags
+  const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
+  return text.replace(urlRegex, (url) => {
+    // Check if URL is already inside an <a> tag
+    const beforeMatch = text.substring(0, text.indexOf(url));
+    const afterMatch = text.substring(text.indexOf(url) + url.length);
+    const beforeTag = beforeMatch.lastIndexOf('<a');
+    const afterTag = afterMatch.indexOf('</a>');
+    
+    // If URL is between <a> and </a>, don't convert it
+    if (beforeTag !== -1 && afterTag !== -1 && beforeTag < text.indexOf(url)) {
+      return url;
+    }
+    
+    return `<a href="${url}" style="color: #0066cc; text-decoration: underline;">${url}</a>`;
+  });
+}
+
+/**
  * Send email via Resend
  * Sprint 4: Supports timezone-aware scheduling
  */
@@ -220,11 +266,16 @@ export async function sendEmail(
   leadId: string,
   scheduledSendAt?: Date // NEW: Optional scheduled send time for timezone awareness
 ): Promise<{ emailId: string; threadId?: string }> {
+  // Convert Markdown links to HTML, then plain URLs, then newlines
+  let htmlBody = convertMarkdownLinksToHtml(body);
+  htmlBody = convertUrlsToClickableLinks(htmlBody);
+  htmlBody = htmlBody.replace(/\n/g, '<br>');
+  
   const sendOptions: any = {
     from: 'Pilot <pilot@pocketportfolio.app>',
     to,
     subject,
-    html: body.replace(/\n/g, '<br>'),
+    html: htmlBody, // Use converted HTML with clickable links
     tags: [{ name: 'lead_id', value: leadId }],
   };
 
