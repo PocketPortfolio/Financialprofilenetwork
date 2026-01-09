@@ -76,6 +76,7 @@ function buildPrompt(
     newsSignals?: Array<{ type: string; description: string }>;
     selectedProduct?: { id: string; name: string };
     employeeCount?: number;
+    requiredLanguage?: string | null; // Execution Order 010 v2: Required language for strict regions
   },
   emailType: string
 ): string {
