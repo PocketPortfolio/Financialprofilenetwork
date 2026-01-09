@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
+import matter from 'gray-matter';
 
 // Load .env.local if it exists
 const envFiles = ['.env.local', '.env'];
@@ -282,16 +283,57 @@ pillar: "${post.pillar}"
       throw new Error('Failed to download image after all retries');
     }
 
-    // Save files
+    // Save files with atomic write operations and verification
     const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
     fs.mkdirSync(path.dirname(imagePath), { recursive: true });
-    fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
-    console.log(`💾 Image saved: ${imagePath}`);
+    
+    // Atomic write: write to temp file first, then rename
+    const imageTempPath = `${imagePath}.tmp`;
+    fs.writeFileSync(imageTempPath, Buffer.from(imageBuffer));
+    fs.renameSync(imageTempPath, imagePath);
+    
+    // Verify image was written correctly
+    if (!fs.existsSync(imagePath)) {
+      throw new Error(`Image file was not created: ${imagePath}`);
+    }
+    const imageStats = fs.statSync(imagePath);
+    if (imageStats.size === 0) {
+      throw new Error(`Image file is empty: ${imagePath}`);
+    }
+    console.log(`💾 Image saved: ${imagePath} (${imageStats.size} bytes)`);
 
     const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
     fs.mkdirSync(path.dirname(mdxPath), { recursive: true });
-    fs.writeFileSync(mdxPath, content);
-    console.log(`💾 Post saved: ${mdxPath}`);
+    
+    // Atomic write: write to temp file first, then rename
+    const mdxTempPath = `${mdxPath}.tmp`;
+    fs.writeFileSync(mdxTempPath, content, 'utf-8');
+    fs.renameSync(mdxTempPath, mdxPath);
+    
+    // Verify MDX was written correctly and is valid
+    if (!fs.existsSync(mdxPath)) {
+      throw new Error(`MDX file was not created: ${mdxPath}`);
+    }
+    const mdxStats = fs.statSync(mdxPath);
+    if (mdxStats.size === 0) {
+      throw new Error(`MDX file is empty: ${mdxPath}`);
+    }
+    
+    // Verify MDX content is valid (has frontmatter and content)
+    const writtenContent = fs.readFileSync(mdxPath, 'utf-8');
+    if (!writtenContent.includes('---')) {
+      throw new Error(`MDX file missing frontmatter: ${mdxPath}`);
+    }
+    if (writtenContent.split('---').length < 3) {
+      throw new Error(`MDX file has invalid frontmatter structure: ${mdxPath}`);
+    }
+    
+    // Verify content matches what we wrote
+    if (writtenContent !== content) {
+      throw new Error(`MDX file content mismatch - file may be corrupted: ${mdxPath}`);
+    }
+    
+    console.log(`💾 Post saved: ${mdxPath} (${mdxStats.size} bytes)`);
 
     console.log(`✅ Generated: ${post.slug}`);
   } catch (error: any) {
@@ -356,6 +398,62 @@ async function main() {
     console.log(`📋 Posts with date <= today: ${calendar.filter(p => p.date <= today).length}`);
     console.log(`📋 Posts with date === today: ${calendar.filter(p => p.date === today).length}`);
     console.log(`📋 Posts with date === today AND status === 'pending': ${calendar.filter(p => p.date === today && p.status === 'pending').length}`);
+    
+    // ✅ PRE-GENERATION HEALTH CHECK: Detect orphaned "published" posts (marked as published but missing files)
+    console.log('\n🔍 Pre-generation health check: Scanning for orphaned "published" posts...');
+    const orphanedPosts: BlogPost[] = [];
+    const publishedPosts = calendar.filter(p => p.status === 'published');
+    
+    for (const post of publishedPosts) {
+      const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+      const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
+      
+      const mdxExists = fs.existsSync(mdxPath);
+      const imageExists = fs.existsSync(imagePath);
+      
+      if (!mdxExists || !imageExists) {
+        orphanedPosts.push(post);
+        console.warn(`⚠️  ORPHANED POST DETECTED: ${post.title} (${post.slug})`);
+        console.warn(`     Status: published, but MDX exists: ${mdxExists ? '✅' : '❌'}, Image exists: ${imageExists ? '✅' : '❌'}`);
+        console.warn(`     Published at: ${post.publishedAt || 'unknown'}`);
+      } else {
+        // Verify files are not empty
+        try {
+          const mdxStats = fs.statSync(mdxPath);
+          const imageStats = fs.statSync(imagePath);
+          if (mdxStats.size === 0 || imageStats.size === 0) {
+            orphanedPosts.push(post);
+            console.warn(`⚠️  ORPHANED POST DETECTED: ${post.title} (${post.slug}) - files are empty`);
+          }
+        } catch (error) {
+          orphanedPosts.push(post);
+          console.warn(`⚠️  ORPHANED POST DETECTED: ${post.title} (${post.slug}) - cannot read file stats`);
+        }
+      }
+    }
+    
+    if (orphanedPosts.length > 0) {
+      console.error(`\n❌ CRITICAL: Found ${orphanedPosts.length} orphaned "published" post(s) missing files!`);
+      console.error('   These posts are marked as "published" but their files are missing or invalid.');
+      console.error('   Resetting status to "pending" so they can be regenerated...\n');
+      
+      for (const post of orphanedPosts) {
+        post.status = 'pending';
+        delete post.publishedAt; // Remove published timestamp
+        console.log(`   🔄 Reset: ${post.title} → status: pending`);
+      }
+      
+      // Save updated calendars immediately
+      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech');
+      const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+      fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
+      if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
+        fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+      }
+      console.log('   ✅ Calendars updated - orphaned posts reset to pending\n');
+    } else {
+      console.log('✅ No orphaned posts detected - all published posts have valid files\n');
+    }
     
     // Show which posts have date <= today (for debugging)
     const postsWithDateLeToday = calendar.filter(p => p.date <= today);
@@ -513,7 +611,7 @@ async function main() {
       try {
         await generateBlogPost(post);
         
-        // ✅ CRITICAL: Verify files exist BEFORE updating status
+        // ✅ CRITICAL: Verify files exist AND are valid BEFORE updating status
         const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
         const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
         
@@ -524,10 +622,43 @@ async function main() {
           throw new Error(`Image file not created: ${imagePath}`);
         }
         
-        // ✅ Only mark for status update if files are verified to exist
+        // Verify files are not empty
+        const mdxStats = fs.statSync(mdxPath);
+        const imageStats = fs.statSync(imagePath);
+        
+        if (mdxStats.size === 0) {
+          throw new Error(`MDX file is empty: ${mdxPath}`);
+        }
+        if (imageStats.size === 0) {
+          throw new Error(`Image file is empty: ${imagePath}`);
+        }
+        
+        // Verify MDX has valid frontmatter
+        const mdxContent = fs.readFileSync(mdxPath, 'utf-8');
+        if (!mdxContent.includes('---')) {
+          throw new Error(`MDX file missing frontmatter: ${mdxPath}`);
+        }
+        if (mdxContent.split('---').length < 3) {
+          throw new Error(`MDX file has invalid frontmatter structure: ${mdxPath}`);
+        }
+        
+        // Verify frontmatter has required fields
+        try {
+          const parsed = matter(mdxContent);
+          if (!parsed.data.title || !parsed.data.date) {
+            throw new Error(`MDX file missing required frontmatter fields: ${mdxPath}`);
+          }
+          if (!parsed.content || parsed.content.trim().length === 0) {
+            throw new Error(`MDX file has no content body: ${mdxPath}`);
+          }
+        } catch (parseError: any) {
+          throw new Error(`MDX file failed frontmatter validation: ${mdxPath} - ${parseError.message}`);
+        }
+        
+        // ✅ Only mark for status update if files are verified to exist AND be valid
         postsToUpdate.push(post);
         successCount++;
-        console.log(`✅ Verified: ${post.slug} - Both MDX and image files exist`);
+        console.log(`✅ Verified: ${post.slug} - Both MDX (${mdxStats.size} bytes) and image (${imageStats.size} bytes) files exist and are valid`);
         
         // Delay to avoid rate limits (2 seconds between posts)
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -597,20 +728,63 @@ async function main() {
       process.exit(1);
     }
 
-    // Verify generated posts actually have files on disk
-    const generatedPosts = duePosts.filter(post => post.status === 'published');
+    // ✅ POST-GENERATION HEALTH CHECK: Verify ALL published posts have valid files
+    console.log('\n🔍 Post-generation health check: Verifying all published posts...');
+    const allPublishedPosts = calendar.filter(post => post.status === 'published');
     const missingFiles: string[] = [];
+    const invalidFiles: string[] = [];
     
-    for (const post of generatedPosts) {
+    for (const post of allPublishedPosts) {
       const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
       const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
       
+      // Check existence
       if (!fs.existsSync(mdxPath)) {
         missingFiles.push(`MDX: ${post.slug}.mdx`);
+        console.error(`   ❌ Missing MDX: ${post.slug}.mdx`);
       }
       if (!fs.existsSync(imagePath)) {
         missingFiles.push(`Image: ${post.slug}.png`);
+        console.error(`   ❌ Missing Image: ${post.slug}.png`);
       }
+      
+      // Check validity if files exist
+      if (fs.existsSync(mdxPath)) {
+        try {
+          const mdxStats = fs.statSync(mdxPath);
+          if (mdxStats.size === 0) {
+            invalidFiles.push(`MDX: ${post.slug}.mdx (empty)`);
+            console.error(`   ❌ Invalid MDX: ${post.slug}.mdx (empty file)`);
+          } else {
+            // Verify frontmatter
+            const mdxContent = fs.readFileSync(mdxPath, 'utf-8');
+            if (!mdxContent.includes('---') || mdxContent.split('---').length < 3) {
+              invalidFiles.push(`MDX: ${post.slug}.mdx (invalid frontmatter)`);
+              console.error(`   ❌ Invalid MDX: ${post.slug}.mdx (invalid frontmatter)`);
+            }
+          }
+        } catch (error: any) {
+          invalidFiles.push(`MDX: ${post.slug}.mdx (read error: ${error.message})`);
+          console.error(`   ❌ Invalid MDX: ${post.slug}.mdx (${error.message})`);
+        }
+      }
+      
+      if (fs.existsSync(imagePath)) {
+        try {
+          const imageStats = fs.statSync(imagePath);
+          if (imageStats.size === 0) {
+            invalidFiles.push(`Image: ${post.slug}.png (empty)`);
+            console.error(`   ❌ Invalid Image: ${post.slug}.png (empty file)`);
+          }
+        } catch (error: any) {
+          invalidFiles.push(`Image: ${post.slug}.png (read error: ${error.message})`);
+          console.error(`   ❌ Invalid Image: ${post.slug}.png (${error.message})`);
+        }
+      }
+    }
+    
+    if (missingFiles.length === 0 && invalidFiles.length === 0) {
+      console.log(`   ✅ All ${allPublishedPosts.length} published posts have valid files\n`);
     }
     
     if (missingFiles.length > 0) {
