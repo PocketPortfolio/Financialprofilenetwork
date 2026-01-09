@@ -19,14 +19,14 @@ import { eq, and, inArray, or, sql, isNotNull } from 'drizzle-orm';
 import { enrichLead } from '@/app/agent/researcher';
 import { generateEmail, sendEmail } from '@/app/agent/outreach';
 import { canContactLead } from '@/lib/sales/compliance';
-import { kv } from '@vercel/kv';
+// WAR MODE: kv import removed - no rate limiting (Directive 011)
 import { calculateOptimalSendTime, isOptimalSendWindow } from '@/lib/sales/timezone-utils';
 import { getBestProductForLead } from '@/lib/stripe/product-catalog';
 import { isRealFirstName } from '@/lib/sales/name-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
 import { determineOutreachLanguage } from '@/lib/sales/cultural-guardrails';
 
-const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be limited by rate limit)
+const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (WAR MODE: No rate limit)
 
 /**
  * Email Sequence Strategy:
@@ -247,22 +247,11 @@ async function processResearchingLeads() {
     console.log(`   ✅ Marked ${placeholderResearching.length} placeholder leads as DO_NOT_CONTACT`);
   }
   
-  // Check rate limit FIRST to calculate dynamic limit
-  const rateLimitKey = `sales:rate-limit:${new Date().toISOString().split('T')[0]}`;
-  const currentCount = (await kv.get<number>(rateLimitKey)) || 0;
-  const maxPerDay = parseInt(process.env.SALES_RATE_LIMIT_PER_DAY || '50', 10);
+  // WAR MODE: Rate limits removed (Directive 011)
+  // Process all available leads without quota restrictions
+  const leadsToProcess = MAX_LEADS_TO_PROCESS;
   
-  if (currentCount >= maxPerDay) {
-    console.log(`   ⚠️  Rate limit reached: ${currentCount}/${maxPerDay} emails today`);
-    return 0;
-  }
-  
-  // Calculate dynamic limit based on remaining quota
-  const remainingQuota = maxPerDay - currentCount;
-  const leadsToProcess = Math.min(MAX_LEADS_TO_PROCESS, remainingQuota);
-  
-  console.log(`   📊 Rate limit status: ${currentCount}/${maxPerDay} sent today, ${remainingQuota} remaining`);
-  console.log(`   🔢 Processing up to ${leadsToProcess} leads (limited by remaining quota)`);
+  console.log(`   🔢 Processing up to ${leadsToProcess} leads (WAR MODE: Unlimited)`);
   
   const researchingLeads = await db
     .select()
@@ -276,12 +265,6 @@ async function processResearchingLeads() {
   let sent = 0;
   
   for (const lead of researchingLeads) {
-    // Double-check rate limit (safety check)
-    if (currentCount + sent >= maxPerDay) {
-      console.log(`   ⚠️  Rate limit reached, stopping`);
-      break;
-    }
-    
     // CRITICAL: Skip placeholder emails - they should never be contacted
     if (isPlaceholderEmail(lead.email)) {
       console.log(`   ⚠️  Skipping placeholder email: ${lead.email} at ${lead.companyName}`);
@@ -403,10 +386,7 @@ async function processResearchingLeads() {
         isScheduled ? optimalSendTime : undefined // Only pass if scheduling
       );
       
-      // Update rate limit (only if sending immediately, not if scheduled)
-      if (!isScheduled) {
-        await kv.set(rateLimitKey, currentCount + sent + 1);
-      }
+      // WAR MODE: Rate limit tracking removed (Directive 011)
       
       // Save conversation
       await db.insert(conversations).values({
@@ -474,20 +454,11 @@ async function processResearchingLeads() {
 async function processContactedLeads() {
   console.log('📧 Processing CONTACTED leads for follow-ups...');
   
-  // Check rate limit FIRST
-  const rateLimitKey = `sales:rate-limit:${new Date().toISOString().split('T')[0]}`;
-  const currentCount = (await kv.get<number>(rateLimitKey)) || 0;
-  const maxPerDay = parseInt(process.env.SALES_RATE_LIMIT_PER_DAY || '50', 10);
+  // WAR MODE: Rate limits removed (Directive 011)
+  // Process all available leads without quota restrictions
+  const leadsToProcess = MAX_LEADS_TO_PROCESS;
   
-  if (currentCount >= maxPerDay) {
-    console.log(`   ⚠️  Rate limit reached: ${currentCount}/${maxPerDay} emails today`);
-    return 0;
-  }
-  
-  const remainingQuota = maxPerDay - currentCount;
-  const leadsToProcess = Math.min(MAX_LEADS_TO_PROCESS, remainingQuota);
-  
-  console.log(`   📊 Rate limit status: ${currentCount}/${maxPerDay} sent today, ${remainingQuota} remaining`);
+  console.log(`   🔢 Processing up to ${leadsToProcess} leads (WAR MODE: Unlimited)`);
   
   // Get CONTACTED leads that have been contacted before
   const contactedLeads = await db
@@ -508,11 +479,7 @@ async function processContactedLeads() {
   let skipped = 0;
 
   for (const lead of contactedLeads) {
-    // Double-check rate limit
-    if (currentCount + sent >= maxPerDay) {
-      console.log(`   ⚠️  Rate limit reached, stopping`);
-      break;
-    }
+    // WAR MODE: Rate limit checks removed (Directive 011)
     
     // CRITICAL: Skip placeholder emails
     if (isPlaceholderEmail(lead.email)) {
@@ -633,10 +600,7 @@ async function processContactedLeads() {
         isScheduled ? optimalSendTime : undefined
       );
       
-      // Update rate limit (only if sending immediately)
-      if (!isScheduled) {
-        await kv.set(rateLimitKey, currentCount + sent + 1);
-      }
+      // WAR MODE: Rate limit tracking removed (Directive 011)
       
       // Save conversation
       await db.insert(conversations).values({

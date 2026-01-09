@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import { generateEmail, sendEmail } from '@/app/agent/outreach';
 import { canContactLead } from '@/lib/sales/compliance';
 import { isRealFirstName } from '@/lib/sales/name-validation';
-import { kv } from '@vercel/kv';
+// WAR MODE: kv import removed - no rate limiting (Directive 011)
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -45,24 +45,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rate limiting check
-    const rateLimitKey = `sales:rate-limit:${new Date().toISOString().split('T')[0]}`;
-    const currentCount = (await kv.get<number>(rateLimitKey)) || 0;
-    const maxPerDay = parseInt(process.env.SALES_RATE_LIMIT_PER_DAY || '50', 10);
-
-    if (currentCount >= maxPerDay) {
-      await db.insert(auditLogs).values({
-        leadId,
-        action: 'RATE_LIMIT_HIT',
-        aiReasoning: `Rate limit reached: ${currentCount}/${maxPerDay} emails today`,
-        metadata: { currentCount, maxPerDay },
-      });
-
-      return NextResponse.json(
-        { error: `Rate limit reached: ${currentCount}/${maxPerDay} emails today` },
-        { status: 429 }
-      );
-    }
+    // WAR MODE: Rate limiting removed (Directive 011)
+    // No quota checks - send immediately
 
     // Fetch lead data
     const [lead] = await db
@@ -99,8 +83,7 @@ export async function POST(request: NextRequest) {
       leadId
     );
 
-    // Update rate limit counter
-    await kv.set(rateLimitKey, currentCount + 1, { ex: 86400 }); // 24 hours
+    // WAR MODE: Rate limit tracking removed (Directive 011)
 
     // Save conversation
     await db.insert(conversations).values({
