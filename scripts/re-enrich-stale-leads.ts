@@ -75,14 +75,14 @@ async function reEnrichStaleLeads() {
         .where(eq(leads.id, lead.id))
         .limit(1);
       
-      if (updated && updated.score > 0 && updated.researchSummary && updated.researchSummary !== 'Research pending') {
+      if (updated && (updated.score ?? 0) > 0 && updated.researchSummary && updated.researchSummary !== 'Research pending') {
         enriched++;
         const summaryPreview = updated.researchSummary.length > 50 
           ? updated.researchSummary.substring(0, 50) + '...'
           : updated.researchSummary;
-        console.log(`   ✅ Updated: Score=${updated.score}, Status=${updated.status}, Summary="${summaryPreview}"`);
+        console.log(`   ✅ Updated: Score=${updated.score ?? 0}, Status=${updated.status}, Summary="${summaryPreview}"`);
       } else {
-        console.log(`   ⚠️  Still stale after enrichment (Score: ${updated?.score || 0})`);
+        console.log(`   ⚠️  Still stale after enrichment (Score: ${updated?.score ?? 0})`);
       }
     } catch (error: any) {
       failed++;
