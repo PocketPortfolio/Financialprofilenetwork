@@ -24,6 +24,8 @@ import { db } from '@/db/sales/client';
 import { leads } from '@/db/sales/schema';
 import { eq, ilike } from 'drizzle-orm';
 import { sourceFromGitHubHiring } from '@/lib/sales/sourcing/github-hiring-scraper';
+import { sourceFromYC as sourceFromYCScraper } from '@/lib/sales/sourcing/yc-scraper';
+import { sourceFromHiringPosts as sourceFromHNScraper } from '@/lib/sales/sourcing/hiring-posts-scraper';
 import { generateLookalikeLeads } from '@/lib/sales/sourcing/lookalike-seeding';
 import { isPlaceholderEmail, resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
 import { validateEmail } from '@/lib/sales/email-validation';
@@ -81,49 +83,44 @@ async function sourceFromGitHub(maxLeads?: number): Promise<LeadCandidate[]> {
 
 /**
  * Source leads from YC company list
- * UPDATED: Filter for fintech companies
+ * v2.1: Strategic Diversification - Channel 2 (High-Ticket Targets)
  */
-async function sourceFromYC(): Promise<LeadCandidate[]> {
-  const candidates: LeadCandidate[] = [];
+async function sourceFromYC(maxLeads?: number): Promise<LeadCandidate[]> {
+  console.log('🔍 Searching YC company list for Fintech/DevTools companies...');
   
-  console.log('🔍 Searching YC company list for Fintech companies...');
+  const ycLeads = await sourceFromYCScraper(maxLeads);
   
-  // UPDATED: Filter YC companies for:
-  // - Fintech category
-  // - Companies with 10+ employees (Corporate Sponsor targets)
-  // - CTO/VP Engineering contacts
-  
-  // In production, this would:
-  // 1. Fetch YC company list (if API available)
-  // 2. Filter for fintech/financial services companies
-  // 3. Find CTO/VP Engineering contacts at companies with 10+ employees
-  
-  // For now, return empty array
-  // TODO: Implement YC company list integration
-  console.log('⚠️  YC sourcing not yet implemented (requires YC API or scraping)');
-  
-  return candidates;
+  // Convert to LeadCandidate format
+  return ycLeads.map(lead => ({
+    email: lead.email,
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    companyName: lead.companyName,
+    jobTitle: lead.jobTitle,
+    linkedinUrl: undefined,
+    dataSource: lead.dataSource,
+  }));
 }
 
 /**
  * Source leads from public hiring posts
- * UPDATED: Prioritize corporate/fintech posts
+ * v2.1: Strategic Diversification - Channel 3 (High-Intent)
  */
-async function sourceFromHiringPosts(): Promise<LeadCandidate[]> {
-  const candidates: LeadCandidate[] = [];
+async function sourceFromHiringPosts(maxLeads?: number): Promise<LeadCandidate[]> {
+  console.log('🔍 Searching HN "Who is Hiring" threads for active hiring companies...');
   
-  console.log('🔍 Searching public hiring posts for Corporate/Fintech roles...');
+  const hnLeads = await sourceFromHNScraper(maxLeads);
   
-  // UPDATED: Sources with corporate focus:
-  // - Hacker News "Who's Hiring" - filter for fintech/financial services
-  // - Twitter/X posts with #hiring #fintech #cto
-  // - LinkedIn posts from fintech companies
-  
-  // For now, return empty array
-  // TODO: Implement hiring post scraping
-  console.log('⚠️  Hiring post sourcing not yet implemented');
-  
-  return candidates;
+  // Convert to LeadCandidate format
+  return hnLeads.map(lead => ({
+    email: lead.email,
+    firstName: lead.firstName,
+    lastName: lead.lastName,
+    companyName: lead.companyName,
+    jobTitle: lead.jobTitle,
+    linkedinUrl: undefined,
+    dataSource: lead.dataSource,
+  }));
 }
 
 /**
@@ -210,8 +207,8 @@ async function sourceLeadsAutonomous() {
     
     const [githubLeads, ycLeads, hiringLeads] = await Promise.all([
       sourceFromGitHub(targetToRequest), // Pass maxLeads for this round
-      sourceFromYC(),
-      sourceFromHiringPosts(),
+      sourceFromYC(targetToRequest), // v2.1: Pass maxLeads for YC scraper
+      sourceFromHiringPosts(targetToRequest), // v2.1: Pass maxLeads for HN scraper
     ]);
     
     allCandidates.push(...githubLeads, ...ycLeads, ...hiringLeads);
