@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { leads, auditLogs, conversations } from '@/db/sales/schema';
-import { desc, eq, gte, and } from 'drizzle-orm';
+import { desc, eq, gte, and, or } from 'drizzle-orm';
 import { getRevenueMetrics } from '@/lib/sales/revenueCalculator';
 import { getRevenueDrivenDecisions } from '@/lib/sales/revenue-driver';
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       researchData: lead.researchData as any,
     })));
 
-    // Calculate emails sent today
+    // Calculate emails sent today (including scheduled emails)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -41,7 +41,10 @@ export async function GET(request: NextRequest) {
       .select()
       .from(auditLogs)
       .where(and(
-        eq(auditLogs.action, 'EMAIL_SENT'),
+        or(
+          eq(auditLogs.action, 'EMAIL_SENT'),
+          eq(auditLogs.action, 'EMAIL_SCHEDULED')
+        ),
         gte(auditLogs.createdAt, today)
       ));
 

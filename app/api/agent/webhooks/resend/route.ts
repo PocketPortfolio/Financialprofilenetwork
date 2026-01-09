@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { conversations, leads, auditLogs } from '@/db/sales/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -23,6 +23,55 @@ export async function POST(request: NextRequest) {
     // if (!verifySignature(signature, body)) {
     //   return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     // }
+
+    // Handle email.sent event - update SCHEDULED → CONTACTED
+    if (type === 'email.sent') {
+      const { id: emailId, scheduled_at } = data;
+      
+      // Find conversation by email ID
+      const [conversation] = await db
+        .select({ leadId: conversations.leadId })
+        .from(conversations)
+        .where(eq(conversations.emailId, emailId))
+        .limit(1);
+      
+      if (conversation) {
+        // Update lead status from SCHEDULED to CONTACTED
+        const updated = await db.update(leads)
+          .set({ 
+            status: 'CONTACTED',
+            scheduledSendAt: null, // Clear scheduled time
+            lastContactedAt: new Date(),
+            updatedAt: new Date()
+          })
+          .where(
+            and(
+              eq(leads.id, conversation.leadId),
+              eq(leads.status, 'SCHEDULED')
+            )
+          )
+          .returning({ id: leads.id });
+        
+        if (updated.length > 0) {
+          console.log(`✅ Updated lead ${conversation.leadId} from SCHEDULED to CONTACTED (email: ${emailId})`);
+          
+          // Log the status change
+          await db.insert(auditLogs).values({
+            leadId: conversation.leadId,
+            action: 'STATUS_CHANGED',
+            aiReasoning: 'Email sent by Resend - updated from SCHEDULED to CONTACTED',
+            metadata: {
+              emailId,
+              scheduledAt: scheduled_at,
+              previousStatus: 'SCHEDULED',
+              newStatus: 'CONTACTED',
+            },
+          });
+        }
+      }
+      
+      return NextResponse.json({ success: true, message: 'Email sent event processed' });
+    }
 
     if (type === 'email.received') {
       // Handle inbound email
