@@ -55,6 +55,39 @@ if (!OPENAI_API_KEY) {
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
+/**
+ * Sanitize MDX content to prevent parsing errors
+ * Fixes common issues that cause "Could not parse expression with acorn" errors
+ */
+function sanitizeMDXContent(content: string): string {
+  let cleaned = content;
+  
+  // Fix 4+ backticks (common artifact)
+  cleaned = cleaned.replace(/````+/g, '```');
+  
+  // Ensure code blocks are properly closed
+  const codeBlockMatches = cleaned.match(/```/g);
+  if (codeBlockMatches && codeBlockMatches.length % 2 !== 0) {
+    console.warn('⚠️  Unmatched code block backticks detected - attempting to fix');
+    // Try to close unclosed code blocks at the end
+    if (!cleaned.trim().endsWith('```')) {
+      cleaned = cleaned.trim() + '\n```';
+    }
+  }
+  
+  // Fix malformed code block endings (4+ backticks)
+  cleaned = cleaned.replace(/````+(\w+)?/g, '```$1');
+  
+  // Ensure code blocks have proper newlines
+  cleaned = cleaned.replace(/```(\w+)?([^\n])/g, '```$1\n$2');
+  cleaned = cleaned.replace(/([^\n])```/g, '$1\n```');
+  
+  // Remove excessive blank lines (more than 2 consecutive)
+  cleaned = cleaned.replace(/\n{4,}/g, '\n\n\n');
+  
+  return cleaned;
+}
+
 interface BlogPost {
   id: string;
   date: string;
@@ -221,6 +254,10 @@ pillar: "${post.pillar}"
       throw new Error('Failed to generate content after all retries');
     }
 
+    // ✅ SANITIZE MDX CONTENT to prevent parsing errors
+    console.log('🧹 Sanitizing MDX content...');
+    content = sanitizeMDXContent(content);
+
     // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO POSTS
     const imagePrompt = isHowTo
       ? `Minimalist terminal interface, dark mode, bright green (#00ff41) text on black background, hacker aesthetic, code-focused, 8k resolution. No text. Theme: ${post.title}. Clean, technical, command-line style.`
@@ -304,6 +341,24 @@ pillar: "${post.pillar}"
 
     const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
     fs.mkdirSync(path.dirname(mdxPath), { recursive: true });
+    
+    // ✅ VALIDATE MDX CAN BE PARSED before saving (prevents deployment of broken posts)
+    try {
+      const { serialize } = require('next-mdx-remote/serialize');
+      const remarkGfm = require('remark-gfm');
+      
+      // Test serialization to catch parsing errors early
+      await serialize(content, {
+        mdxOptions: {
+          remarkPlugins: [remarkGfm],
+        },
+      });
+      console.log(`✅ MDX validation passed: ${post.slug} can be parsed successfully`);
+    } catch (parseError: any) {
+      console.error(`❌ MDX validation failed for ${post.slug}:`, parseError.message);
+      console.error(`   This post will fail to render in production!`);
+      throw new Error(`MDX content cannot be parsed: ${parseError.message}. Post generation aborted to prevent broken deployment.`);
+    }
     
     // Atomic write: write to temp file first, then rename
     const mdxTempPath = `${mdxPath}.tmp`;
