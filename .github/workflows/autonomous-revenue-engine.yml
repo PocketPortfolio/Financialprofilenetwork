@@ -82,6 +82,14 @@ jobs:
           npm run db:add-scheduled-status || echo "⚠️ Enum migration completed with warnings (non-blocking)"
         continue-on-error: true
 
+      - name: Update past scheduled emails to CONTACTED
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔄 Updating past scheduled emails..."
+          npm run update-scheduled-emails || echo "⚠️ Scheduled email update completed with warnings (non-blocking)"
+        continue-on-error: true
+
       - name: Enrich leads and send emails
         env:
           SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}

@@ -5,6 +5,7 @@ import { classifyDealTier } from '@/lib/sales/revenueCalculator';
 import { detectCultureAndLanguage } from '@/lib/sales/cultural-intelligence';
 import { resolveLocationToTimezone } from '@/lib/sales/timezone-utils';
 import { resolveEmailFromGitHub, isPlaceholderEmail } from '@/lib/sales/email-resolution';
+import OpenAI from 'openai';
 
 export interface LeadResearchData {
   companyName: string;
@@ -106,10 +107,21 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
   const location = existingResearch.location || lead.location;
   const timezone = location ? await resolveLocationToTimezone(location) : null;
   
+  // NEW: Generate AI research summary if not already present
+  let researchSummary = lead.researchSummary;
+  if (!researchSummary || researchSummary === 'Research pending') {
+    try {
+      researchSummary = await generateResearchSummary(lead.companyName, lead.techStackTags || [], lead.jobTitle || null);
+    } catch (error: any) {
+      console.warn(`   ⚠️  Failed to generate AI research summary: ${error.message}`);
+      researchSummary = `Research completed for ${lead.companyName}. Tech stack: ${(lead.techStackTags || []).join(', ') || 'Not specified'}.`;
+    }
+  }
+  
   const researchData: LeadResearchData = {
     companyName: lead.companyName,
     techStack: lead.techStackTags || [],
-    summary: lead.researchSummary || 'Research pending',
+    summary: researchSummary,
     // Extract from existing research data if available
     employeeCount: existingResearch.employeeCount,
     recentHires: existingResearch.recentHires,
@@ -260,6 +272,65 @@ async function detectNewsSignals(companyName: string): Promise<LeadResearchData[
   */
   
   return []; // Return empty for now - to be implemented with actual APIs
+}
+
+/**
+ * Generate AI research summary for a company
+ * Uses OpenAI to create a comprehensive summary when external APIs are not available
+ */
+async function generateResearchSummary(
+  companyName: string,
+  techStack: string[],
+  jobTitle: string | null
+): Promise<string> {
+  const openaiApiKey = process.env.OPENAI_API_KEY;
+  
+  if (!openaiApiKey) {
+    return `Research completed for ${companyName}. Tech stack: ${techStack.join(', ') || 'Not specified'}.`;
+  }
+
+  const openai = new OpenAI({ apiKey: openaiApiKey });
+
+  try {
+    const prompt = `Generate a concise research summary (2-3 sentences) for ${companyName}${jobTitle ? `, targeting a ${jobTitle}` : ''}. 
+Tech stack: ${techStack.length > 0 ? techStack.join(', ') : 'Not specified'}.
+
+Focus on:
+- Company's likely tech focus and engineering culture
+- Fit for local-first, data-sovereign software solutions
+- Potential interest in developer tools or B2B SaaS
+
+Be professional and specific. If you don't have specific information, make reasonable inferences based on the company name and tech stack.`;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini', // Use cheaper model for research summaries
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a B2B sales research assistant. Generate concise, professional company research summaries that help sales teams understand potential fit.',
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      max_tokens: 200,
+      temperature: 0.7,
+    });
+
+    const summary = response.choices[0]?.message?.content?.trim() || '';
+    
+    if (summary && summary.length > 20) {
+      return summary;
+    }
+    
+    // Fallback if AI response is too short
+    return `Research completed for ${companyName}. Tech stack: ${techStack.join(', ') || 'Not specified'}. Potential fit for local-first developer tools.`;
+  } catch (error: any) {
+    console.error('Error generating research summary:', error.message);
+    // Fallback to basic summary
+    return `Research completed for ${companyName}. Tech stack: ${techStack.join(', ') || 'Not specified'}.`;
+  }
 }
 
 
