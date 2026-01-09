@@ -43,15 +43,29 @@ export async function sourceFromReddit(
 
       try {
         // Reddit JSON API (no auth required for public data)
+        // Use a more standard User-Agent format to avoid blocking
         const url = `https://www.reddit.com/r/${subreddit}/new.json?limit=100`;
         const response = await fetch(url, {
           headers: {
-            'User-Agent': 'SalesPilot/1.0 (Lead Generation Bot)',
+            'User-Agent': 'Mozilla/5.0 (compatible; SalesPilot/1.0; +https://pocketportfolio.app/bot)',
+            'Accept': 'application/json',
+            'Accept-Language': 'en-US,en;q=0.9',
           },
         });
 
         if (!response.ok) {
-          console.warn(`⚠️  Reddit API error for r/${subreddit}: ${response.statusText}`);
+          const errorText = response.status === 429 
+            ? 'Rate Limited' 
+            : response.status === 403 
+            ? 'Forbidden (may need authentication)'
+            : response.statusText;
+          console.warn(`⚠️  Reddit API error for r/${subreddit}: ${errorText}`);
+          
+          // If rate limited, wait longer before next subreddit
+          if (response.status === 429) {
+            console.log(`   ⏳ Rate limited, waiting 5 seconds before next subreddit...`);
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
           continue;
         }
 
@@ -137,8 +151,9 @@ export async function sourceFromReddit(
           console.log(`   ✅ Validated Reddit Lead: ${companyName} (${extractedEmail}) from r/${subreddit}`);
         }
 
-        // Rate limit: 1 request per second (Reddit API limit)
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Rate limit: 2 seconds between subreddits (Reddit API is strict)
+        // Reddit allows 60 requests per minute, so 2 seconds is safe
+        await new Promise(resolve => setTimeout(resolve, 2000));
       } catch (error: any) {
         console.error(`Error processing r/${subreddit}:`, error.message);
         continue;

@@ -42,6 +42,9 @@ jobs:
           SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRODUCTHUNT_API_TOKEN: ${{ secrets.PRODUCTHUNT_API_TOKEN }}
+          CRUNCHBASE_API_KEY: ${{ secrets.CRUNCHBASE_API_KEY }}
+          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
         run: |
           echo "🔍 Autonomous Lead Sourcing Started"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
