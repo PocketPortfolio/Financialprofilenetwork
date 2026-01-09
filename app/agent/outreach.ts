@@ -304,34 +304,8 @@ export async function sendEmail(
   leadId: string,
   scheduledSendAt?: Date // NEW: Optional scheduled send time for timezone awareness
 ): Promise<{ emailId: string; threadId?: string }> {
-  // v2.1: Hard Quota Limits - Check before sending
-  if (!scheduledSendAt || scheduledSendAt <= new Date()) {
-    // Only check quota for immediate sends (not scheduled)
-    
-    // Daily limit: 100 emails per 24 hours
-    const dailyCount = await db
-      .select({ count: sql<number>`COUNT(*)::int` })
-      .from(conversations)
-      .where(
-        sql`${conversations.createdAt} > NOW() - INTERVAL '24 hours'`
-      );
-    
-    if (dailyCount[0]?.count >= 100) {
-      throw new Error('Daily email quota reached (100 emails/24h). Upgrade plan or wait.');
-    }
-    
-    // Monthly limit: 3000 emails per 30 days
-    const monthlyCount = await db
-      .select({ count: sql<number>`COUNT(*)::int` })
-      .from(conversations)
-      .where(
-        sql`${conversations.createdAt} > NOW() - INTERVAL '30 days'`
-      );
-    
-    if (monthlyCount[0]?.count >= 3000) {
-      throw new Error('Monthly email quota reached (3000 emails/30d). Upgrade plan or wait.');
-    }
-  }
+  // WAR MODE: Quota limits removed (Directive 011)
+  // The engine now sends as fast as the Resend API allows
   
   // Convert Markdown links to HTML, then plain URLs, then newlines
   let htmlBody = convertMarkdownLinksToHtml(body);
