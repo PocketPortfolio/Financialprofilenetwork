@@ -17,8 +17,17 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
 // MDX Content component - now uses client component wrapper to avoid React 19/RSC conflicts
-async function MDXContent({ content }: { content: string }) {
+async function MDXContent({ content, slug }: { content: string; slug: string }) {
   try {
+    // ✅ Validate content before serialization
+    if (!content || typeof content !== 'string') {
+      throw new Error(`Invalid content: content is ${typeof content}, length: ${content?.length || 0}`);
+    }
+    
+    if (content.trim().length === 0) {
+      throw new Error('Content is empty after trimming');
+    }
+    
     // Serialize MDX content on server
     const mdxSource = await serialize(content, {
       mdxOptions: {
@@ -28,6 +37,18 @@ async function MDXContent({ content }: { content: string }) {
     
     return <MDXRenderer source={mdxSource} />;
   } catch (error: any) {
+    // ✅ CRITICAL: Log error in production for debugging (always log, not just dev)
+    console.error('[Blog Post MDX Error]', {
+      slug,
+      error: error.message,
+      errorName: error.name,
+      stack: error.stack,
+      contentLength: content?.length || 0,
+      contentType: typeof content,
+      contentPreview: content?.substring(0, 200) || 'N/A',
+      nodeEnv: process.env.NODE_ENV,
+    });
+    
     return (
       <div style={{
         padding: '2em',
@@ -42,17 +63,36 @@ async function MDXContent({ content }: { content: string }) {
         <p style={{ marginBottom: '1em' }}>
           There was an error rendering this blog post. Please try refreshing the page.
         </p>
-        {process.env.NODE_ENV === 'development' && (
+        {/* Show error details in production for debugging */}
+        <details style={{ marginTop: '1em' }}>
+          <summary style={{ cursor: 'pointer', color: 'var(--accent-warm)', fontWeight: '600' }}>
+            Technical Details
+          </summary>
           <pre style={{
             background: '#f5f5f5',
             padding: '1em',
             borderRadius: '4px',
             overflow: 'auto',
             fontSize: '12px',
+            marginTop: '0.5em',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
           }}>
-            {error.message}
+            Error: {error.message || 'Unknown error'}
+            {error.stack && (
+              <>
+                {'\n\nStack Trace:\n'}
+                {error.stack}
+              </>
+            )}
+            {content && (
+              <>
+                {'\n\nContent Preview (first 500 chars):\n'}
+                {content.substring(0, 500)}
+              </>
+            )}
           </pre>
-        )}
+        </details>
       </div>
     );
   }
@@ -111,8 +151,39 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const resolvedParams = await params;
   const postPath = path.join(process.cwd(), 'content', 'posts', `${resolvedParams.slug}.mdx`);
   
+  // ✅ Enhanced file existence check with detailed logging
   if (!fs.existsSync(postPath)) {
+    console.error('[Blog Post] File not found:', {
+      slug: resolvedParams.slug,
+      postPath,
+      cwd: process.cwd(),
+      postsDir: path.join(process.cwd(), 'content', 'posts'),
+      postsDirExists: fs.existsSync(path.join(process.cwd(), 'content', 'posts')),
+      availableFiles: fs.existsSync(path.join(process.cwd(), 'content', 'posts')) 
+        ? fs.readdirSync(path.join(process.cwd(), 'content', 'posts')).slice(0, 10)
+        : 'N/A',
+    });
     notFound();
+  }
+
+  // ✅ Validate file is readable and not empty
+  try {
+    const fileStats = fs.statSync(postPath);
+    if (fileStats.size === 0) {
+      console.error('[Blog Post] File is empty:', {
+        slug: resolvedParams.slug,
+        postPath,
+        size: fileStats.size,
+      });
+      throw new Error(`Blog post file is empty: ${resolvedParams.slug}`);
+    }
+  } catch (statError: any) {
+    console.error('[Blog Post] Cannot read file stats:', {
+      slug: resolvedParams.slug,
+      postPath,
+      error: statError.message,
+    });
+    throw new Error(`Cannot access blog post file: ${statError.message}`);
   }
 
   // Parse MDX file with error handling
@@ -122,11 +193,41 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   
   try {
     fileContents = fs.readFileSync(postPath, 'utf-8');
+    
+    // ✅ Validate file contents
+    if (!fileContents || fileContents.trim().length === 0) {
+      throw new Error('File contents are empty');
+    }
+    
     const parsed = matter(fileContents);
     data = parsed.data;
     content = parsed.content;
+    
+    // ✅ Validate parsed data
+    if (!data || !data.title) {
+      throw new Error('Frontmatter missing required fields (title)');
+    }
+    
+    if (!content || content.trim().length === 0) {
+      throw new Error('Content body is empty');
+    }
+    
+    // ✅ Log successful parsing (helps with debugging)
+    console.log('[Blog Post] Successfully parsed:', {
+      slug: resolvedParams.slug,
+      title: data.title,
+      contentLength: content.length,
+      hasImage: !!data.image,
+    });
   } catch (error: any) {
-    console.error(`Error parsing MDX file for ${resolvedParams.slug}:`, error);
+    console.error('[Blog Post] Error parsing MDX file:', {
+      slug: resolvedParams.slug,
+      postPath,
+      fileExists: fs.existsSync(postPath),
+      fileSize: fs.existsSync(postPath) ? fs.statSync(postPath).size : 0,
+      error: error.message,
+      errorStack: error.stack,
+    });
     throw new Error(`Failed to parse blog post: ${error.message}`);
   }
 
@@ -350,7 +451,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           }}
           className="blog-content"
         >
-          <MDXContent content={content} />
+          <MDXContent content={content} slug={resolvedParams.slug} />
         </div>
         
         {/* CTA Section */}

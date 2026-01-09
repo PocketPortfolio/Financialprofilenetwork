@@ -255,6 +255,11 @@ interface MDXRendererProps {
 
 export default function MDXRenderer({ source }: MDXRendererProps) {
   try {
+    // Validate source before rendering
+    if (!source) {
+      throw new Error('MDX source is null or undefined');
+    }
+    
     return (
       <MDXRemote
         {...source}
@@ -262,6 +267,16 @@ export default function MDXRenderer({ source }: MDXRendererProps) {
       />
     );
   } catch (error: any) {
+    // ✅ Log error for production debugging
+    console.error('[MDXRenderer Error]', {
+      error: error.message,
+      errorName: error.name,
+      stack: error.stack?.substring(0, 500),
+      hasSource: !!source,
+      sourceType: typeof source,
+      timestamp: new Date().toISOString(),
+    });
+    
     return (
       <div style={{
         padding: '2em',
@@ -276,17 +291,23 @@ export default function MDXRenderer({ source }: MDXRendererProps) {
         <p style={{ marginBottom: '1em' }}>
           There was an error rendering this blog post. Please try refreshing the page.
         </p>
-        {process.env.NODE_ENV === 'development' && (
-          <pre style={{
-            background: '#f5f5f5',
-            padding: '1em',
-            borderRadius: '4px',
-            overflow: 'auto',
-            fontSize: '12px',
-          }}>
-            {error.message}
-          </pre>
-        )}
+        <pre style={{
+          background: '#f5f5f5',
+          padding: '1em',
+          borderRadius: '4px',
+          overflow: 'auto',
+          fontSize: '12px',
+        }}>
+          Error: {error.message || 'Unknown error'}
+          {process.env.NODE_ENV === 'production' && error.stack && (
+            <details style={{ marginTop: '0.5em' }}>
+              <summary style={{ cursor: 'pointer', color: 'var(--accent-warm)' }}>Technical Details</summary>
+              <pre style={{ marginTop: '0.5em', fontSize: '10px', maxHeight: '200px', overflow: 'auto' }}>
+                {error.stack.substring(0, 1000)}
+              </pre>
+            </details>
+          )}
+        </pre>
       </div>
     );
   }
