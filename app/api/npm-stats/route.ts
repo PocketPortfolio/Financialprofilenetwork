@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 // NPM packages to track
 const NPM_PACKAGES = [
   '@pocket-portfolio/importer',

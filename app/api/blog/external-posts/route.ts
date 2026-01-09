@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 
 // Disable caching to ensure fresh posts are always returned
-export const revalidate = 0;
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 interface ExternalPost {
   id: string;

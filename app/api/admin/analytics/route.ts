@@ -7,6 +7,10 @@ import path from 'path';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 // Initialize Firebase Admin
 if (!getApps().length) {

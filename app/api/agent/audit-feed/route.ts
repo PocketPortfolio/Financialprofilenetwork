@@ -3,6 +3,13 @@ import { db } from '@/db/sales/client';
 import { auditLogs, leads } from '@/db/sales/schema';
 import { desc, inArray } from 'drizzle-orm';
 
+// Next.js route configuration for dynamic routes in production
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * GET /api/agent/audit-feed
  * Get recent audit logs for the action feed

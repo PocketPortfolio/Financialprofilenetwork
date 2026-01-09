@@ -4,6 +4,9 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 // Rate limiting storage (in-memory, resets on serverless cold start)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
