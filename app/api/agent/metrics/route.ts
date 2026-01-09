@@ -76,9 +76,10 @@ export async function GET(request: NextRequest) {
     };
 
     // Calculate revenue velocity (projected monthly revenue)
+    // Use projected revenue when current revenue is 0 (early stage)
     const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
     const daysElapsed = new Date().getDate();
-    const revenueVelocity = daysElapsed > 0 
+    const revenueVelocity = revenueMetrics.currentRevenue > 0 && daysElapsed > 0
       ? (revenueMetrics.currentRevenue / daysElapsed) * daysInMonth
       : revenueMetrics.projectedRevenue;
 
