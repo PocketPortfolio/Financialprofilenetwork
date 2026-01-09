@@ -82,8 +82,22 @@ export async function sourceFromHiringPosts(
 
     console.log(`   Found ${comments.length} comments in thread`);
 
-    // Keywords to filter for (companies actively hiring with relevant tech)
-    const keywords = ['typescript', 'remote', 'london', 'us', 'cto', 'vp engineering', 'head of engineering', 'fintech'];
+    // v2.2: Tiered keyword expansion (narrow → broad for wider coverage)
+    // Tier 1: Narrow (high-quality, specific keywords)
+    const tier1Keywords = ['typescript', 'cto', 'vp engineering', 'head of engineering', 'fintech'];
+    
+    // Tier 2: Medium (broader tech/role terms)
+    const tier2Keywords = ['javascript', 'remote', 'london', 'us', 'engineering', 'tech lead', 'director of engineering'];
+    
+    // Tier 3: Broad (any hiring-related terms)
+    const tier3Keywords = ['hiring', 'looking for', 'seeking', 'join us', 'we are hiring'];
+
+    // Determine expansion threshold
+    const resultsThreshold = Math.max(10, maxResults * 0.3);
+    let currentTier = 1;
+    let activeKeywords: string[] = [...tier1Keywords];
+    
+    console.log(`📡 Using Tier ${currentTier} keywords (narrow, high-quality)`);
     
     let processed = 0;
     let skipped = 0;
@@ -93,8 +107,24 @@ export async function sourceFromHiringPosts(
 
       const commentText = (comment.comment_text || '').toLowerCase();
       
-      // Filter for relevant keywords
-      const hasKeywords = keywords.some(keyword => commentText.includes(keyword));
+      // Filter for relevant keywords (expands if results insufficient)
+      let hasKeywords = activeKeywords.some(keyword => commentText.includes(keyword));
+      
+      // Expand keywords if we're not getting enough results
+      if (!hasKeywords && leads.length < resultsThreshold && currentTier < 3) {
+        if (currentTier === 1) {
+          activeKeywords = [...tier1Keywords, ...tier2Keywords];
+          currentTier = 2;
+          console.log(`📡 Expanded to Tier 2 keywords (broader tech/role terms)`);
+          hasKeywords = activeKeywords.some(keyword => commentText.includes(keyword));
+        } else if (currentTier === 2) {
+          activeKeywords = [...tier1Keywords, ...tier2Keywords, ...tier3Keywords];
+          currentTier = 3;
+          console.log(`📡 Expanded to Tier 3 keywords (very broad, any hiring terms)`);
+          hasKeywords = activeKeywords.some(keyword => commentText.includes(keyword));
+        }
+      }
+      
       if (!hasKeywords) {
         continue;
       }
