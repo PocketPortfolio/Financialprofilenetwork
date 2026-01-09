@@ -15,6 +15,20 @@ import sitemapTools from '../../../sitemap-tools';
 import sitemapBlog from '../../../sitemap-blog';
 import sitemapTickers1 from '../../../sitemap-tickers-1';
 import sitemapTickers2 from '../../../sitemap-tickers-2';
+import sitemapTickers3 from '../../../sitemap-tickers-3';
+import sitemapTickers4 from '../../../sitemap-tickers-4';
+import sitemapTickers5 from '../../../sitemap-tickers-5';
+import sitemapTickers6 from '../../../sitemap-tickers-6';
+import sitemapTickers7 from '../../../sitemap-tickers-7';
+import sitemapTickers8 from '../../../sitemap-tickers-8';
+import sitemapTickers9 from '../../../sitemap-tickers-9';
+import sitemapTickers10 from '../../../sitemap-tickers-10';
+import sitemapTickers11 from '../../../sitemap-tickers-11';
+import sitemapTickers12 from '../../../sitemap-tickers-12';
+import sitemapTickers13 from '../../../sitemap-tickers-13';
+import sitemapTickers14 from '../../../sitemap-tickers-14';
+import sitemapTickers15 from '../../../sitemap-tickers-15';
+import sitemapTickers16 from '../../../sitemap-tickers-16';
 
 // Route segment config for Vercel
 export const dynamic = 'force-dynamic';
@@ -30,6 +44,20 @@ const SITEMAP_GENERATORS: Record<string, () => Promise<any>> = {
   'sitemap-blog': sitemapBlog,
   'sitemap-tickers-1': sitemapTickers1,
   'sitemap-tickers-2': sitemapTickers2,
+  'sitemap-tickers-3': sitemapTickers3,
+  'sitemap-tickers-4': sitemapTickers4,
+  'sitemap-tickers-5': sitemapTickers5,
+  'sitemap-tickers-6': sitemapTickers6,
+  'sitemap-tickers-7': sitemapTickers7,
+  'sitemap-tickers-8': sitemapTickers8,
+  'sitemap-tickers-9': sitemapTickers9,
+  'sitemap-tickers-10': sitemapTickers10,
+  'sitemap-tickers-11': sitemapTickers11,
+  'sitemap-tickers-12': sitemapTickers12,
+  'sitemap-tickers-13': sitemapTickers13,
+  'sitemap-tickers-14': sitemapTickers14,
+  'sitemap-tickers-15': sitemapTickers15,
+  'sitemap-tickers-16': sitemapTickers16,
 };
 
 export async function GET(
