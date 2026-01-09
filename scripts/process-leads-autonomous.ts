@@ -23,6 +23,7 @@ import { kv } from '@vercel/kv';
 import { calculateOptimalSendTime, isOptimalSendWindow } from '@/lib/sales/timezone-utils';
 import { getBestProductForLead } from '@/lib/stripe/product-catalog';
 import { isRealFirstName } from '@/lib/sales/name-validation';
+import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
 
 const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be limited by rate limit)
 
@@ -42,6 +43,27 @@ async function processNewLeads() {
   console.log(`   Found ${newLeads.length} NEW leads to enrich`);
   
   for (const lead of newLeads) {
+    // CRITICAL: Skip placeholder emails - they should never be processed
+    if (isPlaceholderEmail(lead.email)) {
+      console.log(`   ⚠️  Skipping placeholder email: ${lead.email} at ${lead.companyName}`);
+      // Mark as DO_NOT_CONTACT immediately
+      await db.update(leads)
+        .set({
+          status: 'DO_NOT_CONTACT',
+          researchSummary: 'Placeholder email detected - cannot contact',
+          updatedAt: new Date(),
+        })
+        .where(eq(leads.id, lead.id));
+      
+      await db.insert(auditLogs).values({
+        leadId: lead.id,
+        action: 'STATUS_CHANGED',
+        aiReasoning: 'Placeholder email detected - marked as DO_NOT_CONTACT',
+        metadata: { originalAction: 'PLACEHOLDER_REJECTED' },
+      });
+      continue;
+    }
+    
     try {
       console.log(`   Enriching: ${lead.email} at ${lead.companyName}`);
       await enrichLead(lead.id);
@@ -101,6 +123,27 @@ async function processResearchingLeads() {
     if (currentCount + sent >= maxPerDay) {
       console.log(`   ⚠️  Rate limit reached, stopping`);
       break;
+    }
+    
+    // CRITICAL: Skip placeholder emails - they should never be contacted
+    if (isPlaceholderEmail(lead.email)) {
+      console.log(`   ⚠️  Skipping placeholder email: ${lead.email} at ${lead.companyName}`);
+      // Mark as DO_NOT_CONTACT immediately
+      await db.update(leads)
+        .set({
+          status: 'DO_NOT_CONTACT',
+          researchSummary: 'Placeholder email detected - cannot contact',
+          updatedAt: new Date(),
+        })
+        .where(eq(leads.id, lead.id));
+      
+      await db.insert(auditLogs).values({
+        leadId: lead.id,
+        action: 'STATUS_CHANGED',
+        aiReasoning: 'Placeholder email detected - marked as DO_NOT_CONTACT',
+        metadata: { originalAction: 'PLACEHOLDER_REJECTED' },
+      });
+      continue;
     }
     
     // Check if lead can be contacted

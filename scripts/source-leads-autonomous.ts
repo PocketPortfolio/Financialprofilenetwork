@@ -21,6 +21,7 @@ import { leads } from '@/db/sales/schema';
 import { eq, ilike } from 'drizzle-orm';
 import { sourceFromGitHubHiring } from '@/lib/sales/sourcing/github-hiring-scraper';
 import { generateLookalikeLeads } from '@/lib/sales/sourcing/lookalike-seeding';
+import { isPlaceholderEmail, resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
 
 const TARGET_LEADS_PER_DAY = 50;
 const QUALIFYING_TITLES = [
@@ -188,16 +189,48 @@ async function sourceLeadsAutonomous() {
   // Check for duplicates and create new leads
   let created = 0;
   let skipped = 0;
+  let rejected = 0;
   
   for (const candidate of qualified) {
-    if (await leadExists(candidate.email, candidate.companyName)) {
+    // CRITICAL: Reject placeholder emails - they should never be inserted
+    if (isPlaceholderEmail(candidate.email)) {
+      console.log(`⚠️  Rejecting placeholder email: ${candidate.email} for ${candidate.companyName}`);
+      rejected++;
+      continue;
+    }
+    
+    // Try to resolve placeholder emails if they exist (shouldn't happen, but safety check)
+    let emailToUse = candidate.email;
+    if (isPlaceholderEmail(emailToUse)) {
+      console.log(`   🔍 Attempting to resolve placeholder email for ${candidate.companyName}...`);
+      const githubUsername = emailToUse.includes('@github-hiring.placeholder')
+        ? emailToUse.split('@')[0]
+        : candidate.companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      
+      const resolution = await resolveEmailFromGitHub(
+        githubUsername,
+        candidate.companyName,
+        process.env.GITHUB_TOKEN
+      );
+      
+      if (resolution.email && resolution.confidence >= 50 && !isPlaceholderEmail(resolution.email)) {
+        emailToUse = resolution.email;
+        console.log(`   ✅ Resolved to: ${emailToUse} (confidence: ${resolution.confidence}%)`);
+      } else {
+        console.log(`   ❌ Could not resolve placeholder email - skipping lead`);
+        rejected++;
+        continue;
+      }
+    }
+    
+    if (await leadExists(emailToUse, candidate.companyName)) {
       skipped++;
       continue;
     }
     
     try {
       await db.insert(leads).values({
-        email: candidate.email,
+        email: emailToUse,
         firstName: candidate.firstName || null,
         lastName: candidate.lastName || null,
         companyName: candidate.companyName,
@@ -210,9 +243,9 @@ async function sourceLeadsAutonomous() {
       });
       
       created++;
-      console.log(`✅ Created lead: ${candidate.email} at ${candidate.companyName}`);
+      console.log(`✅ Created lead: ${emailToUse} at ${candidate.companyName}`);
     } catch (error: any) {
-      console.error(`❌ Failed to create lead ${candidate.email}:`, error.message);
+      console.error(`❌ Failed to create lead ${emailToUse}:`, error.message);
     }
   }
   
@@ -221,9 +254,15 @@ async function sourceLeadsAutonomous() {
   console.log(`📊 Summary:`);
   console.log(`   Created: ${created} new leads`);
   console.log(`   Skipped: ${skipped} duplicates`);
+  console.log(`   Rejected: ${rejected} placeholder/invalid emails`);
   console.log(`   Target: ${TARGET_LEADS_PER_DAY} leads/day`);
   console.log(`   Progress: ${created}/${TARGET_LEADS_PER_DAY} (${Math.round((created / TARGET_LEADS_PER_DAY) * 100)}%)`);
   console.log('');
+  
+  if (rejected > 0) {
+    console.log(`⚠️  Warning: ${rejected} leads rejected due to placeholder emails`);
+    console.log('   Placeholder emails are not allowed - leads must have real email addresses');
+  }
   
   if (created < TARGET_LEADS_PER_DAY) {
     console.log(`⚠️  Warning: Only ${created} leads created, target is ${TARGET_LEADS_PER_DAY}`);
