@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { leads } from '@/db/sales/schema';
-import { eq, desc, inArray, sql } from 'drizzle-orm';
+import { eq, desc, inArray, sql, and, not, or, like } from 'drizzle-orm';
 import { withRetry } from '@/lib/sales/db-retry';
+import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
 
 // Next.js route configuration for dynamic routes in production
 export const dynamic = 'force-dynamic';
@@ -26,51 +27,66 @@ export async function GET(request: NextRequest) {
 
     // Use retry logic for database operations
     const results = await withRetry(async () => {
+      // CRITICAL: Always exclude placeholder emails from dashboard
+      const excludePlaceholders = and(
+        not(like(leads.email, '%.placeholder')),
+        not(like(leads.email, '%@similar.%')),
+        not(like(leads.email, '%@github-hiring.%'))
+      );
+      
       // Handle multiple statuses (comma-separated)
       if (statusParam) {
         const statuses = statusParam.split(',').map(s => s.trim()).filter(Boolean);
         if (statuses.length === 1) {
           return await db.select().from(leads)
-            .where(eq(leads.status, statuses[0] as any))
+            .where(and(eq(leads.status, statuses[0] as any), excludePlaceholders))
             .orderBy(desc(leads.createdAt))
             .limit(limit)
             .offset(offset);
         } else if (statuses.length > 1) {
           // Multiple statuses: use inArray
           return await db.select().from(leads)
-            .where(inArray(leads.status, statuses as any[]))
+            .where(and(inArray(leads.status, statuses as any[]), excludePlaceholders))
             .orderBy(desc(leads.createdAt))
             .limit(limit)
             .offset(offset);
         }
       }
 
-      // No status filter
+      // No status filter - still exclude placeholders
       return await db.select().from(leads)
+        .where(excludePlaceholders)
         .orderBy(desc(leads.createdAt))
         .limit(limit)
         .offset(offset);
     });
 
-    // Get total count for pagination
+    // Get total count for pagination (excluding placeholders)
     const totalCount = await withRetry(async () => {
+      const excludePlaceholders = and(
+        not(like(leads.email, '%.placeholder')),
+        not(like(leads.email, '%@similar.%')),
+        not(like(leads.email, '%@github-hiring.%'))
+      );
+      
       if (statusParam) {
         const statuses = statusParam.split(',').map(s => s.trim()).filter(Boolean);
         if (statuses.length === 1) {
           const result = await db.select({ count: sql<number>`count(*)` }).from(leads)
-            .where(eq(leads.status, statuses[0] as any));
+            .where(and(eq(leads.status, statuses[0] as any), excludePlaceholders));
           const count = result[0]?.count;
           return typeof count === 'number' ? count : parseInt(String(count || '0'), 10);
         } else if (statuses.length > 1) {
           const result = await db.select({ count: sql<number>`count(*)` }).from(leads)
-            .where(inArray(leads.status, statuses as any[]));
+            .where(and(inArray(leads.status, statuses as any[]), excludePlaceholders));
           const count = result[0]?.count;
           return typeof count === 'number' ? count : parseInt(String(count || '0'), 10);
         }
       }
       
-      // No status filter
-      const result = await db.select({ count: sql<number>`count(*)` }).from(leads);
+      // No status filter - still exclude placeholders
+      const result = await db.select({ count: sql<number>`count(*)` }).from(leads)
+        .where(excludePlaceholders);
       const count = result[0]?.count;
       return typeof count === 'number' ? count : parseInt(String(count || '0'), 10);
     });
