@@ -22,6 +22,14 @@ import sitemapTickers5 from '../app/sitemap-tickers-5';
 import sitemapTickers6 from '../app/sitemap-tickers-6';
 import sitemapTickers7 from '../app/sitemap-tickers-7';
 import sitemapTickers8 from '../app/sitemap-tickers-8';
+import sitemapTickers9 from '../app/sitemap-tickers-9';
+import sitemapTickers10 from '../app/sitemap-tickers-10';
+import sitemapTickers11 from '../app/sitemap-tickers-11';
+import sitemapTickers12 from '../app/sitemap-tickers-12';
+import sitemapTickers13 from '../app/sitemap-tickers-13';
+import sitemapTickers14 from '../app/sitemap-tickers-14';
+import sitemapTickers15 from '../app/sitemap-tickers-15';
+import sitemapTickers16 from '../app/sitemap-tickers-16';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
 const VERSION = 'v3'; // Current version - keep in sync with deployed version
@@ -163,7 +171,7 @@ async function main() {
     mkdirSync(PUBLIC_DIR, { recursive: true });
     
     // Build all sub-sitemaps (plain XML, no compression)
-    // Split tickers into 8 sitemaps to reduce file size (~1MB each, under Google's recommended 1MB limit)
+    // Split tickers into 16 sitemaps to reduce file size (~1MB each, under Google's recommended 1MB limit)
     const results: BuildResult[] = [
       await buildSitemap('sitemap-static', sitemapStatic),
       await buildSitemap('sitemap-imports', sitemapImports),
@@ -177,6 +185,14 @@ async function main() {
       await buildSitemap('sitemap-tickers-6', sitemapTickers6),
       await buildSitemap('sitemap-tickers-7', sitemapTickers7),
       await buildSitemap('sitemap-tickers-8', sitemapTickers8),
+      await buildSitemap('sitemap-tickers-9', sitemapTickers9),
+      await buildSitemap('sitemap-tickers-10', sitemapTickers10),
+      await buildSitemap('sitemap-tickers-11', sitemapTickers11),
+      await buildSitemap('sitemap-tickers-12', sitemapTickers12),
+      await buildSitemap('sitemap-tickers-13', sitemapTickers13),
+      await buildSitemap('sitemap-tickers-14', sitemapTickers14),
+      await buildSitemap('sitemap-tickers-15', sitemapTickers15),
+      await buildSitemap('sitemap-tickers-16', sitemapTickers16),
     ];
     
     // Check for duplicates across sitemaps
