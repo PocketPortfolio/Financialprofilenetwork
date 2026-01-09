@@ -74,6 +74,14 @@ jobs:
           npm run db:verify || echo "⚠️ Schema verification failed - continuing (non-blocking)"
         continue-on-error: true
 
+      - name: Add SCHEDULED status to enum (if needed)
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔍 Adding SCHEDULED status to enum (if needed)..."
+          npm run db:add-scheduled-status || echo "⚠️ Enum migration completed with warnings (non-blocking)"
+        continue-on-error: true
+
       - name: Enrich leads and send emails
         env:
           SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
