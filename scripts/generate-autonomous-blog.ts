@@ -8,6 +8,8 @@ import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
 import matter from 'gray-matter';
+import { serialize } from 'next-mdx-remote/serialize';
+import remarkGfm from 'remark-gfm';
 
 // Load .env.local if it exists
 const envFiles = ['.env.local', '.env'];
@@ -344,9 +346,6 @@ pillar: "${post.pillar}"
     
     // ✅ VALIDATE MDX CAN BE PARSED before saving (prevents deployment of broken posts)
     try {
-      const { serialize } = require('next-mdx-remote/serialize');
-      const remarkGfm = require('remark-gfm');
-      
       // Test serialization to catch parsing errors early
       await serialize(content, {
         mdxOptions: {
