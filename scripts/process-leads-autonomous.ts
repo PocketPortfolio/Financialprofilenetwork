@@ -15,7 +15,7 @@ config({ path: resolve(process.cwd(), '.env') });
 
 import { db } from '@/db/sales/client';
 import { leads, auditLogs, conversations } from '@/db/sales/schema';
-import { eq, and, inArray, or, sql } from 'drizzle-orm';
+import { eq, and, inArray, or, sql, isNotNull } from 'drizzle-orm';
 import { enrichLead } from '@/app/agent/researcher';
 import { generateEmail, sendEmail } from '@/app/agent/outreach';
 import { canContactLead } from '@/lib/sales/compliance';
@@ -26,6 +26,92 @@ import { isRealFirstName } from '@/lib/sales/name-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
 
 const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (will be limited by rate limit)
+
+/**
+ * Email Sequence Strategy:
+ * Step 1: Cold Open (Initial Contact) - Wait 0 days (send immediately)
+ * Step 2: Value Add (Follow-Up) - Wait 3 days
+ * Step 3: Objection Killer (Privacy/Security) - Wait 4 days
+ * Step 4: Breakup (Soft Close) - Wait 7 days, then mark as DO_NOT_CONTACT
+ */
+
+/**
+ * Get email sequence step for a lead based on outbound email count
+ */
+async function getEmailSequenceStep(leadId: string): Promise<{
+  step: 1 | 2 | 3 | 4;
+  emailType: 'initial' | 'follow_up' | 'objection_handling';
+  waitDays: number;
+  canSend: boolean;
+  daysSinceLastContact: number;
+  emailCount: number;
+}> {
+  // Count outbound emails for this lead
+  const outboundEmails = await db
+    .select()
+    .from(conversations)
+    .where(
+      and(
+        eq(conversations.leadId, leadId),
+        eq(conversations.direction, 'outbound')
+      )
+    );
+
+  const emailCount = outboundEmails.length;
+  
+  // Get last contacted date
+  const [lead] = await db
+    .select({ lastContactedAt: leads.lastContactedAt })
+    .from(leads)
+    .where(eq(leads.id, leadId))
+    .limit(1);
+
+  const lastContacted = lead?.lastContactedAt ? new Date(lead.lastContactedAt) : null;
+  const now = new Date();
+  const daysSinceLastContact = lastContacted 
+    ? Math.floor((now.getTime() - lastContacted.getTime()) / (1000 * 60 * 60 * 24))
+    : 999; // Never contacted
+
+  // Determine sequence step based on email count
+  let step: 1 | 2 | 3 | 4;
+  let emailType: 'initial' | 'follow_up' | 'objection_handling';
+  let waitDays: number;
+  let canSend: boolean;
+
+  if (emailCount === 0) {
+    // Step 1: Cold Open (Initial Contact)
+    step = 1;
+    emailType = 'initial';
+    waitDays = 0; // Can send immediately
+    canSend = true;
+  } else if (emailCount === 1) {
+    // Step 2: Value Add (Follow-Up) - Wait 3 days
+    step = 2;
+    emailType = 'follow_up';
+    waitDays = 3;
+    canSend = daysSinceLastContact >= 3;
+  } else if (emailCount === 2) {
+    // Step 3: Objection Killer - Wait 4 days
+    step = 3;
+    emailType = 'objection_handling';
+    waitDays = 4;
+    canSend = daysSinceLastContact >= 4;
+  } else if (emailCount === 3) {
+    // Step 4: Breakup (Soft Close) - Wait 7 days
+    step = 4;
+    emailType = 'follow_up'; // Will be handled as breakup in prompt
+    waitDays = 7;
+    canSend = daysSinceLastContact >= 7;
+  } else {
+    // Already sent all 4 emails - don't send more
+    step = 4;
+    emailType = 'follow_up';
+    waitDays = 999;
+    canSend = false;
+  }
+
+  return { step, emailType, waitDays, canSend, daysSinceLastContact, emailCount };
+}
 
 /**
  * Process NEW leads (enrichment)
@@ -204,6 +290,20 @@ async function processResearchingLeads() {
       continue;
     }
     
+    // CRITICAL: Check email sequence - only send initial email if no emails sent yet
+    const sequence = await getEmailSequenceStep(lead.id);
+    if (sequence.emailCount > 0) {
+      console.log(`   ⏭️  Skipping ${lead.email}: Already sent ${sequence.emailCount} email(s) - should be in CONTACTED status for follow-ups`);
+      // Move to CONTACTED status if still in RESEARCHING
+      await db.update(leads)
+        .set({
+          status: 'CONTACTED',
+          updatedAt: new Date(),
+        })
+        .where(eq(leads.id, lead.id));
+      continue;
+    }
+    
     // Check if lead can be contacted
     const contactCheck = await canContactLead(lead.id, db);
     if (!contactCheck.canContact) {
@@ -212,7 +312,7 @@ async function processResearchingLeads() {
     }
     
     try {
-      console.log(`   Generating email for: ${lead.email}`);
+      console.log(`   Generating initial email (Step ${sequence.step}) for: ${lead.email}`);
       
       // Sprint 4: Get enriched research data (includes cultural context, news signals, timezone)
       const researchData = await enrichLead(lead.id);
@@ -266,7 +366,7 @@ async function processResearchingLeads() {
           selectedProduct, // Sprint 4: Smart links
           employeeCount: researchData.employeeCount,
         },
-        'initial'
+        sequence.emailType
       );
       
       // Sprint 4: Send email (Resend handles scheduling automatically via scheduledAt)
@@ -341,6 +441,228 @@ async function processResearchingLeads() {
 }
 
 /**
+ * Process CONTACTED leads that need follow-ups (with wait period enforcement)
+ */
+async function processContactedLeads() {
+  console.log('📧 Processing CONTACTED leads for follow-ups...');
+  
+  // Check rate limit FIRST
+  const rateLimitKey = `sales:rate-limit:${new Date().toISOString().split('T')[0]}`;
+  const currentCount = (await kv.get<number>(rateLimitKey)) || 0;
+  const maxPerDay = parseInt(process.env.SALES_RATE_LIMIT_PER_DAY || '50', 10);
+  
+  if (currentCount >= maxPerDay) {
+    console.log(`   ⚠️  Rate limit reached: ${currentCount}/${maxPerDay} emails today`);
+    return 0;
+  }
+  
+  const remainingQuota = maxPerDay - currentCount;
+  const leadsToProcess = Math.min(MAX_LEADS_TO_PROCESS, remainingQuota);
+  
+  console.log(`   📊 Rate limit status: ${currentCount}/${maxPerDay} sent today, ${remainingQuota} remaining`);
+  
+  // Get CONTACTED leads that have been contacted before
+  const contactedLeads = await db
+    .select()
+    .from(leads)
+    .where(
+      and(
+        eq(leads.status, 'CONTACTED'),
+        isNotNull(leads.lastContactedAt)
+      )
+    )
+    .limit(leadsToProcess)
+    .orderBy(leads.lastContactedAt); // Oldest first
+
+  console.log(`   Found ${contactedLeads.length} CONTACTED leads to check for follow-ups`);
+
+  let sent = 0;
+  let skipped = 0;
+
+  for (const lead of contactedLeads) {
+    // Double-check rate limit
+    if (currentCount + sent >= maxPerDay) {
+      console.log(`   ⚠️  Rate limit reached, stopping`);
+      break;
+    }
+    
+    // CRITICAL: Skip placeholder emails
+    if (isPlaceholderEmail(lead.email)) {
+      console.log(`   ⚠️  Skipping placeholder email: ${lead.email}`);
+      continue;
+    }
+    
+    // Check email sequence step and wait period
+    const sequence = await getEmailSequenceStep(lead.id);
+    
+    if (sequence.emailCount >= 4) {
+      // Already sent all 4 emails - mark as DO_NOT_CONTACT if breakup was sent
+      if (sequence.emailCount === 4 && sequence.daysSinceLastContact >= 7) {
+        console.log(`   🏁 Marking ${lead.email} as DO_NOT_CONTACT (all sequence emails sent)`);
+        await db.update(leads)
+          .set({
+            status: 'DO_NOT_CONTACT',
+            updatedAt: new Date(),
+          })
+          .where(eq(leads.id, lead.id));
+        
+        await db.insert(auditLogs).values({
+          leadId: lead.id,
+          action: 'STATUS_CHANGED',
+          aiReasoning: 'All 4 email sequence steps completed - no response received',
+          metadata: { sequenceStep: 4, emailCount: 4 },
+        });
+      }
+      skipped++;
+      continue;
+    }
+    
+    if (!sequence.canSend) {
+      console.log(`   ⏭️  Skipping ${lead.email}: Step ${sequence.step}, need ${sequence.waitDays} days, ${sequence.daysSinceLastContact} days passed`);
+      skipped++;
+      continue;
+    }
+    
+    // Check if lead can be contacted
+    const contactCheck = await canContactLead(lead.id, db);
+    if (!contactCheck.canContact) {
+      console.log(`   ⏭️  Skipping ${lead.email}: ${contactCheck.reason}`);
+      skipped++;
+      continue;
+    }
+    
+    try {
+      console.log(`   Generating follow-up email (Step ${sequence.step}) for: ${lead.email}`);
+      
+      // Get enriched research data
+      const researchData = await enrichLead(lead.id);
+      
+      // Calculate optimal send time
+      const timezone = lead.timezone || researchData.timezone;
+      let optimalSendTime: Date | undefined;
+      
+      if (timezone) {
+        optimalSendTime = calculateOptimalSendTime(timezone);
+      } else {
+        const tomorrow = new Date();
+        tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+        tomorrow.setUTCHours(9, 0, 0, 0);
+        optimalSendTime = tomorrow;
+      }
+      
+      const isScheduled = optimalSendTime && optimalSendTime > new Date();
+      
+      // Get cultural context
+      const researchDataObj = lead.researchData as any;
+      const culturalContext = lead.detectedLanguage && lead.detectedRegion ? {
+        detectedLanguage: lead.detectedLanguage,
+        detectedRegion: lead.detectedRegion,
+        confidence: researchDataObj?.culturalConfidence || 85,
+        culturalPrompt: researchDataObj?.culturalPrompt || '',
+        greeting: researchDataObj?.culturalGreeting || 'Hi',
+      } : undefined;
+      
+      // Get selected product
+      const selectedProduct = getBestProductForLead({
+        employeeCount: researchData.employeeCount,
+      });
+      
+      // Generate email with sequence context
+      const { email, reasoning } = await generateEmail(
+        lead.id,
+        {
+          firstName: lead.firstName || undefined,
+          firstNameReliable: lead.firstName ? isRealFirstName(lead.firstName) : false,
+          companyName: lead.companyName,
+          techStack: lead.techStackTags || [],
+          researchSummary: lead.researchSummary || undefined,
+          culturalContext,
+          newsSignals: researchData.newsSignals,
+          selectedProduct,
+          employeeCount: researchData.employeeCount,
+        },
+        sequence.step === 4 ? 'follow_up' : sequence.emailType // Step 4 is breakup
+      );
+      
+      // Send email
+      const { emailId, threadId } = await sendEmail(
+        lead.email,
+        email.subject,
+        email.body,
+        lead.id,
+        isScheduled ? optimalSendTime : undefined
+      );
+      
+      // Update rate limit (only if sending immediately)
+      if (!isScheduled) {
+        await kv.set(rateLimitKey, currentCount + sent + 1);
+      }
+      
+      // Save conversation
+      await db.insert(conversations).values({
+        leadId: lead.id,
+        type: sequence.step === 1 ? 'INITIAL_OUTREACH' : 'FOLLOW_UP',
+        subject: email.subject,
+        body: email.body,
+        direction: 'outbound',
+        emailId,
+        threadId,
+        aiReasoning: reasoning,
+      });
+      
+      // Update lead status
+      await db.update(leads)
+        .set({
+          status: isScheduled ? 'SCHEDULED' : 'CONTACTED',
+          lastContactedAt: isScheduled ? optimalSendTime : new Date(),
+          scheduledSendAt: isScheduled ? optimalSendTime : null,
+          updatedAt: new Date(),
+        })
+        .where(eq(leads.id, lead.id));
+      
+      // If Step 4 (breakup) was sent, mark as DO_NOT_CONTACT after 7 more days
+      if (sequence.step === 4) {
+        console.log(`   📝 Step 4 (breakup) sent - will mark as DO_NOT_CONTACT if no response`);
+      }
+      
+      // Log action
+      await db.insert(auditLogs).values({
+        leadId: lead.id,
+        action: isScheduled ? 'EMAIL_SCHEDULED' : 'EMAIL_SENT',
+        aiReasoning: `Sequence Step ${sequence.step}: ${reasoning}`,
+        metadata: {
+          emailId,
+          threadId,
+          subject: email.subject,
+          sequenceStep: sequence.step,
+          emailType: sequence.emailType,
+          scheduledFor: isScheduled ? optimalSendTime?.toISOString() : undefined,
+        },
+      });
+      
+      sent++;
+      if (isScheduled) {
+        console.log(`   ✅ Scheduled follow-up (Step ${sequence.step}) to: ${lead.email} for ${optimalSendTime?.toISOString()}`);
+      } else {
+        console.log(`   ✅ Sent follow-up (Step ${sequence.step}) to: ${lead.email}`);
+      }
+    } catch (error: any) {
+      console.error(`   ❌ Failed to send follow-up to ${lead.email}:`, error.message);
+      
+      await db.insert(auditLogs).values({
+        leadId: lead.id,
+        action: 'STATUS_CHANGED',
+        aiReasoning: `Follow-up email failed: ${error.message}`,
+        metadata: { error: error.message, originalAction: 'FOLLOW_UP_FAILED' },
+      });
+    }
+  }
+  
+  console.log(`   📊 Follow-ups: ${sent} sent, ${skipped} skipped (waiting or completed)`);
+  return sent;
+}
+
+/**
  * Main processing function
  */
 async function processLeadsAutonomous() {
@@ -355,13 +677,16 @@ async function processLeadsAutonomous() {
   }
   
   const enriched = await processNewLeads();
-  const emailsSent = await processResearchingLeads();
+  const initialEmailsSent = await processResearchingLeads();
+  const followUpEmailsSent = await processContactedLeads();
   
   console.log('');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`📊 Summary:`);
   console.log(`   Enriched: ${enriched} leads`);
-  console.log(`   Emails Sent: ${emailsSent} emails`);
+  console.log(`   Initial Emails Sent: ${initialEmailsSent} emails`);
+  console.log(`   Follow-Up Emails Sent: ${followUpEmailsSent} emails`);
+  console.log(`   Total Emails Sent: ${initialEmailsSent + followUpEmailsSent} emails`);
   console.log('');
 }
 
