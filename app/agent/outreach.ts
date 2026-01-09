@@ -34,10 +34,11 @@ export async function generateEmail(
     employeeCount?: number;
     requiredLanguage?: string | null; // Execution Order 010 v2: Required language for strict regions
   },
-  emailType: 'initial' | 'follow_up' | 'objection_handling' = 'initial'
+  emailType: 'initial' | 'follow_up' | 'objection_handling' = 'initial',
+  sequenceStep?: number // NEW: Pass sequence step for Step 4 detection
 ): Promise<{ email: any; reasoning: string }> {
   
-  const prompt = buildPrompt(leadData, emailType);
+  const prompt = buildPrompt(leadData, emailType, sequenceStep);
 
   const { object } = await generateObject({
     model: openai('gpt-4o'),
@@ -78,7 +79,8 @@ function buildPrompt(
     employeeCount?: number;
     requiredLanguage?: string | null; // Execution Order 010 v2: Required language for strict regions
   },
-  emailType: string
+  emailType: string,
+  sequenceStep?: number // NEW: For Step 4 detection
 ): string {
   const products = getActiveProducts();
   const selectedProduct = leadData.selectedProduct || getBestProductForLead({
@@ -194,33 +196,91 @@ CRITICAL REQUIREMENTS (Sprint 4: Humanity & Precision):
   }
   
   if (emailType === 'follow_up') {
+    // STEP 4: BREAKUP EMAIL (Special handling)
+    if (sequenceStep === 4) {
+      return `Generate a breakup (soft close) email to ${greetingName} at ${leadData.companyName}.${firstNameWarning}
+    
+Context:
+- Company: ${leadData.companyName}
+- Tech Stack: ${leadData.techStack.join(', ')}
+- Research: ${leadData.researchSummary || 'No additional research'}${newsContext}${culturalContext}
+- Previous contacts: 3 emails sent (Cold Open, Value Add, Objection Killer)
+- No response received
+
+STEP 4: BREAKUP (Soft Close)
+Purpose: Final attempt with graceful exit. "If this isn't the right time, no worries."
+
+Focus:
+- Leave door open for future contact
+- Graceful exit: "If this isn't the right time, no worries"
+- Be respectful and professional
+- Don't be pushy or aggressive
+- Offer to reconnect in the future if timing changes
+
+Requirements:
+- Soft, respectful, graceful tone
+- Acknowledge they may not be ready now
+- Leave door open: "If timing changes, feel free to reach out"
+- Professional closing
+- Include reasoning
+
+CRITICAL: This is the final email in the sequence. Be graceful, not pushy.`;
+    }
+    
+    // STEP 2: VALUE ADD (Follow-Up Email)
     return `Generate a follow-up email to ${greetingName} at ${leadData.companyName}.${firstNameWarning}
     
 Context:
 - Company: ${leadData.companyName}
-- Previous contact: 3 days ago
 - Tech Stack: ${leadData.techStack.join(', ')}
+- Research: ${leadData.researchSummary || 'No additional research'}${newsContext}${culturalContext}
 
-CRITICAL: Focus on "Local-First" and "Data Sovereignty" value props. Do NOT pitch features we don't have.
+STEP 2: VALUE ADD (Follow-Up Email)
+Purpose: Case study, feature highlight, or use case relevant to their industry.
+
+Focus:
+- Demonstrate value without being pushy
+- Reinforce privacy/sovereignty message
+- Share a relevant technical detail or use case
+- Reference their tech stack or industry context
 
 Requirements:
 - Soft, respectful tone
 - One relevant technical detail about local-first architecture or data privacy
+- Reference their specific tech stack or company context
 - Offer to archive if not interested
-- Include reasoning`;
+- Include reasoning
+
+CRITICAL: Focus on "Local-First" and "Data Sovereignty" value props. Do NOT pitch features we don't have.`;
   }
   
   if (emailType === 'objection_handling') {
-    return `Generate an objection handling email to ${greetingName}.${firstNameWarning}
+    return `Generate an objection handling email to ${greetingName} at ${leadData.companyName}.${firstNameWarning}
     
 Context:
 - Company: ${leadData.companyName}
-- Objection: Price concern
+- Tech Stack: ${leadData.techStack.join(', ')}
+- Research: ${leadData.researchSummary || 'No additional research'}${culturalContext}
+
+STEP 3: OBJECTION KILLER (Privacy/Security)
+Purpose: Address common objections (GDPR, security, data ownership) proactively.
+
+Focus:
+- Use compliance knowledge base to answer concerns autonomously
+- Address privacy, security, and data ownership concerns
+- Reference GDPR compliance, data sovereignty, local-first architecture
+- Be proactive - anticipate objections before they're raised
+
+Common Objections to Address:
+- GDPR Compliance: "Your data lives in YOUR Google Drive, not our servers"
+- Security: "Local-first means data never leaves your device unless you explicitly sync"
+- Data Ownership: "Zero vendor lock-in - export everything, own your data completely"
+- Privacy: "Privacy-absolute: Data never leaves your device unless you explicitly sync"
 
 Requirements:
-- Acknowledge objection
-- Escalate to human supervisor
 - Professional, helpful tone
+- Address privacy/security concerns proactively
+- Use compliance knowledge base information
 - Include reasoning`;
   }
   
