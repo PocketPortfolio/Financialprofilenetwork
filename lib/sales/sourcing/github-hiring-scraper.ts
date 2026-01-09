@@ -1,8 +1,8 @@
 /**
  * GitHub Hiring Repository Scraper
- * Searches for repositories with "hiring" in README + TypeScript + Location filters
- * Sprint 4: Hybrid Sourcing Module
- * v2.1: Resolves emails before returning leads (no placeholders)
+ * Searches for Fintech/Finance repositories with "hiring" in README + TypeScript
+ * v2.1: Fintech-aligned queries (Sniper approach - industry-focused)
+ * Strategy: Target CTOs in Fintech/Finance companies using TypeScript
  */
 
 import { resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
@@ -20,8 +20,9 @@ interface GitHubHiringLead {
 
 /**
  * Source leads from GitHub hiring repositories
- * Searches for: hiring in README + language:TypeScript + location filters
- * v2.1: Resolves emails before returning (no placeholders)
+ * Searches for: Fintech/Finance companies hiring + language:TypeScript
+ * v2.1: Fintech-aligned queries - industry-focused targeting
+ * Note: React preference handled in enrichment scoring, not search query
  */
 export async function sourceFromGitHubHiring(
   githubToken?: string,
@@ -36,17 +37,25 @@ export async function sourceFromGitHubHiring(
   const maxResults = maxLeads || 100; // Default to 100, but can be higher for retries
 
   try {
-    // Expanded search queries for more coverage
+    // v2.1: Fintech-focused queries (Sniper approach - industry-aligned)
+    // Strategy: Target Fintech/Finance companies using TypeScript
+    // Note: React preference handled in enrichment scoring, not search query
     const searchQueries = [
-      'hiring in:readme language:TypeScript',
-      'hiring in:readme language:TypeScript location:London',
-      'hiring in:readme language:TypeScript location:Remote',
-      'hiring in:readme language:TypeScript location:UK',
-      'hiring in:readme language:TypeScript location:Europe',
-      'hiring in:readme language:TypeScript location:US',
-      'hiring in:readme language:JavaScript',
-      'hiring in:readme language:TypeScript stars:>10',
-      'hiring in:readme language:TypeScript pushed:>2024-01-01',
+      // Core Fintech keywords
+      'hiring in:readme language:TypeScript "fintech"',
+      'hiring in:readme language:TypeScript "finance"',
+      'hiring in:readme language:TypeScript "wealth"',
+      'hiring in:readme language:TypeScript "crypto"',
+      'hiring in:readme language:TypeScript "blockchain"',
+      'hiring in:readme language:TypeScript "payment"',
+      'hiring in:readme language:TypeScript "trading"',
+      // Location-specific Fintech queries (high-value markets)
+      'hiring in:readme language:TypeScript "fintech" location:London',
+      'hiring in:readme language:TypeScript "finance" location:Remote',
+      'hiring in:readme language:TypeScript "crypto" location:US',
+      // Alternative: JavaScript for broader coverage (still Fintech-filtered)
+      'hiring in:readme language:JavaScript "fintech"',
+      'hiring in:readme language:JavaScript "finance"',
     ];
 
     let totalProcessed = 0;
