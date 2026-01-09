@@ -82,15 +82,16 @@ function buildPrompt(
 
   // Build CTA link based on product (Sprint 4: Smart Links)
   // Use absolute URLs for email links (relative paths don't work in emails)
+  // All products are on the /sponsor page, so link there
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app';
   const ctaLinks: Record<string, string> = {
-    'foundersClub': `${baseUrl}/pricing?tier=founder&ref=pilot`,
-    'corporateSponsor': `${baseUrl}/corporate?ref=pilot`,
-    'featureVoter': `${baseUrl}/pricing?tier=feature-voter&ref=pilot`,
-    'codeSupporter': `${baseUrl}/github-repo?ref=pilot`,
+    'foundersClub': `${baseUrl}/sponsor?ref=pilot&tier=founder`,
+    'corporateSponsor': `${baseUrl}/sponsor?ref=pilot&tier=corporate`,
+    'featureVoter': `${baseUrl}/sponsor?ref=pilot&tier=feature-voter`,
+    'codeSupporter': `${baseUrl}/sponsor?ref=pilot&tier=code-supporter`,
   };
 
-  const baseLink = ctaLinks[selectedProduct.id] || `${baseUrl}/pricing?ref=pilot`;
+  const baseLink = ctaLinks[selectedProduct.id] || `${baseUrl}/sponsor?ref=pilot`;
   const companySlug = leadData.companyName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const trackedLink = `${baseLink}&utm_source=ai_pilot&utm_medium=email&utm_campaign=${companySlug}`;
 
