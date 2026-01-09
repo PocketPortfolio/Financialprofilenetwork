@@ -16,6 +16,7 @@ interface LeadDetails {
   researchSummary: string | null;
   researchData: any;
   latestReasoning: string | null;
+  sequenceStep?: number | null; // v2.1: Email sequence step (0-4)
   conversations: Array<{
     id: string;
     type: string;
@@ -129,6 +130,19 @@ export function LeadDetailsDrawer({ lead, isOpen, onClose }: LeadDetailsDrawerPr
             <div>{lead.email}</div>
             {lead.jobTitle && <div>{lead.jobTitle}</div>}
             {lead.firstName && <div>{lead.firstName} {lead.lastName}</div>}
+            {/* v2.1: Sequence Step Display */}
+            {lead.sequenceStep !== null && lead.sequenceStep !== undefined && lead.sequenceStep > 0 && (
+              <div style={{ marginTop: 'var(--space-2)', padding: 'var(--space-2)', backgroundColor: 'var(--surface-elevated)', borderRadius: 'var(--radius-sm)' }}>
+                <span style={{ fontWeight: 'var(--font-semibold)', color: 'var(--text)' }}>Email Sequence: </span>
+                <span style={{ color: 'var(--info)' }}>Step {lead.sequenceStep}/4</span>
+                <OptimizedTooltip content={`Step 1: Cold Open (Initial Contact)
+Step 2: Value Add (Follow-Up) - Wait 3 days
+Step 3: Objection Killer (Privacy/Security) - Wait 4 days
+Step 4: Breakup (Soft Close) - Wait 7 days`}>
+                  <span style={{ marginLeft: 'var(--space-1)', cursor: 'help', color: 'var(--info)', fontSize: 'var(--font-size-xs)' }}>ℹ️</span>
+                </OptimizedTooltip>
+              </div>
+            )}
           </div>
         </div>
 

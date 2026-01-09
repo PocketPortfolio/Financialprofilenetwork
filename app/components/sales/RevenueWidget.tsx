@@ -66,7 +66,7 @@ export function RevenueWidget({ metrics }: RevenueWidgetProps) {
       {/* Progress Bar */}
       <div style={{ marginBottom: 'var(--space-4)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
-          <Tooltip content="Progress: (Current Revenue / £5,000 Target) × 100%. Shows how close we are to monthly revenue goal.">
+          <Tooltip content="Progress: (Current Revenue / £8,333 Target) × 100%. Shows how close we are to monthly revenue goal (£100k/year).">
             <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
               Progress
             </span>

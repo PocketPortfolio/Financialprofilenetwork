@@ -120,7 +120,7 @@ export default function AdminSalesPage() {
     },
     archive: {
       label: 'Archive',
-      statuses: ['CONVERTED', 'NOT_INTERESTED', 'DO_NOT_CONTACT'],
+      statuses: ['CONVERTED', 'NOT_INTERESTED', 'DO_NOT_CONTACT', 'UNQUALIFIED'],
       color: 'var(--muted)',
       emoji: '⚪',
     },
@@ -380,6 +380,25 @@ export default function AdminSalesPage() {
       <MobileHeader title="Sales Pilot" />
       <div className="brand-surface" style={{ minHeight: '100vh', padding: 'var(--space-6)' }}>
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
+        {/* v2.1: Quota Check Banner */}
+        {metrics && metrics.activity && (
+          (metrics.activity.emailsSentToday >= 100 || (metrics.activity.totalOutbound || 0) >= 3000) && (
+            <div style={{
+              padding: 'var(--space-4)',
+              backgroundColor: 'var(--error-muted)',
+              border: '2px solid var(--error)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: 'var(--space-6)',
+              color: 'var(--error)',
+              fontWeight: 'var(--font-semibold)',
+            }}>
+              ⚠️ CRITICAL: Email Quota Reached. 
+              {metrics.activity.emailsSentToday >= 100 && ` Daily limit: ${metrics.activity.emailsSentToday}/100.`}
+              {(metrics.activity.totalOutbound || 0) >= 3000 && ` Monthly limit: ${metrics.activity.totalOutbound}/3000.`}
+              {' '}Upgrade plan or wait for quota reset.
+            </div>
+          )
+        )}
         {/* Admin Navigation */}
         <div className="brand-card" style={{ 
           padding: 'var(--space-3)', 

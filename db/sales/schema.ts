@@ -10,6 +10,7 @@ export const leadStatusEnum = pgEnum('lead_status', [
   'REPLIED',
   'INTERESTED',
   'NOT_INTERESTED',
+  'UNQUALIFIED', // v2.1: Invalid emails (no MX records, etc.)
   'DO_NOT_CONTACT',
   'CONVERTED'
 ]);
@@ -72,6 +73,9 @@ export const leads = pgTable('leads', {
   
   // Scheduling (Sprint 4: Timezone Awareness)
   scheduledSendAt: timestamp('scheduled_send_at'), // For timezone-aware sending
+  
+  // Email Sequence (v2.1: Iron Rail State Machine)
+  sequenceStep: integer('sequence_step').default(0), // 0 = not started, 1-4 = current step
   
   // Compliance
   optOut: boolean('opt_out').default(false).notNull(),

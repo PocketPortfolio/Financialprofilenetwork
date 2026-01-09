@@ -88,7 +88,10 @@ export async function GET(
 
     console.log(`[LEAD-DETAILS] Returning data for ${leadId}`);
     return NextResponse.json({
-      lead,
+      lead: {
+        ...lead,
+        sequenceStep: lead.sequenceStep ?? null, // v2.1: Include sequence step
+      },
       conversations: leadConversations || [],
       auditLogs: logs || [],
       // Latest AI reasoning from most recent conversation

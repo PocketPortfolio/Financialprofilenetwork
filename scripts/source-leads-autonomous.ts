@@ -22,8 +22,8 @@ import { eq, ilike } from 'drizzle-orm';
 import { sourceFromGitHubHiring } from '@/lib/sales/sourcing/github-hiring-scraper';
 import { generateLookalikeLeads } from '@/lib/sales/sourcing/lookalike-seeding';
 import { isPlaceholderEmail, resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
-
-const TARGET_LEADS_PER_DAY = 50;
+import { validateEmail } from '@/lib/sales/email-validation';
+import { getRevenueDrivenDecisions } from '@/lib/sales/revenue-driver';
 const QUALIFYING_TITLES = [
   // Corporate-focused titles (prioritize for $1k sponsorships)
   'CTO',
@@ -148,11 +148,37 @@ function qualifyLead(candidate: LeadCandidate): boolean {
 
 /**
  * Main sourcing function
+ * v2.1: Revenue-driven dynamic volume adjustment
  */
 async function sourceLeadsAutonomous() {
   console.log('🚀 Autonomous Lead Sourcing Started');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`Target: ${TARGET_LEADS_PER_DAY} qualified leads/day`);
+  
+  // v2.1: Calculate dynamic target based on revenue gap
+  const allLeads = await db.select().from(leads);
+  const revenueDecisions = getRevenueDrivenDecisions(allLeads.map(lead => ({
+    id: lead.id,
+    status: lead.status,
+    score: lead.score || 0,
+    dealTier: (lead.researchData as any)?.dealTier || null,
+    researchData: lead.researchData as any,
+  })));
+  
+  // Use dynamic target (clamped to safety limits)
+  const MIN_LEADS_PER_DAY = 20;
+  const MAX_LEADS_PER_DAY = 200;
+  const DYNAMIC_TARGET = Math.max(
+    MIN_LEADS_PER_DAY,
+    Math.min(MAX_LEADS_PER_DAY, revenueDecisions.requiredLeadVolume)
+  );
+  
+  console.log(`📊 Revenue-Driven Sourcing:`);
+  console.log(`   Current Revenue: £${revenueDecisions.currentRevenue.toLocaleString()}`);
+  console.log(`   Projected Revenue: £${revenueDecisions.projectedRevenue.toLocaleString()}`);
+  console.log(`   Revenue Gap: £${revenueDecisions.revenueGap.toLocaleString()}`);
+  console.log(`   Action: ${revenueDecisions.adjustment.action.toUpperCase()}`);
+  console.log(`   Target: ${DYNAMIC_TARGET} qualified leads/day (Revenue-driven)`);
+  console.log(`   Reason: ${revenueDecisions.adjustment.reason}`);
   console.log('');
 
   const allCandidates: LeadCandidate[] = [];
@@ -167,9 +193,9 @@ async function sourceLeadsAutonomous() {
   allCandidates.push(...githubLeads, ...ycLeads, ...hiringLeads);
   
   // Sprint 4: Lookalike Seeding (if we have good leads)
-  if (allCandidates.length < TARGET_LEADS_PER_DAY) {
+  if (allCandidates.length < DYNAMIC_TARGET) {
     console.log('🔍 Generating lookalike leads from high-scoring existing leads...');
-    const lookalikeLeads = await generateLookalikeLeads(70, TARGET_LEADS_PER_DAY - allCandidates.length);
+    const lookalikeLeads = await generateLookalikeLeads(70, DYNAMIC_TARGET - allCandidates.length);
     const lookalikeCandidates: LeadCandidate[] = lookalikeLeads.map(lead => ({
       email: lead.email,
       companyName: lead.companyName,
@@ -223,6 +249,14 @@ async function sourceLeadsAutonomous() {
       }
     }
     
+    // PHASE 1: Validate email with MX record check (v2.1)
+    const validation = await validateEmail(emailToUse);
+    if (!validation.isValid) {
+      console.log(`⚠️  Rejecting invalid email: ${emailToUse} for ${candidate.companyName} - ${validation.reason}`);
+      rejected++;
+      continue;
+    }
+    
     if (await leadExists(emailToUse, candidate.companyName)) {
       skipped++;
       continue;
@@ -255,17 +289,17 @@ async function sourceLeadsAutonomous() {
   console.log(`   Created: ${created} new leads`);
   console.log(`   Skipped: ${skipped} duplicates`);
   console.log(`   Rejected: ${rejected} placeholder/invalid emails`);
-  console.log(`   Target: ${TARGET_LEADS_PER_DAY} leads/day`);
-  console.log(`   Progress: ${created}/${TARGET_LEADS_PER_DAY} (${Math.round((created / TARGET_LEADS_PER_DAY) * 100)}%)`);
+  console.log(`   Target: ${DYNAMIC_TARGET} leads/day (Revenue-driven)`);
+  console.log(`   Progress: ${created}/${DYNAMIC_TARGET} (${Math.round((created / DYNAMIC_TARGET) * 100)}%)`);
   console.log('');
   
   if (rejected > 0) {
-    console.log(`⚠️  Warning: ${rejected} leads rejected due to placeholder emails`);
+    console.log(`⚠️  Warning: ${rejected} leads rejected due to placeholder/invalid emails`);
     console.log('   Placeholder emails are not allowed - leads must have real email addresses');
   }
   
-  if (created < TARGET_LEADS_PER_DAY) {
-    console.log(`⚠️  Warning: Only ${created} leads created, target is ${TARGET_LEADS_PER_DAY}`);
+  if (created < DYNAMIC_TARGET) {
+    console.log(`⚠️  Warning: Only ${created} leads created, target is ${DYNAMIC_TARGET}`);
     console.log('   Consider implementing additional sourcing channels');
   } else {
     console.log('✅ Target met!');
