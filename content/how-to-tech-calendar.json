@@ -75,7 +75,7 @@
     "scheduledTime": "16:00",
     "title": "How to Test Autonomous Blog Generation in Zero-Touch Systems",
     "slug": "how-to-test-autonomous-blog-generation-zero-touch-systems",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -84,7 +84,8 @@
       "zero-touch",
       "blog",
       "generation"
-    ]
+    ],
+    "publishedAt": "2026-01-09T16:15:40.233Z"
   },
   {
     "id": "how-to-understanding-stale-while-revalidate-in-next-js-jan-10",
