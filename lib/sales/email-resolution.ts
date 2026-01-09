@@ -72,9 +72,32 @@ export async function resolveEmailFromGitHub(
 }
 
 /**
- * Check if email is a placeholder
+ * Check if email is a placeholder or test/invalid domain
+ * Blocks RFC 2606 reserved test domains and common test patterns
  */
 export function isPlaceholderEmail(email: string): boolean {
-  return email.includes('.placeholder') || email.includes('@similar.') || email.includes('@github-hiring.');
+  const lowerEmail = email.toLowerCase();
+  
+  // Existing placeholder patterns
+  if (lowerEmail.includes('.placeholder') || 
+      lowerEmail.includes('@similar.') || 
+      lowerEmail.includes('@github-hiring.')) {
+    return true;
+  }
+  
+  // Block RFC 2606 reserved test domains and common test patterns
+  const testDomains = [
+    '@example.com',
+    '@example.org',
+    '@example.net',
+    '@test.com',
+    '@test.local',
+    '@invalid.com',
+    '@fake.com',
+    '@dummy.com',
+    '@sample.com',
+  ];
+  
+  return testDomains.some(domain => lowerEmail.includes(domain));
 }
 

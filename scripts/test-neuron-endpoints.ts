@@ -267,6 +267,10 @@ async function testNeuronEndpoints() {
   console.log(`Base URL: ${BASE_URL}`);
   console.log(`API Key: ${NEURON_API_KEY ? 'Configured' : 'Not configured (using test-key)'}`);
   console.log('');
+  console.log('⚠️  WARNING: This test creates test leads with @example.com emails.');
+  console.log('   These will be automatically rejected by email validation in production.');
+  console.log('   Run "npm run cleanup-test-leads" after testing to remove test data.');
+  console.log('');
   
   const results: TestResult[] = [];
 

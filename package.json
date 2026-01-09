@@ -67,6 +67,8 @@
     "source-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/source-leads-autonomous.ts",
     "test-sourcing-channels": "ts-node --project scripts/tsconfig.json scripts/test-sourcing-channels.ts",
     "test-neuron-endpoints": "ts-node --project scripts/tsconfig.json scripts/test-neuron-endpoints.ts",
+    "cleanup-test-leads": "ts-node --project scripts/tsconfig.json scripts/cleanup-test-leads.ts",
+    "test-email-validation": "ts-node --project scripts/tsconfig.json scripts/test-email-validation.ts",
     "db:add-lead-submitted": "ts-node --project scripts/tsconfig.json scripts/add-lead-submitted-audit-action.ts",
     "process-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-leads-autonomous.ts",
     "process-inbound-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-inbound-autonomous.ts",
