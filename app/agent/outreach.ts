@@ -6,6 +6,7 @@ import { checkCompliance } from '@/lib/sales/compliance';
 import { Resend } from 'resend';
 import { getBestProductForLead, getActiveProducts } from '@/lib/stripe/product-catalog';
 import { CulturalContext } from '@/lib/sales/cultural-intelligence';
+import { isRealFirstName } from '@/lib/sales/name-validation';
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -20,6 +21,7 @@ export async function generateEmail(
   leadId: string,
   leadData: {
     firstName?: string;
+    firstNameReliable?: boolean;
     companyName: string;
     techStack: string[];
     researchSummary?: string;
@@ -62,6 +64,7 @@ export async function generateEmail(
 function buildPrompt(
   leadData: {
     firstName?: string;
+    firstNameReliable?: boolean;
     companyName: string;
     techStack: string[];
     researchSummary?: string;
@@ -105,8 +108,15 @@ function buildPrompt(
     ? `\n\nCULTURAL CONTEXT (Low Confidence: ${leadData.culturalContext.confidence}%):\nUse "International English" - simple grammar, no idioms, clear value proposition.`
     : '';
 
+  // Determine if we should use firstName in greeting
+  const firstNameReliable = leadData.firstNameReliable !== false && leadData.firstName && isRealFirstName(leadData.firstName);
+  const greetingName = firstNameReliable ? leadData.firstName : leadData.companyName;
+  const firstNameWarning = leadData.firstName && !firstNameReliable 
+    ? `\n\n⚠️ CRITICAL: The provided "firstName" (${leadData.firstName}) is NOT a real name - it appears to be an email prefix (e.g., "info", "contact", "hello"). DO NOT use this in the greeting. Use the company name instead (${leadData.companyName}).`
+    : '';
+
   if (emailType === 'initial') {
-    return `Generate a cold outreach email to ${leadData.firstName || leadData.companyName} at ${leadData.companyName}.
+    return `Generate a cold outreach email to ${greetingName} at ${leadData.companyName}.${firstNameWarning}
     
 Context:
 - Company: ${leadData.companyName}
@@ -129,7 +139,11 @@ CRITICAL REQUIREMENTS (Sprint 4: Humanity & Precision):
    - Link should be naturally integrated (e.g., "Learn more: [link]" or "Check it out: [link]")
    - Do NOT just paste the link - integrate it into the flow
 
-2. TONE: Write as a fellow Engineer asking for a code review, NOT a Sales Rep asking for a meeting
+2. GREETING: ${firstNameReliable 
+    ? `Use their first name (${leadData.firstName}) in the greeting. Start with "Hi ${leadData.firstName}," or similar.`
+    : `DO NOT use a first name - we don't have a reliable name. Use a company-based greeting like "Hi team at ${leadData.companyName}," or "Hello ${leadData.companyName},"`}
+
+3. TONE: Write as a fellow Engineer asking for a code review, NOT a Sales Rep asking for a meeting
    - Be humble: "I'm mostly reaching out to see if our local-first approach aligns with your privacy goals. If not, tell me to get lost—I won't be offended."
    - Avoid "Sales Breath": No false urgency, no aggressive language, no "I have a great solution for you!"
    - Focus on peer-to-peer curiosity and technical alignment
@@ -141,18 +155,18 @@ CRITICAL REQUIREMENTS (Sprint 4: Humanity & Precision):
      * ❌ "As a CTO, you need this!"
      * ✅ "As a fellow engineer, I thought you might appreciate our local-state architecture..."
 
-3. Subject line: 10-100 characters
-4. Body: 100-2000 characters
-5. Focus on "Data Privacy" and "Local-First Architecture" as primary value props
-6. Reference their tech stack (e.g., "Since you use ${leadData.techStack[0] || 'React'}, you'll appreciate our local-state architecture...")
-7. DO NOT pitch "Enterprise SLA" or "Managed Cloud Hosting" (we don't have these)
-8. DO pitch "Privacy," "No Monthly Fees (for Founders)," "Own Your Data"
-9. Select ONE product from the active products list that best fits this lead (Selected: ${selectedProduct.name})
-10. Include reasoning for why this email was generated and which product you're pitching`;
+4. Subject line: 10-100 characters
+5. Body: 100-2000 characters
+6. Focus on "Data Privacy" and "Local-First Architecture" as primary value props
+7. Reference their tech stack (e.g., "Since you use ${leadData.techStack[0] || 'React'}, you'll appreciate our local-state architecture...")
+8. DO NOT pitch "Enterprise SLA" or "Managed Cloud Hosting" (we don't have these)
+9. DO pitch "Privacy," "No Monthly Fees (for Founders)," "Own Your Data"
+10. Select ONE product from the active products list that best fits this lead (Selected: ${selectedProduct.name})
+11. Include reasoning for why this email was generated and which product you're pitching`;
   }
   
   if (emailType === 'follow_up') {
-    return `Generate a follow-up email to ${leadData.firstName || leadData.companyName} at ${leadData.companyName}.
+    return `Generate a follow-up email to ${greetingName} at ${leadData.companyName}.${firstNameWarning}
     
 Context:
 - Company: ${leadData.companyName}
@@ -169,7 +183,7 @@ Requirements:
   }
   
   if (emailType === 'objection_handling') {
-    return `Generate an objection handling email to ${leadData.firstName || leadData.companyName}.
+    return `Generate an objection handling email to ${greetingName}.${firstNameWarning}
     
 Context:
 - Company: ${leadData.companyName}

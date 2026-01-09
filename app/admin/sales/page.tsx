@@ -8,6 +8,7 @@ import MobileHeader from '@/app/components/nav/MobileHeader';
 import { RevenueWidget } from '@/app/components/sales/RevenueWidget';
 import { ActionFeed } from '@/app/components/sales/ActionFeed';
 import { LeadDetailsDrawer } from '@/app/components/sales/LeadDetailsDrawer';
+import { extractFirstNameFromEmail, isRealFirstName } from '@/lib/sales/name-validation';
 
 interface Lead {
   id: string;
@@ -200,7 +201,8 @@ export default function AdminSalesPage() {
       }
       
       const data = await response.json();
-      setLeads(data.leads || []);
+      const leadsData = data.leads || [];
+      setLeads(leadsData);
     } catch (err: any) {
       console.error('Error loading leads:', err);
       // Show detailed error message
@@ -724,6 +726,17 @@ export default function AdminSalesPage() {
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
                     }}>
+                      Contact
+                    </th>
+                    <th style={{ 
+                      padding: 'var(--space-3)', 
+                      textAlign: 'left', 
+                      color: 'var(--text-secondary)',
+                      fontSize: 'var(--font-size-xs)',
+                      fontWeight: 'var(--font-semibold)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}>
                       Score
                     </th>
                     <th style={{ 
@@ -752,7 +765,7 @@ export default function AdminSalesPage() {
                 <tbody>
                   {filteredLeads.length === 0 ? (
                     <tr>
-                      <td colSpan={4} style={{ 
+                      <td colSpan={5} style={{ 
                         padding: 'var(--space-6)', 
                         textAlign: 'center', 
                         color: 'var(--text-secondary)',
@@ -786,6 +799,31 @@ export default function AdminSalesPage() {
                           <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-secondary)' }}>
                             {lead.email}
                           </div>
+                        </td>
+                        <td style={{ padding: 'var(--space-3)' }}>
+                          <div style={{ fontWeight: 500, color: 'var(--foreground)' }}>
+                            {(() => {
+                              // Use database firstName if it's a real name, otherwise try to extract from email
+                              let displayFirstName = null;
+                              
+                              // Check if database firstName is a real name
+                              if (lead.firstName && isRealFirstName(lead.firstName)) {
+                                displayFirstName = lead.firstName.trim();
+                              } else if (lead.email) {
+                                // Try to extract from email, but only if it looks like a real name
+                                displayFirstName = extractFirstNameFromEmail(lead.email);
+                              }
+                              
+                              return displayFirstName
+                                ? `${displayFirstName} - ${lead.jobTitle || 'Founder'}`
+                                : (lead.jobTitle || 'Founder');
+                            })()}
+                          </div>
+                          {(lead.lastName && lead.lastName.trim()) && (
+                            <div style={{ fontSize: '11px', color: 'var(--accents-5)' }}>
+                              {lead.lastName.trim()}
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: 'var(--space-3)' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>

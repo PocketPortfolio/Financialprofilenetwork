@@ -22,6 +22,7 @@ import { canContactLead } from '@/lib/sales/compliance';
 import { kv } from '@vercel/kv';
 import { calculateOptimalSendTime, isOptimalSendWindow } from '@/lib/sales/timezone-utils';
 import { getBestProductForLead } from '@/lib/stripe/product-catalog';
+import { isRealFirstName } from '@/lib/sales/name-validation';
 
 const MAX_LEADS_TO_PROCESS = 10; // Process 10 leads per run to avoid rate limits
 
@@ -160,6 +161,7 @@ async function processResearchingLeads() {
         lead.id,
         {
           firstName: lead.firstName || undefined,
+          firstNameReliable: lead.firstName ? isRealFirstName(lead.firstName) : false,
           companyName: lead.companyName,
           techStack: lead.techStackTags || [],
           researchSummary: lead.researchSummary || undefined,

@@ -11,6 +11,7 @@ import { generateAutonomousReply } from '@/lib/sales/compliance-kb';
 import { generateEmail, sendEmail } from './outreach';
 import { canContactLead } from '@/lib/sales/compliance';
 import { checkCompliance } from '@/lib/sales/compliance';
+import { isRealFirstName } from '@/lib/sales/name-validation';
 
 const MIN_CONFIDENCE_THRESHOLD = 0.85; // Only auto-reply if confidence >= 85%
 
@@ -123,6 +124,7 @@ export async function handleInboundEmail(
       leadId,
       {
         firstName: lead.firstName || undefined,
+        firstNameReliable: lead.firstName ? isRealFirstName(lead.firstName) : false,
         companyName: lead.companyName,
         techStack: lead.techStackTags || [],
         researchSummary: lead.researchSummary || undefined,

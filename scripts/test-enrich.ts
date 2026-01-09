@@ -47,10 +47,12 @@ async function testEnrichment() {
     
     // Generate email
     console.log('\n📧 Step 2: Generating email...');
+    const { isRealFirstName } = await import('@/lib/sales/name-validation');
     const { email, reasoning } = await generateEmail(
       leadId,
       {
         firstName: lead.firstName || undefined,
+        firstNameReliable: lead.firstName ? isRealFirstName(lead.firstName) : false,
         companyName: lead.companyName,
         techStack: lead.techStackTags || [],
         researchSummary: lead.researchSummary || undefined,
