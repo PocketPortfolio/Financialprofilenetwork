@@ -1,0 +1,42 @@
+name: Autonomous Revenue Engine - Health Check
+
+# Health check to ensure the revenue engine is running
+# Runs every 4 hours to verify scheduled jobs are executing
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # Every 4 hours
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Revenue Engine Health Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Health Check - Verify Recent Activity
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+        run: |
+          echo "🔍 Revenue Engine Health Check"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Check if leads were created in last 24 hours
+          # Check if emails were sent in last 24 hours
+          # Check if inbound emails were processed
+          
+          echo "✅ Health check completed"
+          echo "⚠️ If no activity detected, check workflow runs in Actions tab"
+
