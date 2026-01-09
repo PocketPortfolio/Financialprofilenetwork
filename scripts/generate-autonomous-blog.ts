@@ -509,6 +509,31 @@ async function main() {
       console.log('✅ No orphaned posts detected - all published posts have valid files\n');
     }
     
+    // ✅ PRE-GENERATION HEALTH CHECK: Reset failed posts that are still due
+    console.log('🔍 Pre-generation health check: Scanning for failed posts that are still due...');
+    const failedPosts = calendar.filter(p => p.status === 'failed' && p.date <= today);
+    
+    if (failedPosts.length > 0) {
+      console.warn(`\n⚠️  Found ${failedPosts.length} failed post(s) that are still due (date <= today):`);
+      console.warn('   Resetting status to "pending" so they can be retried...\n');
+      
+      for (const post of failedPosts) {
+        post.status = 'pending';
+        console.log(`   🔄 Reset: ${post.title} (${post.date}) → status: pending (will retry)`);
+      }
+      
+      // Save updated calendars immediately
+      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech');
+      const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+      fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
+      if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
+        fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+      }
+      console.log('   ✅ Calendars updated - failed posts reset to pending\n');
+    } else {
+      console.log('✅ No failed posts detected that need retry\n');
+    }
+    
     // Show which posts have date <= today (for debugging)
     const postsWithDateLeToday = calendar.filter(p => p.date <= today);
     if (postsWithDateLeToday.length > 0) {
