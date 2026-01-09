@@ -71,32 +71,13 @@ export function determineOutreachLanguage(countryCode: string): string | null {
 /**
  * Check if we can email a lead from a specific country
  * 
- * Returns false if:
- * - Country requires native language AND we cannot generate native language emails
- * - Country explicitly forbids English
- * 
- * Currently, we are ONLY English-ready, so strict regions will return false
+ * UPDATED (Execution Order 010 v2): Always returns true - we enforce language instead of blocking
+ * The system will generate emails in the required native language using AI (GPT-4o supports all languages)
+ * This ensures we respect cultural norms while still closing deals
  */
 export function canWeEmail(countryCode: string, supportedLanguages: string[] = ['en-US']): boolean {
-  const rule = REGION_RULES[countryCode];
-  
-  // If no rule exists, allow English (safe default)
-  if (!rule) {
-    return true;
-  }
-
-  // If strict rule forbids English and we don't support native language, RETURN FALSE
-  if (rule.requiresNative && !rule.allowEnglish) {
-    // Check if we support the required native language
-    const langCode = rule.lang.split('-')[0]; // Extract base language (e.g., 'zh' from 'zh-CN')
-    const isSupported = supportedLanguages.some(lang => lang.startsWith(langCode));
-    
-    if (!isSupported) {
-      return false; // Cannot contact - we don't support required native language
-    }
-  }
-
-  // If permissive or we support the language, allow
+  // Always allow - we'll enforce language in email generation
+  // GPT-4o can generate emails in any language, so we don't need to block
   return true;
 }
 

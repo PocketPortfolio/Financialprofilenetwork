@@ -16,29 +16,33 @@ config({ path: resolve(process.cwd(), '.env') });
 import { canWeEmail, getRegionLockReason, isStrictRegion, determineOutreachLanguage, REGION_RULES } from '@/lib/sales/cultural-guardrails';
 
 async function testCulturalGuardrails() {
-  console.log('🧪 Testing Cultural Guardrails (Execution Order 010)');
+  console.log('🧪 Testing Cultural Guardrails (Execution Order 010 v2)');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+  console.log('📌 NEW BEHAVIOR: We no longer BLOCK leads - we ENFORCE native language');
+  console.log('   All regions are allowed, but strict regions require native language\n');
 
-  const supportedLanguages = ['en-US']; // Currently only English supported
+  const supportedLanguages = ['en-US', 'zh-CN', 'es-ES', 'ja-JP', 'ko-KR', 'it-IT', 'ru-RU', 'ar-SA']; // GPT-4o supports all languages
 
-  // Test 1: Strict Regions (Should BLOCK)
-  console.log('📋 Test 1: Strict Regions (Should BLOCK)');
+  // Test 1: Strict Regions (Should REQUIRE native language, not block)
+  console.log('📋 Test 1: Strict Regions (Should REQUIRE native language)');
   const strictRegions = ['CN', 'ES', 'JP', 'KR', 'IT', 'RU', 'AR'];
-  let strictBlocked = 0;
-  let strictAllowed = 0;
+  let strictEnforced = 0;
+  let strictFailed = 0;
 
   for (const region of strictRegions) {
-    const canEmail = canWeEmail(region, supportedLanguages);
-    const reason = getRegionLockReason(region, supportedLanguages);
+    const canEmail = canWeEmail(region, supportedLanguages); // Should always be true now
     const isStrict = isStrictRegion(region);
     const requiredLang = determineOutreachLanguage(region);
 
-    if (canEmail) {
-      console.log(`   ❌ FAIL: ${region} should be BLOCKED but was allowed`);
-      strictAllowed++;
+    if (!canEmail) {
+      console.log(`   ❌ FAIL: ${region} should be ALLOWED (with language enforcement) but was blocked`);
+      strictFailed++;
+    } else if (requiredLang && requiredLang !== 'en-US') {
+      console.log(`   ✅ PASS: ${region} correctly ALLOWED with native language requirement: ${requiredLang}`);
+      strictEnforced++;
     } else {
-      console.log(`   ✅ PASS: ${region} correctly BLOCKED - ${reason}`);
-      strictBlocked++;
+      console.log(`   ⚠️  WARN: ${region} allowed but no native language requirement`);
+      strictFailed++;
     }
     console.log(`      - Is Strict: ${isStrict}`);
     console.log(`      - Required Language: ${requiredLang}`);
@@ -123,19 +127,20 @@ async function testCulturalGuardrails() {
   // Summary
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('📊 Test Summary:');
-  console.log(`   Strict Regions: ${strictBlocked}/${strictRegions.length} correctly blocked, ${strictAllowed} incorrectly allowed`);
+  console.log(`   Strict Regions: ${strictEnforced}/${strictRegions.length} correctly enforce native language, ${strictFailed} failed`);
   console.log(`   Permissive Regions: ${permissiveAllowed}/${permissiveRegions.length} correctly allowed, ${permissiveBlocked} incorrectly blocked`);
   console.log(`   English Regions: ${englishAllowed}/${englishRegions.length} correctly allowed, ${englishBlocked} incorrectly blocked`);
   console.log(`   Unknown Regions: ${unknownAllowed}/${unknownRegions.length} correctly allowed (safe default), ${unknownBlocked} incorrectly blocked`);
   console.log('');
 
   const totalTests = strictRegions.length + permissiveRegions.length + englishRegions.length + unknownRegions.length;
-  const totalPassed = strictBlocked + permissiveAllowed + englishAllowed + unknownAllowed;
-  const totalFailed = strictAllowed + permissiveBlocked + englishBlocked + unknownBlocked;
+  const totalPassed = strictEnforced + permissiveAllowed + englishAllowed + unknownAllowed;
+  const totalFailed = strictFailed + permissiveBlocked + englishBlocked + unknownBlocked;
 
   if (totalFailed === 0) {
-    console.log('✅ ALL TESTS PASSED: Cultural Guardrails are working correctly!');
+    console.log('✅ ALL TESTS PASSED: Cultural Guardrails (Language Enforcement) are working correctly!');
     console.log(`   ${totalPassed}/${totalTests} tests passed`);
+    console.log('   📌 All leads will be contacted - strict regions will receive emails in their native language');
   } else {
     console.log(`❌ SOME TESTS FAILED: ${totalFailed} test(s) failed`);
     console.log(`   ${totalPassed}/${totalTests} tests passed`);
