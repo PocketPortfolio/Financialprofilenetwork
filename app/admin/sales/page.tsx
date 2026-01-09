@@ -380,24 +380,21 @@ export default function AdminSalesPage() {
       <MobileHeader title="Sales Pilot" />
       <div className="brand-surface" style={{ minHeight: '100vh', padding: 'var(--space-6)' }}>
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
-        {/* v2.1: Quota Check Banner */}
+        {/* WAR MODE: Quota limits removed (Directive 011) */}
         {metrics && metrics.activity && (
-          (metrics.activity.emailsSentToday >= 100 || (metrics.activity.totalOutbound || 0) >= 3000) && (
-            <div style={{
-              padding: 'var(--space-4)',
-              backgroundColor: 'var(--error-muted)',
-              border: '2px solid var(--error)',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: 'var(--space-6)',
-              color: 'var(--error)',
-              fontWeight: 'var(--font-semibold)',
-            }}>
-              ⚠️ CRITICAL: Email Quota Reached. 
-              {metrics.activity.emailsSentToday >= 100 && ` Daily limit: ${metrics.activity.emailsSentToday}/100.`}
-              {(metrics.activity.totalOutbound || 0) >= 3000 && ` Monthly limit: ${metrics.activity.totalOutbound}/3000.`}
-              {' '}Upgrade plan or wait for quota reset.
-            </div>
-          )
+          <div style={{
+            padding: 'var(--space-4)',
+            backgroundColor: 'var(--signal-muted)',
+            border: '2px solid var(--signal)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 'var(--space-6)',
+            color: 'var(--signal)',
+            fontWeight: 'var(--font-semibold)',
+          }}>
+            🔥 WAR MODE ACTIVE: Unlimited outreach enabled. 
+            {metrics.activity.emailsSentToday > 0 && ` ${metrics.activity.emailsSentToday} emails sent today.`}
+            {' '}No artificial limits - sending at Resend API rate (100/sec).
+          </div>
         )}
         {/* Admin Navigation */}
         <div className="brand-card" style={{ 

@@ -37,7 +37,10 @@ const MAX_LEADS_PER_DAY = 10000; // WAR MODE: Effectively unlimited (was 200)
 ---
 
 ### 2. ✅ Outreach Quotas Removed
-**File:** `app/agent/outreach.ts`
+**Files:** 
+- `app/agent/outreach.ts` - Main email sending function
+- `scripts/process-leads-autonomous.ts` - Lead processing script
+- `app/api/agent/send-email/route.ts` - API route for manual sends
 
 **Before:**
 ```typescript
@@ -50,23 +53,57 @@ if (dailyCount[0]?.count >= 100) {
 if (monthlyCount[0]?.count >= 3000) {
   throw new Error('Monthly email quota reached (3000 emails/30d)...');
 }
+
+// Rate limiting in processing script
+const maxPerDay = parseInt(process.env.SALES_RATE_LIMIT_PER_DAY || '50', 10);
+if (currentCount >= maxPerDay) {
+  return 0; // Stop processing
+}
 ```
 
 **After:**
 ```typescript
 // WAR MODE: Quota limits removed (Directive 011)
 // The engine now sends as fast as the Resend API allows
+
+// WAR MODE: Rate limits removed (Directive 011)
+// Process all available leads without quota restrictions
 ```
 
 **Impact:**
 - **No daily limit** (was 100 emails/24h)
 - **No monthly limit** (was 3000 emails/30d)
+- **No rate limiting in processing** (was 50/day default)
+- **No rate limiting in API** (was blocking manual sends)
 - Engine sends at **Resend API rate limit** (currently 100/sec)
 - Only physical limits remain (Resend plan limits, domain reputation)
 
 ---
 
-### 3. ✅ Heartbeat Accelerated
+### 3. ✅ UI Banner Updated
+**File:** `app/admin/sales/page.tsx`
+
+**Before:**
+```typescript
+// Shows error banner when quota reached
+⚠️ CRITICAL: Email Quota Reached. Daily limit: 197/100.
+```
+
+**After:**
+```typescript
+// Shows WAR MODE status banner
+🔥 WAR MODE ACTIVE: Unlimited outreach enabled. 
+197 emails sent today. No artificial limits - sending at Resend API rate (100/sec).
+```
+
+**Impact:**
+- No more confusing quota warnings
+- Clear indication that WAR MODE is active
+- Shows actual email count without false limits
+
+---
+
+### 4. ✅ Heartbeat Accelerated
 **File:** `.github/workflows/autonomous-revenue-engine.yml`
 
 **Before:**
@@ -91,7 +128,7 @@ schedule:
 
 ---
 
-### 4. ✅ Revenue Driver Unleashed
+### 5. ✅ Revenue Driver Unleashed
 **File:** `lib/sales/revenue-driver.ts`
 
 **Before:**
@@ -176,11 +213,15 @@ const MAX_LEADS_PER_DAY = 10000; // WAR MODE: Unlimited (was 200) - Directive 01
 
 - [x] **Sourcing Ceilings Removed** - `MAX_LEADS_PER_DAY = 10000` in `source-leads-autonomous.ts`
 - [x] **Outreach Quotas Removed** - Daily/monthly checks deleted from `outreach.ts`
+- [x] **Processing Script Rate Limits Removed** - All rate limit checks removed from `process-leads-autonomous.ts`
+- [x] **API Route Rate Limits Removed** - All rate limit checks removed from `send-email/route.ts`
+- [x] **UI Banner Updated** - Shows WAR MODE status instead of quota warnings
 - [x] **Heartbeat Accelerated** - Cron changed to `0 */4 * * *` in workflow
 - [x] **Revenue Driver Unleashed** - `MAX_LEADS_PER_DAY = 10000` in `revenue-driver.ts`
 - [x] **Build Successful** - All changes compile without errors
 - [x] **Type Safety** - No TypeScript errors
 - [x] **Code Quality** - No linter errors
+- [x] **No Remaining Rate Limits** - Verified all quota/rate limit checks removed
 
 ---
 
@@ -200,10 +241,13 @@ const MAX_LEADS_PER_DAY = 10000; // WAR MODE: Unlimited (was 200) - Directive 01
 ## 📝 TECHNICAL NOTES
 
 ### Files Modified
-1. `scripts/source-leads-autonomous.ts` - Sourcing ceiling removed
-2. `app/agent/outreach.ts` - Quota checks removed
-3. `.github/workflows/autonomous-revenue-engine.yml` - Cron schedule updated
-4. `lib/sales/revenue-driver.ts` - Revenue driver ceiling removed
+1. `scripts/source-leads-autonomous.ts` - Sourcing ceiling removed (200 → 10,000)
+2. `app/agent/outreach.ts` - Quota checks removed (daily 100, monthly 3000)
+3. `scripts/process-leads-autonomous.ts` - Rate limiting removed from processing script
+4. `app/api/agent/send-email/route.ts` - Rate limiting removed from API route
+5. `app/admin/sales/page.tsx` - UI banner updated to show WAR MODE status
+6. `.github/workflows/autonomous-revenue-engine.yml` - Cron schedule updated (daily → every 4 hours)
+7. `lib/sales/revenue-driver.ts` - Revenue driver ceiling removed (200 → 10,000)
 
 ### Build Output
 - ✅ TypeScript compilation: **PASSED**
