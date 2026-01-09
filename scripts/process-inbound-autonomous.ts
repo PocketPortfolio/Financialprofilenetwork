@@ -7,7 +7,7 @@
 
 import { db } from '@/db/sales/client';
 import { conversations, leads } from '@/db/sales/schema';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import { handleInboundEmail } from '@/app/agent/conversation-handler';
 
 /**
@@ -39,6 +39,7 @@ async function processInboundAutonomous() {
   
   for (const email of inboundEmails) {
     // Check if we already replied to this thread
+    // Handle null threadId: use threadId if available, otherwise match by emailId
     const existingReplies = await db
       .select()
       .from(conversations)
@@ -46,7 +47,9 @@ async function processInboundAutonomous() {
         and(
           eq(conversations.leadId, email.leadId),
           eq(conversations.direction, 'outbound'),
-          eq(conversations.threadId, email.threadId || email.emailId)
+          email.threadId
+            ? eq(conversations.threadId, email.threadId)
+            : eq(conversations.emailId, email.emailId || '')
         )
       )
       .limit(1);
