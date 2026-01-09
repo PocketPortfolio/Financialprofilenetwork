@@ -1,0 +1,56 @@
+---
+title: "How to Use curl to Test JSON Endpoints like a Pro"
+date: "2026-01-09"
+description: "Master using curl to test JSON endpoints with this concise guide. Elevate your API testing skills with practical examples."
+tags: ["json", "use", "curl", "test"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-use-curl-to-test-json-endpoints-like-a-pro.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+When developing or interacting with web APIs, validating JSON responses from endpoints is crucial. However, setting up a full-fledged testing environment or using graphical tools can be overkill for quick checks or during early development stages. This is where `curl`, a powerful command-line tool, comes in handy for sending HTTP requests and analyzing responses.
+
+### Direct Solution with Code
+
+To test a JSON endpoint using `curl`, you can use the following command:
+
+```bas
+h
+curl -X GET "http://example.com/api/data" -H "Accept: application/json"
+```
+
+This will send a GET request to the specified URL. The `-H "Accept: application/json"` header tells the server that your client expects JSON in return.
+
+For endpoints requiring authentication, add an authentication token in the header:
+
+```bas
+h
+curl -X GET "http://example.com/api/data" -H "Authorization: Bearer YOUR_TOKEN_HERE" -H "Accept: application/json"
+```
+
+To send a POST request with a JSON payload, use the `-d` (or `--data`) option:
+
+```bas
+h
+curl -X POST "http://example.com/api/data" -H "Content-Type: application/json" -d '{"key":"value"}'
+```
+
+### Explanation of Key Concepts
+
+- **HTTP Methods**: `curl` supports various HTTP methods like GET, POST, PUT, etc. Choose the method that matches your testing scenario.
+- **Headers**: Custom headers (`-H`) are crucial for specifying content types, authentication, and other metadata.
+- **Payload**: For requests like POST or PUT that send data, the `-d` option allows including a JSON payload directly in the command line.
+
+### Quick Tip or Gotcha
+
+- **Pretty-Print JSON**: `curl`'s output can be hard to read. Pipe its output to `jq`, a lightweight command-line JSON processor, to pretty-print the JSON response:
+
+```bas
+h
+curl -X GET "http://example.com/api/data" -H "Accept: application/json" | jq .
+```
+
+- **Avoiding Passwords in Command Line**: For APIs requiring basic authentication, avoid putting passwords directly in the command line. Instead, use `.netrc` files or environment variables to store sensitive data securely.
+
+With these guidelines and tips, testing JSON endpoints with `curl` becomes a streamlined process, empowering developers to quickly validate API behaviors and responses without leaving the terminal's comfort.
