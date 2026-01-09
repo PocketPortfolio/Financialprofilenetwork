@@ -3,12 +3,13 @@ import { db } from '@/db/sales/client';
 import { leads, conversations, auditLogs } from '@/db/sales/schema';
 import { eq, desc } from 'drizzle-orm';
 
-// Next.js route configuration for dynamic routes in production
+// Next.js route configuration - matches working catch-all routes pattern (sitemap, tickers)
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
-export const revalidate = 0; // Force no caching - ensure fresh data
-export const fetchCache = 'force-no-store'; // Force no fetch caching - workaround for Next.js 15 routing bug
+export const revalidate = 0;
+// Note: Removed fetchCache to match working catch-all routes pattern
+// Working routes (sitemap/[...name], tickers/[...ticker]) don't use fetchCache
 
 /**
  * GET /api/agent/leads/[id]
