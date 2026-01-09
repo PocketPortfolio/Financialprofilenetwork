@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSectorClassification } from '@/app/lib/portfolio/sectorService';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * GET /api/portfolio/sector-classification?ticker=AAPL
  * Get sector classification for a single ticker

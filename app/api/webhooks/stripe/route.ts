@@ -4,6 +4,12 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import crypto from 'crypto';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 // Lazy Firebase initialization function
 function getDb() {
   // Initialize Firebase Admin if not already initialized

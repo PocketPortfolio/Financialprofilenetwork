@@ -3,6 +3,12 @@ import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import Stripe from 'stripe';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 // Initialize Firebase Admin
 if (!getApps().length) {
   try {
