@@ -38,6 +38,30 @@ export const fetchCache = 'force-no-store';
 4. ✅ `/app/api/api-keys/user/route.ts` - Added `runtime`, `revalidate`, and `fetchCache`
 5. ✅ `/app/api/npm-stats/route.ts` - Added all configuration (was missing everything)
 
+### Routes Fixed (Batch 4 - Analytics, AI, Portfolio, Payment Routes)
+
+**Analytics & AI Routes:**
+6. ✅ `/app/api/tool-usage/route.ts` - Added all configuration
+7. ✅ `/app/api/metrics/export/route.ts` - Added all configuration
+8. ✅ `/app/api/page-views/route.ts` - Added all configuration
+9. ✅ `/app/api/search/route.ts` - Added all configuration
+
+**Portfolio & Data Routes:**
+10. ✅ `/app/api/portfolio/history/route.ts` - Added all configuration
+11. ✅ `/app/api/portfolio/benchmarks/route.ts` - Added `runtime`, `revalidate`, `fetchCache` (had `dynamic`)
+12. ✅ `/app/api/portfolio/sector-classification/route.ts` - Added all configuration
+13. ✅ `/app/api/portfolio/sector-classification/batch/route.ts` - Added all configuration
+
+**Payment & Webhook Routes:**
+14. ✅ `/app/api/create-checkout-session/route.ts` - Added all configuration
+15. ✅ `/app/api/webhooks/stripe/route.ts` - Added all configuration
+16. ✅ `/app/api/sponsors/route.ts` - Added all configuration
+
+**Other Routes:**
+17. ✅ `/app/api/health/route.ts` - Added all configuration
+18. ✅ `/app/api/waitlist/route.ts` - Added all configuration (deprecated but configured)
+19. ✅ `/app/api/import/parse/route.ts` - Added `dynamic`, `revalidate`, `fetchCache` (had `runtime`)
+
 ### Routes Already Configured (Working)
 
 - ✅ `/app/api/admin/analytics/route.ts`

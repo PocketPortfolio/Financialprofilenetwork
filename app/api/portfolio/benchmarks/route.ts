@@ -6,7 +6,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { BENCHMARK_SYMBOLS, BENCHMARK_NAMES } from '@/app/lib/portfolio/benchmarks';
 
+// Next.js route configuration for production
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 /**
  * Fetch historical benchmark data

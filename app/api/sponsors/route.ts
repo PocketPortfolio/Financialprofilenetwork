@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+// Next.js route configuration for production
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+
 /**
  * Sponsors API Route
  * Returns current sponsorship data for Sustainability Widget
