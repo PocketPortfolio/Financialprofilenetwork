@@ -2,6 +2,7 @@
  * Y Combinator Company Scraper
  * Sources leads from YC companies (high-value, funded startups)
  * v2.1: Strategic Diversification - Channel 2
+ * LIVE FEED: Direct connection to YC's Algolia index (no placeholders)
  */
 
 import { resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
@@ -19,10 +20,24 @@ interface YCLead {
   industry?: string;
 }
 
+interface YCCompany {
+  name: string;
+  short_description?: string;
+  website?: string;
+  batch: string;
+  tags?: string[];
+  location?: string;
+}
+
+// YC's Public Algolia Credentials (standard for their directory)
+const ALGOLIA_ID = '45AD1018D5';
+const ALGOLIA_KEY = '8ea9a4445543c72828b507559e51c89f'; // Public search-only key
+const ALGOLIA_ENDPOINT = `https://${ALGOLIA_ID}-dsn.algolia.net/1/indexes/Persisted_YC_Company_Production/query`;
+
 /**
  * Source leads from Y Combinator companies
- * Filters: Batch > 2024, Industry = Fintech/DevTools, Status = Active
- * Note: In production, this would integrate with YC's API or scrape their site
+ * LIVE FEED: Direct connection to YC's Algolia index
+ * Filters: Recent batches (W24, S24, W25), Fintech/DevTools/AI tags
  */
 export async function sourceFromYC(
   maxLeads?: number
@@ -31,87 +46,104 @@ export async function sourceFromYC(
   const maxResults = maxLeads || 50;
 
   try {
-    console.log('🔍 Fetching YC companies list...');
-    
-    // YC has a public companies list at ycombinator.com/companies
-    // For now, we'll use a curated approach with known patterns
-    // In production, this would:
-    // 1. Scrape ycombinator.com/companies
-    // 2. Or use YC's API if available
-    // 3. Filter for recent batches (2024+) and fintech/DevTools
-    
-    // Expanded search: Try to fetch from public sources
-    // Common YC company patterns for fintech/DevTools
-    const ycCompanyPatterns = [
-      // Recent YC fintech/DevTools companies (examples - would be dynamic)
-      { name: 'Stripe', batch: 'S10', industry: 'Fintech' },
-      { name: 'Coinbase', batch: 'S12', industry: 'Fintech' },
-      { name: 'Plaid', batch: 'W13', industry: 'Fintech' },
-      // Add more patterns for recent batches...
-    ];
+    console.log('🔌 Connecting to Y Combinator Live Feed (Algolia)...');
 
-    // Try to fetch from a public YC companies endpoint (if available)
-    // Alternative: Use a static list that gets updated periodically
-    let companies: Array<{ name: string; batch: string; industry: string }> = [];
+    // 1. Fetch Real Data (Recent Batches Only)
+    // Add timeout and better error handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
+    let response: Response;
     try {
-      // Attempt to fetch from a public YC companies JSON (if available)
-      // This is a placeholder - in production would use actual YC API or scraping
-      // For now, we'll use a combination of known companies and pattern matching
-      
-      // Filter for recent batches (2024+) and fintech/DevTools
-      companies = ycCompanyPatterns.filter(company => {
-        const batchYear = parseInt(company.batch.replace(/[SW]/g, ''));
-        return batchYear >= 2024 && 
-               (company.industry === 'Fintech' || company.industry === 'DevTools');
+      response = await fetch(ALGOLIA_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Algolia-Application-Id': ALGOLIA_ID,
+          'X-Algolia-API-Key': ALGOLIA_KEY,
+          'User-Agent': 'Mozilla/5.0 (compatible; SalesPilot/1.0)',
+        },
+        body: JSON.stringify({
+          params: 'query=&hitsPerPage=500&filters=batch:W24 OR batch:S24 OR batch:W25 OR batch:W23 OR batch:S23'
+        }),
+        signal: controller.signal,
       });
-
-      // If we have a small list, expand with pattern-based discovery
-      if (companies.length < 10) {
-        // Generate additional candidates based on common YC patterns
-        // In production, this would be replaced with actual YC data
-        const additionalPatterns = [
-          { name: 'Fintech Startup A', batch: 'W24', industry: 'Fintech' },
-          { name: 'DevTools Startup B', batch: 'S24', industry: 'DevTools' },
-          { name: 'Fintech Startup C', batch: 'W24', industry: 'Fintech' },
-        ];
-        companies.push(...additionalPatterns);
+      clearTimeout(timeoutId);
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('YC Feed timeout: Request took longer than 10 seconds');
       }
-    } catch (error) {
-      console.warn('⚠️  Could not fetch YC companies list, using fallback');
-      companies = ycCompanyPatterns;
+      throw new Error(`YC Feed network error: ${fetchError.message}`);
     }
 
-    console.log(`   Found ${companies.length} YC companies matching criteria`);
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(`YC Feed failed: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    const hits: YCCompany[] = data.hits || [];
+
+    console.log(`📡 Received ${hits.length} raw companies from YC Live Feed.`);
+
+    // 2. Filter for Relevance (The £100k Target)
+    const candidates = hits.filter(c => {
+      if (!c.website) return false;
+      
+      // Filter for high-value categories
+      const tags = (c.tags || []).map(t => t.toLowerCase());
+      return tags.includes('fintech') || 
+             tags.includes('developer_tools') || 
+             tags.includes('devtools') ||
+             tags.includes('ai') ||
+             tags.includes('artificial_intelligence');
+    });
+
+    console.log(`🎯 Filtered down to ${candidates.length} high-value targets (Fintech/DevTools/AI).`);
 
     let processed = 0;
     let skipped = 0;
 
-    for (const company of companies) {
+    // 3. Resolve & Validate Emails
+    for (const company of candidates) {
       if (leads.length >= maxResults) break;
 
-      const companyName = company.name;
-      const companySlug = companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      
+      if (!company.website) {
+        skipped++;
+        continue;
+      }
+
       processed++;
 
-      // Try multiple email patterns for YC companies
-      const emailPatterns = [
-        `cto@${companySlug}.com`,
-        `hello@${companySlug}.com`,
-        `contact@${companySlug}.com`,
-        `info@${companySlug}.com`,
-        `team@${companySlug}.com`,
+      // Extract domain from website
+      let domain: string;
+      try {
+        const url = new URL(company.website.startsWith('http') ? company.website : `https://${company.website}`);
+        domain = url.hostname.replace('www.', '');
+      } catch (error) {
+        skipped++;
+        continue;
+      }
+
+      // Strategy: Construct likely high-value emails
+      // We prioritize "founders@" or "hello@" for early stage YC companies
+      const potentialEmails = [
+        `founders@${domain}`,
+        `hello@${domain}`,
+        `engineering@${domain}`,
+        `cto@${domain}`,
+        `contact@${domain}`,
       ];
 
       let resolvedEmail: string | null = null;
 
-      // Try each email pattern
-      for (const emailPattern of emailPatterns) {
+      for (const email of potentialEmails) {
         try {
-          const validation = await validateEmail(emailPattern);
+          // THE GATEKEEPER: MX Record Check
+          const validation = await validateEmail(email);
           if (validation.isValid) {
-            resolvedEmail = emailPattern;
+            resolvedEmail = email;
             break;
           }
         } catch (error) {
@@ -121,15 +153,16 @@ export async function sourceFromYC(
         await new Promise(resolve => setTimeout(resolve, 200));
       }
 
-      // If no email pattern worked, try GitHub resolution
+      // Fallback: Try GitHub resolution if email patterns failed
       if (!resolvedEmail && process.env.GITHUB_TOKEN) {
         try {
+          const companySlug = company.name.toLowerCase().replace(/[^a-z0-9]/g, '');
           const resolution = await resolveEmailFromGitHub(
             companySlug,
-            companyName,
+            company.name,
             process.env.GITHUB_TOKEN
           );
-          
+
           if (resolution.email && resolution.confidence >= 50) {
             const validation = await validateEmail(resolution.email);
             if (validation.isValid) {
@@ -142,15 +175,25 @@ export async function sourceFromYC(
       }
 
       if (resolvedEmail) {
+        // Determine industry from tags
+        const tags = (company.tags || []).map(t => t.toLowerCase());
+        let industry = 'Fintech';
+        if (tags.includes('developer_tools') || tags.includes('devtools')) {
+          industry = 'DevTools';
+        } else if (tags.includes('ai') || tags.includes('artificial_intelligence')) {
+          industry = 'AI';
+        }
+
         leads.push({
           email: resolvedEmail,
-          companyName,
-          jobTitle: 'CTO',
+          companyName: company.name,
+          jobTitle: 'CTO', // Default, will be enriched later
           dataSource: 'yc',
           batch: company.batch,
-          industry: company.industry,
+          industry: industry,
+          location: company.location,
         });
-        console.log(`   ✅ Resolved: ${resolvedEmail} for ${companyName} (${company.batch})`);
+        console.log(`   ✅ Validated YC Lead: ${company.name} (${resolvedEmail}) - Batch: ${company.batch}`);
       } else {
         skipped++;
       }
@@ -161,9 +204,10 @@ export async function sourceFromYC(
 
     console.log(`✅ YC sourcing: Found ${leads.length} valid leads (processed ${processed}, skipped ${skipped})`);
   } catch (error: any) {
-    console.error('YC sourcing error:', error.message);
+    console.error('❌ YC Scraper Error:', error.message);
+    // Fail gracefully, let other channels fill the quota
+    return [];
   }
 
   return leads;
 }
-
