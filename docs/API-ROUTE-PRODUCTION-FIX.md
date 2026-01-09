@@ -30,7 +30,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 ```
 
-### Routes Fixed
+### Routes Fixed (Batch 1)
 
 1. ✅ `/app/api/quote/route.ts` - Stock quote API
 2. ✅ `/app/api/agent/health/route.ts` - Sales system health check
@@ -38,6 +38,14 @@ export const fetchCache = 'force-no-store';
 4. ✅ `/app/api/agent/send-email/route.ts` - Email sending
 5. ✅ `/app/api/agent/kill-switch/route.ts` - Emergency stop
 6. ✅ `/app/api/agent/webhooks/resend/route.ts` - Resend webhooks
+
+### Routes Fixed (Batch 2)
+
+7. ✅ `/app/api/portfolio/market-context/route.ts` - Market context API
+8. ✅ `/app/api/aeo/blog/route.ts` - Blog recommendation API (added runtime & fetchCache)
+9. ✅ `/app/api/aeo/answer/route.ts` - Answer engine API (added runtime & fetchCache)
+10. ✅ `/app/api/most-traded/route.ts` - Most traded stocks API
+11. ✅ `/app/api/news/route.ts` - News API
 
 ### Routes Already Configured (Working)
 
@@ -119,12 +127,10 @@ curl https://www.pocketportfolio.app/api/admin/analytics?range=30d
 
 ## 🔄 Remaining Routes to Check
 
-The following routes may also need this configuration if they're failing:
+The following routes may also need this configuration if they're failing in production:
 
 - `/app/api/npm-stats/route.ts`
-- `/app/api/most-traded/route.ts`
-- `/app/api/portfolio/benchmarks/route.ts`
-- `/app/api/portfolio/market-context/route.ts`
+- `/app/api/portfolio/benchmarks/route.ts` (has `dynamic`, may need others)
 - `/app/api/portfolio/history/route.ts`
 - `/app/api/portfolio/sector-classification/route.ts`
 - `/app/api/portfolio/sector-classification/batch/route.ts`
@@ -136,7 +142,6 @@ The following routes may also need this configuration if they're failing:
 - `/app/api/health/route.ts`
 - `/app/api/search/route.ts`
 - `/app/api/import/parse/route.ts`
-- `/app/api/news/route.ts`
 - `/app/api/waitlist/route.ts`
 
 **Note:** These routes should be tested in production. If they fail, add the same configuration.
