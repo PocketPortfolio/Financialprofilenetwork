@@ -90,6 +90,15 @@ jobs:
           npm run update-scheduled-emails || echo "⚠️ Scheduled email update completed with warnings (non-blocking)"
         continue-on-error: true
 
+      - name: Re-enrich stale leads (update scores and research summaries)
+        env:
+          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "🔄 Re-enriching stale leads (score=0 or research pending)..."
+          npm run re-enrich-stale-leads || echo "⚠️ Re-enrichment completed with warnings (non-blocking)"
+        continue-on-error: true
+
       - name: Enrich leads and send emails
         env:
           SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
