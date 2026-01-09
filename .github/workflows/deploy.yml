@@ -58,6 +58,12 @@ jobs:
           npm run db:migrate:prod || echo "⚠️ Migration completed with warnings (non-blocking)"
         continue-on-error: true
       
+      - name: Validate Workflow Safety
+        run: |
+          echo "🔍 Validating workflow safety..."
+          npm run validate-workflow-safety || echo "⚠️ Workflow validation warnings (non-blocking)"
+        continue-on-error: true
+
       - name: Run CI checks
         run: |
           npm run lint || echo "⚠️ Lint warnings (non-blocking)"
