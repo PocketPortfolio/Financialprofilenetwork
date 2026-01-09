@@ -4,6 +4,7 @@ import { leads, conversations, auditLogs } from '@/db/sales/schema';
 import { eq } from 'drizzle-orm';
 import { generateEmail, sendEmail } from '@/app/agent/outreach';
 import { canContactLead } from '@/lib/sales/compliance';
+import { isRealFirstName } from '@/lib/sales/name-validation';
 import { kv } from '@vercel/kv';
 
 // Next.js route configuration for production
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
       leadId,
       {
         firstName: lead.firstName || undefined,
+        firstNameReliable: lead.firstName ? isRealFirstName(lead.firstName) : false,
         companyName: lead.companyName,
         techStack: lead.techStackTags || [],
         researchSummary: lead.researchSummary || undefined,
