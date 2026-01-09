@@ -2,7 +2,11 @@
  * GitHub Hiring Repository Scraper
  * Searches for repositories with "hiring" in README + TypeScript + Location filters
  * Sprint 4: Hybrid Sourcing Module
+ * v2.1: Resolves emails before returning leads (no placeholders)
  */
+
+import { resolveEmailFromGitHub } from '@/lib/sales/email-resolution';
+import { validateEmail } from '@/lib/sales/email-validation';
 
 interface GitHubHiringLead {
   email: string;
@@ -17,9 +21,11 @@ interface GitHubHiringLead {
 /**
  * Source leads from GitHub hiring repositories
  * Searches for: hiring in README + language:TypeScript + location filters
+ * v2.1: Resolves emails before returning (no placeholders)
  */
 export async function sourceFromGitHubHiring(
-  githubToken?: string
+  githubToken?: string,
+  maxLeads?: number
 ): Promise<GitHubHiringLead[]> {
   if (!githubToken) {
     console.log('⚠️  GitHub token not provided, skipping GitHub sourcing');
@@ -27,24 +33,37 @@ export async function sourceFromGitHubHiring(
   }
 
   const leads: GitHubHiringLead[] = [];
+  const maxResults = maxLeads || 100; // Default to 100, but can be higher for retries
 
   try {
-    // Use GitHub REST API (no external dependency needed for basic search)
+    // Expanded search queries for more coverage
     const searchQueries = [
+      'hiring in:readme language:TypeScript',
       'hiring in:readme language:TypeScript location:London',
       'hiring in:readme language:TypeScript location:Remote',
       'hiring in:readme language:TypeScript location:UK',
       'hiring in:readme language:TypeScript location:Europe',
+      'hiring in:readme language:TypeScript location:US',
+      'hiring in:readme language:JavaScript',
+      'hiring in:readme language:TypeScript stars:>10',
+      'hiring in:readme language:TypeScript pushed:>2024-01-01',
     ];
 
+    let totalProcessed = 0;
+    let totalSkipped = 0;
+
     for (const query of searchQueries) {
+      if (leads.length >= maxResults) {
+        break; // Stop if we've reached the target
+      }
+
       try {
         const response = await fetch(
-          `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=updated&per_page=10`,
+          `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=updated&per_page=20`,
           {
             headers: {
               'Accept': 'application/vnd.github.v3+json',
-              ...(githubToken ? { 'Authorization': `token ${githubToken}` } : {}),
+              'Authorization': `token ${githubToken}`,
             },
           }
         );
@@ -57,23 +76,58 @@ export async function sourceFromGitHubHiring(
         const data = await response.json();
 
         for (const repo of data.items || []) {
+          if (leads.length >= maxResults) {
+            break; // Stop if we've reached the target
+          }
+
           // Extract company name from repo owner
           const companyName = repo.owner?.login || repo.full_name?.split('/')[0] || 'Unknown';
+          const githubUsername = repo.owner?.login || companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
           
           // Try to extract location from repo description or owner profile
           const location = repo.description?.match(/location[:\s]+([^,\n]+)/i)?.[1] || 
                           repo.location || 
                           undefined;
 
-          // Create lead structure
-          // Note: Email discovery would require additional API calls or external service
-          leads.push({
-            email: `${companyName.toLowerCase().replace(/[^a-z0-9]/g, '')}@github-hiring.placeholder`, // Placeholder - needs email discovery
-            companyName,
-            jobTitle: 'CTO', // Would need to detect from README content
-            location,
-            dataSource: 'github_hiring',
-          });
+          totalProcessed++;
+
+          // CRITICAL: Attempt to resolve real email BEFORE creating lead
+          try {
+            const resolution = await resolveEmailFromGitHub(
+              githubUsername,
+              companyName,
+              githubToken
+            );
+
+            // Only create lead if we have a valid email with good confidence
+            if (resolution.email && resolution.confidence >= 50) {
+              // Validate email with MX record check
+              const validation = await validateEmail(resolution.email);
+              
+              if (validation.isValid) {
+                leads.push({
+                  email: resolution.email, // Use resolved email, not placeholder
+                  companyName,
+                  jobTitle: 'CTO', // Would need to detect from README content
+                  location,
+                  dataSource: 'github_hiring',
+                });
+                console.log(`   ✅ Resolved: ${resolution.email} for ${companyName} (confidence: ${resolution.confidence}%)`);
+              } else {
+                totalSkipped++;
+                // Silently skip invalid emails (already logged in validation)
+              }
+            } else {
+              totalSkipped++;
+              // Silently skip unresolvable leads to reduce noise
+            }
+          } catch (resolveError: any) {
+            totalSkipped++;
+            // Silently skip on resolution errors
+          }
+
+          // Rate limit: small delay between resolutions
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       } catch (error: any) {
         console.error(`Error processing GitHub query "${query}":`, error.message);
@@ -81,7 +135,7 @@ export async function sourceFromGitHubHiring(
       }
     }
 
-    console.log(`✅ GitHub sourcing: Found ${leads.length} potential leads`);
+    console.log(`✅ GitHub sourcing: Found ${leads.length} valid leads (processed ${totalProcessed}, skipped ${totalSkipped})`);
   } catch (error: any) {
     console.error('GitHub sourcing error:', error.message);
   }

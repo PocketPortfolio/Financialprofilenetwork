@@ -2,11 +2,15 @@
  * Autonomous Lead Sourcing Script
  * 
  * Sources leads from:
- * - GitHub hiring repositories
+ * - GitHub hiring repositories (v2.1: Resolves emails before returning)
  * - YC company lists
  * - Public "Hiring" posts
  * 
- * Target: 50 qualified CTOs/day
+ * v2.1 Features:
+ * - Revenue-driven dynamic targeting
+ * - Retry logic: Keeps sourcing until target is met (max 5 rounds)
+ * - Email resolution: No placeholder emails returned
+ * - Auto-replenishment: Replaces UNQUALIFIED leads automatically
  */
 
 import { config } from 'dotenv';
@@ -54,13 +58,14 @@ interface LeadCandidate {
 /**
  * Source leads from GitHub hiring repositories
  * Sprint 4: Hybrid Sourcing - GitHub Hiring Scraper
+ * v2.1: Passes maxLeads parameter for retry logic
  */
-async function sourceFromGitHub(): Promise<LeadCandidate[]> {
+async function sourceFromGitHub(maxLeads?: number): Promise<LeadCandidate[]> {
   console.log('🔍 Searching GitHub for Corporate/Fintech hiring...');
   
   // Use the new GitHub hiring scraper module
   const githubToken = process.env.GITHUB_TOKEN;
-  const githubLeads = await sourceFromGitHubHiring(githubToken);
+  const githubLeads = await sourceFromGitHubHiring(githubToken, maxLeads);
   
   // Convert to LeadCandidate format
   return githubLeads.map(lead => ({
@@ -181,128 +186,131 @@ async function sourceLeadsAutonomous() {
   console.log(`   Reason: ${revenueDecisions.adjustment.reason}`);
   console.log('');
 
-  const allCandidates: LeadCandidate[] = [];
-  
-  // Source from multiple channels
-  const [githubLeads, ycLeads, hiringLeads] = await Promise.all([
-    sourceFromGitHub(),
-    sourceFromYC(),
-    sourceFromHiringPosts(),
-  ]);
-  
-  allCandidates.push(...githubLeads, ...ycLeads, ...hiringLeads);
-  
-  // Sprint 4: Lookalike Seeding (if we have good leads)
-  if (allCandidates.length < DYNAMIC_TARGET) {
-    console.log('🔍 Generating lookalike leads from high-scoring existing leads...');
-    const lookalikeLeads = await generateLookalikeLeads(70, DYNAMIC_TARGET - allCandidates.length);
-    const lookalikeCandidates: LeadCandidate[] = lookalikeLeads.map(lead => ({
-      email: lead.email,
-      companyName: lead.companyName,
-      jobTitle: lead.jobTitle,
-      dataSource: lead.dataSource,
-    }));
-    allCandidates.push(...lookalikeCandidates);
-    console.log(`✅ Generated ${lookalikeCandidates.length} lookalike leads`);
-  }
-  
-  console.log(`📊 Found ${allCandidates.length} total candidates`);
-  
-  // Qualify leads
-  const qualified = allCandidates.filter(qualifyLead);
-  console.log(`✅ ${qualified.length} candidates qualified (CTO/VP Engineering)`);
-  
-  // Check for duplicates and create new leads
   let created = 0;
   let skipped = 0;
   let rejected = 0;
-  
-  for (const candidate of qualified) {
-    // CRITICAL: Reject placeholder emails - they should never be inserted
-    if (isPlaceholderEmail(candidate.email)) {
-      console.log(`⚠️  Rejecting placeholder email: ${candidate.email} for ${candidate.companyName}`);
-      rejected++;
-      continue;
+  const MAX_ROUNDS = 5; // Maximum sourcing rounds to prevent infinite loops
+  const ROUND_DELAY_MS = 2000; // 2 second delay between rounds
+
+  // v2.1: Retry logic - Keep sourcing until target is met or max rounds reached
+  for (let round = 1; round <= MAX_ROUNDS && created < DYNAMIC_TARGET; round++) {
+    if (round > 1) {
+      console.log(`\n🔄 Round ${round}/${MAX_ROUNDS}: Continuing to source leads (${created}/${DYNAMIC_TARGET} created)...`);
+      await new Promise(resolve => setTimeout(resolve, ROUND_DELAY_MS));
+    }
+
+    const allCandidates: LeadCandidate[] = [];
+    const remainingNeeded = DYNAMIC_TARGET - created;
+    
+    // Source from multiple channels
+    // v2.1: Request more leads than needed to account for rejections
+    const targetToRequest = Math.min(remainingNeeded * 3, 300); // Request 3x needed, max 300
+    
+    console.log(`📡 Round ${round}: Sourcing up to ${targetToRequest} candidates...`);
+    
+    const [githubLeads, ycLeads, hiringLeads] = await Promise.all([
+      sourceFromGitHub(targetToRequest), // Pass maxLeads for this round
+      sourceFromYC(),
+      sourceFromHiringPosts(),
+    ]);
+    
+    allCandidates.push(...githubLeads, ...ycLeads, ...hiringLeads);
+    
+    // Sprint 4: Lookalike Seeding (if we have good leads and still need more)
+    if (allCandidates.length < remainingNeeded) {
+      console.log(`🔍 Generating lookalike leads from high-scoring existing leads...`);
+      const lookalikeLeads = await generateLookalikeLeads(70, remainingNeeded - allCandidates.length);
+      const lookalikeCandidates: LeadCandidate[] = lookalikeLeads.map(lead => ({
+        email: lead.email,
+        companyName: lead.companyName,
+        jobTitle: lead.jobTitle,
+        dataSource: lead.dataSource,
+      }));
+      allCandidates.push(...lookalikeCandidates);
+      console.log(`✅ Generated ${lookalikeCandidates.length} lookalike leads`);
     }
     
-    // Try to resolve placeholder emails if they exist (shouldn't happen, but safety check)
-    let emailToUse = candidate.email;
-    if (isPlaceholderEmail(emailToUse)) {
-      console.log(`   🔍 Attempting to resolve placeholder email for ${candidate.companyName}...`);
-      const githubUsername = emailToUse.includes('@github-hiring.placeholder')
-        ? emailToUse.split('@')[0]
-        : candidate.companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
-      
-      const resolution = await resolveEmailFromGitHub(
-        githubUsername,
-        candidate.companyName,
-        process.env.GITHUB_TOKEN
-      );
-      
-      if (resolution.email && resolution.confidence >= 50 && !isPlaceholderEmail(resolution.email)) {
-        emailToUse = resolution.email;
-        console.log(`   ✅ Resolved to: ${emailToUse} (confidence: ${resolution.confidence}%)`);
-      } else {
-        console.log(`   ❌ Could not resolve placeholder email - skipping lead`);
+    console.log(`📊 Round ${round}: Found ${allCandidates.length} total candidates`);
+    
+    // Qualify leads
+    const qualified = allCandidates.filter(qualifyLead);
+    console.log(`✅ Round ${round}: ${qualified.length} candidates qualified (CTO/VP Engineering)`);
+    
+    // Process candidates
+    for (const candidate of qualified) {
+      if (created >= DYNAMIC_TARGET) {
+        break; // Target met, stop processing
+      }
+
+      // CRITICAL: Reject placeholder emails - they should never be inserted
+      // (This shouldn't happen now since GitHub scraper resolves emails, but safety check)
+      if (isPlaceholderEmail(candidate.email)) {
         rejected++;
         continue;
       }
-    }
-    
-    // PHASE 1: Validate email with MX record check (v2.1)
-    const validation = await validateEmail(emailToUse);
-    if (!validation.isValid) {
-      console.log(`⚠️  Rejecting invalid email: ${emailToUse} for ${candidate.companyName} - ${validation.reason}`);
-      rejected++;
-      continue;
-    }
-    
-    if (await leadExists(emailToUse, candidate.companyName)) {
-      skipped++;
-      continue;
-    }
-    
-    try {
-      await db.insert(leads).values({
-        email: emailToUse,
-        firstName: candidate.firstName || null,
-        lastName: candidate.lastName || null,
-        companyName: candidate.companyName,
-        jobTitle: candidate.jobTitle,
-        linkedinUrl: candidate.linkedinUrl || null,
-        dataSource: candidate.dataSource,
-        dataSourceDate: new Date(),
-        status: 'NEW',
-        score: 0,
-      });
       
-      created++;
-      console.log(`✅ Created lead: ${emailToUse} at ${candidate.companyName}`);
-    } catch (error: any) {
-      console.error(`❌ Failed to create lead ${emailToUse}:`, error.message);
+      // Email should already be resolved and validated by GitHub scraper
+      // But validate again as safety check
+      const validation = await validateEmail(candidate.email);
+      if (!validation.isValid) {
+        rejected++;
+        continue;
+      }
+      
+      if (await leadExists(candidate.email, candidate.companyName)) {
+        skipped++;
+        continue;
+      }
+      
+      try {
+        await db.insert(leads).values({
+          email: candidate.email,
+          firstName: candidate.firstName || null,
+          lastName: candidate.lastName || null,
+          companyName: candidate.companyName,
+          jobTitle: candidate.jobTitle,
+          linkedinUrl: candidate.linkedinUrl || null,
+          dataSource: candidate.dataSource,
+          dataSourceDate: new Date(),
+          status: 'NEW',
+          score: 0,
+        });
+        
+        created++;
+        console.log(`✅ Created lead: ${candidate.email} at ${candidate.companyName} (${created}/${DYNAMIC_TARGET})`);
+      } catch (error: any) {
+        console.error(`❌ Failed to create lead ${candidate.email}:`, error.message);
+        rejected++;
+      }
+    }
+
+    // If we didn't get enough, try another round with expanded search
+    if (created < DYNAMIC_TARGET && round < MAX_ROUNDS) {
+      console.log(`⚠️  Round ${round}: Only ${created}/${DYNAMIC_TARGET} leads created. Continuing to next round...`);
     }
   }
   
   console.log('');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`📊 Summary:`);
+  console.log(`📊 Final Summary:`);
   console.log(`   Created: ${created} new leads`);
   console.log(`   Skipped: ${skipped} duplicates`);
-  console.log(`   Rejected: ${rejected} placeholder/invalid emails`);
+  console.log(`   Rejected: ${rejected} invalid emails`);
   console.log(`   Target: ${DYNAMIC_TARGET} leads/day (Revenue-driven)`);
   console.log(`   Progress: ${created}/${DYNAMIC_TARGET} (${Math.round((created / DYNAMIC_TARGET) * 100)}%)`);
   console.log('');
   
   if (rejected > 0) {
-    console.log(`⚠️  Warning: ${rejected} leads rejected due to placeholder/invalid emails`);
-    console.log('   Placeholder emails are not allowed - leads must have real email addresses');
+    console.log(`⚠️  Note: ${rejected} leads rejected due to invalid emails`);
   }
   
-  if (created < DYNAMIC_TARGET) {
-    console.log(`⚠️  Warning: Only ${created} leads created, target is ${DYNAMIC_TARGET}`);
-    console.log('   Consider implementing additional sourcing channels');
-  } else {
+  if (created >= DYNAMIC_TARGET) {
     console.log('✅ Target met!');
+  } else if (created > 0) {
+    console.log(`⚠️  Partial success: ${created}/${DYNAMIC_TARGET} leads created`);
+    console.log('   System will retry in next scheduled run');
+  } else {
+    console.log(`❌ No leads created. Check sourcing channels and GitHub token.`);
   }
 }
 
