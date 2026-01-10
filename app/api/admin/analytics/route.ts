@@ -834,9 +834,19 @@ async function getBlogPostsData() {
 
     // ✅ Load "Research" calendar (research posts)
     const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
-    const researchCalendar = fs.existsSync(researchCalendarPath)
-      ? JSON.parse(fs.readFileSync(researchCalendarPath, 'utf-8'))
-      : [];
+    let researchCalendar: any[] = [];
+    if (fs.existsSync(researchCalendarPath)) {
+      try {
+        const researchCalendarContent = fs.readFileSync(researchCalendarPath, 'utf-8');
+        researchCalendar = JSON.parse(researchCalendarContent);
+        console.log(`[Analytics] ✅ Loaded ${researchCalendar.length} research posts from calendar`);
+      } catch (error: any) {
+        console.error('[Analytics] ❌ Error loading research calendar:', error.message);
+        researchCalendar = [];
+      }
+    } else {
+      console.warn('[Analytics] ⚠️ Research calendar file not found:', researchCalendarPath);
+    }
 
     // ✅ Merge calendars (mark posts with category)
     const calendar = [
@@ -845,13 +855,17 @@ async function getBlogPostsData() {
       ...researchCalendar.map((p: any) => ({ ...p, category: 'research' }))
     ];
 
+    console.log(`[Analytics] 📊 Total posts after merge: ${calendar.length} (main: ${mainCalendar.length}, how-to: ${howToCalendar.length}, research: ${researchCalendar.length})`);
+
     // ✅ Deduplicate posts by slug (prefer published over pending, newer over older)
     const postMap = new Map<string, any>();
+    let duplicateCount = 0;
     for (const post of calendar) {
       const existing = postMap.get(post.slug);
       if (!existing) {
         postMap.set(post.slug, post);
       } else {
+        duplicateCount++;
         // Prefer published over pending
         if (post.status === 'published' && existing.status !== 'published') {
           postMap.set(post.slug, post);
@@ -868,6 +882,12 @@ async function getBlogPostsData() {
       }
     }
     const deduplicatedCalendar = Array.from(postMap.values());
+    
+    console.log(`[Analytics] 🔄 After deduplication: ${deduplicatedCalendar.length} posts (removed ${duplicateCount} duplicates)`);
+    
+    // Log research posts count
+    const researchPostsCount = deduplicatedCalendar.filter((p: any) => p.category === 'research').length;
+    console.log(`[Analytics] 🔬 Research posts in final calendar: ${researchPostsCount}`);
 
     const today = new Date().toISOString().split('T')[0];
     
