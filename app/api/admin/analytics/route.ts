@@ -832,10 +832,17 @@ async function getBlogPostsData() {
       ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
       : [];
 
-    // ✅ Merge calendars (mark how-to posts with category)
+    // ✅ Load "Research" calendar (research posts)
+    const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+    const researchCalendar = fs.existsSync(researchCalendarPath)
+      ? JSON.parse(fs.readFileSync(researchCalendarPath, 'utf-8'))
+      : [];
+
+    // ✅ Merge calendars (mark posts with category)
     const calendar = [
       ...mainCalendar.map((p: any) => ({ ...p, category: p.category || 'deep-dive' })),
-      ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech' }))
+      ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech' })),
+      ...researchCalendar.map((p: any) => ({ ...p, category: 'research' }))
     ];
 
     const today = new Date().toISOString().split('T')[0];
@@ -878,7 +885,7 @@ async function getBlogPostsData() {
         scheduledTime: post.scheduledTime || null,
         status: post.status,
         pillar: post.pillar,
-        category: post.category || 'deep-dive', // ✅ ADD CATEGORY
+        category: post.category ?? 'deep-dive', // ✅ Preserve category (research, how-to-in-tech, or deep-dive)
         isOverdue,
         hasFiles,
         publishedTime,

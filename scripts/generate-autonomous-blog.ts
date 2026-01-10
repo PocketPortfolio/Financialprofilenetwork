@@ -217,7 +217,7 @@ REQUIRED STRUCTURE:
 1. **Abstract** (Executive Summary) - 150-200 words summarizing key findings
 2. **Methodology** - How the research was conducted, data sources, benchmarks used
 3. **Key Findings** - Core insights with benchmarks, architectural trade-offs, performance implications
-${videoResult ? `\n4. **Video Reference** - Include this YouTube video in the "Key Findings" section using this embed code:\n\n<div style="margin-bottom: 32px;">\n  <iframe width="100%" height="500" src="https://www.youtube.com/embed/${videoResult.videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n  <p style="font-size: 14px; color: #666; margin-top: 8px;"><em>Video: "${videoResult.title}" by ${videoResult.channelTitle}</em></p>\n</div>\n\n` : ''}4. **References** - MUST cite at least 3 external sources:
+${videoResult ? `\n4. **Video Reference** - A relevant video has been selected and will be displayed with the research findings. Reference the video topic "${videoResult.title}" by ${videoResult.channelTitle} in your analysis.\n\n` : ''}4. **References** - MUST cite at least 3 external sources:
    - Documentation (official docs, API references)
    - Whitepapers (technical papers, research papers)
    - Engineering Blogs (company tech blogs, case studies)
