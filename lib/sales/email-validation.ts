@@ -30,11 +30,46 @@ const INVALID_DOMAINS = [
 ];
 
 /**
+ * Disposable email providers (catch-all domains that accept any email)
+ * These are often used for temporary emails and should be rejected
+ */
+const DISPOSABLE_EMAIL_PROVIDERS = [
+  'tempmail.com',
+  '10minutemail.com',
+  'guerrillamail.com',
+  'mailinator.com',
+  'throwaway.email',
+  'getnada.com',
+  'mohmal.com',
+  'yopmail.com',
+  'maildrop.cc',
+  'trashmail.com',
+  'temp-mail.org',
+  'mailnesia.com',
+  'mintemail.com',
+  'sharklasers.com',
+  'grr.la',
+  'guerrillamailblock.com',
+];
+
+/**
+ * Known catch-all patterns (domains that accept any email address)
+ * These are often parking pages or abandoned domains
+ */
+const CATCH_ALL_PATTERNS = [
+  /^mail\d+\./i, // mail1.example.com, mail2.example.com (generic mail servers)
+  /^smtp\d+\./i, // smtp1.example.com
+  /^mx\d+\./i,   // mx1.example.com
+];
+
+/**
  * Validate email with MX record check
  * Returns false if:
  * - Placeholder email detected
  * - Invalid email format
  * - No MX records found (no mail server)
+ * - Disposable email provider detected
+ * - Catch-all pattern detected
  * 
  * Safety First: If DNS validation fails, err on the side of caution (do not send)
  */
@@ -61,6 +96,11 @@ export async function validateEmail(email: string): Promise<EmailValidationResul
     return { isValid: false, reason: 'Test/invalid domain not allowed' };
   }
 
+  // 3.6. Block disposable email providers
+  if (DISPOSABLE_EMAIL_PROVIDERS.includes(domain)) {
+    return { isValid: false, reason: 'Disposable email provider not allowed' };
+  }
+
   // 4. Check MX records (with timeout)
   try {
     // Set timeout for DNS lookup (5 seconds)
@@ -78,10 +118,24 @@ export async function validateEmail(email: string): Promise<EmailValidationResul
         mxRecords: []
       };
     }
+
+    // 4.5. Check for catch-all patterns in MX records
+    const mxHosts = mxRecords.map(r => r.exchange.toLowerCase());
+    const hasCatchAllPattern = mxHosts.some(host => 
+      CATCH_ALL_PATTERNS.some(pattern => pattern.test(host))
+    );
+
+    if (hasCatchAllPattern) {
+      return {
+        isValid: false,
+        reason: 'Catch-all mail server pattern detected (likely abandoned domain)',
+        mxRecords: mxHosts
+      };
+    }
     
     return { 
       isValid: true, 
-      mxRecords: mxRecords.map(r => r.exchange)
+      mxRecords: mxHosts
     };
   } catch (error: any) {
     // DNS lookup failed - err on side of caution
