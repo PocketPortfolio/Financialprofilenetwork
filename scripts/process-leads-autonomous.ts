@@ -218,6 +218,17 @@ async function processNewLeads() {
 async function processResearchingLeads() {
   console.log('📧 Processing RESEARCHING leads (email generation)...');
   
+  // COMMAND 2: Check throttle status before processing
+  const { checkThrottleStatus, pauseOutreach } = await import('@/lib/sales/throttle-governor');
+  const throttleStatus = await checkThrottleStatus();
+  if (throttleStatus.isThrottled) {
+    console.log(`⚠️  ${throttleStatus.reason}`);
+    console.log(`   Stats: ${throttleStatus.recentStats.delayed}/${throttleStatus.recentStats.total} delayed (${throttleStatus.recentStats.delayedRate.toFixed(1)}%)`);
+    await pauseOutreach(throttleStatus.delayMinutes, throttleStatus.reason);
+    console.log(`   ⏸️  Pausing outreach for ${throttleStatus.delayMinutes} minutes...`);
+    return; // Exit early - don't process leads while throttled
+  }
+  
   // First, clean up any placeholder emails in RESEARCHING status
   const placeholderResearching = await db
     .select()
@@ -454,6 +465,17 @@ async function processResearchingLeads() {
  */
 async function processContactedLeads() {
   console.log('📧 Processing CONTACTED leads for follow-ups...');
+  
+  // COMMAND 2: Check throttle status before processing
+  const { checkThrottleStatus, pauseOutreach } = await import('@/lib/sales/throttle-governor');
+  const throttleStatus = await checkThrottleStatus();
+  if (throttleStatus.isThrottled) {
+    console.log(`⚠️  ${throttleStatus.reason}`);
+    console.log(`   Stats: ${throttleStatus.recentStats.delayed}/${throttleStatus.recentStats.total} delayed (${throttleStatus.recentStats.delayedRate.toFixed(1)}%)`);
+    await pauseOutreach(throttleStatus.delayMinutes, throttleStatus.reason);
+    console.log(`   ⏸️  Pausing outreach for ${throttleStatus.delayMinutes} minutes...`);
+    return 0; // Exit early - don't process leads while throttled
+  }
   
   // WAR MODE: Rate limits removed (Directive 011)
   // Process all available leads without quota restrictions

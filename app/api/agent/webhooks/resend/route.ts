@@ -73,6 +73,79 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'Email sent event processed' });
     }
 
+    // COMMAND 3: Handle email.bounced event
+    if (type === 'email.bounced') {
+      const { id: emailId, to, bounce_type, bounce_sub_type } = data;
+      
+      // Find conversation by email ID
+      const [conversation] = await db
+        .select({ leadId: conversations.leadId })
+        .from(conversations)
+        .where(eq(conversations.emailId, emailId))
+        .limit(1);
+      
+      if (conversation) {
+        // Mark lead as UNQUALIFIED (triggers Auto-Replenishment)
+        await db.update(leads)
+          .set({ 
+            status: 'UNQUALIFIED',
+            updatedAt: new Date()
+          })
+          .where(eq(leads.id, conversation.leadId));
+        
+        // Log the bounce
+        await db.insert(auditLogs).values({
+          leadId: conversation.leadId,
+          action: 'STATUS_CHANGED',
+          aiReasoning: `Email bounced: ${bounce_type} (${bounce_sub_type}) - marked as UNQUALIFIED`,
+          metadata: {
+            emailId,
+            bounceType: bounce_type,
+            bounceSubType: bounce_sub_type,
+            to,
+            deliveryStatus: 'bounced',
+            previousStatus: 'CONTACTED',
+            newStatus: 'UNQUALIFIED',
+          },
+        });
+        
+        console.log(`❌ Email bounced for lead ${conversation.leadId}: ${bounce_type} (${bounce_sub_type})`);
+      }
+      
+      return NextResponse.json({ success: true, message: 'Email bounce processed' });
+    }
+
+    // COMMAND 3: Handle email.delivery_delayed event
+    if (type === 'email.delivery_delayed') {
+      const { id: emailId, to, last_event } = data;
+      
+      // Find conversation by email ID
+      const [conversation] = await db
+        .select({ leadId: conversations.leadId })
+        .from(conversations)
+        .where(eq(conversations.emailId, emailId))
+        .limit(1);
+      
+      if (conversation) {
+        // Track delivery_delayed in audit log (for throttle governor)
+        await db.insert(auditLogs).values({
+          leadId: conversation.leadId,
+          action: 'EMAIL_SENT',
+          aiReasoning: `Email delivery delayed - tracking for throttle detection`,
+          metadata: {
+            emailId,
+            to,
+            deliveryStatus: 'delivery_delayed',
+            lastEvent: last_event,
+          },
+        });
+        
+        console.log(`⚠️  Email delivery delayed for lead ${conversation.leadId}: ${last_event}`);
+      }
+      
+      return NextResponse.json({ success: true, message: 'Email delivery delay tracked' });
+    }
+
     if (type === 'email.received') {
       // Handle inbound email
       const { from, to, subject, text, html, headers } = data;
