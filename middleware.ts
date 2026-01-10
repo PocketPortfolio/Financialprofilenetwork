@@ -44,7 +44,7 @@ export function middleware(request: NextRequest) {
       "img-src 'self' data: https:",
       "font-src 'self' data:",
       "connect-src 'self' https://*.googleapis.com https://*.finance.yahoo.com https://stooq.com https://region1.google-analytics.com https://*.google-analytics.com https://www.google-analytics.com https://firebaseinstallations.googleapis.com https://*.firebaseinstallations.googleapis.com https://www.googletagmanager.com https://securetoken.google.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://apis.google.com https://accounts.google.com https://www.gstatic.com https://api.stripe.com https://checkout.stripe.com https://www.google.com",
-      "frame-src 'self' https://accounts.google.com https://content.googleapis.com https://pocket-portfolio-67fa6.firebaseapp.com https://checkout.stripe.com https://js.stripe.com"
+      "frame-src 'self' https://accounts.google.com https://content.googleapis.com https://pocket-portfolio-67fa6.firebaseapp.com https://checkout.stripe.com https://js.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com"
     ].join('; ')
   );
   

@@ -845,6 +845,30 @@ async function getBlogPostsData() {
       ...researchCalendar.map((p: any) => ({ ...p, category: 'research' }))
     ];
 
+    // ✅ Deduplicate posts by slug (prefer published over pending, newer over older)
+    const postMap = new Map<string, any>();
+    for (const post of calendar) {
+      const existing = postMap.get(post.slug);
+      if (!existing) {
+        postMap.set(post.slug, post);
+      } else {
+        // Prefer published over pending
+        if (post.status === 'published' && existing.status !== 'published') {
+          postMap.set(post.slug, post);
+        } else if (post.status === existing.status) {
+          // If same status, prefer the one with files or newer date
+          const postHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`));
+          const existingHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${existing.slug}.mdx`));
+          if (postHasFiles && !existingHasFiles) {
+            postMap.set(post.slug, post);
+          } else if (post.date > existing.date) {
+            postMap.set(post.slug, post);
+          }
+        }
+      }
+    }
+    const deduplicatedCalendar = Array.from(postMap.values());
+
     const today = new Date().toISOString().split('T')[0];
     
     // Check which posts have actual files
@@ -853,7 +877,7 @@ async function getBlogPostsData() {
     const existingPosts = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).map(f => f.replace('.mdx', '')) : [];
     const existingImages = fs.existsSync(imagesDir) ? fs.readdirSync(imagesDir).map(f => f.replace('.png', '')) : [];
     
-    const posts = calendar.map((post: any) => {
+    const posts = deduplicatedCalendar.map((post: any) => {
       const hasFiles = existingPosts.includes(post.slug) && existingImages.includes(post.slug);
       const postDate = new Date(post.date);
       const todayDate = new Date(today);
