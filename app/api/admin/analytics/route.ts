@@ -848,16 +848,28 @@ async function getBlogPostsData() {
       console.warn('[Analytics] ⚠️ Research calendar file not found:', researchCalendarPath);
     }
 
+    // ✅ CRITICAL FIX: Filter out research posts from mainCalendar to prevent overwrites
+    // Research posts should ONLY come from research-calendar.json
+    const mainCalendarFiltered = mainCalendar.filter((p: any) => {
+      // Exclude posts that are explicitly marked as research OR have research slugs
+      const isResearch = p.category === 'research' || 
+                        (p.slug && p.slug.startsWith('research-')) ||
+                        (p.id && p.id.startsWith('research-'));
+      return !isResearch;
+    });
+
     // ✅ Merge calendars (mark posts with category)
     const calendar = [
-      ...mainCalendar.map((p: any) => ({ ...p, category: p.category || 'deep-dive' })),
+      ...mainCalendarFiltered.map((p: any) => ({ ...p, category: p.category || 'deep-dive' })),
       ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech' })),
       ...researchCalendar.map((p: any) => ({ ...p, category: 'research' }))
     ];
 
-    console.log(`[Analytics] 📊 Total posts after merge: ${calendar.length} (main: ${mainCalendar.length}, how-to: ${howToCalendar.length}, research: ${researchCalendar.length})`);
+    console.log(`[Analytics] 📊 Total posts after merge: ${calendar.length} (main: ${mainCalendarFiltered.length}, how-to: ${howToCalendar.length}, research: ${researchCalendar.length})`);
+    console.log(`[Analytics] 🔍 Filtered ${mainCalendar.length - mainCalendarFiltered.length} research posts from main calendar`);
 
     // ✅ Deduplicate posts by slug (prefer published over pending, newer over older)
+    // BUT: Prefer research posts from research-calendar.json over any duplicates
     const postMap = new Map<string, any>();
     let duplicateCount = 0;
     for (const post of calendar) {
@@ -866,17 +878,25 @@ async function getBlogPostsData() {
         postMap.set(post.slug, post);
       } else {
         duplicateCount++;
-        // Prefer published over pending
-        if (post.status === 'published' && existing.status !== 'published') {
+        // CRITICAL: Prefer research posts from research-calendar.json
+        if (post.category === 'research' && existing.category !== 'research') {
           postMap.set(post.slug, post);
-        } else if (post.status === existing.status) {
-          // If same status, prefer the one with files or newer date
-          const postHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`));
-          const existingHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${existing.slug}.mdx`));
-          if (postHasFiles && !existingHasFiles) {
+        } else if (existing.category === 'research' && post.category !== 'research') {
+          // Keep existing research post, skip this one
+          continue;
+        } else {
+          // Prefer published over pending
+          if (post.status === 'published' && existing.status !== 'published') {
             postMap.set(post.slug, post);
-          } else if (post.date > existing.date) {
-            postMap.set(post.slug, post);
+          } else if (post.status === existing.status) {
+            // If same status, prefer the one with files or newer date
+            const postHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`));
+            const existingHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${existing.slug}.mdx`));
+            if (postHasFiles && !existingHasFiles) {
+              postMap.set(post.slug, post);
+            } else if (post.date > existing.date) {
+              postMap.set(post.slug, post);
+            }
           }
         }
       }
@@ -888,6 +908,18 @@ async function getBlogPostsData() {
     // Log research posts count
     const researchPostsCount = deduplicatedCalendar.filter((p: any) => p.category === 'research').length;
     console.log(`[Analytics] 🔬 Research posts in final calendar: ${researchPostsCount}`);
+    
+    // ✅ Log date range for diagnosis
+    const researchPosts = deduplicatedCalendar.filter((p: any) => p.category === 'research');
+    if (researchPosts.length > 0) {
+      const dates = researchPosts.map((p: any) => p.date).sort();
+      const earliestDate = dates[0];
+      const latestDate = dates[dates.length - 1];
+      const janCount = dates.filter((d: string) => d.startsWith('2026-01')).length;
+      const augCount = dates.filter((d: string) => d.startsWith('2026-08')).length;
+      console.log(`[Analytics] 📅 Research posts date range: ${earliestDate} to ${latestDate}`);
+      console.log(`[Analytics] 📊 Research posts by month: Jan=${janCount}, Aug=${augCount}, Total=${dates.length}`);
+    }
 
     const today = new Date().toISOString().split('T')[0];
     
