@@ -817,17 +817,25 @@ export default function AdminAnalyticsPage() {
                             padding: '4px 8px',
                             background: post.category === 'how-to-in-tech' 
                               ? 'rgba(34, 197, 94, 0.1)' 
+                              : post.category === 'research'
+                              ? 'rgba(59, 130, 246, 0.1)'
                               : 'var(--surface-elevated)',
                             color: post.category === 'how-to-in-tech' 
                               ? '#22c55e' 
+                              : post.category === 'research'
+                              ? '#3b82f6'
                               : 'var(--text)',
                             borderRadius: '4px',
                             fontWeight: '600',
                             border: post.category === 'how-to-in-tech' 
                               ? '1px solid #22c55e' 
+                              : post.category === 'research'
+                              ? '1px solid #3b82f6'
                               : '1px solid var(--border)'
                           }}>
-                            {post.category === 'how-to-in-tech' ? '📝 How to' : '📚 Deep Dive'}
+                            {post.category === 'how-to-in-tech' ? '📝 How to' : 
+                             post.category === 'research' ? '🔬 Research' : 
+                             '📚 Deep Dive'}
                           </span>
                         </td>
                         <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
