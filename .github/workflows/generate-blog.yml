@@ -10,6 +10,8 @@ on:
     - cron: '0 */2 * * *'  # Every 2 hours: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
     # Also run at 9 AM UTC as primary time (keeps original schedule)
     - cron: '0 9 * * *'
+    # Research posts at 18:00 UTC daily (18:00 GMT winter / 19:00 BST summer)
+    - cron: '0 18 * * *'  # 18:00 UTC - Research pillar posts
     # One-time: Real-Time Portfolio Tracking post at 16:00 GMT on Jan 5, 2026
     - cron: '0 16 5 1 *'  # 16:00 UTC on Jan 5, 2026
     # One-time: NYE 2025 Year in Review post at 18:30 GMT (Dec 31, 2025)
@@ -42,18 +44,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify OpenAI API Key
+      - name: Verify API Keys
         run: |
           if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
             echo "❌ ERROR: OPENAI_API_KEY secret is not set"
             exit 1
           fi
           echo "✅ OPENAI_API_KEY is configured"
+          if [ -z "${{ secrets.YOUTUBE_API_KEY }}" ]; then
+            echo "⚠️  WARNING: YOUTUBE_API_KEY secret is not set - Research posts will skip video fetching"
+          else
+            echo "✅ YOUTUBE_API_KEY is configured"
+          fi
 
       - name: Generate blog posts (with automatic retry)
         id: generate
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: |
           echo "🕐 Workflow started at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           echo "📅 Checking for posts due today..."
@@ -115,6 +123,7 @@ jobs:
           find public/images/blog -name "*.png" -type f -exec git add -f {} + || true
           git add -f content/blog-calendar.json || true
           git add -f content/how-to-tech-calendar.json || true
+          git add -f content/research-calendar.json || true
           echo "✅ Files staged:"
           git status --short
           

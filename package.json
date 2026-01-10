@@ -39,6 +39,7 @@
     "debug-env": "ts-node --project scripts/tsconfig.json scripts/debug-env.ts",
     "extract-firebase": "ts-node --project scripts/tsconfig.json scripts/extract-firebase-env.ts",
     "generate-blog-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-blog-calendar.ts",
+    "generate-research-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-research-calendar.ts",
     "generate-blog": "ts-node --project scripts/tsconfig.json scripts/generate-autonomous-blog.ts",
     "verify-blog-posts": "ts-node --project scripts/tsconfig.json scripts/verify-blog-posts.ts",
     "check-workflow-execution": "ts-node --project scripts/tsconfig.json scripts/check-workflow-execution.ts",

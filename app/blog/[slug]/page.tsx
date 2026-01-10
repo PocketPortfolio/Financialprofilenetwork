@@ -261,6 +261,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         }
       }
     }
+    
+    // If not found, try research calendar
+    if (!publishedAt) {
+      const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+      if (fs.existsSync(researchCalendarPath)) {
+        const researchCalendar = JSON.parse(fs.readFileSync(researchCalendarPath, 'utf-8'));
+        const postInCalendar = researchCalendar.find((p: any) => p.slug === resolvedParams.slug);
+        if (postInCalendar?.publishedAt) {
+          publishedAt = postInCalendar.publishedAt;
+        }
+      }
+    }
   } catch (error) {
     // Silently fail - publishedAt is optional
     console.warn('Could not load publishedAt from calendar:', error);
@@ -449,6 +461,29 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
           )}
         </header>
+        
+        {/* Video Embed for Research Posts */}
+        {data.category === 'research' && data.videoId && (
+          <div style={{ 
+            marginBottom: '48px',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          }}>
+            <iframe
+              width="100%"
+              height="500"
+              src={`https://www.youtube.com/embed/${data.videoId}`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{
+                display: 'block',
+              }}
+            />
+          </div>
+        )}
+        
         <div 
           style={{ 
             fontSize: '18px', 
@@ -459,6 +494,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         >
           <MDXContent content={content} slug={resolvedParams.slug} />
         </div>
+        
+        {/* Transparency Footer for Research Posts */}
+        {data.category === 'research' && (
+          <div style={{ 
+            marginTop: '48px', 
+            padding: '16px 24px', 
+            fontSize: '14px', 
+            color: 'var(--text-secondary)',
+            fontStyle: 'italic',
+            borderTop: '1px solid var(--border)',
+            textAlign: 'center',
+            background: 'var(--surface-elevated)',
+            borderRadius: '8px',
+          }}>
+            This research was autonomously synthesized by the Pocket Portfolio Engine.
+          </div>
+        )}
         
         {/* CTA Section */}
         <div

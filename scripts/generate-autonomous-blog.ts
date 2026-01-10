@@ -10,6 +10,7 @@ import OpenAI from 'openai';
 import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
+import { fetchRelevantVideo } from './video-fetcher';
 
 // Load .env.local if it exists
 const envFiles = ['.env.local', '.env'];
@@ -98,7 +99,8 @@ interface BlogPost {
   slug: string;
   status: 'pending' | 'published' | 'failed';
   pillar: 'philosophy' | 'technical' | 'market' | 'product';
-  category?: 'how-to-in-tech' | 'deep-dive'; // Content category: short-form daily posts vs long-form deep dives
+  category?: 'how-to-in-tech' | 'deep-dive' | 'research'; // Content category: short-form daily posts vs long-form deep dives vs research reports
+  videoId?: string; // YouTube video ID for Research posts
   keywords: string[];
   type?: 'ai-generated' | 'syndicated' | 'manual';
   source?: 'dev.to' | 'coderlegion_profile' | 'coderlegion_group' | null;
@@ -109,7 +111,8 @@ interface BlogPost {
 async function generateBlogPost(post: BlogPost, retryCount = 0): Promise<void> {
   const MAX_RETRIES = 2;
   const isHowTo = post.category === 'how-to-in-tech';
-  console.log(`📝 Generating: ${post.title}${isHowTo ? ' [How-to Mode]' : ''}${retryCount > 0 ? ` (Retry ${retryCount}/${MAX_RETRIES})` : ''}`);
+  const isResearch = post.category === 'research';
+  console.log(`📝 Generating: ${post.title}${isHowTo ? ' [How-to Mode]' : isResearch ? ' [Research Mode]' : ''}${retryCount > 0 ? ` (Retry ${retryCount}/${MAX_RETRIES})` : ''}`);
   
   // Determine homepage anchor text and route based on pillar
   const homepageAnchors = [
@@ -133,8 +136,49 @@ async function generateBlogPost(post: BlogPost, retryCount = 0): Promise<void> {
     crossLink = '/dashboard';
   }
   
+  // Fetch video for Research posts
+  let videoResult: { videoId: string; title: string; channelTitle: string } | null = null;
+  if (isResearch) {
+    console.log('🔍 Fetching relevant YouTube video for Research post...');
+    const video = await fetchRelevantVideo(post.title, post.keywords);
+    if (video) {
+      videoResult = {
+        videoId: video.videoId,
+        title: video.title,
+        channelTitle: video.channelTitle,
+      };
+      post.videoId = video.videoId; // Store in post object for later use
+    }
+  }
+
   // Generate article content
-  const systemPrompt = `You are the CTO of a high-frequency trading firm. You write with the precision of Linus Torvalds and the philosophy of Naval Ravikant. You HATE vendor lock-in. You LOVE JSON.
+  const systemPrompt = isResearch
+    ? `You are a Lead Technical Researcher at a high-frequency trading firm. You synthesize research reports with academic rigor, focusing on benchmarks, architectural trade-offs, and future trends. You write with the precision of a systems architect and the analytical depth of a quant researcher.
+
+CRITICAL CONSTRAINTS FOR RESEARCH POSTS:
+- NEVER mention "Excel editing" or "Spreadsheets" as a feature. Use "Raw Data" or "JSON" only.
+- Write in MDX format with frontmatter
+- Minimum 1500 words, maximum 2500 words (Research posts are longer)
+- MUST include at least 3 external citations (Documentation, Whitepapers, Engineering Blogs) - NO hallucinations, only real sources
+- Use markdown formatting (headers, lists, code blocks, bold, italic)
+- Include benchmarks, performance data, and quantitative analysis when relevant
+- Write in an academic but accessible tone
+- Focus on architectural trade-offs, performance implications, and future trends
+- Include practical examples and real-world scenarios
+
+🔗 SEO STRATEGY - INTERNAL LINKING (CRITICAL):
+- In the introduction OR the "Verdict" section, you MUST include ONE contextual link using this exact anchor text: "${selectedAnchor}" pointing to "${homepageLink}"
+- DO NOT use generic phrases like "Click here" or "Learn more" - use the exact anchor text provided
+${crossLink ? `- If relevant to the content, include a contextual link to "${crossLink}" using natural anchor text related to the topic.` : ''}
+- The link should feel natural and contextual, not forced
+- All links must use markdown format: [Anchor Text](/route)
+- Anchor text routing:
+  * "Sovereign Financial Tracking" → "/" (homepage)
+  * "Google Drive Portfolio Sync" → "/features/google-drive-sync" (features page)
+  * "JSON-based Investment Tracker" → "/" (homepage)
+- Sponsor links must use: [Learn more about our Corporate and Founder Tiers](/sponsor) or [sponsor page](/sponsor)
+- Feature links must use: [Set up Google Drive Sync](/features/google-drive-sync) or [Google Drive Sync](/features/google-drive-sync)`
+    : `You are the CTO of a high-frequency trading firm. You write with the precision of Linus Torvalds and the philosophy of Naval Ravikant. You HATE vendor lock-in. You LOVE JSON.
 
 CRITICAL CONSTRAINTS:
 - NEVER mention "Excel editing" or "Spreadsheets" as a feature. Use "Raw Data" or "JSON" only.
@@ -163,7 +207,47 @@ ${crossLink ? `- If relevant to the content, include a contextual link to "${cro
 - Sponsor links must use: [Learn more about our Corporate and Founder Tiers](/sponsor) or [sponsor page](/sponsor)
 - Feature links must use: [Set up Google Drive Sync](/features/google-drive-sync) or [Google Drive Sync](/features/google-drive-sync)`;
 
-  const userPrompt = isHowTo
+  const userPrompt = isResearch
+    ? `Act as a Lead Technical Researcher. Synthesize a comprehensive research report titled "${post.title}".
+
+Pillar: ${post.pillar}
+Keywords: ${post.keywords.join(', ')}
+
+REQUIRED STRUCTURE:
+1. **Abstract** (Executive Summary) - 150-200 words summarizing key findings
+2. **Methodology** - How the research was conducted, data sources, benchmarks used
+3. **Key Findings** - Core insights with benchmarks, architectural trade-offs, performance implications
+${videoResult ? `\n4. **Video Reference** - Include this YouTube video in the "Key Findings" section using this embed code:\n\n<div style="margin-bottom: 32px;">\n  <iframe width="100%" height="500" src="https://www.youtube.com/embed/${videoResult.videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n  <p style="font-size: 14px; color: #666; margin-top: 8px;"><em>Video: "${videoResult.title}" by ${videoResult.channelTitle}</em></p>\n</div>\n\n` : ''}4. **References** - MUST cite at least 3 external sources:
+   - Documentation (official docs, API references)
+   - Whitepapers (technical papers, research papers)
+   - Engineering Blogs (company tech blogs, case studies)
+   - Format: [Source Title](URL) - Brief description
+   - NO hallucinations - only real, verifiable sources
+
+5. **Future Trends** - Analysis of where this technology/approach is heading
+
+6. **Verdict** - Clear conclusion with actionable takeaways (MUST include link with anchor text: "${selectedAnchor}" pointing to "${homepageLink}")
+
+⚠️ IMPORTANT: 
+- DO NOT include a CTA section in your content. The blog template automatically adds a CTA at the bottom.
+- The transparency footer will be automatically added by the template.
+- Focus on quantitative analysis, benchmarks, and architectural trade-offs.
+
+Format as MDX with frontmatter:
+---
+title: "${post.title}"
+date: "${post.date}"
+description: "[SEO-optimized description, 150-160 characters, include keywords]"
+tags: [${post.keywords.map(k => `"${k}"`).join(', ')}]
+author: "Pocket Portfolio Team"
+image: "/images/blog/${post.slug}.png"
+pillar: "${post.pillar}"
+category: "research"
+${videoResult ? `videoId: "${videoResult.videoId}"` : ''}
+---
+
+[Your research report content here]`
+    : isHowTo
     ? `Write a concise, hacker-style technical guide titled "${post.title}".
 
 Keywords: ${post.keywords.join(', ')}
@@ -260,9 +344,11 @@ pillar: "${post.pillar}"
     console.log('🧹 Sanitizing MDX content...');
     content = sanitizeMDXContent(content);
 
-    // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO POSTS
+    // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO AND RESEARCH POSTS
     const imagePrompt = isHowTo
       ? `Minimalist terminal interface, dark mode, bright green (#00ff41) text on black background, hacker aesthetic, code-focused, 8k resolution. No text. Theme: ${post.title}. Clean, technical, command-line style.`
+      : isResearch
+      ? `Academic research visualization, data charts and graphs, professional blue (#3b82f6) and grey (#64748b) palette, minimalist, 8k resolution. No text. Theme: ${post.title}. Scholarly, analytical, research-focused aesthetic.`
       : `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. No text. Theme: ${post.title}. Professional, modern, technical aesthetic.`;
     
     console.log(`🎨 Generating image for: ${post.slug}`);
@@ -432,10 +518,24 @@ async function main() {
       }
     }
 
+    // ✅ Load "Research" calendar (research posts)
+    const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+    let researchCalendar: BlogPost[] = [];
+    if (fs.existsSync(researchCalendarPath)) {
+      try {
+        researchCalendar = JSON.parse(fs.readFileSync(researchCalendarPath, 'utf-8'));
+      } catch (error: any) {
+        console.error(`❌ Error parsing ${researchCalendarPath}:`, error.message);
+        console.error('   Using empty calendar as fallback');
+        researchCalendar = [];
+      }
+    }
+
     // ✅ Merge calendars and mark categories
     const calendar: BlogPost[] = [
-      ...mainCalendar.map(p => ({ ...p, category: (p.category || 'deep-dive') as 'how-to-in-tech' | 'deep-dive' })),
-      ...howToCalendar.map(p => ({ ...p, category: 'how-to-in-tech' as const }))
+      ...mainCalendar.map(p => ({ ...p, category: (p.category || 'deep-dive') as 'how-to-in-tech' | 'deep-dive' | 'research' })),
+      ...howToCalendar.map(p => ({ ...p, category: 'how-to-in-tech' as const })),
+      ...researchCalendar.map(p => ({ ...p, category: 'research' as const }))
     ];
     
     const today = new Date().toISOString().split('T')[0];
@@ -498,11 +598,15 @@ async function main() {
       }
       
       // Save updated calendars immediately
-      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech');
+      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech' && p.category !== 'research');
       const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+      const researchPosts = calendar.filter(p => p.category === 'research');
       fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
       if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
         fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+      }
+      if (fs.existsSync(researchCalendarPath) || researchPosts.length > 0) {
+        fs.writeFileSync(researchCalendarPath, JSON.stringify(researchPosts, null, 2));
       }
       console.log('   ✅ Calendars updated - orphaned posts reset to pending\n');
     } else {
@@ -523,11 +627,15 @@ async function main() {
       }
       
       // Save updated calendars immediately
-      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech');
+      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech' && p.category !== 'research');
       const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+      const researchPosts = calendar.filter(p => p.category === 'research');
       fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
       if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
         fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+      }
+      if (fs.existsSync(researchCalendarPath) || researchPosts.length > 0) {
+        fs.writeFileSync(researchCalendarPath, JSON.stringify(researchPosts, null, 2));
       }
       console.log('   ✅ Calendars updated - failed posts reset to pending\n');
     } else {
