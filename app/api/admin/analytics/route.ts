@@ -1021,12 +1021,20 @@ async function getBlogPostsData() {
       const hasFiles = existingPosts.includes(post.slug) && existingImages.includes(post.slug);
       const postDate = new Date(post.date);
       const todayDate = new Date(today);
-      const isOverdue = postDate < todayDate && post.status === 'pending';
+      
+      // ✅ FIX: If files exist and date has passed, treat as published (auto-detect)
+      // This handles cases where calendar wasn't updated but files were generated
+      const effectiveStatus = hasFiles && postDate <= todayDate 
+        ? 'published' 
+        : post.status;
+      
+      // ✅ FIX: Only mark as overdue if status is pending AND no files exist
+      const isOverdue = postDate < todayDate && effectiveStatus === 'pending';
       
       // Get published time from calendar (publishedAt) - this is the actual publish time
       // Fall back to file mtime only if publishedAt is not available (for backwards compatibility)
       let publishedTime: string | null = null;
-      if (hasFiles && post.status === 'published') {
+      if (hasFiles && effectiveStatus === 'published') {
         // Prefer publishedAt from calendar (actual publish time)
         if (post.publishedAt) {
           publishedTime = post.publishedAt;
@@ -1047,7 +1055,7 @@ async function getBlogPostsData() {
         date: post.date,
         scheduledDate: post.date,
         scheduledTime: post.scheduledTime || null,
-        status: post.status,
+        status: effectiveStatus, // ✅ Use effective status instead of calendar status
         pillar: post.pillar,
         category: post.category ?? 'deep-dive', // ✅ Preserve category (research, how-to-in-tech, or deep-dive)
         isOverdue,
@@ -1061,6 +1069,7 @@ async function getBlogPostsData() {
     const pending = posts.filter((p: any) => p.status === 'pending').length;
     const overdue = posts.filter((p: any) => p.isOverdue).length;
     const failed = posts.filter((p: any) => p.status === 'failed').length;
+    // Note: Status counts now use effectiveStatus (auto-detected from file existence)
     const researchPostsInFinal = posts.filter((p: any) => p.category === 'research').length;
 
     const result = {
