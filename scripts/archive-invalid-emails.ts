@@ -35,13 +35,8 @@ async function archiveInvalidEmails() {
       .select({ id: leads.id, email: leads.email, companyName: leads.companyName })
       .from(leads)
       .where(
-        or(
-          sql`${leads.email} LIKE '%.placeholder'`,
-          sql`${leads.email} LIKE '%@similar.%'`,
-          sql`${leads.email} LIKE '%@github-hiring.%'`
-        )
-      )
-      .where(sql`${leads.status} != 'UNQUALIFIED'`);
+        sql`(${leads.email} LIKE '%.placeholder' OR ${leads.email} LIKE '%@similar.%' OR ${leads.email} LIKE '%@github-hiring.%') AND ${leads.status} != 'UNQUALIFIED'`
+      );
 
     for (const lead of placeholderLeads) {
       await db.update(leads)
@@ -76,19 +71,8 @@ async function archiveInvalidEmails() {
       .select({ id: leads.id, email: leads.email, companyName: leads.companyName })
       .from(leads)
       .where(
-        or(
-          sql`${leads.email} LIKE '%@example.com'`,
-          sql`${leads.email} LIKE '%@example.org'`,
-          sql`${leads.email} LIKE '%@example.net'`,
-          sql`${leads.email} LIKE '%@test.com'`,
-          sql`${leads.email} LIKE '%@test.local'`,
-          sql`${leads.email} LIKE '%@invalid.com'`,
-          sql`${leads.email} LIKE '%@fake.com'`,
-          sql`${leads.email} LIKE '%@dummy.com'`,
-          sql`${leads.email} LIKE '%@sample.com'`
-        )
-      )
-      .where(sql`${leads.status} != 'UNQUALIFIED'`);
+        sql`(${leads.email} LIKE '%@example.com' OR ${leads.email} LIKE '%@example.org' OR ${leads.email} LIKE '%@example.net' OR ${leads.email} LIKE '%@test.com' OR ${leads.email} LIKE '%@test.local' OR ${leads.email} LIKE '%@invalid.com' OR ${leads.email} LIKE '%@fake.com' OR ${leads.email} LIKE '%@dummy.com' OR ${leads.email} LIKE '%@sample.com') AND ${leads.status} != 'UNQUALIFIED'`
+      );
 
     for (const lead of testDomainLeads) {
       await db.update(leads)
@@ -145,8 +129,9 @@ async function archiveInvalidEmails() {
     const disposableLeads = await db
       .select({ id: leads.id, email: leads.email, companyName: leads.companyName })
       .from(leads)
-      .where(or(...disposableConditions))
-      .where(sql`${leads.status} != 'UNQUALIFIED'`);
+      .where(
+        sql`(${sql.join(disposableConditions, sql` OR `)}) AND ${leads.status} != 'UNQUALIFIED'`
+      );
 
     for (const lead of disposableLeads) {
       await db.update(leads)
@@ -185,18 +170,19 @@ async function archiveInvalidEmails() {
       })
       .from(auditLogs)
       .where(
-        sql`${auditLogs.metadata}->>'deliveryStatus' IN ('bounced', 'delivery_delayed', 'failed')`
-      )
-      .where(sql`${auditLogs.leadId} IS NOT NULL`);
+        sql`${auditLogs.metadata}->>'deliveryStatus' IN ('bounced', 'delivery_delayed', 'failed') AND ${auditLogs.leadId} IS NOT NULL`
+      );
 
-    const deadLeadIds = [...new Set(deadEmailLogs.map(log => log.leadId).filter(Boolean))];
+    const deadLeadIds = [...new Set(deadEmailLogs.map((log: any) => log.leadId).filter(Boolean))];
 
+    let deadLeads: Array<{ id: string; email: string; companyName: string }> = [];
     if (deadLeadIds.length > 0) {
-      const deadLeads = await db
+      deadLeads = await db
         .select({ id: leads.id, email: leads.email, companyName: leads.companyName })
         .from(leads)
-        .where(inArray(leads.id, deadLeadIds))
-        .where(sql`${leads.status} != 'UNQUALIFIED'`);
+        .where(
+          sql`${leads.id} = ANY(${deadLeadIds}) AND ${leads.status} != 'UNQUALIFIED'`
+        );
 
       for (const lead of deadLeads) {
         await db.update(leads)
