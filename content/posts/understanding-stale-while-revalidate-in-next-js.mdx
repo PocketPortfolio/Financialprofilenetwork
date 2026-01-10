@@ -1,0 +1,41 @@
+---
+title: "Understanding 'Stale-While-Revalidate' in Next.js"
+date: "2026-01-10"
+description: "A concise guide to leveraging Stale-While-Revalidate in Next.js for optimized data fetching and caching strategies."
+tags: ["next.js", "understanding", "stale", "while"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/understanding-stale-while-revalidate-in-next-js.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+When building applications with Next.js, ensuring your data is fresh while maintaining fast load times can be a challenge. The `Stale-While-Revalidate` strategy offers a compelling solution.
+
+```js
+x
+export async function getStaticProps() {
+  const data = await fetchData();
+  return {
+    props: {
+      data,
+    },
+    revalidate: 10, // seconds
+  };
+}
+```
+
+**Stale-While-Revalidate** (SWR) is a caching strategy popularized by HTTP/1.1. In the context of Next.js, it is applied in static generation methods, such as `getStaticProps`, where `revalidate` is the key player. 
+
+This strategy works by serving a "stale" version of the data for a page while revalidating the data in the background. If the data has changed since the last static generation, Next.js will silently generate a new version of the page in the background. Subsequent requests will serve the updated page, ensuring users always get fresh data without a hit to performance.
+
+### Key Concepts:
+- **Stale**: The data currently served to users, which may no longer be up-to-date.
+- **Revalidate**: The process of fetching fresh data in the background.
+
+### Quick Tip:
+When setting the `revalidate` option, consider the frequency of data changes and the tolerance for staleness. A value too low increases server load without significant user benefit, while a value too high may serve outdated data to users for too long.
+
+### Gotcha:
+Remember that during revalidation, if the new data fetching fails, Next.js will keep serving the stale version. Ensure your data fetching is robust and handle errors gracefully to avoid displaying outdated or incorrect information.
+
+By leveraging the `Stale-While-Revalidate` strategy in Next.js, developers can strike an optimal balance between data freshness and application performance, providing users with a seamless browsing experience.

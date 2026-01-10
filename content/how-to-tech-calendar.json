@@ -93,7 +93,7 @@
     "scheduledTime": "14:00",
     "title": "Understanding \"Stale-While-Revalidate\" in Next.js",
     "slug": "understanding-stale-while-revalidate-in-next-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -101,7 +101,8 @@
       "understanding",
       "stale",
       "while"
-    ]
+    ],
+    "publishedAt": "2026-01-10T14:11:59.399Z"
   },
   {
     "id": "how-to-how-to-self-host-your-own-analytics-privacy-first-jan-11",
