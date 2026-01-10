@@ -21,7 +21,7 @@ interface GeneratedPost {
 }
 
 export default function BlogPage() {
-  const [filter, setFilter] = useState<'all' | 'dev.to' | 'coderlegion' | 'generated' | 'how-to-in-tech'>('all');
+  const [filter, setFilter] = useState<'all' | 'dev.to' | 'coderlegion' | 'generated' | 'how-to-in-tech' | 'research'>('all');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
 
   useEffect(() => {
@@ -32,12 +32,13 @@ export default function BlogPage() {
       .catch(() => setGeneratedPosts([]));
   }, []);
 
-  // ✅ SEPARATE HOW-TO POSTS FROM REGULAR POSTS
+  // ✅ SEPARATE POSTS BY CATEGORY
   const howToPosts = generatedPosts.filter(post => post.category === 'how-to-in-tech');
-  const regularPosts = generatedPosts.filter(post => post.category !== 'how-to-in-tech');
+  const researchPosts = generatedPosts.filter(post => post.category === 'research');
+  const regularPosts = generatedPosts.filter(post => post.category !== 'how-to-in-tech' && post.category !== 'research');
   
-  const showGenerated = filter === 'all' || filter === 'generated' || filter === 'how-to-in-tech';
-  const showExternal = filter === 'all' || (filter !== 'generated' && filter !== 'how-to-in-tech');
+  const showGenerated = filter === 'all' || filter === 'generated' || filter === 'how-to-in-tech' || filter === 'research';
+  const showExternal = filter === 'all' || (filter !== 'generated' && filter !== 'how-to-in-tech' && filter !== 'research');
   
   const filteredArticles = showExternal
     ? (filter === 'all' ? featuredArticles : featuredArticles.filter(article => article.platform === filter))
@@ -166,6 +167,22 @@ export default function BlogPage() {
           >
             How to in Tech
           </button>
+          <button
+            onClick={() => setFilter('research')}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: `2px solid ${filter === 'research' ? '#3b82f6' : 'var(--border)'}`,
+              background: filter === 'research' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+              color: filter === 'research' ? '#3b82f6' : 'var(--text)',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            Research
+          </button>
         </div>
       </header>
 
@@ -217,6 +234,101 @@ export default function BlogPage() {
                 letterSpacing: '0.5px'
               }}>
                 {post.pillar?.toUpperCase() || 'GENERATED'}
+              </span>
+            </div>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              marginBottom: '8px',
+              lineHeight: '1.4'
+            }}>
+              {post.title}
+            </h2>
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--text-muted)',
+              marginBottom: '16px',
+              lineHeight: '1.6'
+            }}>
+              {post.description}
+            </p>
+            <div style={{
+              fontSize: '12px',
+              color: 'var(--text-muted)',
+              marginBottom: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px'
+            }}>
+              <div>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div>By {post.author}</div>
+            </div>
+            {post.tags && post.tags.length > 0 && (
+              <div style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '6px'
+              }}>
+                {post.tags.slice(0, 3).map((tag, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      fontSize: '11px',
+                      padding: '2px 8px',
+                      background: 'var(--muted)',
+                      borderRadius: '4px',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </Link>
+        ))}
+
+        {/* Research Posts */}
+        {(filter === 'all' || filter === 'research') && researchPosts.map((post, index) => (
+          <Link
+            key={`research-${index}`}
+            href={`/blog/${post.slug}`}
+            onClick={() => trackBlogPostClick(post.title, 'research', `/blog/${post.slug}`)}
+            style={{
+              display: 'block',
+              padding: '24px',
+              background: 'var(--card)',
+              border: '1px solid var(--card-border)',
+              borderRadius: '12px',
+              transition: 'all 0.2s ease',
+              textDecoration: 'none',
+              color: 'inherit',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(59, 130, 246, 0.15)';
+              e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.borderColor = 'var(--card-border)';
+            }}
+          >
+            <div style={{ marginBottom: '12px' }}>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 12px',
+                fontSize: '12px',
+                fontWeight: '600',
+                borderRadius: '6px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                color: '#3b82f6',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                RESEARCH
               </span>
             </div>
             <h2 style={{
