@@ -89,10 +89,13 @@ const NPM_PACKAGES = [
 ];
 
 export async function GET(request: NextRequest) {
+  console.log('[Analytics API] 🚀 GET request received');
   try {
     // Get time range from query params
     const searchParams = request.nextUrl.searchParams;
     const range = searchParams.get('range') || '30d';
+    
+    console.log('[Analytics API] 📊 Fetching data with range:', range);
     
     // Calculate date range
     const now = new Date();
@@ -112,19 +115,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch monetization data from Stripe
+    console.log('[Analytics API] 💰 Fetching monetization data...');
     const monetization = await getMonetizationData(startDate);
     
     // Fetch tool usage from Firestore
+    console.log('[Analytics API] 🛠️ Fetching tool usage data...');
     const toolUsage = await getToolUsageData(startDate);
     
     // Fetch SEO page data from Firestore
+    console.log('[Analytics API] 📈 Fetching SEO page data...');
     const seoPages = await getSEOPageData(startDate);
 
     // Fetch NPM package data
+    console.log('[Analytics API] 📦 Fetching NPM data...');
     const npmData = await getNPMData();
 
     // Fetch blog posts data
+    console.log('[Analytics API] 📝 Fetching blog posts data...');
     const blogPosts = await getBlogPostsData();
+    console.log('[Analytics API] ✅ Blog posts fetched:', blogPosts.total, 'total posts,', blogPosts.posts.filter((p: any) => p.category === 'research').length, 'research posts');
 
     return NextResponse.json({
       monetization,
@@ -136,7 +145,8 @@ export async function GET(request: NextRequest) {
       lastUpdated: new Date().toISOString()
     });
   } catch (error: any) {
-    console.error('Analytics API error:', error);
+    console.error('[Analytics API] ❌ ERROR:', error);
+    console.error('[Analytics API] ❌ Stack:', error.stack);
     return NextResponse.json(
       { error: error.message || 'Failed to fetch analytics' },
       { status: 500 }
@@ -819,21 +829,31 @@ async function getNPMData() {
 }
 
 async function getBlogPostsData() {
+  console.log('[getBlogPostsData] 🚀 Starting blog posts data fetch');
+  console.log('[getBlogPostsData] 📂 Current working directory:', process.cwd());
   try {
     // ✅ Load main calendar (deep dives)
     const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
+    console.log('[getBlogPostsData] 📂 Loading main calendar from:', mainCalendarPath);
+    console.log('[getBlogPostsData] 📂 Main calendar file exists?', fs.existsSync(mainCalendarPath));
     const mainCalendar = fs.existsSync(mainCalendarPath)
       ? JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'))
       : [];
+    console.log('[getBlogPostsData] ✅ Loaded', mainCalendar.length, 'main calendar posts');
 
     // ✅ Load "How to in Tech" calendar (daily posts)
     const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
+    console.log('[getBlogPostsData] 📂 Loading how-to calendar from:', howToCalendarPath);
+    console.log('[getBlogPostsData] 📂 How-to calendar file exists?', fs.existsSync(howToCalendarPath));
     const howToCalendar = fs.existsSync(howToCalendarPath)
       ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
       : [];
+    console.log('[getBlogPostsData] ✅ Loaded', howToCalendar.length, 'how-to calendar posts');
 
     // ✅ Load "Research" calendar (research posts)
     const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+    console.log('[getBlogPostsData] 📂 Loading research calendar from:', researchCalendarPath);
+    console.log('[getBlogPostsData] 📂 Research calendar file exists?', fs.existsSync(researchCalendarPath));
     let researchCalendar: any[] = [];
     if (fs.existsSync(researchCalendarPath)) {
       try {
@@ -842,10 +862,12 @@ async function getBlogPostsData() {
         console.log(`[Analytics] ✅ Loaded ${researchCalendar.length} research posts from calendar`);
       } catch (error: any) {
         console.error('[Analytics] ❌ Error loading research calendar:', error.message);
+        console.error('[Analytics] ❌ Error stack:', error.stack);
         researchCalendar = [];
       }
     } else {
       console.warn('[Analytics] ⚠️ Research calendar file not found:', researchCalendarPath);
+      console.warn('[Analytics] ⚠️ Current working directory:', process.cwd());
     }
 
     // ✅ CRITICAL FIX: Filter out research posts from mainCalendar to prevent overwrites
@@ -857,45 +879,89 @@ async function getBlogPostsData() {
                         (p.id && p.id.startsWith('research-'));
       return !isResearch;
     });
-
-    // ✅ Merge calendars (mark posts with category)
+    // ✅ Merge calendars (mark posts with category and source)
     const calendar = [
-      ...mainCalendarFiltered.map((p: any) => ({ ...p, category: p.category || 'deep-dive' })),
-      ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech' })),
-      ...researchCalendar.map((p: any) => ({ ...p, category: 'research' }))
+      ...mainCalendarFiltered.map((p: any) => ({ ...p, category: p.category || 'deep-dive', _source: 'main' })),
+      ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech', _source: 'how-to' })),
+      ...researchCalendar.map((p: any) => ({ ...p, category: 'research', _source: 'research-calendar' }))
     ];
-
     console.log(`[Analytics] 📊 Total posts after merge: ${calendar.length} (main: ${mainCalendarFiltered.length}, how-to: ${howToCalendar.length}, research: ${researchCalendar.length})`);
     console.log(`[Analytics] 🔍 Filtered ${mainCalendar.length - mainCalendarFiltered.length} research posts from main calendar`);
 
-    // ✅ Deduplicate posts by slug (prefer published over pending, newer over older)
-    // BUT: Prefer research posts from research-calendar.json over any duplicates
+    // ✅ Deduplicate posts by ID (for research) or slug (for others)
+    // Research posts can have duplicate slugs (same topic, different dates), so use ID as key
+    // Other posts use slug as key (unique per post)
     const postMap = new Map<string, any>();
     let duplicateCount = 0;
-    for (const post of calendar) {
-      const existing = postMap.get(post.slug);
+    let researchDuplicates = 0;
+    let researchReplaced = 0;
+    let researchSkipped = 0;
+    
+    // Helper function to get the deduplication key for a post
+    const getPostKey = (post: any): string => {
+      // Research posts use ID (unique, includes date) to handle duplicate slugs
+      if (post.category === 'research' && post.id) {
+        return post.id;
+      }
+      // Other posts use slug
+      return post.slug || post.id || `unknown-${Math.random()}`;
+    };
+    
+    // CRITICAL: Process research-calendar.json posts FIRST to ensure they always win
+    // Separate research posts from research-calendar.json and process them first
+    const researchCalendarPosts = calendar.filter((p: any) => p._source === 'research-calendar');
+    const otherPosts = calendar.filter((p: any) => p._source !== 'research-calendar');
+    
+    // First pass: Add all research-calendar.json posts to map (they win by default)
+    for (const post of researchCalendarPosts) {
+      const key = getPostKey(post);
+      const existing = postMap.get(key);
       if (!existing) {
-        postMap.set(post.slug, post);
+        postMap.set(key, post);
+      } else {
+        // Shouldn't happen in first pass for research posts (IDs are unique), but handle it
+        duplicateCount++;
+        researchDuplicates++;
+        postMap.set(key, post);
+        researchReplaced++;
+      }
+    }
+    
+    // Second pass: Process other posts, but never replace research-calendar posts
+    for (const post of otherPosts) {
+      const key = getPostKey(post);
+      const existing = postMap.get(key);
+      if (!existing) {
+        postMap.set(key, post);
       } else {
         duplicateCount++;
-        // CRITICAL: Prefer research posts from research-calendar.json
-        if (post.category === 'research' && existing.category !== 'research') {
-          postMap.set(post.slug, post);
-        } else if (existing.category === 'research' && post.category !== 'research') {
-          // Keep existing research post, skip this one
+        // CRITICAL: Never replace research posts from research-calendar.json
+        if (existing._source === 'research-calendar' && existing.category === 'research') {
+          // Existing is from research-calendar.json - keep it, skip this one
+          researchSkipped++;
+          continue;
+        } else if (post.category === 'research' && existing.category !== 'research') {
+          // New post is research (but not from research-calendar), existing is not - prefer research
+          postMap.set(key, post);
+          researchReplaced++;
+        } else if (post.category === 'research' && existing.category === 'research') {
+          // Both are research, but existing is from research-calendar.json (already processed) - keep existing
+          researchSkipped++;
           continue;
         } else {
           // Prefer published over pending
           if (post.status === 'published' && existing.status !== 'published') {
-            postMap.set(post.slug, post);
+            postMap.set(key, post);
           } else if (post.status === existing.status) {
             // If same status, prefer the one with files or newer date
-            const postHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`));
-            const existingHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${existing.slug}.mdx`));
+            const postSlug = post.slug || post.id;
+            const existingSlug = existing.slug || existing.id;
+            const postHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${postSlug}.mdx`));
+            const existingHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${existingSlug}.mdx`));
             if (postHasFiles && !existingHasFiles) {
-              postMap.set(post.slug, post);
+              postMap.set(key, post);
             } else if (post.date > existing.date) {
-              postMap.set(post.slug, post);
+              postMap.set(key, post);
             }
           }
         }
@@ -903,7 +969,29 @@ async function getBlogPostsData() {
     }
     const deduplicatedCalendar = Array.from(postMap.values());
     
+    // ✅ Comprehensive category and pillar tracking verification
+    const categoryBreakdown = {
+      'deep-dive': deduplicatedCalendar.filter((p: any) => p.category === 'deep-dive' || (!p.category && p._source === 'main')).length,
+      'how-to-in-tech': deduplicatedCalendar.filter((p: any) => p.category === 'how-to-in-tech').length,
+      'research': deduplicatedCalendar.filter((p: any) => p.category === 'research').length,
+    };
+    const pillarBreakdown = {
+      'philosophy': deduplicatedCalendar.filter((p: any) => p.pillar === 'philosophy').length,
+      'technical': deduplicatedCalendar.filter((p: any) => p.pillar === 'technical').length,
+      'market': deduplicatedCalendar.filter((p: any) => p.pillar === 'market').length,
+      'product': deduplicatedCalendar.filter((p: any) => p.pillar === 'product').length,
+      'unknown': deduplicatedCalendar.filter((p: any) => !p.pillar).length,
+    };
+    const sourceBreakdown = {
+      'main': deduplicatedCalendar.filter((p: any) => p._source === 'main').length,
+      'how-to': deduplicatedCalendar.filter((p: any) => p._source === 'how-to').length,
+      'research-calendar': deduplicatedCalendar.filter((p: any) => p._source === 'research-calendar').length,
+    };
+    
     console.log(`[Analytics] 🔄 After deduplication: ${deduplicatedCalendar.length} posts (removed ${duplicateCount} duplicates)`);
+    console.log(`[Analytics] 📊 Category breakdown:`, categoryBreakdown);
+    console.log(`[Analytics] 🏛️ Pillar breakdown:`, pillarBreakdown);
+    console.log(`[Analytics] 📁 Source breakdown:`, sourceBreakdown);
     
     // Log research posts count
     const researchPostsCount = deduplicatedCalendar.filter((p: any) => p.category === 'research').length;
@@ -973,8 +1061,9 @@ async function getBlogPostsData() {
     const pending = posts.filter((p: any) => p.status === 'pending').length;
     const overdue = posts.filter((p: any) => p.isOverdue).length;
     const failed = posts.filter((p: any) => p.status === 'failed').length;
+    const researchPostsInFinal = posts.filter((p: any) => p.category === 'research').length;
 
-    return {
+    const result = {
       total: posts.length,
       published,
       pending,
@@ -989,6 +1078,7 @@ async function getBlogPostsData() {
         return 0;
       })
     };
+    return result;
   } catch (error: any) {
     console.error('Error reading blog calendar:', error);
     return {

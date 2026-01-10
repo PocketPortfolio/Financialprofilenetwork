@@ -130,7 +130,9 @@ export default function AdminAnalyticsPage() {
 
   // Fetch analytics data
   useEffect(() => {
-    if (!isAdmin || checkingAdmin) return;
+    if (!isAdmin || checkingAdmin) {
+      return;
+    }
 
     const fetchData = async () => {
       try {
