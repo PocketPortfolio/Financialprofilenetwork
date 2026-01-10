@@ -73,6 +73,7 @@
     "test-throttle-governor": "ts-node --project scripts/tsconfig.json scripts/test-throttle-governor.ts",
     "test-resend-webhook": "ts-node --project scripts/tsconfig.json scripts/test-resend-webhook.ts",
     "purge-dead-leads": "ts-node --project scripts/tsconfig.json scripts/purge-dead-leads.ts",
+    "archive-invalid-emails": "ts-node --project scripts/tsconfig.json scripts/archive-invalid-emails.ts",
     "db:add-lead-submitted": "ts-node --project scripts/tsconfig.json scripts/add-lead-submitted-audit-action.ts",
     "process-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-leads-autonomous.ts",
     "process-inbound-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-inbound-autonomous.ts",
