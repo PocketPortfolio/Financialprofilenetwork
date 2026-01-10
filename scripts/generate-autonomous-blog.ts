@@ -867,13 +867,18 @@ async function main() {
     }
 
     // ✅ Update calendars (save to appropriate files)
-    const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech');
+    const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech' && p.category !== 'research');
     const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+    const researchPosts = calendar.filter(p => p.category === 'research');
     
     fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
     // ✅ Always save if file exists or if we have posts (ensures status updates are persisted)
     if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
       fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+    }
+    // ✅ FIX: Save research posts to research-calendar.json (was missing!)
+    if (fs.existsSync(researchCalendarPath) || researchPosts.length > 0) {
+      fs.writeFileSync(researchCalendarPath, JSON.stringify(researchPosts, null, 2));
     }
     console.log('');
     console.log('✅ Calendar updated');
