@@ -89,7 +89,9 @@
     "resolve-placeholders": "ts-node --project scripts/tsconfig.json scripts/resolve-placeholder-emails.ts",
     "seed-lookalikes": "ts-node --project scripts/tsconfig.json scripts/seed-lookalikes-enhanced.ts",
     "generate-expansion": "ts-node --project scripts/tsconfig.json scripts/generate-expansion-leads.ts",
-    "test-sales-setup": "ts-node --project scripts/tsconfig.json scripts/test-sales-setup.ts"
+    "test-sales-setup": "ts-node --project scripts/tsconfig.json scripts/test-sales-setup.ts",
+    "test-metronome": "ts-node --project scripts/tsconfig.json scripts/test-metronome.ts",
+    "test-metronome:post": "ts-node --project scripts/tsconfig.json scripts/test-metronome.ts --post"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.0",
@@ -118,6 +120,7 @@
     "resend": "^3.2.0",
     "stripe": "^20.0.0",
     "tailwindcss": "^4.1.14",
+    "twitter-api-v2": "^1.28.0",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8",
     "zustand": "^5.0.9"
