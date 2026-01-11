@@ -155,7 +155,7 @@ The **Autonomous Research Engine** has been successfully activated and integrate
 ### Immediate Actions
 1. **Add YouTube API Key to GitHub Secrets:**
    - Go to: Repository Settings → Secrets and variables → Actions
-   - Add: `YOUTUBE_API_KEY` = `AIzaSyB997wNS5FeHXdag9F0vgaWsMRI0TwSRmM`
+   - Add: `YOUTUBE_API_KEY` = `[Add via GitHub Secrets UI - Never commit API keys to repository]`
 
 2. **Verify First Post Generation:**
    - Wait for 18:00 UTC on 2026-01-09
