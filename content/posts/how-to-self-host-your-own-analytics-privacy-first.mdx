@@ -1,0 +1,64 @@
+---
+title: "How to Self-Host Your Own Analytics (Privacy First)"
+date: "2026-01-11"
+description: "Learn how to self-host your analytics for maximum privacy and control, with a step-by-step, code-first guide."
+tags: ["privacy", "analytics", "self", "host", "your"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-self-host-your-own-analytics-privacy-first.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+In an era where data privacy is paramount, relying on third-party analytics services can often feel like a compromise. If you're seeking complete control over your data without sacrificing insights, self-hosting your own analytics is the answer.
+
+### Direct Solution with Code
+
+To self-host your analytics, we'll use an open-source platform called Matomo. It's a robust solution that respects user privacy and provides comprehensive analytics capabilities. Below is a step-by-step guide to get you started:
+
+1. **Set up a server**:
+   First, ensure you have a server running. This guide assumes you're using a Linux server with Apache, MySQL, and PHP installed.
+
+2. **Install Matomo**:
+   Download and unpack Matomo into your web server's root directory. You can use the following commands:
+
+   
+```bas
+h
+   wget https://builds.matomo.org/matomo-latest.zip
+   unzip matomo-latest.zip -d /var/www/html/
+   
+```
+
+3. **Create a database**:
+   Matomo requires a MySQL database. Create one using these commands:
+
+   
+```sq
+l
+   CREATE DATABASE matomo;
+   CREATE USER 'matomo'@'localhost' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON matomo.* TO 'matomo'@'localhost';
+   FLUSH PRIVILEGES;
+   
+```
+
+4. **Configure Matomo**:
+   Navigate to your Matomo installation in a web browser (e.g., http://yourserver/matomo) and follow the setup wizard. When prompted, enter the database details you created in the previous step.
+
+5. **Integrate with your site**:
+   Once Matomo is configured, add the tracking code provided by Matomo to the `<head>` tag of your website.
+
+### Explanation of Key Concepts
+
+- **Privacy**: Self-hosting analytics means that all the data collected stays on your server. You have complete control over the data, ensuring compliance with privacy laws.
+- **Open Source**: Matomo is open-source software, meaning it's freely available and can be modified to suit your specific needs.
+
+### Quick Tip
+
+When self-hosting analytics, regularly update your software to protect against vulnerabilities. Matomo releases updates frequently, so keep an eye on their official website or GitHub repository for new versions.
+
+### Gotcha
+
+Ensure that your server has sufficient resources to handle the analytics workload. As your site grows, so will the demands on your server. Consider upgrading server resources or using a dedicated database server if you notice performance issues.
+
+Self-hosting your analytics is a powerful way to maintain privacy and control over your data. With Matomo, you can enjoy the benefits of comprehensive analytics without relying on third-party services.
