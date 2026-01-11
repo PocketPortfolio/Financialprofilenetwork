@@ -8,14 +8,15 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 /**
- * Vercel Cron: 18:00 UK Daily (17:00 UTC in winter, 18:00 UTC in summer)
+ * Vercel Cron: 19:30 UK Daily (18:30 UTC)
  * RESEARCH Drop - Latest research post
  * 
- * Schedule: "0 17 * * *" (17:00 UTC = 18:00 UK in winter)
+ * Schedule: "30 18 * * *" (18:30 UTC = 19:30 UK in winter)
  * 
- * Note: UK timezone changes between GMT (UTC+0) and BST (UTC+1)
- * - Winter (GMT): 18:00 UK = 17:00 UTC
- * - Summer (BST): 18:00 UK = 17:00 UTC (cron runs at 17:00 UTC = 18:00 BST)
+ * IMPORTANT: Runs AFTER blog generation (18:00 UTC) to ensure new research post is available
+ * - Blog generation: 18:00 UTC
+ * - Twitter post: 18:30 UTC (30 min buffer for generation + deployment)
+ * - UK Time: 19:30 UK in winter (GMT), 19:30 BST in summer
  */
 export async function GET(request: Request) {
   // Verify this is a Vercel Cron request
