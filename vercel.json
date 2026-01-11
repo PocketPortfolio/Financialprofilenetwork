@@ -4,6 +4,20 @@
   "installCommand": "npm ci",
   "devCommand": "next dev",
   "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/test-one-time",
+      "schedule": "30 12 * * *"
+    },
+    {
+      "path": "/api/cron/war-mode-update",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/research-drop",
+      "schedule": "0 17 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/sitemap.xml",
