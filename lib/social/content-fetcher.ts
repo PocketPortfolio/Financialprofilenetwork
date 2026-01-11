@@ -35,9 +35,7 @@ async function getIndexedPagesCount(): Promise<number> {
   try {
     // Fetch the main sitemap index to verify it's accessible
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.pocketportfolio.app';
-    const response = await fetch(`${baseUrl}/sitemap.xml`, {
-      cache: 'no-store',
-    });
+    const response = await fetch(`${baseUrl}/sitemap.xml`);
 
     if (!response.ok) {
       console.warn('Failed to fetch sitemap, using fallback count');
@@ -59,9 +57,7 @@ async function getIndexedPagesCount(): Promise<number> {
 async function getNPMDownloads(): Promise<number> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.pocketportfolio.app';
-    const response = await fetch(`${baseUrl}/api/npm-stats`, {
-      cache: 'no-store',
-    });
+    const response = await fetch(`${baseUrl}/api/npm-stats`);
 
     if (!response.ok) {
       throw new Error(`NPM stats API returned ${response.status}`);
@@ -81,9 +77,7 @@ async function getNPMDownloads(): Promise<number> {
 async function getLatestResearchPost(): Promise<ResearchPost | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.pocketportfolio.app';
-    const response = await fetch(`${baseUrl}/api/blog/posts`, {
-      cache: 'no-store',
-    });
+    const response = await fetch(`${baseUrl}/api/blog/posts`);
 
     if (!response.ok) {
       throw new Error(`Blog posts API returned ${response.status}`);
@@ -91,16 +85,23 @@ async function getLatestResearchPost(): Promise<ResearchPost | null> {
 
     const posts = await response.json();
     
-    // Filter for research posts, get latest
+    // Filter for research posts, get latest by date (most recent first)
     const researchPosts = posts
       .filter((post: any) => post.category === 'research')
-      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      .sort((a: any, b: any) => {
+        // Sort by date (most recent first)
+        const aTime = new Date(a.date).getTime();
+        const bTime = new Date(b.date).getTime();
+        return bTime - aTime;
+      });
 
     if (researchPosts.length === 0) {
+      console.warn('[Content Fetcher] No research posts found');
       return null;
     }
 
     const latest = researchPosts[0];
+    console.log(`[Content Fetcher] Latest research post: ${latest.title} (date: ${latest.date})`);
     return {
       title: latest.title,
       description: latest.description || '',
