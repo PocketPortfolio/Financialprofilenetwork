@@ -110,7 +110,7 @@
     "scheduledTime": "14:00",
     "title": "How to Self-Host Your Own Analytics (Privacy First)",
     "slug": "how-to-self-host-your-own-analytics-privacy-first",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -119,7 +119,8 @@
       "self",
       "host",
       "your"
-    ]
+    ],
+    "publishedAt": "2026-01-11T14:11:34.424Z"
   },
   {
     "id": "how-to-the-absolute-basics-of-local-first-data-architecture-jan-12",
