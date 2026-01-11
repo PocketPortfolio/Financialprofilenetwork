@@ -226,7 +226,7 @@ async function processResearchingLeads() {
     console.log(`   Stats: ${throttleStatus.recentStats.delayed}/${throttleStatus.recentStats.total} delayed (${throttleStatus.recentStats.delayedRate.toFixed(1)}%)`);
     await pauseOutreach(throttleStatus.delayMinutes, throttleStatus.reason);
     console.log(`   ⏸️  Pausing outreach for ${throttleStatus.delayMinutes} minutes...`);
-    return; // Exit early - don't process leads while throttled
+    return 0; // Exit early - don't process leads while throttled
   }
   
   // First, clean up any placeholder emails in RESEARCHING status
