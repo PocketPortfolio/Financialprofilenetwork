@@ -701,19 +701,30 @@ export default function LandingPage() {
             background: 'var(--surface)',
             position: 'relative'
           }}>
-            <img 
-              src="/dashboard-demo-4k.gif"
-              alt="Actual footage of Pocket Portfolio running on localhost - Terminal Aesthetic Dashboard"
-              loading="lazy"
+            <video 
+              src={process.env.NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL || "/dashboard-demo-4k.mp4"}
+              autoPlay
+              loop
+              muted
+              playsInline
               style={{
                 width: '100%',
                 height: 'auto',
                 display: 'block',
                 filter: 'drop-shadow(0 0 10px rgba(0, 255, 0, 0.3))',
-                imageRendering: 'auto' as const,
                 objectFit: 'contain'
               }}
-            />
+              onError={(e) => {
+                console.error('Video load error:', e);
+                // Fallback to local MP4 if CDN fails
+                const target = e.target as HTMLVideoElement;
+                if (!target.src.includes('/dashboard-demo-4k.mp4')) {
+                  target.src = '/dashboard-demo-4k.mp4';
+                }
+              }}
+            >
+              Your browser does not support the video tag.
+            </video>
             <div style={{
               position: 'absolute',
               bottom: '12px',
