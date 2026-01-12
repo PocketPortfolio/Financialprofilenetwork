@@ -202,7 +202,7 @@
     "date": "2026-01-12",
     "title": "Optimizing JSON Parsing: From 10s to 10ms",
     "slug": "optimizing-json-parsing-from-10s-to-10ms",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -212,7 +212,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-01-12T09:38:44.084Z"
   },
   {
     "id": "week-2-post-2",
