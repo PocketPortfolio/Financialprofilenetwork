@@ -13,7 +13,9 @@ import CSVImporter from '../components/CSVImporter';
 import { useTrades } from '../hooks/useTrades';
 import { WebOneBadge } from '../components/hero/WebOneBadge';
 import NPMStats from '../components/NPMStats';
+import DynamicDownloadCount from '../components/DynamicDownloadCount';
 import { useStickyHeader } from '../hooks/useStickyHeader';
+import TickerSearch from '../components/TickerSearch';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -537,7 +539,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Hero Section */}
+      {/* Hero Section - INVESTOR FOCUS */}
       <main className="brand-surface brand-grid mobile-container" style={{ 
         width: '100%',
         maxWidth: '100vw',
@@ -559,466 +561,470 @@ export default function LandingPage() {
           alignItems: 'center',
           textAlign: 'center',
           width: '100%',
-          maxWidth: 'min(1000px, 95vw)',
+          maxWidth: 'min(1200px, 95vw)',
           margin: '0 auto clamp(40px, 8vw, 80px) auto',
           padding: 'clamp(20px, 4vw, 32px)',
           boxSizing: 'border-box'
         }}>
-            {/* npm Install Badge - Top of Hero */}
-            <div style={{
-              marginBottom: '32px',
-              width: '100%',
-              maxWidth: '600px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              alignItems: 'center'
-            }}>
-              <a
-                href="https://www.npmjs.com/package/@pocket-portfolio/importer"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-block',
-                  padding: '12px 20px',
-                  background: 'var(--surface)',
-                  border: '2px solid var(--border-warm)',
-                  borderRadius: '8px',
-                  fontFamily: 'monospace',
-                  fontSize: '14px',
-                  color: 'var(--text)',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.1)',
-                  width: '100%',
-                  textAlign: 'center'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-warm)';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.1)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <span style={{ color: 'var(--muted)' }}>$</span> npm install @pocket-portfolio/importer
-              </a>
-              
-              {/* NPM Download Stats */}
-              <NPMStats />
-            </div>
+          {/* Headline - SOVEREIGN VALUE PROP */}
+          <h1 className="brand-text" style={{ 
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
+            fontWeight: 'bold', 
+            lineHeight: '1.1', 
+            marginBottom: '24px',
+            letterSpacing: '-0.03em',
+            maxWidth: '800px'
+          }}>
+            The Sovereign Financial Stack.
+          </h1>
 
-            {/* WebOne Trust Badge */}
-            <WebOneBadge />
-            
-            {/* Google Drive Verified Badge */}
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              background: 'rgba(66, 133, 244, 0.1)',
-              border: '1px solid rgba(66, 133, 244, 0.3)',
-              borderRadius: '20px',
-              fontSize: '14px',
-              fontWeight: '600',
-              color: '#4285F4',
-              marginBottom: '16px'
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#4285F4">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              <span>Google Drive Verified</span>
-            </div>
-
-            <h1 className="brand-text" style={{ 
-              fontSize: 'clamp(2.5rem, 5vw, 3rem)', 
-              fontWeight: 'bold', 
-              lineHeight: '1.1', 
-              marginBottom: '24px',
-              letterSpacing: '-0.02em'
-            }}>
-              Your Portfolio. Your Data.{' '}
-              <span style={{ color: 'var(--accent-warm)' }}>Sovereign.</span>
-            </h1>
-            <p className="brand-text-secondary" style={{ 
-              fontSize: 'clamp(1.125rem, 2vw, 1.25rem)', 
-              lineHeight: '1.6', 
-              marginBottom: '32px',
-              maxWidth: '600px'
-            }}>
-              Free, open-source portfolio tracker with live P/L, real-time prices, and CSV import. No signup required—your data stays local or syncs securely to your Google Drive.
-            </p>
-            
-            {/* CSV Upload Section - Local-First Onboarding */}
-            <div style={{
-              width: '100%',
-              maxWidth: '600px',
-              marginBottom: '24px'
-            }}>
-              <p style={{
-                fontSize: '14px',
-                color: 'var(--text-secondary)',
-                marginBottom: '12px',
-                fontWeight: '500'
-              }}>
-                Drop your Robinhood/Fidelity CSV here to visualize instantly. No login required.
-              </p>
-              <CSVImporter 
-                onImport={async (trades) => {
-                  try {
-                    // Convert CSVImporter trades to useTrades format (remove id, uid, createdAt, updatedAt)
-                    const tradesToImport = trades.map(({ id, ...trade }) => trade);
-                    await importTrades(tradesToImport);
-                    setCsvUploaded(true);
-                    // Redirect to dashboard after successful import
-                    setTimeout(() => {
-                      router.push('/dashboard');
-                    }, 500);
-                  } catch (error) {
-                    console.error('Error importing CSV:', error);
-                    alert('Error importing CSV. Please try again.');
-                  }
-                }}
-              />
-              {csvUploaded && (
-                <div style={{
-                  marginTop: '16px',
-                  padding: '12px',
-                  background: 'var(--accent-warm)',
-                  color: 'white',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}>
-                  ✓ Portfolio imported! Redirecting to dashboard...
-                </div>
-              )}
-            </div>
-
-            {/* Enterprise Upsell Link */}
+          {/* Subhead - AI-FIRST + SOVEREIGN */}
+          <p className="brand-text-secondary" style={{ 
+            fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
+            lineHeight: '1.6', 
+            marginBottom: '40px',
+            maxWidth: '700px',
+            color: 'var(--text-secondary)'
+          }}>
+            Orchestrated by <strong style={{ color: 'var(--accent-warm)' }}>AI</strong>. Owned by <strong style={{ color: 'var(--accent-warm)' }}>You</strong>.
+            <br />
+            <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
+              Local-first portfolio tracking, autonomous research, and encrypted sync.
+            </span>
+          </p>
+          
+          {/* CTAs - INVESTOR FOCUS */}
+          <div style={{ 
+            display: 'flex', 
+            gap: 'clamp(12px, 3vw, 16px)', 
+            marginBottom: '32px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            width: '100%'
+          }}>
             <Link 
-              href="/sponsor" 
+              href="/dashboard" 
+              className="brand-button brand-button-primary" 
               style={{ 
-                fontSize: 'clamp(13px, 2vw, 14px)', 
-                color: 'var(--text-secondary)', 
-                textDecoration: 'none',
-                textAlign: 'center',
-                marginBottom: '16px',
-                display: 'block',
-                transition: 'color 0.2s ease',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--text-warm)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-secondary)';
-              }}
-            >
-              Enterprise Sync available for{' '}
-              <span style={{ 
-                fontWeight: '600', 
-                color: 'var(--accent-warm)',
-                textDecoration: 'underline',
-                textDecorationColor: 'var(--accent-warm)'
-              }}>
-                Corporate Sponsors →
-              </span>
-            </Link>
-
-            <div style={{ 
-              display: 'flex', 
-              gap: 'clamp(8px, 2vw, 12px)', 
-              marginBottom: '24px',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              width: '100%',
-              maxWidth: '100%'
-            }}>
-              <Link href="/dashboard" className="brand-button brand-button-primary" style={{ 
-                padding: 'clamp(14px, 3vw, 16px) clamp(24px, 6vw, 32px)', 
+                padding: 'clamp(16px, 3vw, 20px) clamp(32px, 6vw, 48px)', 
                 background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)', 
                 color: 'white', 
                 textDecoration: 'none', 
                 borderRadius: '12px', 
-                fontSize: 'clamp(14px, 3vw, 16px)', 
+                fontSize: 'clamp(16px, 3vw, 18px)', 
                 fontWeight: '600',
                 transition: 'all 0.2s ease',
                 boxShadow: '0 4px 14px 0 rgba(245, 158, 11, 0.4)',
                 textAlign: 'center',
                 display: 'block',
-                flex: '1 1 auto',
-                minWidth: '200px',
                 border: '2px solid var(--border-warm)'
-              }}>
-                Launch Dashboard
-              </Link>
-              <button 
-                onClick={handleStarGitHub}
-                style={{ 
-                  padding: 'clamp(14px, 3vw, 16px) clamp(24px, 6vw, 32px)', 
-                  background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-                  border: '2px solid var(--border-warm)', 
-                  color: 'var(--text-warm)', 
-                  borderRadius: '12px', 
-                  fontSize: 'clamp(14px, 3vw, 16px)', 
-                  fontWeight: '600', 
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  flex: '1 1 auto',
-                  minWidth: '200px',
-                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.2)'
-                }}
-              >
-                Star on GitHub
-              </button>
-            </div>
-            
-            {/* Product Hunt Badge */}
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 14px rgba(245, 158, 11, 0.4)';
+              }}
+            >
+              Launch Dashboard
+            </Link>
+            <a 
+              href="#sovereign-architecture"
+              className="brand-button" 
+              style={{ 
+                padding: 'clamp(16px, 3vw, 20px) clamp(32px, 6vw, 48px)', 
+                background: 'transparent',
+                border: '2px solid var(--border-warm)', 
+                color: 'var(--text-warm)', 
+                borderRadius: '12px', 
+                fontSize: 'clamp(16px, 3vw, 18px)', 
+                fontWeight: '600',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer',
+                scrollBehavior: 'smooth'
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById('sovereign-architecture');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--warm-bg)';
+                e.currentTarget.style.borderColor = 'var(--accent-warm)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
+              }}
+            >
+              Why Sovereign?
+            </a>
+          </div>
+
+          {/* Quick Command Search Bar - Sitemap Bridge */}
+          <div style={{
+            width: '100%',
+            maxWidth: '600px',
+            marginTop: '32px',
+            marginBottom: '0',
+            position: 'relative',
+            zIndex: 10000
+          }}>
             <div style={{
-              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-              border: '1px solid rgb(224, 224, 224)',
+              background: '#1a1a1a',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
-              padding: '20px',
-              maxWidth: '500px',
-              margin: '0 auto 24px',
-              background: 'rgb(255, 255, 255)',
-              boxShadow: 'rgba(0, 0, 0, 0.05) 0px 2px 8px'
+              padding: '4px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
             }}>
-              <div style={{
+              <TickerSearch
+                placeholder="> Search 58,070 assets (e.g. NVDA, BTC)..."
+                linkToTickerPage={true}
+              />
+            </div>
+          </div>
+
+          {/* Dashboard Screenshot - High Fidelity Visual */}
+          <div style={{
+            width: '100%',
+            maxWidth: '900px',
+            marginTop: '72px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(245, 158, 11, 0.2), 0 0 60px rgba(0, 255, 0, 0.15)',
+            border: '2px solid var(--border-warm)',
+            background: 'var(--surface)',
+            position: 'relative'
+          }}>
+            <img 
+              src="/dashboard-demo-4k.gif"
+              alt="Actual footage of Pocket Portfolio running on localhost - Terminal Aesthetic Dashboard"
+              loading="lazy"
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+                filter: 'drop-shadow(0 0 10px rgba(0, 255, 0, 0.3))',
+                imageRendering: 'auto' as const,
+                objectFit: 'contain'
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              bottom: '12px',
+              right: '12px',
+              background: 'rgba(0, 0, 0, 0.8)',
+              color: '#00ff00',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontFamily: 'monospace',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(0, 255, 0, 0.3)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)'
+            }}>
+              Actual footage of Pocket Portfolio running on localhost
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* SECTION 2: THE BRIDGE - TRUST ANCHOR */}
+      <section style={{
+        width: '100%',
+        padding: 'clamp(40px, 8vw, 80px) clamp(12px, 3vw, 24px)',
+        background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+        borderTop: '1px solid var(--border-warm)',
+        borderBottom: '1px solid var(--border-warm)',
+        marginBottom: 'clamp(60px, 10vw, 120px)'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
+            fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+            fontWeight: 'bold',
+            marginBottom: '32px',
+            color: 'var(--text-warm)',
+            letterSpacing: '-0.02em'
+          }}>
+            TRUSTED BY <span style={{ color: '#10b981' }}><DynamicDownloadCount /></span> ENGINEERS & BUILDERS
+          </h2>
+          
+          {/* Trust Logos Row */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 'clamp(24px, 5vw, 48px)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '24px'
+          }}>
+            {/* Open Source Badge */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 24px',
+              background: 'var(--surface)',
+              border: '2px solid var(--border-warm)',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: 'var(--text-warm)'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent-warm)">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>Open Source</span>
+            </div>
+
+            {/* GitHub Badge */}
+            <a 
+              href="https://github.com/PocketPortfolio/Financialprofilenetwork"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                marginBottom: '12px'
-              }}>
-                <img 
-                  alt="Pocket Portfolio" 
-                  src="https://ph-files.imgix.net/22f9f173-77d7-4560-90cd-8a059d3cc612.svg?auto=format&fit=crop&w=80&h=80" 
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '8px',
-                    objectFit: 'cover',
-                    flexShrink: 0
-                  }}
-                />
-                <div style={{
-                  flex: '1 1 0%',
-                  minWidth: 0
-                }}>
-                  <h3 style={{
-                    margin: 0,
-                    fontSize: '18px',
-                    fontWeight: 600,
-                    color: 'rgb(26, 26, 26)',
-                    lineHeight: 1.3,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    Pocket Portfolio
-                  </h3>
-                  <p style={{
-                    margin: '4px 0px 0px',
-                    fontSize: '14px',
-                    color: 'rgb(102, 102, 102)',
-                    lineHeight: 1.4,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical'
-                  }}>
-                    The Local-First Investment Tracker. Stop paying monthly fees
-                  </p>
-                </div>
-              </div>
-              <a 
-                href="https://www.producthunt.com/products/pocket-portfolio?embed=true&utm_source=embed&utm_medium=post_embed" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  marginTop: '12px',
-                  padding: '8px 16px',
-                  background: 'rgb(255, 97, 84)',
-                  color: 'rgb(255, 255, 255)',
-                  textDecoration: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 600
-                }}
-              >
-                Check it out on Product Hunt →
-              </a>
-            </div>
-            
-            <div style={{ 
-              display: 'flex', 
-              gap: 'clamp(20px, 5vw, 32px)', 
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              width: '100%',
-              maxWidth: '100%'
+                padding: '12px 24px',
+                background: 'var(--surface)',
+                border: '2px solid var(--border-warm)',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'var(--text-warm)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-warm)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text)">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <span>GitHub</span>
+            </a>
+
+            {/* NPM Badge */}
+            <a 
+              href="https://www.npmjs.com/package/@pocket-portfolio/importer"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 24px',
+                background: 'var(--surface)',
+                border: '2px solid var(--border-warm)',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'var(--text-warm)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-warm)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#CB3837">
+                <path d="M0 0h24v24H0V0zm13.3 2v20l8.7-5.1V7.1L13.3 2z"/>
+              </svg>
+              <span>NPM</span>
+            </a>
+
+            {/* Verified Audit Badge */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '12px 24px',
+              background: 'rgba(66, 133, 244, 0.1)',
+              border: '2px solid rgba(66, 133, 244, 0.3)',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: '#4285F4'
             }}>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '10px'
-              }}>
-                <div style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  background: 'var(--accent-warm)', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 6px rgba(245, 158, 11, 0.6)'
-                }}></div>
-                <span style={{ 
-                  fontSize: '15px', 
-                  fontWeight: '500',
-                  color: 'var(--text-warm)',
-                  letterSpacing: '0.02em'
-                }}>Open source</span>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '10px'
-              }}>
-                <div style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  background: 'var(--accent-warm)', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 6px rgba(245, 158, 11, 0.6)'
-                }}></div>
-                <span style={{ 
-                  fontSize: '15px', 
-                  fontWeight: '500',
-                  color: 'var(--text-warm)',
-                  letterSpacing: '0.02em'
-                }}>Local storage</span>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '10px'
-              }}>
-                <div style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  background: 'var(--accent-warm)', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 6px rgba(245, 158, 11, 0.6)'
-                }}></div>
-                <span style={{ 
-                  fontSize: '15px', 
-                  fontWeight: '500',
-                  color: 'var(--text-warm)',
-                  letterSpacing: '0.02em'
-                }}>No signup</span>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '10px'
-              }}>
-                <div style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  background: 'var(--accent-warm)', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 6px rgba(245, 158, 11, 0.6)'
-                }}></div>
-                <span style={{ 
-                  fontSize: '15px', 
-                  fontWeight: '500',
-                  color: 'var(--text-warm)',
-                  letterSpacing: '0.02em'
-                }}>Sovereign Sync</span>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '10px'
-              }}>
-                <div style={{ 
-                  width: '10px', 
-                  height: '10px', 
-                  background: 'var(--accent-warm)', 
-                  borderRadius: '50%',
-                  boxShadow: '0 0 6px rgba(245, 158, 11, 0.6)'
-                }}></div>
-                <span style={{ 
-                  fontSize: '15px', 
-                  fontWeight: '500',
-                  color: 'var(--text-warm)',
-                  letterSpacing: '0.02em'
-                }}>Always ad-free</span>
-              </div>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#4285F4">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <span>Verified Audit</span>
             </div>
-          
-          {/* JSON Data Preview - Replaces Dashboard Preview */}
-          <div className="brand-card brand-candlestick brand-spine mobile-container" style={{ 
-            width: '100%',
-            maxWidth: 'min(600px, 95vw)',
-            margin: '32px auto 0',
-            padding: 'clamp(20px, 4vw, 32px)',
-            boxSizing: 'border-box'
+          </div>
+
+          {/* Social Proof Text */}
+          <p style={{
+            fontSize: 'clamp(14px, 2vw, 16px)',
+            color: 'var(--text-secondary)',
+            marginTop: '24px',
+            maxWidth: '600px',
+            marginLeft: 'auto',
+            marginRight: 'auto'
           }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center', color: 'var(--text-warm)' }}>JSON Data Endpoint Example</h3>
-            <div style={{ 
-              background: 'var(--bg)', 
-              borderRadius: '8px', 
-              padding: '20px', 
-              marginBottom: '16px',
-              border: '2px solid var(--border-warm)',
+            Audited by <DynamicDownloadCount /> Engineers. MIT Licensed. Fork it.
+          </p>
+        </div>
+      </section>
+
+      {/* SECTION 3: THE BIFURCATION - DEVELOPER FOCUS */}
+      <section id="developer" style={{
+        width: '100%',
+        padding: 'clamp(60px, 10vw, 120px) clamp(12px, 3vw, 24px)',
+        background: '#0a0a0a',
+        marginBottom: 'clamp(60px, 10vw, 120px)',
+        borderTop: '1px solid var(--border-warm)',
+        borderBottom: '1px solid var(--border-warm)'
+      }}>
+        <div style={{
+          maxWidth: '1000px',
+          margin: '0 auto',
+          textAlign: 'center'
+        }}>
+          <h2 style={{
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 'bold',
+            marginBottom: '24px',
+            color: '#ffffff',
+            letterSpacing: '-0.02em',
+            fontFamily: 'system-ui, -apple-system, sans-serif'
+          }}>
+            Or... Build Your Own Stack.
+          </h2>
+
+          <p style={{
+            fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+            color: '#a0a0a0',
+            marginBottom: '48px',
+            maxWidth: '700px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            lineHeight: '1.6'
+          }}>
+            The logic is Open Source. The database is yours.
+          </p>
+
+          {/* Terminal Block */}
+          <div style={{
+            background: '#1a1a1a',
+            border: '2px solid #333',
+            borderRadius: '12px',
+            padding: 'clamp(24px, 5vw, 40px)',
+            marginBottom: '32px',
+            textAlign: 'left',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
+          }}>
+            {/* Terminal Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '24px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid #333'
+            }}>
+              <div style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: '#ff5f56'
+              }}></div>
+              <div style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: '#ffbd2e'
+              }}></div>
+              <div style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                background: '#27c93f'
+              }}></div>
+              <span style={{
+                marginLeft: '16px',
+                color: '#666',
+                fontSize: '14px',
+                fontFamily: 'monospace'
+              }}>terminal</span>
+            </div>
+
+            {/* Code Snippet */}
+            <pre style={{
+              margin: 0,
+              fontSize: 'clamp(14px, 2vw, 16px)',
+              fontFamily: '"Fira Code", "Monaco", "Consolas", monospace',
+              color: '#00ff00',
+              lineHeight: '1.8',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
               overflowX: 'auto'
             }}>
-              <pre style={{
-                margin: 0,
-                fontSize: '12px',
-                fontFamily: 'monospace',
-                color: 'var(--text)',
-                lineHeight: '1.6',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word'
-              }}>
-{`GET /s/aapl/json-api
+{`$ npm install @pocket-portfolio/importer
 
-{
-  "symbol": "AAPL",
-  "price": 215.22,
-  "change": "+1.1%",
-  "volume": 45234567,
-  "marketCap": "3.2T",
-  "data": {
-    "realTime": true,
-    "source": "Yahoo Finance",
-    "lastUpdated": "2025-01-XX"
-  }
-}`}
-              </pre>
-            </div>
-            <p style={{
-              fontSize: '12px',
-              color: 'var(--text-secondary)',
-              textAlign: 'center',
-              margin: 0
-            }}>
-              Free JSON endpoints for every ticker. No API key required.
-            </p>
+$ npx pocket-init --sovereign
+
+✓ Database initialized
+✓ Local-first mode enabled
+✓ Ready to import trades`}
+            </pre>
           </div>
-        </div>
 
-        {/* What you get today */}
+          {/* CTA */}
+          <a
+            href="https://github.com/PocketPortfolio/Financialprofilenetwork#readme"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              padding: '16px 32px',
+              background: 'transparent',
+              border: '2px solid #333',
+              color: '#ffffff',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              textDecoration: 'none',
+              transition: 'all 0.2s ease',
+              fontFamily: 'monospace'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-warm)';
+              e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#333';
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            Read the API Docs →
+          </a>
+        </div>
+      </section>
+
+      <main className="brand-surface brand-grid mobile-container">
+        {/* SECTION 4: THE FEATURE GRID (SPLIT) */}
         <section id="features" className="mobile-container" style={{ 
           marginBottom: 'clamp(60px, 10vw, 120px)',
           width: '100%',
@@ -1027,279 +1033,297 @@ export default function LandingPage() {
           boxSizing: 'border-box'
         }}>
           <h2 style={{ 
-            fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
+            fontSize: 'clamp(2rem, 4vw, 2.5rem)', 
             fontWeight: 'bold', 
             textAlign: 'center', 
-            marginBottom: '48px',
+            marginBottom: '16px',
             letterSpacing: '-0.02em'
           }}>
-            What you get today
+            The Product Portal
           </h2>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-            gap: 'clamp(16px, 4vw, 24px)',
-            width: '100%',
-            maxWidth: '100%',
-            margin: '0 auto',
-            boxSizing: 'border-box'
+          <p style={{ 
+            fontSize: 'clamp(1rem, 2vw, 1.125rem)', 
+            textAlign: 'center', 
+            marginBottom: '48px',
+            color: 'var(--text-secondary)',
+            maxWidth: '600px',
+            marginLeft: 'auto',
+            marginRight: 'auto'
           }}>
-            <div className="brand-card brand-candlestick brand-spine" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
+            Three pillars of the Sovereign Financial Stack.
+          </p>
+
+          {/* 3-Column Product Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 'clamp(24px, 5vw, 32px)',
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
+            {/* CARD 1: THE TERMINAL */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+              border: '2px solid var(--border-warm)',
+              borderRadius: '16px',
+              padding: 'clamp(32px, 5vw, 40px)',
               boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
               transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
+            }}
+            >
+              {/* Terminal/Chart Icon */}
+              <div style={{
+                width: '56px',
+                height: '56px',
+                background: 'var(--accent-warm)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px'
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
                   <path d="M3 12L7 8L11 12L15 6L21 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M3 12V20H21V12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="3" cy="12" r="2" fill="white"/>
-                  <circle cx="7" cy="8" r="2" fill="white"/>
-                  <circle cx="11" cy="12" r="2" fill="white"/>
-                  <circle cx="15" cy="6" r="2" fill="white"/>
-                  <circle cx="21" cy="12" r="2" fill="white"/>
                 </svg>
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Live Profit / Loss</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Unrealised P/L at a glance, refreshed with live prices every 30s.
-              </p>
-            </div>
-            
-            <div className="brand-card brand-sparkline brand-spine" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
+              <h3 style={{
+                fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',
+                fontWeight: 'bold',
+                marginBottom: '12px',
+                color: 'var(--text-warm)'
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="8.5" cy="7" r="4" stroke="white" strokeWidth="2"/>
-                  <path d="M20 8V14" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M23 11H17" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Real-time Prices</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Equities, FX, and crypto with resilient multi-source fallbacks.
-              </p>
-            </div>
-            
-            <div className="brand-card brand-candlestick brand-grid" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
+                The Terminal
+              </h3>
+              <p style={{
+                color: 'var(--text-secondary)',
+                lineHeight: '1.6',
+                fontSize: '15px',
+                marginBottom: '24px',
+                flex: '1'
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                  <path d="M12 2v20c5.16-1.26 9-6.45 9-12V7l-9-5z" fill="rgba(255,255,255,0.3)"/>
-                </svg>
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Google Drive Backed</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6', marginBottom: '12px' }}>
-                Turn Google Drive into your personal database. Real-time 2-way sync with version history and audit trails included.
+                Track net worth across 50+ brokers. Autonomous research by Pulitzer AI. 800+ weekly briefs. Human-verified.
               </p>
-              <Link 
-                href="/features/google-drive-sync"
-                style={{ 
-                  color: 'var(--accent-warm)', 
-                  fontWeight: '600', 
+              <Link
+                href="/dashboard"
+                style={{
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+                  color: 'white',
                   textDecoration: 'none',
-                  fontSize: '14px',
-                  display: 'inline-block',
-                  marginTop: '8px',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  transition: 'all 0.2s ease',
+                  border: '2px solid var(--border-warm)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                Launch App
+              </Link>
+            </div>
+
+            {/* CARD 2: SOVEREIGN SYNC */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+              border: '2px solid var(--border-warm)',
+              borderRadius: '16px',
+              padding: 'clamp(32px, 5vw, 40px)',
+              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
+            }}
+            >
+              {/* Cloud/Lock Icon (Google Drive styled) */}
+              <div style={{
+                width: '56px',
+                height: '56px',
+                background: 'rgba(66, 133, 244, 0.1)',
+                border: '2px solid rgba(66, 133, 244, 0.3)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px'
+              }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#4285F4">
+                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                  <path d="M12 2v20c5.16-1.26 9-6.45 9-12V7l-9-5z" fill="rgba(66, 133, 244, 0.3)"/>
+                </svg>
+              </div>
+              <h3 style={{
+                fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',
+                fontWeight: 'bold',
+                marginBottom: '12px',
+                color: 'var(--text-warm)'
+              }}>
+                Sovereign Storage
+              </h3>
+              <p style={{
+                color: 'var(--text-secondary)',
+                lineHeight: '1.6',
+                fontSize: '15px',
+                marginBottom: '24px',
+                flex: '1'
+              }}>
+                Encrypted sync to your Google Drive. Standard JSON/CSV formats. No vendor lock-in. Total data portability.
+              </p>
+              <Link
+                href="/features/google-drive-sync"
+                style={{
+                  padding: '12px 24px',
+                  background: 'transparent',
+                  border: '2px solid var(--border-warm)',
+                  color: 'var(--text-warm)',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  textAlign: 'center',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.textDecoration = 'underline';
-                  e.currentTarget.style.transform = 'translateX(4px)';
+                  e.currentTarget.style.background = 'var(--warm-bg)';
+                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.textDecoration = 'none';
-                  e.currentTarget.style.transform = 'translateX(0)';
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'var(--border-warm)';
                 }}
               >
-                Learn How It Works →
+                Connect Storage
               </Link>
             </div>
-            
-            <div className="brand-card brand-candlestick brand-sparkline" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
+
+            {/* CARD 3: THE VANGUARD */}
+            <div style={{
+              background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
+              border: '2px solid #333',
+              borderRadius: '16px',
+              padding: 'clamp(32px, 5vw, 40px)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.7)';
+              e.currentTarget.style.borderColor = 'var(--accent-warm)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.5)';
+              e.currentTarget.style.borderColor = '#333';
+            }}
+            >
+              {/* Premium Badge Effect */}
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                right: '0',
+                width: '100px',
+                height: '100px',
+                background: 'radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%)',
+                borderRadius: '0 16px 0 100%'
+              }}></div>
+              
+              {/* Shield/Badge Icon */}
+              <div style={{
+                width: '56px',
+                height: '56px',
+                background: 'rgba(245, 158, 11, 0.2)',
+                border: '2px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px',
+                position: 'relative',
+                zIndex: 1
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#f59e0b">
                   <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
                 </svg>
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Mock Trades</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Paper-invest without committing capital. Test ideas, learn safely, and keep mock positions separate from realised P/L.
+              <h3 style={{
+                fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',
+                fontWeight: 'bold',
+                marginBottom: '12px',
+                color: '#ffffff',
+                position: 'relative',
+                zIndex: 1
+              }}>
+                Founders & Sponsors
+              </h3>
+              <p style={{
+                color: '#a0a0a0',
+                lineHeight: '1.6',
+                fontSize: '15px',
+                marginBottom: '24px',
+                flex: '1',
+                position: 'relative',
+                zIndex: 1
+              }}>
+                Back the protocol. Direct access to the Command Team. Shape the roadmap.
               </p>
+              <Link
+                href="/sponsor"
+                style={{
+                  padding: '12px 24px',
+                  background: 'transparent',
+                  border: '2px solid rgba(245, 158, 11, 0.4)',
+                  color: '#f59e0b',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                  zIndex: 1
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+                }}
+              >
+                Request Access
+              </Link>
             </div>
-            
-            <div className="brand-card brand-grid brand-spine" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                  <path d="M14 2v6h6"/>
-                  <path d="M16 13H8"/>
-                  <path d="M16 17H8"/>
-                  <path d="M10 9H8"/>
-                </svg>
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>CSV Import</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Broker-agnostic parsing. Add historical trades fast.
-              </p>
-            </div>
-            
-            <div className="brand-card brand-grid brand-spine" style={{ 
-              background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-              border: '2px solid var(--border-warm)', 
-              borderRadius: '12px', 
-              padding: '24px', 
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-              transition: 'transform 0.2s, box-shadow 0.2s'
-            }}>
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Per-asset Breakdown</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6' }}>
-                Multi-series portfolio timeline and pie allocation (mock trades excluded).
-              </p>
-            </div>
-            
-            <Link 
-              href="/features/google-drive-sync"
-              className="brand-card brand-sparkline brand-candlestick"
-              style={{ 
-                background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)', 
-                border: '2px solid var(--border-warm)', 
-                borderRadius: '12px', 
-                padding: '24px', 
-                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                cursor: 'pointer',
-                textDecoration: 'none',
-                display: 'block'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
-              }}
-            >
-              <div style={{ 
-                width: '48px', 
-                height: '48px', 
-                background: 'var(--accent-warm)', 
-                borderRadius: '8px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                marginBottom: '16px' 
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                  <path d="M12 2v20c5.16-1.26 9-6.45 9-12V7l-9-5z" fill="rgba(255,255,255,0.3)"/>
-                </svg>
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: 'var(--text-warm)' }}>Sovereign Sync</h3>
-              <p style={{ color: 'var(--text)', lineHeight: '1.6', marginBottom: '12px' }}>
-                Own your data. Sync bidirectionally with <strong>Google Drive</strong>. Edit directly in Drive, view in app. Zero vendor lock-in.
-              </p>
-              <span style={{ 
-                color: 'var(--accent-warm)', 
-                fontWeight: '600', 
-                fontSize: '14px',
-                display: 'inline-block',
-                marginTop: '8px'
-              }}>
-                Learn More →
-              </span>
-            </Link>
           </div>
         </section>
 
@@ -1810,6 +1834,133 @@ export default function LandingPage() {
             <li style={{ marginBottom: '8px' }}>• Good-first-issue labels</li>
             <li style={{ marginBottom: '8px' }}>• Code of Conduct & governance</li>
           </ul>
+        </section>
+
+        {/* SECTION: SOVEREIGN ARCHITECTURE */}
+        <section id="sovereign-architecture" style={{
+          width: '100%',
+          padding: 'clamp(60px, 10vw, 120px) clamp(12px, 3vw, 24px)',
+          background: 'var(--surface)',
+          marginBottom: 'clamp(60px, 10vw, 120px)',
+          scrollMarginTop: '80px'
+        }}>
+          <div style={{
+            maxWidth: '1000px',
+            margin: '0 auto',
+            textAlign: 'center'
+          }}>
+            <h2 style={{
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 'bold',
+              marginBottom: '16px',
+              color: 'var(--text-warm)',
+              letterSpacing: '-0.02em'
+            }}>
+              Why Sovereign?
+              <span style={{
+                fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+                fontWeight: 'normal',
+                color: 'var(--text-secondary)',
+                display: 'block',
+                marginTop: '8px'
+              }}>
+                (Powered by Local-First Architecture)
+              </span>
+            </h2>
+            <p style={{
+              fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+              color: 'var(--text-secondary)',
+              marginBottom: '48px',
+              maxWidth: '700px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              lineHeight: '1.6'
+            }}>
+              Your financial data never leaves your device. Zero tracking pixels. Zero cloud latency. 100% Client-Side Encryption.
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '24px',
+              marginTop: '48px',
+              textAlign: 'left'
+            }}>
+              <div style={{
+                padding: '24px',
+                background: 'var(--warm-bg)',
+                borderRadius: '12px',
+                border: '2px solid var(--border-warm)'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  marginBottom: '12px',
+                  color: 'var(--text-warm)'
+                }}>
+                  Zero Tracking
+                </h3>
+                <p style={{
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.6',
+                  fontSize: '15px'
+                }}>
+                  No analytics pixels. No data collection. Your portfolio data stays on your device.
+                </p>
+              </div>
+              <div style={{
+                padding: '24px',
+                background: 'var(--warm-bg)',
+                borderRadius: '12px',
+                border: '2px solid var(--border-warm)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                minHeight: '140px'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  marginBottom: '12px',
+                  color: 'var(--text-warm)',
+                  alignSelf: 'flex-start'
+                }}>
+                  Client-Side Encryption
+                </h3>
+                <p style={{
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.6',
+                  fontSize: '15px',
+                  margin: 0,
+                  alignSelf: 'flex-start'
+                }}>
+                  All encryption happens in your browser. We never see your data, even if you sync to Google Drive.
+                </p>
+              </div>
+              <div style={{
+                padding: '24px',
+                background: 'var(--warm-bg)',
+                borderRadius: '12px',
+                border: '2px solid var(--border-warm)'
+              }}>
+                <h3 style={{
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  marginBottom: '12px',
+                  color: 'var(--text-warm)'
+                }}>
+                  No Cloud Latency
+                </h3>
+                <p style={{
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.6',
+                  fontSize: '15px'
+                }}>
+                  Everything runs locally. Instant load times. Works offline. Your data, your control.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* FAQ Section */}

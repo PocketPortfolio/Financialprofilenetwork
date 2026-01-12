@@ -149,7 +149,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && query) {
       if (linkToTickerPage) {
-        window.location.href = `/s/${query.toUpperCase().toLowerCase()}`;
+        window.location.href = `/s/${query.toUpperCase()}`;
       } else if (onTickerSelect) {
         onTickerSelect(query.toUpperCase());
       }
