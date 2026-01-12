@@ -128,7 +128,7 @@
     "scheduledTime": "14:00",
     "title": "The Absolute Basics of Local-First Data Architecture",
     "slug": "the-absolute-basics-of-local-first-data-architecture",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -136,7 +136,8 @@
       "absolute",
       "basics",
       "local"
-    ]
+    ],
+    "publishedAt": "2026-01-12T14:17:22.768Z"
   },
   {
     "id": "how-to-how-to-mock-api-responses-for-faster-testing-jan-13",
