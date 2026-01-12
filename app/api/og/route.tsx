@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const title = searchParams.get('title') || 'Pocket Portfolio';
     const description = searchParams.get('description') || 'Track your investments with real-time portfolio analytics';
 
-    return new ImageResponse(
+    const imageResponse = new ImageResponse(
       (
         <div
           style={{
@@ -77,11 +77,22 @@ export async function GET(request: NextRequest) {
         height: 630,
       }
     );
+
+    // Return with explicit headers for Facebook and other social media crawlers
+    return new Response(imageResponse.body, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'X-Content-Type-Options': 'nosniff',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   } catch (error: any) {
     console.error('Error generating OG image:', error);
     // Return a fallback image instead of error to ensure social platforms always get an image
     try {
-      return new ImageResponse(
+      const fallbackImage = new ImageResponse(
         (
           <div
             style={{
@@ -119,6 +130,16 @@ export async function GET(request: NextRequest) {
           height: 630,
         }
       );
+
+      return new Response(fallbackImage.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=31536000, immutable',
+          'X-Content-Type-Options': 'nosniff',
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     } catch (fallbackError) {
       console.error('Fallback image generation also failed:', fallbackError);
       return new Response('Failed to generate image', { 
