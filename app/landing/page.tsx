@@ -716,67 +716,13 @@ export default function LandingPage() {
                 objectFit: 'contain',
                 imageRendering: 'auto' as const
               }}
-              onLoadStart={(e) => {
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:730',message:'Video load started',data:{src:(e.target as HTMLVideoElement).src,networkState:(e.target as HTMLVideoElement).networkState,readyState:(e.target as HTMLVideoElement).readyState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-              }}
-              onLoadedMetadata={(e) => {
-                const video = e.target as HTMLVideoElement;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:738',message:'Video metadata loaded',data:{src:video.src,videoWidth:video.videoWidth,videoHeight:video.videoHeight,duration:video.duration,readyState:video.readyState,networkState:video.networkState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-              }}
-              onLoadedData={(e) => {
-                const video = e.target as HTMLVideoElement;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:745',message:'Video first frame loaded',data:{src:video.src,readyState:video.readyState,networkState:video.networkState,currentTime:video.currentTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-              }}
-              onCanPlay={(e) => {
-                const video = e.target as HTMLVideoElement;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:752',message:'Video can play',data:{src:video.src,readyState:video.readyState,networkState:video.networkState,buffered:video.buffered.length>0?{start:video.buffered.start(0),end:video.buffered.end(0)}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-              }}
-              onWaiting={(e) => {
-                const video = e.target as HTMLVideoElement;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:759',message:'Video waiting/buffering',data:{src:video.src,readyState:video.readyState,networkState:video.networkState,currentTime:video.currentTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
-              }}
-              onStalled={(e) => {
-                const video = e.target as HTMLVideoElement;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:766',message:'Video stalled',data:{src:video.src,readyState:video.readyState,networkState:video.networkState,currentTime:video.currentTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
-              }}
               onError={(e) => {
                 const video = e.target as HTMLVideoElement;
                 const error = video.error;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:773',message:'Video error',data:{src:video.src,errorCode:error?.code,errorMessage:error?.message,readyState:video.readyState,networkState:video.networkState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
                 console.error('Video load error:', e, error);
                 // Fallback to local MP4 if CDN fails
                 if (!video.src.includes('/dashboard-demo-4k.mp4')) {
-                  // #region agent log
-                  fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:780',message:'Falling back to local MP4',data:{oldSrc:video.src,newSrc:'/dashboard-demo-4k.mp4'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                  // #endregion
                   video.src = '/dashboard-demo-4k.mp4';
-                }
-              }}
-              onPlay={(e) => {
-                const video = e.target as HTMLVideoElement;
-                // #region agent log
-                fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:787',message:'Video playing',data:{src:video.src,readyState:video.readyState,networkState:video.networkState,currentTime:video.currentTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
-              }}
-              ref={(videoEl) => {
-                if (videoEl) {
-                  // #region agent log
-                  fetch('http://127.0.0.1:43110/ingest/5643ce9e-ac86-4c6f-a0ea-7d95e0b47ee4',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/landing/page.tsx:794',message:'Video element ref mounted',data:{src:videoEl.src,canPlayTypeH264:videoEl.canPlayType('video/mp4; codecs="avc1.42E01E"'),canPlayTypeH264High:videoEl.canPlayType('video/mp4; codecs="avc1.640028"'),readyState:videoEl.readyState,networkState:videoEl.networkState},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                  // #endregion
                 }
               }}
             >
