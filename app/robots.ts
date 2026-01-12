@@ -3,6 +3,13 @@ import { MetadataRoute } from 'next';
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
+      // Explicitly allow /api/og for all crawlers (social media platforms need this)
+      // This must come before the general /api/ disallow rule
+      {
+        userAgent: '*',
+        allow: ['/api/og'],
+        disallow: [],
+      },
       {
         userAgent: '*',
         allow: '/',
