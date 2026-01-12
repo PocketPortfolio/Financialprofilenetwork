@@ -41,7 +41,7 @@ function JoinWaitlistContent() {
           'financial technology'
         ]}
         canonical="https://www.pocketportfolio.app/join"
-        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=2"
+        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3"
         ogType="website"
       />
       

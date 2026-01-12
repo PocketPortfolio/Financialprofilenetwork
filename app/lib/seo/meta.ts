@@ -8,7 +8,7 @@ export const siteConfig = {
   title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
   description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
   url: 'https://www.pocketportfolio.app',
-  ogImage: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=2',
+  ogImage: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3',
   twitter: '@PocketPortApp',
   keywords: [
     'portfolio tracker',

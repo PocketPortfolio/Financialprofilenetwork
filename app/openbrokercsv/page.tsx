@@ -37,7 +37,7 @@ export default function OpenBrokerCSVPage() {
           name: 'OpenBrokerCSV',
           description: 'Open-source CSV format specification for standardizing trading data across brokerage platforms',
           url: 'https://www.pocketportfolio.app/openbrokercsv',
-          image: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=2',
+          image: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3',
           offers: {
             price: '0',
             priceCurrency: 'USD',

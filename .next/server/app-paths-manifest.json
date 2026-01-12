@@ -1,7 +1,3 @@
 {
-  "/landing/page": "app/landing/page.js",
-  "/blog/page": "app/blog/page.js",
-  "/page": "app/page.js",
-  "/openbrokercsv/page": "app/openbrokercsv/page.js",
-  "/s/[symbol]/page": "app/s/[symbol]/page.js"
+  "/page": "app/page.js"
 }
