@@ -100,7 +100,7 @@ export default function EtoroConverterPage() {
             "name": "eToro CSV to OpenBrokerCSV Converter",
             "description": "Free tool to convert eToro CSV exports to OpenBrokerCSV format for portfolio tracking.",
             "url": "https://www.pocketportfolio.app/static/csv-etoro-to-openbrokercsv",
-            "image": "https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123",
+            "image": "https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=2",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Web",
             "offers": {

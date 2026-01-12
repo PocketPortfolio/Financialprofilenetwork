@@ -36,7 +36,7 @@ export const metadata: Metadata = brandEnabled
           siteName: 'Pocket Portfolio',
           images: [
             {
-              url: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123',
+              url: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=2',
               width: 1200,
               height: 630,
               alt: 'Pocket Portfolio app preview',
@@ -49,7 +49,7 @@ export const metadata: Metadata = brandEnabled
           card: 'summary_large_image',
           title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
           description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
-          images: ['https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&t=20250123'],
+          images: ['https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=2'],
         },
     };
 

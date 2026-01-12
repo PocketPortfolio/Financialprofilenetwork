@@ -3,6 +3,15 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
 
+  // Allow OG image route to be accessed by social media crawlers with CORS
+  if (request.nextUrl.pathname === '/api/og') {
+    const response = NextResponse.next();
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    return response;
+  }
+
   // Handle sitemap files: Set proper cache headers (Googlebot-friendly)
   // Skip CSP and security headers, but add Cache-Control for sitemaps
   if (
