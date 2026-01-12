@@ -24,11 +24,15 @@ try {
   // -crf 18: High quality (lower = better, 18 is visually lossless)
   // -pix_fmt yuv420p: Maximum compatibility
   // -movflags +faststart: Enables streaming (starts playing while downloading)
-  // -vf "fps=20": Match original GIF frame rate
+  // -profile:v high: Use High profile for better quality
+  // -level 4.2: H.264 level for 4K support
+  // -vf "scale=3840:-1:flags=lanczos+accurate_rnd+full_chroma_int": Better scaling with accurate rounding
+  // -r 30: Preserve original frame rate (30fps) instead of converting to 20fps
+  // -g 30: Keyframe interval matching frame rate for smooth playback
   // -an: No audio (silent loop)
   
   execSync(
-    `ffmpeg -y -i "${inputSource}" -vf "fps=20,scale=3840:-1:flags=lanczos" -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -movflags +faststart -an "${outputMp4}"`,
+    `ffmpeg -y -i "${inputSource}" -vf "scale=3840:-1:flags=lanczos+accurate_rnd+full_chroma_int" -c:v libx264 -preset slow -crf 18 -profile:v high -level 4.2 -pix_fmt yuv420p -r 30 -g 30 -movflags +faststart -an "${outputMp4}"`,
     { stdio: 'inherit' }
   );
   
