@@ -18,8 +18,8 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
     // Simulate loading stats (in production, fetch from API)
     // For now, use placeholder values
     setStats({
-      totalUsers: 1250, // Placeholder - would come from API
-      totalPortfolios: 890, // Placeholder
+      totalUsers: 2000, // Placeholder - would come from API
+      totalPortfolios: 1000, // Placeholder
       recentActivity: [
         { action: 'New portfolio created', timestamp: new Date(Date.now() - 5 * 60000) },
         { action: 'Trades imported', timestamp: new Date(Date.now() - 15 * 60000) },
@@ -50,7 +50,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
           <span style={{ fontSize: '18px' }}>📊</span>
           <span>
             <strong style={{ color: 'var(--text)', fontWeight: '600' }}>
-              {stats.totalPortfolios.toLocaleString()}
+              {stats.totalPortfolios.toLocaleString()}+
             </strong> portfolios
           </span>
         </div>
@@ -108,7 +108,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             color: 'var(--signal)', 
             marginBottom: '4px' 
           }}>
-            {stats.totalPortfolios.toLocaleString()}
+            {stats.totalPortfolios.toLocaleString()}+
           </div>
           <div style={{ 
             fontSize: 'var(--font-size-xs)', 
