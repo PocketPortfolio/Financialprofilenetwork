@@ -250,12 +250,17 @@ async function sourceLeadsAutonomous() {
     researchData: lead.researchData as any,
   })));
   
-  // WAR MODE: Unlimited sourcing (Directive 011)
-  const MIN_LEADS_PER_DAY = 20;
-  const MAX_LEADS_PER_DAY = 10000; // Effectively unlimited (was 200)
+  // v3.0: SCALE MODE - Always target 10K/day minimum for pipeline building
+  // Workflow runs every 2 hours = 12 runs/day
+  // Per-run target: 10,000 / 12 = ~833 leads/run
+  const WORKFLOW_RUNS_PER_DAY = 12; // Every 2 hours
+  const TARGET_LEADS_PER_DAY = 10000; // Always target 10K minimum
+  const TARGET_LEADS_PER_RUN = Math.ceil(TARGET_LEADS_PER_DAY / WORKFLOW_RUNS_PER_DAY); // ~833/run
+  
+  // Use Scale Mode target (10K) if revenue-driven target is too low
   const DYNAMIC_TARGET = Math.max(
-    MIN_LEADS_PER_DAY,
-    Math.min(MAX_LEADS_PER_DAY, revenueDecisions.requiredLeadVolume)
+    TARGET_LEADS_PER_DAY, // Always target 10K minimum (Scale Mode)
+    revenueDecisions.requiredLeadVolume
   );
   
   console.log(`📊 Revenue-Driven Sourcing:`);
@@ -263,62 +268,65 @@ async function sourceLeadsAutonomous() {
   console.log(`   Projected Revenue: £${revenueDecisions.projectedRevenue.toLocaleString()}`);
   console.log(`   Revenue Gap: £${revenueDecisions.revenueGap.toLocaleString()}`);
   console.log(`   Action: ${revenueDecisions.adjustment.action.toUpperCase()}`);
-  console.log(`   Target: ${DYNAMIC_TARGET} qualified leads/day (Revenue-driven)`);
-  console.log(`   Reason: ${revenueDecisions.adjustment.reason}`);
+  console.log(`   Revenue-Driven Target: ${revenueDecisions.requiredLeadVolume} leads/day`);
+  console.log(`   🚀 SCALE MODE: Using ${DYNAMIC_TARGET} leads/day target (${TARGET_LEADS_PER_RUN} leads/run)`);
+  console.log(`   Workflow Frequency: ${WORKFLOW_RUNS_PER_DAY} runs/day (every 2 hours)`);
   console.log('');
 
   let created = 0;
   let skipped = 0;
   let rejected = 0;
-  // WAR MODE: Scale rounds dynamically based on target (Directive 011 - 10K/day)
-  // For 10K target: ~10 rounds needed (1000 leads/round with 3 channels)
-  const MAX_ROUNDS = Math.max(5, Math.ceil(DYNAMIC_TARGET / 1000)); // Scale with target, min 5
+  // v3.0: Calculate rounds based on per-run target, not daily target
+  // For 833 leads/run: Need ~2-3 rounds (4 active channels × ~200 leads/round)
+  const LEADS_PER_ROUND_TARGET = 400; // Target 400 leads per round (4 active channels)
+  const MAX_ROUNDS = Math.max(3, Math.ceil(TARGET_LEADS_PER_RUN / LEADS_PER_ROUND_TARGET)); // Scale with per-run target
   const ROUND_DELAY_MS = 2000; // 2 second delay between rounds
 
-  console.log(`🔄 Sourcing Strategy: ${MAX_ROUNDS} rounds max, target: ${DYNAMIC_TARGET} leads/day`);
+  console.log(`🔄 Sourcing Strategy: ${MAX_ROUNDS} rounds max, target: ${TARGET_LEADS_PER_RUN} leads/run (${DYNAMIC_TARGET} leads/day)`);
 
-  // v2.1: Retry logic - Keep sourcing until target is met or max rounds reached
-  for (let round = 1; round <= MAX_ROUNDS && created < DYNAMIC_TARGET; round++) {
+  // v3.0: Retry logic - Keep sourcing until per-run target is met or max rounds reached
+  // Focus on ACTIVE channels only: GitHub, HN, Product Hunt, Reddit
+  for (let round = 1; round <= MAX_ROUNDS && created < TARGET_LEADS_PER_RUN; round++) {
     if (round > 1) {
-      console.log(`\n🔄 Round ${round}/${MAX_ROUNDS}: Continuing to source leads (${created}/${DYNAMIC_TARGET} created)...`);
+      console.log(`\n🔄 Round ${round}/${MAX_ROUNDS}: Continuing to source leads (${created}/${TARGET_LEADS_PER_RUN} created)...`);
       await new Promise(resolve => setTimeout(resolve, ROUND_DELAY_MS));
     }
 
     const allCandidates: LeadCandidate[] = [];
-    const remainingNeeded = DYNAMIC_TARGET - created;
+    const remainingNeeded = TARGET_LEADS_PER_RUN - created;
     
-    // Source from multiple channels
-    // WAR MODE: Remove 300 cap, scale with target (Directive 011 - 10K/day)
-    // Request 3x needed to account for rejections/deduplication, but scale up to 10K
-    const targetToRequest = Math.min(remainingNeeded * 3, Math.max(300, DYNAMIC_TARGET / MAX_ROUNDS));
+    // v3.0: Calculate per-channel target based on active channels
+    // 4 active channels: GitHub, HN, Product Hunt, Reddit
+    // Request 3x needed to account for rejections/deduplication
+    const targetPerChannel = Math.ceil((remainingNeeded * 3) / 4); // Divide by 4 active channels
+    const targetToRequest = Math.max(100, targetPerChannel); // Minimum 100 per channel
     
-    console.log(`📡 Round ${round}: Sourcing up to ${targetToRequest} candidates...`);
+    console.log(`📡 Round ${round}: Sourcing up to ${targetToRequest} candidates per channel (4 active channels)...`);
     
-    // WAR MODE: Multi-channel sourcing for 10K/day capacity
-    const [githubLeads, ycLeads, hiringLeads, crunchbaseLeads, producthuntLeads, redditLeads, twitterLeads] = await Promise.all([
-      sourceFromGitHub(targetToRequest), // Channel 1: GitHub
-      sourceFromYC(targetToRequest), // Channel 2: YC
-      sourceFromHiringPosts(targetToRequest), // Channel 3: HN
-      sourceFromCrunchbaseWrapper(targetToRequest), // Channel 4: Crunchbase
-      sourceFromProductHuntWrapper(targetToRequest), // Channel 5: Product Hunt
-      sourceFromRedditWrapper(targetToRequest), // Channel 6: Reddit
-      sourceFromTwitterWrapper(targetToRequest), // Channel 7: Twitter
+    // v3.0: ACTIVE CHANNELS ONLY - Focus on proven channels
+    // Active: GitHub, HN, Product Hunt, Reddit
+    // Inactive: YC (network issues), Crunchbase (API key needed), Twitter (API key needed)
+    const [githubLeads, hiringLeads, producthuntLeads, redditLeads] = await Promise.all([
+      sourceFromGitHub(targetToRequest), // Channel 1: GitHub ✅ ACTIVE
+      sourceFromHiringPosts(targetToRequest), // Channel 2: HN ✅ ACTIVE
+      sourceFromProductHuntWrapper(targetToRequest), // Channel 3: Product Hunt ✅ ACTIVE
+      sourceFromRedditWrapper(targetToRequest), // Channel 4: Reddit ✅ ACTIVE
     ]);
     
     allCandidates.push(
       ...githubLeads, 
-      ...ycLeads, 
       ...hiringLeads,
-      ...crunchbaseLeads,
       ...producthuntLeads,
-      ...redditLeads,
-      ...twitterLeads
+      ...redditLeads
     );
+    
+    console.log(`   ✅ Active Channels: GitHub (${githubLeads.length}), HN (${hiringLeads.length}), Product Hunt (${producthuntLeads.length}), Reddit (${redditLeads.length})`);
     
     // Sprint 4: Lookalike Seeding (if we have good leads and still need more)
     if (allCandidates.length < remainingNeeded) {
       console.log(`🔍 Generating lookalike leads from high-scoring existing leads...`);
-      const lookalikeLeads = await generateLookalikeLeads(70, remainingNeeded - allCandidates.length);
+      const lookalikeNeeded = Math.min(remainingNeeded - allCandidates.length, 200); // Cap at 200 lookalikes per round
+      const lookalikeLeads = await generateLookalikeLeads(70, lookalikeNeeded);
       const lookalikeCandidates: LeadCandidate[] = lookalikeLeads.map(lead => ({
         email: lead.email,
         companyName: lead.companyName,
@@ -329,7 +337,7 @@ async function sourceLeadsAutonomous() {
       console.log(`✅ Generated ${lookalikeCandidates.length} lookalike leads`);
     }
     
-    console.log(`📊 Round ${round}: Found ${allCandidates.length} total candidates`);
+    console.log(`📊 Round ${round}: Found ${allCandidates.length} total candidates from active channels`);
     
     // Qualify leads
     const qualified = allCandidates.filter(qualifyLead);
@@ -376,7 +384,7 @@ async function sourceLeadsAutonomous() {
         });
         
         created++;
-        console.log(`✅ Created lead: ${candidate.email} at ${candidate.companyName} (${created}/${DYNAMIC_TARGET})`);
+        console.log(`✅ Created lead: ${candidate.email} at ${candidate.companyName} (${created}/${TARGET_LEADS_PER_RUN} per run)`);
       } catch (error: any) {
         console.error(`❌ Failed to create lead ${candidate.email}:`, error.message);
         rejected++;
@@ -384,30 +392,34 @@ async function sourceLeadsAutonomous() {
     }
 
     // If we didn't get enough, try another round with expanded search
-    if (created < DYNAMIC_TARGET && round < MAX_ROUNDS) {
-      console.log(`⚠️  Round ${round}: Only ${created}/${DYNAMIC_TARGET} leads created. Continuing to next round...`);
+    if (created < TARGET_LEADS_PER_RUN && round < MAX_ROUNDS) {
+      console.log(`⚠️  Round ${round}: Only ${created}/${TARGET_LEADS_PER_RUN} leads created. Continuing to next round...`);
     }
   }
   
   console.log('');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`📊 Final Summary:`);
+  console.log(`📊 Final Summary (This Run):`);
   console.log(`   Created: ${created} new leads`);
   console.log(`   Skipped: ${skipped} duplicates`);
   console.log(`   Rejected: ${rejected} invalid emails`);
-  console.log(`   Target: ${DYNAMIC_TARGET} leads/day (Revenue-driven)`);
-  console.log(`   Progress: ${created}/${DYNAMIC_TARGET} (${Math.round((created / DYNAMIC_TARGET) * 100)}%)`);
+  console.log(`   Per-Run Target: ${TARGET_LEADS_PER_RUN} leads/run`);
+  console.log(`   Daily Target: ${DYNAMIC_TARGET} leads/day`);
+  console.log(`   Progress: ${created}/${TARGET_LEADS_PER_RUN} (${Math.round((created / TARGET_LEADS_PER_RUN) * 100)}%)`);
+  console.log(`   Projected Daily: ${created * WORKFLOW_RUNS_PER_DAY} leads/day (${created} × ${WORKFLOW_RUNS_PER_DAY} runs)`);
   console.log('');
   
   if (rejected > 0) {
     console.log(`⚠️  Note: ${rejected} leads rejected due to invalid emails`);
   }
   
-  if (created >= DYNAMIC_TARGET) {
-    console.log('✅ Target met!');
+  if (created >= TARGET_LEADS_PER_RUN) {
+    console.log(`✅ Per-run target met! (${created}/${TARGET_LEADS_PER_RUN})`);
+    console.log(`   Projected daily: ${created * WORKFLOW_RUNS_PER_DAY} leads/day`);
   } else if (created > 0) {
-    console.log(`⚠️  Partial success: ${created}/${DYNAMIC_TARGET} leads created`);
-    console.log('   System will retry in next scheduled run');
+    console.log(`⚠️  Partial success: ${created}/${TARGET_LEADS_PER_RUN} leads created this run`);
+    console.log(`   Projected daily: ${created * WORKFLOW_RUNS_PER_DAY} leads/day`);
+    console.log('   System will retry in next scheduled run (every 2 hours)');
   } else {
     console.log(`❌ No leads created. Check sourcing channels and GitHub token.`);
   }

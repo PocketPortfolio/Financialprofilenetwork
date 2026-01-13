@@ -14,9 +14,14 @@ const BASE_LEADS_PER_DAY = 50;
 const MAX_LEADS_PER_DAY = 10000; // WAR MODE: Unlimited (was 200) - Directive 011
 const MIN_LEADS_PER_DAY = 20; // Minimum to maintain pipeline
 
+// SCALE MODE: Override conservative revenue calculations when we need to build pipeline
+const SCALE_MODE_THRESHOLD = 1000; // If revenue-driven target < 1000, use scale mode
+const SCALE_MODE_TARGET = 10000; // Always source 10K when in scale mode
+
 /**
  * Calculate required lead volume based on revenue gap
  * UPDATED: Uses REAL products, prioritizes Corporate Sponsors
+ * v3.0: Added Scale Mode override for aggressive pipeline building
  */
 export function calculateRequiredLeadVolume(
   currentRevenue: number,
@@ -50,12 +55,19 @@ export function calculateRequiredLeadVolume(
   const leadsNeededPerDay = Math.ceil(revenueNeededPerDay / revenuePerLead);
   
   // Clamp to safety limits
-  const adjustedVolume = Math.max(
+  const revenueDrivenTarget = Math.max(
     MIN_LEADS_PER_DAY,
     Math.min(MAX_LEADS_PER_DAY, leadsNeededPerDay)
   );
   
-  return adjustedVolume;
+  // SCALE MODE: If revenue-driven target is too low, use aggressive scaling
+  // This ensures we build pipeline even when revenue calculations suggest lower targets
+  if (revenueDrivenTarget < SCALE_MODE_THRESHOLD) {
+    console.log(`🚀 SCALE MODE ACTIVATED: Revenue target (${revenueDrivenTarget}) too low, using scale mode (${SCALE_MODE_TARGET}/day)`);
+    return SCALE_MODE_TARGET;
+  }
+  
+  return revenueDrivenTarget;
 }
 
 /**

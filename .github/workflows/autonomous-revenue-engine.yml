@@ -2,8 +2,9 @@ name: Autonomous Revenue Engine
 
 on:
   schedule:
-    # WAR MODE: Every 4 hours - Lead Sourcing (Directive 011)
-    - cron: '0 */4 * * *'
+    # v3.0: SCALE MODE - Every 2 hours - Lead Sourcing (12 runs/day = 10K capacity)
+    # Changed from every 4 hours to every 2 hours for 10K/day target
+    - cron: '0 */2 * * *'
     # Every 2 hours - Lead Enrichment & Email Generation
     - cron: '0 */2 * * *'
     # Every hour - Process inbound emails and generate replies
