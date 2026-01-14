@@ -70,18 +70,28 @@ async function fetchTickerData(symbol: string) {
       return null;
     }
     
-    // Fetch from API during ISR revalidation
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app';
+    // Use Vercel's internal URL during ISR revalidation for better reliability
+    // VERCEL_URL is automatically set by Vercel during server-side rendering
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app');
+    
     const response = await fetch(`${baseUrl}/api/tickers/${symbol}/json?range=max`, {
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 3600 }, // Cache for 1 hour
+      headers: {
+        'Accept': 'application/json',
+      }
     });
     
     if (response.ok) {
       const data = await response.json();
       return data;
+    } else {
+      console.error(`[JSON-API] Failed to fetch ticker data for ${symbol}: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
-    // Silently fail - will use fallback content
+    console.error(`[JSON-API] Error fetching ticker data for ${symbol}:`, error);
+    // Will use fallback content
   }
   return null;
 }
@@ -96,17 +106,26 @@ async function fetchQuoteData(symbol: string) {
       return null;
     }
     
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app';
+    // Use Vercel's internal URL during ISR revalidation for better reliability
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app');
+    
     const response = await fetch(`${baseUrl}/api/quote?symbols=${symbol}`, {
-      next: { revalidate: 300 } // Cache for 5 minutes
+      next: { revalidate: 300 }, // Cache for 5 minutes
+      headers: {
+        'Accept': 'application/json',
+      }
     });
     
     if (response.ok) {
       const data = await response.json();
       return Array.isArray(data) ? data[0] : data;
+    } else {
+      console.error(`[JSON-API] Failed to fetch quote data for ${symbol}: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
-    // Silently fail
+    console.error(`[JSON-API] Error fetching quote data for ${symbol}:`, error);
   }
   return null;
 }
