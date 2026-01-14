@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface TickerThickContentProps {
   symbol: string;
   name: string;
-  price: number | null;
-  changePercent: number | null;
+  price?: number | null;
+  changePercent?: number | null;
   peRatio?: number;
   assetType: 'CRYPTO' | 'STOCK' | 'ETF';
 }
@@ -14,12 +14,36 @@ interface TickerThickContentProps {
 export default function TickerThickContent({ 
   symbol, 
   name, 
-  price, 
-  changePercent, 
+  price: initialPrice, 
+  changePercent: initialChangePercent, 
   peRatio, 
   assetType 
 }: TickerThickContentProps) {
   const [copied, setCopied] = useState(false);
+  const [price, setPrice] = useState<number | null>(initialPrice ?? null);
+  const [changePercent, setChangePercent] = useState<number | null>(initialChangePercent ?? null);
+
+  // Fetch data client-side if not provided
+  useEffect(() => {
+    if (price === null || changePercent === null) {
+      const fetchQuote = async () => {
+        try {
+          const response = await fetch(`/api/quote?symbols=${symbol}`);
+          if (response.ok) {
+            const data = await response.json();
+            const quote = Array.isArray(data) ? data[0] : data;
+            if (quote) {
+              setPrice(quote.price ?? null);
+              setChangePercent(quote.changePct ?? null);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching quote for TickerThickContent:', error);
+        }
+      };
+      fetchQuote();
+    }
+  }, [symbol, price, changePercent]);
 
   // Skip rendering if no price data
   if (price === null || changePercent === null) {

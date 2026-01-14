@@ -180,24 +180,23 @@ export default function TickerPageContent({
           </div>
 
           {/* 🚨 THICK CONTENT LAYERS: Pulitzer, Monetization, Developer */}
-          {initialQuoteData && initialQuoteData.price !== null && initialQuoteData.changePct !== null && (
-            <TickerThickContent
-              symbol={normalizedSymbol}
-              name={metadata?.name || `${normalizedSymbol} Inc.`}
-              price={initialQuoteData.price}
-              changePercent={initialQuoteData.changePct}
-              peRatio={metadata?.peRatio}
-              assetType={
-                normalizedSymbol.includes('USD') || 
-                normalizedSymbol.includes('BTC') || 
-                normalizedSymbol.includes('ETH') ||
-                metadata?.exchange?.toLowerCase().includes('crypto') ||
-                metadata?.sector?.toLowerCase() === 'cryptocurrency'
-                  ? 'CRYPTO' 
-                  : 'STOCK'
-              }
-            />
-          )}
+          {/* Always render - component will fetch data client-side if needed */}
+          <TickerThickContent
+            symbol={normalizedSymbol}
+            name={metadata?.name || `${normalizedSymbol} Inc.`}
+            price={initialQuoteData?.price ?? null}
+            changePercent={initialQuoteData?.changePct ?? null}
+            peRatio={metadata?.peRatio}
+            assetType={
+              normalizedSymbol.includes('USD') || 
+              normalizedSymbol.includes('BTC') || 
+              normalizedSymbol.includes('ETH') ||
+              metadata?.exchange?.toLowerCase().includes('crypto') ||
+              metadata?.sector?.toLowerCase() === 'cryptocurrency'
+                ? 'CRYPTO' 
+                : 'STOCK'
+            }
+          />
 
           {/* JSON Data Section - Above the fold for developers */}
           {metadata && (
