@@ -145,7 +145,7 @@
     "scheduledTime": "14:00",
     "title": "How to Mock API Responses for Faster Testing",
     "slug": "how-to-mock-api-responses-for-faster-testing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -154,7 +154,8 @@
       "ses",
       "mock",
       "responses"
-    ]
+    ],
+    "publishedAt": "2026-01-13T14:18:14.930Z"
   },
   {
     "id": "how-to-stopping-the-crawlers-how-to-block-gptbot-in-2026-jan-14",
