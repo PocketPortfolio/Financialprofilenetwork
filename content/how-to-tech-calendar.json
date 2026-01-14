@@ -163,14 +163,15 @@
     "scheduledTime": "14:00",
     "title": "Stopping the Crawlers: How to Block GPTBot in 2026",
     "slug": "stopping-the-crawlers-how-to-block-gptbot-in-2026",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "stopping",
       "crawlers",
       "block"
-    ]
+    ],
+    "publishedAt": "2026-01-14T14:18:46.898Z"
   },
   {
     "id": "how-to-json-vs-csv-when-to-use-which-for-financial-data-jan-15",
