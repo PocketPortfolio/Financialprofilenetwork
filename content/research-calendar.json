@@ -97,7 +97,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -105,7 +105,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-14T18:22:11.973Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
@@ -5731,7 +5732,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -5739,7 +5740,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-14T18:22:11.973Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
@@ -11365,7 +11367,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -11373,7 +11375,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-14T18:22:11.973Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
@@ -16999,7 +17002,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -17007,7 +17010,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-14T18:22:11.973Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
@@ -22633,7 +22637,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -22641,7 +22645,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-14T18:22:11.973Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
@@ -28267,7 +28272,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -28275,7 +28280,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-14T18:22:11.973Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
