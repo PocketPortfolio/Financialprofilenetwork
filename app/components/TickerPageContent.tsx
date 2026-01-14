@@ -3,6 +3,7 @@ import StructuredData from './StructuredData';
 import SocialShare from './viral/SocialShare';
 import TickerJsonData from './TickerJsonData';
 import TickerStockInfo from './TickerStockInfo';
+import TickerThickContent from './TickerThickContent';
 
 interface TickerPageContentProps {
   normalizedSymbol: string;
@@ -177,6 +178,26 @@ export default function TickerPageContent({
               Check it out on Product Hunt →
             </a>
           </div>
+
+          {/* 🚨 THICK CONTENT LAYERS: Pulitzer, Monetization, Developer */}
+          {initialQuoteData && initialQuoteData.price !== null && initialQuoteData.changePct !== null && (
+            <TickerThickContent
+              symbol={normalizedSymbol}
+              name={metadata?.name || `${normalizedSymbol} Inc.`}
+              price={initialQuoteData.price}
+              changePercent={initialQuoteData.changePct}
+              peRatio={metadata?.peRatio}
+              assetType={
+                normalizedSymbol.includes('USD') || 
+                normalizedSymbol.includes('BTC') || 
+                normalizedSymbol.includes('ETH') ||
+                metadata?.exchange?.toLowerCase().includes('crypto') ||
+                metadata?.sector?.toLowerCase() === 'cryptocurrency'
+                  ? 'CRYPTO' 
+                  : 'STOCK'
+              }
+            />
+          )}
 
           {/* JSON Data Section - Above the fold for developers */}
           {metadata && (
