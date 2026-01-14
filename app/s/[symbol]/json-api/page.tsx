@@ -9,6 +9,7 @@ import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 import { getDatasetSchema } from '@/app/lib/seo/schema';
 import { getDatasetStats } from '@/app/lib/utils/dataset';
 import JsonApiNpmSnippet from '@/app/components/JsonApiNpmSnippet';
+import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import Link from 'next/link';
 
 
@@ -153,14 +154,8 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
     metadata?.exchange
   );
   
-  // Prepare live preview data
-  const previewData = {
-    symbol: normalizedSymbol,
-    timestamp: new Date().toISOString(),
-    price: quoteData?.price || null,
-    change_24h: quoteData?.changePct || null,
-    history_sample: tickerData?.data?.slice(0, 2) || []
-  };
+  // Prepare initial data for client-side component
+  // Client component will fetch live data if server data is unavailable
 
   if (!metadata) {
     return (
@@ -293,53 +288,13 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           }}>
             {/* LEFT COL: Live Preview & NPM Hook */}
             <div>
-
-              {/* 💻 LIVE PREVIEW (The Trust Signal) */}
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.5)',
-                border: '1px solid var(--border)',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                marginBottom: '24px'
-              }}>
-                <div style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  padding: '12px 16px',
-                  borderBottom: '1px solid var(--border)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                  <code style={{
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    color: 'var(--text-secondary)'
-                  }}>
-                    GET /api/tickers/{normalizedSymbol}/json
-                  </code>
-                  <span style={{
-                    fontSize: '12px',
-                    fontFamily: 'monospace',
-                    color: '#34d399'
-                  }}>
-                    ● 200 OK (Live)
-                  </span>
-                </div>
-                <div style={{
-                  padding: '16px',
-                  overflowX: 'auto'
-                }}>
-                  <pre style={{
-                    fontFamily: 'monospace',
-                    fontSize: '12px',
-                    color: 'var(--text)',
-                    margin: 0,
-                    lineHeight: '1.6'
-                  }}>
-                    {JSON.stringify(previewData, null, 2)}
-                  </pre>
-                </div>
-              </div>
+              {/* 💻 LIVE PREVIEW (The Trust Signal) - Client-side component fetches live data */}
+              <JsonApiLivePreview
+                symbol={normalizedSymbol}
+                initialPrice={quoteData?.price ?? null}
+                initialChangePct={quoteData?.changePct ?? null}
+                initialHistorySample={tickerData?.data?.slice(0, 2) ?? []}
+              />
 
               {/* ⚡ VIRAL HOOK (The NPM Snippet) */}
               <JsonApiNpmSnippet symbol={normalizedSymbol} />
