@@ -168,7 +168,7 @@ export default function TickerThickContent({
           
           <a
             href={assetType === 'CRYPTO' 
-              ? 'https://shop.ledger.com/pages/hardware-wallets?r=pocket-portfolio'
+              ? 'https://shop.ledger.com/?r=pocket-portfolio'
               : '/sponsor?utm_source=ticker_page&utm_medium=sovereign_cta'}
             target={assetType === 'CRYPTO' ? '_blank' : undefined}
             rel={assetType === 'CRYPTO' ? 'noopener noreferrer' : undefined}
