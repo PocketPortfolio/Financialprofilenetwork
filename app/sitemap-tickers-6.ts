@@ -7,6 +7,8 @@
 
 import { MetadataRoute } from 'next';
 import { getAllTickers } from './lib/pseo/data';
+import { detectAssetType } from './lib/portfolio/sectorClassification';
+import { AssetType } from './lib/portfolio/sectorClassification';
 
 export default async function sitemapTickers6(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.pocketportfolio.app';
@@ -43,6 +45,9 @@ export default async function sitemapTickers6(): Promise<MetadataRoute.Sitemap> 
       if (ticker && typeof ticker === 'string') {
         const tickerLower = ticker.toLowerCase().replace(/-/g, '');
         
+        const assetType = detectAssetType(ticker.toUpperCase());
+        const hasInsiderData = assetType === AssetType.STOCK || assetType === AssetType.REIT;
+        
         // Main ticker page
         const mainUrl = `${baseUrl}/s/${tickerLower}`;
         if (!seenUrls.has(mainUrl)) {
@@ -77,16 +82,18 @@ export default async function sitemapTickers6(): Promise<MetadataRoute.Sitemap> 
           });
           seenUrls.add(dividendUrl);
         }
-        
-        const insiderUrl = `${baseUrl}/s/${tickerLower}/insider-trading`;
-        if (!seenUrls.has(insiderUrl)) {
-          tickerPages.push({
-            url: insiderUrl,
-            lastModified: now,
-            changeFrequency: 'weekly' as const,
-            priority: 0.7,
-          });
-          seenUrls.add(insiderUrl);
+        // Insider trading (ONLY for stocks/REITs)
+        if (hasInsiderData) {
+          const insiderUrl = `${baseUrl}/s/${tickerLower}/insider-trading`;
+          if (!seenUrls.has(insiderUrl)) {
+            tickerPages.push({
+              url: insiderUrl,
+              lastModified: now,
+              changeFrequency: 'weekly' as const,
+              priority: 0.7,
+            });
+            seenUrls.add(insiderUrl);
+          }
         }
       }
     });
