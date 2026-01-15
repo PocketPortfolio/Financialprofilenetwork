@@ -6,7 +6,6 @@ import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
-import LandingFooter from '../../components/marketing/LandingFooter';
 import SEOHead from '../../components/SEOHead';
 import Link from 'next/link';
 import React from 'react';
@@ -548,7 +547,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </Link>
         </div>
       </article>
-      <LandingFooter />
     </>
   );
 }

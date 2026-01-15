@@ -67,23 +67,27 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
       background: 'var(--surface)',
       border: '1px solid var(--border)',
       borderRadius: '12px',
-      padding: '24px'
+      padding: '32px 28px'
     }}>
       <h3 style={{ 
         fontSize: 'var(--font-size-lg)', 
         fontWeight: '600', 
-        marginBottom: '16px',
+        marginBottom: '20px',
         color: 'var(--text)'
       }}>
         Join the Community
       </h3>
       <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-        gap: '16px', 
-        marginBottom: '20px' 
+        display: 'flex', 
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'flex-start',
+        gap: '40px', 
+        marginBottom: '24px',
+        flexWrap: 'nowrap',
+        padding: '0'
       }}>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', flex: '1' }}>
           <div style={{ 
             fontSize: 'var(--font-size-2xl)', 
             fontWeight: 'bold', 
@@ -101,7 +105,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             Active Users
           </div>
         </div>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', flex: '1' }}>
           <div style={{ 
             fontSize: 'var(--font-size-2xl)', 
             fontWeight: 'bold', 
@@ -119,7 +123,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             Portfolios
           </div>
         </div>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', flex: '1' }}>
           <div style={{ 
             fontSize: 'var(--font-size-2xl)', 
             fontWeight: 'bold', 

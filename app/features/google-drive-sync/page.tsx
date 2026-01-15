@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import SEOHead from '../../components/SEOHead';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
-import LandingFooter from '../../components/marketing/LandingFooter';
 
 export default function GoogleDriveSyncFeaturePage() {
   return (
@@ -403,9 +402,6 @@ export default function GoogleDriveSyncFeaturePage() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <LandingFooter />
     </>
   );
 }

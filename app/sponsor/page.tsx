@@ -4,7 +4,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
-import LandingFooter from '../components/marketing/LandingFooter';
 import SponsorModal from '../components/SponsorModal';
 import AlertModal from '../components/modals/AlertModal';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
@@ -206,15 +205,30 @@ export default function SponsorPage() {
         .founders-club-counter {
           animation: pulse-red 2s ease-in-out infinite;
         }
+        .sponsor-cards-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        @media (max-width: 1200px) {
+          .sponsor-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 768px) {
+          .sponsor-cards-grid {
+            grid-template-columns: 1fr;
+          }
+        }
       `}</style>
       <ProductionNavbar />
       <div style={{
         minHeight: '100vh',
         background: 'var(--bg)',
-        padding: '60px 20px',
-        maxWidth: '1000px',
+        padding: '60px clamp(12px, 3vw, 24px)',
+        maxWidth: 'min(1400px, 95vw)',
         margin: '0 auto',
-        color: 'var(--text)'
+        color: 'var(--text)',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
       <div style={{ textAlign: 'center', marginBottom: '48px' }}>
         <h1 style={{
@@ -310,10 +324,11 @@ export default function SponsorPage() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gridTemplateColumns: 'repeat(4, 1fr)',
         gap: '24px',
         marginBottom: '48px'
-      }}>
+      }}
+      className="sponsor-cards-grid">
         {/* Code Supporter - $5/month */}
         <div style={{
           background: 'var(--surface)',
@@ -746,7 +761,6 @@ export default function SponsorPage() {
         </div>
       </div>
     </div>
-    <LandingFooter />
     
     {/* Floating Preview Banner */}
     {previewTheme && (

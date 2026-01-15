@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { trackBlogPostClick, trackBlogPlatformView } from '../lib/analytics/events';
 import { featuredArticles, type Article } from '../lib/blog/articles';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
-import ToolFooter from '../components/marketing/ToolFooter';
 import SEOPageTracker from '../components/SEOPageTracker';
 
 interface GeneratedPost {
@@ -701,7 +700,6 @@ export default function BlogPage() {
           </a>
         </div>
       </div>
-      <ToolFooter />
     </div>
     </>
   );

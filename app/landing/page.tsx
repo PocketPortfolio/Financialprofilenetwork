@@ -25,6 +25,7 @@ export default function LandingPage() {
   const [showHamburger, setShowHamburger] = useState(false);
   const [csvUploaded, setCsvUploaded] = useState(false);
 
+
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 768;
@@ -2186,389 +2187,65 @@ $ npx pocket-init --sovereign
 
       {/* Social Proof Section */}
       <section style={{ 
-        marginBottom: '80px', 
-        padding: '40px 24px',
-        maxWidth: '1200px',
-        margin: '0 auto 80px'
+        marginTop: 'clamp(40px, 6vw, 80px)',
+        marginBottom: 'clamp(40px, 6vw, 80px)', 
+        width: '100%',
+        maxWidth: '100vw',
+        padding: '0 clamp(12px, 3vw, 24px)',
+        boxSizing: 'border-box'
       }}>
-        <SocialProof variant="full" />
+        <div style={{
+          maxWidth: 'min(1200px, 95vw)',
+          margin: '0 auto'
+        }}>
+          <SocialProof variant="full" />
+        </div>
       </section>
 
       {/* Share Section */}
-      <section className="brand-card brand-spine" style={{ 
-        marginBottom: '80px', 
-        padding: '40px 24px',
-        textAlign: 'center',
-        maxWidth: '800px',
-        margin: '0 auto 80px',
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        borderRadius: '12px'
-      }}>
-        <h2 style={{ 
-          fontSize: 'var(--font-size-xl)', 
-          fontWeight: 'bold', 
-          marginBottom: '16px',
-          color: 'var(--text)'
-        }}>
-          Share Pocket Portfolio
-        </h2>
-        <p style={{ 
-          fontSize: 'var(--font-size-base)', 
-          color: 'var(--text-secondary)', 
-          marginBottom: '24px',
-          lineHeight: 'var(--line-snug)'
-        }}>
-          Help others discover free, open-source portfolio tracking
-        </p>
-        <SocialShare
-          title="Pocket Portfolio - Free, Open-Source Portfolio Tracker"
-          description="Track your investments with a free, privacy-first portfolio tracker. No signup required. Open source."
-          url="https://www.pocketportfolio.app"
-          context="landing_page"
-          showLabel={true}
-          hashtags={['PocketPortfolio', 'PortfolioTracker', 'OpenSource', 'FreeFinance']}
-        />
-      </section>
-
-      {/* Footer */}
-      <footer style={{ 
-        marginTop: 'clamp(40px, 8vw, 80px)', 
-        paddingTop: 'clamp(20px, 4vw, 32px)', 
-        borderTop: '1px solid var(--border)', 
-        textAlign: 'center', 
-        background: 'var(--bg)',
-        padding: 'clamp(20px, 4vw, 32px) clamp(12px, 3vw, 24px)',
+      <section style={{ 
+        marginTop: 'clamp(40px, 6vw, 80px)',
+        marginBottom: 'clamp(40px, 6vw, 80px)', 
         width: '100%',
         maxWidth: '100vw',
+        padding: '0 clamp(12px, 3vw, 24px)',
         boxSizing: 'border-box'
       }}>
-        <div style={{ 
-          maxWidth: '1200px', 
+        <div className="brand-card brand-spine" style={{ 
+          textAlign: 'center',
+          maxWidth: 'min(1200px, 95vw)',
           margin: '0 auto',
-          width: '100%',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '24px'
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '12px',
+          padding: '32px 28px'
         }}>
-          {/* Brand & Legal */}
-          <div style={{ textAlign: 'center' }}>
-            <span className="brand-wordmark brand-wordmark-small">Pocket Portfolio<span className="brand-wordmark-dot">.</span></span>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '8px 0 0 0' }}>© 2025 Open Source. Local-First.</p>
-          </div>
-
-          {/* The Money Links (Bolded) */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            fontWeight: '600'
+          <h2 style={{ 
+            fontSize: 'var(--font-size-xl)', 
+            fontWeight: 'bold', 
+            marginBottom: '16px',
+            color: 'var(--text)'
           }}>
-            <Link href="/for/advisors" style={{ 
-              color: '#D97706',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#B45309'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#D97706'}
-            >
-              For Advisors
-            </Link>
-            <Link href="/features/google-drive-sync" style={{ 
-              color: 'var(--text)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-            >
-              Google Drive Sync
-            </Link>
-            <Link href="/tools/google-sheets-formula" style={{ 
-              color: 'var(--text)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-            >
-              Google Sheets
-            </Link>
-            <Link href="/sponsor" style={{ 
-              color: 'var(--text)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-            >
-              Founders Club
-            </Link>
-          </div>
-
-          {/* Tool Links */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            marginBottom: '16px', 
-            flexWrap: 'wrap' 
+            Share Pocket Portfolio
+          </h2>
+          <p style={{ 
+            fontSize: 'var(--font-size-base)', 
+            color: 'var(--text-secondary)', 
+            marginBottom: '24px',
+            lineHeight: 'var(--line-snug)'
           }}>
-            <Link href="/openbrokercsv" style={{ 
-              padding: '12px 24px', 
-              border: '1px solid var(--border)', 
-              borderRadius: '8px', 
-              color: 'var(--text)', 
-              textDecoration: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D97706';
-              e.currentTarget.style.color = '#D97706';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.color = '#1a1a1a';
-            }}
-            >
-              OpenBrokerCSV
-            </Link>
-            <Link href="/static/portfolio-tracker" style={{ 
-              padding: '12px 24px', 
-              border: '1px solid var(--border)', 
-              borderRadius: '8px', 
-              color: 'var(--text)', 
-              textDecoration: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D97706';
-              e.currentTarget.style.color = '#D97706';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.color = '#1a1a1a';
-            }}
-            >
-              Portfolio Tracker
-            </Link>
-            <Link href="/static/csv-etoro-to-openbrokercsv" style={{ 
-              padding: '12px 24px', 
-              border: '1px solid var(--border)', 
-              borderRadius: '8px', 
-              color: 'var(--text)', 
-              textDecoration: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D97706';
-              e.currentTarget.style.color = '#D97706';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.color = '#1a1a1a';
-            }}
-            >
-              eToro → OpenBrokerCSV
-            </Link>
-          </div>
-
-          {/* The Trust Links */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            color: 'var(--text-secondary)'
-          }}>
-            <Link href="/live" style={{ 
-              color: 'var(--text-secondary)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Browse Stocks
-            </Link>
-            <a 
-              href="https://github.com/PocketPortfolio/Financialprofilenetwork" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              GitHub
-            </a>
-          </div>
-
-          {/* Community Links */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            color: 'var(--text-secondary)'
-          }}>
-            <Link 
-              href="/blog" 
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Blog & News
-            </Link>
-            <a 
-              href="https://x.com/P0cketP0rtf0li0" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-              aria-label="Follow us on X for Daily Research"
-            >
-              <svg 
-                viewBox="0 0 24 24" 
-                aria-hidden="true" 
-                style={{ width: '16px', height: '16px', fill: 'currentColor' }}
-              >
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              <span>Daily Research @ 18:00</span>
-            </a>
-            <a 
-              href="https://dev.to/pocketportfolioapp" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Dev.to
-            </a>
-            <a 
-              href="https://coderlegion.com/5738/welcome-to-coderlegion-22s" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              CoderLegion
-            </a>
-            <a 
-              href="https://discord.gg/Ch9PpjRzwe" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Discord
-            </a>
-            <a 
-              href="https://www.linkedin.com/company/pocket-portfolio-community" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              LinkedIn
-            </a>
-            <a 
-              href="https://www.webone.one" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              1EO Certified
-            </a>
-            <Link 
-              href="/dashboard" 
-              style={{ 
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-            >
-              Launch App
-            </Link>
-          </div>
-
-          {/* Disclaimer */}
-          <div style={{ 
-            marginTop: '16px',
-            padding: '12px 16px',
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            borderRadius: '8px',
-            maxWidth: '800px',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-          }}>
-            <p style={{ 
-              color: 'var(--text-secondary)',
-              fontSize: '12px',
-              margin: 0,
-              lineHeight: '1.5'
-            }}>
-              <strong>⚠️ Disclaimer:</strong> Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
-            </p>
-          </div>
+            Help others discover free, open-source portfolio tracking
+          </p>
+          <SocialShare
+            title="Pocket Portfolio - Free, Open-Source Portfolio Tracker"
+            description="Track your investments with a free, privacy-first portfolio tracker. No signup required. Open source."
+            url="https://www.pocketportfolio.app"
+            context="landing_page"
+            showLabel={true}
+            hashtags={['PocketPortfolio', 'PortfolioTracker', 'OpenSource', 'FreeFinance']}
+          />
         </div>
-      </footer>
+      </section>
     </>
   );
 }

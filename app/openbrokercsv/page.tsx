@@ -6,7 +6,6 @@ import Logo from '../components/Logo';
 import SEOHead from '../components/SEOHead';
 import StructuredData from '../components/StructuredData';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
-import ToolFooter from '../components/marketing/ToolFooter';
 import SEOPageTracker from '../components/SEOPageTracker';
 
 export default function OpenBrokerCSVPage() {
@@ -165,8 +164,6 @@ export default function OpenBrokerCSVPage() {
           </div>
         </div>
       </main>
-
-      <ToolFooter />
       </div>
     </>
   );

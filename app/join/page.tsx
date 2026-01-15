@@ -4,7 +4,6 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
-import ToolFooter from '../components/marketing/ToolFooter';
 import WaitlistForm from '../components/waitlist/WaitlistForm';
 import SEOHead from '../components/SEOHead';
 import StructuredData, { webAppData } from '../components/StructuredData';
@@ -155,8 +154,6 @@ function JoinWaitlistContent() {
             </div>
           </div>
         </main>
-
-        <ToolFooter />
       </div>
     </>
   );

@@ -1,5 +1,4 @@
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
-import ToolFooter from '@/app/components/marketing/ToolFooter';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
 
 export default function SymbolLayout({
@@ -34,7 +33,6 @@ export default function SymbolLayout({
       >
         {children}
       </main>
-      <ToolFooter />
     </div>
   );
 }

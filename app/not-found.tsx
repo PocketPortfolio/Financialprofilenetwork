@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import ProductionNavbar from './components/marketing/ProductionNavbar';
-import LandingFooter from './components/marketing/LandingFooter';
 
 export default function NotFound() {
   const pathname = usePathname();
@@ -55,7 +54,6 @@ export default function NotFound() {
           Go Home
         </Link>
       </div>
-      <LandingFooter />
     </>
   );
 }

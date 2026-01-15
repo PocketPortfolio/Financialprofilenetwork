@@ -13,6 +13,7 @@ import TabBar from './components/nav/TabBar';
 import LandingPageTracker from './components/LandingPageTracker';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
+import GlobalFooter from './components/layout/GlobalFooter';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -165,12 +166,15 @@ export default function RootLayout({
           <ErrorBoundary scope="app-root">
             <PremiumThemeProvider />
             <LandingPageTracker />
-            <div className="safe-area-all">
+            <div className="safe-area-all" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
               <ErrorBoundary scope="main-content">
                 {children}
               </ErrorBoundary>
               <ErrorBoundary scope="tab-bar">
                 <TabBar />
+              </ErrorBoundary>
+              <ErrorBoundary scope="global-footer">
+                <GlobalFooter />
               </ErrorBoundary>
             </div>
           </ErrorBoundary>

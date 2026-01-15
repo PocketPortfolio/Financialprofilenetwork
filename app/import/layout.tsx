@@ -1,5 +1,4 @@
 import MobileHeader from '@/app/components/nav/MobileHeader';
-import ToolFooter from '@/app/components/marketing/ToolFooter';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
 
 export default function ImportLayout({
@@ -35,7 +34,6 @@ export default function ImportLayout({
       >
         {children}
       </main>
-      <ToolFooter />
     </div>
   );
 }
