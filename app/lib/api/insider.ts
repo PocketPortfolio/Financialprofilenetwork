@@ -30,7 +30,7 @@ export interface InsiderData {
 
 export async function getInsiderData(symbol: string): Promise<InsiderData> {
   try {
-    // Skip during build time (ISR will handle it)
+    // Skip during build time - fetch will happen during ISR revalidation
     const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
                         process.env.NEXT_PHASE === 'phase-development-build';
     
@@ -38,7 +38,7 @@ export async function getInsiderData(symbol: string): Promise<InsiderData> {
       return { 
         valid: false, 
         transactions: [],
-        reason: 'Data will be fetched during ISR revalidation'
+        reason: 'Data will be fetched on first request'
       };
     }
 

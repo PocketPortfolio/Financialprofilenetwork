@@ -539,5 +539,6 @@ export default async function InsiderTradingPage({ params }: { params: Promise<{
   );
 }
 
-// ISR configuration - 7 day revalidation
-export const revalidate = 604800;
+// ISR configuration - 1 hour revalidation (insider data changes frequently)
+// Using 0 to force revalidation on every request until cache is stable
+export const revalidate = 0; // Force dynamic rendering for now
