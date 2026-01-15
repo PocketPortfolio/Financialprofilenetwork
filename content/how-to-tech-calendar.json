@@ -179,14 +179,15 @@
     "scheduledTime": "14:00",
     "title": "JSON vs. CSV: When to Use Which for Financial Data",
     "slug": "json-vs-csv-when-to-use-which-for-financial-data",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "json",
       "csv",
       "when"
-    ]
+    ],
+    "publishedAt": "2026-01-15T14:16:58.211Z"
   },
   {
     "id": "how-to-how-to-rotate-api-keys-without-breaking-production-jan-16",
