@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getAllTickers } from '@/app/lib/pseo/data';
 import { detectAssetType, AssetType } from '@/app/lib/portfolio/sectorClassification';
-import Link from 'next/link';
+import CryptoDirectoryClient from './CryptoDirectoryClient';
 
 export const metadata: Metadata = {
   title: 'Browse All Cryptocurrencies | Pocket Portfolio',
@@ -18,49 +18,10 @@ export default function CryptoDirectoryPage() {
     <div style={{ 
       maxWidth: '1200px', 
       margin: '0 auto', 
-      padding: '32px 16px',
+      padding: 'clamp(32px, 6vw, 64px) clamp(16px, 4vw, 32px)',
       minHeight: '60vh'
     }}>
-      <h1 style={{ 
-        fontSize: '32px', 
-        fontWeight: '700', 
-        marginBottom: '8px',
-        color: 'var(--text)'
-      }}>
-        Browse Cryptocurrencies
-      </h1>
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        marginBottom: '32px',
-        fontSize: '16px'
-      }}>
-        {cryptos.length.toLocaleString()} cryptocurrencies available.
-      </p>
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-        gap: '16px' 
-      }}>
-        {cryptos.map(ticker => (
-          <Link
-            key={ticker}
-            href={`/s/${ticker.toLowerCase()}`}
-            style={{
-              padding: '16px',
-              border: '1px solid var(--border)',
-              borderRadius: '8px',
-              color: 'var(--text)',
-              textDecoration: 'none',
-              fontSize: '16px',
-              fontWeight: '500',
-              display: 'block',
-            }}
-          >
-            {ticker.toUpperCase()}
-          </Link>
-        ))}
-      </div>
+      <CryptoDirectoryClient cryptos={cryptos} />
     </div>
   );
 }
