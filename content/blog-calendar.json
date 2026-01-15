@@ -220,7 +220,7 @@
     "date": "2026-01-15",
     "title": "The Roadmap to Data Sovereignty: What's Next",
     "slug": "the-roadmap-to-data-sovereignty-what-s-next",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -230,7 +230,8 @@
       "roadmap"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-01-15T09:35:28.617Z"
   },
   {
     "id": "week-3-post-1",
