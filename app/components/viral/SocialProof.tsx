@@ -67,29 +67,29 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
       background: 'var(--surface)',
       border: '1px solid var(--border)',
       borderRadius: '12px',
-      padding: '32px 28px'
+      padding: 'clamp(20px, 4vw, 32px) clamp(16px, 3vw, 28px)',
+      width: '100%',
+      boxSizing: 'border-box'
     }}>
       <h3 style={{ 
-        fontSize: 'var(--font-size-lg)', 
+        fontSize: 'clamp(18px, 3vw, var(--font-size-lg))', 
         fontWeight: '600', 
-        marginBottom: '20px',
+        marginBottom: 'clamp(16px, 3vw, 20px)',
         color: 'var(--text)'
       }}>
         Join the Community
       </h3>
       <div style={{ 
-        display: 'flex', 
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'flex-start',
-        gap: '40px', 
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: 'clamp(16px, 4vw, 40px)', 
         marginBottom: '24px',
-        flexWrap: 'nowrap',
-        padding: '0'
+        padding: '0',
+        width: '100%'
       }}>
-        <div style={{ textAlign: 'center', flex: '1' }}>
+        <div style={{ textAlign: 'center', flex: '1', minWidth: 0 }}>
           <div style={{ 
-            fontSize: 'var(--font-size-2xl)', 
+            fontSize: 'clamp(24px, 5vw, var(--font-size-2xl))', 
             fontWeight: 'bold', 
             color: 'var(--signal)', 
             marginBottom: '4px' 
@@ -97,7 +97,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             {stats.totalUsers.toLocaleString()}
           </div>
           <div style={{ 
-            fontSize: 'var(--font-size-xs)', 
+            fontSize: 'clamp(10px, 2vw, var(--font-size-xs))', 
             color: 'var(--text-secondary)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em'
@@ -105,9 +105,9 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             Active Users
           </div>
         </div>
-        <div style={{ textAlign: 'center', flex: '1' }}>
+        <div style={{ textAlign: 'center', flex: '1', minWidth: 0 }}>
           <div style={{ 
-            fontSize: 'var(--font-size-2xl)', 
+            fontSize: 'clamp(24px, 5vw, var(--font-size-2xl))', 
             fontWeight: 'bold', 
             color: 'var(--signal)', 
             marginBottom: '4px' 
@@ -115,7 +115,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             {stats.totalPortfolios.toLocaleString()}+
           </div>
           <div style={{ 
-            fontSize: 'var(--font-size-xs)', 
+            fontSize: 'clamp(10px, 2vw, var(--font-size-xs))', 
             color: 'var(--text-secondary)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em'
@@ -123,9 +123,9 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             Portfolios
           </div>
         </div>
-        <div style={{ textAlign: 'center', flex: '1' }}>
+        <div style={{ textAlign: 'center', flex: '1', minWidth: 0 }}>
           <div style={{ 
-            fontSize: 'var(--font-size-2xl)', 
+            fontSize: 'clamp(24px, 5vw, var(--font-size-2xl))', 
             fontWeight: 'bold', 
             color: 'var(--signal)', 
             marginBottom: '4px' 
@@ -133,7 +133,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
             100%
           </div>
           <div style={{ 
-            fontSize: 'var(--font-size-xs)', 
+            fontSize: 'clamp(10px, 2vw, var(--font-size-xs))', 
             color: 'var(--text-secondary)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em'
@@ -145,7 +145,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
       {stats.recentActivity.length > 0 && (
         <div>
           <h4 style={{ 
-            fontSize: 'var(--font-size-sm)', 
+            fontSize: 'clamp(12px, 2.5vw, var(--font-size-sm))', 
             fontWeight: '600', 
             marginBottom: '12px', 
             color: 'var(--text-secondary)',
@@ -157,7 +157,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {stats.recentActivity.map((activity, index) => (
               <div key={index} style={{ 
-                fontSize: 'var(--font-size-xs)', 
+                fontSize: 'clamp(11px, 2vw, var(--font-size-xs))', 
                 color: 'var(--text-secondary)',
                 lineHeight: 'var(--line-snug)'
               }}>
