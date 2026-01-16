@@ -206,16 +206,14 @@ export default function SponsorPage() {
           animation: pulse-red 2s ease-in-out infinite;
         }
         .sponsor-cards-grid {
-          grid-template-columns: repeat(4, 1fr);
-        }
-        @media (max-width: 1200px) {
-          .sponsor-cards-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: clamp(16px, 3vw, 24px);
         }
         @media (max-width: 768px) {
           .sponsor-cards-grid {
             grid-template-columns: 1fr;
+            gap: 20px;
           }
         }
       `}</style>
@@ -223,12 +221,13 @@ export default function SponsorPage() {
       <div style={{
         minHeight: '100vh',
         background: 'var(--bg)',
-        padding: '60px clamp(12px, 3vw, 24px)',
+        padding: 'clamp(40px, 8vw, 60px) clamp(12px, 3vw, 24px)',
         maxWidth: 'min(1400px, 95vw)',
         margin: '0 auto',
         color: 'var(--text)',
         width: '100%',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        overflowX: 'hidden'
       }}>
       <div style={{ textAlign: 'center', marginBottom: '48px' }}>
         <h1 style={{
@@ -272,9 +271,11 @@ export default function SponsorPage() {
         background: 'linear-gradient(135deg, var(--surface) 0%, rgba(59, 130, 246, 0.05) 100%)',
         border: '2px solid rgba(59, 130, 246, 0.2)',
         borderRadius: '16px',
-        padding: '32px',
+        padding: 'clamp(20px, 4vw, 32px)',
         marginBottom: '48px',
-        textAlign: 'center'
+        textAlign: 'center',
+        width: '100%',
+        boxSizing: 'border-box'
       }}>
         <h2 style={{
           fontSize: '20px',
@@ -324,9 +325,10 @@ export default function SponsorPage() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '24px',
-        marginBottom: '48px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: 'clamp(16px, 3vw, 24px)',
+        marginBottom: '48px',
+        width: '100%'
       }}
       className="sponsor-cards-grid">
         {/* Code Supporter - $5/month */}
@@ -334,11 +336,13 @@ export default function SponsorPage() {
           background: 'var(--surface)',
           border: '2px solid var(--border)',
           borderRadius: '12px',
-          padding: '32px',
+          padding: 'clamp(20px, 4vw, 32px)',
           display: 'flex',
           flexDirection: 'column',
           transition: 'transform 0.2s ease',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          minWidth: 0,
+          width: '100%'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-4px)';
@@ -349,11 +353,11 @@ export default function SponsorPage() {
           e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
         }}
         >
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
+          <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
             Code Supporter
           </h3>
-          <div style={{ fontSize: '36px', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
-            $50<span style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>/year</span>
+          <div style={{ fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
+            $50<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)' }}>/year</span>
           </div>
           <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', textDecoration: 'line-through' }}>
             $60/year if paid monthly
@@ -389,12 +393,14 @@ export default function SponsorPage() {
           background: 'var(--surface)',
           border: '2px solid var(--accent-warm)',
           borderRadius: '12px',
-          padding: '32px',
+          padding: 'clamp(20px, 4vw, 32px)',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
           transition: 'transform 0.2s ease',
-          boxShadow: '0 2px 8px rgba(245, 158, 11, 0.2)'
+          boxShadow: '0 2px 8px rgba(245, 158, 11, 0.2)',
+          minWidth: 0,
+          width: '100%'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-4px)';
@@ -418,11 +424,11 @@ export default function SponsorPage() {
           }}>
             Popular
           </div>
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
+          <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
             Feature Voter
           </h3>
-          <div style={{ fontSize: '36px', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
-            $200<span style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>/year</span>
+          <div style={{ fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
+            $200<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)' }}>/year</span>
           </div>
           <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', textDecoration: 'line-through' }}>
             $240/year if paid monthly
@@ -458,11 +464,13 @@ export default function SponsorPage() {
           background: 'var(--surface)',
           border: '2px solid var(--border)',
           borderRadius: '12px',
-          padding: '32px',
+          padding: 'clamp(20px, 4vw, 32px)',
           display: 'flex',
           flexDirection: 'column',
           transition: 'transform 0.2s ease',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          minWidth: 0,
+          width: '100%'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-4px)';
@@ -473,11 +481,11 @@ export default function SponsorPage() {
           e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
         }}
         >
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
+          <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
             Corporate Sponsor
           </h3>
-          <div style={{ fontSize: '36px', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
-            $1,000<span style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>/year</span>
+          <div style={{ fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
+            $1,000<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)' }}>/year</span>
           </div>
           <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', textDecoration: 'line-through' }}>
             $1,200/year if paid monthly
@@ -544,12 +552,14 @@ export default function SponsorPage() {
           background: 'linear-gradient(135deg, var(--surface) 0%, rgba(245, 158, 11, 0.05) 100%)',
           border: '3px solid #f59e0b', // Gold/Amber border
           borderRadius: '12px',
-          padding: '32px',
+          padding: 'clamp(20px, 4vw, 32px)',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
           transition: 'transform 0.2s ease',
-          boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)'
+          boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
+          minWidth: 0,
+          width: '100%'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-4px)';
@@ -610,7 +620,7 @@ export default function SponsorPage() {
           </div>
 
           <h3 style={{ 
-            fontSize: '28px', 
+            fontSize: 'clamp(22px, 4vw, 28px)', 
             fontWeight: 'bold', 
             marginBottom: '8px', 
             color: 'var(--text)',
@@ -619,7 +629,7 @@ export default function SponsorPage() {
             UK FOUNDER'S CLUB
           </h3>
           <div style={{ 
-            fontSize: '14px', 
+            fontSize: 'clamp(12px, 2.5vw, 14px)', 
             color: '#f59e0b', 
             fontWeight: '600',
             marginBottom: '8px',
@@ -628,8 +638,8 @@ export default function SponsorPage() {
           }}>
             Lifetime Access
           </div>
-          <div style={{ fontSize: '42px', fontWeight: 'bold', color: '#f59e0b', marginBottom: '16px' }}>
-            £100<span style={{ fontSize: '18px', color: 'var(--text-secondary)', fontWeight: 'normal' }}> one-time</span>
+          <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 'bold', color: '#f59e0b', marginBottom: '16px' }}>
+            £100<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)', fontWeight: 'normal' }}> one-time</span>
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6', fontSize: '15px' }}>
             <strong style={{ color: 'var(--text)' }}>Never pay monthly.</strong> Get unlimited API access, Discord priority, and a permanent "Founder" badge. Own a piece of the roadmap.
@@ -695,13 +705,13 @@ export default function SponsorPage() {
               disabled={loading === PRICE_IDS.foundersClub || loading !== null}
               style={{
                 flex: '1',
-                minWidth: '180px',
-                padding: '16px 32px',
+                minWidth: 'clamp(140px, 30vw, 180px)',
+                padding: 'clamp(12px, 3vw, 16px) clamp(20px, 5vw, 32px)',
                 background: loading === PRICE_IDS.foundersClub ? 'var(--muted)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: '18px',
+                fontSize: 'clamp(14px, 3vw, 18px)',
                 fontWeight: '700',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',

@@ -366,11 +366,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         style={{ 
           maxWidth: '800px', 
           margin: '0 auto', 
-          padding: 'clamp(40px, 8vw, 60px) clamp(16px, 4vw, 24px)',
-          minHeight: 'calc(100vh - 200px)'
+          padding: 'clamp(24px, 6vw, 60px) clamp(16px, 4vw, 24px)',
+          minHeight: 'calc(100vh - 200px)',
+          width: '100%',
+          boxSizing: 'border-box',
+          overflowX: 'hidden'
         }}
       >
-        <header style={{ marginBottom: '48px' }}>
+        <header style={{ marginBottom: 'clamp(32px, 6vw, 48px)' }}>
           <Link 
             href="/blog"
             style={{
@@ -398,10 +401,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div 
             style={{ 
               display: 'flex', 
-              gap: '16px', 
+              gap: 'clamp(8px, 2vw, 16px)', 
               flexWrap: 'wrap', 
               marginBottom: '24px', 
-              fontSize: '14px', 
+              fontSize: 'clamp(12px, 2.5vw, 14px)', 
               color: 'var(--text-secondary)',
               alignItems: 'center'
             }}
@@ -434,9 +437,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               alt={data.title}
               style={{ 
                 width: '100%', 
+                height: 'auto',
                 borderRadius: '12px', 
                 marginBottom: '32px',
                 boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                maxWidth: '100%'
               }}
             />
           )}
@@ -468,16 +473,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             borderRadius: '12px',
             overflow: 'hidden',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            position: 'relative',
+            width: '100%',
+            paddingBottom: '56.25%', // 16:9 aspect ratio
+            height: 0
           }}>
             <iframe
               width="100%"
-              height="500"
+              height="100%"
               src={`https://www.youtube.com/embed/${data.videoId}`}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               style={{
-                display: 'block',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%'
               }}
             />
           </div>
@@ -485,9 +498,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         
         <div 
           style={{ 
-            fontSize: '18px', 
+            fontSize: 'clamp(16px, 3vw, 18px)', 
             lineHeight: '1.8', 
             color: 'var(--text)',
+            width: '100%',
+            maxWidth: '100%',
+            overflowWrap: 'break-word',
+            wordWrap: 'break-word'
           }}
           className="blog-content"
         >
@@ -515,32 +532,35 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <div
           style={{
             marginTop: '64px',
-            padding: '32px',
+            padding: 'clamp(20px, 4vw, 32px)',
             background: 'var(--surface-elevated)',
             borderRadius: '12px',
             border: '1px solid var(--border)',
             textAlign: 'center',
+            width: '100%',
+            boxSizing: 'border-box'
           }}
         >
-          <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
+          <h2 style={{ fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
             Unlock Sovereign Sync
           </h2>
-          <p style={{ fontSize: '16px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+          <p style={{ fontSize: 'clamp(14px, 2.5vw, 16px)', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.6' }}>
             Take control of your financial data with bidirectional Google Drive sync. Available for Corporate Sponsors and Founders Club members.
           </p>
           <Link
             href="/sponsor"
             style={{
               display: 'inline-block',
-              padding: '14px 28px',
+              padding: 'clamp(12px, 3vw, 14px) clamp(20px, 5vw, 28px)',
               background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
               color: 'white',
               textDecoration: 'none',
               borderRadius: '8px',
-              fontSize: '16px',
+              fontSize: 'clamp(14px, 3vw, 16px)',
               fontWeight: '600',
               transition: 'all 0.2s ease',
               boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+              maxWidth: '100%'
             }}
           >
             Upgrade to Unlock →
