@@ -195,14 +195,15 @@
     "scheduledTime": "14:00",
     "title": "How to Rotate API Keys Without Breaking Production",
     "slug": "how-to-rotate-api-keys-without-breaking-production",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "rotate",
       "keys"
-    ]
+    ],
+    "publishedAt": "2026-01-16T14:15:59.580Z"
   },
   {
     "id": "how-to-the-unix-philosophy-applied-to-modern-web-apps-jan-17",
