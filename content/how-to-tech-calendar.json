@@ -211,14 +211,15 @@
     "scheduledTime": "14:00",
     "title": "The \"Unix Philosophy\" Applied to Modern Web Apps",
     "slug": "the-unix-philosophy-applied-to-modern-web-apps",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "unix",
       "philosophy",
       "applied"
-    ]
+    ],
+    "publishedAt": "2026-01-17T14:12:44.919Z"
   },
   {
     "id": "how-to-how-to-securely-share-environment-variables-with-your-team-jan-18",
