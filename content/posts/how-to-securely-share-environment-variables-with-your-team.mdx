@@ -1,0 +1,80 @@
+---
+title: "How to Securely Share Environment Variables with Your Team"
+date: "2026-01-18"
+description: "Learn to securely share environment variables with your team, ensuring safe and efficient project collaboration."
+tags: ["environment variables", "securely", "share", "environment"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-securely-share-environment-variables-with-your-team.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+Sharing environment variables within a team can be a security risk if not done carefully. These variables often contain sensitive information crucial for your application's configuration, such as API keys, database passwords, and other secrets. The challenge lies in sharing these variables securely without exposing them to unnecessary risks.
+
+## Direct Solution with Code
+
+The most direct and secure way to share environment variables is by using a secrets management tool such as HashiCorp Vault, AWS Secrets Manager, or dotenv coupled with secure version control practices. For this guide, we'll focus on a simple approach using `dotenv` and `git-crypt`.
+
+### Step 1: Initialize `dotenv`
+
+First, ensure that your project is using `dotenv` for managing environment variables. This requires including a `.env` file in your project's root directory, which will not be committed to your version control system.
+
+```bas
+h
+npm install dotenv
+```
+
+In your application's entry file:
+
+```javascrip
+t
+require('dotenv').config();
+```
+
+### Step 2: Secure Your `.env` File with `git-crypt`
+
+`git-crypt` allows you to encrypt files when they are committed to a git repository, ensuring that sensitive information is not exposed.
+
+1. Install `git-crypt` on your system. For most Unix-like systems, it can be done via a package manager.
+
+2. Initialize `git-crypt` in your git repository:
+
+```bas
+h
+git-crypt init
+```
+
+3. Create a `.gitattributes` file in your repository root if you haven't already, and add the following line to tell `git-crypt` to encrypt your `.env` file:
+
+```
+.env filter=git-crypt diff=git-crypt
+```
+
+4. To share the key with a trusted team member, use:
+
+```bas
+h
+git-crypt export-key /path/to/keyfile
+```
+
+**Note:** Securely transfer this key file using a secure channel, such as an encrypted email service or a secure file transfer service.
+
+### Step 3: Using the Key
+
+Team members who receive the key can unlock the encrypted files in their local clone of the repository by running:
+
+```bas
+h
+git-crypt unlock /path/to/keyfile
+```
+
+## Explanation of Key Concepts
+
+- **`dotenv`**: A module that loads environment variables from a `.env` file into `process.env` in Node.js applications.
+- **`git-crypt`**: A git extension that encrypts files with a symmetric key, allowing you to securely store sensitive data in a git repository.
+
+## Quick Tip
+
+Always ensure that `.env` files and encryption keys are explicitly listed in your `.gitignore` and `.gitattributes`, respectively, to prevent accidental exposure.
+
+By leveraging tools like `dotenv` and `git-crypt`, teams can securely share environment variables critical for the development and deployment of applications, maintaining the integrity and confidentiality of sensitive information.
