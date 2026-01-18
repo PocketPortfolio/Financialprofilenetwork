@@ -381,6 +381,21 @@ export default function GlobalFooter() {
                   JSON API Directory
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/s/insider-trading"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Insider Trading Data
+                </Link>
+              </li>
             </ul>
           </div>
 
