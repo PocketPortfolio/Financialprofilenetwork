@@ -171,7 +171,8 @@ export default function PositionsPage() {
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          padding: '20px'
+          padding: '20px',
+          paddingTop: 'calc(64px + 48px + 4px)' // Header (64px) + Banner (~48px) + gap (4px)
         }}>
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Sign in to view positions</h1>
@@ -221,6 +222,7 @@ export default function PositionsPage() {
       <main style={{ 
         flex: 1, 
         padding: '20px',
+        paddingTop: 'calc(64px + 48px + 4px)', // Header (64px) + Banner (~48px) + gap (4px)
         maxWidth: '1200px',
         margin: '0 auto',
         width: '100%'
