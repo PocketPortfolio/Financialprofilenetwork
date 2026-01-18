@@ -46,6 +46,11 @@ import { getDeviceInfo } from '../lib/utils/device';
 import { initializeMobileAnalytics } from '../lib/analytics/device';
 import MobileHeader from '../components/nav/MobileHeader';
 import OnboardingTour from '../components/OnboardingTour';
+import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import { MorningBrief } from '../components/dashboard/MorningBrief';
+import { AssetTerminal } from '../components/dashboard/AssetTerminal';
+import { TerminalSummary } from '../components/dashboard/TerminalSummary';
+import { DataInputDeck } from '../components/dashboard/DataInputDeck';
 import { 
   calculatePositions, 
   calculatePortfolioTotals, 
@@ -84,6 +89,13 @@ export default function Dashboard() {
   const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
   const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
   const { tier } = usePremiumTheme();
+  
+  // Map tier to data-tier attribute for CSS targeting
+  const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
+    if (tier === 'foundersClub') return 'founder';
+    if (tier === 'corporateSponsor') return 'corporate';
+    return 'free';
+  };
   
   // Use ref to track latest trades for sync operations (avoids stale closure)
   const tradesRef = React.useRef(trades);
@@ -228,6 +240,16 @@ export default function Dashboard() {
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showFeatureAnnouncement, setShowFeatureAnnouncement] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'performance' | 'insights'>('performance');
+  const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty'>('value');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [portfolioView, setPortfolioView] = useState<'positions' | 'trades'>('positions');
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    symbol: string;
+    count: number;
+  }>({ isOpen: false, symbol: '', count: 0 });
 
   // Prevent dashboard repaints when modals are open
   React.useEffect(() => {
@@ -314,6 +336,25 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
+  // Listen for custom event to open import modal (from navigation menu)
+  useEffect(() => {
+    const handleOpenImportModal = () => {
+      setShowImportModal(true);
+    };
+
+    // Check sessionStorage for import modal intent (from cross-page navigation)
+    const shouldOpenImport = sessionStorage.getItem('openImportModal');
+    if (shouldOpenImport === 'true') {
+      sessionStorage.removeItem('openImportModal');
+      setShowImportModal(true);
+    }
+
+    window.addEventListener('openImportModal', handleOpenImportModal);
+    return () => {
+      window.removeEventListener('openImportModal', handleOpenImportModal);
+    };
+  }, []);
+
   // Show feature announcement modal once per user
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -347,6 +388,18 @@ export default function Dashboard() {
     } else {
       console.log('ℹ️ Feature announcement already seen, skipping');
     }
+  }, []);
+
+  // Listen for custom event to open import modal (from navigation menu)
+  useEffect(() => {
+    const handleOpenImportModal = () => {
+      setShowImportModal(true);
+    };
+
+    window.addEventListener('openImportModal', handleOpenImportModal);
+    return () => {
+      window.removeEventListener('openImportModal', handleOpenImportModal);
+    };
   }, []);
 
   const handleCloseAnnouncement = () => {
@@ -1116,299 +1169,122 @@ export default function Dashboard() {
       
       <StructuredData type="WebApplication" data={webAppData} />
 
-      {/* Mobile Header */}
-      <MobileHeader title="Dashboard" fixed={true} />
+      {/* 🎨 CONTENT - Layout wrapper handles header/banner/tier injection */}
+      <div>
+          {/* 🎨 INTELLIGENCE LAYER - Above everything */}
+          {trades.length > 0 && (
+            <MorningBrief 
+              netWorthChange={totalUnrealizedPLPercent}
+              topMover={{
+                symbol: Object.values(positions).length > 0 
+                  ? Object.values(positions).reduce((prev, current) => 
+                      Math.abs(current.unrealizedPLPercent) > Math.abs(prev.unrealizedPLPercent) 
+                        ? current 
+                        : prev
+                    ).ticker || 'N/A'
+                  : 'N/A',
+                change: Object.values(positions).length > 0
+                  ? Object.values(positions).reduce((prev, current) => 
+                      Math.abs(current.unrealizedPLPercent) > Math.abs(prev.unrealizedPLPercent) 
+                        ? current 
+                        : prev
+                    ).unrealizedPLPercent || 0
+                  : 0
+              }}
+            />
+          )}
 
-      {/* Founders Club Banner - Sticky at top for free tier users */}
-      <FoundersClubBanner />
-
-      {/* Portfolio Selector */}
-      {/* <PortfolioSelector /> */}
-
-      <div className="mobile-container main-content" data-dashboard-content style={{ 
-        minHeight: '100vh', 
-        background: 'var(--bg)', 
-        color: 'var(--text)', 
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box',
-        paddingTop: typeof window !== 'undefined' && window.innerWidth < 768 
-          ? 'calc(var(--touch-target-large) + var(--safe-area-top) + var(--space-md))' 
-          : '0', // Add space for fixed header on mobile
-        paddingBottom: 'calc(var(--touch-target-large) + var(--safe-area-bottom))'
-      }}>
-      {/* Main Content - Compact Financial Layout */}
-      <main className="mobile-container" style={{ 
-          padding: '16px',
-          maxWidth: '100%',
-          width: '100%',
-          boxSizing: 'border-box',
-          overflowX: 'hidden', // Prevent horizontal overflow
-      }}>
-        {/* Compact Summary Row */}
-            <div className="mobile-card brand-card brand-candlestick brand-grid" style={{ 
-          marginBottom: '12px',
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr auto',
-          gap: '12px',
-          alignItems: 'center',
-          width: '100%',
-            boxSizing: 'border-box',
-            padding: '16px',
-            background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
-            borderRadius: '12px',
-            border: '2px solid var(--border-warm)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: '500' }}>Total Invested</div>
-              <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
-                ${displayTrades.length > 0 ? totalInvested.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
-            </div>
-          </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: '500' }}>Trades</div>
-              <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
-                {displayTrades.length > 0 ? totalTrades : '0'}
-            </div>
-          </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: '500' }}>Positions</div>
-              <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
-                {displayTrades.length > 0 ? totalPositions : '0'}
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <CloudStatusIcon />
-          </div>
-        </div>
+          {/* 🎨 TERMINAL SUMMARY - Metrics Row */}
+          <TerminalSummary
+            totalInvested={totalInvested}
+            totalTrades={totalTrades}
+            totalPositions={totalPositions}
+            totalUnrealizedPL={totalUnrealizedPL}
+            totalUnrealizedPLPercent={totalUnrealizedPLPercent}
+            loading={!trades || trades.length === 0}
+          />
 
 
           {/* Price Pipeline Health */}
-          <div className="mobile-card brand-card brand-grid" style={{ 
-            marginBottom: '12px',
-            padding: '12px',
-            background: 'var(--surface)',
-            borderRadius: '8px',
-            border: '1px solid var(--border)'
-          }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'var(--text)' }}>
+          <div className="dashboard-card" style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'hsl(var(--foreground))' }}>
               Price Pipeline Health
-              </div>
+            </div>
             <PricePipelineHealth />
-            </div>
+          </div>
 
-          {/* P&L Summary */}
-        {trades.length > 0 && (
-            <div className="mobile-card brand-card brand-sparkline brand-spine" style={{ 
-          marginBottom: '12px',
-            padding: '12px',
-              background: 'var(--surface)',
-              borderRadius: '8px',
-              border: '1px solid var(--border)'
-          }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)' }}>Unrealized P&L</div>
-            <div style={{ 
-                  fontSize: '16px', 
-                  fontWeight: '600', 
-                  color: totalUnrealizedPL >= 0 ? 'var(--signal)' : 'var(--danger)'
-                }}>
-                  ${totalUnrealizedPL.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-            <div style={{ 
-                fontSize: '12px', 
-                color: totalUnrealizedPL >= 0 ? 'var(--signal)' : 'var(--danger)',
-                fontWeight: '500'
-              }}>
-                {totalUnrealizedPL >= 0 ? '+' : ''}{totalUnrealizedPLPercent.toFixed(2)}%
-              </div>
-            </div>
-        )}
 
           {/* Sync Upgrade CTA - Show for unauthenticated users with local trades */}
           <SyncUpgradeCTA />
 
-          {/* Authentication Status */}
-          {isAuthenticated && user ? (
-            <div style={{ marginBottom: '12px' }}>
-          <AccountManagement 
-            user={user} 
-            trades={trades}
-            onAccountDeleted={() => {
-              window.location.href = '/';
-            }}
-          />
-            </div>
-          ) : null}
+          {/* Account Management moved to UserAvatarDropdown */}
 
-          {/* Add Trade Form */}
-          <div className="mobile-card brand-card brand-candlestick brand-spine" style={{ 
-            marginBottom: '12px',
-            padding: '16px',
-            background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
-            borderRadius: '12px',
-            border: '2px solid var(--border-warm)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            position: 'relative',
-            overflow: 'visible',
-            zIndex: 1
-          }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'var(--text)' }}>
-              Add Trade
-            </div>
-            {/* Symbol Search - Aligned with other form fields */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px', marginBottom: '8px', position: 'relative', zIndex: 1000 }}>
-                  <TickerSearch
-                onTickerSelect={(ticker) => setNewTrade({ ...newTrade, symbol: ticker })}
-                placeholder="Symbol (e.g., AAPL)"
-                  />
-                </div>
-            
-            {/* Trade Type and Quantity Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-                  <select
-                value={newTrade.type}
-                onChange={(e) => setNewTrade({ ...newTrade, type: e.target.value as 'buy' | 'sell' })}
-                    style={{
-                      padding: '8px',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)'
-                }}
-              >
-                <option value="buy">Buy</option>
-                <option value="sell">Sell</option>
-                  </select>
-                  <input
-                    type="number"
-                placeholder="Quantity"
-                value={newTrade.quantity}
-                onChange={(e) => setNewTrade({ ...newTrade, quantity: e.target.value })}
-                    style={{ 
-                      padding: '8px', 
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)'
-                }}
-                  />
-                </div>
-            {/* Price and Date Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-                  <input
-                    type="number"
-                step="0.01"
-                placeholder="Price"
-                value={newTrade.price}
-                onChange={(e) => setNewTrade({ ...newTrade, price: e.target.value })}
-                    style={{ 
-                      padding: '8px', 
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)'
-                }}
-              />
-              <input
-                type="date"
-                value={newTrade.date}
-                onChange={(e) => setNewTrade({ ...newTrade, date: e.target.value })}
-                style={{ 
-                  padding: '8px', 
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)'
-                }}
-                  />
-                </div>
-            {/* Fees Row */}
-            <div style={{ marginBottom: '8px' }}>
-                    <input
-                      type="number"
-                step="0.01"
-                placeholder="Fees (optional)"
-                value={newTrade.fees}
-                onChange={(e) => setNewTrade({ ...newTrade, fees: e.target.value })}
-                      style={{ 
-                        width: '100%', 
-                        padding: '8px', 
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  background: 'var(--surface)',
-                  color: 'var(--text)'
-                }}
-              />
-                    </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <input
-                    type="checkbox"
-                id="mock-trade"
-                    checked={isMockTrade}
-                    onChange={(e) => setIsMockTrade(e.target.checked)}
-                style={{ marginRight: '4px' }}
-              />
-              <label htmlFor="mock-trade" style={{ fontSize: '12px', color: 'var(--text)' }}>
-                Mock trade (for testing)
-                  </label>
-                </div>
-                <button
-              onClick={handleAddTrade}
-                  style={{ 
-                width: '100%',
-                padding: '16px 24px',
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                    color: 'white', 
-                border: '2px solid var(--border-warm)',
-                borderRadius: '12px',
-                fontSize: '16px',
-                fontWeight: '700',
-                    cursor: 'pointer', 
-                    transition: 'all 0.2s ease',
-                boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
+          {/* Data Input Deck - Unified Input Portal */}
+          <div id="add-trade">
+            <DataInputDeck
+              newTrade={newTrade}
+              isMockTrade={isMockTrade}
+              onTradeChange={(updates) => setNewTrade({ ...newTrade, ...updates })}
+              onMockTradeChange={setIsMockTrade}
+              onAddTrade={handleAddTrade}
+              onImport={() => setShowImportModal(true)}
+            />
+          </div>
+
+          {/* Import Modal */}
+          {showImportModal && (
+            <div 
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'hsl(var(--foreground) / 0.5)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 50,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px'
+                padding: '16px'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, #f59e0b 0%, var(--accent-warm) 100%)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(245, 158, 11, 0.3)';
-              }}
+              onClick={() => setShowImportModal(false)}
             >
-              <span style={{ fontSize: '18px' }}>➕</span>
-              Add Trade
-                </button>
+              <div 
+                className="dashboard-card"
+                style={{
+                  maxWidth: '800px',
+                  width: '100%',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
+                  background: 'hsl(var(--card))',
+                  border: `1px solid hsl(var(--border))`
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'hsl(var(--foreground))', margin: 0 }}>Import CSV Data</h2>
+                  <button
+                    onClick={() => setShowImportModal(false)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'hsl(var(--muted-foreground))',
+                      cursor: 'pointer',
+                      fontSize: '24px',
+                      padding: '4px 8px',
+                      lineHeight: 1
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(var(--foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                  >
+                    ×
+                  </button>
+                </div>
+                <CSVImporter onImport={(trades) => {
+                  handleCSVImport(trades);
+                  setShowImportModal(false);
+                }} />
               </div>
-
-          {/* CSV Import */}
-            <div id="import-trigger" className="mobile-card brand-card brand-grid" style={{ 
-              marginBottom: '12px',
-              padding: '12px',
-              background: 'var(--surface)',
-              borderRadius: '8px',
-              border: '1px solid var(--border)',
-              scrollMarginTop: '80px'
-            }}>
-                <CSVImporter onImport={handleCSVImport} />
             </div>
+          )}
 
           {/* Portfolio Dashboard - New Enhanced Version */}
           {trades.length > 0 && useNewDashboard && (
@@ -1420,20 +1296,73 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* Allocation Recommendations */}
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <AllocationRecommendations
-                  positions={Object.values(positions)}
-                  totalValue={Object.values(positions).reduce(
-                    (sum, pos) => sum + pos.currentValue,
-                    0
-                  )}
-                  portfolioAnalytics={analytics}
-                  historicalSnapshots={historicalSnapshots}
-                />
-              </div>
+              {/* Charts & Insights - Tabbed Interface */}
+              <div className="dashboard-card" style={{ marginBottom: '24px' }}>
+                {/* Tab Navigation */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '8px', 
+                  marginBottom: '16px', 
+                  borderBottom: `1px solid hsl(var(--border))` 
+                }}>
+                  <button
+                    onClick={() => setActiveTab('performance')}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: activeTab === 'performance' ? '2px solid hsl(var(--accent))' : '2px solid transparent',
+                      color: activeTab === 'performance' ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeTab !== 'performance') {
+                        e.currentTarget.style.color = 'hsl(var(--foreground))';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeTab !== 'performance') {
+                        e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                      }
+                    }}
+                  >
+                    Performance
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('insights')}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: activeTab === 'insights' ? '2px solid hsl(var(--accent))' : '2px solid transparent',
+                      color: activeTab === 'insights' ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeTab !== 'insights') {
+                        e.currentTarget.style.color = 'hsl(var(--foreground))';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeTab !== 'insights') {
+                        e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                      }
+                    }}
+                  >
+                    Insights
+                  </button>
+                </div>
 
-              {/* Main Dashboard Grid */}
+                {/* Tab Content */}
+                {activeTab === 'performance' ? (
+                  <div>
+                    {/* Main Dashboard Grid */}
               <div
                 style={{
                   display: 'grid',
@@ -1458,12 +1387,14 @@ export default function Dashboard() {
                     onReset={resetDrillDown}
                   />
 
-                  {/* Performance Chart - Always show, component handles empty state */}
-                  <PortfolioPerformanceChart
-                    snapshots={historicalSnapshots}
-                    timeRange={timeRange}
-                    onTimeRangeChange={setStoreTimeRange}
-                  />
+                  {/* Performance Chart - Hidden for now */}
+                  {false && (
+                    <PortfolioPerformanceChart
+                      snapshots={historicalSnapshots}
+                      timeRange={timeRange}
+                      onTimeRangeChange={setStoreTimeRange}
+                    />
+                  )}
 
                   {/* Heat Map */}
                   {historicalSnapshots.length > 0 && chartView === 'heatmap' && (
@@ -1490,20 +1421,29 @@ export default function Dashboard() {
                   />
                 </div>
               </div>
+                  </div>
+                ) : (
+                  <div>
+                    <AllocationRecommendations
+                      positions={Object.values(positions)}
+                      totalValue={Object.values(positions).reduce(
+                        (sum, pos) => sum + pos.currentValue,
+                        0
+                      )}
+                      portfolioAnalytics={analytics}
+                      historicalSnapshots={historicalSnapshots}
+                    />
+                  </div>
+                )}
+              </div>
             </>
           )}
 
           {/* Portfolio Chart - Legacy Simple Version (fallback) */}
           {trades.length > 0 && !useNewDashboard && (
-            <div className="mobile-card brand-card brand-sparkline brand-spine" style={{ 
-              marginBottom: '12px',
-              padding: '12px',
-              background: 'var(--surface)',
-              borderRadius: '8px',
-              border: '1px solid var(--border)'
-            }}>
+            <div className="dashboard-card" style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)' }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--foreground))' }}>
                   {chartType === 'pie' ? 'Portfolio Allocation' : 'Portfolio Performance'}
                 </div>
                 <div style={{ display: 'flex', gap: '4px' }}>
@@ -1511,15 +1451,15 @@ export default function Dashboard() {
                     onClick={() => setChartType('pie')}
                     style={{
                       padding: '6px 12px',
-                      background: chartType === 'pie' ? 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)' : 'transparent',
-                      color: chartType === 'pie' ? 'white' : 'var(--text)',
-                      border: chartType === 'pie' ? '2px solid var(--border-warm)' : '1px solid var(--border)',
+                      background: chartType === 'pie' ? 'hsl(var(--accent))' : 'transparent',
+                      color: chartType === 'pie' ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
+                      border: chartType === 'pie' ? 'none' : `1px solid hsl(var(--border))`,
                       borderRadius: '8px',
                       fontSize: '12px',
                       fontWeight: '600',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      boxShadow: chartType === 'pie' ? '0 2px 8px rgba(245, 158, 11, 0.3)' : 'none'
+                      boxShadow: chartType === 'pie' ? `0 2px 8px hsla(var(--primary), 0.3)` : 'none'
                     }}
                   >
                     Pie
@@ -1528,15 +1468,15 @@ export default function Dashboard() {
                     onClick={() => setChartType('line')}
                     style={{
                       padding: '6px 12px',
-                      background: chartType === 'line' ? 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)' : 'transparent',
-                      color: chartType === 'line' ? 'white' : 'var(--text)',
-                      border: chartType === 'line' ? '2px solid var(--border-warm)' : '1px solid var(--border)',
+                      background: chartType === 'line' ? `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)` : 'transparent',
+                      color: chartType === 'line' ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
+                      border: chartType === 'line' ? `2px solid hsl(var(--accent))` : `1px solid hsl(var(--border))`,
                       borderRadius: '8px',
                       fontSize: '12px',
                       fontWeight: '600',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      boxShadow: chartType === 'line' ? '0 2px 8px rgba(245, 158, 11, 0.3)' : 'none'
+                      boxShadow: chartType === 'line' ? `0 2px 8px hsla(var(--primary), 0.3)` : 'none'
                     }}
                   >
                     Line
@@ -1573,7 +1513,7 @@ export default function Dashboard() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+                    background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1591,7 +1531,7 @@ export default function Dashboard() {
                       Portfolio Holdings
                     </h1>
                     <p style={{ 
-                      color: 'var(--muted)', 
+                      color: 'hsl(var(--muted-foreground))', 
                       fontSize: '16px',
                       margin: 0
                     }}>
@@ -1607,8 +1547,8 @@ export default function Dashboard() {
                     style={{
                       padding: '6px 12px',
                       background: 'transparent',
-                      color: 'var(--muted)',
-                      border: '1px solid var(--border)',
+                      color: 'hsl(var(--muted-foreground))',
+                      border: `1px solid hsl(var(--border))`,
                       borderRadius: '6px',
                       fontSize: '12px',
                       cursor: 'pointer',
@@ -1620,11 +1560,11 @@ export default function Dashboard() {
                     onMouseEnter={(e) => {
                       e.currentTarget.style.color = 'var(--danger)';
                       e.currentTarget.style.borderColor = 'var(--danger)';
-                      e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                      e.currentTarget.style.background = 'hsla(var(--danger), 0.1)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'var(--muted)';
-                      e.currentTarget.style.borderColor = 'var(--border)';
+                      e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                      e.currentTarget.style.borderColor = 'hsl(var(--border))';
                       e.currentTarget.style.background = 'transparent';
                     }}
                     title="Permanently delete all trades from Firebase"
@@ -1635,13 +1575,165 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-            <ConsolidatedPortfolioTable 
-              positions={Object.values(positions)}
-              onDeleteTrade={handleDeleteTrade}
-              onViewTrades={() => {}}
-              trades={trades}
-              noCard={true}
-            />
+            {/* 🎨 ASSET TERMINAL - Replace ConsolidatedPortfolioTable */}
+            <div className="mb-6">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h2 className="text-sm font-mono text-muted-foreground uppercase" style={{fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace', margin: 0}}>
+                  / Portfolio_Assets
+                </h2>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    onClick={() => setPortfolioView('positions')}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+                      background: portfolioView === 'positions' ? 'hsl(var(--primary))' : 'transparent',
+                      color: portfolioView === 'positions' ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))',
+                      border: `1px solid ${portfolioView === 'positions' ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Positions
+                  </button>
+                  <button
+                    onClick={() => setPortfolioView('trades')}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+                      background: portfolioView === 'trades' ? 'hsl(var(--primary))' : 'transparent',
+                      color: portfolioView === 'trades' ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))',
+                      border: `1px solid ${portfolioView === 'trades' ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Trades ({trades.length})
+                  </button>
+                </div>
+              </div>
+              <AssetTerminal
+                view={portfolioView}
+                assets={(() => {
+                  if (portfolioView === 'trades') {
+                    // Transform trades to Asset format - use all trades (not displayTrades) to match positions page
+                    const tradeAssets = trades.map(trade => ({
+                      symbol: trade.ticker,
+                      name: quotesData?.[trade.ticker]?.name || trade.ticker,
+                      price: trade.price,
+                      change: 0, // Not applicable for individual trades
+                      holdings: trade.qty,
+                      value: trade.qty * trade.price,
+                      tradeId: trade.id,
+                      date: trade.date,
+                      type: trade.type,
+                      qty: trade.qty,
+                      mock: trade.mock
+                    }));
+                    
+                    // Sort trades
+                    return tradeAssets.sort((a, b) => {
+                      let aValue: any, bValue: any;
+                      switch (sortBy) {
+                        case 'symbol':
+                          return sortOrder === 'asc' 
+                            ? a.symbol.localeCompare(b.symbol)
+                            : b.symbol.localeCompare(a.symbol);
+                        case 'date':
+                          aValue = a.date ? new Date(a.date).getTime() : 0;
+                          bValue = b.date ? new Date(b.date).getTime() : 0;
+                          break;
+                        case 'type':
+                          return sortOrder === 'asc' 
+                            ? (a.type || '').localeCompare(b.type || '')
+                            : (b.type || '').localeCompare(a.type || '');
+                        case 'qty':
+                          aValue = a.qty || 0;
+                          bValue = b.qty || 0;
+                          break;
+                        case 'price':
+                          aValue = a.price;
+                          bValue = b.price;
+                          break;
+                        case 'value':
+                        default:
+                          aValue = a.value;
+                          bValue = b.value;
+                          break;
+                      }
+                      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+                    });
+                  } else {
+                    // Positions view (existing logic)
+                    const assets = Object.values(positions).map(pos => ({
+                      symbol: pos.ticker,
+                      name: quotesData?.[pos.ticker]?.name || pos.ticker,
+                      price: pos.currentPrice,
+                      change: quotesData?.[pos.ticker]?.changePct || pos.unrealizedPLPercent || 0,
+                      holdings: pos.shares,
+                      value: pos.currentValue
+                    }));
+                    
+                    // Sort based on sortBy and sortOrder
+                    return assets.sort((a, b) => {
+                      let aValue: number, bValue: number;
+                      switch (sortBy) {
+                        case 'symbol':
+                          return sortOrder === 'asc' 
+                            ? a.symbol.localeCompare(b.symbol)
+                            : b.symbol.localeCompare(a.symbol);
+                        case 'price':
+                          aValue = a.price;
+                          bValue = b.price;
+                          break;
+                        case 'change':
+                          aValue = a.change;
+                          bValue = b.change;
+                          break;
+                        case 'value':
+                        default:
+                          aValue = a.value;
+                          bValue = b.value;
+                          break;
+                      }
+                      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+                    });
+                  }
+                })()}
+                onEdit={(asset) => {
+                  // Scroll to add trade form
+                  const addTradeSection = document.getElementById('add-trade');
+                  if (addTradeSection) {
+                    addTradeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }}
+                onDelete={(symbol) => {
+                  const tradesToDelete = trades.filter(t => t.ticker === symbol);
+                  setDeleteConfirm({
+                    isOpen: true,
+                    symbol,
+                    count: tradesToDelete.length
+                  });
+                }}
+                setShowImportModal={setShowImportModal}
+                onSort={(column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => {
+                  if (sortBy === column) {
+                    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                  } else {
+                    setSortBy(column);
+                    setSortOrder('desc');
+                  }
+                }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+              />
+            </div>
           </div>
         )}
 
@@ -1650,24 +1742,24 @@ export default function Dashboard() {
           <div style={{ 
             textAlign: 'center', 
             padding: '48px 24px',
-            color: 'var(--muted)',
-            background: 'var(--surface)',
+            color: 'hsl(var(--muted-foreground))',
+            background: 'hsl(var(--card))',
             borderRadius: '12px',
-            border: '1px solid var(--border)',
+            border: `1px solid hsl(var(--border))`,
             marginBottom: '12px'
           }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
-                <rect x="14" y="3" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
-                <rect x="14" y="14" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
-                <rect x="3" y="14" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
+                <rect x="3" y="3" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
+                <rect x="14" y="3" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
+                <rect x="14" y="14" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
+                <rect x="3" y="14" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
               </svg>
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0', color: 'var(--text)' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0', color: 'hsl(var(--foreground))' }}>
               No trades yet
             </h3>
-            <p style={{ fontSize: '14px', margin: '0 0 24px 0', color: 'var(--muted)' }}>
+            <p style={{ fontSize: '14px', margin: '0 0 24px 0', color: 'hsl(var(--muted-foreground))' }}>
               {(() => {
                 const isPremium = tier === 'corporateSponsor' || tier === 'foundersClub';
                 return isPremium 
@@ -1685,22 +1777,22 @@ export default function Dashboard() {
                       display: 'inline-block',
                       marginBottom: '16px',
                       padding: '12px 24px',
-                      background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                      color: 'white',
+                      background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
+                      color: 'hsl(var(--primary-foreground))',
                       textDecoration: 'none',
                       borderRadius: '8px',
                       fontSize: '14px',
                       fontWeight: '600',
                       transition: 'all 0.2s ease',
-                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                      boxShadow: `0 4px 12px hsla(var(--primary), 0.3)`,
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
+                      e.currentTarget.style.boxShadow = `0 6px 16px hsla(var(--primary), 0.4)`;
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+                      e.currentTarget.style.boxShadow = `0 4px 12px hsla(var(--primary), 0.3)`;
                     }}
                   >
                     Configure Drive Sync
@@ -1748,15 +1840,15 @@ export default function Dashboard() {
               style={{
                 marginTop: '24px',
                 padding: '16px 32px',
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, var(--accent) 100%)',
+                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)`,
                 border: 'none',
                 borderRadius: '12px',
-                color: 'var(--text-warm)',
+                color: 'hsl(var(--primary-foreground))',
                 cursor: 'pointer',
                 fontSize: '16px',
                 fontWeight: '600',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                boxShadow: 'hsl(var(--foreground) / 0.15) 0 4px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1767,12 +1859,12 @@ export default function Dashboard() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.boxShadow = `hsl(var(--foreground) / 0.2) 0 6px 20px`;
                 e.currentTarget.style.opacity = '0.95';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                e.currentTarget.style.boxShadow = `hsl(var(--foreground) / 0.15) 0 4px 12px`;
                 e.currentTarget.style.opacity = '1';
               }}
             >
@@ -1782,15 +1874,9 @@ export default function Dashboard() {
         )}
 
           {/* News Section */}
-          <div className="mobile-card brand-card brand-grid" style={{ 
-            marginBottom: '12px',
-            padding: '12px',
-            background: 'var(--surface)',
-            borderRadius: '8px',
-            border: '1px solid var(--border)'
-          }}>
+          <div className="dashboard-card" style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)' }}>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--foreground))' }}>
                 Market News
               </div>
               <button 
@@ -1806,21 +1892,21 @@ export default function Dashboard() {
                 }}
                   style={{ 
                   padding: '4px 8px',
-                  background: 'var(--surface-elevated)',
-                  border: '1px solid var(--border)',
+                  background: 'hsl(var(--muted))',
+                  border: `1px solid hsl(var(--border))`,
                   borderRadius: '4px',
                   fontSize: '10px',
-                  color: 'var(--muted)',
+                  color: 'hsl(var(--muted-foreground))',
                   cursor: 'pointer'
                 }}
               >
                 Refresh
               </button>
-                  </div>
+            </div>
             {newsLoading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--muted)' }}>Loading news...</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--muted-foreground))' }}>Loading news...</div>
             ) : newsError ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--danger)' }}>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--danger))' }}>
                 Failed to load news: {newsError}
               </div>
             ) : newsData && newsData.length > 0 ? (
@@ -1829,19 +1915,19 @@ export default function Dashboard() {
                   {newsData.slice(0, showAllNews ? newsData.length : 3).map((article: any, index: number) => (
                     <div key={index} style={{ 
                       padding: '12px', 
-                      background: 'var(--bg)', 
+                      background: 'hsl(var(--card))', 
                       borderRadius: '6px', 
-                      border: '1px solid var(--border-subtle)',
+                      border: `1px solid hsl(var(--border))`,
                       transition: 'all 0.2s ease',
                       cursor: 'pointer'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'var(--surface-elevated)';
-                      e.currentTarget.style.borderColor = 'var(--brand)';
+                      e.currentTarget.style.background = 'hsl(var(--muted))';
+                      e.currentTarget.style.borderColor = 'hsl(var(--accent))';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'var(--bg)';
-                      e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                      e.currentTarget.style.background = 'hsl(var(--muted))';
+                      e.currentTarget.style.borderColor = 'hsl(var(--border))';
                     }}
                     onClick={() => {
                       if (article.url) {
@@ -1852,14 +1938,14 @@ export default function Dashboard() {
                         fontSize: '13px', 
                         fontWeight: '600', 
                         marginBottom: '6px', 
-                        color: 'var(--text)',
+                        color: 'hsl(var(--foreground))',
                         lineHeight: '1.4'
                       }}>
                         {article.title}
                       </div>
                       <div style={{ 
                         fontSize: '11px', 
-                        color: 'var(--muted)',
+                        color: 'hsl(var(--muted-foreground))',
                         marginBottom: '6px',
                         lineHeight: '1.3'
                       }}>
@@ -1870,7 +1956,7 @@ export default function Dashboard() {
                         justifyContent: 'space-between', 
                         alignItems: 'center',
                         fontSize: '10px',
-                        color: 'var(--muted)'
+                        color: 'hsl(var(--muted-foreground))'
                       }}>
                         <span>
                           {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('en-US', {
@@ -1911,25 +1997,19 @@ export default function Dashboard() {
                 )}
               </>
             ) : (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--muted)' }}>No news available</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--muted-foreground))' }}>No news available</div>
             )}
           </div>
 
           {/* Live Prices */}
-          <div className="mobile-card brand-card brand-sparkline" style={{ 
-            marginBottom: '12px',
-            padding: '12px',
-            background: 'var(--surface)',
-            borderRadius: '8px',
-            border: '1px solid var(--border)'
-          }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'var(--text)' }}>
+          <div className="dashboard-card" style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'hsl(var(--foreground))' }}>
               Live Prices
             </div>
             {quotesLoading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--muted)' }}>Loading prices...</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--muted-foreground))' }}>Loading prices...</div>
             ) : quotesError ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--danger)' }}>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--danger))' }}>
                 Failed to load prices: {quotesError}
               </div>
             ) : quotesData && Object.keys(quotesData).length > 0 ? (
@@ -1945,7 +2025,7 @@ export default function Dashboard() {
                   border: '1px solid var(--border-subtle)',
                   fontSize: '11px',
                   fontWeight: '600',
-                  color: 'var(--muted)',
+                  color: 'hsl(var(--muted-foreground))',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -1973,7 +2053,7 @@ export default function Dashboard() {
                   <div style={{ 
                       fontSize: '12px', 
                       fontWeight: '600', 
-                      color: 'var(--text)',
+                      color: 'hsl(var(--foreground))',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px'
@@ -1989,7 +2069,7 @@ export default function Dashboard() {
                     </div>
                     <div style={{ 
                       fontSize: '12px', 
-                      color: 'var(--text)',
+                      color: 'hsl(var(--foreground))',
                       textAlign: 'right',
                       fontWeight: '500'
                     }}>
@@ -2018,7 +2098,7 @@ export default function Dashboard() {
                   justifyContent: 'center', 
                   gap: '4px',
                   fontSize: '10px',
-                  color: 'var(--muted)',
+                  color: 'hsl(var(--muted-foreground))',
                   marginTop: '4px'
                 }}>
                   <div style={{
@@ -2037,13 +2117,7 @@ export default function Dashboard() {
           </div>
 
           {/* Most Traded */}
-          <div className="mobile-card brand-card brand-candlestick" style={{ 
-            marginBottom: '12px',
-              padding: '12px', 
-            background: 'var(--surface)',
-            borderRadius: '8px',
-            border: '1px solid var(--border)'
-          }}>
+          <div className="dashboard-card" style={{ marginBottom: '24px' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'var(--text)' }}>
               Most Traded Stocks
             </div>
@@ -2066,7 +2140,7 @@ export default function Dashboard() {
                   border: '1px solid var(--border-subtle)',
                   fontSize: '11px',
                   fontWeight: '600',
-                  color: 'var(--muted)',
+                  color: 'hsl(var(--muted-foreground))',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -2094,7 +2168,7 @@ export default function Dashboard() {
                     <div style={{ 
                       fontSize: '12px', 
                       fontWeight: '600', 
-                      color: 'var(--text)',
+                      color: 'hsl(var(--foreground))',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px'
@@ -2110,7 +2184,7 @@ export default function Dashboard() {
           </div>
                     <div style={{ 
                       fontSize: '12px', 
-                      color: 'var(--text)',
+                      color: 'hsl(var(--foreground))',
                       textAlign: 'right',
                       fontWeight: '500'
                     }}>
@@ -2139,7 +2213,7 @@ export default function Dashboard() {
                   justifyContent: 'center', 
                   gap: '4px',
                   fontSize: '10px',
-                  color: 'var(--muted)',
+                  color: 'hsl(var(--muted-foreground))',
                   marginTop: '4px'
                 }}>
                   <div style={{
@@ -2161,9 +2235,9 @@ export default function Dashboard() {
           <div id="settings" className="mobile-card brand-card brand-grid" style={{ 
             marginBottom: '12px',
             padding: '12px',
-            background: 'var(--surface)',
+            background: 'hsl(var(--card))',
             borderRadius: '8px',
-            border: '1px solid var(--border)',
+            border: `1px solid hsl(var(--border))`,
             scrollMarginTop: '80px'
           }}>
             {isAuthenticated && user ? (
@@ -2196,7 +2270,7 @@ export default function Dashboard() {
                   Sign In Required
                 </h3>
                 <p style={{ 
-                  color: 'var(--muted)', 
+                  color: 'hsl(var(--muted-foreground))', 
                   fontSize: '14px',
                   margin: '0'
                 }}>
@@ -2219,325 +2293,10 @@ export default function Dashboard() {
               <ReferralProgram userId={user.uid} />
             </div>
           )}
-      </main>
 
-
-      {/* Footer */}
-      <footer style={{ 
-        marginTop: 'clamp(40px, 8vw, 80px)', 
-        paddingTop: 'clamp(20px, 4vw, 32px)', 
-        borderTop: '1px solid var(--border)', 
-        textAlign: 'center', 
-        background: 'var(--bg)',
-        padding: 'clamp(20px, 4vw, 32px) clamp(12px, 3vw, 24px)',
-        width: '100%',
-        maxWidth: '100vw',
-        boxSizing: 'border-box'
-      }}>
-        <div style={{ 
-          maxWidth: '1200px', 
-          margin: '0 auto',
-          width: '100%',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '24px'
-        }}>
-          {/* Brand & Legal */}
-          <div style={{ textAlign: 'center' }}>
-            <span className="brand-wordmark brand-wordmark-small">Pocket Portfolio<span className="brand-wordmark-dot">.</span></span>
-            <p id="privacy-status" style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '8px 0 0 0' }}>© 2025 Open Source. Local-First.</p>
-          </div>
-
-          {/* The Money Links (Bolded) */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            <Link href="/for/advisors" style={{ 
-              color: '#D97706',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#B45309'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#D97706'}
-            >
-              For Advisors
-            </Link>
-            <Link href="/features/google-drive-sync" style={{ 
-              color: 'var(--text)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-            >
-              Google Drive Sync
-            </Link>
-            <Link href="/tools/google-sheets-formula" style={{ 
-              color: 'var(--text)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-            >
-              Google Sheets
-            </Link>
-            <Link href="/sponsor" style={{ 
-              color: 'var(--text)',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
-            >
-              Founders Club
-            </Link>
-          </div>
-
-          {/* Tool Links */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            marginBottom: '16px', 
-            flexWrap: 'wrap' 
-          }}>
-            <Link href="/openbrokercsv" style={{ 
-              padding: '12px 24px', 
-              border: '1px solid var(--border)', 
-              borderRadius: '8px', 
-              color: 'var(--text)', 
-              textDecoration: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D97706';
-              e.currentTarget.style.color = '#D97706';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.color = '#1a1a1a';
-            }}
-            >
-              OpenBrokerCSV
-            </Link>
-            <Link href="/static/portfolio-tracker" style={{ 
-              padding: '12px 24px', 
-              border: '1px solid var(--border)', 
-              borderRadius: '8px', 
-              color: 'var(--text)', 
-              textDecoration: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D97706';
-              e.currentTarget.style.color = '#D97706';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.color = '#1a1a1a';
-            }}
-            >
-              Portfolio Tracker
-            </Link>
-            <Link href="/static/csv-etoro-to-openbrokercsv" style={{ 
-              padding: '12px 24px', 
-              border: '1px solid var(--border)', 
-              borderRadius: '8px', 
-              color: 'var(--text)', 
-              textDecoration: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#D97706';
-              e.currentTarget.style.color = '#D97706';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.color = '#1a1a1a';
-            }}
-            >
-              eToro → OpenBrokerCSV
-            </Link>
-          </div>
-
-          {/* The Trust Links */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            color: '#666'
-          }}>
-            <Link href="/live" style={{ 
-              color: '#666',
-              textDecoration: 'none',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              Browse Stocks
-            </Link>
-            <a 
-              href="https://github.com/PocketPortfolio/Financialprofilenetwork" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              GitHub
-            </a>
-          </div>
-
-          {/* Community Links */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '24px', 
-            flexWrap: 'wrap',
-            fontSize: '14px',
-            color: '#666'
-          }}>
-            <Link 
-              href="/blog" 
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              Blog & News
-            </Link>
-            <a 
-              href="https://dev.to/pocketportfolioapp" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              Dev.to
-            </a>
-            <a 
-              href="https://coderlegion.com/5738/welcome-to-coderlegion-22s" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              CoderLegion
-            </a>
-            <a 
-              href="https://discord.gg/Ch9PpjRzwe" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              Discord
-            </a>
-            <a 
-              href="https://www.linkedin.com/company/pocket-portfolio-community" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              LinkedIn
-            </a>
-            <a 
-              href="https://www.webone.one" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              1EO Certified
-            </a>
-            <Link 
-              href="/dashboard" 
-              style={{ 
-                color: '#666',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1a1a1a'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
-            >
-              Launch App
-            </Link>
-          </div>
-
-          {/* Disclaimer */}
-          <div style={{ 
-            marginTop: '16px',
-            padding: '12px 16px',
-            background: '#FFFFFF',
-            border: '1px solid rgba(245, 158, 11, 0.2)',
-            borderRadius: '8px',
-            maxWidth: '800px',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-          }}>
-            <p style={{ 
-              color: '#666',
-              fontSize: '12px',
-              margin: 0,
-              lineHeight: '1.5'
-            }}>
-              <strong>⚠️ Disclaimer:</strong> Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
-            </p>
-          </div>
-        </div>
-      </footer>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete All Trades Confirmation Modal */}
       <ConfirmationModal
         isOpen={showDeleteModal}
         title="Delete All Trades"
@@ -2548,6 +2307,22 @@ export default function Dashboard() {
         onConfirm={confirmDeleteAllTrades}
         onCancel={() => setShowDeleteModal(false)}
         isLoading={isDeleting}
+      />
+
+      {/* Delete Individual Trades Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteConfirm.isOpen}
+        title="Delete Trades"
+        message={`Delete all ${deleteConfirm.count} trades for ${deleteConfirm.symbol}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="delete"
+        onConfirm={() => {
+          const tradesToDelete = trades.filter(t => t.ticker === deleteConfirm.symbol);
+          tradesToDelete.forEach(t => handleDeleteTrade(t.id));
+          setDeleteConfirm({ isOpen: false, symbol: '', count: 0 });
+        }}
+        onCancel={() => setDeleteConfirm({ isOpen: false, symbol: '', count: 0 })}
       />
 
       {/* Alert Modal */}

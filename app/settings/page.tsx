@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import MobileHeader from '../components/nav/MobileHeader';
+import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import { auth } from '../lib/firebase';
 import { AccountService } from '../services/accountService';
 import { useTrades } from '../hooks/useTrades';
@@ -12,13 +12,22 @@ import { clearLocalPortfolio, exportLocalPortfolio } from '../lib/store/localPor
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import AlertModal from '../components/modals/AlertModal';
 import DriveSyncSettings from '../components/DriveSyncSettings';
+import { NotificationSettings } from '../components/NotificationSettings';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
+import FoundersClubBanner from '../components/FoundersClubBanner';
 
 export default function SettingsPage() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   const { syncState } = useGoogleDrive();
   const { tier, unlockedTheme, hasFounderTheme, hasCorporateTheme } = usePremiumTheme();
+
+  // Map tier to data-tier attribute for CSS targeting
+  const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
+    if (tier === 'foundersClub') return 'founder';
+    if (tier === 'corporateSponsor') return 'corporate';
+    return 'free';
+  };
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
   const [tierFromApi, setTier] = useState<string | null>(null);
@@ -306,18 +315,23 @@ export default function SettingsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        flexDirection: 'column',
-        background: 'var(--bg)',
-        color: 'var(--text)'
-      }}>
+      <div 
+        data-tier={getTierForDataAttribute(tier)}
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
+        style={{
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}
+      >
         <SEOHead 
           title="Settings - Pocket Portfolio"
           description="Manage your account settings and preferences"
         />
-        <MobileHeader title="Settings" fixed={false} />
+        <SovereignHeader 
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
+        <FoundersClubBanner />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -333,8 +347,8 @@ export default function SettingsPage() {
             <button
               onClick={signInWithGoogle}
               style={{
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                color: 'white',
+                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
+                color: 'hsl(var(--primary-foreground))',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '12px 24px',
@@ -353,18 +367,23 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      background: 'var(--bg)',
-      color: 'var(--text)'
-    }}>
+    <div 
+      data-tier={getTierForDataAttribute(tier)}
+      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
+      style={{
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}
+    >
       <SEOHead 
         title="Settings - Pocket Portfolio"
         description="Manage your account settings and preferences"
       />
-      <MobileHeader title="Settings" fixed={false} />
+      <SovereignHeader 
+        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
+        lastSyncTime={syncState.lastSyncTime}
+        user={user}
+      />
+      <FoundersClubBanner />
       
       <main style={{ 
         flex: 1, 
@@ -383,7 +402,7 @@ export default function SettingsPage() {
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+              background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -425,7 +444,7 @@ export default function SettingsPage() {
               width: '48px',
               height: '48px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+              background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -462,6 +481,9 @@ export default function SettingsPage() {
 
         {/* Drive Sync Section */}
         <DriveSyncSettings />
+
+        {/* Push Notifications Section */}
+        <NotificationSettings />
 
         {/* Premium Theme Section - Only show for sponsors */}
         {(hasFounderTheme || hasCorporateTheme) && (
@@ -716,8 +738,8 @@ export default function SettingsPage() {
                 href="/sponsor?utm_source=settings_api&utm_medium=power_user_card&utm_campaign=founders_club"
                 style={{
                   padding: '12px 24px',
-                  background: '#f59e0b',
-                  color: '#000000',
+                  background: 'hsl(var(--primary))',
+                  color: 'hsl(var(--primary-foreground))',
                   textDecoration: 'none',
                   borderRadius: '8px',
                   fontSize: '14px',
@@ -725,11 +747,11 @@ export default function SettingsPage() {
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#d97706';
+                  e.currentTarget.style.background = 'hsl(var(--primary) / 0.8)';
                   e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#f59e0b';
+                  e.currentTarget.style.background = 'hsl(var(--primary))';
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
@@ -872,26 +894,6 @@ export default function SettingsPage() {
             >
               {isDeleting ? '⏳ Deleting...' : '🗑️ Delete All Data'}
             </button>
-          </div>
-        </div>
-
-        {/* About Section */}
-        <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: '12px',
-          padding: '24px'
-        }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>About</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', color: 'var(--muted)' }}>
-            <div>Pocket Portfolio v2.0</div>
-            <div>Built with Next.js 14 and React 18</div>
-            <div>Open source portfolio tracker</div>
-            <div style={{ marginTop: '8px' }}>
-              <a href="/" style={{ color: 'var(--accent-warm)', textDecoration: 'none' }}>
-                Learn more about Pocket Portfolio →
-              </a>
-            </div>
           </div>
         </div>
       </main>

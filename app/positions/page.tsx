@@ -4,13 +4,15 @@ import React, { useState } from 'react';
 import { useTrades } from '../hooks/useTrades';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import Header from '../components/Header';
-import MobileHeader from '../components/nav/MobileHeader';
+import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
 import { Trade } from '../services/tradeService';
 import { useQuotes } from '../hooks/useDataFetching';
 import { BrandProvider } from '../lib/brand/theme';
 import AlertModal from '../components/modals/AlertModal';
+import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { usePremiumTheme } from '../hooks/usePremiumTheme';
+import FoundersClubBanner from '../components/FoundersClubBanner';
 
 interface Position {
   ticker: string;
@@ -29,8 +31,17 @@ interface Position {
 export default function PositionsPage() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   const { trades, deleteTrade } = useTrades();
+  const { syncState } = useGoogleDrive();
+  const { tier } = usePremiumTheme();
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
+
+  // Map tier to data-tier attribute for CSS targeting
+  const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
+    if (tier === 'foundersClub') return 'founder';
+    if (tier === 'corporateSponsor') return 'corporate';
+    return 'free';
+  };
 
   // Debug: Log trades state changes (disabled to reduce console noise)
   // React.useEffect(() => {
@@ -139,18 +150,22 @@ export default function PositionsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        flexDirection: 'column',
-        background: 'var(--bg)',
-        color: 'var(--text)'
-      }}>
+      <div 
+        data-tier={getTierForDataAttribute(tier)}
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
+        style={{
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}
+      >
         <SEOHead 
           title="Positions - Pocket Portfolio"
           description="View your portfolio positions and holdings"
         />
-        <MobileHeader title="Positions" />
+        <SovereignHeader 
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
+          user={user}
+        />
+        <FoundersClubBanner />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -166,8 +181,8 @@ export default function PositionsPage() {
             <button
               onClick={signInWithGoogle}
               style={{
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                color: 'white',
+                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
+                color: 'hsl(var(--primary-foreground))',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '12px 24px',
@@ -186,18 +201,22 @@ export default function PositionsPage() {
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      background: 'var(--bg)',
-      color: 'var(--text)'
-    }}>
+    <div 
+      data-tier={getTierForDataAttribute(tier)}
+      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
+      style={{
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}
+    >
       <SEOHead 
         title="Positions - Pocket Portfolio"
         description="View your portfolio positions and holdings"
       />
-      <MobileHeader title="Positions" />
+      <SovereignHeader 
+        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
+        user={user}
+      />
+      <FoundersClubBanner />
       
       <main style={{ 
         flex: 1, 
@@ -216,7 +235,7 @@ export default function PositionsPage() {
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+              background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -260,8 +279,8 @@ export default function PositionsPage() {
             <a 
               href="/dashboard"
               style={{
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                color: 'white',
+                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
+                color: 'hsl(var(--primary-foreground))',
                 textDecoration: 'none',
                 borderRadius: '8px',
                 padding: '12px 24px',

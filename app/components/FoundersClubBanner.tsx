@@ -28,16 +28,17 @@ export default function FoundersClubBanner() {
 
   return (
     <div
+      className="founder-banner"
       style={{
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        background: '#000000',
-        color: '#f59e0b',
+        background: 'hsl(var(--card))',
+        color: 'hsl(var(--primary))',
         padding: '12px 24px',
         textAlign: 'center',
-        borderBottom: '2px solid #f59e0b',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+        borderBottom: `2px solid hsl(var(--primary))`,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
       }}
     >
       <div
@@ -56,8 +57,8 @@ export default function FoundersClubBanner() {
           href="/sponsor?utm_source=dashboard_banner&utm_medium=sticky_cta&utm_campaign=founders_club"
           style={{
             padding: '8px 20px',
-            background: '#f59e0b',
-            color: '#000000',
+            background: 'hsl(var(--primary))',
+            color: 'hsl(var(--primary-foreground))',
             textDecoration: 'none',
             borderRadius: '6px',
             fontSize: '14px',
@@ -67,11 +68,11 @@ export default function FoundersClubBanner() {
             display: 'inline-block',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#d97706';
+            e.currentTarget.style.background = 'hsl(var(--primary) / 0.9)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = '#f59e0b';
+            e.currentTarget.style.background = 'hsl(var(--primary))';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >

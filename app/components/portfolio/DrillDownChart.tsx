@@ -40,7 +40,7 @@ function groupBySector(positions: Position[]): Record<string, Position[]> {
  */
 export default function DrillDownChart({
   positions,
-  chartView = 'pie',
+  chartView = 'treemap',
   onChartViewChange,
   drillDownPath,
   onDrillDown,

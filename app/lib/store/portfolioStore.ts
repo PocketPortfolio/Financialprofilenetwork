@@ -62,7 +62,7 @@ export const usePortfolioStore = create<PortfolioState>()(
       // Initial state
       positions: [],
       historicalData: [],
-      chartView: 'pie',
+      chartView: 'treemap',
       timeRange: '1M',
       selectedSectors: [],
       sectorFilter: {

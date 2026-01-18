@@ -158,7 +158,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
   };
 
   return (
-    <div ref={searchRef} style={{ position: 'relative', width: '100%', zIndex: 9999, overflow: 'visible' }}>
+    <div ref={searchRef} style={{ position: 'relative', width: '100%', zIndex: 1 }}>
       <input
         ref={inputRef}
         type="text"
@@ -197,7 +197,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
           borderTop: 'none',
           borderRadius: '0 0 8px 8px',
           boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)',
-          zIndex: 9999999,
+          zIndex: 50,
           maxHeight: '200px',
           overflow: 'hidden',
           transform: 'translateZ(0)'

@@ -1,5 +1,294 @@
 /* Pocket Portfolio Global Styles */
 
+/* ROLLBACK: Tailwind CSS v4 import disabled to prevent style conflicts with production dashboard */
+/* @import "tailwindcss"; */
+
+/* Sovereign V2 - Terminal Aesthetic */
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Ensure all numbers use monospace */
+[class*="text-"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Semantic Theme Variables - Light & Dark Mode Support */
+@layer base {
+  :root {
+    /* ☀️ LIGHT MODE: "Pocket Portfolio" Brand Identity */
+    
+    /* 1. BACKGROUND: Warm, subtle Salmon-tinted White */
+    --background: 28 100% 91%;      /* #ffe6d1 - Warm orange-tinted white */
+    
+    /* 2. FOREGROUND: Deep Warm Brown-Grey (not cold Blue-Grey) */
+    --foreground: 20 25% 15%;       /* Deep warm brown-grey for readability */
+    
+    /* 3. CARDS: Pure White (pops off warm background) */
+    --card: 0 0% 100%;              /* Pure White */
+    --card-foreground: 20 25% 15%;  /* Deep warm brown-grey */
+    
+    /* 4. POPOVER: White with warm text */
+    --popover: 0 0% 100%;           /* White */
+    --popover-foreground: 20 25% 15%;
+    
+    /* 5. PRIMARY BRAND COLOR: Pocket Portfolio Salmon/Orange */
+    --primary: 14 100% 60%;         /* #ff6b35 - Brand Salmon/Orange */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+    
+    /* 6. SECONDARY: Warm light grey */
+    --secondary: 28 30% 96%;         /* Warm light grey */
+    --secondary-foreground: 20 25% 15%;
+    
+    /* 7. MUTED: Warm greys */
+    --muted: 28 30% 96%;            /* Warm light grey background */
+    --muted-foreground: 20 15% 40%; /* Warm medium grey text */
+    
+    /* 8. ACCENT: Matches primary (Brand Salmon) */
+    --accent: 14 100% 60%;          /* #ff6b35 - Same as primary */
+    --accent-foreground: 0 0% 100%;
+    
+    /* 9. DESTRUCTIVE: Keep red for errors */
+    --destructive: 0 84% 60%;       /* Rose-500 */
+    --destructive-foreground: 0 0% 100%;
+    
+    /* 10. BORDERS: Soft warm pink/grey */
+    --border: 28 25% 88%;           /* Warm light border */
+    --input: 28 25% 88%;            /* Same as border */
+    --ring: 14 100% 60%;            /* Brand Salmon for focus rings */
+    
+    /* 11. DANGER: Alias for destructive */
+    --danger: 0 84% 60%;            /* Rose-500 */
+    
+    /* 12. RADIUS: Friendly corners for brand warmth */
+    --radius: 0.5rem;
+  }
+
+  [data-theme="dark"],
+  .dark {
+    /* 🌑 DARK MODE ("The Terminal") */
+    --background: 222 47% 11%;      /* Slate-950 */
+    --foreground: 210 40% 98%;      /* Slate-50 */
+    
+    --card: 217 33% 17%;            /* Slate-900/50 */
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 142 71% 45%;         /* Emerald-500 (Neon for Dark BG) */
+    --primary-foreground: 144 65% 10%;
+    
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%; /* Slate-400 */
+    
+    --accent: 142 71% 45%;          /* Emerald-500 (Same as primary) */
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;          /* Slate-800 */
+    --input: 217 33% 17%;
+    --ring: 212.7 26.8% 83.9%;
+    
+    --danger: 0 84% 60%;            /* Rose-500 */
+  }
+}
+
+/* ----------------------------------------------------
+   TIERED DESIGN SYSTEM
+   Each tier gets its own primary/accent color identity
+   ---------------------------------------------------- */
+
+/* TIER 1: FREE USER (The "Pocket Portfolio" Brand Standard)
+   Identity: Brand Salmon/Orange (Warmth, Growth) */
+[data-tier='free'] {
+  --primary: 14 100% 60%;  /* #ff6b35 - Brand Salmon/Orange */
+  --accent: 14 100% 60%;   /* Brand Salmon/Orange */
+  --ring: 14 100% 60%;
+}
+
+[data-theme="dark"] [data-tier='free'],
+.dark [data-tier='free'] {
+  --primary: 14 100% 65%;  /* Slightly brighter for dark mode */
+  --accent: 14 100% 65%;
+  --ring: 14 100% 65%;
+}
+
+/* TIER 2: UK FOUNDERS CLUB (The "Premium" Standard)
+   Identity: Gold / Amber (Wealth) */
+[data-tier='founder'] {
+  --primary: 43 96% 58%;   /* Gold-500 / Amber-500 */
+  --accent: 43 96% 58%;   /* Gold-500 / Amber-500 */
+  --ring: 43 96% 58%;
+  --radius: 0px;          /* Founders get sharp, premium edges */
+}
+
+[data-theme="dark"] [data-tier='founder'],
+.dark [data-tier='founder'] {
+  --primary: 45 93% 47%;   /* Gold-600 (Darker for contrast on dark bg) */
+  --accent: 45 93% 47%;    /* Gold-600 */
+  --ring: 45 93% 47%;
+}
+
+/* TIER 3: CORPORATE (The "Enterprise" Standard)
+   Identity: Corporate Green (Trust) - Matching Sponsor Page */
+[data-tier='corporate'] {
+  --primary: 151 55% 41%;  /* Emerald-600 (Same as Free, but can be customized) */
+  --accent: 151 55% 41%;   /* Emerald-600 */
+  --ring: 151 55% 41%;
+  --radius: 0.5rem;        /* Softer, friendly edges for corporate */
+}
+
+[data-theme="dark"] [data-tier='corporate'],
+.dark [data-tier='corporate'] {
+  --primary: 142 71% 45%;  /* Emerald-500 (Brighter for dark bg) */
+  --accent: 142 71% 45%;   /* Emerald-500 */
+  --ring: 142 71% 45%;
+}
+
+/* Founders Club Specific Banner Override */
+[data-tier='founder'] .founder-banner {
+  background: linear-gradient(135deg, hsl(222 47% 11%) 0%, hsl(217 33% 17%) 100%);
+  border: 1px solid hsl(var(--primary));
+  color: hsl(var(--primary));
+}
+
+/* Utility classes using semantic variables */
+.bg-background {
+  background-color: hsl(var(--background));
+}
+.text-foreground {
+  color: hsl(var(--foreground));
+}
+.bg-card {
+  background-color: hsl(var(--card));
+}
+.text-card-foreground {
+  color: hsl(var(--card-foreground));
+}
+.border-border {
+  border-color: hsl(var(--border));
+}
+.bg-muted {
+  background-color: hsl(var(--muted));
+}
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+}
+.text-accent {
+  color: hsl(var(--accent));
+}
+.text-danger {
+  color: hsl(var(--danger));
+}
+.text-primary {
+  color: hsl(var(--primary));
+}
+.bg-primary {
+  background-color: hsl(var(--primary));
+}
+.text-primary-foreground {
+  color: hsl(var(--primary-foreground));
+}
+.bg-secondary {
+  background-color: hsl(var(--secondary));
+}
+.text-secondary-foreground {
+  color: hsl(var(--secondary-foreground));
+}
+.text-destructive {
+  color: hsl(var(--destructive));
+}
+.bg-destructive {
+  background-color: hsl(var(--destructive));
+}
+.text-destructive-foreground {
+  color: hsl(var(--destructive-foreground));
+}
+
+/* Dashboard Card Standard - Theme-Aware */
+.dashboard-card {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 2px;
+  padding: 24px;
+  color: hsl(var(--card-foreground)) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.dashboard-card h1,
+.dashboard-card h2,
+.dashboard-card h3 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.dashboard-card p,
+.dashboard-card span:not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-accent"]):not([class*="text-danger"]) {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Sovereign V2 - Theme-Aware Dashboard */
+.sovereign-dashboard {
+  /* Use semantic variables - automatically switches with theme */
+  color: hsl(var(--foreground));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply dashboard-card styles to all card-like elements - Theme-Aware */
+.sovereign-dashboard .bg-slate-900\/30,
+.sovereign-dashboard [class*="mobile-card"],
+.sovereign-dashboard [class*="brand-card"] {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 2px;
+  padding: 24px;
+  color: hsl(var(--card-foreground)) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme-aware text elements */
+.sovereign-dashboard p,
+.sovereign-dashboard span:not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-accent"]):not([class*="text-danger"]),
+.sovereign-dashboard div:not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-accent"]):not([class*="text-danger"]),
+.sovereign-dashboard h1,
+.sovereign-dashboard h2,
+.sovereign-dashboard h3 {
+  color: hsl(var(--foreground));
+  transition: color 0.3s ease;
+}
+
+/* Logo color fix */
+.sovereign-dashboard img[alt="Pocket Portfolio"] {
+  filter: brightness(1.2) contrast(1.1);
+}
+
+/* Fade in animation for tooltips */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Pulse animation for skeleton loaders */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* Import mobile animations */
 @import './styles/animations.css';
 

@@ -2,361 +2,361 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.pocketportfolio.app/import</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/openbrokercsv</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/static/csv-etoro-to-openbrokercsv</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/etoro</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/trading212</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/coinbase</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/interactive-brokers</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/revolut</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/freetrade</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/robinhood</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/webull</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/schwab</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/fidelity</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/td-ameritrade</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/etrade</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/vanguard</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/m1-finance</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/sofi</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/ally-invest</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/firstrade</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/public</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/stash</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/acorns</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/betterment</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/wealthfront</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/moomoo</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/tradestation</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/tastyworks</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/hargreaves-lansdown</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/aj-bell</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/ig</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/saxo</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/degiro</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/xtb</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/plus500</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/cmc-markets</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/city-index</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/finecobank</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/scalable-capital</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/trade-republic</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/binance</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/kraken</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/gemini</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/bitfinex</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/kucoin</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/okx</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/bybit</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/gate-io</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/crypto-com</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/bitstamp</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/swissquote</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/dbs-vickers</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/questrade</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/wealthsimple</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/commsec</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/selfwealth</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/koinly</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/turbotax</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/ghostfolio</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.pocketportfolio.app/import/sharesight</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

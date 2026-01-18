@@ -15,12 +15,24 @@ import {
   ResponsiveContainer,
   Treemap,
 } from 'recharts';
+import { LayoutGrid, Thermometer, BarChart3, CircleDashed, PieChart as PieChartIcon } from 'lucide-react';
 import type { Position } from '@/app/lib/utils/portfolioCalculations';
 import type { ChartViewType } from '@/app/lib/portfolio/types';
 import ChartTooltip from './ChartTooltip';
 import { getSectorSync } from '@/app/lib/portfolio/sectorService';
 import { GICSSector } from '@/app/lib/portfolio/sectorClassification';
 import { formatCurrencyAxis } from '@/app/lib/utils/currencyFormatter';
+
+// Helper to calculate color brightness for text contrast
+function getColorBrightness(hex: string): number {
+  // Remove # if present
+  const color = hex.replace('#', '');
+  const r = parseInt(color.substr(0, 2), 16);
+  const g = parseInt(color.substr(2, 2), 16);
+  const b = parseInt(color.substr(4, 2), 16);
+  // Calculate relative luminance
+  return (r * 299 + g * 587 + b * 114) / 1000;
+}
 
 interface PortfolioAllocationChartProps {
   positions: Position[];
@@ -50,7 +62,7 @@ const COLORS = [
  */
 export default function PortfolioAllocationChart({
   positions,
-  chartView = 'pie',
+  chartView = 'treemap',
   onChartViewChange,
   onSegmentClick,
 }: PortfolioAllocationChartProps) {
@@ -182,8 +194,14 @@ export default function PortfolioAllocationChart({
     );
   }
 
-  // Chart type selector
-  const chartTypes: ChartViewType[] = ['pie', 'donut', 'bar', 'treemap', 'heatmap'];
+  // Chart type configuration with icons
+  const CHART_TYPES = [
+    { id: 'treemap' as ChartViewType, icon: LayoutGrid, label: 'Map', tooltip: 'Market Map (Size = Value)' },
+    { id: 'heatmap' as ChartViewType, icon: Thermometer, label: 'Heat', tooltip: 'Intensity Map (Color = Concentration)' },
+    { id: 'bar' as ChartViewType, icon: BarChart3, label: 'Rank', tooltip: 'Ranked List (Top 10)' },
+    { id: 'donut' as ChartViewType, icon: CircleDashed, label: 'Ring', tooltip: 'Summary Ring (Classic)' },
+    { id: 'pie' as ChartViewType, icon: PieChartIcon, label: 'Legacy', tooltip: 'Legacy View (Simple)' },
+  ];
 
   // Render chart based on view type
   const renderChart = () => {
@@ -391,6 +409,18 @@ export default function PortfolioAllocationChart({
                 const displayPercentage = percentage || 0;
                 const displayName = name || ticker || 'N/A';
                 
+                // Enhanced thresholds for text rendering
+                const minWidthForText = isMobile ? 60 : 80;
+                const minHeightForText = isMobile ? 30 : 40;
+                const shouldShowText = width > minWidthForText && height > minHeightForText;
+                
+                // Calculate text color based on background brightness
+                const colorBrightness = getColorBrightness(fillColor);
+                const textColor = colorBrightness > 128 ? '#1a1a1a' : '#ffffff';
+                const textStroke = colorBrightness > 128 
+                  ? 'rgba(255, 255, 255, 0.8)' 
+                  : 'rgba(0, 0, 0, 0.3)';
+                
                 return (
                   <g>
                     <rect
@@ -399,31 +429,37 @@ export default function PortfolioAllocationChart({
                       width={width}
                       height={height}
                       fill={fillColor}
-                      stroke="#fff"
-                      strokeWidth={2}
+                      stroke="var(--background)"
+                      strokeWidth={isMobile ? 1.5 : 2}
                       style={{ cursor: 'pointer' }}
                       onClick={() => {
                         onSegmentClick?.(ticker || name);
                       }}
                     />
-                    {width > 60 && height > 30 && (
+                    {shouldShowText && (
                       <>
                         <text
                           x={x + width / 2}
-                          y={y + height / 2 - 8}
+                          y={y + height / 2 - (isMobile ? 6 : 8)}
                           textAnchor="middle"
-                          fill="#fff"
-                          fontSize="12"
+                          fill={textColor}
+                          fontSize={isMobile ? '11' : '14'}
                           fontWeight="600"
+                          stroke={textStroke}
+                          strokeWidth="0.5"
+                          paintOrder="stroke fill"
                         >
                           {displayName}
                         </text>
                         <text
                           x={x + width / 2}
-                          y={y + height / 2 + 8}
+                          y={y + height / 2 + (isMobile ? 6 : 8)}
                           textAnchor="middle"
-                          fill="#fff"
-                          fontSize="10"
+                          fill={textColor}
+                          fontSize={isMobile ? '9' : '11'}
+                          stroke={textStroke}
+                          strokeWidth="0.5"
+                          paintOrder="stroke fill"
                         >
                           {displayPercentage.toFixed(1)}%
                         </text>
@@ -617,14 +653,14 @@ export default function PortfolioAllocationChart({
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
         border: '1px solid var(--border)',
-        padding: isMobile ? 'var(--space-3)' : 'var(--space-4)',
+        padding: isMobile ? '12px' : 'var(--space-4)',
         width: '100%',
         maxWidth: isMobile ? '100%' : '45%', // Reduce border length on desktop
         marginLeft: isMobile ? '0' : 'auto', // Center with equal spacing
         marginRight: isMobile ? '0' : 'auto',
         minHeight: isMobile ? 300 : 400,
         boxSizing: 'border-box',
-        overflow: 'hidden', // Prevent any overflow from children
+        overflow: 'visible', // Allow content to be visible on mobile
       }}
     >
       {/* Header with chart type selector */}
@@ -641,73 +677,97 @@ export default function PortfolioAllocationChart({
           overflow: 'visible', // Ensure header doesn't clip
         }}
       >
-        {/* Chart type selector - compact on mobile to fit all buttons */}
+        {/* Chart type selector - Icon-based with tooltips */}
         {onChartViewChange && (
           <div
             style={{
-              width: isMobile ? '100%' : 'auto', // Fit content on desktop
+              width: isMobile ? '100%' : 'auto',
               maxWidth: isMobile ? '100%' : 'none',
               background: 'var(--surface-elevated)',
               borderRadius: 'var(--radius-sm)',
               padding: isMobile ? '2px' : '4px',
               display: 'flex',
               gap: isMobile ? '2px' : '4px',
-              flexWrap: 'wrap', // Allow wrapping on mobile if needed
+              flexWrap: 'wrap',
+              border: '1px solid var(--border)',
+              boxSizing: 'border-box',
+              overflowX: isMobile ? 'auto' : 'visible', // Allow horizontal scroll on very small screens
+              WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
             }}
           >
-            {chartTypes.map((type) => (
+            {CHART_TYPES.map(({ id, icon: Icon, label, tooltip }) => (
               <button
-                key={type}
-                onClick={() => onChartViewChange(type)}
-                aria-label={`Switch to ${type} chart view`}
-                aria-pressed={chartView === type}
+                key={id}
+                onClick={() => onChartViewChange(id)}
+                aria-label={`Switch to ${label} chart view`}
+                aria-pressed={chartView === id}
+                title={tooltip}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    onChartViewChange(type);
+                    onChartViewChange(id);
                   }
                 }}
                 style={{
-                  padding: isMobile ? 'var(--space-2) var(--space-2)' : 'var(--space-2) var(--space-3)',
-                  flex: isMobile ? '1 1 auto' : '0 0 auto', // Allow buttons to grow/shrink on mobile to fit
-                  minWidth: isMobile ? '60px' : 'auto', // Smaller min width on mobile
-                  minHeight: isMobile ? '36px' : 'auto',
+                  padding: isMobile ? '4px 6px' : '8px 12px',
+                  flex: isMobile ? '1 1 0' : '0 0 auto',
+                  minWidth: isMobile ? '44px' : 'auto',
+                  maxWidth: isMobile ? 'none' : 'auto',
+                  minHeight: isMobile ? '44px' : '40px', // Better touch target (44px minimum)
+                  boxSizing: 'border-box',
                   background:
-                    chartView === type
+                    chartView === id
                       ? 'var(--signal)'
                       : 'var(--surface-elevated)',
                   color:
-                    chartView === type ? 'var(--bg)' : 'var(--text)',
+                    chartView === id ? 'var(--bg)' : 'var(--text)',
                   border: `1px solid ${
-                    chartView === type ? 'var(--signal)' : 'var(--border)'
+                    chartView === id ? 'var(--signal)' : 'var(--border)'
                   }`,
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: isMobile ? '11px' : 'var(--font-size-sm)', // Smaller font on mobile
+                  fontSize: isMobile ? '10px' : '11px',
                   fontWeight: 'var(--font-medium)',
                   cursor: 'pointer',
-                  transition: 'var(--transition-base)',
-                  textTransform: 'capitalize',
-                  whiteSpace: 'nowrap',
-                  touchAction: 'manipulation',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                  position: 'relative',
                 }}
                 onMouseEnter={(e) => {
-                  if (chartView !== type) {
-                    e.currentTarget.style.background = 'var(--surface-elevated)';
+                  if (chartView !== id) {
+                    e.currentTarget.style.background = 'var(--surface)';
                     e.currentTarget.style.borderColor = 'var(--signal)';
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (chartView !== type) {
-                    e.currentTarget.style.background =
-                      chartView === type
-                        ? 'var(--signal)'
-                        : 'var(--surface-elevated)';
-                    e.currentTarget.style.borderColor =
-                      chartView === type ? 'var(--signal)' : 'var(--border)';
+                  if (chartView !== id) {
+                    e.currentTarget.style.background = 'var(--surface-elevated)';
+                    e.currentTarget.style.borderColor = 'var(--border)';
                   }
                 }}
               >
-                {type === 'donut' ? 'Donut' : type.charAt(0).toUpperCase() + type.slice(1)}
+                <Icon 
+                  size={isMobile ? 16 : 16} 
+                  style={{ 
+                    opacity: chartView === id ? 1 : 0.7,
+                    transition: 'opacity 0.2s ease',
+                    flexShrink: 0
+                  }} 
+                />
+                <span style={{ 
+                  fontSize: isMobile ? '9px' : '10px',
+                  lineHeight: 1,
+                  marginTop: '2px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%'
+                }}>
+                  {label}
+                </span>
               </button>
             ))}
           </div>
@@ -726,9 +786,10 @@ export default function PortfolioAllocationChart({
           height: isMobile ? '300px' : '400px',
           minHeight: isMobile ? '300px' : '400px',
           position: 'relative',
-          overflowX: 'hidden', // Always constrain horizontal overflow
+          overflowX: isMobile ? 'auto' : 'hidden', // Allow horizontal scroll on mobile if needed
           overflowY: 'hidden', // Always constrain vertical overflow
           boxSizing: 'border-box',
+          WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
         }}
       >
         {renderChart()}

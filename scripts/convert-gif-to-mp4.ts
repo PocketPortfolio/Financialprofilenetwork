@@ -6,7 +6,7 @@ const inputGif = path.join(process.cwd(), 'public', 'dashboard-demo-4k.gif');
 const outputMp4 = path.join(process.cwd(), 'public', 'dashboard-demo-4k.mp4');
 
 // Check if original video exists (better quality source)
-const originalVideo = path.join(process.cwd(), 'newscreenshots.mp4');
+const originalVideo = path.join(process.cwd(), 'newscreenrecord.mp4');
 const inputSource = fs.existsSync(originalVideo) ? originalVideo : inputGif;
 
 if (!fs.existsSync(inputSource)) {
@@ -32,7 +32,7 @@ try {
   // -an: No audio (silent loop)
   
   execSync(
-    `ffmpeg -y -i "${inputSource}" -vf "scale=3840:-1:flags=lanczos+accurate_rnd+full_chroma_int" -c:v libx264 -preset slow -crf 18 -profile:v high -level 4.2 -pix_fmt yuv420p -r 30 -g 30 -movflags +faststart -an "${outputMp4}"`,
+    `ffmpeg -y -i "${inputSource}" -vf "scale=3840:-2:flags=lanczos+accurate_rnd+full_chroma_int" -c:v libx264 -preset slow -crf 18 -profile:v high -level 4.2 -pix_fmt yuv420p -r 30 -g 30 -movflags +faststart -an "${outputMp4}"`,
     { stdio: 'inherit' }
   );
   

@@ -4,9 +4,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useWatchlist } from '../hooks/useWatchlist';
 import SEOHead from '../components/SEOHead';
-import MobileHeader from '../components/nav/MobileHeader';
+import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import AlertModal from '../components/modals/AlertModal';
 import { getDeviceInfo } from '../lib/utils/device';
+import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { usePremiumTheme } from '../hooks/usePremiumTheme';
+import FoundersClubBanner from '../components/FoundersClubBanner';
 
 interface SearchSuggestion {
   symbol: string;
@@ -17,6 +20,8 @@ interface SearchSuggestion {
 export default function WatchlistPage() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   const { watchlist, loading, error, addToWatchlist, removeFromWatchlist } = useWatchlist();
+  const { syncState } = useGoogleDrive();
+  const { tier } = usePremiumTheme();
   const [newSymbol, setNewSymbol] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -24,6 +29,13 @@ export default function WatchlistPage() {
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Map tier to data-tier attribute for CSS targeting
+  const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
+    if (tier === 'foundersClub') return 'founder';
+    if (tier === 'corporateSponsor') return 'corporate';
+    return 'free';
+  };
 
   // Mobile detection
   useEffect(() => {
@@ -147,18 +159,22 @@ export default function WatchlistPage() {
 
   if (!isAuthenticated) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        flexDirection: 'column',
-        background: 'var(--bg)',
-        color: 'var(--text)'
-      }}>
+      <div 
+        data-tier={getTierForDataAttribute(tier)}
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
+        style={{
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}
+      >
         <SEOHead 
           title="Watchlist - Pocket Portfolio"
           description="Track your favorite stocks and investments"
         />
-        <MobileHeader title="Watchlist" />
+        <SovereignHeader 
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
+          user={user}
+        />
+        <FoundersClubBanner />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -174,8 +190,8 @@ export default function WatchlistPage() {
             <button
               onClick={signInWithGoogle}
               style={{
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                color: 'white',
+                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
+                color: 'hsl(var(--primary-foreground))',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '12px 24px',
@@ -194,18 +210,22 @@ export default function WatchlistPage() {
   }
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      background: 'var(--bg)',
-      color: 'var(--text)'
-    }}>
+    <div 
+      data-tier={getTierForDataAttribute(tier)}
+      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
+      style={{
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}
+    >
       <SEOHead 
         title="Watchlist - Pocket Portfolio"
         description="Track your favorite stocks and investments"
       />
-      <MobileHeader title="Watchlist" />
+      <SovereignHeader 
+        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
+        user={user}
+      />
+      <FoundersClubBanner />
       
       <main style={{ 
         flex: 1, 
@@ -227,7 +247,7 @@ export default function WatchlistPage() {
               width: isMobile ? '40px' : '48px',
               height: isMobile ? '40px' : '48px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+              background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -300,7 +320,7 @@ export default function WatchlistPage() {
                   background: 'var(--surface)',
                   border: '1px solid var(--border)',
                   borderRadius: '8px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'hsl(var(--foreground) / 0.1) 0 4px 12px',
                   zIndex: 1000,
                   maxHeight: '200px',
                   overflowY: 'auto'
@@ -353,8 +373,8 @@ export default function WatchlistPage() {
             <button
               type="submit"
               style={{
-                background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-                color: 'white',
+                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
+                color: 'hsl(var(--primary-foreground))',
                 border: 'none',
                 borderRadius: '8px',
                 padding: isMobile ? '12px 16px' : '12px 24px',
@@ -367,7 +387,7 @@ export default function WatchlistPage() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
+                e.currentTarget.style.boxShadow = `0 4px 12px hsla(var(--primary), 0.3)`;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
@@ -397,8 +417,8 @@ export default function WatchlistPage() {
         {/* Error Display */}
         {error && (
           <div style={{
-            background: 'var(--danger)',
-            color: 'white',
+            background: 'hsl(var(--danger))',
+            color: 'hsl(var(--destructive-foreground))',
             padding: '12px 16px',
             borderRadius: '8px',
             marginBottom: '16px',
@@ -522,8 +542,8 @@ export default function WatchlistPage() {
                 <button
                   onClick={() => handleRemoveFromWatchlist(item.id!)}
                   style={{
-                    background: 'var(--danger)',
-                    color: 'white',
+                    background: 'hsl(var(--danger))',
+                    color: 'hsl(var(--destructive-foreground))',
                     border: 'none',
                     borderRadius: '6px',
                     padding: isMobile ? '6px 10px' : '8px 12px',

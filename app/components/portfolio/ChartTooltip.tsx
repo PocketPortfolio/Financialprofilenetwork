@@ -43,15 +43,16 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
     <div
       style={{
         background: 'var(--surface-elevated)',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--signal)',
         borderRadius: 'var(--radius-md)',
         padding: 'var(--space-3)',
-        boxShadow: 'var(--shadow-lg)',
-        minWidth: '200px',
-        maxWidth: '300px',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+        minWidth: '220px',
+        maxWidth: '320px',
+        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
       }}
     >
-      {/* Header */}
+      {/* Header with accent line */}
       <div
         style={{
           display: 'flex',
@@ -59,7 +60,7 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
           justifyContent: 'space-between',
           marginBottom: 'var(--space-2)',
           paddingBottom: 'var(--space-2)',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: '2px solid var(--signal)',
         }}
       >
         <div
@@ -67,6 +68,7 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
             fontSize: 'var(--font-size-base)',
             fontWeight: 'var(--font-semibold)',
             color: 'var(--text)',
+            letterSpacing: '0.05em',
           }}
         >
           {position.ticker}
@@ -74,28 +76,32 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
         {position.color && (
           <div
             style={{
-              width: '12px',
-              height: '12px',
+              width: '14px',
+              height: '14px',
               borderRadius: '50%',
               backgroundColor: position.color,
               flexShrink: 0,
+              border: '1px solid var(--border)',
             }}
           />
         )}
       </div>
 
-      {/* Sector */}
+      {/* Sector - Terminal style */}
       <div
         style={{
           fontSize: 'var(--font-size-sm)',
           color: 'var(--text-secondary)',
           marginBottom: 'var(--space-3)',
+          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
         }}
       >
         {sector}
       </div>
 
-      {/* Metrics Grid */}
+      {/* Metrics Grid - Enhanced */}
       <div
         style={{
           display: 'grid',
@@ -106,10 +112,10 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
       >
         {/* Quantity */}
         <div>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>
-            Quantity
+          <div style={{ color: 'var(--text-secondary)', marginBottom: '4px', fontSize: '10px', textTransform: 'uppercase' }}>
+            Qty
           </div>
-          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)' }}>
+          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace' }}>
             {position.shares.toLocaleString(undefined, {
               maximumFractionDigits: 2,
             })}
@@ -118,10 +124,10 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
 
         {/* Market Value */}
         <div>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>
-            Market Value
+          <div style={{ color: 'var(--text-secondary)', marginBottom: '4px', fontSize: '10px', textTransform: 'uppercase' }}>
+            Value
           </div>
-          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)' }}>
+          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace' }}>
             ${totalValue.toLocaleString(undefined, {
               maximumFractionDigits: 2,
             })}
@@ -130,20 +136,20 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
 
         {/* % of Portfolio */}
         <div>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>
-            % of Portfolio
+          <div style={{ color: 'var(--text-secondary)', marginBottom: '4px', fontSize: '10px', textTransform: 'uppercase' }}>
+            Alloc
           </div>
-          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)' }}>
+          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace' }}>
             {percentage.toFixed(2)}%
           </div>
         </div>
 
         {/* Cost Basis */}
         <div>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: '2px' }}>
-            Cost Basis
+          <div style={{ color: 'var(--text-secondary)', marginBottom: '4px', fontSize: '10px', textTransform: 'uppercase' }}>
+            Cost
           </div>
-          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)' }}>
+          <div style={{ color: 'var(--text)', fontWeight: 'var(--font-medium)', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace' }}>
             ${costBasis.toLocaleString(undefined, {
               maximumFractionDigits: 2,
             })}
@@ -151,19 +157,21 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
         </div>
       </div>
 
-      {/* Unrealized P/L */}
+      {/* Unrealized P/L - Enhanced */}
       <div
         style={{
           marginTop: 'var(--space-3)',
           paddingTop: 'var(--space-2)',
-          borderTop: '1px solid var(--border)',
+          borderTop: '2px solid var(--border)',
         }}
       >
         <div
           style={{
             fontSize: 'var(--font-size-sm)',
             color: 'var(--text-secondary)',
-            marginBottom: '4px',
+            marginBottom: '6px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
           }}
         >
           Unrealized P/L
@@ -181,6 +189,7 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
               fontWeight: 'var(--font-semibold)',
               color:
                 unrealizedPL >= 0 ? 'var(--signal)' : 'var(--danger)',
+              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
             }}
           >
             {unrealizedPL >= 0 ? '+' : ''}
@@ -194,6 +203,7 @@ export default function ChartTooltip({ active, payload, label }: ChartTooltipPro
               color:
                 unrealizedPLPercent >= 0 ? 'var(--signal)' : 'var(--danger)',
               fontWeight: 'var(--font-medium)',
+              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
             }}
           >
             ({unrealizedPLPercent >= 0 ? '+' : ''}

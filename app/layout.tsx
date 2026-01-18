@@ -14,6 +14,7 @@ import LandingPageTracker from './components/LandingPageTracker';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
 import GlobalFooter from './components/layout/GlobalFooter';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -176,6 +177,7 @@ export default function RootLayout({
               <ErrorBoundary scope="global-footer">
                 <GlobalFooter />
               </ErrorBoundary>
+              <PWAInstallPrompt />
             </div>
           </ErrorBoundary>
         </BrandProvider>
