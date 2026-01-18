@@ -9,6 +9,7 @@ import DrillDownChart from '../components/portfolio/DrillDownChart';
 import PortfolioPerformanceChart from '../components/portfolio/PortfolioPerformanceChart';
 import AnalyticsPanel from '../components/portfolio/AnalyticsPanel';
 import AllocationRecommendations from '../components/portfolio/AllocationRecommendations';
+import { AnalyticsDashboard } from '../components/analytics/AnalyticsDashboard';
 import SectorFilter from '../components/portfolio/SectorFilter';
 import ReturnHeatMap from '../components/portfolio/ReturnHeatMap';
 import SharePortfolio from '../components/portfolio/SharePortfolio';
@@ -1424,6 +1425,12 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div>
+                    {/* Advanced Analytics & Rebalancing Engine - Premium Feature */}
+                    <AnalyticsDashboard
+                      trades={trades}
+                      positions={Object.values(positions)}
+                      tier={tier}
+                    />
                     <AllocationRecommendations
                       positions={Object.values(positions)}
                       totalValue={Object.values(positions).reduce(
