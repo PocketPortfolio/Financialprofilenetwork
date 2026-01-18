@@ -45,6 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           maxWidth: '1600px',
           margin: '0 auto',
           padding: '16px',
+          paddingTop: 'calc(var(--header-height, 64px) + var(--banner-height, 48px) + 4px)', // Header + Banner + minimal spacing (4px gap)
           minHeight: 'calc(100vh - 80px)'
         }}
       >

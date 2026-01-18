@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
-import dynamic from 'next/dynamic';
 import './globals.css';
 import './styles/tokens.css';
 import './styles/brand.css';
@@ -15,13 +14,7 @@ import LandingPageTracker from './components/LandingPageTracker';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
 import GlobalFooter from './components/layout/GlobalFooter';
-
-// Dynamically import PWAInstallPrompt to ensure it's only loaded client-side
-// This prevents the useState error on the server
-const PWAInstallPrompt = dynamic(
-  () => import('./components/PWAInstallPrompt').then(mod => ({ default: mod.PWAInstallPrompt })),
-  { ssr: false }
-);
+import PWAInstallPromptWrapper from './components/PWAInstallPromptWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -184,7 +177,7 @@ export default function RootLayout({
               <ErrorBoundary scope="global-footer">
                 <GlobalFooter />
               </ErrorBoundary>
-              <PWAInstallPrompt />
+              <PWAInstallPromptWrapper />
             </div>
           </ErrorBoundary>
         </BrandProvider>

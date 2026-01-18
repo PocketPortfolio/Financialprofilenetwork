@@ -9,6 +9,7 @@ import ThemeSwitcher from '../ThemeSwitcher';
 import { usePremiumTheme } from '../../hooks/usePremiumTheme';
 import { useAuth } from '../../hooks/useAuth';
 import { UserAvatarDropdown } from './UserAvatarDropdown';
+import { useStickyHeader } from '../../hooks/useStickyHeader';
 
 interface SovereignHeaderProps {
   syncState?: 'idle' | 'syncing' | 'error';
@@ -78,24 +79,42 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
     }
   }, [user]);
 
+  // Make header fixed like landing page
+  useStickyHeader('header.sovereign-header');
+
   return (
     <>
-      <header style={{
-        borderBottom: '1px solid hsl(var(--border))',
-        background: 'hsl(var(--background) / 0.8)',
-        backdropFilter: 'blur(12px)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        padding: '12px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        transition: 'background-color 0.3s ease, border-color 0.3s ease',
-        overflow: 'visible'
-      }}>
-        {/* LEFT: Menu + Logo + Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <header 
+        className="sovereign-header"
+        style={{
+          borderBottom: '1px solid hsl(var(--border))',
+          background: 'hsl(var(--background) / 0.8)',
+          backdropFilter: 'blur(12px)',
+          position: 'sticky', // Will be converted to 'fixed' by useStickyHeader hook
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000, // Increased to match landing page
+          padding: '0', // Padding moved to inner container to reduce white space
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          transition: 'background-color 0.3s ease, border-color 0.3s ease',
+          overflow: 'visible',
+          width: '100%' // Ensure full width for fixed positioning
+        }}>
+        {/* Max-width container to match production alignment */}
+        <div style={{ 
+          maxWidth: '1280px', 
+          margin: '0 auto', 
+          width: '100%',
+          padding: '12px 24px', // Padding moved here to reduce white space
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          {/* LEFT: Menu + Logo + Brand */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -313,6 +332,8 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
             </button>
           )}
         </div>
+        </div>
+        {/* Close max-width container */}
       </header>
       
       {/* 🟢 RESTORED: Mobile Navigation Menu */}

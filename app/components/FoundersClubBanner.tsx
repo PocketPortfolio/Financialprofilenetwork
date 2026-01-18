@@ -31,14 +31,16 @@ export default function FoundersClubBanner() {
       className="founder-banner"
       style={{
         position: 'sticky',
-        top: 0,
-        zIndex: 1000,
+        top: '64px', // Position directly below fixed header
+        zIndex: 999, // Just below header
         background: 'hsl(var(--card))',
         color: 'hsl(var(--primary))',
         padding: '12px 24px',
         textAlign: 'center',
         borderBottom: `2px solid hsl(var(--primary))`,
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        marginTop: '0', // Remove marginTop since sticky positioning handles it
+        marginBottom: '0', // Remove marginBottom for minimal spacing
       }}
     >
       <div
