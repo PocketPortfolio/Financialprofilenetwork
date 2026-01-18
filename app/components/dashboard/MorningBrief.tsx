@@ -19,7 +19,7 @@ export function MorningBrief({ netWorthChange, topMover }: BriefProps) {
   const truncatedText = analysisText.length > 120 ? analysisText.substring(0, 120) + '...' : analysisText;
 
   return (
-    <section className="dashboard-card">
+    <section className="dashboard-card" data-tour="morning-brief">
       {/* 🧠 PULITZER BRANDING HEADER */}
       <div style={{
         display: 'flex',

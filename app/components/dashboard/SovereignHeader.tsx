@@ -86,6 +86,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
     <>
       <header 
         className="sovereign-header"
+        data-tour="sovereign-header"
         style={{
           borderBottom: '1px solid hsl(var(--border))',
           background: 'hsl(var(--background) / 0.8)',

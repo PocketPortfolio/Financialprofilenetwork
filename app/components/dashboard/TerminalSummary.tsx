@@ -52,12 +52,14 @@ export function TerminalSummary({
   }
   
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-      gap: '16px',
-      marginBottom: '24px'
-    }}>
+    <div 
+      data-tour="terminal-summary"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '16px',
+        marginBottom: '24px'
+      }}>
       {/* Card 1: Total Invested */}
       <div className="dashboard-card" style={{ padding: '20px' }}>
         <div style={{

@@ -66,7 +66,7 @@ export function DataInputDeck({
   }, []);
 
   return (
-    <div ref={outerContainerRef} style={{ width: '100%', marginBottom: '32px' }}>
+    <div ref={outerContainerRef} data-tour="data-input-deck" style={{ width: '100%', marginBottom: '32px' }}>
       {/* Section Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingLeft: '4px' }}>
         <h2 style={{

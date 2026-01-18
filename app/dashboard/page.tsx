@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import SimplePieChart from '../components/SimplePieChart';
 import PortfolioChart from '../components/PortfolioChart';
@@ -240,6 +240,7 @@ export default function Dashboard() {
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showFeatureAnnouncement, setShowFeatureAnnouncement] = useState(false);
+  const modalScheduledRef = useRef(false); // Persist across re-renders
   const [showImportModal, setShowImportModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'performance' | 'insights'>('performance');
   const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty'>('value');
@@ -356,6 +357,7 @@ export default function Dashboard() {
   }, []);
 
   // Show feature announcement modal once per user
+  // IMPORTANT: Wait for onboarding tour to complete first
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
@@ -377,14 +379,85 @@ export default function Dashboard() {
     const hasSeenAnnouncement = localStorage.getItem('pocket-portfolio-feature-announcement-seen');
     
     if (!hasSeenAnnouncement) {
-      console.log('📢 User has not seen announcement, will show in 2 seconds');
-      // Small delay to ensure page is loaded and user sees the dashboard first
-      const timer = setTimeout(() => {
-        console.log('🚀 Showing feature announcement modal');
-        setShowFeatureAnnouncement(true);
-      }, 2000);
+      console.log('📢 User has not seen announcement, waiting for onboarding tour to complete...');
       
-      return () => clearTimeout(timer);
+      // Reset ref if this is a new effect run (React Strict Mode)
+      if (modalScheduledRef.current) {
+        modalScheduledRef.current = false;
+      }
+      
+      let checkInterval: ReturnType<typeof setInterval> | null = null;
+      let showModalTimer: ReturnType<typeof setTimeout> | null = null;
+      let maxTimer: ReturnType<typeof setTimeout> | null = null;
+      
+      // Function to check if onboarding is complete and show modal
+      const checkAndShowModal = () => {
+        // Guard: Don't schedule if already scheduled (check ref and localStorage)
+        if (modalScheduledRef.current) {
+          return;
+        }
+        
+        // Also check localStorage to prevent duplicate calls
+        const hasSeenAnnouncementNow = localStorage.getItem('pocket-portfolio-feature-announcement-seen');
+        if (hasSeenAnnouncementNow) {
+          return;
+        }
+        
+        const hasSeenTour = localStorage.getItem('pocket_onboarding_seen');
+        
+        if (hasSeenTour === 'true') {
+          // Onboarding tour is complete, stop checking and show modal after a short delay
+          modalScheduledRef.current = true; // Set guard immediately using ref
+          
+          if (checkInterval) {
+            clearInterval(checkInterval);
+            checkInterval = null;
+          }
+          console.log('✅ Onboarding tour complete, showing feature announcement modal in 1 second');
+          showModalTimer = setTimeout(() => {
+            console.log('🚀 Showing feature announcement modal');
+            setShowFeatureAnnouncement(true);
+          }, 1000); // 1 second delay after tour completes
+        }
+        // If tour not complete, will check again on next interval
+      };
+      
+      // Start checking after initial delay (give tour time to start)
+      const initialTimer = setTimeout(() => {
+        // Check immediately first time
+        checkAndShowModal();
+        // Then check every 500ms
+        checkInterval = setInterval(checkAndShowModal, 500);
+      }, 3000); // Wait 3 seconds before starting to check (tour starts at ~2.5s)
+      
+      // Also set a maximum timeout (30 seconds) to show modal even if tour never completes
+      maxTimer = setTimeout(() => {
+        // Check both ref and localStorage before showing
+        if (modalScheduledRef.current) {
+          return; // Don't show if already scheduled
+        }
+        
+        const hasSeenAnnouncementNow = localStorage.getItem('pocket-portfolio-feature-announcement-seen');
+        if (hasSeenAnnouncementNow) {
+          return;
+        }
+        
+        modalScheduledRef.current = true; // Set guard using ref
+        
+        if (checkInterval) {
+          clearInterval(checkInterval);
+          checkInterval = null;
+        }
+        console.log('⏰ Max timeout reached, showing feature announcement modal');
+        setShowFeatureAnnouncement(true);
+      }, 30000);
+      
+      return () => {
+        if (initialTimer) clearTimeout(initialTimer);
+        if (checkInterval) clearInterval(checkInterval);
+        if (showModalTimer) clearTimeout(showModalTimer);
+        if (maxTimer) clearTimeout(maxTimer);
+      };
     } else {
       console.log('ℹ️ Feature announcement already seen, skipping');
     }

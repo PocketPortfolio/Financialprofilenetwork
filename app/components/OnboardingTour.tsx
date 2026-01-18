@@ -38,20 +38,31 @@ export default function OnboardingTour() {
 
     // Wait for DOM to be ready
     const startTour = () => {
-      // Check required elements (import and privacy)
+      // Check required elements for Sovereign dashboard
+      const sovereignHeader = document.querySelector('[data-tour="sovereign-header"]');
+      const morningBrief = document.querySelector('[data-tour="morning-brief"]');
+      const terminalSummary = document.querySelector('[data-tour="terminal-summary"]');
+      const dataInputDeck = document.querySelector('[data-tour="data-input-deck"], #add-trade');
+      const foundersClubBanner = document.querySelector('[data-tour="founders-club-banner"], .founder-banner');
+      const foundersClubLink = document.querySelector('a[href="/sponsor"]');
+      
+      // Fallback selectors for backward compatibility
       const importTrigger = document.querySelector('#import-trigger, #import');
       const privacyStatus = document.querySelector('#privacy-status');
-      // Theme selector is optional (it's in a hidden menu)
-      const themeSelector = document.querySelector('#theme-selector');
 
       console.log('[OnboardingTour] Element check:', {
+        sovereignHeader: !!sovereignHeader,
+        morningBrief: !!morningBrief,
+        terminalSummary: !!terminalSummary,
+        dataInputDeck: !!dataInputDeck,
+        foundersClubBanner: !!foundersClubBanner,
+        foundersClubLink: !!foundersClubLink,
         importTrigger: !!importTrigger,
-        privacyStatus: !!privacyStatus,
-        themeSelector: !!themeSelector
+        privacyStatus: !!privacyStatus
       });
 
-      // Only require import and privacy - theme selector is optional
-      if (!importTrigger || !privacyStatus) {
+      // Require at least data input deck or import trigger
+      if (!dataInputDeck && !importTrigger) {
         console.log('[OnboardingTour] Required elements not ready, retrying...');
         // Retry after a short delay if required elements aren't ready
         setTimeout(startTour, 500);
@@ -61,56 +72,129 @@ export default function OnboardingTour() {
       console.log('[OnboardingTour] Starting tour...');
       tourStartedRef.current = true;
 
-      // Build steps array - theme selector is optional
-      const steps: DriveStep[] = [
-        {
-          element: '#import-trigger, #import',
+      // Build steps array for Sovereign dashboard
+      const steps: DriveStep[] = [];
+
+      // Step 1: Welcome to Sovereign Dashboard
+      if (sovereignHeader) {
+        steps.push({
+          element: sovereignHeader as HTMLElement,
+          popover: {
+            title: '🎨 Welcome to Sovereign Dashboard',
+            description: 'This is your premium portfolio command center. The Sovereign design features a terminal-inspired interface with real-time data and AI-powered insights.',
+            side: 'bottom' as const,
+            align: 'start' as const,
+          },
+        });
+      }
+
+      // Step 2: AI Morning Brief (if available)
+      if (morningBrief) {
+        steps.push({
+          element: morningBrief as HTMLElement,
+          popover: {
+            title: '🧠 AI Morning Brief',
+            description: 'Get autonomous portfolio analysis powered by Pulitzer AI. See daily sentiment, top movers, and market insights at a glance. This updates in real-time as your portfolio changes.',
+            side: 'bottom' as const,
+            align: 'start' as const,
+          },
+        });
+      }
+
+      // Step 3: Terminal Summary (Key Metrics)
+      if (terminalSummary) {
+        steps.push({
+          element: terminalSummary as HTMLElement,
+          popover: {
+            title: '📊 Terminal Summary',
+            description: 'Your portfolio metrics at a glance: Total Invested, Trade Count, and Unrealized P/L. These cards update automatically as you add trades.',
+            side: 'top' as const,
+            align: 'start' as const,
+          },
+        });
+      }
+
+      // Step 4: Data Input Deck (Import & Manual Entry)
+      if (dataInputDeck) {
+        steps.push({
+          element: dataInputDeck as HTMLElement,
+          popover: {
+            title: '📂 Data Ingestion Engine',
+            description: 'Import CSV files from Trade Republic, Fidelity, or Trading 212, or add trades manually. Your data stays encrypted in your browser—never on our servers.',
+            side: 'top' as const,
+            align: 'start' as const,
+          },
+        });
+      } else if (importTrigger) {
+        // Fallback to old import trigger
+        steps.push({
+          element: importTrigger as HTMLElement,
           popover: {
             title: '📂 Start Here',
             description: 'Drop your CSV from Trade Republic, Fidelity, or Trading 212 here. We parse it instantly.',
             side: 'bottom' as const,
             align: 'start' as const,
           },
-        },
-        {
-          element: '#privacy-status',
+        });
+      }
+
+      // Step 5: Privacy Status (if available)
+      if (privacyStatus) {
+        steps.push({
+          element: privacyStatus as HTMLElement,
           popover: {
             title: '🔒 Local-First Security',
             description: 'Your financial data is encrypted in your browser. It never reaches our servers.',
             side: 'top' as const,
             align: 'center' as const,
           },
-        },
-      ];
+        });
+      }
 
-      // Always include Gold theme step - use Founders Club link as target (always visible)
-      // This soft-sells the premium theme to users
-      const foundersClubLink = document.querySelector('a[href="/sponsor"]');
-      if (foundersClubLink) {
+      // Step 6: Premium Theme Upgrade (Founders Club)
+      if (foundersClubBanner) {
         steps.push({
-          element: 'a[href="/sponsor"]',
+          element: foundersClubBanner as HTMLElement,
           popover: {
-            title: '🎨 Unlock Founder\'s Gold Theme',
-            description: 'Join the Founder\'s Club to unlock the exclusive Gold theme, lifetime API access, and support the project. Click here to learn more!',
-            side: 'top' as const,
+            title: '✨ Unlock Premium Sovereign Themes',
+            description: 'Join the Founder\'s Club to unlock exclusive premium themes (Gold & Corporate), Google Drive sync, lifetime API access, and support the project. Limited spots available!',
+            side: 'bottom' as const,
             align: 'center' as const,
           },
         });
-        console.log('[OnboardingTour] Founders Club link found - including Gold theme step');
-      } else if (themeSelector) {
-        // Fallback to theme selector if Founders Club link not found
+        console.log('[OnboardingTour] Founders Club banner found - including premium theme step');
+      } else if (foundersClubLink) {
         steps.push({
-          element: '#theme-selector',
+          element: foundersClubLink as HTMLElement,
           popover: {
-            title: '🎨 Go Gold',
-            description: 'Switch between Light, Dark, and the exclusive Founder\'s Gold theme here. Join the Founder\'s Club to unlock premium themes!',
-            side: 'left' as const,
+            title: '✨ Unlock Premium Sovereign Themes',
+            description: 'Join the Founder\'s Club to unlock exclusive premium themes (Gold & Corporate), Google Drive sync, lifetime API access, and support the project.',
+            side: 'bottom' as const,
             align: 'center' as const,
           },
         });
-        console.log('[OnboardingTour] Theme selector found - including in tour');
-      } else {
-        console.log('[OnboardingTour] Neither Founders Club link nor theme selector found - skipping Gold theme step');
+        console.log('[OnboardingTour] Founders Club link found - including premium theme step');
+      }
+
+      // If no steps were found, use minimal fallback
+      if (steps.length === 0) {
+        console.log('[OnboardingTour] No Sovereign elements found, using minimal fallback');
+        if (importTrigger) {
+          steps.push({
+            element: importTrigger as HTMLElement,
+            popover: {
+              title: '📂 Start Here',
+              description: 'Drop your CSV from Trade Republic, Fidelity, or Trading 212 here. We parse it instantly.',
+              side: 'bottom' as const,
+              align: 'start' as const,
+            },
+          });
+        }
+      }
+      
+      if (steps.length === 0) {
+        console.error('[OnboardingTour] CRITICAL: Cannot start tour with 0 steps');
+        return;
       }
 
         // Track if we've already handled completion to prevent multiple calls
@@ -204,7 +288,7 @@ export default function OnboardingTour() {
             el.classList.remove('driver-highlighted-element');
           });
           
-          const importSection = document.querySelector('#import-trigger, #import');
+          const importSection = document.querySelector('[data-tour="data-input-deck"], #add-trade, #import-trigger, #import');
           if (importSection) {
             console.log('[OnboardingTour] Scrolling to import section');
             importSection.scrollIntoView({ behavior: 'smooth', block: 'center' });

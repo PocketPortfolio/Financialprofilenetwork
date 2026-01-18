@@ -29,6 +29,7 @@ export default function FoundersClubBanner() {
   return (
     <div
       className="founder-banner"
+      data-tour="founders-club-banner"
       style={{
         position: 'sticky',
         top: '64px', // Position directly below fixed header
