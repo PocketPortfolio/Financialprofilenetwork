@@ -227,7 +227,7 @@
     "scheduledTime": "14:00",
     "title": "How to Securely Share Environment Variables with Your Team",
     "slug": "how-to-securely-share-environment-variables-with-your-team",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -235,7 +235,8 @@
       "securely",
       "share",
       "environment"
-    ]
+    ],
+    "publishedAt": "2026-01-18T14:11:34.626Z"
   },
   {
     "id": "how-to-why-sovereign-sync-is-safer-than-cloud-databases-jan-19",
