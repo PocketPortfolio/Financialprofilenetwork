@@ -6,9 +6,10 @@ import { useFCM } from '../hooks/useFCM';
 import { useAuth } from '../hooks/useAuth';
 
 export function NotificationSettings() {
-  const { fcmToken, isSupported, permission, requestPermission, error } = useFCM();
+  const { fcmToken, isSupported, permission, requestPermission, disableNotifications, error } = useFCM();
   const { isAuthenticated } = useAuth();
   const [isRequesting, setIsRequesting] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   const handleEnableNotifications = async () => {
@@ -36,24 +37,16 @@ export function NotificationSettings() {
   };
 
   const handleDisableNotifications = async () => {
-    if (!fcmToken) return;
+    setIsDisabling(true);
+    setMessage(null);
 
     try {
-      const response = await fetch('/api/notifications/register', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fcmToken })
-      });
-
-      if (response.ok) {
-        setMessage({ type: 'success', text: 'Notifications disabled successfully' });
-        // Reload to clear token
-        window.location.reload();
-      } else {
-        setMessage({ type: 'error', text: 'Failed to disable notifications' });
-      }
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Error disabling notifications' });
+      await disableNotifications();
+      setMessage({ type: 'success', text: 'Notifications disabled successfully' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Failed to disable notifications' });
+    } finally {
+      setIsDisabling(false);
     }
   };
 
@@ -67,138 +60,273 @@ export function NotificationSettings() {
 
   if (!isSupported) {
     return (
-      <div className="dashboard-card p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <BellOff className="w-5 h-5 text-muted-foreground" />
-          <h3 className="text-lg font-bold text-foreground">Push Notifications</h3>
-        </div>
-        <p className="text-sm text-muted-foreground">
+      <section
+        style={{
+          marginBottom: '2rem',
+          padding: '1.5rem',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: '12px',
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '1rem',
+            color: 'var(--text)',
+          }}
+        >
+          Push Notifications
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
           Push notifications are not supported in this browser. Please use Chrome, Firefox, or Safari (iOS 16.4+).
         </p>
-      </div>
+      </section>
     );
   }
 
   const isEnabled = permission === 'granted' && fcmToken !== null;
 
   return (
-    <div className="dashboard-card p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
+    <section
+      style={{
+        marginBottom: '2rem',
+        padding: '1.5rem',
+        background: 'var(--surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {isEnabled ? (
-            <Bell className="w-5 h-5 text-primary" />
+            <Bell style={{ width: '20px', height: '20px', color: 'var(--signal)' }} />
           ) : (
-            <BellOff className="w-5 h-5 text-muted-foreground" />
+            <BellOff style={{ width: '20px', height: '20px', color: 'var(--text-secondary)' }} />
           )}
-          <h3 className="text-lg font-bold text-foreground">Push Notifications</h3>
+          <h2
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: '600',
+              color: 'var(--text)',
+            }}
+          >
+            Push Notifications
+          </h2>
         </div>
         {isEnabled && (
-          <span className="px-3 py-1 text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/20 rounded">
+          <span
+            style={{
+              fontSize: '0.75rem',
+              padding: '4px 12px',
+              background: 'var(--surface-elevated)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              color: 'var(--text-secondary)',
+              fontWeight: '500',
+            }}
+          >
             Active
           </span>
         )}
       </div>
 
-      <p className="text-sm text-muted-foreground mb-6">
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Receive real-time alerts for price movements, portfolio updates, and breaking financial news.
       </p>
 
       {message && (
         <div
-          className={`mb-4 p-3 rounded flex items-center gap-2 ${
-            message.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+          style={{
+            marginBottom: '1rem',
+            padding: '12px',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.875rem',
+            ...(message.type === 'success'
+              ? {
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                  color: '#10b981',
+                }
               : message.type === 'error'
-              ? 'bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400'
-              : 'bg-primary/10 border border-primary/20 text-primary'
-          }`}
+              ? {
+                  background: 'var(--danger-muted)',
+                  border: '1px solid var(--danger)',
+                  color: 'var(--danger)',
+                }
+              : {
+                  background: 'var(--surface-elevated)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text)',
+                }),
+          }}
         >
           {message.type === 'success' ? (
-            <CheckCircle className="w-4 h-4" />
+            <CheckCircle style={{ width: '16px', height: '16px' }} />
           ) : message.type === 'error' ? (
-            <XCircle className="w-4 h-4" />
+            <XCircle style={{ width: '16px', height: '16px' }} />
           ) : (
-            <AlertCircle className="w-4 h-4" />
+            <AlertCircle style={{ width: '16px', height: '16px' }} />
           )}
-          <span className="text-sm font-medium">{message.text}</span>
+          <span style={{ fontWeight: '500' }}>{message.text}</span>
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-3 rounded bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center gap-2">
-          <XCircle className="w-4 h-4" />
-          <span className="text-sm font-medium">{error.message}</span>
+        <div
+          style={{
+            marginBottom: '1rem',
+            padding: '12px',
+            background: 'var(--danger-muted)',
+            borderRadius: '8px',
+            border: '1px solid var(--danger)',
+            fontSize: '0.875rem',
+            color: 'var(--danger)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <XCircle style={{ width: '16px', height: '16px' }} />
+          <span style={{ fontWeight: '500' }}>{error.message}</span>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {!isEnabled ? (
           <button
             onClick={handleEnableNotifications}
             disabled={isRequesting || !isAuthenticated}
-            className="w-full px-4 py-3 bg-primary text-primary-foreground font-bold rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="brand-button brand-button-primary"
+            style={{
+              padding: 'var(--space-3) var(--space-5)',
+              fontSize: 'var(--font-size-base)',
+              fontWeight: 'var(--font-semibold)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              opacity: isRequesting || !isAuthenticated ? 0.6 : 1,
+              cursor: isRequesting || !isAuthenticated ? 'not-allowed' : 'pointer',
+            }}
           >
             {isRequesting ? (
               <>
-                <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                <div
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid currentColor',
+                    borderTopColor: 'transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                  }}
+                />
                 <span>Enabling...</span>
               </>
             ) : (
               <>
-                <Bell className="w-4 h-4" />
+                <Bell style={{ width: '18px', height: '18px' }} />
                 <span>Enable Push Notifications</span>
               </>
             )}
           </button>
         ) : (
-          <div className="space-y-3">
-            <div className="p-4 bg-muted/30 rounded border border-border">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span className="text-sm font-medium text-foreground">Notifications Active</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div
+              style={{
+                padding: '12px',
+                background: 'var(--surface-elevated)',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <div
+                  style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--signal)',
+                  }}
+                />
+                <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text)' }}>
+                  Notifications Active
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
                 You will receive alerts for price movements, portfolio updates, and breaking news.
               </p>
             </div>
             <button
               onClick={handleDisableNotifications}
-              className="w-full px-4 py-3 bg-muted text-foreground font-medium rounded hover:bg-muted/80 transition-colors flex items-center justify-center gap-2"
+              disabled={isDisabling}
+              className="brand-button brand-button-secondary"
+              style={{
+                padding: 'var(--space-3) var(--space-5)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-medium)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                opacity: isDisabling ? 0.6 : 1,
+                cursor: isDisabling ? 'not-allowed' : 'pointer',
+              }}
             >
-              <BellOff className="w-4 h-4" />
-              <span>Disable Notifications</span>
+              {isDisabling ? (
+                <>
+                  <div
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid currentColor',
+                      borderTopColor: 'transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                    }}
+                  />
+                  <span>Disabling...</span>
+                </>
+              ) : (
+                <>
+                  <BellOff style={{ width: '18px', height: '18px' }} />
+                  <span>Disable Notifications</span>
+                </>
+              )}
             </button>
           </div>
         )}
 
         {!isAuthenticated && (
-          <p className="text-xs text-muted-foreground text-center">
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center', margin: 0 }}>
             Sign in to enable push notifications
           </p>
         )}
 
         {permission === 'denied' && (
-          <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded">
-            <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">
-              <strong>Permission Denied:</strong> Notifications were blocked. To enable:
+          <div
+            style={{
+              padding: '12px',
+              background: 'rgba(245, 158, 11, 0.1)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+            }}
+          >
+            <p style={{ fontWeight: '600', color: 'var(--text-warm)', marginBottom: '8px', margin: 0 }}>
+              Permission Denied
             </p>
-            <ul className="text-xs text-amber-600 dark:text-amber-400 list-disc list-inside space-y-1">
-              <li>Click the lock icon in your browser's address bar</li>
-              <li>Select "Allow" for notifications</li>
-              <li>Refresh this page</li>
-            </ul>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.5' }}>
+              Notifications were blocked. To enable: click the lock icon in your browser's address bar, select "Allow" for notifications, then refresh this page.
+            </p>
           </div>
         )}
       </div>
-
-      {isEnabled && fcmToken && (
-        <div className="mt-6 pt-6 border-t border-border">
-          <p className="text-xs text-muted-foreground font-mono break-all">
-            Token: {fcmToken.substring(0, 20)}...
-          </p>
-        </div>
-      )}
-    </div>
+    </section>
   );
 }
-

@@ -79,6 +79,9 @@ export function PWAInstallPrompt() {
     }
   };
 
+  // Early return if prompt should not be shown
+  if (!showPrompt || isStandalone) return null;
+
   return (
     <div style={{
       position: 'fixed',
@@ -174,7 +177,12 @@ export function PWAInstallPrompt() {
             </button>
           )}
           <button
-            onClick={handleDismiss}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDismiss();
+            }}
+            type="button"
             style={{
               background: 'transparent',
               border: 'none',

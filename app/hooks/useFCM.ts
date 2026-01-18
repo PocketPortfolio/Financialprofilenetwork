@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
 import app from '../lib/firebase';
 import { registerFirebaseMessagingSW } from '../lib/pwa/registerServiceWorker';
@@ -10,14 +10,21 @@ interface UseFCMReturn {
   isSupported: boolean;
   permission: NotificationPermission;
   requestPermission: () => Promise<boolean>;
+  disableNotifications: () => Promise<void>;
   error: Error | null;
 }
 
 export function useFCM(): UseFCMReturn {
   const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const fcmTokenRef = useRef<string | null>(null);
   const [isSupportedState, setIsSupportedState] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [error, setError] = useState<Error | null>(null);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    fcmTokenRef.current = fcmToken;
+  }, [fcmToken]);
 
   // Check browser support and register service worker
   useEffect(() => {
@@ -89,6 +96,7 @@ export function useFCM(): UseFCMReturn {
 
       if (token) {
         setFcmToken(token);
+        fcmTokenRef.current = token;
         setError(null);
         
         // Send token to backend to save
@@ -162,6 +170,7 @@ export function useFCM(): UseFCMReturn {
               
               if (token) {
                 setFcmToken(token);
+                fcmTokenRef.current = token;
               }
             } catch (err) {
               console.error('Error getting FCM token:', err);
@@ -177,11 +186,45 @@ export function useFCM(): UseFCMReturn {
     initializeFCM();
   }, [isSupportedState]);
 
+  // Disable notifications and clear token
+  const disableNotifications = useCallback(async (): Promise<void> => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      // Get current token from ref before clearing
+      const tokenToDelete = fcmTokenRef.current;
+      
+      // Clear the token from state immediately
+      setFcmToken(null);
+      fcmTokenRef.current = null;
+      
+      // Delete token from backend if it exists
+      if (tokenToDelete) {
+        try {
+          await fetch('/api/notifications/register', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fcmToken: tokenToDelete })
+          });
+        } catch (err) {
+          console.error('Error unregistering FCM token:', err);
+          // Continue even if API call fails
+        }
+      }
+      
+      // Note: We don't revoke Notification.permission as that's browser-controlled
+      // The user would need to manually change it in browser settings
+    } catch (err) {
+      console.error('Error disabling notifications:', err);
+    }
+  }, []);
+
   return {
     fcmToken,
     isSupported: isSupportedState,
     permission,
     requestPermission,
+    disableNotifications,
     error
   };
 }
