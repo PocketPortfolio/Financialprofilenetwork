@@ -238,7 +238,7 @@
     "date": "2026-01-19",
     "title": "Why Most Investors Underperform: The Data Doesn't Lie",
     "slug": "why-most-investors-underperform-the-data-doesn-t-lie",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -248,7 +248,8 @@
       "investors"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-01-19T09:40:43.745Z"
   },
   {
     "id": "week-3-post-2",
