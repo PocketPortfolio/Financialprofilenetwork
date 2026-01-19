@@ -244,7 +244,7 @@
     "scheduledTime": "14:00",
     "title": "Why \"Sovereign Sync\" is Safer than Cloud Databases",
     "slug": "why-sovereign-sync-is-safer-than-cloud-databases",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -253,7 +253,8 @@
       "why",
       "sovereign",
       "sync"
-    ]
+    ],
+    "publishedAt": "2026-01-19T14:19:39.754Z"
   },
   {
     "id": "how-to-how-to-parse-large-json-files-in-node-js-streams-jan-20",
