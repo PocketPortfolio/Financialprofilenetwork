@@ -1,0 +1,63 @@
+---
+title: "How to Parse Large JSON Files in Node.js (Streams)"
+date: "2026-01-20"
+description: "Learn to efficiently parse large JSON files in Node.js using streams to prevent memory overflow and enhance performance."
+tags: ["json", "node.js", "parse", "large"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-parse-large-json-files-in-node-js-streams.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+Parsing large JSON files in Node.js without causing a memory overflow can be challenging. The traditional `JSON.parse()` method loads the entire file into memory, which can lead to performance issues or crashes when dealing with massive files. A more efficient approach involves using Node.js streams.
+
+### Direct Solution with Code
+
+To parse large JSON files, we'll use the `stream` and `stream-json` packages. Streams allow us to process data piece by piece without loading the entire file into memory, and `stream-json` is a collection of stream components for parsing and stringifying JSON in a streaming fashion.
+
+First, install the necessary packages:
+
+```bas
+h
+npm install stream-json stream-json/streamers/StreamArray
+```
+
+Next, create a script to parse your large JSON file:
+
+```javascrip
+t
+const fs = require('fs');
+const { parser } = require('stream-json');
+const { streamArray } = require('stream-json/streamers/StreamArray');
+
+const jsonStream = parser();
+const processingStream = streamArray();
+
+processingStream.on('data', ({key, value}) => {
+  console.log(`Processing item ${key}:`, value);
+});
+
+processingStream.on('end', () => {
+  console.log('No more data!');
+});
+
+fs.createReadStream('path/to/your/large.json')
+  .pipe(jsonStream)
+  .pipe(processingStream);
+```
+
+### Explanation of Key Concepts
+
+- **Streams:** Node.js streams are collections of data that might not be available all at once and don't have to fit in memory. This makes them perfect for working with large data files.
+- **The `stream-json` package:** This provides a flexible method of transforming the chunks of data from a JSON file into JavaScript objects in a memory-efficient manner.
+- **`streamArray`:** When parsing a large array in a JSON file, `streamArray` helps by emitting each item of the array one by one, reducing memory usage.
+
+### Quick Tip
+
+When working with very large files, consider splitting the parsing logic into separate chunks or leveraging Node.js child processes to parallelize the workload and further improve performance.
+
+### Gotcha
+
+Ensure your JSON is properly formatted; streams are less forgiving than `JSON.parse()` and will throw an error on improperly formatted JSON files.
+
+By leveraging Node.js streams and the `stream-json` package, you can efficiently parse large JSON files without running into memory overflow issues. This method is not only efficient but also scalable, making it suitable for processing data in real-time applications or handling massive datasets in a memory-conscious manner.
