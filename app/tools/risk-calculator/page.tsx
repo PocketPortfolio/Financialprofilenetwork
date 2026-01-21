@@ -352,6 +352,33 @@ export default function RiskCalculatorPage() {
           }
         }
       `}</style>
+
+      {/* ✅ JSON-LD Schema for AI Visibility */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Pocket Portfolio Risk Calculator",
+            "description": "Calculate your investment portfolio's Beta score and volatility risk instantly. Free tool for UK and US investors.",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "GBP"
+            },
+            "featureList": "Portfolio Beta Calculation, Risk Analysis, Sector Exposure Preview",
+            "author": {
+              "@type": "Organization",
+              "name": "Pocket Portfolio",
+              "url": "https://www.pocketportfolio.app"
+            },
+            "url": "https://www.pocketportfolio.app/tools/risk-calculator"
+          })
+        }}
+      />
     </div>
   );
 }
