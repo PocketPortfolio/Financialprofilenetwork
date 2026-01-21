@@ -369,6 +369,156 @@ export default function LandingFooter() {
           </Link>
         </div>
 
+        {/* Resources Section */}
+        <div style={{ 
+          marginBottom: '24px'
+        }}>
+          <h3 style={{ 
+            fontSize: '12px', 
+            fontWeight: '600', 
+            color: 'var(--text-secondary)', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.5px',
+            marginBottom: '16px',
+            textAlign: 'center'
+          }}>
+            Resources
+          </h3>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '16px', 
+            flexWrap: 'wrap' 
+          }}>
+            <Link href="/blog" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Blog
+            </Link>
+            <Link href="/learn" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Learn
+            </Link>
+            <a href="https://github.com/PocketPortfolio/Financialprofilenetwork#readme" target="_blank" rel="noopener noreferrer" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Documentation
+            </a>
+            <Link href="/status" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              System Status
+            </Link>
+            <Link href="/privacy" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Privacy Policy
+            </Link>
+            <Link href="/terms" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Terms of Service
+            </Link>
+          </div>
+        </div>
+
         {/* Disclaimer */}
         <div style={{ 
           marginTop: '16px',

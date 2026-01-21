@@ -4,6 +4,7 @@ import { Plus, UploadCloud, Link as LinkIcon, ArrowRight } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import TickerSearch from '../TickerSearch';
 import { usePremiumTheme } from '../../hooks/usePremiumTheme';
+import PlaidLinkButton from './PlaidLinkButton';
 
 interface DataInputDeckProps {
   newTrade: {
@@ -643,63 +644,184 @@ export function DataInputDeck({
           </div>
         </div>
 
-        {/* MODULE 3: FUTURE CONNECT (The Teaser) */}
-        <div 
-          className="dashboard-card"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            minHeight: '220px',
-            border: '2px dashed hsl(var(--muted))',
-            borderRadius: '2px',
-            backgroundColor: 'hsla(var(--muted), 0.1)',
-            color: 'hsl(var(--card-foreground))',
-            padding: '24px',
-            opacity: 0.7,
-            transition: 'opacity 0.3s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '1';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '0.7';
-          }}
-        >
-          <div style={{
-            width: '40px',
-            height: '40px',
-            backgroundColor: 'hsl(var(--muted))',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '12px',
-            borderRadius: '50%',
-          }}>
-            <LinkIcon style={{
-              width: '16px',
-              height: '16px',
-              color: 'hsl(var(--muted-foreground))',
-            }} />
-          </div>
-          <h3 style={{
-            fontWeight: '700',
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '14px',
-            margin: 0,
-          }}>Broker Sync</h3>
-          <p style={{
-            fontSize: '12px',
-            color: 'hsl(var(--muted-foreground))',
-            marginTop: '4px',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-          }}>
-            Direct API connection coming soon.
-          </p>
-        </div>
+        {/* MODULE 3: PLAID CONNECTION (Feature Flagged) */}
+        {(() => {
+          const ENABLE_US_PLAID = process.env.NEXT_PUBLIC_ENABLE_US_INVESTMENTS === 'true';
+          
+          if (!ENABLE_US_PLAID) {
+            return (
+              <div 
+                className="dashboard-card"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  minHeight: '220px',
+                  border: '2px dashed hsl(var(--muted))',
+                  borderRadius: '2px',
+                  backgroundColor: 'hsla(var(--muted), 0.1)',
+                  color: 'hsl(var(--card-foreground))',
+                  padding: '24px',
+                  opacity: 0.75,
+                }}
+              >
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  backgroundColor: 'hsl(var(--muted))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '12px',
+                  borderRadius: '50%',
+                }}>
+                  <LinkIcon style={{
+                    width: '16px',
+                    height: '16px',
+                    color: 'hsl(var(--muted-foreground))',
+                  }} />
+                </div>
+                <h3 style={{
+                  fontWeight: '700',
+                  color: 'hsl(var(--muted-foreground))',
+                  fontSize: '14px',
+                  margin: 0,
+                }}>Broker Sync</h3>
+                <p style={{
+                  fontSize: '12px',
+                  color: 'hsl(var(--muted-foreground))',
+                  marginTop: '4px',
+                  marginBottom: '12px',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                }}>
+                  ⚠️ Due to high volume, US connections are currently waitlisted.
+                </p>
+                <a 
+                  href="/waitlist" 
+                  style={{
+                    fontSize: '12px',
+                    color: 'hsl(var(--primary))',
+                    textDecoration: 'underline',
+                    fontWeight: '600',
+                  }}
+                >
+                  Join Priority Queue
+                </a>
+              </div>
+            );
+          }
+
+          // Plaid enabled - show connection button
+          return (
+            <div 
+              className="dashboard-card"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                minHeight: '220px',
+                padding: '20px',
+                position: 'relative',
+                overflow: 'visible',
+                transition: 'all 0.3s ease',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '2px',
+                backgroundColor: 'hsl(var(--card))',
+                color: 'hsl(var(--card-foreground))',
+              }}
+              onMouseEnter={(e) => {
+                const root = getComputedStyle(document.documentElement);
+                const primary = root.getPropertyValue('--primary').trim();
+                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)';
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.borderColor = `hsla(${primary}, 0.5)`;
+                const accentLine = e.currentTarget.querySelector('[data-accent-line]') as HTMLElement;
+                if (accentLine) accentLine.style.backgroundColor = `hsl(${primary})`;
+              }}
+              onMouseLeave={(e) => {
+                const root = getComputedStyle(document.documentElement);
+                const primary = root.getPropertyValue('--primary').trim();
+                const border = root.getPropertyValue('--border').trim();
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.borderColor = `hsl(${border})`;
+                const accentLine = e.currentTarget.querySelector('[data-accent-line]') as HTMLElement;
+                if (accentLine) accentLine.style.backgroundColor = `hsla(${primary}, 0.2)`;
+              }}
+            >
+              {/* Brand Accent Top */}
+              <div 
+                data-accent-line
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '4px',
+                  backgroundColor: 'hsla(var(--primary), 0.2)',
+                  transition: 'background-color 0.3s ease',
+                }}
+              />
+              
+              <div style={{
+                padding: '0',
+                flex: '1',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: 'hsla(var(--primary), 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '12px',
+                }}>
+                  <LinkIcon style={{
+                    width: '20px',
+                    height: '20px',
+                    color: 'hsl(var(--primary))',
+                  }} />
+                </div>
+                <h3 style={{
+                  fontWeight: '700',
+                  color: 'hsl(var(--card-foreground))',
+                  letterSpacing: '-0.025em',
+                  fontSize: '14px',
+                  margin: 0,
+                }}>Connect Brokerage</h3>
+                <p style={{
+                  fontSize: '12px',
+                  color: 'hsl(var(--muted-foreground))',
+                  marginTop: '4px',
+                  marginBottom: '16px',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                }}>
+                  Connect your US brokerage account securely via Plaid.
+                </p>
+                <PlaidLinkButton
+                  onSuccess={(publicToken, metadata) => {
+                    console.log('Plaid connection successful:', metadata);
+                    // TODO: Handle successful connection - fetch investments data
+                  }}
+                  onExit={(err, metadata) => {
+                    if (err) {
+                      console.error('Plaid connection error:', err);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })()}
 
       </div>
     </div>

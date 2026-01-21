@@ -135,12 +135,17 @@ export async function GET(request: NextRequest) {
     const blogPosts = await getBlogPostsData();
     console.log('[Analytics API] ✅ Blog posts fetched:', blogPosts.total, 'total posts,', blogPosts.posts.filter((p: any) => p.category === 'research').length, 'research posts');
 
+    // Fetch leads data
+    console.log('[Analytics API] 👥 Fetching leads data...');
+    const leadsData = await getLeadsData(startDate);
+
     return NextResponse.json({
       monetization,
       toolUsage,
       seoPages,
       npm: npmData,
       blogPosts,
+      leads: leadsData,
       timeRange: range,
       lastUpdated: new Date().toISOString()
     });
@@ -1098,6 +1103,68 @@ async function getBlogPostsData() {
       failed: 0,
       posts: [],
       error: error.message
+    };
+  }
+}
+
+async function getLeadsData(startDate: Date) {
+  try {
+    const { db } = await import('@/db/sales/client');
+    const { leads } = await import('@/db/sales/schema');
+    const { gte, desc, like, and } = await import('drizzle-orm');
+
+    // ✅ FILTER: Only get leads from waitlist (exclude autonomous sales engine)
+    const leadsList = await db
+      .select({
+        id: leads.id,
+        email: leads.email,
+        firstName: leads.firstName,
+        lastName: leads.lastName,
+        companyName: leads.companyName,
+        status: leads.status,
+        createdAt: leads.createdAt,
+        dataSource: leads.dataSource,
+      })
+      .from(leads)
+      .where(and(
+        gte(leads.createdAt, startDate),
+        like(leads.dataSource, 'waitlist_%')  // ✅ Only waitlist leads
+      ))
+      .orderBy(desc(leads.createdAt));
+
+    const total = leadsList.length;
+    const byStatus = leadsList.reduce((acc, lead) => {
+      const status = lead.status || 'NEW';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // ✅ Simplified: All leads are from waitlist now
+    const bySource = {
+      waitlist: total
+    };
+
+    // Last 7 days count
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const last7Days = leadsList.filter(lead => 
+      lead.createdAt && new Date(lead.createdAt) >= sevenDaysAgo
+    ).length;
+
+    return {
+      total,
+      last7Days,
+      byStatus,
+      bySource,
+      recent: leadsList.slice(0, 10), // First 10 leads (already sorted desc, so most recent)
+    };
+  } catch (error) {
+    console.error('Leads data fetch error:', error);
+    return {
+      total: 0,
+      last7Days: 0,
+      byStatus: {},
+      bySource: {},
+      recent: [],
     };
   }
 }

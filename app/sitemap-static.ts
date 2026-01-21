@@ -134,6 +134,50 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    // ✅ Learn Section (Knowledge Graph - Step 2)
+    {
+      url: `${baseUrl}/learn`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9, // High priority - glossary hub
+    },
+    {
+      url: `${baseUrl}/learn/portfolio-beta`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/learn/sector-drift`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/learn/fee-drag`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/learn/sovereign-stack`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/learn/sovereign-finance`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    // ✅ Waitlist Page (Priority Queue)
+    {
+      url: `${baseUrl}/waitlist`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
   ];
 }
 

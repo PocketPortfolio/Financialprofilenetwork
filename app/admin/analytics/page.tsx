@@ -81,6 +81,22 @@ interface AnalyticsData {
     }>;
     error?: string;
   };
+  leads: {
+    total: number;
+    last7Days: number;
+    byStatus: Record<string, number>;
+    bySource: Record<string, number>;
+    recent: Array<{
+      id: string;
+      email: string;
+      firstName: string | null;
+      lastName: string | null;
+      companyName: string;
+      status: string;
+      createdAt: string;
+      dataSource: string | null;
+    }>;
+  };
   timeRange: '7d' | '30d' | '90d' | 'all';
   lastUpdated?: string;
 }
@@ -901,6 +917,118 @@ export default function AdminAnalyticsPage() {
                 <strong>⚠️ Warning:</strong> {analyticsData.blogPosts.overdue} post(s) are overdue. 
                 The health check workflow should auto-trigger generation. Check GitHub Actions if posts don't appear.
               </div>
+            )}
+          </section>
+
+          {/* Leads Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              Priority Queue Leads
+            </h2>
+            
+            {analyticsData.leads && (
+              <>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: 'var(--space-4)',
+                  marginBottom: 'var(--space-6)'
+                }}>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--signal)', marginBottom: '4px' }}>
+                      {analyticsData.leads.total}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Total Leads</div>
+                  </div>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '4px' }}>
+                      {analyticsData.leads.last7Days}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Last 7 Days</div>
+                  </div>
+                </div>
+
+                {analyticsData.leads.recent.length > 0 && (
+                  <div>
+                    <h3 style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-4)',
+                      color: 'var(--text)'
+                    }}>
+                      Recent Leads
+                    </h3>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--space-2)'
+                    }}>
+                      {analyticsData.leads.recent.map((lead) => (
+                        <div
+                          key={lead.id}
+                          style={{
+                            background: 'var(--bg)',
+                            padding: 'var(--space-3)',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border)',
+                            fontSize: '14px'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                              <div style={{ fontWeight: '600', color: 'var(--text)', marginBottom: '4px' }}>
+                                {lead.firstName && lead.lastName 
+                                  ? `${lead.firstName} ${lead.lastName}` 
+                                  : lead.email}
+                              </div>
+                              <div style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
+                                {lead.companyName} • {lead.email}
+                              </div>
+                            </div>
+                            <div style={{
+                              padding: '4px 12px',
+                              borderRadius: '6px',
+                              background: lead.status === 'NEW' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                              color: lead.status === 'NEW' ? 'var(--accent-warm)' : 'var(--brand)',
+                              fontSize: '12px',
+                              fontWeight: '500'
+                            }}>
+                              {lead.status}
+                            </div>
+                          </div>
+                          <div style={{
+                            marginTop: '8px',
+                            fontSize: '12px',
+                            color: 'var(--muted)'
+                          }}>
+                            {new Date(lead.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </section>
         </div>
