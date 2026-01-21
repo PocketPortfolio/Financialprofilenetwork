@@ -696,6 +696,12 @@ export default function SponsorPage() {
                 <strong>Advanced Analytics:</strong> Sector breakdown, portfolio risk (Beta), and rebalancing alerts
               </span>
             </li>
+            <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+              <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
+              <span>
+                <strong>🇬🇧 UK Concierge Onboarding:</strong> For the first 50 UK Founders, the CTO will personally format and import your messy CSV history from Trading212/Freetrade/Hargreaves Lansdown.
+              </span>
+            </li>
           </ul>
           <div style={{ marginBottom: '16px', padding: '12px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', color: '#f59e0b', marginBottom: '8px' }}>

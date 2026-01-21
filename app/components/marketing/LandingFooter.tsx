@@ -81,77 +81,127 @@ export default function LandingFooter() {
           </Link>
         </div>
 
-        {/* Tool Links */}
+        {/* Free Tools Section */}
         <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          gap: '24px', 
-          marginBottom: '16px', 
-          flexWrap: 'wrap' 
+          marginBottom: '24px'
         }}>
-          <Link href="/openbrokercsv" style={{ 
-            padding: '12px 24px', 
-            border: '1px solid var(--border)', 
-            borderRadius: '8px', 
-            color: 'var(--text)', 
-            textDecoration: 'none', 
-            fontSize: '14px', 
-            fontWeight: '500',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#D97706';
-            e.currentTarget.style.color = '#D97706';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
-            e.currentTarget.style.color = 'var(--text)';
-          }}
-          >
-            OpenBrokerCSV
-          </Link>
-          <Link href="/static/portfolio-tracker" style={{ 
-            padding: '12px 24px', 
-            border: '1px solid var(--border)', 
-            borderRadius: '8px', 
-            color: 'var(--text)', 
-            textDecoration: 'none', 
-            fontSize: '14px', 
-            fontWeight: '500',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#D97706';
-            e.currentTarget.style.color = '#D97706';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
-            e.currentTarget.style.color = 'var(--text)';
-          }}
-          >
-            Portfolio Tracker
-          </Link>
-          <Link href="/static/csv-etoro-to-openbrokercsv" style={{ 
-            padding: '12px 24px', 
-            border: '1px solid var(--border)', 
-            borderRadius: '8px', 
-            color: 'var(--text)', 
-            textDecoration: 'none', 
-            fontSize: '14px', 
-            fontWeight: '500',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#D97706';
-            e.currentTarget.style.color = '#D97706';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
-            e.currentTarget.style.color = 'var(--text)';
-          }}
-          >
-            eToro → OpenBrokerCSV
-          </Link>
+          <h3 style={{ 
+            fontSize: '12px', 
+            fontWeight: '600', 
+            color: 'var(--text-secondary)', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.5px',
+            marginBottom: '16px',
+            textAlign: 'center'
+          }}>
+            Free Tools
+          </h3>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '16px', 
+            flexWrap: 'wrap' 
+          }}>
+            <Link href="/tools/risk-calculator" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Risk Calculator
+              <span style={{
+                padding: '2px 6px',
+                borderRadius: '4px',
+                fontSize: '9px',
+                fontWeight: '700',
+                background: 'rgba(59, 130, 246, 0.1)',
+                color: '#3b82f6',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                New
+              </span>
+            </Link>
+            <Link href="/tools/google-sheets-formula" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Google Sheets
+            </Link>
+            <Link href="/for/advisors" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Advisor Reports
+            </Link>
+            <Link href="/tools" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Tax Converter
+            </Link>
+          </div>
         </div>
 
         {/* The Trust Links */}

@@ -567,7 +567,7 @@ export default function LandingPage() {
           padding: 'clamp(20px, 4vw, 32px)',
           boxSizing: 'border-box'
         }}>
-          {/* Headline - SOVEREIGN VALUE PROP */}
+          {/* Headline - ENEMY-FOCUSED VALUE PROP */}
           <h1 className="brand-text" style={{ 
             fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
             fontWeight: 'bold', 
@@ -576,10 +576,11 @@ export default function LandingPage() {
             letterSpacing: '-0.03em',
             maxWidth: '800px'
           }}>
-            The Sovereign Financial Stack.
+            Stop being the product.<br />
+            <span style={{ color: 'var(--accent-warm)' }}>Start managing your wealth.</span>
           </h1>
 
-          {/* Subhead - AI-FIRST + SOVEREIGN */}
+          {/* Subhead - PRIVACY + ENEMY POSITIONING */}
           <p className="brand-text-secondary" style={{ 
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
             lineHeight: '1.6', 
@@ -587,10 +588,11 @@ export default function LandingPage() {
             maxWidth: '700px',
             color: 'var(--text-secondary)'
           }}>
-            Orchestrated by <strong style={{ color: 'var(--accent-warm)' }}>AI</strong>. Owned by <strong style={{ color: 'var(--accent-warm)' }}>You</strong>.
+            Most "free" trackers sell your data to hedge funds.{' '}
+            <strong style={{ color: 'var(--text)' }}>Pocket Portfolio</strong> is the sovereign wealth console that works for <em>you</em>.
             <br />
             <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
-              Local-first portfolio tracking, autonomous research, and encrypted sync.
+              Orchestrated by <strong style={{ color: 'var(--accent-warm)' }}>AI</strong>. Owned by <strong style={{ color: 'var(--accent-warm)' }}>You</strong>.
             </span>
           </p>
           
