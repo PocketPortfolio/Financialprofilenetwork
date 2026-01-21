@@ -60,7 +60,7 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
  */
 async function generateImage(title: string, imagePath: string, pillar: string = 'Philosophy'): Promise<string | null> {
   try {
-    const imagePrompt = `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. No text. Theme: ${title}. Professional, modern, technical aesthetic. Pillar: ${pillar}.`;
+    const imagePrompt = `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, data charts, graphs, pie charts, bar graphs, stacked blocks, connecting lines. Theme: ${title}. Professional, modern, technical aesthetic. Pillar: ${pillar}.`;
     
     console.log(`🎨 Generating image: ${imagePath}`);
     console.log(`   Theme: ${title}`);
