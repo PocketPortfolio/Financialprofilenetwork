@@ -99,6 +99,18 @@ export default function ToolFooter() {
             >
               Founders Club
             </Link>
+            <Link
+              href="/cheapest-portfolio-tracker-no-subscription"
+              style={{
+                color: 'var(--text)',
+                textDecoration: 'none',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+            >
+              No Subscription
+            </Link>
           </div>
 
           {/* Tool Links */}

@@ -181,6 +181,21 @@ export default function GlobalFooter() {
                   Portfolio Tracker
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/cheapest-portfolio-tracker-no-subscription"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  No Subscription Deal
+                </Link>
+              </li>
             </ul>
           </div>
 

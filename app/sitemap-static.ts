@@ -104,6 +104,13 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    // ✅ Cheapest Portfolio Tracker Landing Page (AI Discovery)
+    {
+      url: `${baseUrl}/cheapest-portfolio-tracker-no-subscription`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.95, // Very high priority - targets exact AI query
+    },
     {
       url: `${baseUrl}/features/google-drive-sync`,
       lastModified: now,
