@@ -78,6 +78,20 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    // ✅ Risk Calculator Lead Magnet
+    {
+      url: `${baseUrl}/tools/risk-calculator`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9, // High priority because it's a lead magnet
+    },
+    // ✅ Tools Index Page (Lists all tools including tax converters)
+    {
+      url: `${baseUrl}/tools`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9, // High priority - lists all tools
+    },
     {
       url: `${baseUrl}/for/advisors`,
       lastModified: now,

@@ -399,15 +399,45 @@ export default function GlobalFooter() {
             </ul>
           </div>
 
-          {/* Column 4: Resources (Utility) */}
+          {/* Column 4: Free Tools & Resources */}
           <div>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
-              Resources
+              Free Tools
             </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <Link
-                  href="/openbrokercsv"
+                  href="/tools/risk-calculator"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Risk Calculator
+                  <span style={{
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '9px',
+                    fontWeight: '700',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    color: '#3b82f6',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    New
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tools/google-sheets-formula"
                   style={{
                     color: 'var(--text-secondary)',
                     textDecoration: 'none',
@@ -417,9 +447,44 @@ export default function GlobalFooter() {
                   onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
                   onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
                 >
-                  OpenBrokerCSV
+                  Google Sheets Formula
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/for/advisors"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Advisor Report Generator
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/tools"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Tax Converter
+                </Link>
+              </li>
+            </ul>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', marginTop: '24px', marginBottom: '16px', color: 'var(--text)' }}>
+              Resources
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <a
                   href="https://github.com/PocketPortfolio/Financialprofilenetwork#readme"

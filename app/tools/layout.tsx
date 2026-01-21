@@ -1,5 +1,18 @@
+import { Metadata } from 'next';
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
+
+export const metadata: Metadata = {
+  title: 'Free Financial Tools | Pocket Portfolio',
+  description: 'Free portfolio risk calculator, tax converters, Google Sheets formulas, and advisor tools. All tools process data locally - your financial data never leaves your device.',
+  openGraph: {
+    title: 'Free Financial Tools - Portfolio Risk, Tax Converters & More',
+    description: 'Free tools for portfolio analysis, tax preparation, and financial planning. Privacy-first - all processing happens locally.',
+    url: 'https://www.pocketportfolio.app/tools',
+    siteName: 'Pocket Portfolio',
+    type: 'website',
+  },
+};
 
 export default function ToolsLayout({
   children,
