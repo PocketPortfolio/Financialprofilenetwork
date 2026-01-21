@@ -279,7 +279,7 @@
     "scheduledTime": "14:00",
     "title": "The Developer's Guide to Vercel KV (Redis)",
     "slug": "the-developer-s-guide-to-vercel-kv-redis",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -288,7 +288,8 @@
       "vercel kv",
       "developer",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-01-21T14:23:41.102Z"
   },
   {
     "id": "how-to-how-to-implement-rate-limiting-in-10-lines-of-code-jan-22",
