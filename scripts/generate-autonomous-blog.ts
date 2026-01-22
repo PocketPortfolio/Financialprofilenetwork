@@ -345,11 +345,12 @@ pillar: "${post.pillar}"
     content = sanitizeMDXContent(content);
 
     // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO AND RESEARCH POSTS
+    // CRITICAL: Strong text prohibition to prevent DALL-E from generating text in images
     const imagePrompt = isHowTo
-      ? `Minimalist terminal interface, dark mode, bright green (#00ff41) text on black background, hacker aesthetic, code-focused, 8k resolution. No text. Theme: ${post.title}. Clean, technical, command-line style.`
+      ? `Minimalist terminal interface, dark mode, bright green (#00ff41) text on black background, hacker aesthetic, code-focused, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, terminal windows, code blocks, command prompts, connecting lines. Theme: ${post.title}. Clean, technical, command-line style.`
       : isResearch
-      ? `Academic research visualization, data charts and graphs, professional blue (#3b82f6) and grey (#64748b) palette, minimalist, 8k resolution. No text. Theme: ${post.title}. Scholarly, analytical, research-focused aesthetic.`
-      : `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. No text. Theme: ${post.title}. Professional, modern, technical aesthetic.`;
+      ? `Academic research visualization, data charts and graphs, professional blue (#3b82f6) and grey (#64748b) palette, minimalist, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, data charts, graphs, pie charts, bar graphs, stacked blocks, connecting lines. Theme: ${post.title}. Scholarly, analytical, research-focused aesthetic.`
+      : `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, data charts, graphs, pie charts, bar graphs, stacked blocks, connecting lines. Theme: ${post.title}. Professional, modern, technical aesthetic.`;
     
     console.log(`🎨 Generating image for: ${post.slug}`);
     let imageUrl: string | null = null;
