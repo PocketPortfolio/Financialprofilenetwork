@@ -1,0 +1,48 @@
+---
+title: "How to Implement Rate Limiting in 10 Lines of Code"
+date: "2026-01-22"
+description: "Learn to implement rate limiting efficiently in your applications with this quick, 10-line code tutorial."
+tags: ["implement", "rate", "limiting"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+Rate limiting is crucial for preventing abuse and ensuring the fair use of resources in web applications. Here's how to implement it in just 10 lines of code.
+
+```pytho
+n
+import time
+
+def rate_limiter(max_requests, period=60):
+    timeline = []
+    def request_handler():
+        current_time = time.time()
+        if len(timeline) < max_requests:
+            timeline.append(current_time)
+            return True
+        if current_time - timeline[0] > period:
+            timeline.pop(0)
+            timeline.append(current_time)
+            return True
+        return False
+    return request_handler
+```
+
+**Explanation:**
+
+- `max_requests`: The maximum number of requests allowed.
+- `period`: The time window in seconds during which the `max_requests` count applies.
+- `timeline`: A list to keep track of the timestamps of the incoming requests.
+- `request_handler()`: A closure that checks whether a new request is within rate limits. It returns `True` if the request is allowed, `False` otherwise.
+
+This implementation uses a sliding window algorithm. It records each request's timestamp in a list (`timeline`). When a new request arrives, it checks:
+1. If the list isn't full (`len(timeline) < max_requests`), the request is allowed.
+2. If the oldest request in the list occurred more than `period` seconds ago, it's removed, making room for the new request.
+
+**Quick Tip:**
+
+This code is a basic implementation and works well for single-instance applications. For distributed systems, consider using a centralized store (like Redis) to maintain the state across instances.
+
+Implementing rate limiting efficiently safeguards your application against overuse and potential abuse, ensuring availability and reliability for all users.
