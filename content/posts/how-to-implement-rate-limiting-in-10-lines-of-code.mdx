@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn to implement rate limiting efficiently with a concise, 10-line Python code snippet, perfect for managing resource access."
+description: "Quick guide on how to implement rate limiting in your app using just 10 lines of code to manage API request traffic efficiently."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,44 +9,53 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Rate limiting is crucial for preventing abuse and ensuring equitable resource access in web applications. Here's how you can implement it in just 10 lines of code using Python.
+In the realm of web development, ensuring your application can handle a surge of requests without crashing is essential. One effective strategy to manage this is through rate limiting, which controls how often a user can execute a particular action within a set timeframe. Here's a straightforward way to implement rate limiting in just 10 lines of code.
 
-```pytho
-n
-import time
+### Direct Solution with Code
 
-class RateLimiter:
-    def __init__(self, max_requests, time_window):
-        self.requests = {}
-        self.max_requests = max_requests
-        self.time_window = time_window
+Let's use a simple Express.js server as our example. We will implement rate limiting using a middleware function.
 
-    def is_allowed(self, user_id):
-        current_time = time.time()
-        if user_id not in self.requests:
-            self.requests[user_id] = [current_time]
-            return True
-        self.requests[user_id] = [timestamp for timestamp in self.requests[user_id] if current_time - timestamp < self.time_window]
-        if len(self.requests[user_id]) < self.max_requests:
-            self.requests[user_id].append(current_time)
-            return True
-        return False
+```javascrip
+t
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+const rateLimit = (req, res, next) => {
+  const limit = 100; // Max requests
+  const timeFrame = 3600000; // Time frame in milliseconds (1 hour)
+  const user = req.ip; // Key to track (e.g., IP address)
+  global.users = global.users || {};
+  global.users[user] = global.users[user] || { count: 0, startTime: new Date().getTime() };
+
+  if (new Date().getTime() - global.users[user].startTime < timeFrame) {
+    if (global.users[user].count < limit) {
+      global.users[user].count++;
+      next();
+    } else {
+      res.status(429).send('Rate limit exceeded. Try again later.');
+    }
+  } else {
+    global.users[user] = { count: 1, startTime: new Date().getTime() };
+    next();
+  }
+};
+
+app.use(rateLimit);
+
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 ```
 
-**Key Concepts:**
+### Explanation of Key Concepts
 
-- **Rate Limiting:** A technique used to control the number of requests a user can make to a resource within a given timeframe.
-- **`max_requests`:** The maximum number of requests allowed.
-- **`time_window`:** The timeframe (in seconds) for which the `max_requests` count applies.
-- **`user_id`:** A unique identifier for each user, which could be an IP address, user account id, or any identifier that distinguishes one user from another.
-- **`is_allowed`:** A method that checks if a user's request is within the rate limits. If true, the request is permitted; otherwise, it's denied.
+This code defines a middleware function `rateLimit` that tracks requests from a unique user (in this case, using their IP address as the identifier) and limits the number of requests they can make to 100 per hour. If a user exceeds this limit, they receive a `429` status code indicating too many requests. The tracking of request counts and timestamps is stored in a global object `users`.
 
-**Quick Tip:**
+### Quick Tip
 
-This code snippet uses a sliding window algorithm, which ensures fairness and flexibility in rate limiting. It's memory-efficient because it only keeps timestamps of requests within the specified `time_window`, discarding older entries.
+Remember, using a global object for tracking is only viable for demonstration or very small applications. In production, consider using a more robust solution like Redis to handle rate limiting across multiple server instances efficiently and to prevent memory leaks or inconsistencies.
 
-**Gotcha:**
-
-Be mindful of the `time_window` and `max_requests` values. Setting these too low might overly restrict access, while too high values may not effectively prevent abuse. Adjust these parameters based on the specific usage patterns and requirements of your application.
-
-Implementing an efficient rate limiting mechanism doesn't have to be complex or verbose. This concise approach provides a robust starting point for managing access to resources in your applications.
+Implementing rate limiting is crucial for protecting your APIs and ensuring fair usage among consumers. This simple yet effective approach can be the first line of defense against abuse or accidental overuse.
