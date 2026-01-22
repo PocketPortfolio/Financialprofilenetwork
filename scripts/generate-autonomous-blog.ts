@@ -839,6 +839,21 @@ async function main() {
           if (!parsed.content || parsed.content.trim().length === 0) {
             throw new Error(`MDX file has no content body: ${mdxPath}`);
           }
+          
+          // ✅ CRITICAL: Verify image path matches actual file (prevents image rendering failures)
+          const expectedImagePath = `/images/blog/${post.slug}.png`;
+          if (parsed.data.image !== expectedImagePath) {
+            throw new Error(`Image path mismatch in frontmatter: expected "${expectedImagePath}", got "${parsed.data.image}". This will cause the image to not render in production!`);
+          }
+          
+          // ✅ CRITICAL: Verify the image file referenced in frontmatter actually exists
+          const frontmatterImagePath = parsed.data.image?.startsWith('/') 
+            ? parsed.data.image.substring(1) // Remove leading slash for file system path
+            : parsed.data.image;
+          const frontmatterImageFullPath = path.join(process.cwd(), frontmatterImagePath || '');
+          if (!fs.existsSync(frontmatterImageFullPath)) {
+            throw new Error(`Image file referenced in frontmatter does not exist: ${parsed.data.image} (resolved to: ${frontmatterImageFullPath})`);
+          }
         } catch (parseError: any) {
           throw new Error(`MDX file failed frontmatter validation: ${mdxPath} - ${parseError.message}`);
         }
