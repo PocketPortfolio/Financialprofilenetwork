@@ -256,7 +256,7 @@
     "date": "2026-01-22",
     "title": "JSON Finance: The Open Standard That Breaks Wall Street's Grip",
     "slug": "json-finance-the-open-standard-that-breaks-wall-street-s-gri",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -266,7 +266,8 @@
       "finance:"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-01-22T09:40:10.781Z"
   },
   {
     "id": "week-4-post-1",
