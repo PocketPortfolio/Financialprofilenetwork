@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn to efficiently implement rate limiting in your applications with a concise, 10-line Python example."
+description: "Learn to implement rate limiting in your applications using a straightforward, efficient method in just 10 lines of code."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,37 +9,41 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Rate limiting is crucial for protecting your APIs from overuse and abuse, ensuring fair resource access across all users. Here's how you can implement a basic rate limiter in just 10 lines of Python code.
+Implementing rate limiting is crucial for controlling the rate at which user requests are handled by your application, preventing overuse of resources and ensuring fair usage. Here’s how you can achieve this efficiently in 10 lines of code.
 
 ```pytho
 n
+from flask import Flask, request, jsonify
+from redis import Redis
 import time
 
-class RateLimiter:
-    def __init__(self, max_calls, period):
-        self.calls = []
-        self.max_calls = max_calls
-        self.period = period
+app = Flask(__name__)
+redis = Redis()
 
-    def attempt_call(self):
-        now = time.time()
-        self.calls = [call for call in self.calls if call > now - self.period]
-        if len(self.calls) < self.max_calls:
-            self.calls.append(now)
-            return True
-        return False
+def rate_limiter():
+    ip = request.remote_addr
+    current_time = time.time()
+    if redis.exists(ip) and int(redis.get(ip)) >= 10:
+        return jsonify({"error": "Too many requests"}), 429
+    redis.setex(ip, 60, int(redis.get(ip) or 0) + 1)
+    return True
+
+@app.route('/')
+def index():
+    if rate_limiter() != True:
+        return rate_limiter()
+    return jsonify({"message": "Request successful"})
+
+if __name__ == '__main__':
+    app.run()
 ```
 
-This simple `RateLimiter` class allows you to specify the maximum number of calls (`max_calls`) and the period (in seconds) over which these calls can be made (`period`). The `attempt_call` method checks if adding a new call would exceed the rate limit. If not, it records the call's timestamp and allows the action; otherwise, it denies the attempt.
+### Explanation of Key Concepts
 
-### Key Concepts
-
-- **Call Window**: We use a sliding window based on the current time and the specified period to check if a new call can be made.
-- **Efficiency**: By pruning calls outside the current window each time `attempt_call` is invoked, we keep the `calls` list short and the method efficient.
+This code uses Flask, a lightweight WSGI web application framework, and Redis, an in-memory data structure store, to implement a simple rate limiting mechanism. The `rate_limiter` function checks if a request from a specific IP address has exceeded 10 requests per minute. If it has, the server returns a `429 Too Many Requests` HTTP status code. Otherwise, it increments the request count for that IP in Redis, which automatically expires after 60 seconds, using the `SETEX` command.
 
 ### Quick Tip
 
-Beware of time synchronization issues in distributed systems. If your application spans multiple servers, consider using a centralized time source or a distributed rate limiting solution to prevent inconsistencies.
+Ensure Redis is properly installed and running on your system for this code to work. This example uses Redis' simplicity and speed, making it a powerful choice for tracking request counts in real-time.
 
-Implementing rate limiting is a straightforward but essential task in protecting your application’s resources. This Python example offers a simple yet effective approach, ensuring your APIs remain reliable and accessible.
-
+Implementing rate limiting in your applications can safeguard your resources from abuse and help distribute them fairly among users. This simple, effective method provides a solid foundation that you can adapt and expand based on your specific needs.
