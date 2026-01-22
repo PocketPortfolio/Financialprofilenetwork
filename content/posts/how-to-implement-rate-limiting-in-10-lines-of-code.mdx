@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn how to quickly implement rate limiting in your application with this concise, 10-line code guide."
+description: "Learn to implement rate limiting in your application with a concise, effective 10-line code snippet."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,41 +9,42 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Rate limiting is essential for controlling the rate at which user requests are processed by your application, preventing overuse of resources. This guide shows you how to implement basic rate limiting in just 10 lines of code.
-
-### Direct Solution with Code
-
-Here's a simple Python implementation using Flask:
+Implementing rate limiting is crucial for protecting your APIs and services from abuse and overuse. This concise guide will show you how to achieve this in just 10 lines of code.
 
 ```pytho
 n
 from flask import Flask, request, jsonify
-from time import time
+from functools import wraps
+import time
 
 app = Flask(__name__)
-requests_log = {}
+clients = {}
 
-@app.route('/api', methods=['GET'])
-def limited_endpoint():
-    client_ip = request.remote_addr
-    request_time = requests_log.get(client_ip, 0)
-    
-    if time() - request_time < 1:  # 1 second between requests
-        return jsonify({"error": "Too many requests"}), 429
+def rate_limiter(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        client = request.remote_addr
+        if client not in clients or time.time() - clients[client] > 60:
+            clients[client] = time.time()
+            return f(*args, **kwargs)
+        else:
+            return jsonify({"error": "rate limit exceeded"}), 429
+    return decorated_function
 
-    requests_log[client_ip] = time()
-    return jsonify({"success": "Request successful"})
-
-if __name__ == '__main__':
-    app.run()
+@app.route("/data")
+@rate_limiter
+def data():
+    return "Protected Data"
 ```
 
-### Explanation of Key Concepts
+### Key Concepts
 
-This code snippet is a straightforward implementation of rate limiting in a Flask web application. The core idea is to log the timestamp of the last request for each client IP address. When a new request arrives, the server checks how much time has passed since the last request from the same client. If the time interval is less than the defined limit (in this case, 1 second), the server returns a 429 status code, indicating "Too many requests."
+- **Decorator Pattern**: We use a decorator (`@rate_limiter`) to wrap any function that we want to protect with rate limiting. This pattern allows for clean and reusable code.
+- **Client Tracking**: The `clients` dictionary keeps track of each client's last request time. The key is the client's IP address, obtained via `request.remote_addr`.
+- **Rate Limiting Logic**: Before executing the protected function, we check if the client's last request was made within the past 60 seconds. If so, we return a 429 error; otherwise, we update the client's last request time and proceed.
 
 ### Quick Tip
 
-To ensure fairness and prevent a single user from consuming all available request slots, consider using a more sophisticated approach like the "Token Bucket" algorithm, which allows for burst behavior but limits the average rate over time.
+When implementing rate limiting, consider using more sophisticated methods for identifying clients than just IP addresses, as users behind NAT or proxy services might share the same IP address. Additionally, for production environments, consider storing the `clients` data in a more persistent storage solution like Redis to handle multiple server instances and ensure scalability.
 
-Implementing rate limiting is crucial for maintaining the reliability and availability of your services. This basic example provides a starting point, but for production environments, you may need to explore more comprehensive solutions that include features like distributed rate limiting and dynamic rate adjustments based on traffic patterns.
+Implementing rate limiting efficiently can significantly improve your application's reliability and user experience by preventing service abuse and ensuring fair resource distribution among users.
