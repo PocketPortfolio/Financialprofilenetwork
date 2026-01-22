@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn how to effectively implement rate limiting in your applications with just 10 lines of code to manage request flow."
+description: "Learn to implement rate limiting in your applications with a concise, efficient code snippet in just 10 lines."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,38 +9,45 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Implementing rate limiting is crucial for managing the flow of requests to your application, preventing overloads and ensuring equitable resource distribution. This concise guide demonstrates how to implement basic rate limiting in just 10 lines of code using Python and Redis, a popular in-memory data structure store.
+When building web applications, managing the rate at which users can make requests is crucial to prevent abuse and ensure service reliability. Rate limiting is the solution, but how can you implement it succinctly?
+
+Here's a direct solution using Python and Flask—a popular web framework. This code snippet demonstrates a simple yet effective way to rate limit requests:
 
 ```pytho
 n
-import redis
+from flask import Flask, request, jsonify
+from functools import wraps
 import time
 
-r = redis.Redis()
-user_id = "user123"
-key = f"rate_limit:{user_id}"
-request_count = r.incr(key)
+app = Flask(__name__)
+clients = {}
 
-if request_count == 1:
-    r.expire(key, 60)
-if request_count > 100:
-    raise Exception("Rate limit exceeded")
+def rate_limiter(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        client_ip = request.remote_addr
+        if client_ip not in clients:
+            clients[client_ip] = time.time()
+        elif time.time() - clients[client_ip] < 60:
+            return jsonify({"error": "Too many requests"}), 429
+        clients[client_ip] = time.time()
+        return f(*args, **kwargs)
+    return decorated_function
 
-# Your application logic here
+@app.route('/data', methods=['GET'])
+@rate_limiter
+def get_data():
+    return jsonify({"data": "Here's your data"})
 ```
 
 ### Explanation of Key Concepts
 
-- **Redis**: An in-memory key-value database that excels at tasks like rate limiting due to its speed and simplicity.
-- **INCR and EXPIRE commands**: `INCR` increments the number of requests (hits) by a user. If it's the first hit (`request_count == 1`), we set an expiration time of 60 seconds with `EXPIRE`, starting a new window.
-- **Request Count and Limit**: We limit the user to 100 requests per 60 seconds. If `request_count` exceeds 100, we raise an exception, indicating the rate limit has been exceeded.
+- **Flask**: A micro web framework for Python that's easy to use for building web applications.
+- **Decorators**: Functions that wrap around another function to modify its behavior. In this case, `@rate_limiter` is a decorator that adds rate limiting functionality to any route it's applied to.
+- **Time Tracking**: The core of this rate limiting implementation is tracking the time of the last request from each client (identified by IP address) and denying requests that come in too quickly after the previous one.
 
 ### Quick Tip
 
-Ensure Redis is properly installed and configured in your environment before implementing this script. Also, adjust the request limit and window size (60 seconds in the example) according to your application's needs and capacity.
+When implementing rate limiting, consider the specific needs of your application. The example provided uses a 60-second limit, but you might need a tighter or looser restriction based on your use case. Also, remember that using the IP address to identify clients might not work well in environments where users share the same external IP (e.g., corporate networks or VPNs).
 
-### Gotcha
-
-In a distributed system, timing issues can arise if the Redis `EXPIRE` command is not set quickly enough after the `INCR` command, potentially allowing a user to exceed their rate limit. To mitigate this, consider using Redis transactions or Lua scripts for atomicity.
-
-Implementing rate limiting is a balance between protecting your resources and providing a smooth user experience. This simple yet effective approach helps you achieve that balance, ensuring your application remains robust and responsive under varying loads.
+This code is a basic implementation meant for educational purposes. For production environments, you should consider more robust solutions like those provided by web servers (e.g., Nginx) or dedicated rate limiting services.
