@@ -533,11 +533,30 @@ async function main() {
     }
 
     // ✅ Merge calendars and mark categories
-    const calendar: BlogPost[] = [
+    const mergedCalendar: BlogPost[] = [
       ...mainCalendar.map(p => ({ ...p, category: (p.category || 'deep-dive') as 'how-to-in-tech' | 'deep-dive' | 'research' })),
       ...howToCalendar.map(p => ({ ...p, category: 'how-to-in-tech' as const })),
       ...researchCalendar.map(p => ({ ...p, category: 'research' as const }))
     ];
+    
+    // ✅ COST OPTIMIZATION: Deduplicate posts by slug (prevents generating same post multiple times)
+    const seenSlugs = new Set<string>();
+    const calendar: BlogPost[] = [];
+    let duplicateCount = 0;
+    
+    for (const post of mergedCalendar) {
+      if (seenSlugs.has(post.slug)) {
+        duplicateCount++;
+        console.warn(`⚠️  Skipping duplicate post: ${post.title} (${post.date}) - slug: ${post.slug}`);
+        continue;
+      }
+      seenSlugs.add(post.slug);
+      calendar.push(post);
+    }
+    
+    if (duplicateCount > 0) {
+      console.log(`\n✅ Deduplication complete: Removed ${duplicateCount} duplicate post(s) from calendar\n`);
+    }
     
     const today = new Date().toISOString().split('T')[0];
     const now = new Date();
@@ -796,6 +815,32 @@ async function main() {
     const postsToUpdate: BlogPost[] = [];
 
     for (const post of duePosts) {
+      // ✅ COST OPTIMIZATION: Skip if post already exists (prevents unnecessary API calls)
+      const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+      const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
+      
+      if (fs.existsSync(mdxPath) && fs.existsSync(imagePath)) {
+        // Verify files are not empty
+        try {
+          const mdxStats = fs.statSync(mdxPath);
+          const imageStats = fs.statSync(imagePath);
+          if (mdxStats.size > 0 && imageStats.size > 0) {
+            console.log(`⏭️  Skipping ${post.title}: Files already exist (MDX: ${mdxStats.size} bytes, Image: ${imageStats.size} bytes)`);
+            // Mark as published if not already
+            if (post.status === 'pending') {
+              post.status = 'published';
+              post.publishedAt = new Date().toISOString();
+              postsToUpdate.push(post);
+            }
+            successCount++;
+            continue;
+          }
+        } catch (error) {
+          // If we can't read stats, proceed with generation
+          console.warn(`⚠️  Could not read file stats for ${post.slug}, proceeding with generation`);
+        }
+      }
+      
       try {
         await generateBlogPost(post);
         
@@ -850,7 +895,7 @@ async function main() {
           const frontmatterImagePath = parsed.data.image?.startsWith('/') 
             ? parsed.data.image.substring(1) // Remove leading slash for file system path
             : parsed.data.image;
-          const frontmatterImageFullPath = path.join(process.cwd(), frontmatterImagePath || '');
+          const frontmatterImageFullPath = path.join(process.cwd(), 'public', frontmatterImagePath || '');
           if (!fs.existsSync(frontmatterImageFullPath)) {
             throw new Error(`Image file referenced in frontmatter does not exist: ${parsed.data.image} (resolved to: ${frontmatterImageFullPath})`);
           }
