@@ -307,13 +307,52 @@ function generateCalendar(): ResearchPost[] {
 
 // Main execution
 const calendar = generateCalendar();
+
+// ✅ PRESERVE: Load existing calendar to preserve published posts' status and publishedAt
 const outputPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+let existingCalendar: any[] = [];
+if (fs.existsSync(outputPath)) {
+  try {
+    existingCalendar = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+    console.log(`📋 Loaded ${existingCalendar.length} existing posts from calendar`);
+  } catch (error) {
+    console.warn(`⚠️  Could not parse existing calendar, will create new one`);
+  }
+}
+
+// Create a map of existing published posts by ID to preserve their status
+const publishedPostsMap = new Map<string, any>();
+for (const existingPost of existingCalendar) {
+  if (existingPost.status === 'published' && existingPost.id) {
+    publishedPostsMap.set(existingPost.id, {
+      status: existingPost.status,
+      publishedAt: existingPost.publishedAt,
+      videoId: existingPost.videoId, // Preserve video ID if exists
+    });
+  }
+}
+
+// ✅ PRESERVE: Restore published status and publishedAt for already published posts
+let preservedCount = 0;
+for (const post of calendar) {
+  const existingData = publishedPostsMap.get(post.id);
+  if (existingData) {
+    post.status = existingData.status as 'pending';
+    (post as any).publishedAt = existingData.publishedAt;
+    if (existingData.videoId) {
+      (post as any).videoId = existingData.videoId;
+    }
+    preservedCount++;
+  }
+}
+
 fs.writeFileSync(outputPath, JSON.stringify(calendar, null, 2));
 
 console.log(`✅ Generated ${calendar.length} research posts`);
 console.log(`📅 Date range: ${calendar[0].date} to ${calendar[calendar.length - 1].date}`);
 console.log(`🕐 All posts scheduled at 18:00 UTC`);
 console.log(`💾 Saved to: ${outputPath}`);
+console.log(`✅ Preserved ${preservedCount} published post(s) with their status and publishedAt`);
 console.log(`\n📊 Pillar distribution:`);
 const pillarCounts = calendar.reduce((acc, post) => {
   acc[post.pillar] = (acc[post.pillar] || 0) + 1;
