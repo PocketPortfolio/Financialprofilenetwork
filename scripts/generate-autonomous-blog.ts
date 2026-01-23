@@ -539,20 +539,33 @@ async function main() {
       ...researchCalendar.map(p => ({ ...p, category: 'research' as const }))
     ];
     
-    // ✅ COST OPTIMIZATION: Deduplicate posts by slug (prevents generating same post multiple times)
-    const seenSlugs = new Set<string>();
-    const calendar: BlogPost[] = [];
+    // ✅ COST OPTIMIZATION: Deduplicate posts by ID (for research) or slug (for others)
+    // Research posts can have duplicate slugs (same topic, different dates), so use ID as key
+    // Other posts use slug as key (unique per post)
+    const postMap = new Map<string, BlogPost>();
     let duplicateCount = 0;
     
+    // Helper function to get the deduplication key for a post
+    const getPostKey = (post: BlogPost): string => {
+      // Research posts use ID (unique, includes date) to handle duplicate slugs
+      if (post.category === 'research' && post.id) {
+        return post.id;
+      }
+      // Other posts use slug
+      return post.slug || post.id || `unknown-${Math.random()}`;
+    };
+    
     for (const post of mergedCalendar) {
-      if (seenSlugs.has(post.slug)) {
+      const key = getPostKey(post);
+      if (postMap.has(key)) {
         duplicateCount++;
-        console.warn(`⚠️  Skipping duplicate post: ${post.title} (${post.date}) - slug: ${post.slug}`);
+        console.warn(`⚠️  Skipping duplicate post: ${post.title} (${post.date}) - key: ${key}`);
         continue;
       }
-      seenSlugs.add(post.slug);
-      calendar.push(post);
+      postMap.set(key, post);
     }
+    
+    const calendar: BlogPost[] = Array.from(postMap.values());
     
     if (duplicateCount > 0) {
       console.log(`\n✅ Deduplication complete: Removed ${duplicateCount} duplicate post(s) from calendar\n`);
