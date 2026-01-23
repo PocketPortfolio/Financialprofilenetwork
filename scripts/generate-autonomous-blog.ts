@@ -829,7 +829,9 @@ async function main() {
             // Mark as published if not already
             if (post.status === 'pending') {
               post.status = 'published';
-              post.publishedAt = new Date().toISOString();
+              // ✅ FIX: Use file modification time (actual publish time), not current time
+              const filePublishTime = new Date(Math.max(mdxStats.mtime.getTime(), imageStats.mtime.getTime())).toISOString();
+              post.publishedAt = filePublishTime;
               postsToUpdate.push(post);
             }
             successCount++;
@@ -920,11 +922,21 @@ async function main() {
 
     // ✅ UPDATE STATUS ONLY FOR POSTS WITH VERIFIED FILES
     // This ensures status is only 'published' when files actually exist
-    const publishTimestamp = new Date().toISOString();
     for (const post of postsToUpdate) {
-      post.status = 'published';
-      post.publishedAt = publishTimestamp; // Store actual publish time
-      console.log(`📝 Status updated to 'published': ${post.slug} (published at ${publishTimestamp})`);
+      // ✅ FIX: Use file modification time (actual publish time), not current time
+      const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+      const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
+      
+      if (fs.existsSync(mdxPath) && fs.existsSync(imagePath)) {
+        const mdxStats = fs.statSync(mdxPath);
+        const imageStats = fs.statSync(imagePath);
+        // Use the later of the two file times (when generation completed)
+        const publishTimestamp = new Date(Math.max(mdxStats.mtime.getTime(), imageStats.mtime.getTime())).toISOString();
+        
+        post.status = 'published';
+        post.publishedAt = publishTimestamp; // Store actual publish time from file
+        console.log(`📝 Status updated to 'published': ${post.slug} (published at ${publishTimestamp})`);
+      }
     }
 
     // ✅ Update calendars (save to appropriate files)

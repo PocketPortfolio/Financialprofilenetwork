@@ -1037,19 +1037,25 @@ async function getBlogPostsData() {
       const isOverdue = postDate < todayDate && effectiveStatus === 'pending';
       
       // Get published time from calendar (publishedAt) - this is the actual publish time
-      // Fall back to scheduled date/time if publishedAt is not available (more accurate than file mtime)
+      // Fall back to file modification time if publishedAt is not available (actual publish time)
       let publishedTime: string | null = null;
       if (hasFiles && effectiveStatus === 'published') {
         // Prefer publishedAt from calendar (actual publish time)
         if (post.publishedAt) {
           publishedTime = post.publishedAt;
         } else {
-          // ✅ FIX: Use scheduled date/time instead of file mtime (more accurate for research posts)
-          // Combine date and scheduledTime to create a proper timestamp
-          const scheduledDateTime = post.scheduledTime 
-            ? `${post.date}T${post.scheduledTime}:00Z`
-            : `${post.date}T00:00:00Z`;
-          publishedTime = scheduledDateTime;
+          // ✅ FIX: Use file modification time instead of scheduled time (actual publish time)
+          const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+          if (fs.existsSync(mdxPath)) {
+            const mdxStats = fs.statSync(mdxPath);
+            publishedTime = mdxStats.mtime.toISOString();
+          } else {
+            // Fallback to scheduled time only if file doesn't exist (shouldn't happen)
+            const scheduledDateTime = post.scheduledTime 
+              ? `${post.date}T${post.scheduledTime}:00Z`
+              : `${post.date}T00:00:00Z`;
+            publishedTime = scheduledDateTime;
+          }
         }
       }
       
