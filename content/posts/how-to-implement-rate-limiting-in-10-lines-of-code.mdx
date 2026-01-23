@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn to implement rate limiting efficiently in just 10 lines of code to manage your application's request load better."
+description: "Learn to implement rate limiting in your API or app to manage traffic flow efficiently, in just 10 lines of Python code."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,42 +9,43 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Rate limiting is essential for controlling the amount of incoming requests to a server, ensuring that resources are evenly distributed and preventing abuse. Implementing this feature doesn't have to be complex. Here's how you can do it in just 10 lines of code.
+Implementing rate limiting is crucial for controlling the traffic to your web server or API, ensuring it remains responsive under high load. This guide will show you how to achieve effective rate limiting with just 10 lines of Python code.
 
 ```pytho
 n
-import time
+from flask import Flask, request, g
+from time import time
 
-def rate_limiter(max_requests, period):
-    timeline = []
-    
-    def request_handler():
-        current_time = time.time()
-        if len(timeline) < max_requests:
-            timeline.append(current_time)
-            return True
-        if current_time - timeline[0] > period:
-            timeline.pop(0)
-            timeline.append(current_time)
-            return True
-        return False
-    return request_handler
+app = Flask(__name__)
+RATE_LIMITS = {}  # Key: IP, Value: [timestamps]
 
-# Example usage:
-limiter = rate_limiter(3, 60)  # 3 requests per 60 seconds
+@app.before_request
+def rate_limiter():
+    client_ip = request.remote_addr
+    access_times = RATE_LIMITS.get(client_ip, [])
+    access_times = [t for t in access_times if time() - t < 60]  # 1-minute window
+    if len(access_times) >= 5:  # Limit: 5 requests per minute
+        return "Rate limit exceeded.", 429
+    access_times.append(time())
+    RATE_LIMITS[client_ip] = access_times
+
+@app.route('/')
+def home():
+    return "Hello, World!"
+
+if __name__ == '__main__':
+    app.run(debug=True)
 ```
 
-**Explanation:**
+### Explanation of Key Concepts
 
-- `rate_limiter` is a higher-order function that takes two parameters: `max_requests` (the maximum number of requests allowed) and `period` (the time frame in seconds for these requests).
-- It initializes an empty list `timeline` to keep track of the timestamps of incoming requests.
-- The `request_handler` function is defined within `rate_limiter`. It checks if the number of requests is below the limit or if the oldest request in the `timeline` is outside the current rate limit period.
-- If the request can be processed, it updates the `timeline` with the current timestamp and returns `True`; otherwise, it returns `False`, signaling a rate limit hit.
+- **Rate Limiting**: This strategy is used to control the amount of incoming requests to a server by defining a limit on how many requests a user (or IP address) can make within a certain timeframe.
+- **Sliding Time Window Algorithm**: The code implements this algorithm by tracking the timestamps of incoming requests within a sliding window of time (1 minute in this example). If the number of requests exceeds the limit (5 requests per minute here), it blocks further requests from that IP address until the window slides enough for the earliest request to fall out of the window.
 
-**Quick Tip:**
+### Quick Tip
 
-For a distributed or high-load system, consider implementing this logic with a more scalable storage mechanism like Redis. This example is best suited for simple applications or as a learning tool.
+Make sure to consider the scalability of this approach. For a production environment, you might want to use a more robust solution like Redis to store access times, as it can handle expiration and counting more efficiently.
 
-**Gotcha:**
+### Gotcha
 
-Be cautious of the server's clock drifts or adjustments, which may affect the timing accuracy in rate limiting. In distributed systems, always rely on synchronized time sources.
+Be aware that using the client's IP address for rate limiting might not work well in environments where users are behind NAT or a proxy, as many users might appear to come from the same IP address. Consider using API keys or user IDs for rate limiting in such cases.
