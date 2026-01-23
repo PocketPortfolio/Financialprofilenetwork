@@ -94,7 +94,7 @@ Respond in JSON format only:
 
   try {
     const { text } = await generateText({
-      model: openai('gpt-4o-mini'), // Use cheaper model for detection
+      model: openai('gpt-4o-mini') as any, // AI SDK v6 type compatibility - Use cheaper model for detection
       prompt,
       temperature: 0.3, // Lower temperature for more consistent detection
     });

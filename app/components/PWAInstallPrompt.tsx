@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Share2, Download, Bell } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -56,10 +56,12 @@ export function PWAInstallPrompt() {
     };
   }, []);
 
-  const handleDismiss = () => {
-    setShowPrompt(false);
+  const handleDismiss = useCallback(() => {
+    // Set localStorage first to prevent re-showing
     localStorage.setItem('pwa-install-dismissed', 'true');
-  };
+    // Then update state
+    setShowPrompt(false);
+  }, []);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
@@ -147,7 +149,7 @@ export function PWAInstallPrompt() {
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative', zIndex: 10001, pointerEvents: 'auto' }}>
           {!isIOS && deferredPrompt && (
             <button
               onClick={handleInstall}
@@ -182,6 +184,11 @@ export function PWAInstallPrompt() {
               e.stopPropagation();
               handleDismiss();
             }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDismiss();
+            }}
             type="button"
             style={{
               background: 'transparent',
@@ -191,7 +198,12 @@ export function PWAInstallPrompt() {
               padding: '4px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 10000,
+              pointerEvents: 'auto',
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'hsl(var(--foreground))';

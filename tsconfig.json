@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "ES6"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES6"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,16 +24,47 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/app/*": ["./app/*"],
-      "@/db/*": ["./db/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/services/*": [
+        "./src/services/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
+      ],
+      "@/app/*": [
+        "./app/*"
+      ],
+      "@/db/*": [
+        "./db/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "src_backup", "scripts_backup", "tests_backup", "scripts", "drizzle.config.ts"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src_backup",
+    "scripts_backup",
+    "tests_backup",
+    "scripts",
+    "drizzle.config.ts",
+    "lib/sales/sourcing/predator-scraper.ts",
+    "lib/sales/sourcing/apollo-scraper.ts"
+  ]
 }
