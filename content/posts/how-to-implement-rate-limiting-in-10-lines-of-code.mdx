@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn how to quickly implement rate limiting to protect your APIs using just 10 lines of code, enhancing security and performance."
+description: "Learn to implement efficient rate limiting in your apps with this concise, practical guide. Quick setup, immediate results."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,41 +9,41 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Implementing rate limiting is crucial for protecting your APIs from overuse and abuse, ensuring your services remain fast and reliable for users. Here’s how you can achieve it in just 10 lines of code using Node.js and the `express-rate-limit` package.
+Implementing rate limiting is essential to protect your APIs from abuse and to ensure fair usage among users. This brief guide demonstrates how to set up a basic rate limiter in just 10 lines of code using Node.js and Redis.
+
+### Solution
 
 ```javascrip
 t
-const rateLimit = require('express-rate-limit');
-const express = require('express');
-const app = express();
+const redis = require('redis');
+const client = redis.createClient();
+const { promisify } = require('util');
+const getAsync = promisify(client.get).bind(client);
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
-
-//  Apply to all requests
-app.use(limiter);
-
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
-
-app.listen(3000);
+const rateLimit = async (userId) => {
+  let requests = await getAsync(userId);
+  if (requests && requests >= 5) return false;
+  client.multi().incr(userId).expire(userId, 60).exec();
+  return true;
+};
 ```
 
-### Explanation of Key Concepts
+### Explanation
 
-- **Rate Limiting**: It's a technique used to control the amount of incoming and outgoing traffic to or from a network. In the context of web applications, it helps to prevent API abuse and ensures equitable service distribution among users.
+1. **Redis Setup**: We use Redis, a fast, in-memory key-value store, to track the number of requests a user has made. Redis is ideal for this due to its speed and simplicity in handling expiry of keys.
+   
+2. **Promisifying Redis Calls**: Node.js Redis library uses callbacks by default. We use `promisify` to work with async/await for better readability and flow control.
 
-- **`express-rate-limit` Package**: This is a middleware for Express applications that enables rate limiting. It's simple to use and integrates seamlessly with your existing Express apps.
-
-- **`windowMs`**: This option specifies the duration in milliseconds for which each IP's request count is valid. In the example above, we've set it to 15 minutes.
-
-- **`max`**: This is the maximum number of requests that an IP can make within the specified `windowMs` duration. We've limited it to 100 requests per 15 minutes in the example.
+3. **The `rateLimit` Function**: This function accepts a `userId` and checks the number of requests already made.
+   - If a user has made 5 or more requests within a minute (`if (requests && requests >= 5)`), it returns `false`, indicating the user has been rate limited.
+   - Otherwise, it increments the request count and sets an expiry of 60 seconds on the record. It then returns `true`, allowing the request.
 
 ### Quick Tip
 
-While the `express-rate-limit` package is powerful for basic rate limiting needs, consider more advanced solutions like Redis-based rate limiters for distributed systems or high-load environments. These solutions can handle more complex scenarios and offer greater flexibility and performance.
+In a production environment, consider enhancing this basic rate limiter with more sophisticated rules. For example, differentiating between read and write operations or applying different limits based on the user's subscription level.
 
-Implementing rate limiting in your applications is a straightforward yet effective way to enhance security and user experience by preventing system overloads and ensuring fair resource usage among all users. With just a few lines of code, you can protect your services and maintain optimal performance.
+### Gotcha
+
+Remember to handle Redis connection errors and downtimes gracefully in your application to avoid denial of service to your users when Redis is unavailable.
+
+Implementing rate limiting is a critical step in creating robust, scalable web applications. This simple approach offers a lightweight, effective solution, but always consider your specific application needs and traffic patterns when designing rate limiting strategies.
