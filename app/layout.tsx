@@ -98,7 +98,7 @@ export default function RootLayout({
                   const savedTheme = localStorage.getItem('pocket-portfolio-theme');
                   const theme = savedTheme && ['system', 'light', 'dark', 'contrast'].includes(savedTheme) 
                     ? savedTheme 
-                    : 'system';
+                    : 'dark';
                   
                   let themeValue = 'dark'; // Default fallback
                   

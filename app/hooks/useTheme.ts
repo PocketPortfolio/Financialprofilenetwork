@@ -8,12 +8,12 @@ export function useTheme() {
   // Initialize from DOM to avoid state mismatch
   // Read current theme from DOM on first render (SSR-safe)
   const getInitialTheme = (): Theme => {
-    if (typeof window === 'undefined') return 'system';
+    if (typeof window === 'undefined') return 'dark';
     const savedTheme = localStorage.getItem('pocket-portfolio-theme') as Theme;
     if (savedTheme && ['system', 'light', 'dark', 'contrast'].includes(savedTheme)) {
       return savedTheme;
     }
-    return 'system';
+    return 'dark';
   };
   
   const getInitialResolvedTheme = (): 'light' | 'dark' => {
