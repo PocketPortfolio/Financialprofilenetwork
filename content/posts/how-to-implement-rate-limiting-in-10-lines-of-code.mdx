@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn how to implement rate limiting in your applications with a concise, 10-line code snippet, ensuring optimal server performance."
+description: "Learn how to efficiently implement rate limiting in your applications using just 10 lines of code to prevent system overload."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,46 +9,45 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Implementing rate limiting is crucial for maintaining the reliability and availability of your services. It prevents individual users from overloading your server by making too many requests in a short period.
+Implementing rate limiting is crucial for preventing system overload by too many requests in a short period. This guide will show you a straightforward way to implement rate limiting in just 10 lines of code.
 
-### Direct Solution with Code
+## Direct Solution with Code
 
-Here's how you can implement basic rate limiting in a Node.js application using an Express middleware in just 10 lines of code:
+Here's a quick and efficient way to implement rate limiting using Python and Redis:
 
-```javascrip
-t
-const express = require('express');
-const rateLimit = require('express-rate-limit');
+```pytho
+n
+import redis
+import time
 
-const app = express();
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
+r = redis.Redis()
+key = "rate_limit:my_api"
+expire_time = 60 # Window time in seconds
+request_limit = 100 # Max number of requests
 
-//  apply to all requests
-app.use(limiter);
-
-app.get('/', function(req, res) {
-  res.send('Hello World');
-});
-
-app.listen(3000);
+current_count = r.get(key)
+if current_count and int(current_count) >= request_limit:
+    print("Rate limit exceeded. Try again later.")
+else:
+    pipe = r.pipeline()
+    pipe.incr(key, 1)
+    pipe.expire(key, expire_time)
+    pipe.execute()
+    print("Request processed.")
 ```
 
-### Explanation of Key Concepts
+## Explanation of Key Concepts
 
-- **Express Middleware**: Functions that have access to the request object (`req`), the response object (`res`), and the next middleware function in the application’s request-response cycle.
-- **`express-rate-limit`**: A Node.js library that provides middleware to limit repeated requests to public APIs and/or endpoints.
-- **`windowMs`**: The duration in milliseconds of how long to keep records of requests in memory.
-- **`max`**: The maximum number of requests allowed from a single IP address within each window.
+- **Redis**: An in-memory data structure store, used as a database, cache, and message broker. Here, it's used to store and manage request counts.
+- **Pipelines**: A Redis feature that groups commands to reduce the latency of round trips between the client and server.
+- **Rate Limiting Logic**: The script uses a simple counter (`incr` command in Redis) that increases with each request. If the counter exceeds a predefined limit within a certain time window, further requests are blocked until the counter resets.
 
-### Quick Tip
+## Quick Tip
 
-Ensure your rate limiting settings are configured based on your server's capacity and the average expected traffic. Setting the limits too low might block legitimate users, while setting them too high could fail to protect your server from overload.
+When implementing rate limiting, consider using Redis's built-in support for expiring keys (`expire` command) to automatically reset the rate limit counter. This approach simplifies the process, as you don't need to manually reset the counters or handle the expiration logic in your application code.
 
-### Gotcha
+## Gotcha
 
-When deploying behind a reverse proxy like Nginx or in a containerized environment, make sure to correctly configure the trust proxy settings in Express. This ensures the client's IP address is accurately captured for rate limiting purposes.
+Be aware of Redis's single-threaded nature. While it's incredibly fast and suitable for rate limiting, under extremely high loads, the time it takes to execute commands can become a bottleneck. In such cases, consider sharding your rate limiting counters across multiple Redis instances or using Redis Cluster to distribute the load.
 
-Implementing rate limiting is a straightforward yet powerful way to protect your application from abuse and ensure its availability to legitimate users. With just 10 lines of code, you can significantly improve the robustness of your server against potential overload scenarios.
+Implementing effective rate limiting can safeguard your systems from abuse and ensure a fair distribution of resources among users. With these ten lines of code, you're well on your way to adding a basic but powerful rate limiting mechanism to your application.
