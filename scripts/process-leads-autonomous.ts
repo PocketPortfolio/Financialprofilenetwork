@@ -197,7 +197,7 @@ async function processNewLeads() {
     const hasResearchData = lead.researchData && typeof lead.researchData === 'object';
     const hasCulturalData = lead.detectedLanguage && lead.detectedRegion;
     const existingResearch = (lead.researchData as any) || {};
-    const hasEmployeeCount = existingResearch.employeeCount !== undefined || lead.employeeCount !== undefined;
+    const hasEmployeeCount = existingResearch.employeeCount !== undefined;
     
     if (hasResearchSummary && hasResearchData && hasCulturalData && hasEmployeeCount) {
       console.log(`   ⏭️  Skipping ${lead.email}: Already enriched (has researchSummary, researchData, cultural data, and employee count)`);

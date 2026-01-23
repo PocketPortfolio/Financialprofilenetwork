@@ -96,7 +96,7 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
   const hasResearchSummary = lead.researchSummary && lead.researchSummary !== 'Research pending';
   const hasCulturalData = lead.detectedLanguage && lead.detectedRegion;
   const hasNewsSignals = lead.newsSignals && Array.isArray(lead.newsSignals);
-  const hasEmployeeCount = existingResearch.employeeCount !== undefined || lead.employeeCount !== undefined;
+  const hasEmployeeCount = existingResearch.employeeCount !== undefined;
   
   if (hasResearchSummary && hasCulturalData && hasEmployeeCount) {
     console.log(`   ⏭️  Skipping enrichment for ${lead.email}: Already enriched (researchSummary, cultural data, and employee count present)`);
@@ -106,14 +106,14 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
       companyName: lead.companyName,
       techStack: lead.techStackTags || [],
       summary: lead.researchSummary || '',
-      employeeCount: existingResearch.employeeCount || lead.employeeCount,
+      employeeCount: existingResearch.employeeCount,
       recentHires: existingResearch.recentHires,
       fundingStage: existingResearch.fundingStage,
       newsSignals: lead.newsSignals || [],
-      location: lead.location || existingResearch.location,
-      timezone: lead.timezone || existingResearch.timezone,
-      detectedLanguage: lead.detectedLanguage,
-      detectedRegion: lead.detectedRegion,
+      location: lead.location || existingResearch.location || undefined,
+      timezone: lead.timezone || existingResearch.timezone || undefined,
+      detectedLanguage: lead.detectedLanguage || undefined,
+      detectedRegion: lead.detectedRegion || undefined,
     };
   }
   
@@ -171,8 +171,8 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
     newsSignals, // NEW
     location, // NEW
     timezone: timezone || undefined, // NEW
-    detectedLanguage: culturalContext.detectedLanguage, // NEW
-    detectedRegion: culturalContext.detectedRegion, // NEW
+    detectedLanguage: culturalContext.detectedLanguage || undefined, // NEW
+    detectedRegion: culturalContext.detectedRegion || undefined, // NEW
   };
 
   // Classify deal tier based on company size
