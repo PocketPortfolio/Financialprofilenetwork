@@ -192,6 +192,27 @@ async function processNewLeads() {
       continue;
     }
     
+    // ✅ COST OPTIMIZATION: Skip if already enriched (prevents unnecessary API calls)
+    const hasResearchSummary = lead.researchSummary && lead.researchSummary !== 'Research pending';
+    const hasResearchData = lead.researchData && typeof lead.researchData === 'object';
+    const hasCulturalData = lead.detectedLanguage && lead.detectedRegion;
+    const existingResearch = (lead.researchData as any) || {};
+    const hasEmployeeCount = existingResearch.employeeCount !== undefined || lead.employeeCount !== undefined;
+    
+    if (hasResearchSummary && hasResearchData && hasCulturalData && hasEmployeeCount) {
+      console.log(`   ⏭️  Skipping ${lead.email}: Already enriched (has researchSummary, researchData, cultural data, and employee count)`);
+      // Move to RESEARCHING status if still NEW
+      if (lead.status === 'NEW') {
+        await db.update(leads)
+          .set({
+            status: 'RESEARCHING',
+            updatedAt: new Date(),
+          })
+          .where(eq(leads.id, lead.id));
+      }
+      continue;
+    }
+    
     try {
       console.log(`   Enriching: ${lead.email} at ${lead.companyName}`);
       await enrichLead(lead.id);

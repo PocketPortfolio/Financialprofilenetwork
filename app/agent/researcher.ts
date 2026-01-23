@@ -92,22 +92,62 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
   // For now, extract from existing research data or use defaults
   const existingResearch = (lead.researchData as any) || {};
   
-  // NEW: Detect news signals
-  const newsSignals = await detectNewsSignals(lead.companyName);
+  // ✅ COST OPTIMIZATION: Skip enrichment if already complete (prevents unnecessary API calls)
+  const hasResearchSummary = lead.researchSummary && lead.researchSummary !== 'Research pending';
+  const hasCulturalData = lead.detectedLanguage && lead.detectedRegion;
+  const hasNewsSignals = lead.newsSignals && Array.isArray(lead.newsSignals);
+  const hasEmployeeCount = existingResearch.employeeCount !== undefined || lead.employeeCount !== undefined;
   
-  // NEW: Detect culture and language
-  const culturalContext = await detectCultureAndLanguage(
-    lead.firstName || undefined,
-    lead.lastName || undefined,
-    lead.companyName,
-    existingResearch.location || lead.location || undefined
-  );
+  if (hasResearchSummary && hasCulturalData && hasEmployeeCount) {
+    console.log(`   ⏭️  Skipping enrichment for ${lead.email}: Already enriched (researchSummary, cultural data, and employee count present)`);
+    
+    // Return existing research data without making API calls
+    return {
+      companyName: lead.companyName,
+      techStack: lead.techStackTags || [],
+      summary: lead.researchSummary || '',
+      employeeCount: existingResearch.employeeCount || lead.employeeCount,
+      recentHires: existingResearch.recentHires,
+      fundingStage: existingResearch.fundingStage,
+      newsSignals: lead.newsSignals || [],
+      location: lead.location || existingResearch.location,
+      timezone: lead.timezone || existingResearch.timezone,
+      detectedLanguage: lead.detectedLanguage,
+      detectedRegion: lead.detectedRegion,
+    };
+  }
+  
+  // ✅ COST OPTIMIZATION: Only call detectNewsSignals if not already set
+  let newsSignals;
+  if (hasNewsSignals && lead.newsSignals && lead.newsSignals.length > 0) {
+    newsSignals = lead.newsSignals;
+    console.log(`   ⏭️  Skipping news detection: Already set (${newsSignals.length} signals)`);
+  } else {
+    newsSignals = await detectNewsSignals(lead.companyName);
+  }
+  
+  // ✅ COST OPTIMIZATION: Only call detectCultureAndLanguage if not already set
+  let culturalContext;
+  if (hasCulturalData) {
+    culturalContext = {
+      detectedLanguage: lead.detectedLanguage,
+      detectedRegion: lead.detectedRegion,
+    };
+    console.log(`   ⏭️  Skipping cultural detection: Already set (${lead.detectedLanguage}, ${lead.detectedRegion})`);
+  } else {
+    culturalContext = await detectCultureAndLanguage(
+      lead.firstName || undefined,
+      lead.lastName || undefined,
+      lead.companyName,
+      existingResearch.location || lead.location || undefined
+    );
+  }
   
   // NEW: Resolve timezone from location
   const location = existingResearch.location || lead.location;
   const timezone = location ? await resolveLocationToTimezone(location) : null;
   
-  // NEW: Generate AI research summary if not already present
+  // ✅ COST OPTIMIZATION: Only generate research summary if not already present
   let researchSummary = lead.researchSummary;
   if (!researchSummary || researchSummary === 'Research pending') {
     try {
@@ -116,6 +156,8 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
       console.warn(`   ⚠️  Failed to generate AI research summary: ${error.message}`);
       researchSummary = `Research completed for ${lead.companyName}. Tech stack: ${(lead.techStackTags || []).join(', ') || 'Not specified'}.`;
     }
+  } else {
+    console.log(`   ⏭️  Skipping research summary generation: Already exists`);
   }
   
   const researchData: LeadResearchData = {
