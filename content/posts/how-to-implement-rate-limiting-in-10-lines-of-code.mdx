@@ -1,7 +1,7 @@
 ---
 title: "How to Implement Rate Limiting in 10 Lines of Code"
 date: "2026-01-22"
-description: "Learn to implement efficient rate limiting in your apps with this concise, practical guide. Quick setup, immediate results."
+description: "Learn to implement rate limiting in your API with a concise, 10-line Python code snippet to manage request flow efficiently."
 tags: ["implement", "rate", "limiting"]
 author: "Pocket Portfolio Team"
 image: "/images/blog/how-to-implement-rate-limiting-in-10-lines-of-code.png"
@@ -9,41 +9,40 @@ pillar: "technical"
 category: "how-to-in-tech"
 ---
 
-Implementing rate limiting is essential to protect your APIs from abuse and to ensure fair usage among users. This brief guide demonstrates how to set up a basic rate limiter in just 10 lines of code using Node.js and Redis.
+In a world where APIs are the backbone of digital communication, managing the flow of requests is crucial. Rate limiting is a strategy to control the number of requests a user can make to an API within a given timeframe, preventing overuse and ensuring equitable access. Here's how you can implement basic rate limiting in just 10 lines of Python code using a simple token bucket algorithm.
 
-### Solution
+```pytho
+n
+from flask import Flask, request, g
+from time import time
 
-```javascrip
-t
-const redis = require('redis');
-const client = redis.createClient();
-const { promisify } = require('util');
-const getAsync = promisify(client.get).bind(client);
+app = Flask(__name__)
+BUCKET = {}
+WINDOW_SIZE = 60  # seconds
+MAX_REQUESTS = 5
 
-const rateLimit = async (userId) => {
-  let requests = await getAsync(userId);
-  if (requests && requests >= 5) return false;
-  client.multi().incr(userId).expire(userId, 60).exec();
-  return true;
-};
+@app.before_request
+def rate_limiter():
+    client_id = request.remote_addr
+    request_time = time()
+    bucket = BUCKET.get(client_id, (0, request_time))
+    requests, last_time = bucket
+    if request_time - last_time > WINDOW_SIZE:
+        BUCKET[client_id] = (1, request_time)
+    elif requests < MAX_REQUESTS:
+        BUCKET[client_id] = (requests + 1, last_time)
+    else:
+        return "Rate limit exceeded", 429
 ```
 
-### Explanation
+### Explanation of Key Concepts
 
-1. **Redis Setup**: We use Redis, a fast, in-memory key-value store, to track the number of requests a user has made. Redis is ideal for this due to its speed and simplicity in handling expiry of keys.
-   
-2. **Promisifying Redis Calls**: Node.js Redis library uses callbacks by default. We use `promisify` to work with async/await for better readability and flow control.
-
-3. **The `rateLimit` Function**: This function accepts a `userId` and checks the number of requests already made.
-   - If a user has made 5 or more requests within a minute (`if (requests && requests >= 5)`), it returns `false`, indicating the user has been rate limited.
-   - Otherwise, it increments the request count and sets an expiry of 60 seconds on the record. It then returns `true`, allowing the request.
+- **Token Bucket Algorithm:** This approach allows for a specific number of requests (tokens) in a bucket, refilling over time. Once the bucket is empty, further requests are denied until it refills.
+- **Flask Middleware:** The `@app.before_request` decorator in Flask is used to execute the `rate_limiter` function before each request, enabling the rate limiting check.
+- **Global Dictionary:** `BUCKET` stores the count and the last request time for each `client_id`, which in this case, is the client's IP address (`request.remote_addr`).
 
 ### Quick Tip
 
-In a production environment, consider enhancing this basic rate limiter with more sophisticated rules. For example, differentiating between read and write operations or applying different limits based on the user's subscription level.
+Implementing rate limiting at the application level, as shown, is straightforward and suitable for small to medium-scale applications. However, for larger, more distributed systems, consider using dedicated middleware or services designed for rate limiting and traffic management.
 
-### Gotcha
-
-Remember to handle Redis connection errors and downtimes gracefully in your application to avoid denial of service to your users when Redis is unavailable.
-
-Implementing rate limiting is a critical step in creating robust, scalable web applications. This simple approach offers a lightweight, effective solution, but always consider your specific application needs and traffic patterns when designing rate limiting strategies.
+This simple rate limiting solution demonstrates how a few lines of code can significantly enhance the robustness and fairness of your API's request handling.
