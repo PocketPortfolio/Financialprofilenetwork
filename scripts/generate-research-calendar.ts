@@ -13,10 +13,12 @@ interface ResearchPost {
   scheduledTime: string;
   title: string;
   slug: string;
-  status: 'pending';
+  status: 'pending' | 'published' | 'failed'; // ✅ FIX: Allow all statuses
   category: 'research';
   pillar: 'philosophy' | 'technical' | 'market' | 'product';
   keywords: string[];
+  publishedAt?: string; // ✅ FIX: Add optional publishedAt
+  videoId?: string; // ✅ FIX: Add optional videoId
 }
 
 function generateSlug(title: string): string {
@@ -291,8 +293,8 @@ function generateCalendar(): ResearchPost[] {
       scheduledTime: '18:00',
       title,
       slug: `research-${generateSlug(title)}`,
-      status: 'pending',
-      category: 'research',
+      status: 'pending' as const, // Default to pending, will be preserved if already published
+      category: 'research' as const,
       pillar: getPillar(title),
       keywords: extractKeywords(title)
     });
@@ -306,10 +308,29 @@ function generateCalendar(): ResearchPost[] {
 }
 
 // Main execution
+// ✅ SAFETY CHECK: Prevent accidental regeneration unless explicitly forced
+const outputPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+const FORCE_REGENERATE = process.env.FORCE_REGENERATE === 'true';
+
+if (!FORCE_REGENERATE && fs.existsSync(outputPath)) {
+  try {
+    const existing = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+    if (existing.length > 0) {
+      console.error('❌ ERROR: Research calendar already exists and contains posts.');
+      console.error('   To prevent accidental data loss, this script will not overwrite the calendar.');
+      console.error('   If you need to regenerate, set FORCE_REGENERATE=true environment variable.');
+      console.error(`   Current calendar has ${existing.length} posts.`);
+      process.exit(1);
+    }
+  } catch (error) {
+    // If file exists but is corrupted, allow regeneration
+    console.warn(`⚠️  Existing calendar file is corrupted, will regenerate`);
+  }
+}
+
 const calendar = generateCalendar();
 
 // ✅ PRESERVE: Load existing calendar to preserve published posts' status and publishedAt
-const outputPath = path.join(process.cwd(), 'content', 'research-calendar.json');
 let existingCalendar: any[] = [];
 if (fs.existsSync(outputPath)) {
   try {
@@ -337,10 +358,10 @@ let preservedCount = 0;
 for (const post of calendar) {
   const existingData = publishedPostsMap.get(post.id);
   if (existingData) {
-    post.status = existingData.status as 'pending';
-    (post as any).publishedAt = existingData.publishedAt;
+    post.status = existingData.status; // ✅ FIX: Remove incorrect type cast
+    post.publishedAt = existingData.publishedAt;
     if (existingData.videoId) {
-      (post as any).videoId = existingData.videoId;
+      post.videoId = existingData.videoId;
     }
     preservedCount++;
   }
