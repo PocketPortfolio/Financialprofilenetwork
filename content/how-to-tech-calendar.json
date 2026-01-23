@@ -313,14 +313,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding CORS Errors (and How to Fix Them)",
     "slug": "understanding-cors-errors-and-how-to-fix-them",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "cors",
       "understanding",
       "errors"
-    ]
+    ],
+    "publishedAt": "2026-01-23T14:18:47.130Z"
   },
   {
     "id": "how-to-how-to-use-llms-txt-to-control-ai-context-jan-24",

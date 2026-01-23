@@ -1,0 +1,62 @@
+---
+title: "Understanding CORS Errors (and How to Fix Them)"
+date: "2026-01-23"
+description: "Demystify CORS errors with direct solutions, key concepts, and practical code examples to fix common issues."
+tags: ["cors", "understanding", "errors"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/understanding-cors-errors-and-how-to-fix-them.png"
+pillar: "technical"
+category: "how-to-in-tech"
+---
+
+CORS errors often stand as a frustrating roadblock for developers making cross-origin HTTP requests. Understanding and resolving these errors is crucial for seamless web development.
+
+### Direct Solution with Code
+
+To fix a CORS error, you typically need to set the `Access-Control-Allow-Origin` header on the server. Here's a quick example in Node.js using the Express framework:
+
+```javascrip
+t
+const express = require('express');
+const app = express();
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); // This allows all domains
+  next();
+});
+
+app.get('/data', (req, res) => {
+  res.json({ msg: 'This endpoint is CORS-enabled for all origins!' });
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+```
+
+This snippet configures your server to accept requests from any origin, effectively resolving CORS errors for your endpoints.
+
+### Explanation of Key Concepts
+
+CORS (Cross-Origin Resource Sharing) is a security feature enforced by web browsers to prevent malicious websites from accessing resources and data from another domain without permission. When a web application tries to make a request to a domain different from its own, the browser checks for specific headers (`Access-Control-Allow-Origin`) in the response to ensure the request is allowed.
+
+### Quick Tip
+
+While setting `Access-Control-Allow-Origin` to `*` (a wildcard that allows all domains) is an easy fix, it's not recommended for production environments due to security concerns. Instead, explicitly list allowed domains or use environment variables to manage them dynamically:
+
+```javascrip
+t
+const allowedOrigins = ['http://example1.com', 'https://example2.com'];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  next();
+});
+```
+
+### Gotcha
+
+Remember, CORS is enforced by the client (browser), not the server. If you're testing your API with tools like Postman or cURL, you won't encounter CORS errors—these tools do not enforce CORS policies. This sometimes leads developers to believe their CORS issues are resolved when they've only bypassed them during testing. Always verify your CORS configuration with actual browser requests.
+
+Understanding CORS errors and knowing how to resolve them is essential for developing secure, cross-origin capable web applications. With the direct solutions and concepts provided, you can ensure your applications communicate seamlessly across different domains.
