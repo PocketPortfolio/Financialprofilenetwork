@@ -291,7 +291,7 @@
     "scheduledTime": "18:00",
     "title": "Research: File Upload Performance - Multipart vs Streaming",
     "slug": "research-file-upload-performance-multipart-vs-streaming-2026-01-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -299,7 +299,9 @@
       "streaming",
       "file",
       "upload"
-    ]
+    ],
+    "videoId": "JVyDZXautN0",
+    "publishedAt": "2026-01-25T18:14:53.116Z"
   },
   {
     "id": "research-database-migration-performance-zero-downtime-strategies-2026-01-26",
