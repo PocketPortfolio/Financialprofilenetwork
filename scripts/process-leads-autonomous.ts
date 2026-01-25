@@ -406,7 +406,7 @@ async function processResearchingLeads() {
           employeeCount: researchData.employeeCount,
           requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
           dataSource: lead.dataSource || undefined, // B2B Strategy: Source detection
-          region: lead.region || undefined, // B2B Strategy: Region detection
+          region: lead.detectedRegion || undefined, // B2B Strategy: Region detection
           jobTitle: lead.jobTitle || undefined, // B2B Strategy: IFA detection
         },
         sequence.emailType,
@@ -635,7 +635,7 @@ async function processContactedLeads() {
           employeeCount: researchData.employeeCount,
           requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
           dataSource: lead.dataSource || undefined, // B2B Strategy: Source detection
-          region: lead.region || undefined, // B2B Strategy: Region detection
+          region: lead.detectedRegion || undefined, // B2B Strategy: Region detection
           jobTitle: lead.jobTitle || undefined, // B2B Strategy: IFA detection
         },
         sequence.step === 4 ? 'follow_up' : sequence.emailType, // Step 4 is breakup

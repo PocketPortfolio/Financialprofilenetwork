@@ -45,7 +45,8 @@ export async function generateEmail(
   const prompt = buildPrompt(leadData, emailType, sequenceStep);
 
   const { object } = await generateObject({
-    model: openai('gpt-4o') as any, // AI SDK v6 type compatibility
+    // @ts-expect-error - AI SDK v6 type compatibility: LanguageModelV1 to LanguageModel conversion
+    model: openai('gpt-4o'),
     schema: EmailOutputSchema,
     prompt: `${SYSTEM_IDENTITY.identity}\n\n${prompt}`,
   });

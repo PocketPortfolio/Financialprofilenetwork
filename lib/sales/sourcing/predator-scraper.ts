@@ -259,7 +259,7 @@ async function processCity(
   
   // 2. Launch fresh browser for this city
   const browser = await puppeteerExtra.launch({
-    headless: false, // Non-headless for better Cloudflare bypass
+    headless: true, // Headless mode for CI/CD compatibility
     args: launchArgs,
     ignoreDefaultArgs: ['--enable-automation'],
   });
