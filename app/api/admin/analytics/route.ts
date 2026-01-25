@@ -1019,11 +1019,14 @@ async function getBlogPostsData() {
     // Check which posts have actual files
     const postsDir = path.join(process.cwd(), 'content', 'posts');
     const imagesDir = path.join(process.cwd(), 'public', 'images', 'blog');
-    const existingPosts = fs.existsSync(postsDir) ? fs.readdirSync(postsDir).map(f => f.replace('.mdx', '')) : [];
-    const existingImages = fs.existsSync(imagesDir) ? fs.readdirSync(imagesDir).map(f => f.replace('.png', '')) : [];
     
+    // ✅ FIX: Use direct filesystem checks instead of array includes
+    // This is more reliable and handles edge cases (case sensitivity, timing, exact path matching)
     const posts = deduplicatedCalendar.map((post: any) => {
-      const hasFiles = existingPosts.includes(post.slug) && existingImages.includes(post.slug);
+      // Direct filesystem check - more reliable than array includes
+      const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
+      const imagePath = path.join(imagesDir, `${post.slug}.png`);
+      const hasFiles = fs.existsSync(mdxPath) && fs.existsSync(imagePath);
       const postDate = new Date(post.date);
       const todayDate = new Date(today);
       
@@ -1045,7 +1048,7 @@ async function getBlogPostsData() {
           publishedTime = post.publishedAt;
         } else {
           // ✅ FIX: Use file modification time instead of scheduled time (actual publish time)
-          const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+          // We already know the file exists (hasFiles is true), so we can safely use mdxPath
           if (fs.existsSync(mdxPath)) {
             const mdxStats = fs.statSync(mdxPath);
             publishedTime = mdxStats.mtime.toISOString();
