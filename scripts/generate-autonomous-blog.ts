@@ -91,6 +91,71 @@ function sanitizeMDXContent(content: string): string {
   return cleaned;
 }
 
+/**
+ * Parse and validate scheduledTime string (format: "HH:MM")
+ * Returns parsed time and validation status
+ */
+function parseScheduledTime(scheduledTime: string | undefined): { hour: number; minute: number; valid: boolean } {
+  if (!scheduledTime || typeof scheduledTime !== 'string') {
+    return { hour: 0, minute: 0, valid: false };
+  }
+  
+  const trimmed = scheduledTime.trim();
+  const parts = trimmed.split(':');
+  
+  if (parts.length !== 2) {
+    console.warn(`⚠️  Invalid scheduledTime format: "${scheduledTime}" (expected "HH:MM")`);
+    return { hour: 0, minute: 0, valid: false };
+  }
+  
+  const hour = parseInt(parts[0], 10);
+  const minute = parseInt(parts[1], 10);
+  
+  if (isNaN(hour) || isNaN(minute)) {
+    console.warn(`⚠️  Invalid scheduledTime values: "${scheduledTime}" (not numbers)`);
+    return { hour: 0, minute: 0, valid: false };
+  }
+  
+  if (hour < 0 || hour > 23) {
+    console.warn(`⚠️  Invalid scheduledTime hour: ${hour} (must be 0-23) for "${scheduledTime}"`);
+    return { hour: 0, minute: 0, valid: false };
+  }
+  
+  if (minute < 0 || minute > 59) {
+    console.warn(`⚠️  Invalid scheduledTime minute: ${minute} (must be 0-59) for "${scheduledTime}"`);
+    return { hour: 0, minute: 0, valid: false };
+  }
+  
+  return { hour, minute, valid: true };
+}
+
+/**
+ * Validate date string is in YYYY-MM-DD format and is a valid date
+ */
+function validateDate(date: string): boolean {
+  if (!date || typeof date !== 'string') {
+    return false;
+  }
+  
+  // Check format YYYY-MM-DD
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(date)) {
+    return false;
+  }
+  
+  // Check if it's a valid date
+  const dateObj = new Date(date + 'T00:00:00Z');
+  if (isNaN(dateObj.getTime())) {
+    return false;
+  }
+  
+  // Check if date string matches parsed date (catches invalid dates like 2026-13-45)
+  const [year, month, day] = date.split('-').map(Number);
+  return dateObj.getUTCFullYear() === year &&
+         dateObj.getUTCMonth() + 1 === month &&
+         dateObj.getUTCDate() === day;
+}
+
 interface BlogPost {
   id: string;
   date: string;
@@ -696,13 +761,84 @@ async function main() {
       postMap.set(key, post);
     }
     
-    const calendar: BlogPost[] = Array.from(postMap.values());
+    let calendar: BlogPost[] = Array.from(postMap.values());
     
     if (duplicateCount > 0) {
       console.log(`\n✅ Deduplication complete: Removed ${duplicateCount} duplicate post(s) from calendar\n`);
     }
     
+    // ✅ VALIDATION: Check for duplicate slugs across all calendars
+    // NOTE: Research posts are ALLOWED to have duplicate slugs - they use unique IDs instead
+    // Only check for duplicate slugs in non-research posts
+    console.log('🔍 Validating calendar: Checking for duplicate slugs (excluding research posts)...');
+    const slugMap = new Map<string, BlogPost[]>();
+    for (const post of calendar) {
+      // Skip research posts - they use IDs for uniqueness, slugs can be duplicated
+      if (post.category === 'research') {
+        continue;
+      }
+      if (!slugMap.has(post.slug)) {
+        slugMap.set(post.slug, []);
+      }
+      slugMap.get(post.slug)!.push(post);
+    }
+    
+    const duplicateSlugs: string[] = [];
+    for (const [slug, posts] of slugMap.entries()) {
+      if (posts.length > 1) {
+        duplicateSlugs.push(slug);
+        console.error(`❌ Duplicate slug detected: "${slug}" used by ${posts.length} posts:`);
+        posts.forEach(p => console.error(`   - ${p.title} (${p.id}) - ${p.date} - ${p.status}`));
+      }
+    }
+    
+    if (duplicateSlugs.length > 0) {
+      console.error(`\n❌ CRITICAL: Found ${duplicateSlugs.length} duplicate slug(s) in non-research posts!`);
+      console.error('   Posts with duplicate slugs will overwrite each other. Keeping first occurrence...');
+      // Keep only the first post for each duplicate slug (by date, then by ID)
+      // But preserve all research posts
+      const seenSlugs = new Set<string>();
+      calendar = calendar.filter(p => {
+        // Always keep research posts
+        if (p.category === 'research') {
+          return true;
+        }
+        if (seenSlugs.has(p.slug)) {
+          return false;
+        }
+        seenSlugs.add(p.slug);
+        return true;
+      });
+      console.warn(`   ✅ Removed ${duplicateSlugs.length} duplicate post(s), kept first occurrence of each slug.`);
+    } else {
+      console.log('✅ No duplicate slugs detected in non-research posts');
+      console.log(`   Note: Research posts may share slugs (they use unique IDs instead)`);
+    }
+    
+    // ✅ VALIDATION: Validate all post dates
+    console.log('🔍 Validating calendar: Checking date formats...');
+    const invalidDates: BlogPost[] = [];
+    for (const post of calendar) {
+      if (!validateDate(post.date)) {
+        invalidDates.push(post);
+        console.error(`❌ Post "${post.title}" (${post.id}) has invalid date: "${post.date}"`);
+      }
+    }
+    
+    if (invalidDates.length > 0) {
+      console.error(`\n❌ CRITICAL: Found ${invalidDates.length} post(s) with invalid dates!`);
+      console.error('   These posts will be skipped. Please fix the dates in the calendar files.');
+      // Remove invalid posts from calendar
+      calendar = calendar.filter(p => !invalidDates.includes(p));
+      console.warn(`   ✅ Removed ${invalidDates.length} post(s) with invalid dates from calendar.`);
+    } else {
+      console.log('✅ All post dates are valid');
+    }
+    
     const today = new Date().toISOString().split('T')[0];
+    if (!validateDate(today)) {
+      throw new Error(`CRITICAL: Invalid today date: ${today} - system date is corrupted!`);
+    }
     const now = new Date();
     const currentHour = now.getUTCHours();
     const currentMinute = now.getUTCMinutes();
@@ -868,10 +1004,13 @@ async function main() {
       
       // Post date is today - check scheduled time
       if (post.scheduledTime) {
-        const [hour, minute] = post.scheduledTime.split(':').map(Number);
-        const scheduledTimeMinutes = hour * 60 + minute;
+        const timeParsed = parseScheduledTime(post.scheduledTime);
+        if (!timeParsed.valid) {
+          console.warn(`⚠️  Post "${post.title}" has invalid scheduledTime "${post.scheduledTime}", treating as no scheduled time (will generate immediately)`);
+          return true; // Generate immediately if time is invalid
+        }
         
-        // Only include if current time >= scheduled time
+        const scheduledTimeMinutes = timeParsed.hour * 60 + timeParsed.minute;
         const isTimeReached = currentTimeMinutes >= scheduledTimeMinutes;
         
         if (!isTimeReached) {
@@ -910,15 +1049,17 @@ async function main() {
         // Check if any are waiting for scheduled time
         const waitingForTime = todayPosts.filter(post => {
           if (!post.scheduledTime) return false;
-          const [hour, minute] = post.scheduledTime.split(':').map(Number);
-          const scheduledTimeMinutes = hour * 60 + minute;
+          const timeParsed = parseScheduledTime(post.scheduledTime);
+          if (!timeParsed.valid) return false; // Invalid time = treat as no scheduled time
+          const scheduledTimeMinutes = timeParsed.hour * 60 + timeParsed.minute;
           return currentTimeMinutes < scheduledTimeMinutes;
         });
         
         const shouldBeGenerated = todayPosts.filter(post => {
           if (!post.scheduledTime) return true; // No time = should be generated
-          const [hour, minute] = post.scheduledTime.split(':').map(Number);
-          const scheduledTimeMinutes = hour * 60 + minute;
+          const timeParsed = parseScheduledTime(post.scheduledTime);
+          if (!timeParsed.valid) return true; // Invalid time = generate immediately
+          const scheduledTimeMinutes = timeParsed.hour * 60 + timeParsed.minute;
           return currentTimeMinutes >= scheduledTimeMinutes;
         });
         
@@ -1136,8 +1277,9 @@ async function main() {
       if (!post.scheduledTime) return true;
       
       // If scheduled time, only check if time has passed
-      const [hour, minute] = post.scheduledTime.split(':').map(Number);
-      const scheduledTimeMinutes = hour * 60 + minute;
+      const timeParsed = parseScheduledTime(post.scheduledTime);
+      if (!timeParsed.valid) return true; // Invalid time = should have been generated
+      const scheduledTimeMinutes = timeParsed.hour * 60 + timeParsed.minute;
       return currentTimeMinutes >= scheduledTimeMinutes;
     });
     

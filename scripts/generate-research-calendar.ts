@@ -287,12 +287,17 @@ function generateCalendar(): ResearchPost[] {
     const topic = researchTopics[topicIndex % researchTopics.length];
     const title = `Research: ${topic}`;
     
+    // ✅ FIX: Include date in slug for research posts to prevent overwrites
+    // Research posts with same title but different dates need unique slugs
+    const baseSlug = `research-${generateSlug(title)}`;
+    const slugWithDate = `${baseSlug}-${dateStr.replace(/-/g, '-')}`;
+    
     calendar.push({
       id: `research-${generateSlug(title)}-${dateStr.replace(/-/g, '-')}`,
       date: dateStr,
       scheduledTime: '18:00',
       title,
-      slug: `research-${generateSlug(title)}`,
+      slug: slugWithDate, // ✅ Include date to make slugs unique
       status: 'pending' as const, // Default to pending, will be preserved if already published
       category: 'research' as const,
       pillar: getPillar(title),
