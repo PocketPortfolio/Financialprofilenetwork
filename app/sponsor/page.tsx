@@ -236,7 +236,7 @@ export default function SponsorPage() {
           marginBottom: '16px',
           color: 'var(--text)'
         }}>
-          Support Pocket Portfolio
+          Enterprise Portfolio Analytics & White Label Solutions
         </h1>
         <p style={{
           fontSize: '1.125rem',
@@ -245,7 +245,7 @@ export default function SponsorPage() {
           margin: '0 auto',
           lineHeight: '1.6'
         }}>
-          Help us build the best open-source portfolio tracker. Choose a tier that works for you.
+          Professional-grade portfolio tracking, risk analysis, and client reporting tools for wealth managers and financial advisors. Sovereign data architecture meets enterprise needs.
         </p>
         {/* Stripe Status Indicator */}
         {process.env.NODE_ENV === 'development' && (
@@ -491,8 +491,37 @@ export default function SponsorPage() {
             $1,200/year if paid monthly
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6' }}>
-            Your Logo on our README + Priority Support.
+            White Label Portal for Financial Advisors & Wealth Managers. Enterprise-grade portfolio analytics and client reporting.
           </p>
+          
+          {/* White Label Features */}
+          <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
+              🏢 <strong>White Label Features:</strong>
+            </div>
+            <ul style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '20px', marginTop: '8px', lineHeight: '1.8', padding: 0, listStyle: 'none' }}>
+              <li style={{ marginBottom: '4px' }}>• Custom branded client dashboard</li>
+              <li style={{ marginBottom: '4px' }}>• White label PDF portfolio reports</li>
+              <li style={{ marginBottom: '4px' }}>• Firm logo integration</li>
+              <li style={{ marginBottom: '4px' }}>• Client-facing portal with your branding</li>
+            </ul>
+          </div>
+
+          {/* Corporate Perks */}
+          <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
+              ⚡ <strong>Corporate Perks:</strong>
+            </div>
+            <ul style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '20px', marginTop: '8px', lineHeight: '1.8', padding: 0, listStyle: 'none' }}>
+              <li style={{ marginBottom: '4px' }}>• Unlimited API calls (stock prices, market data)</li>
+              <li style={{ marginBottom: '4px' }}>• Advanced analytics (sector breakdown, portfolio risk, rebalancing)</li>
+              <li style={{ marginBottom: '4px' }}>• Priority support & onboarding</li>
+              <li style={{ marginBottom: '4px' }}>• Your logo on our README</li>
+              <li style={{ marginBottom: '4px' }}>• Early access to new features</li>
+            </ul>
+          </div>
+
+          {/* Sovereign Sync */}
           <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
               ✅ <strong>Sovereign Sync:</strong> Google Drive as Database (2 Seats)
