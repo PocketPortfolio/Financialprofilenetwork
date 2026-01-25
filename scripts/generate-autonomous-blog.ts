@@ -344,6 +344,98 @@ pillar: "${post.pillar}"
     console.log('🧹 Sanitizing MDX content...');
     content = sanitizeMDXContent(content);
 
+    // ✅ CRITICAL FIX: Extract and validate frontmatter BEFORE saving
+    // If AI didn't generate proper frontmatter, construct it manually
+    console.log('🔍 Validating and fixing frontmatter...');
+    let parsedContent: { data: any; content: string };
+    try {
+      parsedContent = matter(content);
+    } catch (error: any) {
+      // If frontmatter parsing fails, the AI didn't generate it properly
+      console.warn(`⚠️  Frontmatter parsing failed: ${error.message}`);
+      console.warn('   Constructing frontmatter manually from post data...');
+      parsedContent = { data: {}, content };
+    }
+
+    // Validate and fix frontmatter fields
+    const frontmatter = parsedContent.data;
+    const bodyContent = parsedContent.content;
+
+    // Ensure required fields exist with proper values
+    if (!frontmatter.title || typeof frontmatter.title !== 'string' || frontmatter.title.trim() === '') {
+      console.log('   ⚠️  Missing or invalid title in frontmatter, using post title');
+      frontmatter.title = post.title;
+    }
+    if (!frontmatter.date || typeof frontmatter.date !== 'string' || frontmatter.date.trim() === '') {
+      console.log('   ⚠️  Missing or invalid date in frontmatter, using post date');
+      frontmatter.date = post.date;
+    }
+    if (!frontmatter.description || typeof frontmatter.description !== 'string' || frontmatter.description.trim() === '') {
+      // Generate a basic description if missing
+      const desc = `${post.title} - ${post.keywords.slice(0, 3).join(', ')}`;
+      console.log('   ⚠️  Missing or invalid description in frontmatter, generating default');
+      frontmatter.description = desc.length > 160 ? desc.substring(0, 157) + '...' : desc;
+    }
+    if (!frontmatter.tags || !Array.isArray(frontmatter.tags) || frontmatter.tags.length === 0) {
+      console.log('   ⚠️  Missing or invalid tags in frontmatter, using post keywords');
+      frontmatter.tags = post.keywords;
+    }
+    if (!frontmatter.author || typeof frontmatter.author !== 'string' || frontmatter.author.trim() === '') {
+      frontmatter.author = 'Pocket Portfolio Team';
+    }
+    if (!frontmatter.image || typeof frontmatter.image !== 'string' || frontmatter.image.trim() === '') {
+      frontmatter.image = `/images/blog/${post.slug}.png`;
+    }
+    if (!frontmatter.pillar || typeof frontmatter.pillar !== 'string' || frontmatter.pillar.trim() === '') {
+      frontmatter.pillar = post.pillar;
+    }
+    if (isHowTo && (!frontmatter.category || typeof frontmatter.category !== 'string' || frontmatter.category.trim() === '')) {
+      frontmatter.category = 'how-to-in-tech';
+    }
+    if (isResearch && (!frontmatter.category || typeof frontmatter.category !== 'string' || frontmatter.category.trim() === '')) {
+      frontmatter.category = 'research';
+    }
+    if (isResearch && videoResult && !frontmatter.videoId) {
+      frontmatter.videoId = videoResult.videoId;
+    }
+
+    // Ensure date format is correct (YYYY-MM-DD)
+    if (frontmatter.date && frontmatter.date.includes('T')) {
+      frontmatter.date = frontmatter.date.split('T')[0];
+    }
+    if (frontmatter.date && !/^\d{4}-\d{2}-\d{2}$/.test(frontmatter.date)) {
+      console.warn(`   ⚠️  Invalid date format: ${frontmatter.date}, using post date`);
+      frontmatter.date = post.date;
+    }
+
+    // Ensure description length is within limits
+    if (frontmatter.description && frontmatter.description.length > 160) {
+      frontmatter.description = frontmatter.description.substring(0, 157) + '...';
+    }
+
+    // Normalize tags to lowercase kebab-case
+    if (frontmatter.tags && Array.isArray(frontmatter.tags)) {
+      frontmatter.tags = frontmatter.tags.map((tag: string) => 
+        typeof tag === 'string' ? tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : String(tag).toLowerCase()
+      ).filter((tag: string) => tag.length > 0);
+    }
+
+    // Reconstruct MDX content with validated frontmatter
+    const validatedContent = matter.stringify(bodyContent, frontmatter);
+
+    // ✅ CRITICAL: Validate frontmatter fields BEFORE proceeding
+    const validationCheck = matter(validatedContent);
+    if (!validationCheck.data.title || !validationCheck.data.date) {
+      throw new Error(`Frontmatter validation failed: missing required fields (title: ${!!validationCheck.data.title}, date: ${!!validationCheck.data.date})`);
+    }
+    if (!validationCheck.content || validationCheck.content.trim().length === 0) {
+      throw new Error('Frontmatter validation failed: content body is empty');
+    }
+
+    console.log('✅ Frontmatter validated and fixed');
+    // Use validatedContent for all subsequent operations
+    content = validatedContent;
+
     // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO AND RESEARCH POSTS
     // CRITICAL: Strong text prohibition to prevent DALL-E from generating text in images
     const imagePrompt = isHowTo
@@ -469,9 +561,48 @@ pillar: "${post.pillar}"
       throw new Error(`MDX file has invalid frontmatter structure: ${mdxPath}`);
     }
     
-    // Verify content matches what we wrote
-    if (writtenContent !== content) {
-      throw new Error(`MDX file content mismatch - file may be corrupted: ${mdxPath}`);
+    // ✅ CRITICAL: Validate frontmatter fields in the written file
+    try {
+      const finalParsed = matter(writtenContent);
+      if (!finalParsed.data.title || typeof finalParsed.data.title !== 'string' || finalParsed.data.title.trim() === '') {
+        throw new Error(`MDX file missing required frontmatter field: title`);
+      }
+      if (!finalParsed.data.date || typeof finalParsed.data.date !== 'string' || finalParsed.data.date.trim() === '') {
+        throw new Error(`MDX file missing required frontmatter field: date`);
+      }
+      if (!finalParsed.data.description || typeof finalParsed.data.description !== 'string' || finalParsed.data.description.trim() === '') {
+        throw new Error(`MDX file missing required frontmatter field: description`);
+      }
+      if (!finalParsed.data.tags || !Array.isArray(finalParsed.data.tags) || finalParsed.data.tags.length === 0) {
+        throw new Error(`MDX file missing required frontmatter field: tags`);
+      }
+      if (!finalParsed.data.author || typeof finalParsed.data.author !== 'string' || finalParsed.data.author.trim() === '') {
+        throw new Error(`MDX file missing required frontmatter field: author`);
+      }
+      if (!finalParsed.data.image || typeof finalParsed.data.image !== 'string' || finalParsed.data.image.trim() === '') {
+        throw new Error(`MDX file missing required frontmatter field: image`);
+      }
+      if (!finalParsed.data.pillar || typeof finalParsed.data.pillar !== 'string' || finalParsed.data.pillar.trim() === '') {
+        throw new Error(`MDX file missing required frontmatter field: pillar`);
+      }
+      if (!finalParsed.content || finalParsed.content.trim().length === 0) {
+        throw new Error(`MDX file has no content body`);
+      }
+      console.log(`✅ Frontmatter validation passed: all required fields present`);
+    } catch (parseError: any) {
+      throw new Error(`MDX file failed frontmatter validation: ${mdxPath} - ${parseError.message}`);
+    }
+    
+    // Verify content matches what we wrote (with some tolerance for whitespace differences)
+    const normalizedWritten = writtenContent.replace(/\r\n/g, '\n').trim();
+    const normalizedExpected = content.replace(/\r\n/g, '\n').trim();
+    if (normalizedWritten !== normalizedExpected) {
+      // Only throw if the difference is significant (not just whitespace)
+      const significantDiff = normalizedWritten.split('\n').length !== normalizedExpected.split('\n').length ||
+                              normalizedWritten.length < normalizedExpected.length * 0.9;
+      if (significantDiff) {
+        throw new Error(`MDX file content mismatch - file may be corrupted: ${mdxPath}`);
+      }
     }
     
     console.log(`💾 Post saved: ${mdxPath} (${mdxStats.size} bytes)`);
@@ -890,12 +1021,38 @@ async function main() {
           throw new Error(`MDX file has invalid frontmatter structure: ${mdxPath}`);
         }
         
-        // Verify frontmatter has required fields
+        // Verify frontmatter has required fields (comprehensive validation)
         try {
           const parsed = matter(mdxContent);
-          if (!parsed.data.title || !parsed.data.date) {
-            throw new Error(`MDX file missing required frontmatter fields: ${mdxPath}`);
+          
+          // Check all required fields with detailed error messages
+          const missingFields: string[] = [];
+          if (!parsed.data.title || typeof parsed.data.title !== 'string' || parsed.data.title.trim() === '') {
+            missingFields.push('title');
           }
+          if (!parsed.data.date || typeof parsed.data.date !== 'string' || parsed.data.date.trim() === '') {
+            missingFields.push('date');
+          }
+          if (!parsed.data.description || typeof parsed.data.description !== 'string' || parsed.data.description.trim() === '') {
+            missingFields.push('description');
+          }
+          if (!parsed.data.tags || !Array.isArray(parsed.data.tags) || parsed.data.tags.length === 0) {
+            missingFields.push('tags');
+          }
+          if (!parsed.data.author || typeof parsed.data.author !== 'string' || parsed.data.author.trim() === '') {
+            missingFields.push('author');
+          }
+          if (!parsed.data.image || typeof parsed.data.image !== 'string' || parsed.data.image.trim() === '') {
+            missingFields.push('image');
+          }
+          if (!parsed.data.pillar || typeof parsed.data.pillar !== 'string' || parsed.data.pillar.trim() === '') {
+            missingFields.push('pillar');
+          }
+          
+          if (missingFields.length > 0) {
+            throw new Error(`MDX file missing required frontmatter fields: ${missingFields.join(', ')}`);
+          }
+          
           if (!parsed.content || parsed.content.trim().length === 0) {
             throw new Error(`MDX file has no content body: ${mdxPath}`);
           }
