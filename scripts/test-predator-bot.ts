@@ -1,15 +1,8 @@
 /**
- * Test script for Predator Bot
+ * Test script for Predator Bot V3
  * 
- * Tests the zero-cost IFA directory scraper
+ * Tests the autonomous global discovery protocol
  */
-
-import { config } from 'dotenv';
-import { resolve } from 'path';
-
-// Load environment variables
-config({ path: resolve(process.cwd(), '.env.local') });
-config({ path: resolve(process.cwd(), '.env') });
 
 import { sourceFromPredator } from '@/lib/sales/sourcing/predator-scraper';
 
@@ -20,7 +13,8 @@ async function testPredatorBot() {
   console.log('');
 
   try {
-    console.log('📡 Testing Predator Bot V2 (VouchedFor Protocol) with max 10 high-intent leads...');
+    console.log('📡 Testing Predator Bot V3 (Autonomous Global Discovery) with max 10 high-intent leads...');
+    console.log('   Testing UK (VouchedFor) + US (NAPFA) sources...');
     const leads = await sourceFromPredator(10);
 
     console.log('');

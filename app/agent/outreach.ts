@@ -10,6 +10,7 @@ import { isRealFirstName } from '@/lib/sales/name-validation';
 import { db } from '@/db/sales/client';
 import { conversations } from '@/db/sales/schema';
 import { sql, gte } from 'drizzle-orm';
+import { getPromptForStep, shouldUseB2BStrategy } from '@/lib/sales/campaign-logic';
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -33,6 +34,9 @@ export async function generateEmail(
     selectedProduct?: { id: string; name: string };
     employeeCount?: number;
     requiredLanguage?: string | null; // Execution Order 010 v2: Required language for strict regions
+    dataSource?: string; // B2B Strategy: Source of lead (sjp, vouchedfor, predator)
+    region?: string; // B2B Strategy: Region (UK, US)
+    jobTitle?: string; // B2B Strategy: Job title for IFA detection
   },
   emailType: 'initial' | 'follow_up' | 'objection_handling' = 'initial',
   sequenceStep?: number // NEW: Pass sequence step for Step 4 detection
@@ -78,10 +82,85 @@ function buildPrompt(
     selectedProduct?: { id: string; name: string };
     employeeCount?: number;
     requiredLanguage?: string | null; // Execution Order 010 v2: Required language for strict regions
+    dataSource?: string;
+    region?: string;
+    jobTitle?: string;
   },
   emailType: string,
   sequenceStep?: number // NEW: For Step 4 detection
 ): string {
+  // CHECK: Should we use B2B strategy?
+  const useB2BStrategy = shouldUseB2BStrategy({
+    region: leadData.region,
+    dataSource: leadData.dataSource,
+    jobTitle: leadData.jobTitle,
+  });
+
+  // B2B Strategy: Step 0 (Cold Open)
+  if (useB2BStrategy && emailType === 'initial' && sequenceStep === 1) {
+    const b2bPrompt = getPromptForStep(0, {
+      firstName: leadData.firstName,
+      lastName: undefined,
+      companyName: leadData.companyName,
+      email: '',
+      dataSource: leadData.dataSource,
+      region: leadData.region,
+    });
+    
+    if (b2bPrompt) {
+      return b2bPrompt;
+    }
+  }
+
+  // B2B Strategy: Step 2 (Value Add)
+  if (useB2BStrategy && emailType === 'follow_up' && sequenceStep === 2) {
+    const b2bPrompt = getPromptForStep(1, {
+      firstName: leadData.firstName,
+      lastName: undefined,
+      companyName: leadData.companyName,
+      email: '',
+      dataSource: leadData.dataSource,
+      region: leadData.region,
+    });
+    
+    if (b2bPrompt) {
+      return b2bPrompt;
+    }
+  }
+
+  // B2B Strategy: Step 3 (Objection Killer)
+  if (useB2BStrategy && emailType === 'objection_handling') {
+    const b2bPrompt = getPromptForStep(2, {
+      firstName: leadData.firstName,
+      lastName: undefined,
+      companyName: leadData.companyName,
+      email: '',
+      dataSource: leadData.dataSource,
+      region: leadData.region,
+    });
+    
+    if (b2bPrompt) {
+      return b2bPrompt;
+    }
+  }
+
+  // B2B Strategy: Step 4 (Breakup)
+  if (useB2BStrategy && emailType === 'follow_up' && sequenceStep === 4) {
+    const b2bPrompt = getPromptForStep(3, {
+      firstName: leadData.firstName,
+      lastName: undefined,
+      companyName: leadData.companyName,
+      email: '',
+      dataSource: leadData.dataSource,
+      region: leadData.region,
+    });
+    
+    if (b2bPrompt) {
+      return b2bPrompt;
+    }
+  }
+
+  // Standard strategy continues below for non-B2B leads
   const products = getActiveProducts();
   const selectedProduct = leadData.selectedProduct || getBestProductForLead({
     employeeCount: leadData.employeeCount,
@@ -291,7 +370,7 @@ function addAiDisclosure(body: string): string {
   const footer = `
 
 ---
-I am an AI Sales Pilot for Pocket Portfolio. Reply 'STOP' to pause.
+I am an AI assistant for Pocket Portfolio. Reply 'STOP' to pause.
 Automated outreach • Human supervisor monitoring this thread.`;
 
   return body + footer;
@@ -373,7 +452,7 @@ export async function sendEmail(
   htmlBody = htmlBody.replace(/\n/g, '<br>');
   
   const sendOptions: any = {
-    from: 'Pilot <pilot@pocketportfolio.app>',
+    from: 'AI <ai@pocketportfolio.app>',
     to,
     subject,
     html: htmlBody, // Use converted HTML with clickable links

@@ -405,6 +405,9 @@ async function processResearchingLeads() {
           selectedProduct, // Sprint 4: Smart links
           employeeCount: researchData.employeeCount,
           requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
+          dataSource: lead.dataSource || undefined, // B2B Strategy: Source detection
+          region: lead.region || undefined, // B2B Strategy: Region detection
+          jobTitle: lead.jobTitle || undefined, // B2B Strategy: IFA detection
         },
         sequence.emailType,
         1 // Step 1: Initial contact
@@ -631,6 +634,9 @@ async function processContactedLeads() {
           selectedProduct,
           employeeCount: researchData.employeeCount,
           requiredLanguage: requiredLanguage, // Execution Order 010 v2: Enforce native language
+          dataSource: lead.dataSource || undefined, // B2B Strategy: Source detection
+          region: lead.region || undefined, // B2B Strategy: Region detection
+          jobTitle: lead.jobTitle || undefined, // B2B Strategy: IFA detection
         },
         sequence.step === 4 ? 'follow_up' : sequence.emailType, // Step 4 is breakup
         sequence.step // Pass sequence step for Step 4 detection

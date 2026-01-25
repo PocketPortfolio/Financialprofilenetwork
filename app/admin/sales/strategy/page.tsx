@@ -199,11 +199,11 @@ export default function AdminSalesStrategyPage() {
                   </h3>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', margin: 0 }}>
-                  <strong>Purpose:</strong> Contextual hook based on lead's tech stack, company, or research data.
+                  <strong>Purpose:</strong> Hook with data (The "Nvidia Problem") - 60% of retail portfolios are dangerously over-exposed to US Tech.
                   <br />
-                  <strong>Focus:</strong> Data Privacy, Local-First Architecture, No Monthly Fees.
+                  <strong>Focus:</strong> White Label Portal for IFAs. No sponsorship pitches.
                   <br />
-                  <strong>Product Selection:</strong> AI selects best-fit product from catalog (Founder's Club, Corporate Sponsor, etc.)
+                  <strong>Product Selection:</strong> Corporate Sponsor ($1,000/year) - Includes White Label features
                 </p>
               </div>
 
@@ -238,9 +238,9 @@ export default function AdminSalesStrategyPage() {
                   </h3>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', margin: 0 }}>
-                  <strong>Purpose:</strong> Case study, feature highlight, or use case relevant to their industry.
+                  <strong>Purpose:</strong> Sell the "Sovereign Portal" - Privacy-first dashboard that calculates risk client-side.
                   <br />
-                  <strong>Focus:</strong> Demonstrate value without being pushy. Reinforce privacy/sovereignty message.
+                  <strong>Focus:</strong> Clients' data never leaves their device. Branded dashboard for their firm.
                 </p>
               </div>
 
@@ -275,9 +275,9 @@ export default function AdminSalesStrategyPage() {
                   </h3>
                 </div>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)', margin: 0 }}>
-                  <strong>Purpose:</strong> Address common objections (GDPR, security, data ownership) proactively.
+                  <strong>Purpose:</strong> Address integration concerns - works alongside Intelliflo/Xplan.
                   <br />
-                  <strong>Focus:</strong> Use compliance knowledge base to answer concerns autonomously.
+                  <strong>Focus:</strong> Clients connect via Open Banking. Simple setup process.
                 </p>
               </div>
 
@@ -331,15 +331,15 @@ export default function AdminSalesStrategyPage() {
                   Primary Target
                 </div>
                 <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                  CTOs, VPs of Engineering, Technical Co-Founders
+                  UK Independent Financial Advisors (IFAs), St. James's Place Partners
                 </div>
               </div>
               <div style={{ padding: 'var(--space-3)', backgroundColor: 'var(--surface-elevated)', borderRadius: 'var(--radius-sm)' }}>
                 <div style={{ fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-1)', color: 'var(--text)' }}>
-                  Tech Stack Focus
+                  Product Focus
                 </div>
                 <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                  React, TypeScript, Local-First Architecture
+                  Corporate Sponsor ($1,000/year) - White Label Portal with Sovereign Client Dashboard
                 </div>
               </div>
               <div style={{ padding: 'var(--space-3)', backgroundColor: 'var(--surface-elevated)', borderRadius: 'var(--radius-sm)' }}>
@@ -347,7 +347,7 @@ export default function AdminSalesStrategyPage() {
                   Industry Focus
                 </div>
                 <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                  Fintech, Financial Services, Wealth Management
+                  Wealth Management, Financial Advisory, Portfolio Risk Analysis
                 </div>
               </div>
             </div>
