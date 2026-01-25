@@ -671,7 +671,7 @@ export default function SponsorPage() {
             £100<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)', fontWeight: 'normal' }}> one-time</span>
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6', fontSize: '15px' }}>
-            <strong style={{ color: 'var(--text)' }}>Never pay monthly.</strong> Get unlimited API access, Discord priority, and a permanent "Founder" badge. Own a piece of the roadmap.
+            <strong style={{ color: 'var(--text)' }}>Never pay monthly.</strong> Get unlimited API access, white-label portfolio reports, Discord priority, and a permanent "Founder" badge. Own a piece of the roadmap.
           </p>
           <ul style={{ 
             listStyle: 'none', 
@@ -723,6 +723,12 @@ export default function SponsorPage() {
               <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
               <span>
                 <strong>Advanced Analytics:</strong> Sector breakdown, portfolio risk (Beta), and rebalancing alerts
+              </span>
+            </li>
+            <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+              <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
+              <span>
+                <strong>🏢 White Label Portfolio Reports:</strong> Generate professional branded PDF reports with your firm logo - same value as Corporate License
               </span>
             </li>
             <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>

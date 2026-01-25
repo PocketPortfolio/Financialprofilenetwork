@@ -426,7 +426,7 @@ export default function CheapestPortfolioTrackerPage() {
                   lineHeight: '1.7',
                   color: 'var(--text-secondary)'
                 }}>
-                  The Pocket Portfolio UK Founder's Club is a £100 one-time payment that gives you lifetime access to all premium features, including unlimited API access, Discord priority, advanced analytics, and a permanent Founder badge. No monthly fees ever.
+                  The Pocket Portfolio UK Founder's Club is a £100 one-time payment that gives you lifetime access to all premium features, including unlimited API access, white-label portfolio reports, Discord priority, advanced analytics, and a permanent Founder badge. No monthly fees ever.
                 </p>
               </div>
               <div style={{
