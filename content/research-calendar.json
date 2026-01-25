@@ -273,7 +273,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Distributed Tracing Overhead - OpenTelemetry Performance",
     "slug": "research-distributed-tracing-overhead-opentelemetry-performance",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -281,7 +281,9 @@
       "tracing",
       "distributed",
       "overhead"
-    ]
+    ],
+    "videoId": "WacdjOsXJDI",
+    "publishedAt": "2026-01-24T18:15:42.301Z"
   },
   {
     "id": "research-file-upload-performance-multipart-vs-streaming-2026-01-25",

@@ -329,14 +329,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use llms.txt to Control AI Context",
     "slug": "how-to-use-llms-txt-to-control-ai-context",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "llms",
       "txt"
-    ]
+    ],
+    "publishedAt": "2026-01-24T14:11:51.125Z"
   },
   {
     "id": "how-to-the-best-privacy-focused-open-source-fonts-for-2026-jan-25",
