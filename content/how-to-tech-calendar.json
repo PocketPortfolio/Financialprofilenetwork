@@ -345,14 +345,15 @@
     "scheduledTime": "14:00",
     "title": "The Best Privacy-Focused Open Source Fonts for 2026",
     "slug": "the-best-privacy-focused-open-source-fonts-for-2026",
-    "status": "failed",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "privacy",
       "best",
       "focused"
-    ]
+    ],
+    "publishedAt": "2026-01-25T14:24:19.153Z"
   },
   {
     "id": "how-to-how-to-structure-a-clean-json-api-response-jan-26",
