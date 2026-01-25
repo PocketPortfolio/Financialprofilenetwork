@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import SEOHead from '../components/SEOHead';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
+import AlertModal from '../components/modals/AlertModal';
 
 export default function RetrieveApiKeyPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,17 @@ export default function RetrieveApiKeyPage() {
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
   const [tier, setTier] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
 
   const handleRetrieve = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -193,7 +205,12 @@ export default function RetrieveApiKeyPage() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(apiKey);
-                  alert('API key copied to clipboard!');
+                  setAlertModal({
+                    isOpen: true,
+                    title: 'Copied!',
+                    message: 'API key copied to clipboard!',
+                    type: 'success'
+                  });
                 }}
                 style={{
                   padding: '12px 16px',
@@ -258,7 +275,12 @@ export default function RetrieveApiKeyPage() {
                 onClick={() => {
                   navigator.clipboard.writeText(corporateLicense);
                   localStorage.setItem('CORPORATE_KEY', corporateLicense);
-                  alert('Corporate license key copied and saved!');
+                  setAlertModal({
+                    isOpen: true,
+                    title: 'Saved!',
+                    message: 'Corporate license key copied and saved!',
+                    type: 'success'
+                  });
                 }}
                 style={{
                   padding: '12px 16px',
@@ -297,6 +319,14 @@ export default function RetrieveApiKeyPage() {
           </Link>
         </div>
       </main>
+      
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        type={alertModal.type}
+        onClose={() => setAlertModal({ ...alertModal, isOpen: false })}
+      />
     </div>
   );
 }

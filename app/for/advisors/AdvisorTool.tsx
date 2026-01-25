@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/app/hooks/useAuth';
+import AlertModal from '@/app/components/modals/AlertModal';
 import { 
   trackToolPageView, 
   trackToolInteraction, 
@@ -28,6 +29,17 @@ export default function AdvisorTool() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [hasCorporateLicense, setHasCorporateLicense] = useState(false);
   const [checkingLicense, setCheckingLicense] = useState(true);
+  const [alertModal, setAlertModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
   const [portfolioData, setPortfolioData] = useState<PortfolioData>({
     clientName: 'Sample Client',
     totalValue: 125000,
@@ -170,7 +182,12 @@ export default function AdvisorTool() {
         fileType: file.type,
         fileSize: file.size
       });
-      alert('Please upload an image file');
+      setAlertModal({
+        isOpen: true,
+        title: 'Invalid File Type',
+        message: 'Please upload an image file (PNG, JPG, or SVG).',
+        type: 'error'
+      });
       return;
     }
 
@@ -180,7 +197,12 @@ export default function AdvisorTool() {
         fileSize: file.size,
         maxSize: 5 * 1024 * 1024
       });
-      alert('Logo file must be less than 5MB');
+      setAlertModal({
+        isOpen: true,
+        title: 'File Too Large',
+        message: 'Logo file must be less than 5MB. Please compress your image and try again.',
+        type: 'error'
+      });
       return;
     }
 
@@ -204,7 +226,12 @@ export default function AdvisorTool() {
       trackToolError('advisor_tool', 'license_required', {
         hasLogo: !!logo
       });
-      alert('To generate high-res PDFs for clients without watermarks, requires a Corporate License ($100/mo).\n\nPreview is available for free. Get your Corporate License at pocketportfolio.app/sponsor');
+      setAlertModal({
+        isOpen: true,
+        title: 'Corporate License Required',
+        message: 'To generate high-res PDFs for clients without watermarks, you need a Corporate License ($100/mo).\n\nPreview is available for free. Get your Corporate License at pocketportfolio.app/sponsor',
+        type: 'warning'
+      });
       return;
     }
 
@@ -225,11 +252,17 @@ export default function AdvisorTool() {
       hasLogo: !!logo
     });
 
-    alert('PDF generation will be implemented with server-side PDF library. This requires Corporate License validation.');
+    setAlertModal({
+      isOpen: true,
+      title: 'PDF Generation',
+      message: 'PDF generation will be implemented with server-side PDF library. This requires Corporate License validation.',
+      type: 'info'
+    });
   }, [hasCorporateLicense, logo]);
 
   return (
-    <div className="brand-card" style={{ padding: 'var(--space-6)' }}>
+    <>
+      <div className="brand-card" style={{ padding: 'var(--space-6)' }}>
       {/* Logo Upload */}
       <div style={{ marginBottom: 'var(--space-8)' }}>
         <label style={{
@@ -567,5 +600,14 @@ export default function AdvisorTool() {
         )}
       </div>
     </div>
+    
+    <AlertModal
+      isOpen={alertModal.isOpen}
+      title={alertModal.title}
+      message={alertModal.message}
+      type={alertModal.type}
+      onClose={() => setAlertModal({ ...alertModal, isOpen: false })}
+    />
+    </>
   );
 }
