@@ -5,7 +5,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Cloud vs Local-First Architecture Performance Benchmarks",
     "slug": "research-cloud-vs-local-first-architecture-performance-benchmarks-2026-01-09",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -16,7 +16,8 @@
       "cloud",
       "local"
     ],
-    "videoId": "IOAfHjGqGQc"
+    "videoId": "IOAfHjGqGQc",
+    "publishedAt": "2026-01-25T15:13:37.269Z"
   },
   {
     "id": "research-database-query-performance-indexing-strategies-analysis-2026-01-10",
@@ -24,7 +25,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Query Performance - Indexing Strategies Analysis",
     "slug": "research-database-query-performance-indexing-strategies-analysis-2026-01-10",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -32,7 +33,8 @@
       "database",
       "query"
     ],
-    "videoId": "BIlFTFrEFOI"
+    "videoId": "BIlFTFrEFOI",
+    "publishedAt": "2026-01-25T15:14:15.203Z"
   },
   {
     "id": "research-api-response-time-optimization-best-practices-2026-2026-01-11",
@@ -40,7 +42,7 @@
     "scheduledTime": "18:00",
     "title": "Research: API Response Time Optimization - Best Practices 2026",
     "slug": "research-api-response-time-optimization-best-practices-2026-2026-01-11",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -49,7 +51,8 @@
       "response",
       "time"
     ],
-    "videoId": "ofC4OeNjDx8"
+    "videoId": "ofC4OeNjDx8",
+    "publishedAt": "2026-01-25T15:14:58.687Z"
   },
   {
     "id": "research-container-runtime-performance-docker-vs-podman-vs-containerd-2026-01-12",
@@ -57,7 +60,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Container Runtime Performance - Docker vs Podman vs Containerd",
     "slug": "research-container-runtime-performance-docker-vs-podman-vs-containerd-2026-01-12",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -67,7 +70,8 @@
       "container",
       "runtime"
     ],
-    "videoId": "oGPjzCBZGzg"
+    "videoId": "oGPjzCBZGzg",
+    "publishedAt": "2026-01-25T15:15:40.136Z"
   },
   {
     "id": "research-edge-computing-latency-global-distribution-analysis-2026-01-13",
@@ -75,7 +79,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Edge Computing Latency - Global Distribution Analysis",
     "slug": "research-edge-computing-latency-global-distribution-analysis-2026-01-13",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -84,7 +88,8 @@
       "edge",
       "computing"
     ],
-    "videoId": "3hScMLH7B4o"
+    "videoId": "3hScMLH7B4o",
+    "publishedAt": "2026-01-25T15:16:19.585Z"
   },
   {
     "id": "research-authentication-token-performance-jwt-vs-paseto-vs-branca-2026-01-14",
@@ -92,7 +97,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Authentication Token Performance - JWT vs PASETO vs Branca",
     "slug": "research-authentication-token-performance-jwt-vs-paseto-vs-branca-2026-01-14",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -100,7 +105,8 @@
       "authentication",
       "JWT",
       "token"
-    ]
+    ],
+    "publishedAt": "2026-01-25T15:17:05.669Z"
   },
   {
     "id": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
@@ -108,7 +114,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Message Queue Throughput - Kafka vs RabbitMQ vs NATS",
     "slug": "research-message-queue-throughput-kafka-vs-rabbitmq-vs-nats-2026-01-15",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -116,7 +122,8 @@
       "queue",
       "throughput"
     ],
-    "videoId": "nw8XKpuJCNo"
+    "videoId": "nw8XKpuJCNo",
+    "publishedAt": "2026-01-25T15:17:42.966Z"
   },
   {
     "id": "research-search-engine-scalability-elasticsearch-cluster-performance-2026-01-16",
@@ -124,7 +131,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Search Engine Scalability - Elasticsearch Cluster Performance",
     "slug": "research-search-engine-scalability-elasticsearch-cluster-performance-2026-01-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -134,7 +141,8 @@
       "search",
       "engine"
     ],
-    "videoId": "hxsk_R--kSg"
+    "videoId": "hxsk_R--kSg",
+    "publishedAt": "2026-01-25T15:18:24.032Z"
   },
   {
     "id": "research-cdn-cache-hit-rates-optimization-strategies-2026-01-17",
@@ -142,7 +150,7 @@
     "scheduledTime": "18:00",
     "title": "Research: CDN Cache Hit Rates - Optimization Strategies",
     "slug": "research-cdn-cache-hit-rates-optimization-strategies-2026-01-17",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -151,7 +159,8 @@
       "cache",
       "hit"
     ],
-    "videoId": "0JbMCG19bNQ"
+    "videoId": "0JbMCG19bNQ",
+    "publishedAt": "2026-01-25T15:19:03.639Z"
   },
   {
     "id": "research-database-connection-pooling-performance-impact-analysis-2026-01-18",
@@ -159,7 +168,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Connection Pooling - Performance Impact Analysis",
     "slug": "research-database-connection-pooling-performance-impact-analysis-2026-01-18",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -168,7 +177,8 @@
       "connection",
       "pooling"
     ],
-    "videoId": "Wpln4Lk38Dg"
+    "videoId": "Wpln4Lk38Dg",
+    "publishedAt": "2026-01-25T15:19:45.714Z"
   },
   {
     "id": "research-graphql-query-complexity-performance-vs-flexibility-2026-01-19",
@@ -176,7 +186,7 @@
     "scheduledTime": "18:00",
     "title": "Research: GraphQL Query Complexity - Performance vs Flexibility",
     "slug": "research-graphql-query-complexity-performance-vs-flexibility-2026-01-19",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -186,7 +196,8 @@
       "query",
       "complexity"
     ],
-    "videoId": "vbzcv-RqKM0"
+    "videoId": "vbzcv-RqKM0",
+    "publishedAt": "2026-01-25T15:20:29.439Z"
   },
   {
     "id": "research-serverless-function-cold-starts-mitigation-strategies-2026-01-20",
@@ -194,7 +205,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Serverless Function Cold Starts - Mitigation Strategies",
     "slug": "research-serverless-function-cold-starts-mitigation-strategies-2026-01-20",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -202,7 +213,8 @@
       "function",
       "cold"
     ],
-    "videoId": "qURoj6GidTU"
+    "videoId": "qURoj6GidTU",
+    "publishedAt": "2026-01-25T15:21:08.055Z"
   },
   {
     "id": "research-websocket-connection-scaling-load-testing-results-2026-01-21",
@@ -210,7 +222,7 @@
     "scheduledTime": "18:00",
     "title": "Research: WebSocket Connection Scaling - Load Testing Results",
     "slug": "research-websocket-connection-scaling-load-testing-results-2026-01-21",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -218,7 +230,8 @@
       "connection",
       "scaling"
     ],
-    "videoId": "KCyL4NN10QA"
+    "videoId": "KCyL4NN10QA",
+    "publishedAt": "2026-01-25T15:21:48.444Z"
   },
   {
     "id": "research-encryption-algorithm-performance-aes-vs-chacha20-2026-01-22",
@@ -226,7 +239,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Encryption Algorithm Performance - AES vs ChaCha20",
     "slug": "research-encryption-algorithm-performance-aes-vs-chacha20-2026-01-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -234,7 +247,8 @@
       "encryption",
       "algorithm"
     ],
-    "videoId": "Ddqo84QM1IU"
+    "videoId": "Ddqo84QM1IU",
+    "publishedAt": "2026-01-23T22:02:54.723Z"
   },
   {
     "id": "research-load-balancer-health-check-overhead-analysis-2026-01-23",
@@ -242,7 +256,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Load Balancer Health Check Overhead - Analysis",
     "slug": "research-load-balancer-health-check-overhead-analysis-2026-01-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -250,7 +264,8 @@
       "balancer",
       "health"
     ],
-    "videoId": "YVHcrItJwXA"
+    "videoId": "YVHcrItJwXA",
+    "publishedAt": "2026-01-23T22:46:19.351Z"
   },
   {
     "id": "research-distributed-tracing-overhead-opentelemetry-performance-2026-01-24",
@@ -258,7 +273,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Distributed Tracing Overhead - OpenTelemetry Performance",
     "slug": "research-distributed-tracing-overhead-opentelemetry-performance-2026-01-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -267,7 +282,8 @@
       "distributed",
       "overhead"
     ],
-    "videoId": "WacdjOsXJDI"
+    "videoId": "WacdjOsXJDI",
+    "publishedAt": "2026-01-25T10:47:02.716Z"
   },
   {
     "id": "research-file-upload-performance-multipart-vs-streaming-2026-01-25",
