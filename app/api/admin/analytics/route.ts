@@ -1026,7 +1026,31 @@ async function getBlogPostsData() {
       // Direct filesystem check - more reliable than array includes
       const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
       const imagePath = path.join(imagesDir, `${post.slug}.png`);
-      const hasFiles = fs.existsSync(mdxPath) && fs.existsSync(imagePath);
+      
+      // ✅ ENHANCED: Add error handling and logging for production debugging
+      let hasFiles = false;
+      try {
+        const mdxExists = fs.existsSync(mdxPath);
+        const imageExists = fs.existsSync(imagePath);
+        hasFiles = mdxExists && imageExists;
+        
+        // Log missing files for debugging (only for published research posts to reduce noise)
+        if (!hasFiles && post.category === 'research' && post.status === 'published') {
+          console.warn(`[Analytics] Research post files missing: ${post.slug}`, {
+            mdxPath,
+            imagePath,
+            mdxExists,
+            imageExists,
+            postsDirExists: fs.existsSync(postsDir),
+            imagesDirExists: fs.existsSync(imagesDir),
+            cwd: process.cwd(),
+          });
+        }
+      } catch (error: any) {
+        console.error(`[Analytics] Error checking files for ${post.slug}:`, error.message);
+        // If we can't check, assume files don't exist (safer default)
+        hasFiles = false;
+      }
       const postDate = new Date(post.date);
       const todayDate = new Date(today);
       
