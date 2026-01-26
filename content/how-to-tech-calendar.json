@@ -361,7 +361,7 @@
     "scheduledTime": "14:00",
     "title": "How to structure a Clean JSON API Response",
     "slug": "how-to-structure-a-clean-json-api-response",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -369,7 +369,8 @@
       "json",
       "structure",
       "clean"
-    ]
+    ],
+    "publishedAt": "2026-01-26T14:26:42.288Z"
   },
   {
     "id": "how-to-automating-seo-how-to-inject-schema-org-dynamically-jan-27",
