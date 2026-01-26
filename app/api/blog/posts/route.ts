@@ -19,7 +19,24 @@ export async function GET() {
 
     const files = fs.readdirSync(postsDir);
     const posts = files
-      .filter(file => file.endsWith('.mdx'))
+      .filter(file => {
+        // Exclude backup files
+        if (file.endsWith('.bak.mdx')) return false;
+        
+        // ✅ FIX: For research posts, only include files with date-based slugs
+        // Old research posts without dates should be excluded (they've been migrated)
+        if (file.startsWith('research-') && file.endsWith('.mdx')) {
+          const slug = file.replace('.mdx', '');
+          // Research posts should have date in slug (format: research-*-YYYY-MM-DD)
+          const hasDate = /\d{4}-\d{2}-\d{2}$/.test(slug);
+          if (!hasDate) {
+            console.warn(`[Blog API] Skipping old research post without date: ${file}`);
+            return false;
+          }
+        }
+        
+        return file.endsWith('.mdx');
+      })
       .map(file => {
         const filePath = path.join(postsDir, file);
         const fileContents = fs.readFileSync(filePath, 'utf-8');
