@@ -56,14 +56,14 @@ export async function generateEmail(
   
   const reasoning = object.reasoning;
 
-  // Compliance check
-  const compliance = checkCompliance(object.body);
+  // Add AI disclosure footer FIRST
+  const bodyWithFooter = addAiDisclosure(object.body);
+
+  // Compliance check AFTER footer is added (footer contains "AI" and "Automated" which satisfy the check)
+  const compliance = checkCompliance(bodyWithFooter);
   if (!compliance.passed) {
     throw new Error(`Compliance violation: ${compliance.violations.join(', ')}`);
   }
-
-  // Add AI disclosure footer
-  const bodyWithFooter = addAiDisclosure(object.body);
 
   return {
     email: {
@@ -268,14 +268,22 @@ CRITICAL REQUIREMENTS (Sprint 4: Humanity & Precision):
    - Be genuine, not robotic - show personality while staying professional
    - Use contractions naturally ("I'm", "you're", "we're") for a conversational feel
 
-4. Subject line: 10-100 characters
-5. Body: 100-2000 characters
-6. Focus on "Data Privacy" and "Local-First Architecture" as primary value props
-7. Reference their tech stack (e.g., "Since you use ${leadData.techStack[0] || 'React'}, you'll appreciate our local-state architecture...")
-8. DO NOT pitch "Enterprise SLA" or "Managed Cloud Hosting" (we don't have these)
-9. DO pitch "Privacy," "No Monthly Fees (for Founders)," "Own Your Data"
-10. Select ONE product from the active products list that best fits this lead (Selected: ${selectedProduct.name})
-11. Include reasoning for why this email was generated and which product you're pitching`;
+5. SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
+   Best,
+   
+   Abba
+   AI Assistant at Pocket Portfolio
+   
+   (Note: The AI disclosure footer will be added automatically after this signature)
+
+6. Subject line: 10-100 characters
+7. Body: 100-2000 characters
+8. Focus on "Data Privacy" and "Local-First Architecture" as primary value props
+9. Reference their tech stack (e.g., "Since you use ${leadData.techStack[0] || 'React'}, you'll appreciate our local-state architecture...")
+10. DO NOT pitch "Enterprise SLA" or "Managed Cloud Hosting" (we don't have these)
+11. DO pitch "Privacy," "No Monthly Fees (for Founders)," "Own Your Data"
+12. Select ONE product from the active products list that best fits this lead (Selected: ${selectedProduct.name})
+13. Include reasoning for why this email was generated and which product you're pitching`;
   }
   
   if (emailType === 'follow_up') {
@@ -307,6 +315,14 @@ Requirements:
 - Professional closing
 - Include reasoning
 
+SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
+Best,
+
+Abba
+AI Assistant at Pocket Portfolio
+
+(Note: The AI disclosure footer will be added automatically after this signature)
+
 CRITICAL: This is the final email in the sequence. Be graceful, not pushy.`;
     }
     
@@ -333,6 +349,14 @@ Requirements:
 - Reference their specific tech stack or company context
 - Offer to archive if not interested
 - Include reasoning
+
+SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
+Best,
+
+Abba
+AI Assistant at Pocket Portfolio
+
+(Note: The AI disclosure footer will be added automatically after this signature)
 
 CRITICAL: Focus on "Local-First" and "Data Sovereignty" value props. Do NOT pitch features we don't have.`;
   }
@@ -364,7 +388,15 @@ Requirements:
 - Professional, helpful tone
 - Address privacy/security concerns proactively
 - Use compliance knowledge base information
-- Include reasoning`;
+- Include reasoning
+
+SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
+Best,
+
+Abba
+AI Assistant at Pocket Portfolio
+
+(Note: The AI disclosure footer will be added automatically after this signature)`;
   }
   
   return '';

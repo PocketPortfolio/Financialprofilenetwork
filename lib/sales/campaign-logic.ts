@@ -101,8 +101,13 @@ export function getPromptForStep(
     ${strategy.prompt_instruction}
     
     TONE: Founder-to-Founder. Direct. High status. You represent the CEO's voice but are transparently an AI assistant.
-    SIGNATURE: Abba, CEO & Founder, Pocket Portfolio.
-    NOTE: The email will include an AI disclosure footer automatically.
+    SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
+    Best,
+    
+    Abba
+    AI Assistant at Pocket Portfolio
+    
+    NOTE: The AI disclosure footer will be added automatically after this signature.
   `;
 }
 
