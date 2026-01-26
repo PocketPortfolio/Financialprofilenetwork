@@ -18,7 +18,7 @@ export async function GET() {
     }
 
     const files = fs.readdirSync(postsDir);
-    const posts = files
+    const allPosts = files
       .filter(file => {
         // Exclude backup files
         if (file.endsWith('.bak.mdx')) return false;
@@ -51,9 +51,53 @@ export async function GET() {
           tags: data.tags || [],
           image: data.image,
           pillar: data.pillar,
-          category: data.category || 'deep-dive', // ✅ ADD CATEGORY
+          category: data.category || 'deep-dive',
         };
-      })
+      });
+
+    // ✅ DEDUPLICATION: For research posts, deduplicate by title+date
+    // If multiple files exist for same title+date, keep only one (prefer the one with date in slug)
+    const postMap = new Map<string, typeof allPosts[0]>();
+    
+    for (const post of allPosts) {
+      if (post.category === 'research') {
+        // Use title+date as unique key for research posts
+        const key = `${post.title}|${post.date}`;
+        const existing = postMap.get(key);
+        
+        if (existing) {
+          // Prefer the one with date in slug (new format) over any variant
+          const existingHasDate = /\d{4}-\d{2}-\d{2}$/.test(existing.slug);
+          const currentHasDate = /\d{4}-\d{2}-\d{2}$/.test(post.slug);
+          
+          if (currentHasDate && !existingHasDate) {
+            // Current has date, existing doesn't - replace
+            postMap.set(key, post);
+          } else if (currentHasDate && existingHasDate) {
+            // Both have dates - if same date, prefer the one that matches expected format
+            // Keep the first one encountered (shouldn't happen if slugs are correct)
+            console.warn(`[Blog API] Duplicate research post detected: ${post.title} (${post.date}) - keeping first occurrence (slug: ${existing.slug}), skipping duplicate (slug: ${post.slug})`);
+            // Skip current duplicate - keep existing
+            continue;
+          }
+          // If existing has date and current doesn't, keep existing (skip current)
+          continue;
+        } else {
+          // First occurrence - add it
+          postMap.set(key, post);
+        }
+      } else {
+        // Non-research posts: deduplicate by slug (should be unique)
+        if (!postMap.has(post.slug)) {
+          postMap.set(post.slug, post);
+        } else {
+          console.warn(`[Blog API] Duplicate non-research post slug detected: ${post.slug} - keeping first occurrence`);
+        }
+      }
+    }
+    
+    // Convert map back to array and sort
+    const posts = Array.from(postMap.values())
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return NextResponse.json(posts, {
