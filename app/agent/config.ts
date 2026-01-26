@@ -94,8 +94,7 @@ export const EmailOutputSchema = z.object({
   subject: z.string().min(10).max(100),
   body: z.string().min(100).max(2000),
   reasoning: z.string().describe('Why this email was generated'),
-  painPoint: z.string().optional().describe('Identified pain point'),
-  techStackMatch: z.array(z.string()).optional().describe('Matching tech stack items'),
+  // Removed painPoint and techStackMatch - not used and causing AI SDK v6 validation errors
 });
 
 export type EmailOutput = z.infer<typeof EmailOutputSchema>;
