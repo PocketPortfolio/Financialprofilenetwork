@@ -45,8 +45,8 @@ export async function generateEmail(
   const prompt = buildPrompt(leadData, emailType, sequenceStep);
 
   // AI SDK v6 type compatibility: Use type assertion to avoid deep type instantiation
-  // Use gpt-4o-2024-08-06 for v2 specification support (required for AI SDK v6)
-  const openaiModel = openai('gpt-4o-2024-08-06') as any;
+  // Latest @ai-sdk/openai@3.0.19 should support gpt-4o with v2 specification
+  const openaiModel = openai('gpt-4o') as any;
   const result = await (generateObject as any)({
     model: openaiModel,
     schema: EmailOutputSchema,
