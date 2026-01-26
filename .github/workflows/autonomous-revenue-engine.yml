@@ -46,6 +46,7 @@ jobs:
           PRODUCTHUNT_API_TOKEN: ${{ secrets.PRODUCTHUNT_API_TOKEN }}
           CRUNCHBASE_API_KEY: ${{ secrets.CRUNCHBASE_API_KEY }}
           TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+          SALES_PROXY_URL: ${{ secrets.SALES_PROXY_URL }}
         run: |
           echo "🔍 Autonomous Lead Sourcing Started"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

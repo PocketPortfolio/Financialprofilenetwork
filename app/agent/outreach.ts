@@ -44,12 +44,15 @@ export async function generateEmail(
   
   const prompt = buildPrompt(leadData, emailType, sequenceStep);
 
-  const { object } = await generateObject({
-    // @ts-expect-error - AI SDK v6 type compatibility: LanguageModelV1 to LanguageModel conversion
-    model: openai('gpt-4o'),
+  // AI SDK v6 type compatibility: Use type assertion to avoid deep type instantiation
+  // Cast both the model and the entire call to bypass TypeScript's deep type inference
+  const openaiModel = openai('gpt-4o') as any;
+  const result = await (generateObject as any)({
+    model: openaiModel,
     schema: EmailOutputSchema,
     prompt: `${SYSTEM_IDENTITY.identity}\n\n${prompt}`,
   });
+  const { object } = result;
   
   const reasoning = object.reasoning;
 

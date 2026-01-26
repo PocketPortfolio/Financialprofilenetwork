@@ -26,7 +26,7 @@ import { isRealFirstName } from '@/lib/sales/name-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
 import { determineOutreachLanguage } from '@/lib/sales/cultural-guardrails';
 
-const MAX_LEADS_TO_PROCESS = 50; // Maximum leads to process per run (WAR MODE: No rate limit)
+const MAX_LEADS_TO_PROCESS = 833; // Maximum leads to process per run (10K/day mandate: 10,000 / 12 runs = ~833/run)
 
 /**
  * Email Sequence Strategy:
