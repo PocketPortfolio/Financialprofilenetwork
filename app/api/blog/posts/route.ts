@@ -73,6 +73,7 @@ export async function GET() {
           if (currentHasDate && !existingHasDate) {
             // Current has date, existing doesn't - replace
             postMap.set(key, post);
+            continue; // ✅ FIX: Continue after replacing to skip remaining logic
           } else if (currentHasDate && existingHasDate) {
             // Both have dates - if same date, prefer the one that matches expected format
             // Keep the first one encountered (shouldn't happen if slugs are correct)
