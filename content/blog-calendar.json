@@ -274,7 +274,7 @@
     "date": "2026-01-26",
     "title": "The Future of Portfolio Management: Local-First and Open",
     "slug": "the-future-of-portfolio-management-local-first-and-open",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -284,7 +284,8 @@
       "future"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-01-26T09:40:54.534Z"
   },
   {
     "id": "week-4-post-2",
