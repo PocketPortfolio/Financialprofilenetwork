@@ -35,12 +35,27 @@ export default function TickerPageContent({
           name: 'Pocket Portfolio',
           applicationCategory: 'FinanceApplication',
           operatingSystem: 'Web Browser',
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD'
-          },
-          description: `Free, privacy-first portfolio tracker for ${normalizedSymbol}. No login required.`,
+          offers: [
+            {
+              '@type': 'Offer',
+              name: 'Free Tier',
+              price: '0',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock',
+              description: 'Free portfolio tracking with no login required. Privacy-first local-first architecture.'
+            },
+            {
+              '@type': 'Offer',
+              name: 'Founders Club Lifetime License',
+              price: '100.00',
+              priceCurrency: 'GBP',
+              availability: 'https://schema.org/LimitedAvailability',
+              description: 'One-time payment of £100. Lifetime access with Sovereign Sync (Google Drive), unlimited API access, priority support, and permanent Founder badge.',
+              url: 'https://www.pocketportfolio.app/sponsor',
+              priceValidUntil: '2026-12-31'
+            }
+          ],
+          description: `Free, privacy-first portfolio tracker for ${normalizedSymbol}. No login required. Upgrade to Founder's Club (£100 lifetime) for Sovereign Sync and unlimited API access.`,
           url: `https://www.pocketportfolio.app/s/${normalizedSymbol.toLowerCase()}`,
           aggregateRating: {
             '@type': 'AggregateRating',
