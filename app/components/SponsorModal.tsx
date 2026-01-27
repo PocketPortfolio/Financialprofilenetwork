@@ -30,7 +30,7 @@ const getTierConfig = (tierName: string) => {
       boxShadow: '0 25px 50px -12px rgba(245, 158, 11, 0.25)'
     };
   } else {
-    // Standard tier styling (Code Supporter, Feature Voter)
+    // Standard tier styling (Code Supporter, Developer Utility)
     const isCodeSupporter = tierName.includes('Code Supporter');
     return {
       modalBg: '#FFFFFF',
@@ -108,7 +108,7 @@ interface SponsorModalProps {
 export default function SponsorModal({ isOpen, onClose, onSubmit, tierName, billingInterval: initialBillingInterval, priceIds }: SponsorModalProps) {
   const [email, setEmail] = useState('');
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>(
-    initialBillingInterval || 'annual' // Default to annual for Code Supporter and Feature Voter
+    initialBillingInterval || 'annual' // Default to annual for Code Supporter and Developer Utility
   );
   const tierConfig = getTierConfig(tierName);
   const isPremium = isPremiumTier(tierName);
@@ -232,7 +232,7 @@ export default function SponsorModal({ isOpen, onClose, onSubmit, tierName, bill
             dangerouslySetInnerHTML={{ __html: tierConfig.subtext }}
           />
 
-          {/* Billing Interval Toggle for Code Supporter and Feature Voter */}
+          {/* Billing Interval Toggle for Code Supporter and Developer Utility */}
           {supportsBillingToggle && (
             <div style={{
               marginBottom: '20px',

@@ -56,10 +56,10 @@ const VALID_PRICE_IDS = new Set([
 const PRICE_ID_TO_TIER: Record<string, string> = {
   [SPONSOR_PRICE_IDS.codeSupporterMonthly]: 'Code Supporter (Monthly)',
   [SPONSOR_PRICE_IDS.codeSupporterAnnual]: 'Code Supporter (Annual)',
-  [SPONSOR_PRICE_IDS.featureVoterMonthly]: 'Feature Voter (Monthly)',
-  [SPONSOR_PRICE_IDS.featureVoterAnnual]: 'Feature Voter (Annual)',
-  [SPONSOR_PRICE_IDS.corporateSponsorMonthly]: 'Corporate Sponsor (Monthly)',
-  [SPONSOR_PRICE_IDS.corporateSponsorAnnual]: 'Corporate Sponsor (Annual)',
+  [SPONSOR_PRICE_IDS.featureVoterMonthly]: 'Developer Utility (Monthly)',
+  [SPONSOR_PRICE_IDS.featureVoterAnnual]: 'Developer Utility (Annual)',
+  [SPONSOR_PRICE_IDS.corporateSponsorMonthly]: 'Corporate Ecosystem (Monthly)',
+  [SPONSOR_PRICE_IDS.corporateSponsorAnnual]: 'Corporate Ecosystem (Annual)',
 };
 
 // NPM Packages list

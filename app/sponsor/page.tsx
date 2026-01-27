@@ -96,12 +96,12 @@ export default function SponsorPage() {
   }, [previewTheme]);
 
   const handleCheckout = async (priceId: string | { monthly: string; annual: string }, tierName: string) => {
-    // For Code Supporter and Feature Voter, default to annual
+    // For Code Supporter and Developer Utility, default to annual
     let finalPriceId: string;
     let billingInterval: 'monthly' | 'annual' = 'annual';
     
     if (typeof priceId === 'object') {
-      // Default to annual for Code Supporter and Feature Voter
+      // Default to annual for Code Supporter and Developer Utility
       finalPriceId = priceId.annual;
     } else {
       finalPriceId = priceId;

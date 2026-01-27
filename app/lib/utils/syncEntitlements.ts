@@ -16,8 +16,8 @@ export interface SyncEntitlements {
  * Get sync entitlements for a given tier
  * 
  * Business Rules:
- * - Corporate Sponsor ($1,000/yr): 2 seats included, $50/month/seat for overage
- * - UK Founder's Club (£100 lifetime): 1 seat included, £50/month/seat for overage
+ * - Corporate Ecosystem ($1,000/yr): 2 seats included, $50/month/seat for overage
+ * - Founder's Club (£100 lifetime): 1 seat included, £50/month/seat for overage
  * - All other tiers: No access
  */
 export function getSyncEntitlements(tier: Tier): SyncEntitlements {
@@ -54,7 +54,7 @@ export function getTierDisplayName(tier: Tier): string {
     case 'corporateSponsor':
       return 'Corporate Ecosystem';
     case 'foundersClub':
-      return "UK Founder's Club";
+      return "Founder's Club";
     case 'featureVoter':
       return 'Developer Utility';
     default:

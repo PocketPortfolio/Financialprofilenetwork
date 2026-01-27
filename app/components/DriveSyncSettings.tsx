@@ -558,7 +558,7 @@ export default function DriveSyncSettings({ onConnect, onDisconnect }: DriveSync
                   <span>Premium Feature</span>
                 </div>
                 <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>
-                  Upgrade to <strong>Corporate Sponsor</strong> or <strong>UK Founder's Club</strong> to unlock Sovereign Sync.
+                  Upgrade to <strong>Corporate Ecosystem</strong> or <strong>Founder's Club</strong> to unlock Sovereign Sync.
                 </div>
                 <Link
                   href="/sponsor"

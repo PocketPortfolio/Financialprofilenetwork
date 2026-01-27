@@ -509,12 +509,12 @@ export default function SettingsPage() {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px' }}>
-                    {unlockedTheme === 'founder' ? "Founder's Club Theme" : 'Corporate Sponsor Theme'}
+                    {unlockedTheme === 'founder' ? "Founder's Club Theme" : 'Corporate Ecosystem Theme'}
                   </div>
                   <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
                     {unlockedTheme === 'founder' 
                       ? "Use your exclusive Founder's Club theme with royal gold accents"
-                      : "Use your exclusive Corporate Sponsor theme with terminal green accents"}
+                      : "Use your exclusive Corporate Ecosystem theme with terminal green accents"}
                   </div>
                 </div>
                 <label style={{ 
@@ -727,7 +727,7 @@ export default function SettingsPage() {
                 marginBottom: '16px',
               }}
             >
-              Free tier is capped. Join the <strong>UK Founders Club</strong> for expanded API limits and direct programmatic access via Google Drive.
+              Free tier is capped. Join the <strong>Founder's Club</strong> for expanded API limits and direct programmatic access via Google Drive.
             </p>
             <div
               style={{

@@ -21,7 +21,7 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 - Single Source of Truth for all products
 - 4 real products defined:
   - **Founder's Club**: £100 lifetime
-  - **Corporate Sponsor**: $1,000/year
+  - **Corporate Ecosystem**: $1,000/year
   - **Developer Utility**: $200/year
   - **Code Supporter**: $50/year
 - Dynamic product selection based on lead context
@@ -63,7 +63,7 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 
 **Updated**: `lib/sales/compliance-kb.ts`
 - Fixed pricing answer (lines 44-60) to reflect real products
-- Updated support answer to mention Corporate Sponsors and Feature Voters
+- Updated support answer to mention Corporate Ecosystem and Developer Utility
 - Updated free trial answer to clarify core functionality is free
 
 **Updated**: `lib/sales/revenueCalculator.ts`
@@ -73,7 +73,7 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 
 **Updated**: `lib/sales/revenue-driver.ts`
 - Already updated to use real products
-- Revenue math now prioritizes Corporate Sponsors ($1k/year = $83.33/month)
+- Revenue math now prioritizes Corporate Ecosystem ($1k/year = $83.33/month)
 - Comments explain real product math
 
 ---
@@ -84,10 +84,10 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 - 10 × Team Licenses (£500/mo) = £5,000/mo ❌
 
 ### New (Real Products):
-- **60 × Corporate Sponsors** ($1,000/yr = $83.33/mo) = ~$5,000/mo ✅
+- **60 × Corporate Ecosystem** ($1,000/yr = $83.33/mo) = ~$5,000/mo ✅
 - OR **600 × Founders Club** (£100 lifetime = £8.33/mo annualized) = ~£5,000/mo ✅
 
-**Strategy**: System now prioritizes Corporate Sponsors (highest value) to hit £5k target efficiently.
+**Strategy**: System now prioritizes Corporate Ecosystem (highest value) to hit £5k target efficiently.
 
 ---
 
@@ -98,7 +98,7 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 3. **AI Safety**: AI can ONLY pitch products from the catalog (hard rule)
 4. **Correct Math**: Revenue calculations use real product values
 5. **Sovereign Narrative**: All emails focus on "Data Privacy" and "Local-First Architecture"
-6. **Corporate Priority**: Lead sourcing prioritizes companies (Corporate Sponsor targets)
+6. **Corporate Priority**: Lead sourcing prioritizes companies (Corporate Ecosystem targets)
 
 ---
 
@@ -109,7 +109,7 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 - ✅ Product catalog loads correctly (4 products)
 - ✅ All linter checks pass
 - ✅ Revenue calculator uses real products
-- ✅ Revenue driver prioritizes Corporate Sponsors
+- ✅ Revenue driver prioritizes Corporate Ecosystem
 - ✅ Compliance KB has real pricing
 - ✅ Outreach prompts include "Sovereign" narrative
 

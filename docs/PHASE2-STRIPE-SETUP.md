@@ -16,8 +16,8 @@
 The Stripe Price IDs have been extracted from your dashboard and are now configured in `app/sponsor/page.tsx`:
 
 - **Code Supporter** ($5/month): `price_1SeZh7D4sftWa1WtWsDwvQu5`
-- **Feature Voter** ($20/month): `price_1SeZhnD4sftWa1WtP5GdZ5cT`
-- **Corporate Sponsor** ($100/month): `price_1SeZigD4sftWa1WtTODsYpwE`
+- **Developer Utility** ($20/month): `price_1SeZhnD4sftWa1WtP5GdZ5cT`
+- **Corporate Ecosystem** ($100/month): `price_1SeZigD4sftWa1WtTODsYpwE`
 - **One-Time Donation** ($50): `price_1SeZj0D4sftWa1WtXkkVps9a`
 
 ## 🔧 Required Configuration
