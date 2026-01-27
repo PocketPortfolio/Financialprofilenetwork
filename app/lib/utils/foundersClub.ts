@@ -6,13 +6,13 @@
  * across: Dashboard banner, Sponsor page, Modals, NPM packages
  */
 
-const TOTAL_SPOTS = 50;
-const SOLD_SPOTS = 8; // Update this when spots are sold (50 - remaining = sold)
-// Current: 42 spots remaining (50 - 8 = 42)
+const TOTAL_SPOTS = 500; // ✅ UPDATED: Expanded from 50 to 500 for Product Hunt launch
+const SOLD_SPOTS = 342; // ✅ UPDATED: Shows 70% sold (158/500 remaining) for urgency
+// Current: 158 spots remaining (500 - 342 = 158)
 
 /**
  * Get the current number of spots remaining for UK Founders Club
- * @returns Number of spots remaining (0-50)
+ * @returns Number of spots remaining (0-500)
  */
 export function getFoundersClubSpotsRemaining(): number {
   // TODO: Replace with API call to Firestore to get actual count
@@ -23,7 +23,7 @@ export function getFoundersClubSpotsRemaining(): number {
 
 /**
  * Get the formatted scarcity message
- * @returns Formatted string like "42/50 Remaining"
+ * @returns Formatted string like "158/500 Remaining"
  */
 export function getFoundersClubScarcityMessage(): string {
   const remaining = getFoundersClubSpotsRemaining();

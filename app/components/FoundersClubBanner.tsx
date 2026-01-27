@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
-import { getFoundersClubSpotsRemaining, isFoundersClubSoldOut } from '../lib/utils/foundersClub';
+import { getFoundersClubSpotsRemaining, isFoundersClubSoldOut, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 
 /**
  * Sticky banner showing Founders Club scarcity counter
@@ -54,7 +54,7 @@ export default function FoundersClubBanner() {
         }}
       >
         <span style={{ fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>
-          🇬🇧 UK FOUNDERS CLUB: Batch 1 Closing. {spotsRemaining}/50 Lifetime Spots Remaining.
+          🇬🇧 UK FOUNDERS CLUB: Batch 1 Closing. {getFoundersClubScarcityMessage()} Lifetime Spots Remaining.
         </span>
         <Link
           href="/sponsor?utm_source=dashboard_banner&utm_medium=sticky_cta&utm_campaign=founders_club"

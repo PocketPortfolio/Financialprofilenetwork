@@ -540,7 +540,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Hero Section - INVESTOR FOCUS */}
+      {/* Hero Section - PREMIUM POSITIONING */}
       <main className="brand-surface brand-grid mobile-container" style={{ 
         width: '100%',
         maxWidth: '100vw',
@@ -567,7 +567,7 @@ export default function LandingPage() {
           padding: 'clamp(20px, 4vw, 32px)',
           boxSizing: 'border-box'
         }}>
-          {/* Headline - ENEMY-FOCUSED VALUE PROP */}
+          {/* Headline - PREMIUM POSITIONING */}
           <h1 className="brand-text" style={{ 
             fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
             fontWeight: 'bold', 
@@ -576,11 +576,11 @@ export default function LandingPage() {
             letterSpacing: '-0.03em',
             maxWidth: '800px'
           }}>
-            Stop being the product.<br />
-            <span style={{ color: 'var(--accent-warm)' }}>Start managing your wealth.</span>
+            The Last Portfolio Tracker You Will Ever Buy.<br />
+            <span style={{ color: 'var(--accent-warm)' }}>Zero servers. Zero monthly fees. 100% Privacy.</span>
           </h1>
 
-          {/* Subhead - PRIVACY + ENEMY POSITIONING */}
+          {/* Subhead - PREMIUM POSITIONING */}
           <p className="brand-text-secondary" style={{ 
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
             lineHeight: '1.6', 
@@ -588,15 +588,15 @@ export default function LandingPage() {
             maxWidth: '700px',
             color: 'var(--text-secondary)'
           }}>
-            Most "free" trackers sell your data to hedge funds.{' '}
+            Your financial data lives in your Google Drive, not our cloud.{' '}
             <strong style={{ color: 'var(--text)' }}>Pocket Portfolio</strong> is the sovereign wealth console that works for <em>you</em>.
             <br />
             <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
-              Orchestrated by <strong style={{ color: 'var(--accent-warm)' }}>AI</strong>. Owned by <strong style={{ color: 'var(--accent-warm)' }}>You</strong>.
+              <strong style={{ color: 'var(--accent-warm)' }}>£100 Lifetime License.</strong> Own it forever.
             </span>
           </p>
           
-          {/* CTAs - INVESTOR FOCUS */}
+          {/* CTAs - PREMIUM POSITIONING */}
           <div style={{ 
             display: 'flex', 
             gap: 'clamp(12px, 3vw, 16px)', 
@@ -606,7 +606,7 @@ export default function LandingPage() {
             width: '100%'
           }}>
             <Link 
-              href="/dashboard" 
+              href="/sponsor?utm_source=landing&utm_medium=hero_cta&utm_campaign=founders_club" 
               className="brand-button brand-button-primary" 
               style={{ 
                 padding: 'clamp(16px, 3vw, 20px) clamp(32px, 6vw, 48px)', 
@@ -631,10 +631,10 @@ export default function LandingPage() {
                 e.currentTarget.style.boxShadow = '0 4px 14px rgba(245, 158, 11, 0.4)';
               }}
             >
-              Launch Dashboard
+              Join Founder's Club (£100 Lifetime)
             </Link>
-            <a 
-              href="#sovereign-architecture"
+            <Link 
+              href="/tools/risk-calculator?utm_source=landing&utm_medium=hero_cta&utm_campaign=risk_calculator"
               className="brand-button" 
               style={{ 
                 padding: 'clamp(16px, 3vw, 20px) clamp(32px, 6vw, 48px)', 
@@ -647,14 +647,6 @@ export default function LandingPage() {
                 textDecoration: 'none',
                 transition: 'all 0.2s ease',
                 cursor: 'pointer',
-                scrollBehavior: 'smooth'
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                const element = document.getElementById('sovereign-architecture');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--warm-bg)';
@@ -665,8 +657,8 @@ export default function LandingPage() {
                 e.currentTarget.style.borderColor = 'var(--border-warm)';
               }}
             >
-              Why Sovereign?
-            </a>
+              Check My Portfolio Risk
+            </Link>
           </div>
 
           {/* Quick Command Search Bar - Sitemap Bridge */}

@@ -19,6 +19,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/automating-seo-how-to-inject-schema-org-dynamically</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/building-financial-systems-with-modern-software-architecture-patterns-for-fintech-applications</loc>
     <lastmod>2026-01-07</lastmod>
     <changefreq>weekly</changefreq>
