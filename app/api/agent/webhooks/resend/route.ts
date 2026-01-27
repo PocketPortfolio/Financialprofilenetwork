@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { conversations, leads, auditLogs } from '@/db/sales/schema';
 import { eq, and } from 'drizzle-orm';
+import { sendEmail } from '@/app/agent/outreach';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -179,6 +180,13 @@ export async function POST(request: NextRequest) {
           .set({ status: 'INTERESTED', updatedAt: new Date() })
           .where(eq(leads.id, leadId));
       } else if (classification === 'NOT_INTERESTED' || classification === 'STOP') {
+        // Fetch lead to get email address for confirmation
+        const [lead] = await db
+          .select({ email: leads.email })
+          .from(leads)
+          .where(eq(leads.id, leadId))
+          .limit(1);
+
         await db.update(leads)
           .set({ 
             status: 'DO_NOT_CONTACT', 
@@ -186,6 +194,14 @@ export async function POST(request: NextRequest) {
             updatedAt: new Date() 
           })
           .where(eq(leads.id, leadId));
+
+        // Send opt-out confirmation email (only for STOP, not NOT_INTERESTED)
+        if (classification === 'STOP' && lead) {
+          // Send confirmation in background (don't await to avoid blocking webhook)
+          sendOptOutConfirmation(lead.email, leadId).catch((error) => {
+            console.error('Failed to send opt-out confirmation:', error);
+          });
+        }
       }
 
       // Audit log
@@ -233,6 +249,58 @@ export async function POST(request: NextRequest) {
       { error: error.message || 'Failed to process webhook' },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * Send opt-out confirmation email
+ */
+async function sendOptOutConfirmation(
+  leadEmail: string,
+  leadId: string
+): Promise<void> {
+  try {
+    const subject = 'You have been unsubscribed';
+    const body = `Thank you for letting us know.
+
+We have removed you from our mailing list and will no longer send you emails.
+
+If you change your mind in the future, you can always reach out to us at ai@pocketportfolio.app.
+
+Best regards,
+Pocket Portfolio Team
+
+---
+This is an automated confirmation. You will not receive any further emails from us.`;
+
+    await sendEmail(leadEmail, subject, body, leadId);
+    
+    // Log the confirmation email
+    await db.insert(auditLogs).values({
+      leadId,
+      action: 'EMAIL_SENT',
+      aiReasoning: 'Opt-out confirmation email sent to acknowledge unsubscribe request',
+      metadata: {
+        email: leadEmail,
+        emailType: 'OPT_OUT_CONFIRMATION',
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    console.log(`✅ Opt-out confirmation sent to ${leadEmail}`);
+  } catch (error: any) {
+    // Log error but don't fail the webhook
+    console.error('Failed to send opt-out confirmation:', error);
+    await db.insert(auditLogs).values({
+      leadId,
+      action: 'AUTONOMOUS_REPLY_FAILED',
+      aiReasoning: `Failed to send opt-out confirmation: ${error.message}`,
+      metadata: { 
+        error: error.message,
+        emailType: 'OPT_OUT_CONFIRMATION',
+        failed: true,
+      },
+    }).catch(() => {});
   }
 }
 
