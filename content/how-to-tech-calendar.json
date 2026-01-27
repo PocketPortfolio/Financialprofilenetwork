@@ -378,7 +378,7 @@
     "scheduledTime": "14:00",
     "title": "Automating SEO: How to Inject Schema.org Dynamically",
     "slug": "automating-seo-how-to-inject-schema-org-dynamically",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -386,7 +386,8 @@
       "schema.org",
       "automating",
       "inject"
-    ]
+    ],
+    "publishedAt": "2026-01-27T14:23:34.122Z"
   },
   {
     "id": "how-to-how-to-use-just-in-time-static-generation-jan-28",
