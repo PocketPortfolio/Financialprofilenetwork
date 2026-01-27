@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 
 // Determine if tier is premium
 const isPremiumTier = (tierName: string): boolean => {
-  return tierName.includes('Corporate Sponsor') || tierName.includes("Founder's Club");
+  return tierName.includes('Corporate Ecosystem') || tierName.includes("Founder's Club");
 };
 
 // Get tier-specific configuration
@@ -12,7 +12,7 @@ const getTierConfig = (tierName: string) => {
   const isPremium = isPremiumTier(tierName);
   
   if (isPremium) {
-    // Premium tier styling (Corporate Sponsor, UK Founder's Club)
+    // Premium tier styling (Corporate Ecosystem, UK Founder's Club)
     return {
       modalBg: 'linear-gradient(135deg, #FFF7ED 0%, #FEF3C7 100%)',
       borderColor: 'rgba(245, 158, 11, 0.4)',
@@ -40,7 +40,7 @@ const getTierConfig = (tierName: string) => {
       headerSize: '20px',
       subtext: isCodeSupporter
         ? "Thanks for the coffee! Enter your email to receive your <b>API Key</b> and supporter details."
-        : "Great choice! Enter your email to receive your <b>API Key</b> and roadmap access details.",
+        : "Great choice! Enter your email to receive your <b>API Key</b> (unlimited calls) and roadmap access details.",
       buttonGradient: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
       buttonShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.3)',
       maxWidth: '420px',
@@ -150,9 +150,9 @@ export default function SponsorModal({ isOpen, onClose, onSubmit, tierName, bill
   const getSavingsMessage = (): string => {
     if (tierName === 'Code Supporter') {
       return 'Save $10/year (2 months free!)';
-    } else if (tierName === 'Feature Voter') {
+    } else if (tierName === 'Developer Utility') {
       return 'Save $40/year (2 months free!)';
-    } else if (tierName === 'Corporate Sponsor') {
+    } else if (tierName === 'Corporate Ecosystem') {
       return 'Save $200/year (2 months free!)';
     }
     return '';

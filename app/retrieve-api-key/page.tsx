@@ -231,7 +231,7 @@ export default function RetrieveApiKeyPage() {
               color: 'var(--muted)',
               marginTop: '8px'
             }}>
-              💡 Save this key securely. You'll need it for the Google Sheets formula generator.
+              💡 Save this key securely. Use it for unlimited API calls across all endpoints (stock prices, market data, historical data, etc.)
             </p>
           </div>
         )}

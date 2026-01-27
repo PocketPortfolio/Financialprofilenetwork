@@ -363,7 +363,7 @@ export default function SponsorPage() {
             $60/year if paid monthly
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6' }}>
-            I use the npm package and want to buy you a coffee.
+            I use the NPM packages and I support open source technologies.
           </p>
           <div style={{ marginBottom: '12px', fontSize: '13px', color: '#f59e0b', fontWeight: '600', background: 'rgba(245, 158, 11, 0.1)', padding: '8px', borderRadius: '6px' }}>
             💰 Save $10/year (2 months free!)
@@ -388,7 +388,7 @@ export default function SponsorPage() {
           </button>
         </div>
 
-        {/* Feature Voter - $20/month */}
+        {/* Developer Utility - $20/month */}
         <div style={{
           background: 'var(--surface)',
           border: '2px solid var(--accent-warm)',
@@ -425,7 +425,7 @@ export default function SponsorPage() {
             Popular
           </div>
           <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
-            Feature Voter
+            Developer Utility
           </h3>
           <div style={{ fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
             $200<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)' }}>/year</span>
@@ -434,13 +434,40 @@ export default function SponsorPage() {
             $240/year if paid monthly
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6' }}>
-            Priority access to the Roadmap & Insider Discord.
+            Perfect for developers and power users. Shape the product roadmap and get unlimited API access for your projects.
           </p>
+          
+          {/* Developer Benefits */}
+          <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
+              🚀 <strong>Developer Benefits:</strong>
+            </div>
+            <ul style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '20px', marginTop: '8px', lineHeight: '1.8', padding: 0, listStyle: 'none' }}>
+              <li style={{ marginBottom: '4px' }}>• Priority access to the Roadmap & Insider Discord</li>
+              <li style={{ marginBottom: '4px' }}>• Influence product development decisions</li>
+              <li style={{ marginBottom: '4px' }}>• Early access to new features</li>
+              <li style={{ marginBottom: '4px' }}>• Direct line to the development team</li>
+            </ul>
+          </div>
+
+          {/* API Access */}
+          <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
+              ⚡ <strong>Unlimited API Access:</strong>
+            </div>
+            <ul style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '20px', marginTop: '8px', lineHeight: '1.8', padding: 0, listStyle: 'none' }}>
+              <li style={{ marginBottom: '4px' }}>• Unlimited API calls (stock prices, market data)</li>
+              <li style={{ marginBottom: '4px' }}>• Real-time quote data</li>
+              <li style={{ marginBottom: '4px' }}>• Historical ticker data (JSON format)</li>
+              <li style={{ marginBottom: '4px' }}>• No rate limits or throttling</li>
+            </ul>
+          </div>
+
           <div style={{ marginBottom: '12px', fontSize: '13px', color: '#f59e0b', fontWeight: '600', background: 'rgba(245, 158, 11, 0.1)', padding: '8px', borderRadius: '6px' }}>
             💰 Save $40/year (2 months free!)
           </div>
           <button
-            onClick={() => handleCheckout(PRICE_IDS.featureVoter, 'Feature Voter')}
+            onClick={() => handleCheckout(PRICE_IDS.featureVoter, 'Developer Utility')}
             disabled={loading === PRICE_IDS.featureVoter.annual || loading !== null}
             style={{
               padding: '12px 24px',
@@ -459,7 +486,7 @@ export default function SponsorPage() {
           </button>
         </div>
 
-        {/* Corporate Sponsor - $1,000/year */}
+        {/* Corporate Ecosystem - $1,000/year */}
         <div style={{
           background: 'var(--surface)',
           border: '2px solid var(--border)',
@@ -482,7 +509,7 @@ export default function SponsorPage() {
         }}
         >
           <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
-            Corporate Sponsor
+            Corporate Ecosystem
           </h3>
           <div style={{ fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
             $1,000<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)' }}>/year</span>
@@ -535,7 +562,7 @@ export default function SponsorPage() {
           </div>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button
-              onClick={() => handleCheckout(PRICE_IDS.corporateSponsor, 'Corporate Sponsor')}
+              onClick={() => handleCheckout(PRICE_IDS.corporateSponsor, 'Corporate Ecosystem')}
               disabled={loading === PRICE_IDS.corporateSponsor.annual || loading !== null}
               style={{
                 flex: '1',
@@ -795,28 +822,6 @@ export default function SponsorPage() {
         </div>
       </div>
 
-      <div style={{
-        textAlign: 'center',
-        padding: '24px',
-        background: 'var(--surface)',
-        borderRadius: '12px',
-        border: '1px solid var(--border)',
-        marginBottom: '48px'
-      }}>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0, lineHeight: '1.6' }}>
-          All sponsorships help us maintain and improve Pocket Portfolio. Thank you for your support! ❤️
-        </p>
-        <div style={{ marginTop: '16px' }}>
-          <Link href="/" style={{
-            color: 'var(--accent-warm)',
-            textDecoration: 'none',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}>
-            ← Back to Home
-          </Link>
-        </div>
-      </div>
     </div>
     
     {/* Floating Preview Banner */}
@@ -850,7 +855,7 @@ export default function SponsorPage() {
         </p>
         <button 
           onClick={() => {
-            const tierName = previewTheme === 'founder' ? "UK Founder's Club" : 'Corporate Sponsor';
+            const tierName = previewTheme === 'founder' ? "UK Founder's Club" : 'Corporate Ecosystem';
             const priceId = previewTheme === 'founder' 
               ? PRICE_IDS.foundersClub 
               : PRICE_IDS.corporateSponsor.annual;
@@ -887,8 +892,8 @@ export default function SponsorPage() {
       tierName={selectedTier?.tierName || ''}
       billingInterval={selectedTier?.billingInterval}
       priceIds={selectedTier?.tierName === 'Code Supporter' ? PRICE_IDS.codeSupporter : 
-                selectedTier?.tierName === 'Feature Voter' ? PRICE_IDS.featureVoter : 
-                selectedTier?.tierName === 'Corporate Sponsor' ? PRICE_IDS.corporateSponsor : undefined}
+                selectedTier?.tierName === 'Developer Utility' ? PRICE_IDS.featureVoter : 
+                selectedTier?.tierName === 'Corporate Ecosystem' ? PRICE_IDS.corporateSponsor : undefined}
       onClose={() => {
         setModalOpen(false);
         setSelectedTier(null);

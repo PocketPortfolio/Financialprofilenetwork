@@ -32,9 +32,9 @@ export const PRODUCT_CATALOG: Product[] = [
     dealValue: 100, // One-time, so annualized = 100
   },
   {
-    id: 'corporateSponsor',
-    name: 'Corporate Sponsor',
-    displayName: 'Corporate Sponsor',
+    id: 'corporateSponsor', // Keep ID for backward compatibility
+    name: 'Corporate Ecosystem',
+    displayName: 'Corporate Ecosystem',
     price: 1000,
     currency: 'USD',
     billing: 'annual',
@@ -44,14 +44,14 @@ export const PRODUCT_CATALOG: Product[] = [
     dealValue: 1000, // Annual, so monthly = 83.33
   },
   {
-    id: 'featureVoter',
-    name: 'Feature Voter',
-    displayName: 'Feature Voter',
+    id: 'featureVoter', // Keep ID for backward compatibility
+    name: 'Developer Utility',
+    displayName: 'Developer Utility',
     price: 200,
     currency: 'USD',
     billing: 'annual',
     targetAudience: 'Power Users',
-    aiPitchStrategy: 'Priority feature requests, insider Discord access. For developers who want to shape the product roadmap.',
+    aiPitchStrategy: 'Priority feature requests, insider Discord access, unlimited API calls for stock prices and market data. For developers who want to shape the product roadmap.',
     stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FEATURE_VOTER_ANNUAL || 'price_1SgPHJD4sftWa1WtW03Tzald',
     dealValue: 200, // Annual, so monthly = 16.67
   },

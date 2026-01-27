@@ -203,7 +203,7 @@ export default function AdminSalesStrategyPage() {
                   <br />
                   <strong>Focus:</strong> White Label Portal for IFAs. No sponsorship pitches.
                   <br />
-                  <strong>Product Selection:</strong> Corporate Sponsor ($1,000/year) - Includes White Label features
+                  <strong>Product Selection:</strong> Corporate Ecosystem ($1,000/year) - Includes White Label features
                 </p>
               </div>
 
@@ -339,7 +339,7 @@ export default function AdminSalesStrategyPage() {
                   Product Focus
                 </div>
                 <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                  Corporate Sponsor ($1,000/year) - White Label Portal with Sovereign Client Dashboard
+                  Corporate Ecosystem ($1,000/year) - White Label Portal with Sovereign Client Dashboard
                 </div>
               </div>
               <div style={{ padding: 'var(--space-3)', backgroundColor: 'var(--surface-elevated)', borderRadius: 'var(--radius-sm)' }}>
@@ -410,8 +410,8 @@ Pocket Portfolio is a LOCAL-FIRST portfolio tracking platform.
 
 ACTIVE PRODUCTS (ONLY PITCH THESE):
 - Founder's Club: £100 (lifetime)
-- Corporate Sponsor: $1,000/year
-- Feature Voter: $200/year
+- Corporate Ecosystem: $1,000/year
+- Developer Utility: $200/year
 - Code Supporter: $50/year
 
 REQUIREMENTS:

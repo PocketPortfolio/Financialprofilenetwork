@@ -631,7 +631,7 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '8px' }}>
-                    💡 Use this key for unlimited API calls in the Google Sheets formula generator
+                    💡 Use this key for unlimited API calls across all endpoints (stock prices, market data, historical data, etc.)
                   </div>
                 </div>
               )}

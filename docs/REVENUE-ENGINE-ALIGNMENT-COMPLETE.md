@@ -22,7 +22,7 @@ The revenue engine has been fully aligned with the **real Stripe product catalog
 - 4 real products defined:
   - **Founder's Club**: £100 lifetime
   - **Corporate Sponsor**: $1,000/year
-  - **Feature Voter**: $200/year
+  - **Developer Utility**: $200/year
   - **Code Supporter**: $50/year
 - Dynamic product selection based on lead context
 - Monthly revenue value calculation

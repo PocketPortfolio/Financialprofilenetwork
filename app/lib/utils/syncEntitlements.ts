@@ -52,9 +52,11 @@ export function getSyncEntitlements(tier: Tier): SyncEntitlements {
 export function getTierDisplayName(tier: Tier): string {
   switch (tier) {
     case 'corporateSponsor':
-      return 'Corporate Sponsor';
+      return 'Corporate Ecosystem';
     case 'foundersClub':
       return "UK Founder's Club";
+    case 'featureVoter':
+      return 'Developer Utility';
     default:
       return 'Premium Tier';
   }

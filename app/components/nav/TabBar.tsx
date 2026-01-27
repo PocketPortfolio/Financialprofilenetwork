@@ -215,7 +215,7 @@ const tabs: TabItem[] = [
   },
   {
     id: 'sponsor',
-    label: 'Sponsor',
+    label: 'Utility',
     href: '/sponsor',
     icon: <SponsorIcon isActive={false} />,
     ariaLabel: 'Support Pocket Portfolio',

@@ -247,33 +247,76 @@ export async function GET(
     );
   }
   
+  // Get API key from query parameter (optional)
+  const apiKey = request.nextUrl.searchParams.get('key');
+  const DEMO_KEY = 'demo_key';
+  
   // Get client IP for rate limiting
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
              request.headers.get('x-real-ip') || 
              'unknown';
   
-  // Check rate limit using distributed KV storage
-  const rateLimitResult = await checkRateLimit(ip);
-  
-  if (!rateLimitResult.allowed) {
-    const retryAfter = Math.max(0, rateLimitResult.resetTime - Math.floor(Date.now() / 1000));
-    return NextResponse.json(
-      { 
-        error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
-        limit: FREE_TIER_LIMIT,
-        window: '1 hour',
-        retryAfter: retryAfter
-      },
-      { 
-        status: 429,
-        headers: {
-          'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
-          'Retry-After': String(retryAfter)
+  // Check if user has a valid paid API key (bypasses rate limiting)
+  let hasValidApiKey = false;
+  if (apiKey && apiKey !== DEMO_KEY) {
+    try {
+      const { getFirestore } = await import('firebase-admin/firestore');
+      const { initializeApp, getApps, cert } = await import('firebase-admin/app');
+      
+      // Initialize Firebase Admin if not already done
+      if (!getApps().length) {
+        try {
+          initializeApp({
+            credential: cert({
+              projectId: process.env.FIREBASE_PROJECT_ID,
+              clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+              privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            }),
+          });
+        } catch (error) {
+          console.error('Firebase Admin initialization error:', error);
         }
       }
-    );
+      
+      const db = getFirestore();
+      const apiKeySnapshot = await db.collection('apiKeysByEmail')
+        .where('apiKey', '==', apiKey)
+        .limit(1)
+        .get();
+      
+      hasValidApiKey = !apiKeySnapshot.empty;
+    } catch (error) {
+      console.error('API key validation error:', error);
+      // Fallback: check if key format is valid (pp_ prefix)
+      hasValidApiKey = apiKey.startsWith('pp_');
+    }
+  }
+  
+  // Only apply rate limiting for free tier (no API key or demo key)
+  let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
+  if (!hasValidApiKey) {
+    rateLimitResult = await checkRateLimit(ip);
+    
+    if (!rateLimitResult.allowed) {
+      const retryAfter = Math.max(0, rateLimitResult.resetTime - Math.floor(Date.now() / 1000));
+      return NextResponse.json(
+        { 
+          error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
+          limit: FREE_TIER_LIMIT,
+          window: '1 hour',
+          retryAfter: retryAfter
+        },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
+            'Retry-After': String(retryAfter)
+          }
+        }
+      );
+    }
   }
 
   // Get optional query parameters
@@ -312,15 +355,22 @@ export async function GET(
       }
     };
 
-    return NextResponse.json(response, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200', // Cache for 1 hour, stale for 2 hours
-        'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
-        'X-RateLimit-Remaining': String(rateLimitResult.remaining),
-        'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
-      },
-    });
+    // Set rate limit headers (unlimited for paid users)
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200', // Cache for 1 hour, stale for 2 hours
+    };
+    
+    if (hasValidApiKey) {
+      headers['X-RateLimit-Limit'] = 'unlimited';
+      headers['X-RateLimit-Remaining'] = 'unlimited';
+    } else if (rateLimitResult) {
+      headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+      headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
+      headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
+    }
+    
+    return NextResponse.json(response, { headers });
   } catch (error: any) {
     console.error(`Error fetching ticker data for ${ticker}:`, error);
     return NextResponse.json(

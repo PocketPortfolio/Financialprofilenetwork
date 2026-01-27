@@ -177,7 +177,7 @@ function buildPrompt(
   const ctaLinks: Record<string, string> = {
     'foundersClub': `${baseUrl}/sponsor?ref=pilot&tier=founder`,
     'corporateSponsor': `${baseUrl}/sponsor?ref=pilot&tier=corporate`,
-    'featureVoter': `${baseUrl}/sponsor?ref=pilot&tier=feature-voter`,
+    'featureVoter': `${baseUrl}/sponsor?ref=pilot&tier=developer-utility`,
     'codeSupporter': `${baseUrl}/sponsor?ref=pilot&tier=code-supporter`,
   };
 

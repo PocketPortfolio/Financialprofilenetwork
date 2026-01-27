@@ -46,13 +46,13 @@ We use industry-standard encryption (AES-256) and follow security best practices
     answer: `Our pricing supports the open-source project:
 
 - **Founder's Club**: £100 one-time lifetime license (perfect for CTOs and early adopters)
-- **Corporate Sponsor**: $1,000/year (for fintechs and agencies - logo on repo, premium badge)
-- **Feature Voter**: $200/year (priority feature requests, insider Discord)
+- **Corporate Ecosystem**: $1,000/year (for fintechs and agencies - logo on repo, premium badge)
+- **Developer Utility**: $200/year (priority feature requests, insider Discord, unlimited API calls)
 - **Code Supporter**: $50/year (support the project, get a badge)
 
 Core functionality is FREE. Sponsorships help us maintain the open-source project and add features.
 
-The Founder's Club is ideal if you want lifetime access and to influence the roadmap. Corporate Sponsorships are perfect for companies building financial products who want to align with privacy-first infrastructure.
+The Founder's Club is ideal if you want lifetime access and to influence the roadmap. Corporate Ecosystem memberships are perfect for companies building financial products who want to align with privacy-first infrastructure.
 
 Would you like to learn more about which option fits your needs?`,
     confidence: 0.95,
@@ -86,10 +86,10 @@ Our API is designed to integrate seamlessly with your existing infrastructure. I
 
 - **Documentation**: Full API docs and guides at https://pocketportfolio.app/docs
 - **Email Support**: Response within 24 hours (usually faster)
-- **Priority Support**: For Corporate Sponsors and Feature Voters
+- **Priority Support**: For Corporate Ecosystem members and Developer Utility users
 - **Community Discord**: Insider access for sponsors
 
-All plans include email support. Corporate Sponsors and Feature Voters get priority response times and access to our community Discord.`,
+All plans include email support. Corporate Ecosystem members and Developer Utility users get priority response times and access to our community Discord.`,
     confidence: 0.90,
   },
   {
@@ -103,7 +103,7 @@ Core features are completely free:
 - Google Drive sync
 - Local-first architecture
 
-Sponsorships (Founder's Club, Corporate Sponsor, etc.) are optional and help support the open-source project. They unlock additional perks like priority feature requests and community access, but aren't required to use the platform.
+Sponsorships (Founder's Club, Corporate Ecosystem, etc.) are optional and help support the open-source project. They unlock additional perks like priority feature requests and community access, but aren't required to use the platform.
 
 Would you like me to send you setup instructions?`,
     confidence: 0.95,

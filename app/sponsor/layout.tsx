@@ -3,7 +3,7 @@ import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'Support Pocket Portfolio | Pricing & Sponsorship',
-  description: 'Choose a sponsorship tier: Code Supporter ($50/year), Feature Voter ($200/year), Corporate Sponsor ($1,000/year), or UK Founder\'s Club (£100 lifetime).',
+  description: 'Choose a sponsorship tier: Code Supporter ($50/year), Developer Utility ($200/year), Corporate Ecosystem ($1,000/year), or UK Founder\'s Club (£100 lifetime).',
   openGraph: {
     title: 'Support Pocket Portfolio - Pricing & Sponsorship',
     description: 'Help us build the best open-source portfolio tracker. Choose a tier that works for you.',
@@ -51,17 +51,17 @@ export default function SponsorLayout({
       },
       {
         "@type": "Offer",
-        "name": "Feature Voter (Annual)",
+        "name": "Developer Utility (Annual)",
         "price": "200.00",
         "priceCurrency": "USD",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
-        "description": "Annual subscription at $200/year. Priority access to Roadmap & Insider Discord.",
+        "description": "Annual subscription at $200/year. Priority access to Roadmap & Insider Discord. Unlimited API calls, stock price and market data.",
         "url": "https://www.pocketportfolio.app/sponsor"
       },
       {
         "@type": "Offer",
-        "name": "Corporate Sponsor (Annual)",
+        "name": "Corporate Ecosystem (Annual)",
         "price": "1000.00",
         "priceCurrency": "USD",
         "priceValidUntil": "2026-12-31",
