@@ -345,14 +345,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Monitoring Agent Overhead - Data Collection Impact",
     "slug": "research-monitoring-agent-overhead-data-collection-impact-2026-01-28",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "monitoring",
       "agent",
       "overhead"
-    ]
+    ],
+    "videoId": "fTR4S81Alt4",
+    "publishedAt": "2026-01-28T18:23:11.405Z"
   },
   {
     "id": "research-ci-cd-pipeline-duration-optimization-techniques-2026-01-29",
