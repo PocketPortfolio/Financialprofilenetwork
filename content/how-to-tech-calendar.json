@@ -395,14 +395,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use \"Just-in-Time\" Static Generation",
     "slug": "how-to-use-just-in-time-static-generation",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "just",
       "time"
-    ]
+    ],
+    "publishedAt": "2026-01-28T14:24:17.596Z"
   },
   {
     "id": "how-to-protecting-your-api-from-ddos-a-quick-primer-jan-29",

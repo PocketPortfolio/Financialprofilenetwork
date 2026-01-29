@@ -1,0 +1,53 @@
+---
+title: How to Use 'Just-in-Time' Static Generation
+date: '2026-01-28'
+description: >-
+  Learn how to use Just-in-Time static generation to improve website performance
+  and SEO with this concise guide.
+tags:
+  - use
+  - just
+  - time
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-just-in-time-static-generation.png
+pillar: technical
+category: how-to-in-tech
+---
+
+In modern web development, delivering optimized content quickly is crucial for both user experience and search engine rankings. However, pre-generating static pages for every possible state can be impractical for dynamic applications. Enter "Just-in-Time" static generation, a solution that blends the benefits of static generation with the dynamism of server-side rendering.
+
+### Direct Solution with Code
+
+To implement Just-in-Time static generation, we'll use Next.js, a React framework that supports this feature out of the box through Incremental Static Regeneration (ISR). The key is to define revalidation times for your pages, allowing them to be regenerated on-demand and cached until the next request after a specified period.
+
+```js
+x
+export async function getStaticProps() {
+  const data = await fetchData(); // Your data fetching logic here
+  return {
+    props: {
+      data,
+    },
+    // Revalidate every 10 seconds for fresh data
+    revalidate: 10, 
+  };
+}
+```
+
+In this example, `getStaticProps` fetches your page's data and specifies that the page should be revalidated every 10 seconds. This means the server will render the page statically on the first request and serve the static file for subsequent requests within the 10-second window. After 10 seconds, the next request triggers a page regeneration, ensuring the content is up-to-date.
+
+### Explanation of Key Concepts
+
+**Static Generation**: Pre-rendering pages at build time. Pages are served as static HTML, improving load times and SEO.
+
+**Incremental Static Regeneration (ISR)**: A feature of Next.js that allows pages to be regenerated on-demand after deployment. This approach provides the best of both worlds: the speed of static generation and the flexibility of server-side rendering.
+
+### Quick Tip
+
+Be mindful of the revalidation time (`revalidate` property) you set. A lower value means more frequent updates and fresher content but can lead to increased server load. Conversely, a higher value reduces server load but may serve stale content. Find a balance based on your application's needs and content update frequency.
+
+### Gotcha
+
+While Just-in-Time static generation offers many benefits, it may not be suitable for all types of content. Highly dynamic content that changes on every request (e.g., user-specific data) might be better served using traditional server-side rendering or client-side fetching strategies.
+
+Just-in-Time static generation strikes a balance, offering improved performance without sacrificing content freshness. It's a powerful tool in the modern web developer's arsenal, enabling scalable, efficient, and user-friendly web applications.
