@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.pocketportfolio.app/blog</loc>
-    <lastmod>2026-01-27</lastmod>
+    <lastmod>2026-01-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -133,6 +133,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-use-just-in-time-static-generation</loc>
+    <lastmod>2026-01-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/how-to-use-llms-txt-to-control-ai-context</loc>
     <lastmod>2026-01-24</lastmod>
     <changefreq>weekly</changefreq>
@@ -177,6 +183,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/realised-vs-unrealised-p-l-money-in-your-pocket-vs-money-on-</loc>
     <lastmod>2025-10-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-api-rate-limiting-algorithms-token-bucket-vs-sliding-window-2026-01-27</loc>
+    <lastmod>2026-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -403,6 +415,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/research-monitoring-agent-overhead-data-collection-impact-2026-01-28</loc>
+    <lastmod>2026-01-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/research-search-engine-scalability-elasticsearch-cluster-performance-2026-01-16</loc>
     <lastmod>2026-01-16</lastmod>
     <changefreq>weekly</changefreq>
@@ -465,6 +483,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/the-absolute-basics-of-local-first-data-architecture</loc>
     <lastmod>2026-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/the-architecture-of-sovereign-sync-how-it-really-works</loc>
+    <lastmod>2026-01-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -192,6 +192,29 @@ export default function ToolFooter() {
             >
               eToro → OpenBrokerCSV
             </Link>
+            <Link
+              href="/tools/risk-pages"
+              style={{
+                padding: '12px 24px',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                color: 'var(--text)',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#D97706';
+                e.currentTarget.style.color = '#D97706';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.color = '#1a1a1a';
+              }}
+            >
+              Track Stock Risk (15K+ Pages)
+            </Link>
           </div>
 
           {/* The Trust Links */}

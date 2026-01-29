@@ -85,6 +85,13 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9, // High priority because it's a lead magnet
     },
+    // ✅ Risk Pages Browser (15K+ Pages Hub)
+    {
+      url: `${baseUrl}/tools/risk-pages`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85, // High priority for SEO (15K+ pages hub)
+    },
     // ✅ Tools Index Page (Lists all tools including tax converters)
     {
       url: `${baseUrl}/tools`,

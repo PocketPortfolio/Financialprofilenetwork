@@ -148,6 +148,27 @@ export default function LandingFooter() {
                 New
               </span>
             </Link>
+            <Link href="/tools/risk-pages" style={{ 
+              padding: '10px 20px', 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              Track Stock Risk (15K+ Pages)
+            </Link>
             <Link href="/tools/google-sheets-formula" style={{ 
               padding: '10px 20px', 
               border: '1px solid var(--border)', 

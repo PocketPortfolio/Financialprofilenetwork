@@ -452,6 +452,21 @@ export default function GlobalFooter() {
               </li>
               <li>
                 <Link
+                  href="/tools/risk-pages"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Track Stock Risk (15K+ Pages)
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/tools/google-sheets-formula"
                   style={{
                     color: 'var(--text-secondary)',
