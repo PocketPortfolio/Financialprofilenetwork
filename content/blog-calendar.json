@@ -292,7 +292,7 @@
     "date": "2026-01-29",
     "title": "The Architecture of Sovereign Sync: How It Really Works",
     "slug": "the-architecture-of-sovereign-sync-how-it-really-works",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -302,7 +302,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-01-29T09:53:23.283Z"
   },
   {
     "id": "week-5-post-1",
