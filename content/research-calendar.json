@@ -362,14 +362,16 @@
     "scheduledTime": "18:00",
     "title": "Research: CI/CD Pipeline Duration - Optimization Techniques",
     "slug": "research-ci-cd-pipeline-duration-optimization-techniques-2026-01-29",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "pipeline",
       "duration",
       "optimization"
-    ]
+    ],
+    "videoId": "scEDHsr3APg",
+    "publishedAt": "2026-01-29T18:29:56.526Z"
   },
   {
     "id": "research-container-image-size-impact-build-optimization-2026-01-30",
