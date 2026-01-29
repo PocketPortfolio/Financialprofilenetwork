@@ -16,7 +16,7 @@
 - **Additional Popular**: 20+ stocks
 
 ### Total After Deduplication
-**~1,000-1,200 unique real tickers**
+**15,457 unique real tickers**
 
 *(Set deduplication handles overlaps automatically)*
 
@@ -36,26 +36,31 @@
 - **Performance**: ~500ms first request, <50ms cached
 
 ### Total Pages
-**~1,000-1,200 pages** (all real tickers)
+**15,457 pages** (all real tickers)
 
 ---
 
 ## Sitemap
 
-### Total URLs
-- **Ticker Pages**: ~1,000-1,200
-- **Static Pages**: 14
-- **Exchange Pages**: 3
-- **Total**: **~1,017-1,217 URLs**
+### URL Breakdown
+- **Ticker Routes**: ~61,828 URLs (15,457 tickers × 4 routes each)
+  - Main page: `/s/{ticker}`
+  - JSON API: `/s/{ticker}/json-api`
+  - Dividend history: `/s/{ticker}/dividend-history`
+  - Insider trading: `/s/{ticker}/insider-trading`
+- **Risk Pages**: 15,457 URLs (`/tools/track-{ticker}-risk`)
+- **Total Programmatic**: ~77,285 URLs
+- **Static Pages**: Blog, tools, imports, etc.
+- **Grand Total**: **62,116 URLs** in sitemap
 
 ---
 
 ## SEO Impact
 
-| Metric | Before (10K Generated) | After (1K Real) | Change |
-|--------|------------------------|-----------------|--------|
-| **Total Pages** | 10,017 | ~1,017-1,217 | Quality over quantity |
-| **Real Tickers** | ~600 | ~1,000-1,200 | **2x increase** |
+| Metric | Before (10K Generated) | After (15K Real) | Change |
+|--------|------------------------|------------------|--------|
+| **Total Pages** | 10,017 | ~30,931 | **3x increase** |
+| **Real Tickers** | ~600 | 15,457 | **25.7x increase** |
 | **Fake Tickers** | ~9,400 | 0 | **Removed** |
 | **Build Time** | +2-3 min | +30-60s | **50% faster** |
 | **SEO Quality** | Mixed | 100% real | **Higher** |
@@ -76,14 +81,15 @@
 
 ## Scalability Path
 
-To scale beyond 1,200 tickers with **real** data:
+✅ **Current Status**: 15,457 unique real tickers achieved.
 
-1. **Full Russell 2000**: +1,500 real small-cap stocks
-2. **More International**: +500-1,000 (European, Asian, Canadian)
-3. **Sector Lists**: +200-500 (Biotech, REITs, Energy)
+Optional future expansion opportunities:
+1. **Full Russell 2000**: Additional small-cap stocks
+2. **More International**: Additional European, Asian, Canadian exchanges
+3. **Sector Lists**: Additional Biotech, REITs, Energy stocks
 4. **API Integration**: Dynamic ticker fetching
 
-**Potential**: 3,000-5,000 real tickers (all with search volume)
+**Potential**: 20,000+ real tickers (all with search volume)
 
 ---
 

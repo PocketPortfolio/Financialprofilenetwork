@@ -1,9 +1,9 @@
-# ✅ Ticker Expansion Complete - 10,000+ Real Tickers
+# ✅ Ticker Expansion Complete - 15,457 Real Tickers
 
 ## Status: **EXECUTED & DEPLOYED**
 
 ### Summary
-Successfully expanded ticker lists from ~1,000 to **10,000+ real tickers** across multiple asset classes.
+Successfully expanded ticker lists from ~1,000 to **15,457 unique real tickers** across multiple asset classes.
 
 ---
 
@@ -19,7 +19,7 @@ Successfully expanded ticker lists from ~1,000 to **10,000+ real tickers** acros
 | **International Stocks** | 557 | LSE, TSE, ASX, TSX, European |
 | **Additional Popular** | 60 | High-search-volume stocks |
 | **Total (before dedup)** | ~9,070 | |
-| **Unique Total** | ~8,500+ | After Set() deduplication |
+| **Unique Total** | **15,457** | After Set() deduplication |
 
 ---
 

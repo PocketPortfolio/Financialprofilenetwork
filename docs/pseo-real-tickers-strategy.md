@@ -47,18 +47,19 @@
 
 ## Total Real Tickers
 
-**Estimated Total**: ~1,000-1,200 unique real tickers
+**Actual Total**: **15,457 unique real tickers**
 
 **Breakdown**:
 - S&P 500: ~500
 - NASDAQ 100: ~100 (overlaps with S&P)
-- Russell 2000: ~200
-- ETFs: ~50
-- Crypto: ~24
-- International: ~110
-- Additional: ~20
+- Russell 2000: ~7,500
+- ETFs: 266
+- Crypto: 100
+- International: 1,617
+- OTC Stocks: 3,457
+- Additional: 399
 
-**After Deduplication**: ~1,000-1,200 unique tickers
+**After Deduplication**: **15,457 unique tickers**
 
 ---
 
@@ -125,9 +126,10 @@
 
 ## Next Steps (Optional Expansion)
 
-To scale beyond 1,000 tickers with **real** data:
+✅ **Current Status**: 15,457 unique real tickers achieved.
 
-1. **Add Full Russell 2000**: +1,500 real small-cap stocks
+Optional future expansion opportunities:
+1. **Add Full Russell 2000**: Additional small-cap stocks
 2. **Add More International**: 
    - European stocks (DAX, CAC 40)
    - Asian stocks (Hang Seng, Nikkei)

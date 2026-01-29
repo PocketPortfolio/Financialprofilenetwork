@@ -10,7 +10,7 @@ All ticker pages (`/s/[symbol]`) are now **fully SEO-optimized** with real-time 
 
 ### Key Achievement
 ✅ **Real-time stock data is now visible to search engines** - No more "Loading..." text in HTML source  
-✅ **All 10,000+ ticker pages** will display real-time data when visited  
+✅ **All 15,457 ticker pages** will display real-time data when visited  
 ✅ **Zero SEO impact** - Server-side data fetching during ISR revalidation ensures crawlers see real data
 
 ---
@@ -99,7 +99,7 @@ All ticker pages (`/s/[symbol]`) are now **fully SEO-optimized** with real-time 
 |---------|--------|--------------|
 | **ISR (Incremental Static Regeneration)** | ✅ Active | 6-hour revalidation (`revalidate: 21600`) |
 | **Static Generation** | ✅ Active | Top 500 tickers pre-generated at build |
-| **Dynamic Routing** | ✅ Active | All 10,000+ tickers supported via ISR |
+| **Dynamic Routing** | ✅ Active | All 15,457 tickers supported via ISR |
 | **Sitemap** | ✅ Active | Dynamic sitemap with all ticker pages |
 | **Robots.txt** | ✅ Active | Properly configured |
 | **Mobile Responsive** | ✅ Active | Fully responsive design |
@@ -208,7 +208,7 @@ With real-time data in HTML source, pages are eligible for:
 ## Scalability
 
 ### Current Capacity
-- ✅ **10,000+ ticker pages** supported
+- ✅ **15,457 ticker pages** supported
 - ✅ **500 tickers** pre-generated at build
 - ✅ **ISR** handles remaining on-demand
 - ✅ **Dynamic sitemap** scales automatically
@@ -266,7 +266,7 @@ All ticker pages are now **fully optimized for search engines** with:
 3. **Dynamic metadata** - Unique titles, descriptions, keywords per ticker
 4. **Internal linking** - Automatic link graph for crawl budget optimization
 5. **Fast performance** - Static HTML with ISR for optimal Core Web Vitals
-6. **Scalability** - Supports 10,000+ pages with room for expansion
+6. **Scalability** - Supports 15,457 pages with room for expansion
 
 ### Key Achievement
 
