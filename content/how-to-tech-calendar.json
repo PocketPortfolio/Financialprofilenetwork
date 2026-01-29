@@ -411,14 +411,15 @@
     "scheduledTime": "14:00",
     "title": "Protecting Your API from DDoS: A Quick Primer",
     "slug": "protecting-your-api-from-ddos-a-quick-primer",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "protecting",
       "your"
-    ]
+    ],
+    "publishedAt": "2026-01-29T14:34:11.860Z"
   },
   {
     "id": "how-to-how-to-write-a-robot-resume-for-your-website-jan-30",
