@@ -42,6 +42,46 @@ const concepts = [
     tool: '/',
     toolName: 'Learn More',
     category: 'Philosophy'
+  },
+  {
+    slug: 'realised-vs-unrealised',
+    title: 'Realised vs Unrealised P&L',
+    definition: 'Realised gains/losses are profits or losses from actual sales of assets. Unrealised gains/losses are paper profits/losses on assets you still own. Understanding the difference is crucial for tax planning and portfolio assessment.',
+    tool: '/dashboard',
+    toolName: 'Portfolio Dashboard',
+    category: 'Tax & Accounting'
+  },
+  {
+    slug: 'dollar-cost-averaging',
+    title: 'Dollar-Cost Averaging',
+    definition: 'An investment strategy where you invest a fixed amount regularly regardless of price, reducing the impact of volatility and eliminating the need to time the market.',
+    tool: '/blog/dollar-cost-averaging-vs-lump-sum-a-data-driven-analysis',
+    toolName: 'DCA Analysis',
+    category: 'Investment Strategy'
+  },
+  {
+    slug: 'local-first',
+    title: 'Local-First Architecture',
+    definition: 'A software design pattern where data is stored and processed on the user\'s device first, with optional cloud sync. This ensures privacy, offline functionality, and user data sovereignty.',
+    tool: '/blog/stop-building-fintech-with-databases-why-i-went-local-first-',
+    toolName: 'Architecture Guide',
+    category: 'Architecture'
+  },
+  {
+    slug: 'vendor-lock-in',
+    title: 'Vendor Lock-In',
+    definition: 'The situation where switching from one service provider to another is difficult or costly due to proprietary formats, APIs, or data structures. Local-first architecture prevents this.',
+    tool: '/blog/the-death-of-the-cloud-portfolio-why-vendor-lock-in-kills-fi',
+    toolName: 'Learn More',
+    category: 'Philosophy'
+  },
+  {
+    slug: 'json-finance',
+    title: 'JSON Finance Standard',
+    definition: 'An open standard for representing financial data in JSON format, enabling interoperability between financial tools and eliminating proprietary data formats.',
+    tool: '/blog/json-finance-the-open-standard-that-breaks-wall-street-s-gri',
+    toolName: 'JSON Standard',
+    category: 'Data Standards'
   }
 ];
 

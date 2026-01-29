@@ -2,6 +2,36 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // #region agent log - DISABLED FOR PRODUCTION (causes timeouts during rapid testing)
+  // const logData = {pathname:request.nextUrl.pathname,timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug',hypothesisId:'D'};
+  // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:5',message:'Middleware invoked',data:logData,...logData})}).catch(()=>{});
+  // #endregion
+  
+  // Rewrite programmatic risk pages: /tools/track-{ticker}-risk -> /tools/track/{ticker}
+  // Remove "-risk" suffix so route folder track-[ticker] can match with ticker param
+  // Only match the original URL pattern, not the rewritten one (avoid infinite loop)
+  const riskPageMatch = request.nextUrl.pathname.match(/^\/tools\/track-([a-z0-9]+)-risk$/i);
+  
+  // #region agent log - DISABLED FOR PRODUCTION
+  // const logCheck = {location:'middleware.ts:13',message:'Risk page pattern check',data:{pathname:request.nextUrl.pathname,matched:!!riskPageMatch,matchResult:riskPageMatch?.[1]},timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug-v5',hypothesisId:'I'};
+  // console.warn('[MIDDLEWARE] Risk page check', logCheck.data);
+  // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logCheck)}).catch(()=>{});
+  // #endregion
+  
+  if (riskPageMatch) {
+    const ticker = riskPageMatch[1];
+    const url = request.nextUrl.clone();
+    // Rewrite to /tools/track/{ticker} (without -risk suffix)
+    url.pathname = `/tools/track/${ticker}`;
+    
+    // #region agent log - DISABLED FOR PRODUCTION
+    // const logRewrite = {location:'middleware.ts:22',message:'Rewriting risk page URL',data:{original:request.nextUrl.pathname,rewritten:url.pathname,ticker},timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug-v5',hypothesisId:'I'};
+    // console.warn('[MIDDLEWARE] Rewriting', logRewrite.data);
+    // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logRewrite)}).catch(()=>{});
+    // #endregion
+    
+    return NextResponse.rewrite(url);
+  }
 
   // Allow OG image route to be accessed by social media crawlers with CORS
   if (request.nextUrl.pathname === '/api/og') {
