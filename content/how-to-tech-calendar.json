@@ -427,14 +427,15 @@
     "scheduledTime": "14:00",
     "title": "How to Write a \"Robot Resume\" for Your Website",
     "slug": "how-to-write-a-robot-resume-for-your-website",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "write",
       "robot",
       "resume"
-    ]
+    ],
+    "publishedAt": "2026-01-30T14:29:48.511Z"
   },
   {
     "id": "how-to-the-tech-stack-of-a-zero-data-application-jan-31",
