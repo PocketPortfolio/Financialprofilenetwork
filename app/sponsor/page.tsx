@@ -353,6 +353,22 @@ export default function SponsorPage() {
           e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
         }}
         >
+          {/* Archetype Icon - "The Contributor" */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <img 
+              src="/brand/archetype-code-supporter.svg" 
+              alt="The Contributor"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+          </div>
+          
           <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
             Code Supporter
           </h3>
@@ -424,6 +440,23 @@ export default function SponsorPage() {
           }}>
             Popular
           </div>
+          
+          {/* Archetype Icon - "The Builder" */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <img 
+              src="/brand/archetype-developer-utility.svg" 
+              alt="The Builder"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+          </div>
+          
           <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
             Developer Utility
           </h3>
@@ -508,6 +541,22 @@ export default function SponsorPage() {
           e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
         }}
         >
+          {/* Archetype Icon - "The Institution" */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <img 
+              src="/brand/archetype-corporate-ecosystem.svg" 
+              alt="The Institution"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
+          </div>
+          
           <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
             Corporate Ecosystem
           </h3>
@@ -673,6 +722,22 @@ export default function SponsorPage() {
             }}>
               Limited Edition
             </div>
+          </div>
+
+          {/* Archetype Icon - "The Sovereign" */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <img 
+              src="/brand/archetype-founders-club.svg" 
+              alt="The Sovereign"
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
           </div>
 
           <h3 style={{ 

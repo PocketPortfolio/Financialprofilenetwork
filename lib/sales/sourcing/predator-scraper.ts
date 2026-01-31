@@ -936,6 +936,7 @@ async function processCity(
         
         // Validate email before using it
         let isValidEmail = false;
+        const originalEmail = email; // Store for debugging
         if (email) {
           isValidEmail = !email.includes('sentry') && 
                          !email.includes('example.com') && 
@@ -947,25 +948,25 @@ async function processCity(
                          !email.includes('subject='); // Reject share link params
         }
         
-        // If email found but invalid, try constructing from name as fallback
-        if (email && !isValidEmail && nameParts.length >= 2) {
-          const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
-          const lastName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '');
-          if (firstName.length > 0 && lastName.length > 0) {
-            email = `${firstName}.${lastName}@sjpp.co.uk`;
-            isValidEmail = true; // Constructed emails are considered valid
-            extractionStats.emailConstructed++;
-          } else {
-            email = null; // Clear invalid email
-          }
+        // If email found but invalid, clear it and construct from name as fallback
+        if (email && !isValidEmail) {
+          email = null; // Clear invalid email so we can construct from name
         }
         
-        // If still no email, construct from name (common pattern: firstname.lastname@sjpp.co.uk)
+        // If no valid email, construct from name (common pattern: firstname.lastname@sjpp.co.uk)
         if (!email && nameParts.length >= 2) {
           const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
           const lastName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '');
           if (firstName.length > 0 && lastName.length > 0) {
             email = `${firstName}.${lastName}@sjpp.co.uk`;
+            isValidEmail = true;
+            extractionStats.emailConstructed++;
+          }
+        } else if (!email && nameParts.length === 1) {
+          // Fallback for single-name cases: use name@sjpp.co.uk
+          const name = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
+          if (name.length > 0) {
+            email = `${name}@sjpp.co.uk`;
             isValidEmail = true;
             extractionStats.emailConstructed++;
           }

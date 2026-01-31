@@ -1,0 +1,24 @@
+<!-- Corporate Ecosystem Archetype: "The Institution" - Network Node + Shield -->
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="institutionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+  <!-- Background rounded square -->
+  <rect x="4" y="4" width="72" height="72" rx="12" fill="url(#institutionGrad)" stroke="#f59e0b" stroke-width="2"/>
+  <!-- Central shield -->
+  <path d="M40 20 L30 25 L30 35 C30 45 35 50 40 55 C45 50 50 45 50 35 L50 25 Z" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Network nodes (outer) -->
+  <circle cx="20" cy="25" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <circle cx="60" cy="25" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <circle cx="20" cy="55" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <circle cx="60" cy="55" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <!-- Connection lines to center -->
+  <line x1="25" y1="25" x2="35" y2="30" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="55" y1="25" x2="45" y2="30" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="25" y1="55" x2="35" y2="50" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="55" y1="55" x2="45" y2="50" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+

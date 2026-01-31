@@ -1,0 +1,26 @@
+<!-- Code Supporter Archetype: "The Contributor" - Git Commit Graph -->
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="contributorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#contributorGrad)" stroke="#f59e0b" stroke-width="2"/>
+  <!-- Git commit graph nodes -->
+  <circle cx="25" cy="30" r="4" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <circle cx="40" cy="25" r="4" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <circle cx="55" cy="30" r="4" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <circle cx="30" cy="45" r="4" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <circle cx="50" cy="45" r="4" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <circle cx="40" cy="55" r="4" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <!-- Connection lines -->
+  <line x1="25" y1="30" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="25" x2="55" y2="30" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="25" y1="30" x2="30" y2="45" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="55" y1="30" x2="50" y2="45" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="30" y1="45" x2="40" y2="55" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <line x1="50" y1="45" x2="40" y2="55" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</svg>
+

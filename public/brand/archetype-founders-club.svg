@@ -1,0 +1,25 @@
+<!-- Founder's Club Archetype: "The Sovereign" - Golden Key -->
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sovereignGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:0.15" />
+    </linearGradient>
+    <linearGradient id="keyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b" />
+      <stop offset="100%" style="stop-color:#d97706" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="38" fill="url(#sovereignGrad)" stroke="#f59e0b" stroke-width="2"/>
+  <!-- Key head (circular) -->
+  <circle cx="40" cy="30" r="10" fill="url(#keyGrad)" stroke="white" stroke-width="2"/>
+  <!-- Key shaft -->
+  <rect x="38" y="30" width="4" height="28" rx="2" fill="url(#keyGrad)" stroke="white" stroke-width="1.5"/>
+  <!-- Key teeth (bottom) -->
+  <rect x="32" y="52" width="16" height="4" rx="2" fill="url(#keyGrad)" stroke="white" stroke-width="1.5"/>
+  <rect x="36" y="56" width="8" height="4" rx="2" fill="url(#keyGrad)" stroke="white" stroke-width="1.5"/>
+  <!-- Keyhole in head -->
+  <circle cx="40" cy="30" r="4" fill="none" stroke="white" stroke-width="1.5"/>
+</svg>
+
