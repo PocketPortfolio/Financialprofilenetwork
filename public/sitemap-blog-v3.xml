@@ -559,6 +559,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/the-tech-stack-of-a-zero-data-application</loc>
+    <lastmod>2026-01-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/the-ultimate-test-verifying-time-based-autonomous-systems</loc>
     <lastmod>2026-01-07</lastmod>
     <changefreq>weekly</changefreq>

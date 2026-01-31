@@ -103,6 +103,8 @@ export default function AdminSalesPage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [loadingLeadDetails, setLoadingLeadDetails] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'fresh' | 'active' | 'archive'>('fresh');
+  const [currentPage, setCurrentPage] = useState(1);
+  const leadsPerPage = 100;
 
   // Tab configuration
   const tabConfig = {
@@ -137,6 +139,17 @@ export default function AdminSalesPage() {
   const filteredLeads = leads.filter(lead => 
     tabConfig[activeTab].statuses.includes(lead.status)
   );
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredLeads.length / leadsPerPage);
+  const startIndex = (currentPage - 1) * leadsPerPage;
+  const endIndex = startIndex + leadsPerPage;
+  const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+
+  // Reset to page 1 when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
 
   // Check admin status
   useEffect(() => {
@@ -805,8 +818,18 @@ export default function AdminSalesPage() {
                         {leads.length === 0 && 'No leads yet. Create your first lead to get started.'}
                       </td>
                     </tr>
+                  ) : paginatedLeads.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} style={{ 
+                        padding: 'var(--space-6)', 
+                        textAlign: 'center', 
+                        color: 'var(--text-secondary)',
+                      }}>
+                        No leads on this page.
+                      </td>
+                    </tr>
                   ) : (
-                    filteredLeads.map((lead) => (
+                    paginatedLeads.map((lead) => (
                       <tr 
                         key={lead.id}
                         style={{ 
@@ -920,6 +943,120 @@ export default function AdminSalesPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {filteredLeads.length > leadsPerPage && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 'var(--space-5)',
+                paddingTop: 'var(--space-4)',
+                borderTop: '1px solid var(--border)',
+                flexWrap: 'wrap',
+                gap: 'var(--space-3)'
+              }}>
+                <div style={{
+                  fontSize: 'var(--font-size-sm)',
+                  color: 'var(--text-secondary)'
+                }}>
+                  Showing {startIndex + 1}-{Math.min(endIndex, filteredLeads.length)} of {filteredLeads.length} leads
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  gap: 'var(--space-2)',
+                  alignItems: 'center'
+                }}>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: 'var(--space-2) var(--space-3)',
+                      backgroundColor: currentPage === 1 ? 'var(--surface-elevated)' : 'var(--surface)',
+                      color: currentPage === 1 ? 'var(--text-secondary)' : 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-sm)',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      fontSize: 'var(--font-size-sm)',
+                      opacity: currentPage === 1 ? 0.5 : 1,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Previous
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  <div style={{
+                    display: 'flex',
+                    gap: 'var(--space-1)',
+                    alignItems: 'center'
+                  }}>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          style={{
+                            padding: 'var(--space-2) var(--space-3)',
+                            backgroundColor: currentPage === pageNum ? 'var(--signal)' : 'var(--surface)',
+                            color: currentPage === pageNum ? 'white' : 'var(--text)',
+                            border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius-sm)',
+                            cursor: 'pointer',
+                            fontSize: 'var(--font-size-sm)',
+                            fontWeight: currentPage === pageNum ? 'var(--font-semibold)' : 'var(--font-medium)',
+                            minWidth: '36px',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (currentPage !== pageNum) {
+                              e.currentTarget.style.backgroundColor = 'var(--surface-elevated)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (currentPage !== pageNum) {
+                              e.currentTarget.style.backgroundColor = 'var(--surface)';
+                            }
+                          }}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    style={{
+                      padding: 'var(--space-2) var(--space-3)',
+                      backgroundColor: currentPage === totalPages ? 'var(--surface-elevated)' : 'var(--surface)',
+                      color: currentPage === totalPages ? 'var(--text-secondary)' : 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-sm)',
+                      cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                      fontSize: 'var(--font-size-sm)',
+                      opacity: currentPage === totalPages ? 0.5 : 1,
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
