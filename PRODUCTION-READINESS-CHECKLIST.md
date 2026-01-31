@@ -159,7 +159,7 @@ The entire pipeline from lead sourcing to email sending is **100% automated** vi
 | `SALES_RATE_LIMIT_PER_DAY` | ⚠️ **OPTIONAL** | enrich-and-email | Rate limiting (defaults to 50, WAR MODE: unlimited) |
 | `KV_REST_API_URL` | ⚠️ **OPTIONAL** | enrich-and-email | Rate limit tracking (WAR MODE: disabled) |
 | `KV_REST_API_TOKEN` | ⚠️ **OPTIONAL** | enrich-and-email | Rate limit tracking (WAR MODE: disabled) |
-| `EMERGENCY_STOP` | ⚠️ **RECOMMENDED** | enrich-and-email | Kill switch (should be added to workflow) |
+| `EMERGENCY_STOP` | ⚠️ **OPTIONAL** | enrich-and-email | Kill switch (database-backed, env var is fallback) |
 
 ---
 
@@ -167,39 +167,27 @@ The entire pipeline from lead sourcing to email sending is **100% automated** vi
 
 ### Current Implementation
 
-**Location:** `scripts/process-leads-autonomous.ts:732-736`
+**Location:** `lib/sales/emergency-stop.ts` (Database-backed)
 
-```typescript
-// Check emergency stop
-if (process.env.EMERGENCY_STOP === 'true') {
-  console.log('⛔ Emergency stop activated - processing halted');
-  return;
-}
-```
+**Status:** ✅ **FULLY IMPLEMENTED** - Database-backed with UI control
 
-**Status:** ✅ **IMPLEMENTED** in script  
-**Issue:** ⚠️ **NOT EXPOSED** in GitHub workflow
+**Implementation Details:**
+- ✅ Database table: `system_settings` (key: `emergency_stop`)
+- ✅ UI button: `/app/admin/sales/page.tsx` (toggles via API)
+- ✅ API endpoint: `/app/api/agent/kill-switch/route.ts` (GET/POST)
+- ✅ Script integration: `scripts/process-leads-autonomous.ts:733` (uses `isEmergencyStopActive()`)
+- ✅ 5-second cache to reduce database queries
+- ✅ Falls back to environment variable if database unavailable
 
-### Required Fix
-
-**Add to `.github/workflows/autonomous-revenue-engine.yml`:**
-
-```yaml
-- name: Enrich leads and send emails
-  env:
-    SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
-    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-    RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-    EMERGENCY_STOP: ${{ secrets.EMERGENCY_STOP || 'false' }}  # ADD THIS LINE
-    SALES_RATE_LIMIT_PER_DAY: ${{ secrets.SALES_RATE_LIMIT_PER_DAY || '50' }}
-    KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
-    KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
-```
+**Workflow Integration:**
+- ✅ `EMERGENCY_STOP` environment variable passed to workflow (line 118)
+- ✅ Falls back to `'false'` if secret not set
+- ✅ Database check takes precedence over environment variable
 
 **Action Required:**
-1. Add `EMERGENCY_STOP` secret to GitHub repository (set to `false` by default)
-2. Update workflow file to pass `EMERGENCY_STOP` environment variable
-3. Test emergency stop by setting secret to `true` and verifying workflow halts
+1. ✅ Database table created (`npm run db:create-system-settings`)
+2. ✅ UI button functional (toggles database value)
+3. ⚠️ **Optional:** Set `EMERGENCY_STOP` secret in GitHub (for fallback only)
 
 ---
 
@@ -251,25 +239,27 @@ if (process.env.EMERGENCY_STOP === 'true') {
 
 ### Required Actions
 
-- [ ] **Add `EMERGENCY_STOP` secret to GitHub repository**
-  - Set to `false` by default
-  - Can be changed to `true` to halt all email sending
+- [x] **Database-backed emergency stop implemented**
+  - ✅ `system_settings` table created
+  - ✅ UI button functional at `/admin/sales`
+  - ✅ API endpoint operational (`/api/agent/kill-switch`)
 
-- [ ] **Update workflow file to pass `EMERGENCY_STOP`**
-  - Add to `enrich-and-email` job environment variables
-  - Default to `'false'` if secret not set
+- [x] **Workflow file updated with `EMERGENCY_STOP`**
+  - ✅ Added to `enrich-and-email` job environment variables (line 118)
+  - ✅ Defaults to `'false'` if secret not set
 
 - [ ] **Verify all required secrets are configured**
   - `SUPABASE_SALES_DATABASE_URL`
   - `OPENAI_API_KEY`
   - `RESEND_API_KEY`
   - `SALES_PROXY_URL` (recommended for Predator Bot)
+  - `EMERGENCY_STOP` (optional - database takes precedence)
 
 - [ ] **Test emergency stop mechanism**
-  - Set `EMERGENCY_STOP=true` in GitHub secrets
+  - Use UI button at `/admin/sales` to toggle emergency stop
   - Trigger workflow manually
   - Verify processing halts with message: "⛔ Emergency stop activated - processing halted"
-  - Set back to `false` after testing
+  - Toggle back to inactive via UI
 
 - [ ] **Verify workflow schedules**
   - Check cron expressions are correct
@@ -379,10 +369,12 @@ if (process.env.EMERGENCY_STOP === 'true') {
 
 ## 🎯 Conclusion
 
-**Status:** ✅ **READY FOR PRODUCTION** (with one minor fix)
+**Status:** ✅ **READY FOR PRODUCTION**
 
-**Required Fix:**
-- Add `EMERGENCY_STOP` environment variable to workflow
+**Recent Updates:**
+- ✅ Database-backed emergency stop implemented
+- ✅ UI control functional
+- ✅ Workflow integration complete
 
 **System Capabilities:**
 - ✅ Fully autonomous from sourcing to email sending
