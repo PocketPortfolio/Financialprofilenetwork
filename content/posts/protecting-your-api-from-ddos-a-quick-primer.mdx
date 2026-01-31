@@ -1,0 +1,64 @@
+---
+title: 'Protecting Your API from DDoS: A Quick Primer'
+date: '2026-01-29'
+description: >-
+  Safeguard your API against DDoS attacks with effective strategies and code
+  examples for robust protection.
+tags:
+  - api
+  - protecting
+  - your
+author: Pocket Portfolio Team
+image: /images/blog/protecting-your-api-from-ddos-a-quick-primer.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Distributed Denial of Service (DDoS) attacks can cripple your API, rendering it unavailable to users. Protecting your API against such threats is crucial for maintaining service reliability and user trust.
+
+### Direct Solution with Code
+
+To shield your API, implement rate limiting and IP filtering. Here’s a quick setup using Node.js and the `express-rate-limit` and `express-ipfilter` packages:
+
+1. **Rate Limiting**
+
+```javascrip
+t
+const rateLimit = require('express-rate-limit');
+
+// Apply rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later."
+});
+
+// Load this middleware with your API routes
+app.use('/api/', apiLimiter);
+```
+
+This code snippet sets up basic rate limiting for your API, allowing a maximum of 100 requests per IP address every 15 minutes.
+
+2. **IP Filtering**
+
+```javascrip
+t
+const ipfilter = require('express-ipfilter').IpFilter;
+const allowedIps = ['123.456.78.90', '98.76.54.32']; // Add your whitelist IPs here
+
+// Apply IP filtering
+app.use(ipfilter(allowedIps, { mode: 'allow' }));
+```
+
+Using `express-ipfilter`, you can whitelist IP addresses that are allowed to access your API, blocking all others by default.
+
+### Explanation of Key Concepts
+
+- **Rate Limiting:** This controls the number of requests a user can make to your API within a set timeframe, preventing overuse.
+- **IP Filtering:** This allows or blocks requests based on the IP address, enabling you to restrict access to trusted sources.
+
+### Quick Tip
+
+While rate limiting and IP filtering are effective against many types of DDoS attacks, they’re not silver bullets. For sophisticated or large-scale attacks, consider using dedicated DDoS protection services like Cloudflare or AWS Shield, which offer advanced features like automatic attack detection and mitigation.
+
+In conclusion, protecting your API from DDoS attacks involves a combination of rate limiting, IP filtering, and potentially third-party protection services. Start with the basics and scale your security measures as needed to ensure your API remains robust and reliable.

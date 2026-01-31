@@ -1,0 +1,68 @@
+---
+title: How to Write a 'Robot Resume' for Your Website
+date: '2026-01-30'
+description: >-
+  Learn how to write a robot resume for your website, ensuring it's ready for
+  SEO and automation tools.
+tags:
+  - write
+  - robot
+  - resume
+author: Pocket Portfolio Team
+image: /images/blog/how-to-write-a-robot-resume-for-your-website.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Ensuring your website is easily understood by search engines and automation tools is akin to writing a resume for a robot. This "robot resume" is crucial for SEO and the smooth operation of various web services.
+
+### Direct Solution with Code
+
+To write a robot resume for your website, you'll primarily work with `robots.txt` and structured data in JSON-LD format. Here's a brief example:
+
+**robots.txt**
+```plaintex
+t
+User-agent: *
+Disallow: /sensitive-data/
+Allow: /
+Sitemap: https://www.yoursite.com/sitemap.xml
+```
+
+**Structured Data (JSON-LD)**
+```jso
+n
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "Your Company",
+  "url": "https://www.yoursite.com",
+  "logo": "https://www.yoursite.com/images/logo.png",
+  "contactPoint": [{
+    "@type": "ContactPoint",
+    "telephone": "+1-800-555-1234",
+    "contactType": "customer service"
+  }],
+  "sameAs": [
+    "https://www.facebook.com/YourCompany",
+    "https://www.twitter.com/YourCompany",
+    "https://www.linkedin.com/company/YourCompany"
+  ]
+}
+</script>
+```
+
+### Explanation of Key Concepts
+
+The `robots.txt` file tells search engines which parts of your website should not be accessed. This is crucial for excluding sensitive data or under-construction pages from search results.
+
+Structured data using JSON-LD (JavaScript Object Notation for Linked Data) provides detailed information about your website to search engines in a readable format. This includes details like your organization's contact information, social media profiles, and more, making your website more comprehensible to "robots."
+
+### Quick Tip
+
+Always validate your JSON-LD using Google's Structured Data Testing Tool to ensure there are no errors and that it's correctly implemented. Misconfigured structured data can lead to missed opportunities in search engine results.
+
+Additionally, regularly review your `robots.txt` file to confirm that it aligns with your current website structure and SEO goals. Old disallow directives might accidentally hide valuable content from search engines.
+
+By effectively writing a "robot resume" for your website, you ensure better visibility and comprehension by search engines, aiding in your overall SEO strategy.

@@ -362,14 +362,16 @@
     "scheduledTime": "18:00",
     "title": "Research: CI/CD Pipeline Duration - Optimization Techniques",
     "slug": "research-ci-cd-pipeline-duration-optimization-techniques-2026-01-29",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "pipeline",
       "duration",
       "optimization"
-    ]
+    ],
+    "videoId": "scEDHsr3APg",
+    "publishedAt": "2026-01-29T18:29:56.526Z"
   },
   {
     "id": "research-container-image-size-impact-build-optimization-2026-01-30",
@@ -377,7 +379,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Container Image Size Impact - Build Optimization",
     "slug": "research-container-image-size-impact-build-optimization-2026-01-30",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -385,7 +387,9 @@
       "container",
       "image",
       "size"
-    ]
+    ],
+    "videoId": "t779DVjCKCs",
+    "publishedAt": "2026-01-30T18:26:39.902Z"
   },
   {
     "id": "research-database-replication-lag-consistency-vs-performance-2026-01-31",
