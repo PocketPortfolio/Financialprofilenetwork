@@ -4,6 +4,7 @@ import SocialShare from './viral/SocialShare';
 import TickerJsonData from './TickerJsonData';
 import TickerStockInfo from './TickerStockInfo';
 import TickerThickContent from './TickerThickContent';
+import CompanyLogo from './CompanyLogo';
 
 interface TickerPageContentProps {
   normalizedSymbol: string;
@@ -78,11 +79,21 @@ export default function TickerPageContent({
           <div style={{ marginBottom: '32px' }}>
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              marginBottom: '16px'
+              alignItems: 'flex-start',
+              gap: '20px',
+              marginBottom: '16px',
+              flexWrap: 'wrap'
             }}>
-              <div style={{ flex: 1 }}>
+              {/* Company Logo */}
+              <CompanyLogo 
+                key={normalizedSymbol} // Force remount when symbol changes
+                symbol={normalizedSymbol}
+                metadata={metadata}
+                name={metadata?.name || normalizedSymbol}
+                size={64}
+              />
+              
+              <div style={{ flex: 1, minWidth: '200px' }}>
                 <h1 style={{
                   fontSize: '30px',
                   fontWeight: '700',
@@ -100,6 +111,7 @@ export default function TickerPageContent({
                   {content.description}
                 </p>
               </div>
+              
               <div style={{ flexShrink: 0 }}>
                 <SocialShare
                   title={content.title}
