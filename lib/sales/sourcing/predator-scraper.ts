@@ -31,10 +31,44 @@ puppeteerExtra.use(StealthPlugin());
 // Get from BrightData, IPRoyal, Smartproxy, etc.
 let PROXY_URL_RAW = process.env.SALES_PROXY_URL || process.env.PROXY_URL;
 
+// Debug: Log proxy URL status (without exposing credentials)
+if (PROXY_URL_RAW) {
+  try {
+    const url = new URL(PROXY_URL_RAW);
+    const maskedUrl = `${url.protocol}//${url.username ? '***' : ''}@${url.hostname}:${url.port || ''}`;
+    console.log(`🔍 Proxy URL detected: ${maskedUrl}`);
+    console.log(`   Protocol: ${url.protocol}`);
+    console.log(`   Hostname: ${url.hostname}`);
+    console.log(`   Port: ${url.port || 'default'}`);
+    console.log(`   Has username: ${!!url.username}`);
+    console.log(`   Has password: ${!!url.password}`);
+  } catch (e) {
+    console.warn(`⚠️  Proxy URL format check failed: ${PROXY_URL_RAW.substring(0, 50)}...`);
+  }
+} else {
+  console.log('🔍 SALES_PROXY_URL: NOT SET');
+  console.log('   Checking process.env.SALES_PROXY_URL:', process.env.SALES_PROXY_URL ? 'SET (but empty?)' : 'undefined');
+  console.log('   Checking process.env.PROXY_URL:', process.env.PROXY_URL ? 'SET (but empty?)' : 'undefined');
+}
+
 // Auto-detect placeholder proxies and disable them
-if (PROXY_URL_RAW && (PROXY_URL_RAW.includes('user123') || PROXY_URL_RAW.includes('proxy-pool.com') || PROXY_URL_RAW.includes('placeholder'))) {
-  console.warn('   ⚠️  Placeholder proxy detected. Disabling proxy to prevent timeouts.');
-  PROXY_URL_RAW = undefined;
+// Only disable if it's clearly a placeholder pattern, not a real proxy URL
+if (PROXY_URL_RAW) {
+  const isPlaceholder = 
+    PROXY_URL_RAW === 'user123' ||
+    PROXY_URL_RAW.includes('user123@proxy-pool.com') ||
+    PROXY_URL_RAW.includes('placeholder@example.com') ||
+    PROXY_URL_RAW.startsWith('http://user123:') ||
+    PROXY_URL_RAW.startsWith('http://placeholder:') ||
+    PROXY_URL_RAW.includes('proxy-pool.com') && PROXY_URL_RAW.includes('user123');
+  
+  if (isPlaceholder) {
+    console.warn('   ⚠️  Placeholder proxy detected. Disabling proxy to prevent timeouts.');
+    console.warn(`   Detected pattern: ${PROXY_URL_RAW.substring(0, 50)}...`);
+    PROXY_URL_RAW = undefined;
+  } else {
+    console.log('✅ Proxy URL passed placeholder check');
+  }
 }
 
 // Parse proxy URL for Chrome flags (native proxy support)
@@ -1391,7 +1425,18 @@ async function processCity(
 }
 
 /**
+ * GUERRILLA MODE: Randomly select a batch of cities to stay under Cloudflare radar
+ * When no proxy is available, process only 5 random cities per run to avoid bans
+ */
+function getGuerillaTargetBatch(allCities: WealthHub[], batchSize: number = 5): WealthHub[] {
+  // Create a shuffled copy of the array
+  const shuffled = [...allCities].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, batchSize);
+}
+
+/**
  * Main Predator Bot V7 function - "One Browser Per City" Protocol
+ * GUERRILLA MODE: When no proxy, randomly select 5 cities to avoid Cloudflare bans
  */
 export async function sourceFromPredator(
   maxLeads?: number
@@ -1402,18 +1447,25 @@ export async function sourceFromPredator(
   console.log('🦅 Predator Bot V7.3: "Force Select Protocol" (The "React State" Fix)');
   console.log(`   Target: ${maxResults} high-intent leads`);
   console.log(`   Strategy: Fresh browser per city → Scrape → Kill → Next city`);
+  
+  // GUERRILLA MODE: If no proxy, use random batch of 5 cities to stay under Cloudflare radar
+  // If proxy is enabled, process all 53 cities
+  const targetCities = PROXY_SERVER 
+    ? UK_WEALTH_HUBS 
+    : getGuerillaTargetBatch(UK_WEALTH_HUBS, 5);
+  
   if (PROXY_SERVER) {
-    console.log(`   🛡️  Proxy: Enabled (${PROXY_SERVER})`);
+    console.log(`   🛡️  Proxy: Enabled (${PROXY_SERVER}) - Processing all ${UK_WEALTH_HUBS.length} cities`);
   } else {
-    console.log(`   ⚠️  Proxy: Disabled (expect Cloudflare bans)`);
+    console.log(`   🎯 Guerrilla Mode: No proxy detected - Randomly selecting ${targetCities.length} cities to avoid Cloudflare bans`);
+    console.log(`   📍 Selected cities: ${targetCities.map(h => h.name).join(', ')}`);
   }
   
   // Initialize email cache
   await initializeEmailCache();
   
   // Process cities sequentially (safer for rate limits)
-  // For parallel processing, use p-limit library
-  for (const hub of UK_WEALTH_HUBS) {
+  for (const hub of targetCities) {
     if (leads.length >= maxResults) {
       console.log(`\n   ✅ Target reached (${leads.length}/${maxResults}). Stopping.`);
       break;
@@ -1431,5 +1483,9 @@ export async function sourceFromPredator(
   }
   
   console.log(`\n   ✅ Predator Bot V7 captured ${leads.length}/${maxResults} leads`);
+  if (!PROXY_SERVER) {
+    console.log(`   📊 Guerrilla Mode: Processed ${targetCities.length}/${UK_WEALTH_HUBS.length} cities (${Math.round((targetCities.length / UK_WEALTH_HUBS.length) * 100)}% coverage)`);
+    console.log(`   💡 Next run (2 hours) will process a different random batch`);
+  }
   return leads;
 }
