@@ -97,6 +97,14 @@ async function sourceLeadsAutonomous() {
         continue;
       }
 
+      // Validate firstName - reject if invalid (Share, Visit, Partner, etc.)
+      const { isRealFirstName } = await import('@/lib/sales/name-validation');
+      if (lead.firstName && !isRealFirstName(lead.firstName)) {
+        console.log(`   ⚠️  Rejecting lead ${lead.email}: Invalid firstName "${lead.firstName}"`);
+        rejected++;
+        continue;
+      }
+
       // Insert lead into database
       try {
         await db.insert(leads).values({

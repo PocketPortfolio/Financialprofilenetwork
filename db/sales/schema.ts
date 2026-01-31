@@ -149,6 +149,16 @@ export const auditLogs = pgTable('audit_logs', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// System Settings Table (for emergency stop and other system-wide flags)
+export const systemSettings = pgTable('system_settings', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  key: text('key').notNull().unique(), // e.g., 'emergency_stop'
+  value: jsonb('value').$type<any>().notNull(), // Can store any JSON value
+  description: text('description'),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  updatedBy: text('updated_by'), // User ID or 'system'
+});
+
 // Relations
 export const leadsRelations = relations(leads, ({ many }) => ({
   conversations: many(conversations),

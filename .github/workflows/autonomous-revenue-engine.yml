@@ -115,6 +115,7 @@ jobs:
           SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMERGENCY_STOP: ${{ secrets.EMERGENCY_STOP || 'false' }}
           SALES_RATE_LIMIT_PER_DAY: ${{ secrets.SALES_RATE_LIMIT_PER_DAY || '50' }}
           KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}

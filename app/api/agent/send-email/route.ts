@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check emergency stop
-    if (process.env.EMERGENCY_STOP === 'true') {
+    const { isEmergencyStopActive } = await import('@/lib/sales/emergency-stop');
+    if (await isEmergencyStopActive()) {
       return NextResponse.json(
         { error: 'Emergency stop activated. All outbound emails are paused.' },
         { status: 503 }

@@ -151,7 +151,39 @@ export async function enrichLead(leadId: string): Promise<LeadResearchData> {
   let researchSummary = lead.researchSummary;
   if (!researchSummary || researchSummary === 'Research pending') {
     try {
-      researchSummary = await generateResearchSummary(lead.companyName, lead.techStackTags || [], lead.jobTitle || null);
+      // For SJP leads, use advisor-specific research instead of generic company research
+      let researchCompanyName = lead.companyName;
+      let researchContext = '';
+      
+      // If this is an SJP advisor, make research advisor-specific
+      if (lead.dataSource === 'predator_sjp' || lead.companyName === "St. James's Place Partner" || lead.companyName?.includes("Practice")) {
+        // Use the practice name if available (not generic), otherwise use advisor name + location
+        if (lead.companyName && 
+            lead.companyName !== "St. James's Place Partner" && 
+            !lead.companyName.includes("Practice")) {
+          // We have an actual practice name - use it!
+          researchCompanyName = lead.companyName;
+          const advisorName = lead.firstName && lead.lastName 
+            ? `${lead.firstName} ${lead.lastName}` 
+            : lead.firstName || 'the advisor';
+          researchContext = `This is an Independent Financial Advisor (IFA) practice called "${lead.companyName}" run by ${advisorName}, who is a St. James's Place Partner. They provide financial planning and wealth management services to clients. Focus research on this specific practice, their client base, and how they might benefit from portfolio tracking tools for their clients.`;
+        } else {
+          // No practice name found - use advisor name + location
+          const advisorName = lead.firstName && lead.lastName 
+            ? `${lead.firstName} ${lead.lastName}` 
+            : lead.firstName || 'Independent Financial Advisor';
+          const location = lead.location || 'UK';
+          researchCompanyName = `${advisorName}'s Practice - ${location}`;
+          researchContext = `This is an Independent Financial Advisor (IFA) practice run by ${advisorName}, who is a St. James's Place Partner based in ${location}. They provide financial planning and wealth management services to clients. Focus research on their practice, client base, and how they might benefit from portfolio tracking tools for their clients.`;
+        }
+      }
+      
+      researchSummary = await generateResearchSummary(
+        researchCompanyName, 
+        lead.techStackTags || [], 
+        lead.jobTitle || null,
+        researchContext // Pass context for advisor-specific research
+      );
     } catch (error: any) {
       console.warn(`   ⚠️  Failed to generate AI research summary: ${error.message}`);
       researchSummary = `Research completed for ${lead.companyName}. Tech stack: ${(lead.techStackTags || []).join(', ') || 'Not specified'}.`;
@@ -365,7 +397,8 @@ async function detectNewsSignals(companyName: string): Promise<LeadResearchData[
 async function generateResearchSummary(
   companyName: string,
   techStack: string[],
-  jobTitle: string | null
+  jobTitle: string | null,
+  context?: string // Optional context for advisor-specific research
 ): Promise<string> {
   const openaiApiKey = process.env.OPENAI_API_KEY;
   
@@ -376,15 +409,30 @@ async function generateResearchSummary(
   const openai = new OpenAI({ apiKey: openaiApiKey });
 
   try {
-    const prompt = `Generate a concise research summary (2-3 sentences) for ${companyName}${jobTitle ? `, targeting a ${jobTitle}` : ''}. 
-Tech stack: ${techStack.length > 0 ? techStack.join(', ') : 'Not specified'}.
+    // Build context-aware prompt
+    let prompt = `Generate a concise research summary (2-3 sentences) for ${companyName}${jobTitle ? `, targeting a ${jobTitle}` : ''}. 
+Tech stack: ${techStack.length > 0 ? techStack.join(', ') : 'Not specified'}.`;
 
-Focus on:
+    if (context) {
+      prompt += `\n\nContext: ${context}`;
+    }
+
+    prompt += `\n\nFocus on:`;
+    
+    // Adjust focus based on context
+    if (context && (context.includes('Financial Advisor') || context.includes('IFA'))) {
+      prompt += `
+- Their practice and client base (wealth management, financial planning)
+- How they might benefit from portfolio tracking tools for their clients
+- Potential interest in white-label solutions for client reporting`;
+    } else {
+      prompt += `
 - Company's likely tech focus and engineering culture
 - Fit for local-first, data-sovereign software solutions
-- Potential interest in developer tools or B2B SaaS
+- Potential interest in developer tools or B2B SaaS`;
+    }
 
-Be professional and specific. If you don't have specific information, make reasonable inferences based on the company name and tech stack.`;
+    prompt += `\n\nBe professional and specific. If you don't have specific information, make reasonable inferences based on the company name and context.`;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini', // Use cheaper model for research summaries

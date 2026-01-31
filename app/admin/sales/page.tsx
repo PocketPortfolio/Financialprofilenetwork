@@ -225,8 +225,20 @@ export default function AdminSalesPage() {
   };
 
   const checkEmergencyStop = async () => {
-    // In a real app, this would check an API endpoint
-    setEmergencyStop(process.env.EMERGENCY_STOP === 'true');
+    try {
+      const response = await fetch('/api/agent/kill-switch');
+      if (response.ok) {
+        const data = await response.json();
+        setEmergencyStop(data.active === true);
+      } else {
+        // Fallback to environment variable if API fails
+        setEmergencyStop(process.env.EMERGENCY_STOP === 'true');
+      }
+    } catch (err) {
+      console.error('Failed to check emergency stop:', err);
+      // Fallback to environment variable if API fails
+      setEmergencyStop(process.env.EMERGENCY_STOP === 'true');
+    }
   };
 
   const checkHealth = async () => {
@@ -254,9 +266,10 @@ export default function AdminSalesPage() {
         }),
       });
       if (!response.ok) throw new Error('Failed to toggle kill switch');
-      setEmergencyStop(!emergencyStop);
+      const data = await response.json();
+      setEmergencyStop(data.active === true);
       setToast({ 
-        message: `Emergency stop ${emergencyStop ? 'deactivated' : 'activated'}`, 
+        message: `Emergency stop ${data.active ? 'activated' : 'deactivated'}`, 
         type: 'success' 
       });
       setTimeout(() => setToast(null), 3000);

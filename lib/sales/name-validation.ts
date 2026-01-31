@@ -15,7 +15,13 @@ const EMAIL_PREFIXES = new Set([
   'it', 'dev', 'developer', 'engineering', 'product', 'products',
   'founder', 'founders', 'ceo', 'cto', 'cfo', 'coo', 'cmo', 'cpo',
   'director', 'manager', 'lead', 'head', 'vp', 'vice', 'president',
-  'owner', 'co-founder', 'cofounder', 'founder', 'founders'
+  'owner', 'co-founder', 'cofounder', 'founder', 'founders',
+  // UI button/link text that should NOT be used as names
+  'share', 'visit', 'partner', 'view', 'read', 'more', 'click', 'here',
+  'link', 'download', 'subscribe', 'follow', 'like', 'comment', 'reply',
+  'send', 'submit', 'cancel', 'close', 'open', 'next', 'previous', 'back',
+  'forward', 'search', 'filter', 'sort', 'refresh', 'reload', 'update',
+  'edit', 'delete', 'remove', 'add', 'create', 'new', 'save', 'load'
 ]);
 
 /**

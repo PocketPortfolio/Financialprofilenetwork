@@ -108,7 +108,8 @@ export async function canContactLead(
   }
 
   // Check emergency stop
-  if (process.env.EMERGENCY_STOP === 'true') {
+  const { isEmergencyStopActive } = await import('@/lib/sales/emergency-stop');
+  if (await isEmergencyStopActive()) {
     return { canContact: false, reason: 'Emergency stop activated' };
   }
 

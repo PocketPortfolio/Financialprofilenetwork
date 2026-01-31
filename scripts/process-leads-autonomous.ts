@@ -730,7 +730,8 @@ async function processLeadsAutonomous() {
   console.log('');
   
   // Check emergency stop
-  if (process.env.EMERGENCY_STOP === 'true') {
+  const { isEmergencyStopActive } = await import('@/lib/sales/emergency-stop');
+  if (await isEmergencyStopActive()) {
     console.log('⛔ Emergency stop activated - processing halted');
     return;
   }

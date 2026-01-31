@@ -149,6 +149,60 @@ export default function GoogleDriveSyncFeaturePage() {
             </ul>
           </div>
 
+          {/* Video Demonstration */}
+          <div style={{
+            width: '100%',
+            maxWidth: '900px',
+            margin: 'clamp(32px, 6vw, 48px) auto',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(245, 158, 11, 0.2)',
+            border: '2px solid var(--border-warm)',
+            background: 'var(--surface)',
+            position: 'relative'
+          }}>
+            <video 
+              src={process.env.NEXT_PUBLIC_SYNC_DEMO_VIDEO_URL || "/sovereign-sync-4k.mp4"}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              crossOrigin="anonymous"
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+                objectFit: 'contain',
+                imageRendering: 'auto' as const
+              }}
+              onError={(e) => {
+                const video = e.target as HTMLVideoElement;
+                const error = video.error;
+                console.error('Video load error:', e, error);
+                // Fallback to local MP4 if CDN fails
+                if (!video.src.includes('/sovereign-sync-4k.mp4')) {
+                  video.src = '/sovereign-sync-4k.mp4';
+                }
+              }}
+            >
+              Your browser does not support the video tag.
+            </video>
+            <div style={{
+              position: 'absolute',
+              bottom: '12px',
+              right: '12px',
+              background: 'rgba(0, 0, 0, 0.7)',
+              color: 'white',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '12px',
+              fontWeight: '500'
+            }}>
+              4K Quality
+            </div>
+          </div>
+
           <h2
             style={{
               fontSize: 'clamp(22px, 5vw, 28px)',

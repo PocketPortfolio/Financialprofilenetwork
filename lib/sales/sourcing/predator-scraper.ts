@@ -897,10 +897,105 @@ async function processCity(
         const card = container || link;
         const text = card.textContent || '';
         
-        // Extract name from link text or nearby heading
-        const nameEl = card.querySelector('h3, h2, h4, .name, [class*="name"]') || link;
-        const nameText = nameEl?.textContent?.trim() || linkText || 'Partner';
-        const nameParts = nameText.split(' ').filter(p => p.length > 0 && p.length < 50); // Filter out very long "words"
+        // Extract name from advisor card - target the specific SJP structure
+        // The name is typically in: .views-name-image-container > h3 or similar
+        let nameText = '';
+        
+        // Strategy 1: Look for name in the specific SJP card structure
+        const nameContainer = card.querySelector('.views-name-image-container, [class*="name-image"], [class*="adviser-name"]');
+        if (nameContainer) {
+          const nameHeading = nameContainer.querySelector('h3, h2, h4, h5, .name, [class*="name"]');
+          if (nameHeading) {
+            nameText = nameHeading.textContent?.trim() || '';
+          } else {
+            // If no heading, try direct text content (but filter out link text)
+            const containerText = nameContainer.textContent?.trim() || '';
+            // Split by newlines and take the first non-empty line that looks like a name
+            const lines = containerText.split(/\n/).map(l => l.trim()).filter(l => l.length > 0);
+            for (const line of lines) {
+              const words = line.split(/\s+/).filter(w => w.length > 0);
+              if (words.length >= 2 && words.length <= 4) {
+                // Check if it looks like a name (capitalized, not a link)
+                if (words[0] && words[0][0] === words[0][0].toUpperCase() && 
+                    !line.toLowerCase().includes('share') && 
+                    !line.toLowerCase().includes('visit') &&
+                    !line.toLowerCase().includes('website')) {
+                  nameText = line;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        
+        // Strategy 2: Fallback to general heading search (but exclude link)
+        if (!nameText || nameText.length < 2) {
+          const nameEl = card.querySelector('h3, h2, h4, .name, [class*="name"], [class*="advisor"], [class*="adviser"]');
+          if (nameEl && nameEl !== link && !nameEl.closest('a') && !nameEl.closest('button')) {
+            const candidate = nameEl.textContent?.trim() || '';
+            // Validate it's not link text
+            if (candidate && 
+                candidate.length >= 2 && 
+                !candidate.toLowerCase().includes('share') &&
+                !candidate.toLowerCase().includes('visit') &&
+                !candidate.toLowerCase().includes('website') &&
+                !candidate.toLowerCase().includes('read more')) {
+              nameText = candidate;
+            }
+          }
+        }
+        
+        // If no name from heading, try extracting from card text (but exclude link text)
+        if (!nameText || nameText.length < 2) {
+          // Get all text nodes in card, excluding link text
+          const textNodes: string[] = [];
+          const walker = document.createTreeWalker(
+            card,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode: (node) => {
+                // Skip if parent is a link
+                let parent = node.parentElement;
+                while (parent) {
+                  if (parent.tagName === 'A' || parent.tagName === 'BUTTON') {
+                    return NodeFilter.FILTER_REJECT;
+                  }
+                  parent = parent.parentElement;
+                }
+                return NodeFilter.FILTER_ACCEPT;
+              }
+            }
+          );
+          
+          let node;
+          while (node = walker.nextNode()) {
+            const text = node.textContent?.trim() || '';
+            if (text.length > 2 && text.length < 100) {
+              textNodes.push(text);
+            }
+          }
+          
+          // Find the first text that looks like a name (2-3 words, capitalized)
+          for (const text of textNodes) {
+            const words = text.split(/\s+/).filter(w => w.length > 0);
+            if (words.length >= 2 && words.length <= 4) {
+              // Check if first word is capitalized (likely a name)
+              if (words[0] && words[0][0] === words[0][0].toUpperCase() && words[0][0] !== words[0][0].toLowerCase()) {
+                nameText = text;
+                break;
+              }
+            }
+          }
+        }
+        
+        // Validate name - reject invalid names like "Share", "Visit", "Partner"
+        const invalidNames = ['share', 'visit', 'partner', 'view', 'read', 'more', 'click', 'link', 'download'];
+        const nameLower = nameText.toLowerCase().trim();
+        if (invalidNames.includes(nameLower) || nameText.length < 2) {
+          nameText = ''; // Clear invalid name
+        }
+        
+        const nameParts = nameText.split(' ').filter(p => p.length > 0 && p.length < 50 && !invalidNames.includes(p.toLowerCase()));
         
         if (nameParts.length > 0) {
           extractionStats.nameExtracted++;
@@ -972,13 +1067,108 @@ async function processCity(
           }
         }
         
-        // Add to results if we have a valid email
-        if (email && isValidEmail) {
+        // Validate name before using - reject if invalid
+        const firstName = nameParts.length > 0 ? nameParts[0] : null;
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+        
+        // Extract practice/company name from card (try to find actual practice name, not generic)
+        // SJP cards typically have practice names in various locations - need to search more thoroughly
+        let practiceName = "St. James's Place Partner"; // Default fallback
+        
+        // Strategy 1: Look for practice name in specific SJP card structure
+        // Practice names often appear in: .views-advisers-description, .views-advisers-company, or similar
+        const practiceSelectors = [
+          '[class*="company"]',
+          '[class*="practice"]',
+          '[class*="firm"]',
+          '[class*="business"]',
+          '.views-advisers-description',
+          '.views-advisers-company',
+          '[class*="advisers-company"]',
+          '[class*="advisers-description"]'
+        ];
+        
+        let practiceNameFound = false;
+        for (const selector of practiceSelectors) {
+          const practiceNameEl = card.querySelector(selector);
+          if (practiceNameEl) {
+            const practiceText = practiceNameEl.textContent?.trim();
+            // Filter out generic text and validate it looks like a practice name
+            if (practiceText && 
+                practiceText.length > 5 && 
+                practiceText.length < 100 &&
+                !practiceText.toLowerCase().includes("st. james's place") &&
+                !practiceText.toLowerCase().includes("independent financial advisor") &&
+                !practiceText.toLowerCase().includes("financial adviser") &&
+                !practiceText.toLowerCase().includes("share") &&
+                !practiceText.toLowerCase().includes("visit")) {
+              practiceName = practiceText;
+              practiceNameFound = true;
+              break;
+            }
+          }
+        }
+        
+        // Strategy 2: Extract from card text - look for patterns like "XYZ Wealth Management"
+        if (!practiceNameFound) {
+          const cardText = card.textContent || '';
+          // Look for patterns: Capitalized words followed by Wealth/Financial/Planning/Advisory/Partners/Associates/Group/Limited
+          const practicePatterns = [
+            /([A-Z][a-zA-Z\s&]+(?:Wealth\s+Management|Financial\s+Planning|Financial\s+Advisory|Financial\s+Services|Advisory\s+Services|Partners|Associates|Group|Limited|LLP|Ltd))/i,
+            /([A-Z][a-zA-Z\s&]{3,40}(?:Wealth|Financial|Planning|Advisory|Partners|Associates|Group))/,
+            // Also look for standalone practice names (2-4 capitalized words, not common phrases)
+            /(?:^|\n)([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})(?:\s+(?:Wealth|Financial|Planning|Advisory|Partners|Associates|Group|Limited|LLP|Ltd))?/m
+          ];
+          
+          for (const pattern of practicePatterns) {
+            const match = cardText.match(pattern);
+            if (match && match[1]) {
+              const candidate = match[1].trim();
+              // Validate it's not generic or too short/long
+              if (candidate.length > 5 && 
+                  candidate.length < 80 &&
+                  !candidate.toLowerCase().includes("st. james's place") &&
+                  !candidate.toLowerCase().includes("independent financial advisor") &&
+                  !candidate.toLowerCase().includes("financial adviser") &&
+                  !candidate.toLowerCase().includes("share") &&
+                  !candidate.toLowerCase().includes("visit") &&
+                  candidate.split(' ').length >= 1 && 
+                  candidate.split(' ').length <= 6) {
+                practiceName = candidate;
+                practiceNameFound = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        // Strategy 3: If still no practice name, use advisor name + "Practice" or location-based name
+        if (!practiceNameFound && firstName && lastName) {
+          // Use advisor name as practice identifier (better than generic)
+          practiceName = `${firstName} ${lastName} Practice`;
+        } else if (!practiceNameFound && firstName) {
+          practiceName = `${firstName}'s Practice`;
+        }
+        
+        // Log practice name extraction for debugging
+        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:1070',message:'Practice name extraction',data:{practiceName,practiceNameFound,firstName,lastName,cardTextLength:card.textContent?.length||0},timestamp:Date.now(),sessionId:'debug-session',runId:'practice-name-extraction',hypothesisId:'PRACTICE-NAME'})}).catch(()=>{});
+        
+        // Reject if firstName is invalid (Share, Visit, Partner, etc.)
+        const invalidFirstNames = ['share', 'visit', 'partner', 'view', 'read', 'more', 'click', 'link'];
+        const isValidFirstName = firstName && 
+                                 firstName.length >= 2 && 
+                                 !invalidFirstNames.includes(firstName.toLowerCase()) &&
+                                 /^[A-Za-z]+$/.test(firstName.replace(/[^A-Za-z]/g, ''));
+        
+        // Add to results if we have a valid email AND valid name
+        if (email && isValidEmail && isValidFirstName) {
+          fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:976',message:'Adding lead with extracted data',data:{email:email.toLowerCase().trim(),firstName,lastName,practiceName,linkText,linkHref,nameText,extractedFrom:nameContainer?'nameContainer':'fallback'},timestamp:Date.now(),sessionId:'debug-session',runId:'name-extraction-fix-v2',hypothesisId:'NAME-FIX-V2'})}).catch(()=>{});
+          
           results.push({
             email: email.toLowerCase().trim(),
-            firstName: nameParts[0] || 'Partner',
-            lastName: nameParts.slice(1).join(' ') || '',
-            companyName: "St. James's Place Partner",
+            firstName: firstName,
+            lastName: lastName || '',
+            companyName: practiceName, // Use extracted practice name instead of generic
             jobTitle: 'Independent Financial Advisor',
             location: cityName,
             website: linkHref || null,
@@ -986,6 +1176,10 @@ async function processCity(
             region: 'UK'
           });
           extractionStats.added++;
+        } else if (email && isValidEmail && !isValidFirstName) {
+          // Email is valid but name is invalid - log for debugging
+          fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:990',message:'Rejecting lead - invalid name',data:{email:email.toLowerCase().trim(),firstName,invalidReason:!firstName?'no name':invalidFirstNames.includes(firstName.toLowerCase())?'invalid name':'other'},timestamp:Date.now(),sessionId:'debug-session',runId:'name-extraction-fix',hypothesisId:'NAME-FIX'})}).catch(()=>{});
+          extractionStats.emailRejected++;
         } else if (email) {
           extractionStats.emailRejected++;
         }
@@ -1041,20 +1235,108 @@ async function processCity(
           }
           
           if (email && !email.includes('sentry') && !email.includes('example.com') && !email.includes('example') && email.includes('@') && email.length > 5) {
-            const nameText = nameEl?.textContent?.trim() || 'Partner';
-            const nameParts = nameText.split(' ');
+            // Extract name with same validation as Strategy 1
+            let nameText = '';
+            if (nameEl && nameEl !== linkEl) {
+              nameText = nameEl.textContent?.trim() || '';
+            }
             
-            results.push({
-              email: email.toLowerCase().trim(),
-              firstName: nameParts[0] || 'Partner',
-              lastName: nameParts.slice(1).join(' ') || '',
-              companyName: "St. James's Place Partner",
-              jobTitle: 'Independent Financial Advisor',
-              location: cityName,
-              website: linkEl ? (linkEl as HTMLAnchorElement).href : null,
-              dataSource: 'predator_sjp' as const,
-              region: 'UK'
-            });
+            // Validate name - reject invalid names
+            const invalidNames = ['share', 'visit', 'partner', 'view', 'read', 'more', 'click', 'link'];
+            const nameLower = nameText.toLowerCase().trim();
+            if (invalidNames.includes(nameLower) || nameText.length < 2) {
+              nameText = ''; // Clear invalid name
+            }
+            
+            const nameParts = nameText.split(' ').filter(p => p.length > 0 && p.length < 50 && !invalidNames.includes(p.toLowerCase()));
+            const firstName = nameParts.length > 0 ? nameParts[0] : null;
+            const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+            
+            // Reject if firstName is invalid
+            const invalidFirstNames = ['share', 'visit', 'partner', 'view', 'read', 'more', 'click', 'link'];
+            const isValidFirstName = firstName && 
+                                     firstName.length >= 2 && 
+                                     !invalidFirstNames.includes(firstName.toLowerCase()) &&
+                                     /^[A-Za-z]+$/.test(firstName.replace(/[^A-Za-z]/g, ''));
+            
+            // Only add if we have a valid name
+            if (isValidFirstName) {
+              // Try to extract practice name (same logic as Strategy 1)
+              let practiceName = "St. James's Place Partner";
+              let practiceNameFound = false;
+              
+              // Strategy 1: Look for practice name in specific SJP card structure
+              const practiceSelectors = [
+                '[class*="company"]',
+                '[class*="practice"]',
+                '[class*="firm"]',
+                '[class*="business"]',
+                '.views-advisers-description',
+                '.views-advisers-company',
+                '[class*="advisers-company"]',
+                '[class*="advisers-description"]'
+              ];
+              
+              for (const selector of practiceSelectors) {
+                const practiceNameEl = card.querySelector(selector);
+                if (practiceNameEl) {
+                  const practiceText = practiceNameEl.textContent?.trim();
+                  if (practiceText && 
+                      practiceText.length > 5 && 
+                      practiceText.length < 100 &&
+                      !practiceText.toLowerCase().includes("st. james's place") &&
+                      !practiceText.toLowerCase().includes("independent financial advisor") &&
+                      !practiceText.toLowerCase().includes("financial adviser")) {
+                    practiceName = practiceText;
+                    practiceNameFound = true;
+                    break;
+                  }
+                }
+              }
+              
+              // Strategy 2: Extract from card text patterns
+              if (!practiceNameFound) {
+                const cardText = card.textContent || '';
+                const practicePatterns = [
+                  /([A-Z][a-zA-Z\s&]+(?:Wealth\s+Management|Financial\s+Planning|Financial\s+Advisory|Partners|Associates|Group|Limited|LLP|Ltd))/i,
+                  /([A-Z][a-zA-Z\s&]{3,40}(?:Wealth|Financial|Planning|Advisory|Partners|Associates|Group))/
+                ];
+                
+                for (const pattern of practicePatterns) {
+                  const match = cardText.match(pattern);
+                  if (match && match[1]) {
+                    const candidate = match[1].trim();
+                    if (candidate.length > 5 && candidate.length < 80 &&
+                        !candidate.toLowerCase().includes("st. james's place")) {
+                      practiceName = candidate;
+                      practiceNameFound = true;
+                      break;
+                    }
+                  }
+                }
+              }
+              
+              // Strategy 3: Use advisor name if no practice name found
+              if (!practiceNameFound) {
+                if (firstName && lastName) {
+                  practiceName = `${firstName} ${lastName} Practice`;
+                } else if (firstName) {
+                  practiceName = `${firstName}'s Practice`;
+                }
+              }
+              
+              results.push({
+                email: email.toLowerCase().trim(),
+                firstName: firstName,
+                lastName: lastName || '',
+                companyName: practiceName,
+                jobTitle: 'Independent Financial Advisor',
+                location: cityName,
+                website: linkEl ? (linkEl as HTMLAnchorElement).href : null,
+                dataSource: 'predator_sjp' as const,
+                region: 'UK'
+              });
+            }
           }
         });
       }

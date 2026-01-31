@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { auditLogs } from '@/db/sales/schema';
+import { setEmergencyStop, clearEmergencyStopCache } from '@/lib/sales/emergency-stop';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -30,27 +31,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const isActive = action === 'activate';
+    const updatedBy = 'admin_ui'; // TODO: Get from auth session
+
+    // Update database
+    await setEmergencyStop(isActive, updatedBy);
+    clearEmergencyStopCache();
+
     // Log the action
     await db.insert(auditLogs).values({
       action: 'KILL_SWITCH_ACTIVATED',
-      aiReasoning: `Emergency stop ${action}d`,
-      metadata: { action },
+      aiReasoning: `Emergency stop ${action}d via admin UI`,
+      metadata: { action, updatedBy },
       humanOverride: true,
     });
-
-    // Note: In production, you'd update an environment variable or database flag
-    // For now, this is a placeholder that logs the action
-    // The actual kill switch check happens in the send-email route via process.env.EMERGENCY_STOP
 
     return NextResponse.json({
       success: true,
       message: `Emergency stop ${action}d`,
-      note: 'Set EMERGENCY_STOP=true in environment variables to activate',
+      active: isActive,
     });
   } catch (error: any) {
     console.error('Error toggling kill switch:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to toggle kill switch' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/agent/kill-switch
+ * Get current emergency stop status
+ */
+export async function GET() {
+  try {
+    const { isEmergencyStopActive } = await import('@/lib/sales/emergency-stop');
+    const isActive = await isEmergencyStopActive();
+    
+    return NextResponse.json({
+      active: isActive,
+    });
+  } catch (error: any) {
+    console.error('Error checking kill switch status:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to check kill switch status' },
       { status: 500 }
     );
   }
