@@ -30,6 +30,22 @@ import sitemapTickers13 from '../app/sitemap-tickers-13';
 import sitemapTickers14 from '../app/sitemap-tickers-14';
 import sitemapTickers15 from '../app/sitemap-tickers-15';
 import sitemapTickers16 from '../app/sitemap-tickers-16';
+import sitemapRisk1 from '../app/sitemap-risk-1';
+import sitemapRisk2 from '../app/sitemap-risk-2';
+import sitemapRisk3 from '../app/sitemap-risk-3';
+import sitemapRisk4 from '../app/sitemap-risk-4';
+import sitemapRisk5 from '../app/sitemap-risk-5';
+import sitemapRisk6 from '../app/sitemap-risk-6';
+import sitemapRisk7 from '../app/sitemap-risk-7';
+import sitemapRisk8 from '../app/sitemap-risk-8';
+import sitemapRisk9 from '../app/sitemap-risk-9';
+import sitemapRisk10 from '../app/sitemap-risk-10';
+import sitemapRisk11 from '../app/sitemap-risk-11';
+import sitemapRisk12 from '../app/sitemap-risk-12';
+import sitemapRisk13 from '../app/sitemap-risk-13';
+import sitemapRisk14 from '../app/sitemap-risk-14';
+import sitemapRisk15 from '../app/sitemap-risk-15';
+import sitemapRisk16 from '../app/sitemap-risk-16';
 
 const PUBLIC_DIR = join(process.cwd(), 'public');
 const VERSION = 'v3'; // Current version - keep in sync with deployed version
@@ -193,6 +209,22 @@ async function main() {
       await buildSitemap('sitemap-tickers-14', sitemapTickers14),
       await buildSitemap('sitemap-tickers-15', sitemapTickers15),
       await buildSitemap('sitemap-tickers-16', sitemapTickers16),
+      await buildSitemap('sitemap-risk-1', sitemapRisk1),
+      await buildSitemap('sitemap-risk-2', sitemapRisk2),
+      await buildSitemap('sitemap-risk-3', sitemapRisk3),
+      await buildSitemap('sitemap-risk-4', sitemapRisk4),
+      await buildSitemap('sitemap-risk-5', sitemapRisk5),
+      await buildSitemap('sitemap-risk-6', sitemapRisk6),
+      await buildSitemap('sitemap-risk-7', sitemapRisk7),
+      await buildSitemap('sitemap-risk-8', sitemapRisk8),
+      await buildSitemap('sitemap-risk-9', sitemapRisk9),
+      await buildSitemap('sitemap-risk-10', sitemapRisk10),
+      await buildSitemap('sitemap-risk-11', sitemapRisk11),
+      await buildSitemap('sitemap-risk-12', sitemapRisk12),
+      await buildSitemap('sitemap-risk-13', sitemapRisk13),
+      await buildSitemap('sitemap-risk-14', sitemapRisk14),
+      await buildSitemap('sitemap-risk-15', sitemapRisk15),
+      await buildSitemap('sitemap-risk-16', sitemapRisk16),
     ];
     
     // Check for duplicates across sitemaps

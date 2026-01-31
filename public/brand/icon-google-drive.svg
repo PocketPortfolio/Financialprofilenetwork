@@ -1,0 +1,12 @@
+<!-- Google Drive Logo - Official Colors -->
+<svg width="56" height="56" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blue Triangle -->
+  <path d="M7.71 6.5L1.15 12l6.56 5.5L14.29 12 7.71 6.5z" fill="#0066DA"/>
+  <!-- Green Triangle -->
+  <path d="M7.71 6.5L14.29 12l6.56-5.5L14.29 1 7.71 6.5z" fill="#00AC47"/>
+  <!-- Red Triangle -->
+  <path d="M14.29 12l-6.58 5.5 6.58 5.5 6.58-5.5L14.29 12z" fill="#EA4335"/>
+  <!-- Yellow Triangle -->
+  <path d="M14.29 1L7.71 6.5l6.58 5.5L20.87 6.5 14.29 1z" fill="#FFBA00"/>
+</svg>
+

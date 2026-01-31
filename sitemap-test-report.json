@@ -1,0 +1,1373 @@
+{
+  "timestamp": "2026-01-27T19:35:26.902Z",
+  "baseUrl": "http://localhost:3001",
+  "summary": {
+    "totalTested": 2292,
+    "totalPassed": 589,
+    "totalFailed": 1585,
+    "totalErrors": 118,
+    "passRate": 25.7,
+    "totalTime": 659.865
+  },
+  "categories": [
+    {
+      "category": "Blog",
+      "total": 0,
+      "tested": 92,
+      "passed": 1,
+      "failed": 91,
+      "errors": 0,
+      "passRate": 1.0869565217391304,
+      "avgResponseTime": 2121,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/blog/2025-year-in-review-sovereign-finance",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7183
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/ai-powered-financial-analysis-transforming-portfolio-management-with-machine-learning",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7596
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/automating-seo-how-to-inject-schema-org-dynamically",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7184
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/building-financial-systems-with-modern-software-architecture-patterns-for-fintech-applications",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7186
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/building-production-ready-systems-infrastructure-as-an-autonomous-engines",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7597
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/building-resilient-systems-the-power-of-self-healing-architecture-in-production",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7600
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/discuss-what-s-the-1-headache-in-portfolio-tracking-today",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7598
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/dollar-cost-averaging-vs-lump-sum-a-data-driven-analysis",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7187
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/hello-dev-we-re-building-pocket-portfolio-in-public",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 7601
+        },
+        {
+          "url": "https://www.pocketportfolio.app/blog/how-ai-can-revolutionize-b2b-saas",
+          "status": 500,
+          "category": "Blog",
+          "responseTime": 1421
+        }
+      ]
+    },
+    {
+      "category": "Broker Imports",
+      "total": 0,
+      "tested": 60,
+      "passed": 50,
+      "failed": 0,
+      "errors": 10,
+      "passRate": 83.33333333333334,
+      "avgResponseTime": 4754,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/openbrokercsv",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10007,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/static/csv-etoro-to-openbrokercsv",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10007,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/etoro",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10007,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/trading212",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10007,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/coinbase",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10007,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/interactive-brokers",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10008,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/revolut",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10008,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/freetrade",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10008,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/robinhood",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10009,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/import/webull",
+          "status": "TIMEOUT",
+          "category": "Broker Imports",
+          "responseTime": 10009,
+          "error": "Request timeout (10s)"
+        }
+      ]
+    },
+    {
+      "category": "Static Pages",
+      "total": 0,
+      "tested": 29,
+      "passed": 29,
+      "failed": 0,
+      "errors": 0,
+      "passRate": 100,
+      "avgResponseTime": 5693,
+      "failures": []
+    },
+    {
+      "category": "Tickers (Tickers-1)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 0,
+      "errors": 100,
+      "passRate": 0,
+      "avgResponseTime": 10007,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/aapl",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aapl/json-api",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aapl/dividend-history",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aapl/insider-trading",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/msft",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/msft/json-api",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10006,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/msft/dividend-history",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10006,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/msft/insider-trading",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10006,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/googl",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/googl/json-api",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-1)",
+          "responseTime": 10005,
+          "error": "Request timeout (10s)"
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-10)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2514,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrtx",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 1969
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrtx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2584
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrtx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2553
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrtx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2630
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrux",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 1989
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrux/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2593
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrux/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2562
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tgrux/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2651
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tblax",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2023
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/tblax/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-10)",
+          "responseTime": 2543
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-11)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2459,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/evlbx",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3045
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlbx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3083
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlbx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3025
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlbx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3111
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlcx",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3070
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlcx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3100
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlcx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3012
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlcx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 3143
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlix",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 2463
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/evlix/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-11)",
+          "responseTime": 2540
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-12)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2370,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/oglrx",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2325
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglrx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2372
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglrx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2313
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglrx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2403
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglyx",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2342
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglyx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2354
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglyx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2296
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglyx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2423
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglzx",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 2326
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/oglzx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-12)",
+          "responseTime": 1829
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-13)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2353,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/yinxx",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2237
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinxx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2308
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinxx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2267
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinxx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2359
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinwx",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2277
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinwx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2328
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinwx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2295
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinwx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2377
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinvx",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 2310
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/yinvx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-13)",
+          "responseTime": 1814
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-14)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2350,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/arelx",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 1811
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/arelx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2350
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/arelx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2411
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/arelx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2443
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aremx",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 1829
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aremx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2370
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aremx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2400
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aremx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2462
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/arenx",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2317
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/arenx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-14)",
+          "responseTime": 2358
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-15)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2421,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/dcoox",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2348
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcoox/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2328
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcoox/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2261
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcoox/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2412
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcopx",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2369
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcopx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2315
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcopx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2294
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcopx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2399
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcoqx",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2598
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dcoqx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-15)",
+          "responseTime": 2547
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-16)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2416,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvvx",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 2995
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvvx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 3057
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvvx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 3026
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvvx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 3087
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvwx",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 2978
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvwx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 3076
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvwx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 3046
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvwx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 3106
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvxx",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 2387
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/vhvxx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-16)",
+          "responseTime": 2419
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-2)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 92,
+      "errors": 8,
+      "passRate": 0,
+      "avgResponseTime": 3537,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/casi",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/casi/json-api",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/casi/dividend-history",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/casi/insider-trading",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cass",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cass/json-api",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cass/dividend-history",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10016,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cass/insider-trading",
+          "status": "TIMEOUT",
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 10017,
+          "error": "Request timeout (10s)"
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/catc",
+          "status": 500,
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 3600
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/catc/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-2)",
+          "responseTime": 3942
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-3)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2478,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/fif",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2621
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fif/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2589
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fif/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2553
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fif/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2670
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fig",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2639
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fig/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2608
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fig/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2573
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/fig/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2690
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/figs",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2586
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/figs/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-3)",
+          "responseTime": 2620
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-4)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2665,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/idmo",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2455
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idmo/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 1916
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idmo/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2505
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idmo/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2550
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idn",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2475
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idn/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 1934
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idn/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2516
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idn/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2569
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idna",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 2538
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/idna/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-4)",
+          "responseTime": 1991
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-5)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2518,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/allo",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2494
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allo/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2455
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allo/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2443
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allo/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2528
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allr",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2515
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allr/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2477
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allr/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2421
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allr/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2568
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allt",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 1947
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/allt/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-5)",
+          "responseTime": 2539
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-6)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2626,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/cmdt",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 1871
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cmdt/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 2999
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cmdt/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 2947
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cmdt/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 3240
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/bcd",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 1894
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/bcd/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 3013
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/bcd/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 2969
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/bcd/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 3254
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dvy",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 2364
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/dvy/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-6)",
+          "responseTime": 2411
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-7)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 2564,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/azc",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2477
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azc/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2526
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azc/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 1992
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azc/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2555
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azd",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2493
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azd/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2538
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azd/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2010
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/azd/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2569
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aze",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 2375
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/aze/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-7)",
+          "responseTime": 1860
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-8)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 3184,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/cloa",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2527
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloa/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2493
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloa/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2462
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloa/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2575
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloer",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2542
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloer/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2505
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloer/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2474
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloer/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2586
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloeu",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 1997
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/cloeu/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-8)",
+          "responseTime": 2540
+        }
+      ]
+    },
+    {
+      "category": "Tickers (Tickers-9)",
+      "total": 0,
+      "tested": 100,
+      "passed": 0,
+      "failed": 100,
+      "errors": 0,
+      "passRate": 0,
+      "avgResponseTime": 3005,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/s/meldx",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 4184
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/meldx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 4238
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/meldx/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 3615
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/meldx/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 4707
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/melex",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 4215
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/melex/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 4294
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/melex/dividend-history",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 3631
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/melex/insider-trading",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 4629
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/melfx",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 2968
+        },
+        {
+          "url": "https://www.pocketportfolio.app/s/melfx/json-api",
+          "status": 500,
+          "category": "Tickers (Tickers-9)",
+          "responseTime": 3073
+        }
+      ]
+    },
+    {
+      "category": "Tools",
+      "total": 0,
+      "tested": 511,
+      "passed": 509,
+      "failed": 2,
+      "errors": 0,
+      "passRate": 99.60861056751467,
+      "avgResponseTime": 1351,
+      "failures": [
+        {
+          "url": "https://www.pocketportfolio.app/tools/track-brk.b-risk",
+          "status": 404,
+          "category": "Tools",
+          "responseTime": 4084
+        },
+        {
+          "url": "https://www.pocketportfolio.app/tools/track-bf.b-risk",
+          "status": 404,
+          "category": "Tools",
+          "responseTime": 1308
+        }
+      ]
+    }
+  ]
+}

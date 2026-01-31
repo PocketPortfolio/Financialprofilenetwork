@@ -1090,7 +1090,7 @@ $ npx pocket-init --sovereign
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
             }}
             >
-              {/* Terminal/Chart Icon */}
+              {/* Terminal Icon - Real Dashboard Preview */}
               <div style={{
                 width: '56px',
                 height: '56px',
@@ -1099,12 +1099,15 @@ $ npx pocket-init --sovereign
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '20px'
+                marginBottom: '20px',
+                overflow: 'hidden',
+                padding: '4px'
               }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-                  <path d="M3 12L7 8L11 12L15 6L21 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M3 12V20H21V12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <img 
+                  src="/brand/icon-terminal.svg" 
+                  alt="Terminal Dashboard"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
               </div>
               <h3 style={{
                 fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',
@@ -1170,22 +1173,24 @@ $ npx pocket-init --sovereign
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
             }}
             >
-              {/* Cloud/Lock Icon (Google Drive styled) */}
+              {/* Google Drive Icon - Real Brand Icon */}
               <div style={{
                 width: '56px',
                 height: '56px',
-                background: 'rgba(66, 133, 244, 0.1)',
-                border: '2px solid rgba(66, 133, 244, 0.3)',
+                background: 'white',
                 borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '20px'
+                marginBottom: '20px',
+                padding: '8px',
+                boxShadow: '0 2px 8px rgba(66, 133, 244, 0.2)'
               }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#4285F4">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                  <path d="M12 2v20c5.16-1.26 9-6.45 9-12V7l-9-5z" fill="rgba(66, 133, 244, 0.3)"/>
-                </svg>
+                <img 
+                  src="/brand/icon-google-drive.svg" 
+                  alt="Google Drive"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
               </div>
               <h3 style={{
                 fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',
@@ -1266,11 +1271,11 @@ $ npx pocket-init --sovereign
                 borderRadius: '0 16px 0 100%'
               }}></div>
               
-              {/* Shield/Badge Icon */}
+              {/* Premium Crown Icon - Real Founders Badge */}
               <div style={{
                 width: '56px',
                 height: '56px',
-                background: 'rgba(245, 158, 11, 0.2)',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%)',
                 border: '2px solid rgba(245, 158, 11, 0.4)',
                 borderRadius: '12px',
                 display: 'flex',
@@ -1278,11 +1283,14 @@ $ npx pocket-init --sovereign
                 justifyContent: 'center',
                 marginBottom: '20px',
                 position: 'relative',
-                zIndex: 1
+                zIndex: 1,
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
               }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#f59e0b">
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                </svg>
+                <img 
+                  src="/brand/icon-founders-crown.svg" 
+                  alt="Founders Crown"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
               </div>
               <h3 style={{
                 fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',

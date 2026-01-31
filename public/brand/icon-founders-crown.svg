@@ -1,0 +1,18 @@
+<!-- Premium Crown Icon for Founders & Sponsors -->
+<svg width="56" height="56" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="crownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Crown Base -->
+  <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z" fill="url(#crownGrad)" stroke="#fbbf24" stroke-width="0.5"/>
+  <!-- Crown Jewels -->
+  <circle cx="8" cy="10" r="1.5" fill="#fbbf24"/>
+  <circle cx="12" cy="8" r="1.5" fill="#fbbf24"/>
+  <circle cx="16" cy="10" r="1.5" fill="#fbbf24"/>
+  <!-- Bottom Line -->
+  <path d="M5 16h14" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
+

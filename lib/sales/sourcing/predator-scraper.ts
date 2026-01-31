@@ -1,12 +1,12 @@
 /**
- * Predator Bot V7.2: "Explicit Interaction Protocol" (The "Typing" Fix)
+ * Predator Bot V7.3: "Force Select Protocol" (The "React State" Fix)
  * 
  * ARCHITECTURE CHANGE:
  * - Launch fresh browser for each city
  * - Use native Chrome proxy flags (--proxy-server)
  * - Kill browser after each city (clean state, zero memory leaks)
  * - 100% IP rotation if using rotating proxy gateway
- * - V7.2: Explicit typing interaction (human emulation)
+ * - V7.3: Force Select Protocol - ArrowDown + Enter to trigger React state update
  * 
  * CEO MANDATE: No third-party APIs. Predator Bot is the PRIMARY and ONLY source.
  * 
@@ -277,23 +277,53 @@ async function processCity(
     
     // 3.5. Monitor network requests to capture API calls
     const networkRequests: any[] = [];
+    const allNetworkRequests: any[] = []; // Track ALL requests for debugging
     page.on('request', (request) => {
       const url = request.url();
-      if (url.includes('api') || url.includes('search') || url.includes('adviser') || url.includes('advisors')) {
+      const method = request.method();
+      const postData = request.postData();
+      
+      // Track all SJP domain requests
+      if (url.includes('sjp.co.uk')) {
+        allNetworkRequests.push({
+          url: url.substring(0, 300),
+          method,
+          postData: postData ? postData.substring(0, 200) : undefined,
+          timestamp: Date.now(),
+          type: 'request'
+        });
+      }
+      
+      // Track API/search requests
+      if (url.includes('api') || url.includes('search') || url.includes('adviser') || url.includes('advisors') || url.includes('find-an-adviser')) {
         networkRequests.push({
-          url: url.substring(0, 200),
-          method: request.method(),
-          headers: request.headers(),
+          url: url.substring(0, 300),
+          method,
+          postData: postData ? postData.substring(0, 200) : undefined,
+          headers: Object.keys(request.headers()),
           timestamp: Date.now()
         });
       }
     });
     page.on('response', (response) => {
       const url = response.url();
-      if (url.includes('api') || url.includes('search') || url.includes('adviser') || url.includes('advisors')) {
+      const status = response.status();
+      
+      // Track all SJP domain responses
+      if (url.includes('sjp.co.uk')) {
+        allNetworkRequests.push({
+          url: url.substring(0, 300),
+          status,
+          timestamp: Date.now(),
+          type: 'response'
+        });
+      }
+      
+      // Track API/search responses
+      if (url.includes('api') || url.includes('search') || url.includes('adviser') || url.includes('advisors') || url.includes('find-an-adviser')) {
         networkRequests.push({
-          url: url.substring(0, 200),
-          status: response.status(),
+          url: url.substring(0, 300),
+          status,
           timestamp: Date.now(),
           type: 'response'
         });
@@ -352,94 +382,234 @@ async function processCity(
       await page.waitForSelector(inputSelector, { timeout: 10000 });
       console.log(`   📝 Found location input field`);
       
-      // Clear any existing value and type city name
-      await page.click(inputSelector, { clickCount: 3 }); // Triple-click to select all
-      await page.type(inputSelector, hub.name, { delay: 100 }); // Type with human-like delay
-      console.log(`   ⌨️  Typed "${hub.name}" into location field`);
+      // CRITICAL FIX V7.3: "Force Select" Protocol - Trigger React State Update
+      // The issue: Typing into input doesn't update React's internal `selectedLocation` state
+      // Solution: Use ArrowDown + Enter to trigger the `onSelect` event from Google Places Autocomplete
+      let searchTriggered = false;
       
-      // Wait for autocomplete suggestions to appear
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log(`   🔍 V7.3: Force Select Protocol - Triggering React state update`);
       
-      // #region agent log - Check autocomplete state before interaction
-      const beforeAutocomplete = await page.evaluate(() => {
-        const input = document.querySelector('#edit-location, input[name="location"], input[type="text"]') as HTMLInputElement;
-        const autocompleteDropdown = document.querySelector('[class*="autocomplete"], [class*="dropdown"], [id*="autocomplete"], [id*="suggestions"]');
-        const searchButton = document.querySelector('button[type="submit"], input[type="submit"], button[class*="search"], [class*="search-button"]');
+      // #region agent log - Before Force Select
+      const beforeForceSelect = await page.evaluate(() => {
+        const input = document.querySelector('#edit-location, input[name="location"]') as HTMLInputElement;
         return {
           inputValue: input?.value || '',
           inputFocused: document.activeElement === input,
-          autocompleteVisible: !!autocompleteDropdown,
-          autocompleteText: autocompleteDropdown?.textContent?.substring(0, 100) || '',
-          searchButtonVisible: !!searchButton,
-          searchButtonText: searchButton?.textContent || '',
-          url: window.location.href
+          pacContainerVisible: !!document.querySelector('.pac-container'),
+          pacItemsCount: document.querySelectorAll('.pac-item').length
         };
       });
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:335',message:'Before autocomplete interaction (V7.2)',data:{city:hub.name,beforeAutocomplete},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2-fix',hypothesisId:'L'})}).catch(()=>{});
+      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:385',message:'Before Force Select (V7.3:ReactStateFix)',data:{city:hub.name,beforeForceSelect},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
       // #endregion
       
-      // Try multiple search trigger methods
-      let searchTriggered = false;
+      // Step 1: Clear and Focus (Triple Click ensures we clear "Type location" placeholders)
+      await page.click(inputSelector, { clickCount: 3 });
+      await page.keyboard.press('Backspace');
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Method 1: ArrowDown + Enter (original)
+      // Step 2: Slow Type to trigger the Google Places API (150ms delay is CRITICAL for React to catch up)
+      console.log(`   ⌨️  Typing "${hub.name}" with 150ms delay to trigger Google Places API...`);
+      await page.type(inputSelector, hub.name, { delay: 150 });
+      
+      // Step 3: WAIT for the Autocomplete Dropdown
       try {
-        await page.keyboard.press('ArrowDown'); // Select first suggestion
-        await new Promise(resolve => setTimeout(resolve, 500));
-        await page.keyboard.press('Enter'); // Trigger search
-        console.log(`   🔍 Method 1: Triggered search via ArrowDown + Enter`);
-        searchTriggered = true;
+        console.log(`   ⏳ Waiting for autocomplete dropdown...`);
+        await page.waitForFunction(
+          () => {
+            const pacItems = document.querySelectorAll('.pac-item, .suggestion-item, li[role="option"]');
+            return pacItems.length > 0;
+          },
+          { timeout: 5000 }
+        );
+        console.log(`   ✅ Autocomplete dropdown appeared`);
       } catch (e) {
-        console.log(`   ⚠️  Method 1 failed: ${e}`);
+        console.warn(`   ⚠️  Dropdown didn't appear within 5s. Trying Force-Enter anyway...`);
       }
       
-      // Method 2: Click search button explicitly (if Enter didn't work)
-      if (!searchTriggered) {
+      // Step 4: THE INTERACTION CHAIN (ArrowDown + Enter)
+      // This simulates selecting the first suggestion and triggers React's onSelect event
+      console.log(`   ⬇️  Pressing ArrowDown to select first suggestion...`);
+      await page.keyboard.press('ArrowDown');
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait for highlight
+      
+      console.log(`   ⏎  Pressing Enter to confirm selection and trigger React state update...`);
+      await page.keyboard.press('Enter');
+      console.log(`   ✅ Selected "${hub.name}" from dropdown - React state should now be updated`);
+      
+      // Step 5: Wait for the "Flash" (State Update)
+      // Often the input text changes from "London" to "London, UK" or lat/lng gets populated
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // #region agent log - After Force Select (verify state update)
+      const cityName = hub.name; // Capture for evaluate callback
+      const afterForceSelect = await page.evaluate((city) => {
+        const input = document.querySelector('#edit-location, input[name="location"]') as HTMLInputElement;
+        // Check for hidden fields that might contain lat/lng
+        const hiddenFields = Array.from(document.querySelectorAll('input[type="hidden"]')).map((el: any) => ({
+          name: el.name,
+          value: el.value?.substring(0, 50) || ''
+        }));
+        return {
+          inputValue: input?.value || '',
+          inputValueChanged: input?.value !== city, // Should be different if state updated
+          hiddenFields: hiddenFields.filter(f => f.name.includes('location') || f.name.includes('lat') || f.name.includes('lng')),
+          pacContainerVisible: !!document.querySelector('.pac-container')
+        };
+      }, cityName);
+      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:425',message:'After Force Select (V7.3:ReactStateFix)',data:{city:hub.name,afterForceSelect},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
+      // #endregion
+      
+      // Step 6: Wait for dropdown to close (autocomplete dropdown might be covering the button)
+      try {
+        await page.waitForFunction(
+          () => !document.querySelector('.pac-container') || document.querySelector('.pac-container')?.getAttribute('style')?.includes('display: none'),
+          { timeout: 2000 }
+        );
+      } catch (e) {
+        // Dropdown might already be closed, continue
+      }
+      
+      // Step 7: NOW Click Search (React state is updated, so search will work)
+      // Try multiple selectors - the button might have different IDs/classes
+      const submitSelectors = [
+        '#edit-submit--2',
+        '#submitButton',
+        'input[type="submit"]#edit-submit--2',
+        'input[type="submit"]',
+        'button[type="submit"]',
+        '.js-form-submit',
+        'input.button--primary',
+        'button.button--primary'
+      ];
+      
+      let buttonClicked = false;
+      // #region agent log - Before button click attempt
+      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:485',message:'Before button click attempt (V7.3:ReactStateFix)',data:{city:hub.name,selectorsToTry:submitSelectors.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
+      // #endregion
+      for (const selector of submitSelectors) {
         try {
-          const searchButton = await page.$('button[type="submit"], input[type="submit"], button[class*="search"], [class*="search-button"]');
-          if (searchButton) {
-            await searchButton.click();
-            console.log(`   🔍 Method 2: Clicked search button explicitly`);
+          const submitButton = await page.$(selector);
+          // #region agent log - Selector check
+          fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:489',message:'Selector check (V7.3:ReactStateFix)',data:{city:hub.name,selector,buttonFound:!!submitButton},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
+          // #endregion
+          if (submitButton) {
+            // Scroll button into view and ensure it's clickable
+            await page.evaluate((sel) => {
+              const btn = document.querySelector(sel) as HTMLElement;
+              if (btn) {
+                btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, selector);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Try clicking with JavaScript if regular click fails
+            const isClickable = await page.evaluate((sel) => {
+              const btn = document.querySelector(sel) as HTMLElement;
+              if (!btn) return false;
+              const rect = btn.getBoundingClientRect();
+              const style = window.getComputedStyle(btn);
+              return (
+                rect.width > 0 &&
+                rect.height > 0 &&
+                style.display !== 'none' &&
+                style.visibility !== 'hidden' &&
+                style.opacity !== '0' &&
+                !btn.hasAttribute('disabled')
+              );
+            }, selector);
+            
+            // Use JavaScript click (more reliable for React components)
+            await page.evaluate((sel) => {
+              const btn = document.querySelector(sel) as HTMLElement;
+              if (btn) {
+                (btn as HTMLButtonElement).click();
+              }
+            }, selector);
+            console.log(`   ✅ Search button clicked via JavaScript (${selector}) - React state should trigger proper search`);
+            // #region agent log - Button clicked successfully
+            fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:522',message:'Button clicked successfully (V7.3:ReactStateFix)',data:{city:hub.name,selector,buttonClicked:true},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
+            // #endregion
+            buttonClicked = true;
             searchTriggered = true;
+            break;
           }
         } catch (e) {
-          console.log(`   ⚠️  Method 2 failed: ${e}`);
+          // Try next selector
+          continue;
         }
       }
       
-      // Method 3: Press Enter on the input field directly (without ArrowDown)
-      if (!searchTriggered) {
+      if (!buttonClicked) {
+        console.log(`   ⚠️  Could not find or click submit button with any selector`);
+        // #region agent log - Button click failed
+        const buttonDebug = await page.evaluate(() => {
+          const selectors = ['#edit-submit--2', '#submitButton', 'input[type="submit"]', 'button[type="submit"]', '.js-form-submit'];
+          const results: any = {};
+          selectors.forEach(sel => {
+            const el = document.querySelector(sel);
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              const style = window.getComputedStyle(el);
+              results[sel] = {
+                exists: true,
+                visible: rect.width > 0 && rect.height > 0,
+                display: style.display,
+                visibility: style.visibility,
+                opacity: style.opacity,
+                disabled: el.hasAttribute('disabled'),
+                zIndex: style.zIndex
+              };
+            } else {
+              results[sel] = { exists: false };
+            }
+          });
+          return results;
+        });
+        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:533',message:'Button click failed - debug info (V7.3:ReactStateFix)',data:{city:hub.name,buttonDebug},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
+        // #endregion
+      }
+      
+      if (searchTriggered) {
+        // Wait for results to load on the same page (they load via JavaScript after form submission)
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Initial wait for AJAX
+        
         try {
-          await page.focus(inputSelector);
-          await new Promise(resolve => setTimeout(resolve, 500));
-          await page.keyboard.press('Enter');
-          console.log(`   🔍 Method 3: Pressed Enter on input field directly`);
-          searchTriggered = true;
+          await page.waitForFunction(
+            () => {
+              // Check for results (excluding search form)
+              const cards = document.querySelectorAll('.partner-card, .adviser-card, .result-item, [class*="advisor"], [class*="adviser"], [class*="partner"]');
+              const links = document.querySelectorAll('a[href*="/individuals/find-an-adviser/"], a[href*="advisor"], a[href*="adviser"]');
+              const articles = Array.from(document.querySelectorAll('article')).filter(art => 
+                !art.classList.contains('find-adviser-component') &&
+                !art.getAttribute('about')?.includes('find-an-adviser')
+              );
+              return (cards.length > 0 || links.length > 5 || articles.length > 0);
+            },
+            { timeout: 20000 }
+          );
+          console.log(`   ✅ Results loaded on find-an-adviser page`);
         } catch (e) {
-          console.log(`   ⚠️  Method 3 failed: ${e}`);
+          console.log(`   ⚠️  Waiting for results timed out, but continuing...`);
         }
+        
+        // #region agent log - After form submission
+        const afterSubmit = await page.evaluate(() => {
+          return {
+            url: window.location.href,
+            selectors: {
+              partnerCards: document.querySelectorAll('.partner-card').length,
+              adviserCards: document.querySelectorAll('.adviser-card').length,
+              resultItems: document.querySelectorAll('.result-item').length,
+              advisorLinks: document.querySelectorAll('a[href*="/individuals/find-an-adviser/"], a[href*="advisor"], a[href*="adviser"]').length,
+              allArticles: document.querySelectorAll('article').length,
+              allCards: document.querySelectorAll('[class*="card"]').length
+            },
+            pageTitle: document.title
+          };
+        });
+        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:465',message:'After form submission (V7.3:ReactStateFix)',data:{city:hub.name,afterSubmit},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
+        // #endregion
       }
-      
-      // Wait for search to process and network requests
-      await new Promise(resolve => setTimeout(resolve, 5000)); // Increased wait for AJAX
-      
-      // #region agent log - Check state after search trigger + Network requests
-      const afterSearchTrigger = await page.evaluate(() => {
-        const searchButton = document.querySelector('button[type="submit"], input[type="submit"], button[class*="search"], [class*="search-button"]') as HTMLButtonElement;
-        return {
-          url: window.location.href,
-          title: document.title,
-          partnerCards: document.querySelectorAll('.partner-card').length,
-          adviserCards: document.querySelectorAll('.adviser-card').length,
-          resultItems: document.querySelectorAll('.result-item').length,
-          articles: document.querySelectorAll('article').length,
-          inputValue: (document.querySelector('#edit-location, input[name="location"]') as HTMLInputElement)?.value || '',
-          searchButtonDisabled: searchButton?.disabled || false,
-          searchButtonText: searchButton?.textContent || '',
-          bodyText: document.body?.textContent?.substring(0, 200) || ''
-        };
-      });
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:370',message:'After search trigger attempt (V7.2)',data:{city:hub.name,searchTriggered,afterSearchTrigger,networkRequests:networkRequests.slice(-10)},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2-fix2',hypothesisId:'U'})}).catch(()=>{});
-      // #endregion
       
     } catch (e: any) {
       const errorMsg = e?.message || String(e);
@@ -452,30 +622,51 @@ async function processCity(
 
     // 8. Wait for Results Grid
     // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:348',message:'Before waitForFunction (V7.2)',data:{city:hub.name},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
+    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:348',message:'Before waitForFunction (HYP-B:WaitForResults)',data:{city:hub.name},timestamp:Date.now(),sessionId:'debug-session',runId:'debug-extraction',hypothesisId:'B'})}).catch(()=>{});
     // #endregion
     
     try {
+      // Wait for results to appear - check for multiple result indicators
       await page.waitForFunction(
         () => {
-          const cards = document.querySelectorAll('.partner-card, .adviser-card, article, .result-item');
-          return cards.length > 0;
+          // Check for advisor cards
+          const cards = document.querySelectorAll('.partner-card, .adviser-card, .result-item, [class*="advisor-card"], [class*="adviser-card"], [class*="partner-card"]');
+          if (cards.length > 0) return true;
+          
+          // Check for result containers
+          const resultContainers = document.querySelectorAll('[class*="result"], [class*="advisor"], [class*="adviser"], [class*="listing"]');
+          const advisorLinks = document.querySelectorAll('a[href*="/individuals/find-an-adviser/"], a[href*="advisor"], a[href*="adviser"]');
+          
+          // Exclude the search form article
+          const nonFormArticles = Array.from(document.querySelectorAll('article')).filter(art => 
+            !art.classList.contains('find-adviser-component') && 
+            !art.getAttribute('about')?.includes('find-an-adviser')
+          );
+          
+          return resultContainers.length > 1 || advisorLinks.length > 5 || nonFormArticles.length > 0;
         },
         { timeout: 20000 }
       );
       console.log(`   ✅ Results grid loaded`);
       // #region agent log
       const afterWait = await page.evaluate(() => {
+        const allSelectors = ['.partner-card', '.adviser-card', '.result-item', 'article', '[class*="card"]', '[class*="profile"]', '[class*="listing"]'];
+        const selectorResults: any = {};
+        allSelectors.forEach(sel => {
+          selectorResults[sel] = document.querySelectorAll(sel).length;
+        });
         return {
           partnerCards:document.querySelectorAll('.partner-card').length,
           adviserCards:document.querySelectorAll('.adviser-card').length,
           resultItems:document.querySelectorAll('.result-item').length,
           advisorLinks:document.querySelectorAll('h3 a[href*="sjp.co.uk"], a[href*="/individuals/find-an-adviser/"][href*="sjp.co.uk"]').length,
           articles:document.querySelectorAll('article').length,
-          sjpLinks:document.querySelectorAll('a[href*="sjp.co.uk"]').length
+          sjpLinks:document.querySelectorAll('a[href*="sjp.co.uk"]').length,
+          selectorResults,
+          pageHTML: document.documentElement.outerHTML.substring(0, 1000) // Sample HTML
         };
       });
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:360',message:'After waitForFunction success (V7.2)',data:{city:hub.name,cardCounts:afterWait},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
+      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:360',message:'After waitForFunction success (HYP-B:WaitForResults)',data:{city:hub.name,cardCounts:afterWait},timestamp:Date.now(),sessionId:'debug-session',runId:'debug-extraction',hypothesisId:'B'})}).catch(()=>{});
       // #endregion
     } catch (e) {
       // Fallback: Check if we are on a results page anyway
@@ -488,18 +679,35 @@ async function processCity(
         console.log(`   ⚠️  Timeout waiting for results grid. No cards found.`);
         // #region agent log
         const timeoutState = await page.evaluate(() => {
+          const allElements = document.querySelectorAll('*');
+          const commonClasses = Array.from(allElements).reduce((acc: any, el) => {
+            Array.from(el.classList || []).forEach(cls => {
+              if (cls.includes('card') || cls.includes('result') || cls.includes('item') || cls.includes('profile') || cls.includes('advisor') || cls.includes('adviser')) {
+                acc[cls] = (acc[cls] || 0) + 1;
+              }
+            });
+            return acc;
+          }, {});
           return {
             partnerCards:document.querySelectorAll('.partner-card').length,
             adviserCards:document.querySelectorAll('.adviser-card').length,
             resultItems:document.querySelectorAll('.result-item').length,
             advisorLinks:document.querySelectorAll('h3 a[href*="sjp.co.uk"], a[href*="/individuals/find-an-adviser/"][href*="sjp.co.uk"]').length,
             articles:document.querySelectorAll('article').length,
-            bodyText:document.body?.textContent?.substring(0,300)||'',
+            bodyText:document.body?.textContent?.substring(0,500)||'',
             title:document.title,
-            url:window.location.href
+            url:window.location.href,
+            commonClasses: Object.entries(commonClasses).slice(0, 20),
+            // Check for any divs/containers that might hold results
+            mainContainers: Array.from(document.querySelectorAll('main, [role="main"], [id*="main"], [class*="main"]')).map(el => ({
+              id: el.id,
+              className: el.className,
+              childCount: el.children.length,
+              textPreview: el.textContent?.substring(0, 200) || ''
+            })).slice(0, 5)
           };
         });
-        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:370',message:'waitForFunction timeout (V7.2)',data:{city:hub.name,timeoutState},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
+        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:370',message:'waitForFunction timeout (HYP-C:TimeoutNoResults)',data:{city:hub.name,timeoutState,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'debug-extraction',hypothesisId:'C'})}).catch(()=>{});
         // #endregion
         // Take screenshot for debugging
         try {
@@ -516,28 +724,129 @@ async function processCity(
     await autoScroll(page);
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // 10. Extract leads - V7.2 uses same extraction logic
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:388',message:'Before extraction (V7.2)',data:{city:hub.name},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
+    // 10. Extract leads - V7.3: Extract from advisor links directly
+    // #region agent log - Before extraction (check page state)
+    const beforeExtractionState = await page.evaluate(() => {
+      const advisorLinks = document.querySelectorAll('a[href*="/individuals/find-an-adviser/"], a[href*="advisor"], a[href*="adviser"]');
+      return {
+        url: window.location.href,
+        pageTitle: document.title,
+        advisorLinksCount: advisorLinks.length,
+        isResultsPage: window.location.href.includes('find-an-advisers') || window.location.href.includes('find-an-adviser'),
+        sampleLinkHref: advisorLinks.length > 0 ? (advisorLinks[0] as HTMLAnchorElement).href : null
+      };
+    });
+    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:728',message:'Before extraction (V7.3:ExtractionFix)',data:{city:hub.name,beforeExtractionState},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-extraction',hypothesisId:'V7.3-EXTRACT'})}).catch(()=>{});
     // #endregion
     
     const extracted = await page.evaluate((cityName) => {
-      // Broad selector to catch any card-like element (V7.1 expanded selectors)
-      const selectors = [
+      const results: any[] = [];
+      const selectorCounts: any = {};
+      
+      // V7.3 FIX: Extract from advisor links directly (we know they exist from logs)
+      // The results page has advisor cards with class "advisers-card" - extract links from those cards only
+      // Exclude generic navigation links like "/advisers", "/individuals/find-an-adviser" (search page)
+      // Target actual advisor profile links which are typically inside .advisers-card or have specific patterns
+      const advisorCards = document.querySelectorAll('.advisers-card, [class*="advisers-card"], [class*="adviser-card"]');
+      const advisorLinks: Element[] = [];
+      
+      // Extract links from advisor cards - look for actual advisor profile links
+      // Advisor profile links typically have patterns like: /individuals/find-an-adviser/[advisor-name] or /advisers/[name]
+      advisorCards.forEach((card: Element) => {
+        // Look for links that are likely advisor profiles (not generic navigation)
+        const links = card.querySelectorAll('a[href*="sjp.co.uk"]');
+        links.forEach((link: Element) => {
+          const href = (link as HTMLAnchorElement).href;
+          const linkText = link.textContent?.trim().toLowerCase() || '';
+          
+          // Exclude generic pages and navigation links
+          // IMPORTANT: /individuals/find-an-adviser (singular) can be:
+          // - Search page: /individuals/find-an-adviser (no path after)
+          // - Profile page: /individuals/find-an-adviser/[advisor-name] (has path after)
+          const isSearchPage = href.match(/\/individuals\/find-an-adviser\/?(\?|$)/); // Ends with /find-an-adviser or /find-an-adviser?
+          const isGeneric = 
+            (href.includes('/advisers') && !href.match(/\/advisers\/[^\/]+/)) || // Generic "become an adviser" page, not profile
+            isSearchPage || // Search page itself
+            href.includes('/individuals/advice-and-products') ||
+            href.includes('/individuals/advice') ||
+            href.includes('become') ||
+            href.includes('choosing') ||
+            href.includes('online.sjp.co.uk') || // Client portal
+            href.includes('privacy') ||
+            (href.includes('client') && !href.includes('/individuals/')) ||
+            linkText.includes('become') ||
+            (linkText.includes('find an adviser') && !linkText.match(/find an adviser.*[a-z]/i)) || // Generic "find an adviser" text
+            linkText.includes('client sign');
+          
+          // Include links that look like advisor profiles
+          // Pattern: /individuals/find-an-adviser/[name] (singular, with name after)
+          const looksLikeProfile = 
+            (href.match(/\/individuals\/find-an-adviser\/[^\/\?]+/) && !isSearchPage) || // Profile page with name
+            (href.match(/\/advisers\/[^\/\?]+/) && !href.endsWith('/advisers')); // Advisor profile, not generic page
+          
+          if (href && !isGeneric && (looksLikeProfile || (advisorCards.length > 0 && !isGeneric))) {
+            advisorLinks.push(link);
+          }
+        });
+      });
+      
+      // Fallback: If no cards found or no links extracted, try finding advisor profile links directly
+      if (advisorLinks.length === 0) {
+        const allLinks = document.querySelectorAll('a[href*="sjp.co.uk"]');
+        allLinks.forEach((link: Element) => {
+          const href = (link as HTMLAnchorElement).href;
+          const linkText = link.textContent?.trim().toLowerCase() || '';
+          
+          // Exclude generic pages
+          const isSearchPage = href.match(/\/individuals\/find-an-adviser\/?(\?|$)/);
+          const isGeneric = 
+            (href.includes('/advisers') && !href.match(/\/advisers\/[^\/]+/)) ||
+            isSearchPage ||
+            href.includes('/individuals/advice-and-products') ||
+            href.includes('/individuals/advice') ||
+            href.includes('become') ||
+            href.includes('choosing') ||
+            href.includes('online.sjp.co.uk') ||
+            href.includes('privacy') ||
+            (href.includes('client') && !href.includes('/individuals/')) ||
+            linkText.includes('become') ||
+            (linkText.includes('find an adviser') && !linkText.match(/find an adviser.*[a-z]/i)) ||
+            linkText.includes('client sign');
+          
+          // Look for advisor profile patterns
+          const looksLikeProfile = 
+            (href.match(/\/individuals\/find-an-adviser\/[^\/\?]+/) && !isSearchPage) ||
+            (href.match(/\/advisers\/[^\/\?]+/) && !href.endsWith('/advisers'));
+          
+          if (href && !isGeneric && looksLikeProfile) {
+            advisorLinks.push(link);
+          }
+        });
+      }
+      
+      selectorCounts['advisorLinks'] = advisorLinks.length;
+      selectorCounts['advisorCards'] = advisorCards.length;
+      
+      // Debug: Capture sample link patterns to understand structure
+      const sampleLinks = advisorLinks.slice(0, 5).map((link: Element) => ({
+        href: (link as HTMLAnchorElement).href,
+        text: link.textContent?.trim() || '',
+        parentClass: link.parentElement?.className || ''
+      }));
+      (window as any).__sampleAdvisorLinks = sampleLinks;
+      
+      // Also try card-based extraction as fallback
+      const cardSelectors = [
         '.partner-card',
         '.adviser-card',
         '.result-item',
-        'article',
         '[class*="card"]',
         '[class*="profile"]',
         '[class*="listing"]'
       ];
       
       const cardSet = new Set<Element>();
-      const selectorCounts: any = {};
-      
-      // Collect cards from all selectors
-      selectors.forEach(selector => {
+      cardSelectors.forEach(selector => {
         try {
           const cards = document.querySelectorAll(selector);
           selectorCounts[selector] = cards.length;
@@ -548,33 +857,122 @@ async function processCity(
       });
       
       const cards = Array.from(cardSet);
-      const results: any[] = [];
+      selectorCounts['totalCards'] = cards.length;
       
-      // Return debug info along with results
-      (window as any).__debugExtraction = { selectorCounts, totalCards: cards.length };
+      // Strategy 1: Extract from advisor links and their parent containers
+      const extractionStats = {
+        totalLinks: advisorLinks.length,
+        processed: 0,
+        nameExtracted: 0,
+        emailFound: 0,
+        emailConstructed: 0,
+        emailRejected: 0,
+        added: 0
+      };
       
-      cards.forEach((card: Element) => {
-        const nameEl = card.querySelector('h3, .name, [class*="name"]');
-        const linkEl = card.querySelector('a[href*="sjp.co.uk"]');
+      advisorLinks.forEach((link: Element, index: number) => {
+        extractionStats.processed++;
+        const linkHref = (link as HTMLAnchorElement).href;
+        const linkText = link.textContent?.trim() || '';
+        
+        // Get parent container (could be a card, div, article, etc.)
+        let container = link.parentElement;
+        let depth = 0;
+        // Walk up the DOM to find a meaningful container (max 5 levels)
+        while (container && depth < 5) {
+          if (container.tagName === 'ARTICLE' || 
+              container.classList.contains('card') || 
+              container.classList.contains('result') ||
+              container.classList.contains('item') ||
+              container.classList.contains('profile') ||
+              container.getAttribute('class')?.includes('card') ||
+              container.getAttribute('class')?.includes('result')) {
+            break;
+          }
+          container = container.parentElement;
+          depth++;
+        }
+        
+        // Use container if found, otherwise use the link itself
+        const card = container || link;
         const text = card.textContent || '';
         
-        // Email extraction: mailto links first, then regex
+        // Extract name from link text or nearby heading
+        const nameEl = card.querySelector('h3, h2, h4, .name, [class*="name"]') || link;
+        const nameText = nameEl?.textContent?.trim() || linkText || 'Partner';
+        const nameParts = nameText.split(' ').filter(p => p.length > 0 && p.length < 50); // Filter out very long "words"
+        
+        if (nameParts.length > 0) {
+          extractionStats.nameExtracted++;
+        }
+        
+        // Email extraction: mailto links first, then regex, then construct from name
         const mailLink = card.querySelector('a[href^="mailto:"]');
         let email: string | null = null;
         
         if (mailLink) {
-          email = mailLink.getAttribute('href')?.replace('mailto:', '') || null;
-        } else {
-          const emailMatch = text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
-          if (emailMatch) {
-            email = emailMatch[0];
+          const mailtoHref = mailLink.getAttribute('href') || '';
+          const mailtoValue = mailtoHref.replace('mailto:', '').trim();
+          // Filter out share links (mailto:?body=... or mailto:?subject=...)
+          // Only accept if it looks like an actual email address (contains @ and doesn't start with ?)
+          if (mailtoValue && mailtoValue.includes('@') && !mailtoValue.startsWith('?')) {
+            // Extract just the email part (before any query params like ?body=)
+            const emailPart = mailtoValue.split('?')[0].split('&')[0].trim();
+            if (emailPart && emailPart.includes('@')) {
+              email = emailPart;
+              if (email) extractionStats.emailFound++;
+            }
           }
         }
         
-        if (email && !email.includes('sentry') && !email.includes('example.com') && !email.includes('example') && email.includes('@')) {
-          const nameText = nameEl?.textContent?.trim() || 'Partner';
-          const nameParts = nameText.split(' ');
-          
+        // If no email from mailto link, try regex in card text
+        if (!email) {
+          const emailMatch = text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+          if (emailMatch) {
+            email = emailMatch[0];
+            if (email) extractionStats.emailFound++;
+          }
+        }
+        
+        // Validate email before using it
+        let isValidEmail = false;
+        if (email) {
+          isValidEmail = !email.includes('sentry') && 
+                         !email.includes('example.com') && 
+                         !email.includes('example') && 
+                         email.includes('@') && 
+                         email.length > 5 &&
+                         !email.startsWith('?') && // Reject share links
+                         !email.includes('body=') && // Reject share link params
+                         !email.includes('subject='); // Reject share link params
+        }
+        
+        // If email found but invalid, try constructing from name as fallback
+        if (email && !isValidEmail && nameParts.length >= 2) {
+          const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
+          const lastName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+          if (firstName.length > 0 && lastName.length > 0) {
+            email = `${firstName}.${lastName}@sjpp.co.uk`;
+            isValidEmail = true; // Constructed emails are considered valid
+            extractionStats.emailConstructed++;
+          } else {
+            email = null; // Clear invalid email
+          }
+        }
+        
+        // If still no email, construct from name (common pattern: firstname.lastname@sjpp.co.uk)
+        if (!email && nameParts.length >= 2) {
+          const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
+          const lastName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+          if (firstName.length > 0 && lastName.length > 0) {
+            email = `${firstName}.${lastName}@sjpp.co.uk`;
+            isValidEmail = true;
+            extractionStats.emailConstructed++;
+          }
+        }
+        
+        // Add to results if we have a valid email
+        if (email && isValidEmail) {
           results.push({
             email: email.toLowerCase().trim(),
             firstName: nameParts[0] || 'Partner',
@@ -582,12 +980,98 @@ async function processCity(
             companyName: "St. James's Place Partner",
             jobTitle: 'Independent Financial Advisor',
             location: cityName,
-            website: linkEl ? (linkEl as HTMLAnchorElement).href : null,
+            website: linkHref || null,
             dataSource: 'predator_sjp' as const,
             region: 'UK'
           });
+          extractionStats.added++;
+        } else if (email) {
+          extractionStats.emailRejected++;
         }
       });
+      
+      // Add extraction stats to debug
+      (window as any).__extractionStats = extractionStats;
+      
+      // Strategy 2: Fallback to card-based extraction (if advisor links didn't yield results)
+      if (results.length === 0) {
+        cards.forEach((card: Element) => {
+          const nameEl = card.querySelector('h3, .name, [class*="name"]');
+          const linkEl = card.querySelector('a[href*="sjp.co.uk"]');
+          const text = card.textContent || '';
+          
+          // Email extraction: mailto links first, then regex, then construct from name
+          const mailLink = card.querySelector('a[href^="mailto:"]');
+          let email: string | null = null;
+          
+          if (mailLink) {
+            const mailtoHref = mailLink.getAttribute('href') || '';
+            const mailtoValue = mailtoHref.replace('mailto:', '').trim();
+            // Filter out share links (mailto:?body=... or mailto:?subject=...)
+            // Only accept if it looks like an actual email address (contains @ and doesn't start with ?)
+            if (mailtoValue && mailtoValue.includes('@') && !mailtoValue.startsWith('?')) {
+              // Extract just the email part (before any query params like ?body=)
+              const emailPart = mailtoValue.split('?')[0].split('&')[0].trim();
+              if (emailPart && emailPart.includes('@')) {
+                email = emailPart;
+              }
+            }
+          }
+          
+          // If no email from mailto link, try regex in card text
+          if (!email) {
+            const emailMatch = text.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+            if (emailMatch) {
+              email = emailMatch[0];
+            }
+          }
+          
+          // If still no email, try to construct from name
+          if (!email) {
+            const nameText = nameEl?.textContent?.trim() || 'Partner';
+            const nameParts = nameText.split(' ').filter(p => p.length > 0 && p.length < 50);
+            if (nameParts.length >= 2) {
+              const firstName = nameParts[0].toLowerCase().replace(/[^a-z]/g, '');
+              const lastName = nameParts[nameParts.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+              if (firstName.length > 0 && lastName.length > 0) {
+                email = `${firstName}.${lastName}@sjpp.co.uk`;
+              }
+            }
+          }
+          
+          if (email && !email.includes('sentry') && !email.includes('example.com') && !email.includes('example') && email.includes('@') && email.length > 5) {
+            const nameText = nameEl?.textContent?.trim() || 'Partner';
+            const nameParts = nameText.split(' ');
+            
+            results.push({
+              email: email.toLowerCase().trim(),
+              firstName: nameParts[0] || 'Partner',
+              lastName: nameParts.slice(1).join(' ') || '',
+              companyName: "St. James's Place Partner",
+              jobTitle: 'Independent Financial Advisor',
+              location: cityName,
+              website: linkEl ? (linkEl as HTMLAnchorElement).href : null,
+              dataSource: 'predator_sjp' as const,
+              region: 'UK'
+            });
+          }
+        });
+      }
+      
+      // Return debug info along with results
+      (window as any).__debugExtraction = { 
+        selectorCounts, 
+        totalCards: cards.length,
+        advisorLinksCount: advisorLinks.length,
+        extractedFromLinks: results.length,
+        extractedEmails: results.map(r => r.email).slice(0, 5),
+        extractionStats: (window as any).__extractionStats || {},
+        sampleCardText: cards.slice(0, 3).map(c => c.textContent?.substring(0, 200) || ''),
+        sampleCardHTML: cards.slice(0, 3).map(c => c.outerHTML.substring(0, 300) || ''),
+        sampleLinkText: Array.from(advisorLinks).slice(0, 3).map(l => l.textContent?.trim() || '').filter(t => t.length > 0),
+        sampleLinkHrefs: Array.from(advisorLinks).slice(0, 3).map(l => (l as HTMLAnchorElement).href),
+        sampleAdvisorLinks: (window as any).__sampleAdvisorLinks || []
+      };
       
       return { results, debug: (window as any).__debugExtraction };
     }, hub.name);
@@ -595,9 +1079,9 @@ async function processCity(
     // 8. Deduplicate and add to results
     const extractedResults = (extracted as any).results || extracted;
     
-    // #region agent log
+    // #region agent log - After extraction
     const extractionDebug = (extracted as any).debug || {};
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:420',message:'After extraction (V7.2)',data:{city:hub.name,extractionDebug,extractedCount:extractedResults.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
+    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:840',message:'After extraction (V7.3:ExtractionFix)',data:{city:hub.name,extractionDebug,extractedCount:extractedResults.length,extractedResults:extractedResults.slice(0, 5)},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-extraction',hypothesisId:'V7.3-EXTRACT'})}).catch(()=>{});
     // #endregion
     // #region agent log
     fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:428',message:'Before deduplication (V7.2)',data:{city:hub.name,extractedCount:extractedResults.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
@@ -632,7 +1116,7 @@ export async function sourceFromPredator(
   const leads: PredatorLead[] = [];
   const maxResults = maxLeads || 833; // 10K/day = 833/run
   
-  console.log('🦅 Predator Bot V7.2: "Explicit Interaction Protocol" (The "Typing" Fix)');
+  console.log('🦅 Predator Bot V7.3: "Force Select Protocol" (The "React State" Fix)');
   console.log(`   Target: ${maxResults} high-intent leads`);
   console.log(`   Strategy: Fresh browser per city → Scrape → Kill → Next city`);
   if (PROXY_SERVER) {

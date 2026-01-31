@@ -83,6 +83,7 @@
     "db:add-lead-submitted": "ts-node --project scripts/tsconfig.json scripts/add-lead-submitted-audit-action.ts",
     "process-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-leads-autonomous.ts",
     "process-inbound-autonomous": "ts-node --project scripts/tsconfig.json scripts/process-inbound-autonomous.ts",
+    "test-predator-100": "ts-node --project scripts/tsconfig.json scripts/test-predator-100-leads.ts",
     "update-scheduled-emails": "ts-node --project scripts/tsconfig.json scripts/update-scheduled-emails.ts",
     "re-enrich-stale-leads": "ts-node --project scripts/tsconfig.json scripts/re-enrich-stale-leads.ts",
     "db:add-sequence-step": "ts-node --project scripts/tsconfig.json scripts/add-sequence-step-migration.ts",
