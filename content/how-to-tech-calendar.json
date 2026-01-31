@@ -443,14 +443,15 @@
     "scheduledTime": "14:00",
     "title": "The Tech Stack of a \"Zero-Data\" Application",
     "slug": "the-tech-stack-of-a-zero-data-application",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "stack",
       "zero",
       "data"
-    ]
+    ],
+    "publishedAt": "2026-01-31T14:17:31.484Z"
   },
   {
     "id": "how-to-how-to-format-currency-correctly-in-javascript-intl-api-feb-1",

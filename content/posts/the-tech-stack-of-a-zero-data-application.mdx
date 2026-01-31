@@ -1,0 +1,87 @@
+---
+title: The Tech Stack of a 'Zero-Data' Application
+date: '2026-01-31'
+description: >-
+  Discover the optimal tech stack for building a zero-data application, ensuring
+  user data sovereignty and privacy.
+tags:
+  - stack
+  - zero
+  - data
+author: Pocket Portfolio Team
+image: /images/blog/the-tech-stack-of-a-zero-data-application.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Building a zero-data application, where the app operates without needing to store user data on its servers, poses unique challenges and demands a carefully selected tech stack to ensure user data sovereignty and privacy.
+
+### Direct Solution with Code
+
+To achieve this, you'll want to leverage client-side storage technologies and end-to-end encryption. Here's a quick example using LocalStorage for data storage and the Web Crypto API for encryption:
+
+```javascrip
+t
+// Sample data to be stored
+const userData = { portfolio: "BTC, ETH, XMR" };
+
+// Encrypt user data before storing
+async function encryptData(data) {
+  const encodedData = new TextEncoder().encode(JSON.stringify(data));
+  const cryptoKey = await window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 256,
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+  const encryptedData = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv: window.crypto.getRandomValues(new Uint8Array(12)),
+    },
+    cryptoKey,
+    encodedData
+  );
+  return { encryptedData, cryptoKey };
+}
+
+// Decrypt user data when accessing
+async function decryptData(encryptedData, cryptoKey) {
+  const decryptedData = await window.crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: encryptedData.iv, // Assume IV is stored with encrypted data
+    },
+    cryptoKey,
+    encryptedData.data
+  );
+  return JSON.parse(new TextDecoder().decode(decryptedData));
+}
+
+// Encrypt and store data
+encryptData(userData).then(({ encryptedData, cryptoKey }) => {
+  localStorage.setItem("userPortfolio", JSON.stringify(encryptedData));
+  // Store cryptoKey securely
+});
+
+// Decrypt and access data
+const storedData = JSON.parse(localStorage.getItem("userPortfolio"));
+decryptData(storedData, cryptoKey).then((data) => {
+  console.log(data); // { portfolio: "BTC, ETH, XMR" }
+});
+```
+
+### Explanation of Key Concepts
+
+- **LocalStorage**: A web storage option allowing you to store data on the client's browser. It's synchronous and limited to string data, but sufficient for small datasets when combined with encryption for security.
+- **Web Crypto API**: Provides cryptographic operations in web applications, such as hashing, signature generation, and encryption. It's essential for encrypting sensitive data before storing it client-side.
+
+### Quick Tip
+
+When using LocalStorage, always be mindful of its limitations, such as the 5-10 MB storage limit and its synchronous nature, which can block the main thread. Also, consider the security implications and ensure encryption keys are managed securely, possibly using IndexedDB or secure cloud key management services to store the encryption keys separately from the data.
+
+### Verdict
+
+Building a zero-data application requires a strategic selection of client-side technologies and security practices. By leveraging LocalStorage for data storage and the Web Crypto API for encryption, developers can create secure, privacy-focused applications that respect user data sovereignty. Remember, the key is in ensuring that all user data is encrypted before storage and that encryption keys are managed securely and separately from the user's data.
