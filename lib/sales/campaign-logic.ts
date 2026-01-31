@@ -7,6 +7,8 @@
  * NO sponsorship pitches - only White Label Portal pitches.
  */
 
+import { isRealFirstName } from '@/lib/sales/name-validation';
+
 export const CAMPAIGN_STRATEGY = {
   product: "Corporate Sponsor (White Label Edition)",
   price: "$1,000/year",
@@ -64,6 +66,7 @@ export function getPromptForStep(
   step: number, 
   lead: {
     firstName?: string;
+    firstNameReliable?: boolean;
     lastName?: string;
     companyName: string;
     email: string;
@@ -75,7 +78,16 @@ export function getPromptForStep(
   
   if (!strategy) return null; // End of sequence
 
-  const greetingName = lead.firstName || lead.companyName;
+  // Validate firstName before using it (same logic as standard strategy)
+  const firstNameReliable = lead.firstNameReliable !== false && 
+                            lead.firstName && 
+                            isRealFirstName(lead.firstName);
+  const greetingName = firstNameReliable ? lead.firstName : lead.companyName;
+  
+  // Add warning if firstName is unreliable
+  const firstNameWarning = lead.firstName && !firstNameReliable 
+    ? `\n\n⚠️ CRITICAL: The provided "firstName" (${lead.firstName}) is NOT a real name - it appears to be an email prefix (e.g., "info", "contact", "hello"). DO NOT use this in the greeting. Use the company name instead (${lead.companyName}).`
+    : '';
   const sourceContext = lead.dataSource?.includes('sjp') 
     ? 'St. James\'s Place Partner' 
     : lead.dataSource?.includes('vouchedfor') 
@@ -91,7 +103,7 @@ export function getPromptForStep(
 
   return `
     RECIPIENT: ${greetingName}${lead.lastName ? ` ${lead.lastName}` : ''}
-    COMPANY: ${lead.companyName}
+    COMPANY: ${lead.companyName}${firstNameWarning}
     SOURCE: ${sourceContext} (Adjust tone: Professional but direct)
     REGION: ${lead.region || 'UK'} - ${regionalContext}
     
@@ -99,6 +111,12 @@ export function getPromptForStep(
     
     INSTRUCTIONS:
     ${strategy.prompt_instruction}
+    
+    GREETING: ${firstNameReliable 
+      ? `Use their first name: "Hi ${lead.firstName}," or "Hello ${lead.firstName}," - be professional and direct`
+      : `Use a company greeting: "Hi team at ${lead.companyName}," or "Hello ${lead.companyName}," - be professional and direct`}
+    
+    CLOSING: MUST include a friendly closing before the signature: "Looking forward to your thoughts!" or "Hope to hear from you!" (REQUIRED - do not omit)
     
     TONE: Founder-to-Founder. Direct. High status. You represent the CEO's voice but are transparently an AI assistant.
     SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):

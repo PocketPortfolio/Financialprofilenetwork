@@ -114,6 +114,17 @@ const nextConfig = {
         destination: '/dashboard',
         permanent: true,
       },
+      // Redirect /import/nasdaq and /import/nyse to /import (exchanges, not brokers)
+      {
+        source: '/import/nasdaq',
+        destination: '/import',
+        permanent: true,
+      },
+      {
+        source: '/import/nyse',
+        destination: '/import',
+        permanent: true,
+      },
       // Sector pages not yet implemented - redirect to dashboard
       {
         source: '/sector',

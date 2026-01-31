@@ -104,6 +104,7 @@ function buildPrompt(
   if (useB2BStrategy && emailType === 'initial' && sequenceStep === 1) {
     const b2bPrompt = getPromptForStep(0, {
       firstName: leadData.firstName,
+      firstNameReliable: leadData.firstNameReliable,
       lastName: undefined,
       companyName: leadData.companyName,
       email: '',
@@ -120,6 +121,7 @@ function buildPrompt(
   if (useB2BStrategy && emailType === 'follow_up' && sequenceStep === 2) {
     const b2bPrompt = getPromptForStep(1, {
       firstName: leadData.firstName,
+      firstNameReliable: leadData.firstNameReliable,
       lastName: undefined,
       companyName: leadData.companyName,
       email: '',
@@ -136,6 +138,7 @@ function buildPrompt(
   if (useB2BStrategy && emailType === 'objection_handling') {
     const b2bPrompt = getPromptForStep(2, {
       firstName: leadData.firstName,
+      firstNameReliable: leadData.firstNameReliable,
       lastName: undefined,
       companyName: leadData.companyName,
       email: '',
@@ -152,6 +155,7 @@ function buildPrompt(
   if (useB2BStrategy && emailType === 'follow_up' && sequenceStep === 4) {
     const b2bPrompt = getPromptForStep(3, {
       firstName: leadData.firstName,
+      firstNameReliable: leadData.firstNameReliable,
       lastName: undefined,
       companyName: leadData.companyName,
       email: '',
@@ -264,7 +268,7 @@ CRITICAL REQUIREMENTS (Sprint 4: Humanity & Precision):
 4. FRIENDLINESS CHECKLIST:
    - Start with a warm greeting (use exclamation marks sparingly but naturally)
    - Use "I" and "you" (conversational, not formal)
-   - Include a friendly closing ("Looking forward to your thoughts!" or "Hope to hear from you!")
+   - MUST include a friendly closing before the signature: "Looking forward to your thoughts!" or "Hope to hear from you!" (REQUIRED - do not omit)
    - Be genuine, not robotic - show personality while staying professional
    - Use contractions naturally ("I'm", "you're", "we're") for a conversational feel
 
@@ -348,6 +352,7 @@ Requirements:
 - One relevant technical detail about local-first architecture or data privacy
 - Reference their specific tech stack or company context
 - Offer to archive if not interested
+- MUST include a friendly closing before the signature: "Looking forward to your thoughts!" or "Hope to hear from you!" (REQUIRED - do not omit)
 - Include reasoning
 
 SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
@@ -388,6 +393,7 @@ Requirements:
 - Professional, helpful tone
 - Address privacy/security concerns proactively
 - Use compliance knowledge base information
+- MUST include a friendly closing before the signature: "Looking forward to your thoughts!" or "Hope to hear from you!" (REQUIRED - do not omit)
 - Include reasoning
 
 SIGNATURE: End with this exact signature (DO NOT use "[Your Name]" or any placeholder):
