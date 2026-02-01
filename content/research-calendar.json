@@ -416,7 +416,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Cache Invalidation Strategies - Performance Analysis",
     "slug": "research-cache-invalidation-strategies-performance-analysis-2026-02-01",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -424,7 +424,9 @@
       "cache",
       "invalidation",
       "strategies"
-    ]
+    ],
+    "videoId": "rJkObKkcl6w",
+    "publishedAt": "2026-02-01T18:19:40.728Z"
   },
   {
     "id": "research-api-gateway-routing-performance-path-matching-overhead-2026-02-02",
