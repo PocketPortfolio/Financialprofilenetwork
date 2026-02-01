@@ -292,11 +292,27 @@ async function processCity(
   }
   
   // 2. Launch fresh browser for this city
-  const browser = await puppeteerExtra.launch({
-    headless: true, // Headless mode for CI/CD compatibility
-    args: launchArgs,
-    ignoreDefaultArgs: ['--enable-automation'],
-  });
+  let browser: Browser | null = null;
+  try {
+    browser = await puppeteerExtra.launch({
+      headless: true, // Headless mode for CI/CD compatibility
+      args: launchArgs,
+      ignoreDefaultArgs: ['--enable-automation'],
+    });
+    console.log(`   ✅ Browser launched successfully for ${hub.name}`);
+  } catch (launchError: any) {
+    console.error(`   ❌ Browser launch failed for ${hub.name}: ${launchError.message}`);
+    if (launchError.message?.includes('Chrome') || launchError.message?.includes('browser')) {
+      console.error(`   ⚠️  CRITICAL: Chrome/Chromium not found. Install Chrome dependencies in GitHub Actions.`);
+    }
+    // Return empty array if browser fails to launch
+    return cityLeads;
+  }
+  
+  if (!browser) {
+    console.error(`   ❌ Browser is null for ${hub.name}`);
+    return cityLeads;
+  }
   
   try {
     const page = await browser.newPage();
@@ -1416,9 +1432,20 @@ async function processCity(
     
   } catch (error: any) {
     console.error(`   ❌ Failed ${hub.name}: ${error.message}`);
+    console.error(`   Stack: ${error.stack}`);
+    // Log error details for debugging in GitHub Actions
+    if (error.message?.includes('Chrome') || error.message?.includes('browser')) {
+      console.error(`   ⚠️  Browser launch error - Chrome dependencies may be missing`);
+    }
   } finally {
     // 11. Kill browser (clean state, zero memory leaks)
-    await browser.close();
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (closeError: any) {
+        console.error(`   ⚠️  Error closing browser: ${closeError.message}`);
+      }
+    }
   }
   
   return cityLeads;
