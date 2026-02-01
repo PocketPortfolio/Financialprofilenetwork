@@ -1,0 +1,53 @@
+---
+title: How to Format Currency Correctly in JavaScript (Intl API)
+date: '2026-02-01'
+description: >-
+  Learn to format currency accurately in JavaScript using the Intl API, ensuring
+  your financial applications display data correctly.
+tags:
+  - api
+  - javascript
+  - ava
+  - format
+  - currency
+author: Pocket Portfolio Team
+image: /images/blog/how-to-format-currency-correctly-in-javascript-intl-api.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Formatting currency correctly in JavaScript applications is crucial for financial accuracy and user experience. Displaying currency without proper format can lead to misunderstandings or mistrust in the data presented. The Intl API provides a robust solution for this problem.
+
+Here's a direct solution using the `Intl.NumberFormat` object:
+
+```javascrip
+t
+const formatCurrency = (amount, currency = 'USD', locale = 'en-US') => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(amount);
+};
+
+console.log(formatCurrency(123456.789, 'EUR')); // Output: €123,456.79
+console.log(formatCurrency(123456.789, 'JPY', 'ja-JP')); // Output: ￥123,457
+```
+
+### Explanation of Key Concepts
+
+- **Intl API**: Part of the ECMAScript Internationalization API, providing language sensitive string comparison, number formatting, and date and time formatting.
+- **Intl.NumberFormat**: A constructor for objects that enable language-sensitive number formatting.
+- **Parameters**:
+  - `locale`: A string with a BCP 47 language tag, or an array of such strings; for example, 'en-US' for English as used in the United States. This controls the language and formatting conventions.
+  - `options`: An object with properties that specify details about the formatting. The `style: 'currency'` option is essential for formatting currency, and `currency: 'USD'` specifies the type of currency to display.
+  
+### Quick Tip
+
+Always ensure the `locale` and `currency` codes are correctly specified to match your application's target audience. Incorrect codes can result in unexpected formatting or errors.
+
+### Gotchas
+
+- **Rounding**: The `Intl.NumberFormat` rounds numbers based on the currency's smallest unit (e.g., cents for USD). Be aware of this when formatting currencies that do not use a minor unit, like the Japanese Yen (JPY).
+- **Browser Support**: While the Intl API is widely supported among modern browsers, always check for compatibility if your application targets older browsers or environments.
+
+This straightforward approach to formatting currency utilizing the Intl API in JavaScript ensures that financial data is accurately and appropriately displayed across different locales and currencies, enhancing the overall user experience in your applications.
