@@ -16,6 +16,7 @@ export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const runtime = 'nodejs';
 export const revalidate = 0; // Force no caching to ensure Next.js recognizes the route
+export const fetchCache = 'force-no-store'; // Required for Next.js 15 production routes
 
 // Free tier: 50 calls per hour per IP (more generous than price API since this is historical data)
 const FREE_TIER_LIMIT = 50;
