@@ -310,7 +310,7 @@
     "date": "2026-02-02",
     "title": "Breaking Free: How JSON Unlocks True Financial Data Ownership",
     "slug": "breaking-free-how-json-unlocks-true-financial-data-ownership",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -320,7 +320,8 @@
       "breaking"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-02-02T09:59:48.035Z"
   },
   {
     "id": "week-5-post-2",
