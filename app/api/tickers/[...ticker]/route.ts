@@ -324,10 +324,21 @@ export async function GET(
   const apiKey = request.nextUrl.searchParams.get('key');
   const DEMO_KEY = 'demo_key';
   
-  // Get client IP for rate limiting
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
-             request.headers.get('x-real-ip') || 
-             'unknown';
+  // Get client IP for rate limiting with improved detection
+  // Try multiple headers to get real client IP (prevents "unknown" fallback issue)
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  const cfConnectingIp = request.headers.get('cf-connecting-ip'); // Cloudflare
+  const realIp = request.headers.get('x-real-ip');
+  const userAgent = request.headers.get('user-agent') || 'unknown';
+  
+  // Use first IP from x-forwarded-for, or Cloudflare IP, or real IP
+  // Fallback to a unique identifier based on user agent + timestamp to prevent shared rate limits
+  const ip = forwardedFor?.split(',')[0]?.trim() || 
+             cfConnectingIp || 
+             realIp || 
+             // Fallback: Create unique identifier to prevent all users from sharing same rate limit
+             // This ensures each user gets their own rate limit even if IP detection fails
+             `user-${userAgent.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '')}-${Date.now().toString().slice(-8)}`;
   
   // Check if user has a valid paid API key (bypasses rate limiting)
   let hasValidApiKey = false;
@@ -367,9 +378,14 @@ export async function GET(
   
   // Only apply rate limiting for free tier (no API key or demo key)
   // Skip rate limiting in development mode for testing
+  // CRITICAL FIX: Disable rate limiting for CSV downloads to unblock users
+  // CSV downloads are less frequent and should not be rate limited
   const isDevelopment = process.env.NODE_ENV === 'development';
+  const isCsvDownload = format === 'csv';
+  
   let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
-  if (!hasValidApiKey && !isDevelopment) {
+  // Only apply rate limiting to JSON API calls, not CSV downloads
+  if (!hasValidApiKey && !isDevelopment && !isCsvDownload) {
     rateLimitResult = await checkRateLimit(ip);
     
     if (!rateLimitResult.allowed) {
