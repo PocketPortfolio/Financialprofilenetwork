@@ -438,13 +438,16 @@ export async function GET(
   // Only apply rate limiting for free tier (no API key or demo key)
   // Skip rate limiting in development mode for testing
   // CRITICAL FIX: Disable rate limiting for CSV downloads to unblock users
-  // CSV downloads are less frequent and should not be rate limited
+  // CRITICAL FIX: Disable rate limiting for desktop view requests (ticker page features must always render)
+  // CSV downloads and desktop view requests are less frequent and should not be rate limited
   const isDevelopment = process.env.NODE_ENV === 'development';
   const isCsvDownload = format === 'csv';
+  const isDesktopView = searchParams.get('desktop') === 'true'; // Desktop view requests from ticker pages
   
   let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
-  // Only apply rate limiting to JSON API calls, not CSV downloads
-  if (!hasValidApiKey && !isDevelopment && !isCsvDownload) {
+  // Only apply rate limiting to external JSON API calls, not CSV downloads or desktop view requests
+  // Desktop view requests are exempt because Risk Metrics and Historical Data Table must always render
+  if (!hasValidApiKey && !isDevelopment && !isCsvDownload && !isDesktopView) {
     rateLimitResult = await checkRateLimit(ip);
     
     if (!rateLimitResult.allowed) {

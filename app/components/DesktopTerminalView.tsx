@@ -84,10 +84,21 @@ export default function DesktopTerminalView({
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/tickers/${normalizedSymbol}/json?range=1y`);
+        // Add desktop=true parameter to exempt from rate limiting
+        // This ensures ticker page features (Risk Metrics, Historical Data Table) always render
+        const response = await fetch(`/api/tickers/${normalizedSymbol}/json?range=1y&desktop=true`);
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch data');
+          // Improved error handling for better UX
+          if (response.status === 429) {
+            const errorData = await response.json().catch(() => ({}));
+            const retryAfter = errorData.retryAfter || 60;
+            const minutes = Math.ceil(retryAfter / 60);
+            throw new Error(`Rate limit exceeded. Please try again in ${minutes} minute${minutes !== 1 ? 's' : ''}. Get unlimited access: pocketportfolio.app/sponsor`);
+          }
+          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
         }
+        
         const data = await response.json();
         const dataPoints = data.data || [];
         // Sort by date (newest first) and take first 10
@@ -137,10 +148,12 @@ export default function DesktopTerminalView({
     }
   };
 
-  // Calculate risk metrics
-  const prices = historicalData.map(d => d.close);
-  const volatility = calculateVolatility(prices);
-  const maxDrawdown = calculateMaxDrawdown(prices);
+  // Calculate risk metrics (only if data is available)
+  const prices = historicalData.length > 0 
+    ? historicalData.map(d => d.close).filter((price): price is number => typeof price === 'number' && !isNaN(price))
+    : [];
+  const volatility = prices.length >= 2 ? calculateVolatility(prices) : 0;
+  const maxDrawdown = prices.length > 0 ? calculateMaxDrawdown(prices) : 0;
 
   return (
     <div style={{
@@ -262,7 +275,7 @@ export default function DesktopTerminalView({
                     fontSize: '14px',
                     color: 'var(--text-secondary)'
                   }}>
-                    {metadata.exchange} • {metadata.sector || 'General'}
+                    {metadata?.exchange || 'Unknown'} • {metadata?.sector || 'General'}
                   </span>
                 </div>
                 <TickerStockInfo symbol={normalizedSymbol} initialData={initialQuoteData ? {
