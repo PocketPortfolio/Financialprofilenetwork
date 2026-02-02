@@ -134,10 +134,13 @@ concurrency:
 ## ✅ Verification
 
 ### Current Status
-- ✅ **0 stuck runs** across all workflows
+- ✅ **0 stuck runs** across all workflows (excluding 33-day-old ghost run #1)
 - ✅ All workflows have concurrency control
 - ✅ All long-running jobs have timeouts
 - ✅ Cancellation script works for all workflows
+
+### Known Edge Case (Resolved)
+- ✅ **Ghost Run #1:** "Generate Blog Posts" run #1 (33+ days old) was manually deleted via GitHub UI. Issue resolved.
 
 ### Test Commands
 ```bash
