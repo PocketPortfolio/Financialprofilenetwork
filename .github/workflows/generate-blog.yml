@@ -22,6 +22,12 @@ on:
     - cron: '30 12 6 1 *'  # 12:30 UTC on Jan 6, 2026 - Stress test AI post (rescheduled from 12:00 to test system)
   workflow_dispatch: # Allow manual triggering (for testing/debugging only)
 
+# Concurrency control - prevent queue buildup
+# Only allow one instance of this workflow to run at a time
+concurrency:
+  group: generate-blog
+  cancel-in-progress: false  # Don't cancel scheduled runs, just queue them
+
 jobs:
   generate:
     runs-on: ubuntu-latest

@@ -11,6 +11,12 @@ on:
     - cron: '0 * * * *'
   workflow_dispatch: # Allow manual triggering for testing
 
+# Concurrency control - prevent queue buildup
+# Only allow one instance of this workflow to run at a time
+concurrency:
+  group: autonomous-revenue-engine
+  cancel-in-progress: false  # Don't cancel scheduled runs, just queue them
+
 jobs:
   source-leads:
     name: Source New Leads
