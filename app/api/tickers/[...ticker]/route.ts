@@ -240,12 +240,13 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ ticker: string[] }> }
 ) {
-  // Next.js 15: params is always a Promise
-  const resolvedParams = await params;
-  const pathname = request.nextUrl.pathname;
-  
-  // Log for debugging (production-safe)
-  console.warn(`[TICKERS_JSON_API] Route handler ENTRY | Path: ${pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
+  try {
+    // Next.js 15: params is always a Promise
+    const resolvedParams = await params;
+    const pathname = request.nextUrl.pathname;
+    
+    // Log for debugging (production-safe)
+    console.warn(`[TICKERS_JSON_API] Route handler ENTRY | Path: ${pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
   
   // Extract ticker and format from pathname as fallback (more reliable than params on Vercel)
   // Path format: /api/tickers/{TICKER}/json or /api/tickers/{TICKER}/csv
@@ -472,6 +473,21 @@ export async function GET(
         error: 'Failed to fetch historical data',
         symbol: ticker,
         message: error.message
+      },
+      { status: 500 }
+    );
+  }
+  } catch (error: any) {
+    // Catch any initialization errors or unexpected errors outside the main try-catch
+    console.error('[TICKERS_API] Unexpected error in route handler:', error);
+    return NextResponse.json(
+      { 
+        error: 'Internal server error',
+        message: error?.message || 'An unexpected error occurred',
+        diagnostic: {
+          errorType: error?.constructor?.name || 'Unknown',
+          timestamp: new Date().toISOString()
+        }
       },
       { status: 500 }
     );

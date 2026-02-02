@@ -44,7 +44,9 @@ export default function TickerCsvDownload({ symbol, name }: TickerCsvDownloadPro
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('CSV download error:', error);
-      alert('Failed to download CSV. Please try again.');
+      // Show the actual error message instead of generic message
+      const errorMessage = error instanceof Error ? error.message : 'Failed to download CSV. Please try again.';
+      alert(errorMessage);
     } finally {
       setDownloading(false);
     }
