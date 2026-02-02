@@ -1025,6 +1025,119 @@ async function main() {
       console.log('✅ No failed posts detected that need retry\n');
     }
     
+    // ✅ PRE-GENERATION HEALTH CHECK: Detect broken published posts (MDX validation failures)
+    console.log('🔍 Pre-generation health check: Scanning for broken published posts (MDX validation)...');
+    const brokenPosts: BlogPost[] = [];
+    const publishedPostsToCheck = calendar.filter(p => p.status === 'published' && p.date <= today);
+    
+    for (const post of publishedPostsToCheck) {
+      const mdxPath = path.join(process.cwd(), 'content', 'posts', `${post.slug}.mdx`);
+      
+      if (!fs.existsSync(mdxPath)) continue;
+      
+      try {
+        const mdxContent = fs.readFileSync(mdxPath, 'utf-8');
+        const { content } = matter(mdxContent);
+        
+        // Try to serialize to catch any parsing errors
+        try {
+          await serialize(content, {
+            mdxOptions: {
+              remarkPlugins: [remarkGfm],
+            },
+          });
+        } catch (parseError: any) {
+          // If serialization fails, mark as broken
+          brokenPosts.push(post);
+          console.warn(`⚠️  BROKEN POST DETECTED: ${post.title} (${post.slug}) - MDX validation failed`);
+          console.warn(`     Error: ${parseError.message}`);
+          continue;
+        }
+        
+        // Check if content contains unescaped variable patterns that might cause runtime errors
+        // Look for V_f, V_i, P_0, etc. that are NOT in code blocks, inline code, or LaTeX
+        // Pattern: variable with underscore, not preceded by backtick or backslash, not in LaTeX
+        const lines = content.split('\n');
+        let inCodeBlock = false;
+        let hasUnescapedVars = false;
+        
+        for (const line of lines) {
+          // Track code block boundaries
+          if (line.trim().startsWith('```')) {
+            inCodeBlock = !inCodeBlock;
+            continue;
+          }
+          
+          // Skip code blocks
+          if (inCodeBlock) continue;
+          
+          // Check for unescaped variables (not in inline code, not in LaTeX)
+          // LaTeX uses \[...\] or \(...\) so we check for those
+          const hasLaTeX = line.includes('\\[') || line.includes('\\(') || line.includes('$$');
+          const hasInlineCode = line.includes('`');
+          
+          // If line has LaTeX or is mostly LaTeX, skip (MathJax will handle it)
+          if (hasLaTeX && !hasInlineCode) continue;
+          
+          // Check for variable patterns that aren't in backticks
+          const varPattern = /\b([A-Z][a-z]*)_([a-z0-9]+)\b/g;
+          let match;
+          while ((match = varPattern.exec(line)) !== null) {
+            const beforeMatch = line.substring(0, match.index);
+            const afterMatch = line.substring(match.index + match[0].length);
+            
+            // Check if it's already in inline code (backticks)
+            const backticksBefore = (beforeMatch.match(/`/g) || []).length;
+            const backticksAfter = (afterMatch.match(/`/g) || []).length;
+            const inInlineCode = backticksBefore % 2 === 1;
+            
+            // If not in inline code and not in LaTeX context, it's potentially broken
+            if (!inInlineCode && !hasLaTeX) {
+              hasUnescapedVars = true;
+              break;
+            }
+          }
+          
+          if (hasUnescapedVars) break;
+        }
+        
+        if (hasUnescapedVars) {
+          brokenPosts.push(post);
+          console.warn(`⚠️  BROKEN POST DETECTED: ${post.title} (${post.slug}) - Contains unescaped variables that may cause runtime errors`);
+        }
+      } catch (error: any) {
+        // Skip if we can't read or parse the file
+        continue;
+      }
+    }
+    
+    if (brokenPosts.length > 0) {
+      console.error(`\n❌ CRITICAL: Found ${brokenPosts.length} broken "published" post(s)!`);
+      console.error('   These posts may fail to render in production with "V_f is not defined" or similar errors.');
+      console.error('   Resetting status to "pending" so they can be regenerated with proper sanitization...\n');
+      
+      for (const post of brokenPosts) {
+        post.status = 'pending';
+        delete post.publishedAt;
+        console.log(`   🔄 Reset: ${post.title} → status: pending`);
+      }
+      
+      // Save updated calendars
+      const mainPosts = calendar.filter(p => p.category !== 'how-to-in-tech' && p.category !== 'research');
+      const howToPosts = calendar.filter(p => p.category === 'how-to-in-tech');
+      const researchPosts = calendar.filter(p => p.category === 'research');
+      fs.writeFileSync(mainCalendarPath, JSON.stringify(mainPosts, null, 2));
+      if (fs.existsSync(howToCalendarPath) || howToPosts.length > 0) {
+        fs.writeFileSync(howToCalendarPath, JSON.stringify(howToPosts, null, 2));
+      }
+      if (fs.existsSync(researchCalendarPath) || researchPosts.length > 0) {
+        fs.writeFileSync(researchCalendarPath, JSON.stringify(researchPosts, null, 2));
+      }
+      console.log('   ✅ Calendars updated - broken posts reset to pending\n');
+    } else {
+      console.log('✅ No broken posts detected - all published posts pass MDX validation\n');
+    }
+    
     // Show which posts have date <= today (for debugging)
     const postsWithDateLeToday = calendar.filter(p => p.date <= today);
     if (postsWithDateLeToday.length > 0) {
