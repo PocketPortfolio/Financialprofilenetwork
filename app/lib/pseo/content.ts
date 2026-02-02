@@ -21,7 +21,7 @@ export async function generateTickerContent(
   // Generate title and description
   const title = `${symbol} Stock Analysis & Portfolio Tracking | Pocket Portfolio`;
   const description = metadata.description || 
-    `Track ${symbol} (${name}) stock price, performance, and portfolio analysis. Import ${symbol} positions from broker CSVs or export ${symbol} historical data to JSON. Free, open-source portfolio tracking.`;
+    `Track ${symbol} (${name}) stock price, performance, and portfolio analysis. Import ${symbol} positions from broker CSVs or export ${symbol} historical data to JSON or CSV. Free, open-source portfolio tracking.`;
 
   // Generate H1
   const h1 = `${symbol} Stock Analysis & Portfolio Tracker`;
@@ -62,7 +62,7 @@ export async function generateTickerContent(
   body += `<p>Import your ${symbol} trades from any supported broker including Robinhood, Fidelity, eToro, Trading212, Coinbase, and more. Simply upload your CSV file and Pocket Portfolio will automatically parse and track your ${symbol} positions.</p>`;
   
   body += `<h2>${h2Sections[2]}</h2>`;
-  body += `<p>Export ${symbol} historical data to JSON format for programmatic access. Use our free API to integrate ${symbol} tracking into your own applications or analysis tools.</p>`;
+  body += `<p>Export ${symbol} historical data to JSON or CSV format for programmatic access or spreadsheet analysis. Use our free API to integrate ${symbol} tracking into your own applications, or download ${symbol} data as CSV for Excel, Google Sheets, and data analysis tools.</p>`;
 
   if (metadata.relatedTickers && metadata.relatedTickers.length > 0) {
     body += `<h2>${h2Sections[h2Sections.length - 1]}</h2>`;

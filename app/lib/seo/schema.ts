@@ -112,16 +112,20 @@ export function getDatasetSchema(
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: `${normalizedSymbol} Historical Stock Data`,
-    description: `Free JSON API providing historical price, volume, and dividend data for ${normalizedSymbol}${name ? ` (${name})` : ''}. No API key required.`,
+    description: `Free JSON and CSV API providing historical price, volume, and dividend data for ${normalizedSymbol}${name ? ` (${name})` : ''}. Download ${normalizedSymbol} data in JSON or CSV format. No API key required.`,
     url: `https://www.pocketportfolio.app/s/${symbolLower}/json-api`,
     identifier: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/json`,
     keywords: [
       `${normalizedSymbol} historical data`,
       `${normalizedSymbol} JSON API`,
+      `${normalizedSymbol} CSV download`,
       `${normalizedSymbol} stock data`,
+      `${normalizedSymbol} historical data CSV`,
       'free stock data API',
       'historical price data',
-      'JSON financial data'
+      'JSON financial data',
+      'CSV stock data download',
+      'download stock data CSV'
     ],
     license: 'https://www.pocketportfolio.app',
     creator: {
@@ -135,6 +139,12 @@ export function getDatasetSchema(
         encodingFormat: 'application/json',
         contentUrl: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/json`,
         description: `JSON endpoint for ${normalizedSymbol} historical data`
+      },
+      {
+        '@type': 'DataDownload',
+        encodingFormat: 'text/csv',
+        contentUrl: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/csv`,
+        description: `CSV download for ${normalizedSymbol} historical data`
       }
     ],
     temporalCoverage: '2000-01-01/..',

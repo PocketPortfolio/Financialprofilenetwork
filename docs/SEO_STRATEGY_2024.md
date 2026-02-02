@@ -37,6 +37,12 @@ Following the integration of dev.to and CoderLegion content marketing into Pocke
   - "portfolio analytics"
   - "dev.to portfolio"
   - "developer community finance"
+- ✅ Added CSV download keywords (2026-02-02):
+  - "{TICKER} CSV download"
+  - "{TICKER} historical data CSV"
+  - "CSV stock data download"
+  - "download stock data CSV"
+  - "export stock data to CSV"
 
 ### 4. **Social Proof & Community**
 - ✅ Visible community engagement indicators
@@ -70,6 +76,9 @@ Following the integration of dev.to and CoderLegion content marketing into Pocke
 | "portfolio tracker" | Not ranked | 35-45 | **15-25** | High |
 | "developer portfolio tracker" | Not ranked | 20-30 | **8-15** | Medium |
 | "CSV portfolio import" | Not ranked | 25-35 | **10-20** | Low |
+| "{TICKER} CSV download" | Not ranked | 15-25 | **5-15** | Low |
+| "{TICKER} historical data CSV" | Not ranked | 20-30 | **8-18** | Low |
+| "download stock data CSV" | Not ranked | 18-25 | **10-20** | Medium |
 | "price pipeline health" | Not ranked | 10-15 | **3-8** | Very Low |
 | "building in public finance" | Not ranked | 15-25 | **5-12** | Low |
 | "never 0.00 price pipeline" | Not ranked | 5-10 | **1-5** | Very Low |

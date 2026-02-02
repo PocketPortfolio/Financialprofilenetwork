@@ -34,6 +34,53 @@ interface HistoricalDataPoint {
 }
 
 /**
+ * Convert historical data to CSV format
+ * Using Excel-friendly date format: Convert YYYY-MM-DD to MM/DD/YYYY
+ * Excel recognizes MM/DD/YYYY format better when opening CSV files directly
+ */
+function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
+  const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'];
+  const rows = data.map((d, index) => {
+    // Convert ISO date (YYYY-MM-DD) to Excel-friendly format (MM/DD/YYYY)
+    // Excel recognizes MM/DD/YYYY format better when opening CSV files
+    let excelDate = d.date;
+    try {
+      const parts = d.date.split('-');
+      if (parts.length === 3) {
+        const [year, month, day] = parts;
+        if (year && month && day && year.length === 4 && month.length === 2 && day.length === 2) {
+          excelDate = `${month}/${day}/${year}`;
+        }
+      }
+    } catch (e) {
+      // Fallback to original date if conversion fails
+    }
+    
+    return [
+      excelDate,
+      d.open.toFixed(2),
+      d.high.toFixed(2),
+      d.low.toFixed(2),
+      d.close.toFixed(2),
+      d.volume.toString()
+    ];
+  });
+  
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n');
+  
+  // Add UTF-8 BOM for better Excel compatibility (helps Excel recognize UTF-8 encoding)
+  // Excel sometimes needs BOM to properly display special characters and dates
+  // Note: Excel may show "########" for dates - users should:
+  // 1. Widen the Date column (double-click column border)
+  // 2. Or use Data > Text to Columns > Date format
+  // 3. Or open in Google Sheets (which handles dates correctly)
+  return '\uFEFF' + csvContent;
+}
+
+/**
  * Fetch historical stock data from Yahoo Finance
  */
 async function fetchHistoricalData(ticker: string, range: string = '1y'): Promise<HistoricalDataPoint[] | null> {
@@ -95,7 +142,14 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
         typeof close === 'number' &&
         typeof volume === 'number'
       ) {
-        const date = new Date(timestamp * 1000).toISOString().split('T')[0];
+        // Convert timestamp to date string using UTC to avoid timezone shifts
+        // Yahoo Finance timestamps are in UTC, so we use UTC methods to get the correct date
+        const dateObj = new Date(timestamp * 1000);
+        const year = dateObj.getUTCFullYear();
+        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getUTCDate()).padStart(2, '0');
+        const date = `${year}-${month}-${day}`;
+        
         historicalData.push({
           date,
           open: Number(open.toFixed(2)),
@@ -106,6 +160,13 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
         });
       }
     }
+    
+    // Sort by date to ensure chronological order (Yahoo Finance sometimes returns unsorted data)
+    historicalData.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB;
+    });
 
     // Cache the result
     dataCache.set(cacheKey, {
@@ -186,29 +247,39 @@ export async function GET(
   console.warn(`[TICKERS_JSON_API] Route handler ENTRY | Path: ${pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
   
   // Extract ticker and format from pathname as fallback (more reliable than params on Vercel)
-  // Path format: /api/tickers/{TICKER}/json
-  const pathMatch = pathname.match(/^\/api\/tickers\/([^\/]+)\/json$/i);
+  // Path format: /api/tickers/{TICKER}/json or /api/tickers/{TICKER}/csv
+  const pathMatchJson = pathname.match(/^\/api\/tickers\/([^\/]+)\/json$/i);
+  const pathMatchCsv = pathname.match(/^\/api\/tickers\/([^\/]+)\/csv$/i);
+  const searchParams = request.nextUrl.searchParams;
+  const formatParam = searchParams.get('format'); // Support ?format=csv
+  
   let ticker: string | undefined;
   let format: string | undefined;
   
-  if (pathMatch) {
-    // Extract from pathname (most reliable)
-    ticker = pathMatch[1]?.toUpperCase();
-    format = 'json';
-    console.warn(`[TICKERS_JSON_API] Extracted from pathname: ticker=${ticker}, format=${format}`);
+  if (pathMatchJson) {
+    // Extract from pathname (most reliable) - JSON
+    ticker = pathMatchJson[1]?.toUpperCase();
+    format = formatParam || 'json';
+    console.warn(`[TICKERS_API] Extracted from pathname: ticker=${ticker}, format=${format}`);
+  } else if (pathMatchCsv) {
+    // Extract from pathname - CSV
+    ticker = pathMatchCsv[1]?.toUpperCase();
+    format = 'csv';
+    console.warn(`[TICKERS_API] Extracted from pathname: ticker=${ticker}, format=${format}`);
   } else {
     // Fallback to params (catch-all route)
     const tickerArray = resolvedParams.ticker || [];
     ticker = tickerArray[0]?.toUpperCase();
-    format = tickerArray[tickerArray.length - 1]?.toLowerCase();
-    console.warn(`[TICKERS_JSON_API] Extracted from params: ticker array=${JSON.stringify(tickerArray)}, ticker=${ticker}, format=${format}`);
+    const lastParam = tickerArray[tickerArray.length - 1]?.toLowerCase();
+    format = formatParam || (lastParam === 'csv' ? 'csv' : 'json');
+    console.warn(`[TICKERS_API] Extracted from params: ticker array=${JSON.stringify(tickerArray)}, ticker=${ticker}, format=${format}`);
   }
   
-  // Verify format is "json"
-  if (format !== 'json') {
+  // Verify format is "json" or "csv"
+  if (format !== 'json' && format !== 'csv') {
     return NextResponse.json(
       { 
-        error: 'Invalid format. Use /api/tickers/{SYMBOL}/json',
+        error: 'Invalid format. Use /api/tickers/{SYMBOL}/json or /api/tickers/{SYMBOL}/csv',
         diagnostic: {
           params: resolvedParams,
           pathname: pathname,
@@ -293,8 +364,10 @@ export async function GET(
   }
   
   // Only apply rate limiting for free tier (no API key or demo key)
+  // Skip rate limiting in development mode for testing
+  const isDevelopment = process.env.NODE_ENV === 'development';
   let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
-  if (!hasValidApiKey) {
+  if (!hasValidApiKey && !isDevelopment) {
     rateLimitResult = await checkRateLimit(ip);
     
     if (!rateLimitResult.allowed) {
@@ -319,8 +392,7 @@ export async function GET(
     }
   }
 
-  // Get optional query parameters
-  const searchParams = request.nextUrl.searchParams;
+  // Get optional query parameters (searchParams already defined above)
   const range = searchParams.get('range') || '1y'; // Default to 1 year
   const validRanges = ['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'];
   const requestedRange = validRanges.includes(range) ? range : '1y';
@@ -342,7 +414,28 @@ export async function GET(
     // Get ticker metadata for name and exchange
     const metadata = await getTickerMetadata(ticker);
 
-    // Format response according to documentation
+    // Handle CSV format
+    if (format === 'csv') {
+      const csv = convertToCSV(historicalData, ticker);
+      const headers: Record<string, string> = {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${ticker}-historical-data.csv"`,
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+      };
+      
+      if (hasValidApiKey) {
+        headers['X-RateLimit-Limit'] = 'unlimited';
+        headers['X-RateLimit-Remaining'] = 'unlimited';
+      } else if (rateLimitResult) {
+        headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+        headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
+        headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
+      }
+      
+      return new NextResponse(csv, { headers });
+    }
+
+    // Format JSON response according to documentation
     const response = {
       symbol: ticker,
       name: metadata?.name || `${ticker} Inc.`,

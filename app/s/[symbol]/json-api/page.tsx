@@ -10,6 +10,7 @@ import { getDatasetSchema } from '@/app/lib/seo/schema';
 import { getDatasetStats } from '@/app/lib/utils/dataset';
 import JsonApiNpmSnippet from '@/app/components/JsonApiNpmSnippet';
 import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
+import TickerCsvDownload from '@/app/components/TickerCsvDownload';
 import Link from 'next/link';
 
 
@@ -35,22 +36,29 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   }
 
   return {
-    title: `${symbol} Historical Data & JSON API | Free Download | Pocket Portfolio`,
-    description: `Download ${metadata.name} (${symbol}) historical stock data in JSON format. Free API for developers. Export price, volume, and dividend data. No login required.`,
+    title: `${symbol} Historical Data & JSON/CSV API | Free Download | Pocket Portfolio`,
+    description: `Download ${metadata.name} (${symbol}) historical stock data in JSON or CSV format. Free API for developers. Export price, volume, and dividend data. No login required.`,
     keywords: [
       `${symbol} historical data json format`,
+      `${symbol} historical data csv`,
       `${symbol} stock historical data json`,
+      `${symbol} CSV download`,
       `${symbol} JSON API`,
+      `${symbol} CSV API`,
       `${symbol} JSON export`,
+      `${symbol} CSV export`,
       `${symbol} historical data JSON`,
+      `${symbol} historical data CSV`,
       `${symbol} stock data API`,
       `${symbol} price API`,
       `export ${symbol} to JSON`,
-      `download ${symbol} JSON data`
+      `export ${symbol} to CSV`,
+      `download ${symbol} JSON data`,
+      `download ${symbol} CSV data`
     ],
     openGraph: {
-      title: `${symbol} Historical Data & JSON API | Free Download`,
-      description: `Download ${symbol} historical stock data in JSON format. Free API for developers.`,
+      title: `${symbol} Historical Data & JSON/CSV API | Free Download`,
+      description: `Download ${symbol} historical stock data in JSON or CSV format. Free API for developers.`,
       type: 'website',
       url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
     },
@@ -278,6 +286,35 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             >
               View {normalizedSymbol} Market Intelligence & Forecast →
             </Link>
+          </div>
+
+          {/* CSV Download Option */}
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: '24px',
+            marginBottom: '24px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: '600',
+              color: 'var(--text)',
+              marginBottom: '12px'
+            }}>
+              Download as CSV
+            </h3>
+            <p style={{
+              color: 'var(--text-secondary)',
+              fontSize: '14px',
+              marginBottom: '16px',
+              lineHeight: '1.6'
+            }}>
+              Prefer CSV format? Download {normalizedSymbol} historical data as a CSV file 
+              for Excel, Google Sheets, or any spreadsheet application.
+            </p>
+            <TickerCsvDownload symbol={normalizedSymbol} name={metadata?.name} />
           </div>
           
           <div style={{

@@ -5,6 +5,7 @@ import TickerJsonData from './TickerJsonData';
 import TickerStockInfo from './TickerStockInfo';
 import TickerThickContent from './TickerThickContent';
 import CompanyLogo from './CompanyLogo';
+import TickerCsvDownload from './TickerCsvDownload';
 
 interface TickerPageContentProps {
   normalizedSymbol: string;
@@ -224,6 +225,35 @@ export default function TickerPageContent({
                 : 'STOCK'
             }
           />
+
+          {/* CSV Download Section - Above the fold */}
+          <div style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: '24px',
+            marginBottom: '24px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: '600',
+              color: 'var(--text)',
+              marginBottom: '12px'
+            }}>
+              Download {normalizedSymbol} Historical Data
+            </h3>
+            <p style={{
+              color: 'var(--text-secondary)',
+              fontSize: '14px',
+              marginBottom: '16px',
+              lineHeight: '1.6'
+            }}>
+              Export {normalizedSymbol} historical price, volume, and dividend data in CSV format. 
+              Compatible with Excel, Google Sheets, and all data analysis tools.
+            </p>
+            <TickerCsvDownload symbol={normalizedSymbol} name={metadata?.name} />
+          </div>
 
           {/* JSON Data Section - Above the fold for developers */}
           {metadata && (

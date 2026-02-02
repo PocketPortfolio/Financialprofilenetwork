@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.pocketportfolio.app/blog</loc>
-    <lastmod>2026-01-31</lastmod>
+    <lastmod>2026-02-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -21,6 +21,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/automating-seo-how-to-inject-schema-org-dynamically</loc>
     <lastmod>2026-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/breaking-free-how-json-unlocks-true-financial-data-ownership</loc>
+    <lastmod>2026-02-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -69,6 +75,18 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/how-to-audit-your-github-repo-for-leaked-secrets</loc>
     <lastmod>2026-01-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-calculate-cagr-programmatically</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-format-currency-correctly-in-javascript-intl-api</loc>
+    <lastmod>2026-02-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -241,6 +259,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/research-cache-invalidation-strategies-performance-analysis-2026-02-01</loc>
+    <lastmod>2026-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/research-cdn-cache-hit-rates-optimization-strategies-2026-01-17</loc>
     <lastmod>2026-01-17</lastmod>
     <changefreq>weekly</changefreq>
@@ -345,6 +369,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/research-database-query-performance-indexing-strategies-analysis</loc>
     <lastmod>2026-01-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-database-replication-lag-consistency-vs-performance-2026-01-31</loc>
+    <lastmod>2026-01-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
