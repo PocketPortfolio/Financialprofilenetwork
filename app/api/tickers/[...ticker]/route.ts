@@ -23,6 +23,8 @@ const FREE_TIER_LIMIT = 50;
 const FREE_TIER_WINDOW_SECONDS = 3600; // 1 hour in seconds (for KV TTL)
 
 // Cache for historical data (1 hour TTL)
+// Limit cache size to prevent memory leaks in serverless functions
+const MAX_CACHE_SIZE = 100;
 const dataCache = new Map<string, { data: any; expiresAt: number }>();
 
 interface HistoricalDataPoint {
@@ -32,6 +34,20 @@ interface HistoricalDataPoint {
   low: number;
   close: number;
   volume: number;
+}
+
+/**
+ * Escape CSV cell content to prevent injection and parsing errors
+ * Escapes commas, quotes, and newlines according to CSV RFC 4180
+ */
+function escapeCsvCell(cell: string | number): string {
+  const str = String(cell);
+  // Escape cells containing commas, quotes, or newlines
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    // Double quotes to escape quotes, wrap in quotes
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
 }
 
 /**
@@ -49,7 +65,16 @@ function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
       const parts = d.date.split('-');
       if (parts.length === 3) {
         const [year, month, day] = parts;
-        if (year && month && day && year.length === 4 && month.length === 2 && day.length === 2) {
+        // Validate date parts are valid numbers
+        const yearNum = parseInt(year, 10);
+        const monthNum = parseInt(month, 10);
+        const dayNum = parseInt(day, 10);
+        if (year && month && day && 
+            year.length === 4 && month.length === 2 && day.length === 2 &&
+            !isNaN(yearNum) && !isNaN(monthNum) && !isNaN(dayNum) &&
+            yearNum >= 1900 && yearNum <= 2100 &&
+            monthNum >= 1 && monthNum <= 12 &&
+            dayNum >= 1 && dayNum <= 31) {
           excelDate = `${month}/${day}/${year}`;
         }
       }
@@ -57,13 +82,14 @@ function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
       // Fallback to original date if conversion fails
     }
     
+    // Escape all cells to prevent CSV injection and parsing errors
     return [
-      excelDate,
-      d.open.toFixed(2),
-      d.high.toFixed(2),
-      d.low.toFixed(2),
-      d.close.toFixed(2),
-      d.volume.toString()
+      escapeCsvCell(excelDate),
+      escapeCsvCell(d.open.toFixed(2)),
+      escapeCsvCell(d.high.toFixed(2)),
+      escapeCsvCell(d.low.toFixed(2)),
+      escapeCsvCell(d.close.toFixed(2)),
+      escapeCsvCell(d.volume.toString())
     ];
   });
   
@@ -169,7 +195,17 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
       return dateA - dateB;
     });
 
-    // Cache the result
+    // Cache the result with size limit to prevent memory leaks
+    // Evict oldest 20% of entries if cache is full
+    if (dataCache.size >= MAX_CACHE_SIZE) {
+      const entries = Array.from(dataCache.entries());
+      // Sort by expiration time (oldest first)
+      entries.sort((a, b) => a[1].expiresAt - b[1].expiresAt);
+      // Remove oldest 20% of entries
+      const toRemove = entries.slice(0, Math.floor(MAX_CACHE_SIZE * 0.2));
+      toRemove.forEach(([key]) => dataCache.delete(key));
+    }
+    
     dataCache.set(cacheKey, {
       data: historicalData,
       expiresAt: Date.now() + 3600 * 1000, // 1 hour
@@ -315,6 +351,29 @@ export async function GET(
         headers: {
           'X-Tickers-Route': 'called',
           'X-Tickers-Error': 'missing-ticker'
+        }
+      }
+    );
+  }
+  
+  // Validate ticker format (alphanumeric, dots, hyphens, max 10 chars)
+  // Prevents path traversal attacks and invalid input
+  const TICKER_REGEX = /^[A-Z0-9.\-]{1,10}$/i;
+  if (!TICKER_REGEX.test(ticker)) {
+    return NextResponse.json(
+      { 
+        error: 'Invalid ticker symbol format. Ticker must be 1-10 alphanumeric characters (may include . or -).',
+        symbol: ticker,
+        diagnostic: {
+          pathname: pathname,
+          url: request.url
+        }
+      },
+      { 
+        status: 400,
+        headers: {
+          'X-Tickers-Route': 'called',
+          'X-Tickers-Error': 'invalid-ticker-format'
         }
       }
     );
