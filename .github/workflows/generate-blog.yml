@@ -2,23 +2,31 @@ name: Generate Blog Posts
 
 on:
   schedule:
-    # FIX: Single schedule to prevent conflicts - runs every 2 hours
-    # This prevents multiple cron jobs from triggering simultaneously and cancelling each other
-    # The workflow script handles checking for posts internally (hourly logic built-in)
+    # SELF-HEALING: Run every hour to catch missed posts (GitHub Actions cron is unreliable)
+    # This ensures posts are generated even if scheduled runs fail
+    - cron: '0 * * * *'  # Every hour at :00 minutes - Self-healing check for missed posts
+    # Run every 2 hours for maximum reliability (12 checks per day)
+    # Posts are generated when their date <= today and status is "pending"
     - cron: '0 */2 * * *'  # Every 2 hours: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
-    # Removed redundant schedules that caused conflicts:
-    # - Every hour: conflicts with 2-hour schedule, caused pending/cancelled cycles
-    # - 9 AM: already covered by 2-hour schedule (runs at 8:00, 10:00, 12:00, etc.)
-    # - 18:00: already covered by 2-hour schedule
-    # - One-time schedules: expired (Jan 5-6, 2026, Dec 31, 2025)
+    # Also run at 9 AM UTC as primary time (keeps original schedule)
+    - cron: '0 9 * * *'
+    # Research posts at 18:00 UTC daily (18:00 GMT winter / 19:00 BST summer)
+    - cron: '0 18 * * *'  # 18:00 UTC - Research pillar posts
+    # Removed expired one-time schedules:
+    # - Real-Time Portfolio Tracking: 16:00 GMT on Jan 5, 2026 (expired)
+    # - NYE 2025 Year in Review: 18:30 GMT on Dec 31, 2025 (expired)
+    # - Building Production-Ready Systems: 10:00 UTC on Jan 6, 2026 (expired)
+    # - AI-Powered Financial Analysis: 12:30 UTC on Jan 6, 2026 (expired)
   workflow_dispatch: # Allow manual triggering (for testing/debugging only)
 
 # Concurrency control - prevent queue buildup
-# CRITICAL FIX: Cancel old runs when new scheduled run starts to prevent 30+ stuck jobs
-# This ensures only the latest scheduled run executes, preventing queue buildup
+# CRITICAL: With cancel-in-progress: true, multiple schedules are safe
+# They will cancel each other if they overlap, but the script checks for due posts each time
+# This ensures posts are detected even if one run fails or is delayed
+# The script logic checks currentTime >= scheduledTime, so posts generate at the right time
 concurrency:
   group: generate-blog
-  cancel-in-progress: true  # FIX: Cancel old runs when new scheduled run starts
+  cancel-in-progress: true  # Cancel old runs when new scheduled run starts - prevents conflicts while maintaining safeguards
 
 jobs:
   generate:
