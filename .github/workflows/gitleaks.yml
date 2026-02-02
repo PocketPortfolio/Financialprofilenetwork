@@ -1,7 +1,10 @@
 name: Secret scan (Gitleaks)
+# FIX: Only run on PRs to reduce simultaneous push-triggered workflows
+# This prevents queue buildup when push triggers CI/CD + Deploy + Gitleaks simultaneously
+# Gitleaks is most valuable on PRs anyway (catching secrets before merge)
 on:
-  push:
   pull_request:
+    branches: [ main, develop ]
 
 # Concurrency control - prevent queue buildup from multiple commits
 concurrency:
