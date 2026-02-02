@@ -5,7 +5,7 @@
 
 import { trackMicroConversion, trackConversion, trackFunnelStage, trackFunnelDropOff } from './conversion';
 
-export type ToolType = 'tax_converter' | 'google_sheets' | 'advisor_tool';
+export type ToolType = 'tax_converter' | 'google_sheets' | 'advisor_tool' | 'ticker_csv';
 
 export interface ToolUsageMetadata {
   toolType: ToolType;

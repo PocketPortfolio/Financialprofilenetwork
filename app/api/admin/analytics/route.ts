@@ -361,8 +361,17 @@ async function getToolUsageData(startDate: Date) {
       last7Days: 0
     };
 
+    const csvDownloads = {
+      total: 0,
+      last7Days: 0,
+      last24Hours: 0,
+      byTicker: {} as Record<string, number>
+    };
+
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const oneDayAgoTimestamp = Timestamp.fromDate(oneDayAgo);
 
     snapshot.docs.forEach(doc => {
       const data = doc.data();
@@ -418,6 +427,23 @@ async function getToolUsageData(startDate: Date) {
           if (isLast7Days) advisorTool.last7Days++;
           break;
         
+        case 'ticker_csv':
+          // Track CSV downloads - action should be 'download_csv'
+          if (data.action === 'download_csv' || data.action?.includes('download')) {
+            csvDownloads.total++;
+            if (isLast7Days) csvDownloads.last7Days++;
+            // Check if last 24 hours
+            if (eventTimestamp >= oneDayAgoTimestamp) {
+              csvDownloads.last24Hours++;
+            }
+            // Track by ticker
+            if (data.metadata?.ticker && typeof data.metadata.ticker === 'string') {
+              const ticker = data.metadata.ticker.toUpperCase();
+              csvDownloads.byTicker[ticker] = (csvDownloads.byTicker[ticker] || 0) + 1;
+            }
+          }
+          break;
+        
         default:
           // Unknown tool type - log but don't break
           console.warn('Unknown tool type:', data.toolType, 'in record:', doc.id);
@@ -428,14 +454,16 @@ async function getToolUsageData(startDate: Date) {
     return {
       taxConverter,
       googleSheets,
-      advisorTool
+      advisorTool,
+      csvDownloads
     };
   } catch (error) {
     console.error('Tool usage fetch error:', error);
     return {
       taxConverter: { total: 0, successful: 0, byPair: {}, last7Days: 0 },
       googleSheets: { total: 0, formulasGenerated: 0, copies: 0, last7Days: 0 },
-      advisorTool: { total: 0, pdfsGenerated: 0, last7Days: 0 }
+      advisorTool: { total: 0, pdfsGenerated: 0, last7Days: 0 },
+      csvDownloads: { total: 0, last7Days: 0, last24Hours: 0, byTicker: {} }
     };
   }
 }

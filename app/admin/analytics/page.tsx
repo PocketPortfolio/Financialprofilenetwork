@@ -40,6 +40,12 @@ interface AnalyticsData {
       pdfsGenerated: number;
       last7Days: number;
     };
+    csvDownloads: {
+      total: number;
+      last7Days: number;
+      last24Hours: number;
+      byTicker: Record<string, number>;
+    };
   };
   seoPages: {
     totalViews: number;
@@ -488,6 +494,74 @@ export default function AdminAnalyticsPage() {
                 }
               />
             </div>
+          </section>
+
+          {/* CSV Downloads Section */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              📥 CSV Downloads
+            </h2>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 'var(--space-4)',
+              marginBottom: 'var(--space-4)'
+            }}>
+              <MetricCard
+                label="Total Downloads"
+                value={analyticsData.toolUsage.csvDownloads.total.toLocaleString()}
+                subtitle="All time"
+              />
+              <MetricCard
+                label="Last 7 Days"
+                value={analyticsData.toolUsage.csvDownloads.last7Days.toLocaleString()}
+                subtitle="Recent activity"
+              />
+              <MetricCard
+                label="Last 24 Hours"
+                value={analyticsData.toolUsage.csvDownloads.last24Hours.toLocaleString()}
+                subtitle="Real-time"
+              />
+            </div>
+
+            {/* Top Tickers */}
+            {Object.keys(analyticsData.toolUsage.csvDownloads.byTicker).length > 0 && (
+              <div style={{ marginTop: 'var(--space-4)' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)' }}>
+                  Top Downloaded Tickers
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                  {Object.entries(analyticsData.toolUsage.csvDownloads.byTicker)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 10)
+                    .map(([ticker, count]) => (
+                      <div key={ticker} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px',
+                        background: 'var(--card)',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border)'
+                      }}>
+                        <span style={{ fontWeight: '600', color: 'var(--text)' }}>{ticker}</span>
+                        <span style={{ color: 'var(--text-secondary)' }}>{count} download{count !== 1 ? 's' : ''}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </section>
 
           {/* SEO Pages Section */}

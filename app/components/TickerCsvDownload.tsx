@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { trackToolDownload } from '@/app/lib/analytics/tools';
 
 interface TickerCsvDownloadProps {
   symbol: string;
@@ -70,6 +71,12 @@ export default function TickerCsvDownload({ symbol, name }: TickerCsvDownloadPro
       const blob = await response.blob();
       const blobUrl = URL.createObjectURL(blob);
       blobUrlRef.current = blobUrl; // Store for cleanup
+      
+      // Track the download
+      trackToolDownload('ticker_csv', 'csv', {
+        ticker: symbol,
+        fileType: 'csv'
+      });
       
       const link = document.createElement('a');
       link.href = blobUrl;
