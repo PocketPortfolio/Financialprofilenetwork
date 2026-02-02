@@ -374,6 +374,26 @@ export async function GET(
     
     if (!rateLimitResult.allowed) {
       const retryAfter = Math.max(0, rateLimitResult.resetTime - Math.floor(Date.now() / 1000));
+      
+      // Return format-appropriate error response
+      if (format === 'csv') {
+        // Return CSV error response for CSV requests
+        const minutes = Math.ceil(retryAfter / 60);
+        const errorCsv = `Date,Error,RetryAfter\n${new Date().toISOString().split('T')[0]},Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor,${minutes} minute${minutes !== 1 ? 's' : ''}`;
+        return new NextResponse(errorCsv, {
+          status: 429,
+          headers: {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': `attachment; filename="${ticker}-rate-limit-error.csv"`,
+            'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
+            'Retry-After': String(retryAfter)
+          }
+        });
+      }
+      
+      // JSON error response for JSON requests
       return NextResponse.json(
         { 
           error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
