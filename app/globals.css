@@ -1105,3 +1105,23 @@ select option:checked {
   box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
 }
 
+/* P1: Desktop/Mobile Bifurcation - Zero CLS */
+/* Both views exist in DOM, CSS handles visibility instantly */
+.ticker-mobile-view {
+  display: block;
+}
+
+.ticker-desktop-view {
+  display: none;
+}
+
+/* Desktop breakpoint: >= 1024px (matches device.ts logic) */
+@media (min-width: 1024px) {
+  .ticker-mobile-view {
+    display: none;
+  }
+  
+  .ticker-desktop-view {
+    display: block;
+  }
+}
