@@ -371,9 +371,9 @@ CRITICAL CONSTRAINTS FOR RESEARCH POSTS:
 - Write in an academic but accessible tone
 - Focus on architectural trade-offs, performance implications, and future trends
 - Include practical examples and real-world scenarios
-- For mathematical formulas, use plain text with variables in backticks (e.g., CAGR = (`V_f` / `V_i`)^(1/n) - 1)
+- For mathematical formulas, use plain text with variables in backticks (e.g., CAGR = (\`V_f\` / \`V_i\`)^(1/n) - 1)
 - DO NOT use LaTeX syntax (\[...\], \(...\), $$...$$) as MathJax is not configured
-- Always escape variable names with underscores (V_f, V_i, P_0, etc.) using backticks: `V_f`
+- Always escape variable names with underscores (V_f, V_i, P_0, etc.) using backticks: \`V_f\`
 - Place complex formulas in code blocks if needed, or use plain text with escaped variables
 
 🔗 SEO STRATEGY - INTERNAL LINKING (CRITICAL):
@@ -402,9 +402,9 @@ CRITICAL CONSTRAINTS:
 - Write in a technical but accessible tone
 - Use markdown formatting (headers, lists, code blocks, bold, italic)
 - Include practical examples and use cases
-- For mathematical formulas, use plain text with variables in backticks (e.g., CAGR = (`V_f` / `V_i`)^(1/n) - 1)
+- For mathematical formulas, use plain text with variables in backticks (e.g., CAGR = (\`V_f\` / \`V_i\`)^(1/n) - 1)
 - DO NOT use LaTeX syntax (\[...\], \(...\), $$...$$) as MathJax is not configured
-- Always escape variable names with underscores (V_f, V_i, P_0, etc.) using backticks: `V_f`
+- Always escape variable names with underscores (V_f, V_i, P_0, etc.) using backticks: \`V_f\`
 - Place complex formulas in code blocks if needed, or use plain text with escaped variables
 
 🔗 SEO STRATEGY - INTERNAL LINKING (CRITICAL):
