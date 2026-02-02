@@ -82,8 +82,91 @@ function sanitizeMDXContent(content: string): string {
   cleaned = cleaned.replace(/````+(\w+)?/g, '```$1');
   
   // Ensure code blocks have proper newlines
-  cleaned = cleaned.replace(/```(\w+)?([^\n])/g, '```$1\n$2');
+  // Only add newline before closing code blocks if there's content on the same line
   cleaned = cleaned.replace(/([^\n])```/g, '$1\n```');
+  // Only add newline after opening code block if there's content immediately after (not language identifier)
+  // This is more conservative - only fixes cases where content starts on same line as ```
+  cleaned = cleaned.replace(/```([^\n`]+?)([A-Za-z_$])/g, (match, p1, p2) => {
+    // If p1 looks like a language identifier (single word), don't modify
+    if (/^\w+$/.test(p1.trim())) {
+      return match; // Language identifier, leave as-is
+    }
+    // Otherwise, add newline before the content
+    return `\`\`\`${p1}\n${p2}`;
+  });
+  
+  // ✅ CRITICAL FIX: Escape variable names with underscores (V_f, V_i, P_0, etc.)
+  // MDX interprets these as JSX variables, causing "V_f is not defined" errors
+  // Process line by line, skipping code blocks and inline code
+  const lines = cleaned.split('\n');
+  const processedLines: string[] = [];
+  let inCodeBlock = false;
+  
+  for (const line of lines) {
+    // Track code block boundaries
+    if (line.trim().startsWith('```')) {
+      inCodeBlock = !inCodeBlock;
+      processedLines.push(line);
+      continue;
+    }
+    
+    // Don't process lines inside code blocks
+    if (inCodeBlock) {
+      processedLines.push(line);
+      continue;
+    }
+    
+    // Process line: escape variable patterns that aren't already in inline code
+    // Pattern matches: V_f, V_i, P_0, CAGR_formula, etc.
+    let processedLine = line;
+    let result = '';
+    let i = 0;
+    let inInlineCode = false;
+    
+    while (i < processedLine.length) {
+      const char = processedLine[i];
+      
+      // Track inline code state (backticks)
+      if (char === '`') {
+        // Check if it's an escaped backtick
+        if (i > 0 && processedLine[i - 1] === '\\') {
+          result += char;
+          i++;
+          continue;
+        }
+        inInlineCode = !inInlineCode;
+        result += char;
+        i++;
+        continue;
+      }
+      
+      // If inside inline code, just copy characters
+      if (inInlineCode) {
+        result += char;
+        i++;
+        continue;
+      }
+      
+      // Try to match variable pattern: Capital letter, lowercase letters, underscore, alphanumeric
+      // Examples: V_f, V_i, P_0, CAGR_formula
+      const remaining = processedLine.substring(i);
+      const varMatch = remaining.match(/^([A-Z][a-z]*)_([a-z0-9]+)\b/);
+      
+      if (varMatch) {
+        // Found variable pattern, escape it with backticks
+        result += `\`${varMatch[0]}\``;
+        i += varMatch[0].length;
+      } else {
+        // No match, copy character
+        result += char;
+        i++;
+      }
+    }
+    
+    processedLines.push(result);
+  }
+  
+  cleaned = processedLines.join('\n');
   
   // Remove excessive blank lines (more than 2 consecutive)
   cleaned = cleaned.replace(/\n{4,}/g, '\n\n\n');
