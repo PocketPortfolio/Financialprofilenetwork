@@ -1,9 +1,8 @@
 name: Test Deploy Workflow
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [main]
+  workflow_dispatch:  # Manual trigger only - prevents queue buildup on every push
+  # Removed push trigger - deploy.yml handles production deployments
 
 # Concurrency control - prevent queue buildup from multiple commits
 concurrency:

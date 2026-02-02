@@ -1,9 +1,8 @@
 name: Simple Test Workflow
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [main]
+  workflow_dispatch:  # Manual trigger only - prevents queue buildup on every push
+  # Removed push trigger - this is a test workflow, not essential for deployments
 
 # Concurrency control - prevent queue buildup from multiple commits
 concurrency:

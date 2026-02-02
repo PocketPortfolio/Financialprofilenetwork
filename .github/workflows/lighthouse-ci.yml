@@ -2,8 +2,8 @@ name: Lighthouse CI
 on: 
   pull_request:
     branches: [main, develop]
-  push:
-    branches: [main]
+  workflow_dispatch:  # Manual trigger for main branch - prevents queue buildup
+  # Removed automatic push trigger - Lighthouse CI runs on PRs, manual trigger for main
 
 # Concurrency control - prevent queue buildup from multiple commits
 concurrency:
