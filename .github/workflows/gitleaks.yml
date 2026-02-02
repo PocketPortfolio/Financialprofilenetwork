@@ -11,6 +11,7 @@ concurrency:
 jobs:
   gitleaks:
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # Gitleaks scan should complete quickly
     steps:
       - uses: actions/checkout@v4
         with:

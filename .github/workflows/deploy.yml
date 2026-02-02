@@ -21,7 +21,7 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45  # Deploy includes DB checks, migrations, CI checks, build, and Vercel deployment
     steps:
       - uses: actions/checkout@v4
       

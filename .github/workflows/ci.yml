@@ -14,6 +14,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # CI/CD can take time with matrix builds, E2E tests, and builds
     
     strategy:
       matrix:
@@ -72,6 +73,7 @@ jobs:
 
   waitlist-smoke-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15  # Smoke tests should be quick
     needs: test
     if: contains(github.event.head_commit.message, 'waitlist') || contains(github.event.pull_request.title, 'waitlist')
     
@@ -106,6 +108,7 @@ jobs:
 
   security-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # Security scans should be quick
     if: github.event_name == 'pull_request'
     
     steps:
@@ -127,6 +130,7 @@ jobs:
 
   deploy-preview:
     runs-on: ubuntu-latest
+    timeout-minutes: 20  # Preview builds should be quick
     needs: [test, waitlist-smoke-test]
     if: github.event_name == 'pull_request'
     
@@ -158,6 +162,7 @@ jobs:
 
   deploy-production:
     runs-on: ubuntu-latest
+    timeout-minutes: 20  # Production deploy from CI/CD (Vercel action)
     needs: [test, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
