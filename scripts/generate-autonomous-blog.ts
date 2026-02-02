@@ -116,9 +116,67 @@ function sanitizeMDXContent(content: string): string {
       continue;
     }
     
-    // Process line: escape variable patterns that aren't already in inline code
-    // Pattern matches: V_f, V_i, P_0, CAGR_formula, etc.
+    // ✅ ENHANCED: Detect and convert LaTeX formulas to plain text
+    // Check if line contains LaTeX syntax (MathJax is not configured, so we convert to plain text)
+    const hasLaTeX = line.includes('\\[') || line.includes('\\]') || 
+                     line.includes('\\(') || line.includes('\\)') || 
+                     line.includes('$$') || 
+                     line.includes('\\begin{') || line.includes('\\end{');
+    
     let processedLine = line;
+    
+    if (hasLaTeX) {
+      // Convert LaTeX to plain text with escaped variables
+      let latexToText = line;
+      
+      // Remove LaTeX block delimiters
+      latexToText = latexToText.replace(/\\\[/g, '').replace(/\\\]/g, '');
+      latexToText = latexToText.replace(/\\\(/g, '').replace(/\\\)/g, '');
+      latexToText = latexToText.replace(/\$\$/g, '');
+      
+      // Remove LaTeX environment delimiters
+      latexToText = latexToText.replace(/\\begin\{[^}]+\}/g, '');
+      latexToText = latexToText.replace(/\\end\{[^}]+\}/g, '');
+      
+      // Convert common LaTeX commands to plain text
+      // Handle nested fractions recursively (process from innermost to outermost)
+      for (let depth = 0; depth < 5; depth++) {
+        latexToText = latexToText.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, (match, num, den) => {
+          // Clean up nested fractions in numerator and denominator
+          const cleanNum = num.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)');
+          const cleanDen = den.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1 / $2)');
+          return `(${cleanNum} / ${cleanDen})`;
+        });
+      }
+      
+      // Parentheses: \left( and \right) -> regular parentheses (remove extra spaces)
+      latexToText = latexToText.replace(/\\left\s*\(/g, '(').replace(/\\right\s*\)/g, ')');
+      latexToText = latexToText.replace(/\\left\s*\[/g, '[').replace(/\\right\s*\]/g, ']');
+      latexToText = latexToText.replace(/\\left\s*\{/g, '{').replace(/\\right\s*\}/g, '}');
+      
+      // Superscripts: ^{...} -> ^(...)
+      latexToText = latexToText.replace(/\^\s*\{([^}]+)\}/g, '^($1)');
+      latexToText = latexToText.replace(/\^\s*\\frac\{([^}]+)\}\{([^}]+)\}/g, '^($1/$2)');
+      
+      // Subscripts: _{...} -> _...
+      latexToText = latexToText.replace(/_\s*\{([^}]+)\}/g, '_$1');
+      
+      // Remove remaining LaTeX commands (keep the content)
+      latexToText = latexToText.replace(/\\[a-zA-Z]+\{([^}]+)\}/g, '$1');
+      latexToText = latexToText.replace(/\\[a-zA-Z]+/g, '');
+      
+      // Clean up extra braces (but preserve variable patterns)
+      latexToText = latexToText.replace(/\{([^}]+)\}/g, '$1');
+      
+      // Clean up whitespace around operators and parentheses
+      latexToText = latexToText.replace(/\s*\(\s*/g, '(').replace(/\s*\)\s*/g, ')');
+      latexToText = latexToText.replace(/\s*\/\s*/g, ' / ').replace(/\s*\^\s*/g, '^');
+      latexToText = latexToText.replace(/\s+/g, ' ').trim();
+      
+      processedLine = latexToText;
+    }
+    
+    // Now escape variable patterns in the processed line (whether from LaTeX or regular text)
     let result = '';
     let i = 0;
     let inInlineCode = false;
@@ -313,6 +371,10 @@ CRITICAL CONSTRAINTS FOR RESEARCH POSTS:
 - Write in an academic but accessible tone
 - Focus on architectural trade-offs, performance implications, and future trends
 - Include practical examples and real-world scenarios
+- For mathematical formulas, use plain text with variables in backticks (e.g., CAGR = (`V_f` / `V_i`)^(1/n) - 1)
+- DO NOT use LaTeX syntax (\[...\], \(...\), $$...$$) as MathJax is not configured
+- Always escape variable names with underscores (V_f, V_i, P_0, etc.) using backticks: `V_f`
+- Place complex formulas in code blocks if needed, or use plain text with escaped variables
 
 🔗 SEO STRATEGY - INTERNAL LINKING (CRITICAL):
 - In the introduction OR the "Verdict" section, you MUST include ONE contextual link using this exact anchor text: "${selectedAnchor}" pointing to "${homepageLink}"
@@ -340,6 +402,10 @@ CRITICAL CONSTRAINTS:
 - Write in a technical but accessible tone
 - Use markdown formatting (headers, lists, code blocks, bold, italic)
 - Include practical examples and use cases
+- For mathematical formulas, use plain text with variables in backticks (e.g., CAGR = (`V_f` / `V_i`)^(1/n) - 1)
+- DO NOT use LaTeX syntax (\[...\], \(...\), $$...$$) as MathJax is not configured
+- Always escape variable names with underscores (V_f, V_i, P_0, etc.) using backticks: `V_f`
+- Place complex formulas in code blocks if needed, or use plain text with escaped variables
 
 🔗 SEO STRATEGY - INTERNAL LINKING (CRITICAL):
 - In the introduction OR the "Verdict" section, you MUST include ONE contextual link using this exact anchor text: "${selectedAnchor}" pointing to "${homepageLink}"
