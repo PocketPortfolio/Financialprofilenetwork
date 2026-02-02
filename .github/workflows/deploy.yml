@@ -1,6 +1,6 @@
 name: Deploy to Vercel
 # Workflow for automated Vercel deployments
-# Last updated: 2025-12-31 - Updated to Node.js 20 for Firebase compatibility
+# Last updated: 2026-02-02 - Added concurrency control to prevent queue buildup
 
 on:
   push:
@@ -9,6 +9,12 @@ on:
 
 # Automatic deployment on all pushes to main
 # Blog generation commits will trigger deployment automatically
+
+# FIX: Concurrency control - cancel in-progress deployments when new commit is pushed
+# This prevents queue buildup from rapid commits
+concurrency:
+  group: deploy-production-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy-production:
