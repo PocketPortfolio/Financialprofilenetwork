@@ -2,21 +2,24 @@ name: Autonomous Revenue Engine
 
 on:
   schedule:
-    # FIX: Single schedule to prevent conflicts - runs every 2 hours
-    # This prevents multiple cron jobs from triggering simultaneously and cancelling each other
-    # The workflow script handles different job types internally (source-leads, enrich-and-email, process-inbound)
+    # SELF-HEALING: Run every hour to catch missed jobs (GitHub Actions cron is unreliable)
+    # This ensures jobs are executed even if scheduled runs fail
+    - cron: '0 * * * *'  # Every hour at :00 minutes - Self-healing check for missed jobs (process-inbound needs hourly runs)
+    # Run every 2 hours for maximum reliability (12 checks per day)
+    # Jobs are executed when their schedule is due (enrich-and-email needs 2-hour runs)
     - cron: '0 */2 * * *'  # Every 2 hours: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
-    # Removed duplicate schedules that caused conflicts:
-    # - Duplicate 2-hour schedule: was triggering twice simultaneously
-    # - Every hour schedule: conflicted with 2-hour schedule, caused pending/cancelled cycles
+    # Also run at 6 AM UTC daily for lead sourcing (primary time)
+    - cron: '0 6 * * *'  # 6:00 AM UTC - Lead sourcing (find 50 new CTOs daily)
   workflow_dispatch: # Allow manual triggering for testing
 
 # Concurrency control - prevent queue buildup
-# CRITICAL FIX: Cancel old runs when new scheduled run starts to prevent 30+ stuck jobs
-# This ensures only the latest scheduled run executes, preventing queue buildup
+# CRITICAL: With cancel-in-progress: true, multiple schedules are safe
+# They will cancel each other if they overlap, but all jobs run each time
+# This ensures jobs are executed even if one run fails or is delayed
+# The scripts have internal logic to handle different job types (source-leads, enrich-and-email, process-inbound)
 concurrency:
   group: autonomous-revenue-engine
-  cancel-in-progress: true  # FIX: Cancel old runs when new scheduled run starts
+  cancel-in-progress: true  # Cancel old runs when new scheduled run starts - prevents conflicts while maintaining safeguards
 
 jobs:
   source-leads:
