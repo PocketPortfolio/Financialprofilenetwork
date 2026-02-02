@@ -12,14 +12,16 @@ on:
 
 # FIX: Concurrency control - cancel in-progress deployments when new commit is pushed
 # This prevents queue buildup from rapid commits
+# Using a simpler group name that works better with GitHub Actions
 concurrency:
-  group: deploy-production-${{ github.ref }}
+  group: deploy-production
   cancel-in-progress: true
 
 jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       
