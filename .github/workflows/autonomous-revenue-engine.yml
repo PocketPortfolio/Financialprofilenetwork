@@ -2,13 +2,13 @@ name: Autonomous Revenue Engine
 
 on:
   schedule:
-    # v3.0: SCALE MODE - Every 2 hours - Lead Sourcing (12 runs/day = 10K capacity)
-    # Changed from every 4 hours to every 2 hours for 10K/day target
-    - cron: '0 */2 * * *'
-    # Every 2 hours - Lead Enrichment & Email Generation
-    - cron: '0 */2 * * *'
-    # Every hour - Process inbound emails and generate replies
-    - cron: '0 * * * *'
+    # FIX: Single schedule to prevent conflicts - runs every 2 hours
+    # This prevents multiple cron jobs from triggering simultaneously and cancelling each other
+    # The workflow script handles different job types internally (source-leads, enrich-and-email, process-inbound)
+    - cron: '0 */2 * * *'  # Every 2 hours: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00 UTC
+    # Removed duplicate schedules that caused conflicts:
+    # - Duplicate 2-hour schedule: was triggering twice simultaneously
+    # - Every hour schedule: conflicted with 2-hour schedule, caused pending/cancelled cycles
   workflow_dispatch: # Allow manual triggering for testing
 
 # Concurrency control - prevent queue buildup
