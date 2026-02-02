@@ -47,6 +47,7 @@
     "cancel-stuck-deployments": "ts-node --project scripts/tsconfig.json scripts/cancel-stuck-deployments.ts",
     "diagnose-all-workflows": "ts-node --project scripts/tsconfig.json scripts/diagnose-all-workflows.ts",
     "cancel-all-stuck-workflows": "ts-node --project scripts/tsconfig.json scripts/cancel-all-stuck-workflows.ts",
+    "check-runner-usage": "ts-node --project scripts/tsconfig.json scripts/check-runner-usage.ts",
     "audit-external-content": "ts-node --project scripts/tsconfig.json scripts/audit-external-content.ts",
     "import-external-content": "ts-node --project scripts/tsconfig.json scripts/import-external-content.ts",
     "fix-imported-posts": "ts-node --project scripts/tsconfig.json scripts/fix-imported-posts.ts",
