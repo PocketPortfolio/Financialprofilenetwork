@@ -10,6 +10,20 @@ export default function robots(): MetadataRoute.Robots {
         allow: ['/api/og'],
         disallow: [],
       },
+      // Explicitly allow /static/portfolio-tracker for all crawlers (SEO page in sitemap)
+      // This must come before the general /static/ disallow rule
+      {
+        userAgent: '*',
+        allow: ['/static/portfolio-tracker'],
+        disallow: [],
+      },
+      // Explicitly allow /static/csv-etoro-to-openbrokercsv for all crawlers (conversion guide in sitemap)
+      // This must come before the general /static/ disallow rule
+      {
+        userAgent: '*',
+        allow: ['/static/csv-etoro-to-openbrokercsv'],
+        disallow: [],
+      },
       {
         userAgent: '*',
         allow: '/',
