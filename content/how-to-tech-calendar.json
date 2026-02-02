@@ -459,7 +459,7 @@
     "scheduledTime": "14:00",
     "title": "How to Format Currency Correctly in JavaScript (Intl API)",
     "slug": "how-to-format-currency-correctly-in-javascript-intl-api",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -468,7 +468,8 @@
       "ava",
       "format",
       "currency"
-    ]
+    ],
+    "publishedAt": "2026-02-01T14:19:36.917Z"
   },
   {
     "id": "how-to-how-to-calculate-cagr-programmatically-feb-2",
