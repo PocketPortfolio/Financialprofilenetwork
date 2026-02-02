@@ -18,12 +18,30 @@ Added `timeout-minutes: 15` to prevent jobs from running indefinitely.
 
 ## Immediate Actions Required
 
-### Step 1: Cancel Stuck Runs (Manual)
+### Step 1: Cancel Stuck Runs (Automated) ✅
+**Script created and executed successfully!**
+
+Run the automated cancellation script:
+```bash
+npm run cancel-stuck-deployments
+```
+
+**What it does:**
+- Automatically finds stuck runs (queued or in_progress)
+- Cancels them via GitHub API
+- Verifies cancellation status
+
+**Results:**
+- ✅ Run #401 cancelled
+- ✅ Run #400 cancelled
+- ✅ Runs #399 and #398 were already cancelled
+
+### Alternative: Manual Cancellation
+If the script doesn't work, manually cancel:
 1. Go to: https://github.com/PocketPortfolio/Financialprofilenetwork/actions/workflows/deploy.yml
-2. For each stuck run (#398, #399, #400):
+2. For each stuck run:
    - Click on the run
    - Click "Cancel workflow" button (if available)
-   - Or wait for them to timeout/fail
 
 ### Step 2: Push the Improved Fix
 The improved concurrency configuration will be pushed with this commit.
