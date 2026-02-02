@@ -477,7 +477,7 @@
     "scheduledTime": "14:00",
     "title": "How to calculate CAGR Programmatically",
     "slug": "how-to-calculate-cagr-programmatically",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -486,7 +486,8 @@
       "technical",
       "tutorial",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-02-02T14:37:19.012Z"
   },
   {
     "id": "how-to-visualizing-json-data-in-the-terminal-feb-3",
