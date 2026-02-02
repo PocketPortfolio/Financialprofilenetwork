@@ -23,14 +23,16 @@ on:
   workflow_dispatch: # Allow manual triggering (for testing/debugging only)
 
 # Concurrency control - prevent queue buildup
-# Only allow one instance of this workflow to run at a time
+# CRITICAL FIX: Cancel old runs when new scheduled run starts to prevent 30+ stuck jobs
+# This ensures only the latest scheduled run executes, preventing queue buildup
 concurrency:
   group: generate-blog
-  cancel-in-progress: false  # Don't cancel scheduled runs, just queue them
+  cancel-in-progress: true  # FIX: Cancel old runs when new scheduled run starts
 
 jobs:
   generate:
     runs-on: ubuntu-latest
+    timeout-minutes: 60  # Prevent indefinite hangs (blog generation can take time)
     permissions:
       contents: write
       issues: write

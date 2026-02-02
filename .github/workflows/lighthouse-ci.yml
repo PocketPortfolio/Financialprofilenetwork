@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
 
+# Concurrency control - prevent queue buildup from multiple commits
+concurrency:
+  group: lighthouse-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lhci:
     runs-on: ubuntu-latest

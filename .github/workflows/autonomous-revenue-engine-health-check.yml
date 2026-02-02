@@ -7,6 +7,11 @@ on:
     - cron: '0 */4 * * *'  # Every 4 hours
   workflow_dispatch:
 
+# Concurrency control - prevent queue buildup
+concurrency:
+  group: revenue-engine-health-check
+  cancel-in-progress: true
+
 jobs:
   health-check:
     name: Revenue Engine Health Check

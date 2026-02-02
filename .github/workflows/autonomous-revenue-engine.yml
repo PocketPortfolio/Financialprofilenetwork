@@ -12,15 +12,17 @@ on:
   workflow_dispatch: # Allow manual triggering for testing
 
 # Concurrency control - prevent queue buildup
-# Only allow one instance of this workflow to run at a time
+# CRITICAL FIX: Cancel old runs when new scheduled run starts to prevent 30+ stuck jobs
+# This ensures only the latest scheduled run executes, preventing queue buildup
 concurrency:
   group: autonomous-revenue-engine
-  cancel-in-progress: false  # Don't cancel scheduled runs, just queue them
+  cancel-in-progress: true  # FIX: Cancel old runs when new scheduled run starts
 
 jobs:
   source-leads:
     name: Source New Leads
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Prevent indefinite hangs
     permissions:
       contents: read
     steps:
@@ -110,6 +112,7 @@ jobs:
   enrich-and-email:
     name: Enrich Leads & Send Emails
     runs-on: ubuntu-latest
+    timeout-minutes: 45  # Prevent indefinite hangs
     permissions:
       contents: read
     steps:
@@ -179,6 +182,7 @@ jobs:
   process-inbound:
     name: Process Inbound Emails
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Prevent indefinite hangs
     permissions:
       contents: read
     steps:

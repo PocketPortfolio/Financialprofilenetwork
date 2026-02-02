@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Concurrency control - prevent queue buildup from multiple commits
+concurrency:
+  group: ci-cd-pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest

@@ -16,6 +16,7 @@ interface WorkflowRun {
   html_url: string;
   name: string;
   workflow_id: number;
+  event: string;
 }
 
 async function cancelAllStuckWorkflows() {
@@ -49,45 +50,35 @@ async function cancelAllStuckWorkflows() {
 
     console.log(`📋 Found ${workflows.length} workflows\n`);
 
-    // Key workflows to check
-    const keyWorkflowNames = [
-      'Deploy to Vercel',
-      'Generate Blog Posts',
-      'Autonomous Revenue Engine',
-      'Autonomous Revenue Engine - Health Check',
-      'Blog Health Check'
-    ];
-
     const allStuckRuns: Array<{workflow: string, run: WorkflowRun}> = [];
 
-    // Check each key workflow
+    // Check ALL workflows (not just key ones) to find all queued runs
     for (const workflow of workflows) {
-      if (!keyWorkflowNames.includes(workflow.name)) {
-        continue;
-      }
 
       console.log(`🔍 Checking ${workflow.name}...`);
       
-      const runsUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/${workflow.id}/runs?per_page=10&status=all`;
+      const runsUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/${workflow.id}/runs?per_page=50&status=queued`;
       const runsResponse = await fetch(runsUrl, { headers });
       
       if (runsResponse.ok) {
         const runsData = await runsResponse.json();
         const runs: WorkflowRun[] = runsData.workflow_runs || [];
         
-        // Find queued runs
+        // Find ALL queued runs (regardless of age - they're stuck if queued)
         const queuedRuns = runs.filter(run => run.status === 'queued');
         
         if (queuedRuns.length > 0) {
           console.log(`   ⚠️  Found ${queuedRuns.length} queued run(s)`);
           queuedRuns.forEach(run => {
             const age = Math.round((Date.now() - new Date(run.created_at).getTime()) / 1000 / 60);
-            console.log(`      - Run #${run.run_number}: queued (${age}m ago)`);
+            console.log(`      - Run #${run.run_number}: queued (${age}m ago) - ${run.event}`);
             allStuckRuns.push({workflow: workflow.name, run});
           });
         } else {
           console.log(`   ✅ No queued runs`);
         }
+      } else {
+        console.log(`   ⚠️  Failed to fetch runs: ${runsResponse.status}`);
       }
       console.log('');
     }
