@@ -404,6 +404,20 @@ export async function GET(
     const historicalData = await fetchHistoricalData(ticker, requestedRange);
 
     if (!historicalData || historicalData.length === 0) {
+      // Return format-appropriate error response
+      if (format === 'csv') {
+        // Return CSV error response for CSV requests
+        const errorCsv = `Date,Error\n${new Date().toISOString().split('T')[0]},Historical data not found for ticker: ${ticker}`;
+        return new NextResponse(errorCsv, {
+          status: 404,
+          headers: {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': `attachment; filename="${ticker}-error.csv"`,
+          },
+        });
+      }
+      
+      // JSON error response for JSON requests
       return NextResponse.json(
         { 
           error: `Historical data not found for ticker: ${ticker}`,
