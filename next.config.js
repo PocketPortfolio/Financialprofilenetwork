@@ -65,6 +65,11 @@ const nextConfig = {
         source: '/api/tickers/:ticker/json',
         destination: '/api/tickers/:ticker/json',
       },
+      // Map /api/tickers/{ticker}/csv to catch-all route for Next.js 15 compatibility
+      {
+        source: '/api/tickers/:ticker/csv',
+        destination: '/api/tickers/:ticker/csv',
+      },
       // Rewrite RESTful lead detail URL to nested structure (avoids Next.js routing conflict)
       // Industry-standard fix: Catch-all route cannot coexist with sibling route.ts
       {
