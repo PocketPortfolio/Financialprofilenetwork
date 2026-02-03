@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import SponsorModal from '../components/SponsorModal';
 import AlertModal from '../components/modals/AlertModal';
+import SponsorDeck from '../components/sponsor/SponsorDeck';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 
 // Get publishable key - REQUIRED (no fallback for security)
@@ -323,6 +324,18 @@ export default function SponsorPage() {
         </a>
       </div>
 
+      {/* Desktop: Focus Deck (Horizontal Accordion) */}
+      <div style={{ marginBottom: '48px', width: '100%' }}>
+        <SponsorDeck
+          onCheckout={handleCheckout}
+          loading={loading}
+          previewTheme={previewTheme}
+          onPreviewTheme={setPreviewTheme}
+          PRICE_IDS={PRICE_IDS}
+        />
+      </div>
+
+      {/* Mobile: Vertical Grid (Fallback) */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -330,7 +343,7 @@ export default function SponsorPage() {
         marginBottom: '48px',
         width: '100%'
       }}
-      className="sponsor-cards-grid">
+      className="sponsor-cards-grid mobile-sponsor-grid">
         {/* Code Supporter - $5/month */}
         <div style={{
           background: 'var(--surface)',

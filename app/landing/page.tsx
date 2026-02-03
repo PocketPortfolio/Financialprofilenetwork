@@ -16,6 +16,7 @@ import NPMStats from '../components/NPMStats';
 import DynamicDownloadCount from '../components/DynamicDownloadCount';
 import { useStickyHeader } from '../hooks/useStickyHeader';
 import TickerSearch from '../components/TickerSearch';
+import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function LandingPage() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Ensure header stays visible when scrolling
+  // Header positioning is now handled globally by useStickyHeader hook
   useStickyHeader('header.brand-header');
 
   return (
@@ -57,16 +58,17 @@ export default function LandingPage() {
         autoTrackScroll={true}
         autoTrackTime={true}
       />
-      {/* Header - Outside scrolling container for proper sticky positioning */}
+      
+      {/* Header - Positioned below banner (handled globally by useStickyHeader) */}
       <header 
         className="brand-header brand-spine" 
         style={{
           padding: '12px 24px',
-          position: 'sticky',
-          top: 0,
+          position: 'sticky', // Will be overridden by useStickyHeader
+          top: '0', // Will be overridden by useStickyHeader
           left: 0,
           right: 0,
-          zIndex: 1000,
+          zIndex: 1000, // Below banner
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%)',

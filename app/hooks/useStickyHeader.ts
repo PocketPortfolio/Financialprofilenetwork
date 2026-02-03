@@ -18,18 +18,27 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
       const headerHeight = rect.height;
       const computed = window.getComputedStyle(header);
       
+      // Detect global founders club banner
+      const banner = document.querySelector('.founder-banner, .global-founders-banner');
+      let bannerHeight = 0;
+      if (banner) {
+        const bannerRect = banner.getBoundingClientRect();
+        bannerHeight = bannerRect.height;
+      }
+      
       // Always use fixed for reliable behavior across all pages
       (header as HTMLElement).style.position = 'fixed';
-      (header as HTMLElement).style.top = '0';
+      (header as HTMLElement).style.top = `${bannerHeight}px`; // Position below banner
       (header as HTMLElement).style.left = '0';
       (header as HTMLElement).style.right = '0';
       (header as HTMLElement).style.width = '100%';
       (header as HTMLElement).style.zIndex = computed.zIndex || '1000';
       
-      // Add padding to body to prevent content from jumping under fixed header
+      // Add padding to body to prevent content from jumping under fixed header and banner
+      const totalHeaderHeight = bannerHeight + headerHeight;
       const bodyPadding = parseFloat(getComputedStyle(document.body).paddingTop) || 0;
-      if (bodyPadding < headerHeight) {
-        document.body.style.paddingTop = `${headerHeight}px`;
+      if (bodyPadding < totalHeaderHeight) {
+        document.body.style.paddingTop = `${totalHeaderHeight}px`;
       }
       
       appliedRef.current = true;
