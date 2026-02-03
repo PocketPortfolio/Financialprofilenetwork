@@ -495,7 +495,7 @@
     "scheduledTime": "14:00",
     "title": "Visualizing JSON Data in the Terminal",
     "slug": "visualizing-json-data-in-the-terminal",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -503,7 +503,8 @@
       "terminal",
       "visualizing",
       "data"
-    ]
+    ],
+    "publishedAt": "2026-02-03T14:40:35.811Z"
   },
   {
     "id": "how-to-how-to-build-a-dark-mode-that-actually-respects-system-prefs-feb-4",
