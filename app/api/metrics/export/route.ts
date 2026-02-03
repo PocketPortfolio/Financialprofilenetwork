@@ -9,22 +9,24 @@ export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-// Initialize Firebase Admin
-if (!getApps().length) {
-  try {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
+// Lazy initialization for Firebase Admin
+function getDb() {
+  // Initialize Firebase Admin if not already done
+  if (!getApps().length) {
+    try {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+      });
+    } catch (error) {
+      console.error('Firebase Admin initialization error:', error);
+    }
   }
+  return getFirestore();
 }
-
-const db = getFirestore();
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -173,6 +175,7 @@ export async function GET(request: NextRequest) {
  */
 async function getSEOMetrics(startDate: Date) {
   try {
+    const db = getDb();
     const startTimestamp = Timestamp.fromDate(startDate);
     const pageViewsRef = db.collection('pageViews');
     
@@ -496,6 +499,7 @@ async function getMonetizationMetrics(startDate: Date) {
  */
 async function getToolUsageMetrics(startDate: Date) {
   try {
+    const db = getDb();
     const startTimestamp = Timestamp.fromDate(startDate);
     
     // Tax Converter usage

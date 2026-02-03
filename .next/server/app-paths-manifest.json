@@ -1,11 +1,4 @@
 {
-  "/api/most-traded/route": "app/api/most-traded/route.js",
-  "/api/api-keys/route": "app/api/api-keys/route.js",
-  "/api/api-keys/user/route": "app/api/api-keys/user/route.js",
-  "/api/agent/leads/route": "app/api/agent/leads/route.js",
-  "/api/agent/metrics/route": "app/api/agent/metrics/route.js",
-  "/api/agent/health/route": "app/api/agent/health/route.js",
-  "/api/agent/audit-feed/route": "app/api/agent/audit-feed/route.js",
-  "/api/agent/kill-switch/route": "app/api/agent/kill-switch/route.js",
-  "/admin/sales/page": "app/admin/sales/page.js"
+  "/api/npm-stats/route": "app/api/npm-stats/route.js",
+  "/landing/page": "app/landing/page.js"
 }

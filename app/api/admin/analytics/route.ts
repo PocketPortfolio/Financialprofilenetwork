@@ -12,19 +12,23 @@ export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-// Initialize Firebase Admin
-if (!getApps().length) {
-  try {
-    initializeApp({
-      credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
+// Lazy initialization for Firebase Admin
+function getDb() {
+  // Initialize Firebase Admin if not already done
+  if (!getApps().length) {
+    try {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+      });
+    } catch (error) {
+      console.error('Firebase Admin initialization error:', error);
+    }
   }
+  return getFirestore();
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY
@@ -331,7 +335,7 @@ async function getMonetizationData(startDate: Date) {
 
 async function getToolUsageData(startDate: Date) {
   try {
-    const db = getFirestore();
+    const db = getDb();
     
     // Fetch tool usage events from Firestore
     const toolEventsRef = db.collection('toolUsage');
@@ -470,7 +474,7 @@ async function getToolUsageData(startDate: Date) {
 
 async function getSEOPageData(startDate: Date) {
   try {
-    const db = getFirestore();
+    const db = getDb();
     
     // Fetch page view events
     const pageViewsRef = db.collection('pageViews');
