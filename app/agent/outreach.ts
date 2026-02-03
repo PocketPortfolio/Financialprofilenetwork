@@ -16,7 +16,19 @@ const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-initialize Resend to avoid build-time errors when API key is missing
+let resendInstance: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resendInstance) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not set. Please configure it in your environment variables.');
+    }
+    resendInstance = new Resend(apiKey);
+  }
+  return resendInstance;
+}
 
 /**
  * Generate an email using AI
@@ -507,7 +519,7 @@ export async function sendEmail(
     console.log(`📅 Email scheduled for ${scheduledSendAt.toISOString()} (timezone-aware)`);
   }
 
-  const { data, error } = await resend.emails.send(sendOptions);
+  const { data, error } = await getResend().emails.send(sendOptions);
 
   if (error) {
     throw new Error(`Resend error: ${error.message}`);
