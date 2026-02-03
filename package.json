@@ -127,6 +127,7 @@
     "drizzle-orm": "^0.29.0",
     "firebase": "^10.13.0",
     "firebase-admin": "^13.5.0",
+    "framer-motion": "^12.31.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.0.0",
     "lucide-react": "^0.562.0",
