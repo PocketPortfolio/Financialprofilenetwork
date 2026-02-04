@@ -1,0 +1,84 @@
+---
+title: How to Build a 'Dark Mode' that Actually Respects System Prefs
+date: '2026-02-04'
+description: >-
+  Learn how to build a dark mode feature that respects user's system preferences
+  with straightforward CSS and JavaScript.
+tags:
+  - dark-mode
+  - build
+  - dark
+  - mode
+author: Pocket Portfolio Team
+image: /images/blog/how-to-build-a-dark-mode-that-actually-respects-system-prefs.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Implementing a dark mode that respects the system preferences of the user's device enhances the user experience by matching their chosen theme, reducing eye strain, and potentially saving battery life on OLED screens. Here's a direct, hacker-style guide to building such a feature.
+
+### Direct Solution with Code
+
+First, use CSS to set up basic theming, utilizing the `prefers-color-scheme` media query to detect if the user has requested a light or dark color scheme:
+
+```css
+/* Default to light mode */
+body {
+  background-color: #fff;
+  color: #000;
+}
+
+/* If dark mode is preferred */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #333;
+    color: #fff;
+  }
+}
+```
+
+Next, add JavaScript to toggle between themes while respecting the system preference as a default:
+
+```javascript
+// Check for system preference at the time of script execution
+const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+// Function to toggle dark mode
+function toggleDarkMode(force) {
+  if (force !== undefined) {
+    document.body.classList.toggle('dark-mode', force);
+  } else {
+    document.body.classList.toggle('dark-mode');
+  }
+}
+
+// Initially apply the system preference
+toggleDarkMode(systemPrefersDark);
+
+// Optional: Listen for changes in system preferences
+window.matchMedia('(prefers-color-scheme: dark)').addListener(e => {
+  toggleDarkMode(e.matches);
+});
+```
+
+### Explanation of Key Concepts
+
+- **`prefers-color-scheme` media query**: This CSS feature detects if the user has requested a light or dark color scheme in their system preferences.
+- **`window.matchMedia`**: This JavaScript method returns an object that can be used to determine if the document matches the media query string, making it ideal for dynamically applying styles based on system preferences.
+
+### Quick Tip
+
+When implementing a toggle feature, always provide the option to revert to the system preference. This respects user autonomy, allowing them to switch between manual and automatic theme settings.
+
+```javascript
+// Function to reset to system preference
+function resetToSystemPreference() {
+  toggleDarkMode(systemPrefersDark);
+}
+```
+
+### Gotcha
+
+Ensure your site or application's theme smoothly transitions between modes by using CSS transitions for color properties. Sudden changes can be jarring and detract from the user experience.
+
+Implementing a responsive dark mode isn't just about aesthetics; it's about respecting user preferences and providing a comfortable browsing experience. With the outlined solution, you'll have a robust dark mode that aligns with both individual preferences and system settings, bridging the gap between user desire and application functionality.
