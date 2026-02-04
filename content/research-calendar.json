@@ -469,7 +469,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Index Maintenance - Performance Impact",
     "slug": "research-database-index-maintenance-performance-impact-2026-02-04",
-    "status": "failed",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -479,7 +479,8 @@
       "index",
       "maintenance"
     ],
-    "videoId": "BIlFTFrEFOI"
+    "videoId": "BIlFTFrEFOI",
+    "publishedAt": "2026-02-04T19:00:39.713Z"
   },
   {
     "id": "research-message-serialization-performance-json-vs-protobuf-vs-avro-2026-02-05",
