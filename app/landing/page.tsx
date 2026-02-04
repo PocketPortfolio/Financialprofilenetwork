@@ -47,6 +47,10 @@ export default function LandingPage() {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Header positioning is now handled globally by useStickyHeader hook
   useStickyHeader('header.brand-header');
 
@@ -85,7 +89,14 @@ export default function LandingPage() {
             justifyContent: 'space-between'
           }}>
             {/* Logo */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                cursor: 'pointer'
+              }}
+              onClick={handleLogoClick}
+            >
               <Logo size="medium" showWordmark={!isMobile} />
             </div>
 
