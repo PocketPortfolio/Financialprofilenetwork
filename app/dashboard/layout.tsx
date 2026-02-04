@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import { SovereignHeader } from '../components/dashboard/SovereignHeader';
-import FoundersClubBanner from '../components/FoundersClubBanner';
+// Removed FoundersClubBanner import - using GlobalFoundersClubBanner from root layout instead
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -34,8 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         user={user}
       />
 
-      {/* Founders Club Banner - Sticky at top for free tier users */}
-      <FoundersClubBanner />
+      {/* Removed FoundersClubBanner - using GlobalFoundersClubBanner from root layout instead */}
 
       {/* 🎨 CONTENT SLOT - Where sub-pages render */}
       <main 
@@ -45,7 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           maxWidth: '1600px',
           margin: '0 auto',
           padding: '16px',
-          paddingTop: 'calc(var(--header-height, 64px) + var(--banner-height, 48px) + 4px)', // Header + Banner + minimal spacing (4px gap)
+          paddingTop: 'calc(var(--header-height, 64px) + 4px)', // Header + minimal spacing (global banner is fixed at top)
           minHeight: 'calc(100vh - 80px)'
         }}
       >
