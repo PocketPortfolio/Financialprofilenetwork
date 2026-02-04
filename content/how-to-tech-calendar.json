@@ -512,7 +512,7 @@
     "scheduledTime": "14:00",
     "title": "How to Build a \"Dark Mode\" that Actually Respects System Prefs",
     "slug": "how-to-build-a-dark-mode-that-actually-respects-system-prefs",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -520,7 +520,8 @@
       "build",
       "dark",
       "mode"
-    ]
+    ],
+    "publishedAt": "2026-02-04T14:37:47.839Z"
   },
   {
     "id": "how-to-sanitizing-user-input-the-first-line-of-defense-feb-5",
