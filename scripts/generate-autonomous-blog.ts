@@ -542,10 +542,38 @@ pillar: "${post.pillar}"
           throw new Error('No content generated from OpenAI');
         }
       } catch (error: any) {
-        if (attempts >= maxAttempts) {
-          throw new Error(`Failed to generate content after ${maxAttempts} attempts: ${error.message}`);
+        const errorMessage = error.message || '';
+        const errorStatus = error.status || error.response?.status;
+        
+        // Distinguish between different types of 429 errors
+        const isQuotaError = errorMessage.includes('exceeded your current quota') && 
+                             (errorMessage.includes('billing') || errorMessage.includes('plan'));
+        const isRateLimitError = errorStatus === 429 && 
+                                 (errorMessage.includes('rate limit') || 
+                                  errorMessage.includes('requests per minute') ||
+                                  errorMessage.includes('tokens per minute') ||
+                                  errorMessage.includes('Too Many Requests'));
+        
+        if (isQuotaError && attempts >= 1) {
+          // Quota/billing errors won't resolve with retries - fail fast
+          throw new Error(`OpenAI API quota exceeded - billing issue: ${errorMessage}. Please check your OpenAI account billing at https://platform.openai.com/account/billing`);
         }
-        console.warn(`⚠️ Attempt ${attempts} failed, retrying... (${error.message})`);
+        
+        if (isRateLimitError) {
+          // Rate limit errors are transient - use longer backoff
+          const backoffSeconds = Math.min(60 * attempts, 300); // Max 5 minutes
+          console.warn(`⚠️ Rate limit hit (attempt ${attempts}/${maxAttempts}), waiting ${backoffSeconds}s before retry...`);
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, backoffSeconds * 1000));
+            continue; // Retry immediately after backoff
+          }
+        }
+        
+        if (attempts >= maxAttempts) {
+          throw new Error(`Failed to generate content after ${maxAttempts} attempts: ${errorMessage}`);
+        }
+        
+        console.warn(`⚠️ Attempt ${attempts} failed, retrying... (${errorMessage})`);
         await new Promise(resolve => setTimeout(resolve, 5000 * attempts)); // Exponential backoff
       }
     }
