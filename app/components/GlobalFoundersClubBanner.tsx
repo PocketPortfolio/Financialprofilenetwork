@@ -3,12 +3,27 @@
 import React from 'react';
 import Link from 'next/link';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
+import { usePremiumTheme } from '../hooks/usePremiumTheme';
 
 /**
  * Global Founders Club banner shown on all pages
  * Fixed at the very top, above all navigation
+ * Hidden for Corporate and UK Founders tier members
  */
 export default function GlobalFoundersClubBanner() {
+  const { tier, isLoading } = usePremiumTheme();
+
+  // Hide banner for Corporate and UK Founders tier members
+  if (isLoading) {
+    // Show nothing while checking subscription status (prevents flash)
+    return null;
+  }
+
+  if (tier === 'corporateSponsor' || tier === 'foundersClub') {
+    // User is already subscribed - don't show banner
+    return null;
+  }
+
   return (
     <div
       className="founder-banner global-founders-banner"
