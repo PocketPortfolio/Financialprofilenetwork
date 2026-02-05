@@ -328,7 +328,7 @@
     "date": "2026-02-05",
     "title": "The Power of Compounding: Visualizing Long-Term Growth",
     "slug": "the-power-of-compounding-visualizing-long-term-growth",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -338,7 +338,8 @@
       "power"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-02-05T09:40:55.700Z"
   },
   {
     "id": "week-6-post-1",
