@@ -1,0 +1,49 @@
+---
+title: 'Research: Message Serialization Performance - JSON vs. Protobuf vs. Avro'
+date: '2026-02-05'
+description: >-
+  Explore the serialization performance differences between JSON, Protobuf, and
+  Avro, including benchmarks and architectural trade-offs.
+tags:
+  - performance
+  - message
+  - serialization
+author: Pocket Portfolio Team
+image: >-
+  /images/blog/research-message-serialization-performance-json-vs-protobuf-vs-avro-2026-02-05.png
+pillar: technical
+category: research
+videoId: ZlKrnOD-4TQ
+---
+
+## Abstract
+
+In the realm of high-frequency trading, the serialization and deserialization of messages play a pivotal role in determining the overall system latency and throughput. This research delves into the comparative performance analysis of three predominant serialization formats: JSON, Protocol Buffers (Protobuf), and Apache Avro. Through rigorous benchmarking, we aim to provide a comprehensive understanding of the trade-offs involved in choosing a serialization format, focusing on serialization speed, message size, and ease of schema evolution. The results indicate significant performance disparities among the formats, with Protobuf and Avro generally outperforming JSON in terms of efficiency and speed, albeit with some trade-offs in terms of human readability and ease of integration.
+
+## Methodology
+
+Our research methodology involved the collection of data through a series of controlled experiments designed to evaluate the serialization and deserialization speed, the size of serialized messages, and the flexibility of schema evolution across JSON, Protobuf, and Avro. Benchmarks were conducted using a standardized dataset of trading messages, encompassing a variety of message types and sizes to ensure a comprehensive analysis. The experiments were replicated across multiple environments to account for potential variances in performance due to underlying hardware or software configurations.
+
+## Key Findings
+
+- **Serialization and Deserialization Speed**: Protobuf and Avro demonstrated superior performance in serialization and deserialization speeds compared to JSON. Protobuf, in particular, showed a notable advantage in deserialization speed, which is critical for systems requiring fast data processing.
+- **Message Size**: Protobuf and Avro messages were significantly smaller in size than their JSON counterparts, leading to reduced network bandwidth consumption and faster transmission times. This size efficiency comes at the cost of human readability, which JSON provides.
+- **Schema Evolution**: Avro's schema evolution capabilities were found to be more robust than those of Protobuf, with JSON trailing due to its lack of built-in schema support. This makes Avro particularly suitable for environments where message schemas are expected to change over time.
+
+## Video Reference
+
+The video "Improving performance with binary data-interchange formats and protocols" by Julien Genestoux provides an insightful overview of the importance of efficient serialization formats in optimizing application performance. Genestoux's discussion aligns with our findings, emphasizing the trade-offs between human readability and performance efficiency when choosing a serialization format.
+
+## References
+
+- [Protobuf Documentation](https://developers.google.com/protocol-buffers) - Official documentation providing an overview of Protobuf, its usage, and benefits.
+- [Apache Avro: A Compact, Fast, Binary Data Format](http://avro.apache.org/docs/current/) - A whitepaper detailing Avro's design principles, features, and advantages over other serialization formats.
+- [The Performance of Open Source Data Serialization Formats](https://eng.uber.com/trip-data-squeeze/) - An engineering blog post by Uber discussing the comparative performance of various serialization formats, including JSON, Protobuf, and Avro.
+
+## Future Trends
+
+The future of message serialization seems to be heading towards formats and protocols that optimize for both performance and ease of schema evolution. As systems increasingly require the handling of massive volumes of data at high speeds, the efficiency of data serialization and deserialization becomes critical. Protobuf and Avro are well-positioned to meet these demands, particularly in systems where the trade-off of human readability is acceptable. Furthermore, the development of tools to improve the usability and integration of these formats, such as GUI schema editors and automatic code generation, is likely to mitigate some of their current drawbacks.
+
+## Verdict
+
+Choosing the right serialization format involves balancing considerations of performance, message size, and schema evolution capabilities. For high-frequency trading systems, where speed and efficiency are paramount, Protobuf and Avro present compelling advantages over JSON. However, the final decision should be informed by the specific requirements and constraints of the application in question. For developers and architects looking to improve their systems' performance, exploring binary serialization formats like Protobuf and Avro is a worthwhile investment. For those interested in tracking and managing investments with precision and speed, incorporating a [JSON-based Investment Tracker](/) could offer a complementary solution that leverages JSON's ease of use and flexibility.

@@ -488,14 +488,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Message Serialization Performance - JSON vs Protobuf vs Avro",
     "slug": "research-message-serialization-performance-json-vs-protobuf-vs-avro-2026-02-05",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "message",
       "serialization"
-    ]
+    ],
+    "videoId": "ZlKrnOD-4TQ",
+    "publishedAt": "2026-02-05T18:39:32.086Z"
   },
   {
     "id": "research-api-authentication-overhead-oauth-2-0-vs-api-keys-2026-02-06",
