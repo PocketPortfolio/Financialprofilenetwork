@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/sales/client';
 import { conversations, leads, auditLogs } from '@/db/sales/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import { sendEmail } from '@/app/agent/outreach';
 
 // Next.js route configuration for production
@@ -149,15 +149,84 @@ export async function POST(request: NextRequest) {
 
     if (type === 'email.received') {
       // Handle inbound email
-      const { from, to, subject, text, html, headers } = data;
+      const { from, to, subject, text, html, headers, tags } = data;
 
-      // Extract lead ID from email tags or thread
-      const leadId = headers?.['x-lead-id'] || extractLeadIdFromThread(headers);
+      // Enhanced leadId extraction from multiple sources
+      let leadId: string | null = null;
+      let extractionMethod = 'unknown';
+
+      // Method 1: Extract from Resend tags (most reliable)
+      if (tags && Array.isArray(tags)) {
+        const leadIdTag = tags.find((tag: any) => tag.name === 'lead_id');
+        if (leadIdTag?.value) {
+          leadId = leadIdTag.value;
+          extractionMethod = 'resend_tags';
+          console.log(`✅ Extracted leadId from Resend tags: ${leadId}`);
+        }
+      }
+
+      // Method 2: Extract from headers (x-lead-id)
+      if (!leadId && headers?.['x-lead-id']) {
+        leadId = headers['x-lead-id'];
+        extractionMethod = 'headers';
+        console.log(`✅ Extracted leadId from headers: ${leadId}`);
+      }
+
+      // Method 3: Lookup by thread ID (in-reply-to or references)
+      if (!leadId) {
+        const threadId = headers?.['in-reply-to'] || headers?.['references'];
+        if (threadId) {
+          const extracted = await extractLeadIdFromThread(threadId);
+          if (extracted) {
+            leadId = extracted;
+            extractionMethod = 'thread_lookup';
+            console.log(`✅ Extracted leadId from thread lookup: ${leadId}`);
+          }
+        }
+      }
+
+      // Method 4: Fallback to sender email lookup
+      if (!leadId && from) {
+        const emailMatch = await extractLeadIdFromEmail(from);
+        if (emailMatch) {
+          leadId = emailMatch;
+          extractionMethod = 'sender_email_lookup';
+          console.log(`✅ Extracted leadId from sender email: ${leadId}`);
+        }
+      }
 
       if (!leadId) {
-        console.warn('No lead ID found in inbound email');
-        return NextResponse.json({ success: true, message: 'No lead ID found' });
+        console.warn('❌ No lead ID found in inbound email', {
+          from,
+          to,
+          subject,
+          hasTags: !!tags,
+          hasHeaders: !!headers,
+          threadId: headers?.['in-reply-to'] || headers?.['references'],
+        });
+        
+        // Log failed extraction (use EMAIL_RECEIVED with failure metadata)
+        await db.insert(auditLogs).values({
+          action: 'EMAIL_RECEIVED',
+          aiReasoning: `Failed to extract leadId from inbound email. From: ${from}, To: ${to}`,
+          metadata: {
+            from,
+            to,
+            subject,
+            hasTags: !!tags,
+            hasHeaders: !!headers,
+            threadId: headers?.['in-reply-to'] || headers?.['references'],
+            extractionFailed: true,
+          },
+        }).catch(() => {});
+
+        return NextResponse.json({ 
+          success: false, 
+          message: 'No lead ID found - logged to audit logs' 
+        });
       }
+
+      console.log(`📧 Processing inbound email for lead ${leadId} (extracted via: ${extractionMethod})`);
 
       // Classify the email
       const classification = classifyEmail(text || html || '');
@@ -208,12 +277,13 @@ export async function POST(request: NextRequest) {
       await db.insert(auditLogs).values({
         leadId,
         action: 'EMAIL_RECEIVED',
-        aiReasoning: `Inbound email classified as: ${classification}`,
+        aiReasoning: `Inbound email classified as: ${classification} (leadId extracted via: ${extractionMethod})`,
         metadata: {
           from,
           to,
           subject,
           classification,
+          extractionMethod,
         },
       });
 
@@ -240,6 +310,11 @@ export async function POST(request: NextRequest) {
           }).catch(() => {});
         });
       }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: `Email processed (classification: ${classification}, leadId: ${leadId})` 
+      });
     }
 
     return NextResponse.json({ success: true });
@@ -304,11 +379,61 @@ This is an automated confirmation. You will not receive any further emails from 
   }
 }
 
-function extractLeadIdFromThread(headers: Record<string, string>): string | null {
-  // Extract from thread ID or email tags
-  const threadId = headers?.['in-reply-to'] || headers?.['references'];
-  // TODO: Implement thread-to-lead mapping
-  return null;
+/**
+ * Extract leadId from thread ID by looking up original email in database
+ */
+async function extractLeadIdFromThread(threadId: string): Promise<string | null> {
+  try {
+    // Look up conversation by threadId or emailId
+    const [conversation] = await db
+      .select({ leadId: conversations.leadId })
+      .from(conversations)
+      .where(
+        or(
+          eq(conversations.threadId, threadId),
+          eq(conversations.emailId, threadId)
+        )
+      )
+      .limit(1);
+
+    if (conversation?.leadId) {
+      console.log(`✅ Found leadId ${conversation.leadId} from threadId ${threadId}`);
+      return conversation.leadId;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error looking up threadId:', error);
+    return null;
+  }
+}
+
+/**
+ * Extract leadId from sender email address (fallback method)
+ */
+async function extractLeadIdFromEmail(email: string): Promise<string | null> {
+  try {
+    // Extract email address from "Name <email@domain.com>" format
+    const emailMatch = email.match(/<(.+)>/);
+    const emailAddress = emailMatch ? emailMatch[1] : email;
+
+    // Look up lead by email
+    const [lead] = await db
+      .select({ id: leads.id })
+      .from(leads)
+      .where(eq(leads.email, emailAddress.toLowerCase().trim()))
+      .limit(1);
+
+    if (lead?.id) {
+      console.log(`✅ Found leadId ${lead.id} from sender email ${emailAddress}`);
+      return lead.id;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error looking up sender email:', error);
+    return null;
+  }
 }
 
 function classifyEmail(content: string): 'INTERESTED' | 'NOT_INTERESTED' | 'OOO' | 'HUMAN_ESCALATION' | 'STOP' {
