@@ -1,0 +1,49 @@
+---
+title: 'Sanitizing User Input: The First Line of Defense'
+date: '2026-02-05'
+description: >-
+  Learn how sanitizing user input is crucial in securing applications against
+  malicious attacks. Code examples included.
+tags:
+  - sanitizing
+  - user
+  - input
+author: Pocket Portfolio Team
+image: /images/blog/sanitizing-user-input-the-first-line-of-defense.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Unfiltered user input can be a gateway for attackers to exploit vulnerabilities in your system. Sanitizing this input is thus critical in fortifying your application's defenses.
+
+### Direct Solution with Code
+
+Suppose we're accepting a username from a user, which will be inserted into a database. Here's how to sanitize this input using Python with the `bleach` library:
+
+```python
+import bleach
+
+# User input
+raw_username = "<script>alert('Malicious Code');</script>username"
+
+# Sanitize the input
+sanitized_username = bleach.clean(raw_username)
+
+# sanitized_username now equals "username", with the script tag removed
+```
+
+### Explanation of Key Concepts
+
+Sanitizing involves cleaning or filtering user input to ensure it does not contain harmful or unnecessary data before it's processed by your application. This process helps prevent a wide range of attacks, including SQL injection, Cross-Site Scripting (XSS), and others.
+
+The `bleach` library in Python, as shown above, removes or escapes tags and attributes that are not explicitly allowed, effectively preventing the execution of harmful scripts.
+
+### Quick Tip
+
+Always whitelist allowed characters or patterns instead of trying to blacklist harmful ones. Attackers can be incredibly creative, and a blacklist approach often misses less common but equally dangerous payloads.
+
+### Gotcha
+
+Do not rely solely on client-side sanitization. Attackers can bypass JavaScript and other client-side measures by interacting with your server through other means, such as curl or Postman. Always sanitize on the server side.
+
+Sanitizing user input is a fundamental security practice. Incorporating it into your development process protects both your users and your systems from a variety of attacks. Remember, security is not a one-time setup but a continuous effort.

@@ -529,14 +529,15 @@
     "scheduledTime": "14:00",
     "title": "Sanitizing User Input: The First Line of Defense",
     "slug": "sanitizing-user-input-the-first-line-of-defense",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "sanitizing",
       "user",
       "input"
-    ]
+    ],
+    "publishedAt": "2026-02-05T14:40:08.815Z"
   },
   {
     "id": "how-to-how-to-cache-api-calls-in-localstorage-feb-6",
