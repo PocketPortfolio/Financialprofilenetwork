@@ -56,7 +56,7 @@ function escapeCsvCell(cell: string | number): string {
  * Excel recognizes MM/DD/YYYY format better when opening CSV files directly
  */
 function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
-  const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'];
+  const headers = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'SOURCE: Pocket Portfolio API'];
   const rows = data.map((d, index) => {
     // Convert ISO date (YYYY-MM-DD) to Excel-friendly format (MM/DD/YYYY)
     // Excel recognizes MM/DD/YYYY format better when opening CSV files
@@ -82,20 +82,23 @@ function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
       // Fallback to original date if conversion fails
     }
     
-    // Escape all cells to prevent CSV injection and parsing errors
     return [
       escapeCsvCell(excelDate),
       escapeCsvCell(d.open.toFixed(2)),
       escapeCsvCell(d.high.toFixed(2)),
       escapeCsvCell(d.low.toFixed(2)),
       escapeCsvCell(d.close.toFixed(2)),
-      escapeCsvCell(d.volume.toString())
+      escapeCsvCell(d.volume.toString()),
+      ''
     ];
   });
-  
+
+  const footerRow = ['DATA END', 'For automated updates', 'upgrade at:', 'pocketportfolio.app/sponsor', '', '', ''].map(escapeCsvCell).join(',');
+
   const csvContent = [
     headers.join(','),
-    ...rows.map(row => row.join(','))
+    ...rows.map(row => row.join(',')),
+    footerRow
   ].join('\n');
   
   // Add UTF-8 BOM for better Excel compatibility (helps Excel recognize UTF-8 encoding)

@@ -37,6 +37,9 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
   const [results, setResults] = useState<TickerResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [voteEmail, setVoteEmail] = useState('');
+  const [voteSubmitting, setVoteSubmitting] = useState(false);
+  const [voteSubmitted, setVoteSubmitted] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -85,13 +88,11 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
         } else {
           // Use the actual search API
           try {
-            console.log('TickerSearch: making API call for:', query);
             const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-            console.log('TickerSearch: API response status:', response.status);
             if (response.ok) {
-              const apiResults = await response.json();
-              console.log('TickerSearch: API results:', apiResults);
-              const formattedResults = apiResults.map((result: any) => ({
+              const data = await response.json();
+              const rawResults = Array.isArray(data.results) ? data.results : [];
+              const formattedResults = rawResults.map((result: any) => ({
                 symbol: result.symbol,
                 name: result.name,
                 type: result.type === 'crypto' ? 'Crypto' : 'Stock',
@@ -99,7 +100,6 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                 currency: result.currency || 'USD',
                 matchScore: 0.9
               }));
-              console.log('TickerSearch: formatted results:', formattedResults);
               setResults(formattedResults.slice(0, 8));
             } else {
               // Fallback to mock results
@@ -138,12 +138,8 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    console.log('TickerSearch input changed:', value, 'length:', value.length);
-    setQuery(value);
-    const shouldOpen = value.length > 0;
-    setIsOpen(shouldOpen);
-    console.log('TickerSearch isOpen set to:', shouldOpen);
+    setQuery(e.target.value);
+    setIsOpen(e.target.value.length > 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -332,14 +328,78 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                 );
               })
             ) : query.length >= 2 ? (
-              <div style={{ 
-                padding: '20px 16px', 
-                textAlign: 'center', 
-                color: 'var(--muted)',
-                fontSize: '14px'
-              }}>
-                <div style={{ marginBottom: '8px', fontSize: '16px' }}>🔍</div>
-                No results found for "{query}"
+              <div style={{ padding: '16px', fontSize: '14px' }}>
+                <div style={{ marginBottom: '8px', color: 'var(--text)', fontWeight: '500' }}>
+                  We don&apos;t have &quot;{query}&quot; yet.
+                </div>
+                {voteSubmitted ? (
+                  <div style={{ color: 'var(--muted)', fontSize: '13px' }}>
+                    Thanks! We&apos;ll consider adding this ticker.
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ marginBottom: '8px', color: 'var(--muted)', fontSize: '13px' }}>
+                      Vote for this ticker to be added.
+                    </div>
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!voteEmail.trim() || voteSubmitting) return;
+                        setVoteSubmitting(true);
+                        try {
+                          const res = await fetch('/api/vote-ticker', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ searchQuery: query.trim(), email: voteEmail.trim() }),
+                          });
+                          if (res.ok) setVoteSubmitted(true);
+                          else {
+                            const err = await res.json().catch(() => ({}));
+                            alert(err.error || 'Something went wrong.');
+                          }
+                        } catch {
+                          alert('Something went wrong.');
+                        } finally {
+                          setVoteSubmitting(false);
+                        }
+                      }}
+                      style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+                    >
+                      <input
+                        type="email"
+                        placeholder="Your email"
+                        value={voteEmail}
+                        onChange={(e) => setVoteEmail(e.target.value)}
+                        required
+                        style={{
+                          padding: '8px 12px',
+                          border: '1px solid var(--border)',
+                          borderRadius: '6px',
+                          background: 'var(--surface)',
+                          color: 'var(--text)',
+                          fontSize: '14px',
+                          outline: 'none'
+                        }}
+                      />
+                      <button
+                        type="submit"
+                        disabled={voteSubmitting}
+                        style={{
+                          padding: '8px 12px',
+                          background: 'var(--accent-warm)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          cursor: voteSubmitting ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {voteSubmitting ? 'Submitting...' : 'Vote for this ticker'}
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
             ) : null}
           </div>

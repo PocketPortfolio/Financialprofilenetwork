@@ -56,6 +56,14 @@ export default function SponsorPage() {
     message: '',
     type: 'info'
   });
+  const [scarcity, setScarcity] = useState<{ count: number; batch: number; label: string; progress: number; remaining: number; max: number } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/scarcity')
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => data && setScarcity(data))
+      .catch(() => {});
+  }, []);
 
   // Verify Stripe loads correctly
   useEffect(() => {
@@ -696,26 +704,41 @@ export default function SponsorPage() {
             marginBottom: '16px',
             flexWrap: 'wrap'
           }}>
-            {/* Scarcity Counter - Red and Pulsing */}
-            <div 
-              className="founders-club-counter"
-              style={{
-                background: 'rgba(220, 38, 38, 0.15)',
-                border: '2px solid #dc2626',
-                color: '#dc2626',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                fontSize: '11px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                whiteSpace: 'nowrap',
-                lineHeight: '1.4',
-                animation: 'pulse-red 2s ease-in-out infinite',
-                boxShadow: '0 0 0 0 rgba(220, 38, 38, 0.7)'
-              }}
-            >
-              Batch 1: {getFoundersClubScarcityMessage()}
+            {/* Scarcity Counter - Red (Batch 1) / Orange (Batch 2), progress bar */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '140px' }}>
+              <div
+                className="founders-club-counter"
+                style={{
+                  background: scarcity?.batch === 2 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(220, 38, 38, 0.15)',
+                  border: `2px solid ${scarcity?.batch === 2 ? '#f97316' : '#dc2626'}`,
+                  color: scarcity?.batch === 2 ? '#ea580c' : '#dc2626',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  whiteSpace: 'nowrap',
+                  lineHeight: '1.4',
+                  animation: 'pulse-red 2s ease-in-out infinite',
+                  boxShadow: scarcity?.batch === 2 ? '0 0 0 0 rgba(249, 115, 22, 0.5)' : '0 0 0 0 rgba(220, 38, 38, 0.7)'
+                }}
+              >
+                {scarcity ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left` : `Batch 1: ${getFoundersClubScarcityMessage()}`}
+              </div>
+              {scarcity != null && (
+                <div style={{ width: '100%', height: '4px', background: 'var(--surface)', borderRadius: '2px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      width: `${Math.min(100, scarcity.progress * 100)}%`,
+                      height: '100%',
+                      background: scarcity.batch === 2 ? '#f97316' : '#dc2626',
+                      borderRadius: '2px',
+                      transition: 'width 0.3s ease'
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Limited Edition Badge */}
