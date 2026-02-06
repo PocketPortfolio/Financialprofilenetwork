@@ -545,7 +545,7 @@
     "scheduledTime": "14:00",
     "title": "How to Cache API Calls in LocalStorage",
     "slug": "how-to-cache-api-calls-in-localstorage",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -553,7 +553,8 @@
       "localstorage",
       "cache",
       "calls"
-    ]
+    ],
+    "publishedAt": "2026-02-06T14:36:28.483Z"
   },
   {
     "id": "how-to-building-a-simple-health-check-endpoint-feb-7",

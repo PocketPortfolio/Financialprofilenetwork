@@ -1,0 +1,56 @@
+---
+title: How to Cache API Calls in LocalStorage
+date: '2026-02-06'
+description: >-
+  Learn to efficiently cache API calls in LocalStorage to enhance your web
+  application's performance and user experience.
+tags:
+  - api
+  - localstorage
+  - cache
+  - calls
+author: Pocket Portfolio Team
+image: /images/blog/how-to-cache-api-calls-in-localstorage.png
+pillar: technical
+category: how-to-in-tech
+---
+
+When building web applications, excessive API calls can lead to slower performance and a poor user experience. Caching these calls in `LocalStorage` is an efficient solution to mitigate this issue.
+
+Here's a straightforward approach to caching API calls in `LocalStorage`:
+
+```javascript
+// Function to fetch data from an API and cache it in LocalStorage
+async function fetchData(url) {
+  // Check if the data for the URL is already in LocalStorage
+  const cachedData = localStorage.getItem(url);
+  if (cachedData) {
+    return JSON.parse(cachedData); // Return the cached data
+  } else {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      localStorage.setItem(url, JSON.stringify(data)); // Cache the new data
+      return data;
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
+  }
+}
+```
+
+### Explanation of Key Concepts
+
+- **LocalStorage**: A web storage API that allows you to store data as key/value pairs in a web browser with no expiration date. It's accessible across browser sessions, making it ideal for caching.
+- **JSON**: JavaScript Object Notation is a lightweight data-interchange format. It's used here to store the API response in `LocalStorage` and to parse it when retrieving the cached data.
+- **Async/Await**: These JavaScript keywords allow asynchronous, promise-based behavior to be written in a cleaner style, avoiding the need for a chain of `.then()` calls.
+
+### Quick Tip
+
+Remember that `LocalStorage` has a storage limit of approximately 5MB per origin. Be mindful of the size and number of API responses you cache. For applications requiring more storage or complex data structures, consider using IndexedDB or a server-side caching strategy.
+
+### Gotcha
+
+While caching can significantly improve your application's performance, stale data can become an issue. Implement a cache invalidation strategy, such as timestamping cached entries and checking for data freshness, to ensure users receive the most current information.
+
+By implementing this caching strategy, you'll enhance your application's responsiveness and reduce the load on your APIs, leading to a better overall user experience.
