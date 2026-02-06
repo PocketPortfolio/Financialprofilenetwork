@@ -149,6 +149,23 @@ export const auditLogs = pgTable('audit_logs', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Search Miss Log (Data Gap audit: zero-result searches for product roadmap)
+export const searchMissLog = pgTable('search_miss_log', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  searchQuery: text('search_query').notNull(),
+  resultCount: integer('result_count').notNull().default(0),
+  userAgent: text('user_agent'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Ticker votes (retention net: capture email when user searches for missing ticker)
+export const tickerVotes = pgTable('ticker_votes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  searchQuery: text('search_query').notNull(),
+  email: text('email').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // System Settings Table (for emergency stop and other system-wide flags)
 export const systemSettings = pgTable('system_settings', {
   id: uuid('id').defaultRandom().primaryKey(),
