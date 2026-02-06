@@ -15,13 +15,12 @@ if (!publishableKey) {
   console.error('❌ SECURITY: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY environment variable is required');
 }
 
-// Debug: Log key info (only in browser)
-if (typeof window !== 'undefined') {
+// Debug: Log key info only in development (browser)
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   console.log('🔍 Stripe Configuration:', {
     envVarSet: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    keyPrefix: publishableKey?.substring(0, 20),
+    keyPrefix: publishableKey?.substring(0, 12) + '...',
     keyType: publishableKey?.startsWith('pk_') ? 'PUBLISHABLE ✅' : publishableKey?.startsWith('sk_') ? 'SECRET ❌ (WRONG!)' : 'UNKNOWN',
-    keyLength: publishableKey?.length
   });
 }
 
