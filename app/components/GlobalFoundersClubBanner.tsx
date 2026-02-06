@@ -5,24 +5,25 @@ import Link from 'next/link';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 
+/** Approximate banner height so useStickyHeader can reserve space before content loads */
+const BANNER_PLACEHOLDER_HEIGHT = 52;
+
 /**
- * Global Founders Club banner shown on all pages
- * Fixed at the very top, above all navigation
- * Hidden for Corporate and UK Founders tier members
+ * Global Founders Club banner shown on all pages.
+ * Fixed at the very top, above all navigation.
+ * Hidden for Corporate and UK Founders tier members.
+ *
+ * Always renders a DOM node with .founder-banner so useStickyHeader can find it
+ * and attach ResizeObserver immediately (fixes nav disappearing in production when
+ * tier check is slow and banner would otherwise mount after the hook's timeouts).
  */
 export default function GlobalFoundersClubBanner() {
   const { tier, isLoading } = usePremiumTheme();
 
-  // Hide banner for Corporate and UK Founders tier members
-  if (isLoading) {
-    // Show nothing while checking subscription status (prevents flash)
-    return null;
-  }
-
-  if (tier === 'corporateSponsor' || tier === 'foundersClub') {
-    // User is already subscribed - don't show banner
-    return null;
-  }
+  const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
+  const showContent = !isLoading && !isPaid;
+  // While loading: same height, invisible so header reserves space. Paid: 0 height so header at top.
+  const hidden = isLoading || isPaid;
 
   return (
     <div
@@ -32,13 +33,18 @@ export default function GlobalFoundersClubBanner() {
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 1001, // Above header
+        zIndex: 1001,
+        height: hidden ? (isPaid ? 0 : BANNER_PLACEHOLDER_HEIGHT) : undefined,
+        minHeight: isPaid ? 0 : undefined,
+        overflow: 'hidden',
+        visibility: hidden ? 'hidden' : 'visible',
+        pointerEvents: hidden ? 'none' : 'auto',
         background: 'hsl(var(--card))',
         color: 'hsl(var(--primary))',
-        padding: '12px 24px',
+        padding: showContent ? '12px 24px' : 0,
         textAlign: 'center',
-        borderBottom: '2px solid hsl(var(--primary))',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        borderBottom: showContent ? '2px solid hsl(var(--primary))' : 'none',
+        boxShadow: showContent ? '0 2px 8px rgba(0, 0, 0, 0.1)' : 'none',
         width: '100%',
       }}
     >
