@@ -9,7 +9,6 @@ import AlertModal from '../components/modals/AlertModal';
 import { getDeviceInfo } from '../lib/utils/device';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
-import FoundersClubBanner from '../components/FoundersClubBanner';
 
 interface SearchSuggestion {
   symbol: string;
@@ -174,7 +173,6 @@ export default function WatchlistPage() {
           syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
           user={user}
         />
-        <FoundersClubBanner />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -226,7 +224,6 @@ export default function WatchlistPage() {
         syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
         user={user}
       />
-      <FoundersClubBanner />
       
       <main style={{ 
         flex: 1, 

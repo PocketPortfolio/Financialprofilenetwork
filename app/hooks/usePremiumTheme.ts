@@ -33,7 +33,27 @@ export function usePremiumTheme() {
         setTier(cachedTier);
         setUnlockedTheme(cachedTheme);
         setIsLoading(false);
-        // Don't make API call if cache is fresh - this prevents quota exhaustion
+        // Background revalidate: if user was revoked, we clear cache and update state so revoke is seamless
+        if (isAuthenticated && user?.email) {
+          user.getIdToken().then((idToken) => {
+            fetch('/api/api-keys/user', { headers: { Authorization: `Bearer ${idToken}` } })
+              .then((r) => r.ok ? r.json() : null)
+              .then((data) => {
+                if (data && !data.tier) {
+                  localStorage.removeItem('pocket-portfolio-tier');
+                  localStorage.removeItem('pocket-portfolio-premium-theme');
+                  localStorage.removeItem('pocket-portfolio-tier-timestamp');
+                  localStorage.removeItem('CORPORATE_KEY');
+                  const ek = `apiKeys_${user.email}`;
+                  localStorage.removeItem(ek);
+                  localStorage.removeItem(`${ek}_timestamp`);
+                  setTier(null);
+                  setUnlockedTheme(null);
+                }
+              })
+              .catch(() => {});
+          }).catch(() => {});
+        }
         return;
       }
     }
@@ -120,10 +140,16 @@ export function usePremiumTheme() {
             localStorage.setItem('pocket-portfolio-premium-theme', theme);
           }
         } else {
-          // No tier found - clear cache if it exists
+          // No tier found (e.g. revoked) - clear all tier/API caches so revoke is seamless
           localStorage.removeItem('pocket-portfolio-tier');
           localStorage.removeItem('pocket-portfolio-premium-theme');
           localStorage.removeItem('pocket-portfolio-tier-timestamp');
+          localStorage.removeItem('CORPORATE_KEY');
+          if (user?.email) {
+            const ek = `apiKeys_${user.email}`;
+            localStorage.removeItem(ek);
+            localStorage.removeItem(`${ek}_timestamp`);
+          }
         }
       } catch (error) {
         console.error('Error checking tier:', error);

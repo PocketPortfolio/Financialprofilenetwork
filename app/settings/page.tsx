@@ -13,9 +13,9 @@ import ConfirmationModal from '../components/modals/ConfirmationModal';
 import AlertModal from '../components/modals/AlertModal';
 import DriveSyncSettings from '../components/DriveSyncSettings';
 import { NotificationSettings } from '../components/NotificationSettings';
+import SeatManager, { type SeatAllocation } from '../components/SeatManager';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
-import FoundersClubBanner from '../components/FoundersClubBanner';
 
 export default function SettingsPage() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
@@ -32,6 +32,9 @@ export default function SettingsPage() {
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
   const [tierFromApi, setTier] = useState<string | null>(null);
   const [loadingKeys, setLoadingKeys] = useState(false);
+  const [seatAllocations, setSeatAllocations] = useState<SeatAllocation[]>([]);
+  const [seatMaxSeats, setSeatMaxSeats] = useState(0);
+  const [loadingSeats, setLoadingSeats] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -88,6 +91,59 @@ export default function SettingsPage() {
     }
   }, [hasFounderTheme, hasCorporateTheme]);
 
+  const fetchSeats = async () => {
+    if (!auth || !user) return;
+    const tier = tierFromApi ?? null;
+    if (tier !== 'corporateSponsor' && tier !== 'foundersClub') return;
+    setLoadingSeats(true);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch('/api/seats', { headers: { Authorization: `Bearer ${idToken}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setSeatAllocations(data.allocations ?? []);
+        setSeatMaxSeats(data.maxSeats ?? 0);
+      }
+    } catch (e) {
+      console.error('Failed to fetch seats:', e);
+    } finally {
+      setLoadingSeats(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user && (tierFromApi === 'corporateSponsor' || tierFromApi === 'foundersClub')) {
+      fetchSeats();
+    }
+  }, [isAuthenticated, user, tierFromApi]);
+
+  const handleSeatInvite = async (email: string) => {
+    if (!user) return;
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/seats/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ email }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to invite');
+    }
+    await fetchSeats();
+  };
+
+  const handleSeatRevoke = async (email: string) => {
+    if (!user) return;
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/seats/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ email }),
+    });
+    if (!res.ok) throw new Error('Failed to revoke');
+    await fetchSeats();
+  };
+
   const fetchApiKeys = async () => {
     if (!auth || !user) return;
     
@@ -108,10 +164,19 @@ export default function SettingsPage() {
         setCorporateLicense(data.corporateLicense);
         setTier(data.tier);
         
-        // Cache the result
         const cacheKey = `apiKeys_${user.email}`;
-        localStorage.setItem(cacheKey, JSON.stringify(data));
-        localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+        if (data.tier) {
+          localStorage.setItem(cacheKey, JSON.stringify(data));
+          localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+        } else {
+          // Revoked or no tier - clear caches so UI updates seamlessly
+          localStorage.removeItem(cacheKey);
+          localStorage.removeItem(`${cacheKey}_timestamp`);
+          localStorage.removeItem('CORPORATE_KEY');
+          localStorage.removeItem('pocket-portfolio-tier');
+          localStorage.removeItem('pocket-portfolio-premium-theme');
+          localStorage.removeItem('pocket-portfolio-tier-timestamp');
+        }
       } else if (response.status === 503 || response.status === 500) {
         // If quota exceeded or service unavailable, try to use cached data as fallback
         const cacheKey = `apiKeys_${user.email}`;
@@ -331,7 +396,6 @@ export default function SettingsPage() {
           lastSyncTime={syncState.lastSyncTime}
           user={user}
         />
-        <FoundersClubBanner />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -384,7 +448,6 @@ export default function SettingsPage() {
         lastSyncTime={syncState.lastSyncTime}
         user={user}
       />
-      <FoundersClubBanner />
       
       <main style={{ 
         flex: 1, 
@@ -483,6 +546,19 @@ export default function SettingsPage() {
 
         {/* Drive Sync Section */}
         <DriveSyncSettings />
+
+        {/* Sovereign Team Access - Corporate & Founders Club only */}
+        {(tierFromApi === 'corporateSponsor' || tierFromApi === 'foundersClub') && (
+          <SeatManager
+            tier={tierFromApi}
+            usedSeats={seatAllocations.length}
+            maxSeats={seatMaxSeats}
+            allocations={seatAllocations}
+            onInvite={handleSeatInvite}
+            onRevoke={handleSeatRevoke}
+            loading={loadingSeats}
+          />
+        )}
 
         {/* Push Notifications Section */}
         <NotificationSettings />

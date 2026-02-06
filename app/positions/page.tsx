@@ -12,7 +12,6 @@ import { BrandProvider } from '../lib/brand/theme';
 import AlertModal from '../components/modals/AlertModal';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
-import FoundersClubBanner from '../components/FoundersClubBanner';
 
 interface Position {
   ticker: string;
@@ -165,7 +164,6 @@ export default function PositionsPage() {
           syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
           user={user}
         />
-        <FoundersClubBanner />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -217,7 +215,6 @@ export default function PositionsPage() {
         syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
         user={user}
       />
-      <FoundersClubBanner />
       
       <main style={{ 
         flex: 1, 

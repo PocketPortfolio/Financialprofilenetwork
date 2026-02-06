@@ -67,23 +67,11 @@ export async function generateMetadata({ params }: { params: Promise<{ ticker: s
 
 // Main page component
 export default async function TrackTickerRiskPage({ params }: { params: Promise<{ ticker: string }> }) {
-  // #region agent log
-  const logEntry = {location:'track-[ticker]/page.tsx:69',message:'Route handler entry',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'route-debug-v6',hypothesisId:'J'};
-  console.warn('[TRACK-TICKER] Entry', logEntry.data);
-  fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logEntry)}).catch(()=>{});
-  // #endregion
-  
   try {
     const resolvedParams = await params;
     const tickerParam = resolvedParams?.ticker || '';
     const ticker = tickerParam.toUpperCase() || 'STOCK';
-    
-    // #region agent log
-    const logParams = {location:'track-[ticker]/page.tsx:77',message:'Params resolved',data:{tickerParam,ticker,resolvedParams:JSON.stringify(resolvedParams)},timestamp:Date.now(),sessionId:'debug-session',runId:'route-debug-v6',hypothesisId:'J'};
-    console.warn('[TRACK-TICKER] Params:', logParams.data);
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logParams)}).catch(()=>{});
-    // #endregion
-    
+
     return (
       <>
         {/* SEO Schema - SoftwareApplication with pricing */}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { applySeatGrant, type InheritedTier } from '@/app/lib/seats/applySeatGrant';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -71,9 +72,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Canonical email for Firestore doc IDs (case-insensitive so claim and revoke use same key)
+    const userEmailCanonical = userEmail.trim().toLowerCase();
+
     // Rate limiting check
     const now = Date.now();
-    const limitKey = `user:${userEmail}`;
+    const limitKey = `user:${userEmailCanonical}`;
     const limit = rateLimitMap.get(limitKey);
     
     if (limit) {
@@ -99,13 +103,37 @@ export async function GET(request: NextRequest) {
       rateLimitMap.set(limitKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     }
 
-    // Get API key from Firestore
+    // Get API key from Firestore (use canonical email so revoke can find same doc)
     const db = getDb();
-    const apiKeyDoc = await db.collection('apiKeysByEmail').doc(userEmail).get();
-    const apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
+    let apiKeyDoc = await db.collection('apiKeysByEmail').doc(userEmailCanonical).get();
+    let apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
+
+    // Claim-on-sign-in (shadow user): if user has no tier but has a pending/active seat allocation, grant tier
+    if (!apiKeyData?.tier) {
+      const allocationSnapshot = await db
+        .collection('seatAllocations')
+        .where('memberEmail', '==', userEmailCanonical)
+        .where('status', 'in', ['pending', 'active'])
+        .limit(1)
+        .get();
+
+      if (!allocationSnapshot.empty) {
+        const allocationDoc = allocationSnapshot.docs[0];
+        const allocation = allocationDoc.data();
+        const inheritedTier = allocation.inheritedTier as InheritedTier;
+        const ownerId = allocation.ownerId as string;
+        await applySeatGrant(db, userEmailCanonical, inheritedTier, ownerId);
+        await allocationDoc.ref.update({
+          status: 'active',
+          memberUserId: decodedToken.uid,
+        });
+        apiKeyDoc = await db.collection('apiKeysByEmail').doc(userEmailCanonical).get();
+        apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
+      }
+    }
 
     // Get corporate license
-    const licenseDoc = await db.collection('corporateLicenses').doc(userEmail).get();
+    const licenseDoc = await db.collection('corporateLicenses').doc(userEmailCanonical).get();
     const licenseData = licenseDoc.exists ? licenseDoc.data() : null;
 
     return NextResponse.json({

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import crypto from 'crypto';
+import { generateApiKey } from '@/app/lib/utils/apiKey';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -42,19 +42,6 @@ const stripe = process.env.STRIPE_SECRET_KEY
 
 // Webhook secret from Stripe Dashboard
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-/**
- * Generate a secure API key
- */
-function generateApiKey(): string {
-  const prefix = 'pp_';
-  const randomBytes = crypto.randomBytes(32);
-  const base64 = randomBytes.toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-  return `${prefix}${base64}`;
-}
 
 /**
  * Determine tier from price ID

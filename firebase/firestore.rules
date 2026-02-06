@@ -126,6 +126,11 @@ service cloud.firestore {
     match /corporateLicenses/{email} {
       allow read, write: if false; // Only server can access via Admin SDK
     }
+
+    // Seat allocations (Sovereign Seats): Server-side only
+    match /seatAllocations/{id} {
+      allow read, write: if false; // Only server can access via Admin SDK
+    }
     
     // Tool Usage Tracking: anyone can write (for analytics), only admins can read
     match /toolUsage/{eventId} {
