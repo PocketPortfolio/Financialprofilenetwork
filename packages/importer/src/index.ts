@@ -97,6 +97,16 @@ export type {
 // Re-export registry functions
 export { detectBroker, ADAPTERS } from './registry';
 
+// Re-export Universal Import (Smart Mapping) API
+export { parseUniversal, genericParse, genericRowToTrade, inferMapping } from './universal';
+export type {
+  UniversalMapping,
+  RequiresMappingResult,
+  StandardField,
+  InferMappingInput,
+  InferMappingOutput,
+} from './universal';
+
 
 
 

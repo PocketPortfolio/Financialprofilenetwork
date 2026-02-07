@@ -2,7 +2,8 @@ export type BrokerId =
   | 'schwab'|'vanguard'|'etrade'|'fidelity'
   | 'trading212'|'freetrade'|'degiro'|'ig'|'saxo'|'interactive_investor'|'revolut'
   | 'ibkr_flex'|'kraken'|'binance'|'coinbase'
-  | 'koinly'|'turbotax'|'ghostfolio'|'sharesight';
+  | 'koinly'|'turbotax'|'ghostfolio'|'sharesight'
+  | 'generic';  // Universal Import / Smart Mapping path
 
 export interface RawFile {
   name: string;
