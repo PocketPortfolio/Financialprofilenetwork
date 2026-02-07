@@ -4,7 +4,7 @@
 echo "Adding environment variables to Vercel..."
 
 # Firebase Configuration
-vercel env add NEXT_PUBLIC_FIREBASE_API_KEY production <<< "AIzaSyDIL02q3thafHYAEziJVRlr4ibst5dqvRo"
+vercel env add NEXT_PUBLIC_FIREBASE_API_KEY production <<< "<YOUR_FIREBASE_API_KEY>"
 vercel env add NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN production <<< "pocket-portfolio-67fa6.firebaseapp.com"
 vercel env add NEXT_PUBLIC_FIREBASE_PROJECT_ID production <<< "pocket-portfolio-67fa6"
 vercel env add NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET production <<< "pocket-portfolio-67fa6.firebasestorage.app"

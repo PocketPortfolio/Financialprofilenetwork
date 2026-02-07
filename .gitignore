@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 dist/
 .vite/
 .vercel/
@@ -15,3 +15,7 @@ Thumbs.db
 
 # stray files from earlier SSH tests
 1234567890*
+
+# Avoid committing secrets (use env vars / Vercel)
+temp_api_key.txt
+*.key

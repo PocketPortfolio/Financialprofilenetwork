@@ -77,7 +77,7 @@
 SUPABASE_SALES_DATABASE_URL=postgresql://postgres:[PASSWORD]@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&sslmode=require
 
 # Firebase
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDIL02q3thafHYAEziJVRlr4ibst5dqvRo
+NEXT_PUBLIC_FIREBASE_API_KEY=<YOUR_FIREBASE_API_KEY>
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=pocket-portfolio-67fa6.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=pocket-portfolio-67fa6
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=pocket-portfolio-67fa6.firebasestorage.app

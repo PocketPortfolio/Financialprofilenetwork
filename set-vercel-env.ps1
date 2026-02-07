@@ -20,7 +20,7 @@ function Set-VercelEnv {
 }
 
 # Set all Firebase environment variables
-Set-VercelEnv NEXT_PUBLIC_FIREBASE_API_KEY "AIzaSyDIL02q3thafHYAEziJVRlr4ibst5dqvRo"
+Set-VercelEnv NEXT_PUBLIC_FIREBASE_API_KEY "<YOUR_FIREBASE_API_KEY>"
 Set-VercelEnv NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN "pocket-portfolio-67fa6.firebaseapp.com"
 Set-VercelEnv NEXT_PUBLIC_FIREBASE_PROJECT_ID "pocket-portfolio-67fa6"
 Set-VercelEnv NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET "pocket-portfolio-67fa6.firebasestorage.app"

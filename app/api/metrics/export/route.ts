@@ -76,6 +76,7 @@ const NPM_PACKAGES = [
   '@pocket-portfolio/turbotax-csv-parser',
   '@pocket-portfolio/ghostfolio-csv-parser',
   '@pocket-portfolio/sharesight-csv-parser',
+  '@pocket-portfolio/universal-csv-importer',
 ];
 
 /**

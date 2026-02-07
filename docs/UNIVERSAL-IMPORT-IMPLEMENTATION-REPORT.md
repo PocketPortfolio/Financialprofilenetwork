@@ -159,3 +159,12 @@
 - **Production readiness:** Lint and production build completed successfully. Tests have pre-existing failures unrelated to Universal Import; import unit tests passed.
 - **Universal Import implementation:** Single narrative from landing → import (CSVImporter, /import, DataInputDeck) → unknown-broker interstitial → onboarding → portfolio placeholders → sponsor. Copy and presentation only; checkout and SEO logic unchanged.
 - **Report:** This document is the authoritative end-to-end record for production sign-off and verification.
+
+---
+
+## NPM packaging (executed)
+
+- **Core export:** `@pocket-portfolio/importer` (v1.1.0) exports `parseUniversal`, `genericParse`, `genericRowToTrade`, `inferMapping`, and types `UniversalMapping`, `RequiresMappingResult`, `StandardField`, `InferMappingInput`, `InferMappingOutput` from the main entry.
+- **Alias package:** `@pocket-portfolio/universal-csv-importer` (v1.0.0) – thin wrapper that re-exports only the universal API for discoverability; see `packages/aliases/universal-csv-importer/`.
+- **Analytics:** The new alias is included in `NPM_PACKAGES` in `app/api/admin/analytics/route.ts`, `app/api/metrics/export/route.ts`, and `app/api/npm-stats/route.ts`, so it appears on `/admin/analytics` with other packages once published.
+- **Publish:** See `docs/UNIVERSAL-IMPORT-NPM-PACKAGING-PLAN.md` for publish steps (core then alias).

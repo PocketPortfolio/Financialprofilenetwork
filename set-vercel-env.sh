@@ -8,7 +8,7 @@ echo ""
 
 # Set each environment variable
 echo "Setting NEXT_PUBLIC_FIREBASE_API_KEY..."
-echo "AIzaSyDIL02q3thafHYAEziJVRlr4ibst5dqvRo" | vercel env add NEXT_PUBLIC_FIREBASE_API_KEY production
+echo "<YOUR_FIREBASE_API_KEY>" | vercel env add NEXT_PUBLIC_FIREBASE_API_KEY production
 
 echo "Setting NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN..."
 echo "pocket-portfolio-67fa6.firebaseapp.com" | vercel env add NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN production

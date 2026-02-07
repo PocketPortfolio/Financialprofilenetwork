@@ -13,7 +13,7 @@ Since the environment variables already exist, you need to update them manually 
 For each variable below, click the **Edit** button and update with these values:
 
 ```
-NEXT_PUBLIC_FIREBASE_API_KEY = AIzaSyDIL02q3thafHYAEziJVRlr4ibst5dqvRo
+NEXT_PUBLIC_FIREBASE_API_KEY = <YOUR_FIREBASE_API_KEY>
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = pocket-portfolio-67fa6.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID = pocket-portfolio-67fa6
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = pocket-portfolio-67fa6.firebasestorage.app
@@ -45,7 +45,7 @@ If you prefer command line, run these commands one by one:
 
 ```bash
 vercel env rm NEXT_PUBLIC_FIREBASE_API_KEY production
-echo "AIzaSyDIL02q3thafHYAEziJVRlr4ibst5dqvRo" | vercel env add NEXT_PUBLIC_FIREBASE_API_KEY production
+echo "<YOUR_FIREBASE_API_KEY>" | vercel env add NEXT_PUBLIC_FIREBASE_API_KEY production
 
 vercel env rm NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN production  
 echo "pocket-portfolio-67fa6.firebaseapp.com" | vercel env add NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN production

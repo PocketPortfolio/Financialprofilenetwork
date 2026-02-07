@@ -1,0 +1,44 @@
+{
+  "name": "@pocket-portfolio/universal-csv-importer",
+  "version": "1.0.0",
+  "description": "Parse any broker CSV with smart column mapping. No broker-specific adapter required. Free & open-source. Support: pocketportfolio.app/sponsor",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "keywords": [
+    "universal",
+    "csv",
+    "importer",
+    "smart mapping",
+    "column mapping",
+    "any broker",
+    "portfolio",
+    "finance",
+    "trading",
+    "typescript",
+    "pocket-portfolio"
+  ],
+  "author": "Pocket Portfolio",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PocketPortfolio/Financialprofilenetwork.git",
+    "directory": "packages/aliases/universal-csv-importer"
+  },
+  "dependencies": {
+    "@pocket-portfolio/importer": "^1.1.0"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "scripts"
+  ],
+  "homepage": "https://www.pocketportfolio.app",
+  "bugs": {
+    "url": "https://github.com/PocketPortfolio/Financialprofilenetwork/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
