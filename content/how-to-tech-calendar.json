@@ -562,14 +562,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Simple \"Health Check\" Endpoint",
     "slug": "building-a-simple-health-check-endpoint",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "simple",
       "health"
-    ]
+    ],
+    "publishedAt": "2026-02-07T14:19:16.749Z"
   },
   {
     "id": "how-to-how-to-use-jq-to-slice-json-data-in-the-command-line-feb-8",
