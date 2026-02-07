@@ -613,7 +613,7 @@ export function DataInputDeck({
               padding: '0 16px',
               fontFamily: 'system-ui, -apple-system, sans-serif',
             }}>
-              Drag & drop files from Trading212, eToro, Degiro.
+              Drag & drop any broker CSV. Auto-detection for 20+ brokers; Smart Mapping for everything else.
             </p>
             <div 
               style={{

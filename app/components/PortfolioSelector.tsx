@@ -137,7 +137,7 @@ export default function PortfolioSelector({ className = '' }: PortfolioSelectorP
                 type="text"
                 value={newPortfolioName}
                 onChange={(e) => setNewPortfolioName(e.target.value)}
-                placeholder="e.g., Trading212 Portfolio"
+                placeholder="e.g. My Global Portfolio"
                 style={{
                   width: '100%',
                   padding: '8px 12px',
@@ -165,7 +165,7 @@ export default function PortfolioSelector({ className = '' }: PortfolioSelectorP
                 type="text"
                 value={newPortfolioBroker}
                 onChange={(e) => setNewPortfolioBroker(e.target.value)}
-                placeholder="e.g., Trading212, Freetrade, Fidelity"
+                placeholder="e.g. Fidelity & Crypto"
                 style={{
                   width: '100%',
                   padding: '8px 12px',

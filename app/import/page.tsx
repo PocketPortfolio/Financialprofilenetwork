@@ -173,7 +173,7 @@ export default function ImportPage() {
                 fontSize: '16px',
                 margin: 0
               }}>
-                Upload CSV files from any broker and we'll automatically detect the format
+                Auto-detection for 20+ brokers. Smart Mapping for everything else.
               </p>
             </div>
           </div>
@@ -187,7 +187,10 @@ export default function ImportPage() {
           padding: '24px',
           marginBottom: '32px'
         }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>Supported Brokers</h2>
+          <h2 style={{ fontSize: '20px', marginBottom: '8px' }}>Supported Brokers</h2>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', margin: '0 0 16px 0' }}>
+            Auto-detection for 20+ brokers. Smart Mapping for everything else.
+          </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div>
               <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--accent-warm)' }}>US Brokers</h3>

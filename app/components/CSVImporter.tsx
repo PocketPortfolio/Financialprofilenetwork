@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import { trackCSVImportSuccess, trackCSVImportStart, trackCSVImportError } from '../lib/analytics/events';
-import { parseCSV as parseCSVAdapter, detectBrokerFromSample } from '@pocket-portfolio/importer';
+import { parseCSV as parseCSVAdapter, detectBrokerFromSample, genericParse, parseUniversal } from '@pocket-portfolio/importer';
 import { detectBroker } from '@pocket-portfolio/importer';
-import type { BrokerId, NormalizedTrade } from '@pocket-portfolio/importer';
+import type { BrokerId, NormalizedTrade, RequiresMappingResult } from '@pocket-portfolio/importer';
 import AlertModal from './modals/AlertModal';
+import ColumnMappingModal from './import/ColumnMappingModal';
+import UnknownBrokerInterstitial from './import/UnknownBrokerInterstitial';
 import InfrastructureUpgradeModal from './InfrastructureUpgradeModal';
 import { getFoundersClubSpotsRemaining } from '../lib/utils/foundersClub';
 
@@ -25,12 +27,20 @@ interface CSVImporterProps {
   onImport: (trades: Trade[]) => void;
 }
 
+function debugLog(step: string, data: Record<string, unknown>) {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[CSVImporter]', step, data);
+  }
+}
+
 export default function CSVImporter({ onImport }: CSVImporterProps) {
   const [dragActive, setDragActive] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [pendingUniversal, setPendingUniversal] = useState<RequiresMappingResult | null>(null);
+  const [unknownFile, setUnknownFile] = useState<{ file: File; rawFile: import('@pocket-portfolio/importer').RawFile; csvContent: string; reason?: 'unknown' | 'zero_trades' } | null>(null);
 
   // Helper function to show alerts
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
@@ -1236,9 +1246,35 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       'turbotax': 'TurboTax',
       'ghostfolio': 'Ghostfolio',
       'sharesight': 'Sharesight',
+      'generic': 'Generic CSV',
       'unknown': 'Unknown'
     };
     return names[brokerId] || brokerId;
+  };
+
+  const convertToAppTrades = (parseResult: { trades: Array<{ date: string; ticker: string; type: 'BUY'|'SELL'; qty: number; price: number; currency?: string }> }): Trade[] => {
+    return parseResult.trades
+      .map((t, idx) => ({
+        id: `csv-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 9)}`,
+        date: t.date,
+        ticker: t.ticker,
+        type: t.type,
+        currency: t.currency || 'USD',
+        qty: t.qty,
+        price: t.price,
+        mock: false,
+      }))
+      .filter((t) =>
+        Number.isFinite(t.qty) &&
+        Number.isFinite(t.price) &&
+        t.qty > 0 &&
+        t.price > 0 &&
+        typeof t.ticker === 'string' &&
+        t.ticker.trim().length > 0 &&
+        (t.type === 'BUY' || t.type === 'SELL') &&
+        typeof t.date === 'string' &&
+        t.date.trim().length > 0
+      );
   };
 
   const handleFileUpload = async (file: File) => {
@@ -1274,14 +1310,16 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
     }
 
     setProcessing(true);
+    debugLog('STEP_START', { fileName: file.name, size: file.size });
 
     try {
       const csvContent = await file.text();
+      debugLog('STEP_FILE_READ', { contentLength: csvContent.length, firstLine: csvContent.split('\n')[0]?.slice(0, 80) });
       console.log('CSV content read successfully');
-      
+
       // Convert File to RawFile format for adapter system
       const rawFile = fileToRawFile(file);
-      
+
       // Auto-detect broker from CSV sample
       const sample = csvContent.slice(0, 2048);
       
@@ -1487,37 +1525,30 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
         
         detectedBroker = result;
         console.log('[CSVImporter] After detection', { detectedBroker, sampleLength: sample.length });
-        
       } catch (error) {
         console.error('[CSVImporter] Detection error', error);
-        
+        debugLog('STEP_DETECTION_ERROR', { error: String(error), stack: error instanceof Error ? error.stack : undefined });
       }
-      
-      
-      
+
+      debugLog('STEP_DETECTION_DONE', { detectedBroker });
       console.log('🔍 Detected broker:', detectedBroker);
       
       
       
+      type ParseResultLike = { broker: BrokerId | string; trades: Array<{ date: string; ticker: string; type: 'BUY'|'SELL'; qty: number; price: number; currency?: string; fees?: number; source?: string; rawHash?: string }>; warnings: string[]; meta?: { rows: number; invalid: number; durationMs: number; version: string } };
+      let result: ParseResultLike | undefined;
+
       if (detectedBroker === 'unknown') {
-        trackCSVImportError({
-          errorType: 'broker_detection_failed',
-          errorMessage: 'Could not detect broker from CSV format'
-        });
-        showAlert(
-          'Broker Not Detected',
-          'Could not detect the broker format from your CSV file. Please ensure your CSV matches one of the supported broker formats.',
-          'warning'
-        );
+        debugLog('STEP_UNKNOWN', { fileName: file?.name });
+        setUnknownFile({ file, rawFile, csvContent });
         setProcessing(false);
         return;
-      }
-
-      // Parse CSV using adapter system
-      let result;
-      try {
-        
-        result = await parseCSVAdapter(rawFile, 'en-US', detectedBroker);
+      } else {
+        debugLog('STEP_ADAPTER_START', { detectedBroker, fileName: file?.name });
+        // Parse CSV using adapter system
+        try {
+          result = await parseCSVAdapter(rawFile, 'en-US', detectedBroker);
+          debugLog('STEP_ADAPTER_RESULT', { broker: result?.broker, tradesCount: result?.trades?.length, warningsCount: result?.warnings?.length });
         
         console.log('Parsing complete:', result.trades.length, 'trades found');
         console.log('Broker:', result.broker);
@@ -1830,13 +1861,20 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
           }
         }
       }
+      }
       
       
       
+      if (!result) {
+        setProcessing(false);
+        return;
+      }
+      const parseResultForConvert = result;
+
       // Convert NormalizedTrade[] to Trade[] format
       // CRITICAL: Filter out invalid trades with NaN, zero, or missing values BEFORE import
-      const trades: Trade[] = result.trades
-        .map((t, idx) => ({
+      const trades: Trade[] = parseResultForConvert.trades
+        .map((t: { date: string; ticker: string; type: 'BUY'|'SELL'; qty: number; price: number; currency?: string }, idx: number) => ({
           id: `csv-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 9)}`,
           date: t.date,
           ticker: t.ticker,
@@ -1846,7 +1884,7 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
           price: t.price,
           mock: false
         }))
-        .filter(t => {
+        .filter((t: Trade) => {
           // Validate all required fields are valid
           const isValid = 
             Number.isFinite(t.qty) && 
@@ -1881,30 +1919,27 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       
       
       
-      const broker = getBrokerDisplayName(result.broker as BrokerId | 'unknown');
-      
+      debugLog('STEP_CONVERT_DONE', { tradesCount: trades.length, broker: (parseResultForConvert as { broker: string })?.broker });
+
+      const broker = getBrokerDisplayName((parseResultForConvert as { broker: BrokerId | 'unknown' }).broker);
+
       if (trades.length === 0) {
         trackCSVImportError({
           errorType: 'no_trades_found',
           errorMessage: 'No valid trades found in CSV',
           broker
         });
-        showAlert(
-          'No Trades Found',
-          'No valid trades found in the CSV file. Please check that:\n• Your CSV contains BUY or SELL transactions\n• Quantity and price values are valid numbers\n• The file format matches the supported formats',
-          'warning'
-        );
+        setUnknownFile({ file, rawFile, csvContent, reason: 'zero_trades' });
         setProcessing(false);
         return;
       }
 
       
       
+      debugLog('STEP_ON_IMPORT', { tradesCount: trades.length });
       // Import trades
       onImport(trades);
-      
-      
-      
+
       // Track successful CSV import (wrap in try-catch to prevent errors from blocking success)
       try {
         trackCSVImportSuccess({
@@ -1947,21 +1982,22 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       
       
     } catch (error) {
-      console.error('Error processing CSV:', error);
-      
-      
-      
+      const errMsg = error instanceof Error ? error.message : String(error);
+      const errStack = error instanceof Error ? error.stack : undefined;
+      console.error('[CSVImporter] Error processing CSV:', error);
+      debugLog('STEP_ERROR', { error: errMsg, stack: errStack, name: error instanceof Error ? error.name : undefined });
       trackCSVImportError({
         errorType: 'parse_error',
-        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+        errorMessage: errMsg
       });
       showAlert(
         'Import Error',
-        `Error processing CSV file. Please check the format and try again.\n\nError: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error processing CSV file. Please check the format and try again.\n\nError: ${errMsg}`,
         'error'
       );
     } finally {
       setProcessing(false);
+      debugLog('STEP_END', {});
     }
   };
 
@@ -1990,6 +2026,136 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       handleFileUpload(e.target.files[0]);
     }
   };
+
+  const handleUniversalMappingConfirm = (mapping: Record<string, string>) => {
+    if (!pendingUniversal) return;
+    try {
+      const parseResult = genericParse(pendingUniversal.rawCsvText, mapping as import('@pocket-portfolio/importer').UniversalMapping, 'en-US');
+      const trades: Trade[] = parseResult.trades
+        .map((t: NormalizedTrade, idx: number) => ({
+          id: `csv-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 9)}`,
+          date: t.date,
+          ticker: t.ticker,
+          type: t.type,
+          currency: t.currency || 'USD',
+          qty: t.qty,
+          price: t.price,
+          mock: false,
+        }))
+        .filter((t: Trade) => {
+          const isValid =
+            Number.isFinite(t.qty) &&
+            Number.isFinite(t.price) &&
+            t.qty > 0 &&
+            t.price > 0 &&
+            typeof t.ticker === 'string' &&
+            t.ticker.trim().length > 0 &&
+            (t.type === 'BUY' || t.type === 'SELL') &&
+            typeof t.date === 'string' &&
+            t.date.trim().length > 0;
+          return isValid;
+        });
+      if (trades.length === 0) {
+        showAlert(
+          'No Trades Found',
+          'No valid trades found with this column mapping. Please check your mapping and try again.',
+          'warning'
+        );
+        setPendingUniversal(null);
+        return;
+      }
+      onImport(trades);
+      try {
+        trackCSVImportSuccess({ broker: 'generic', rowCount: trades.length, fileSize: 0 });
+      } catch (_) {}
+      showAlert(
+        'Import Successful',
+        `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} using your column mapping.`,
+        'success'
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showAlert('Import Error', `Failed to parse CSV: ${msg}`, 'error');
+    }
+    setPendingUniversal(null);
+  };
+
+  if (unknownFile) {
+    return (
+      <>
+        <div style={{ border: '2px dashed var(--card-border)', borderRadius: 12, padding: 32, background: 'var(--card)' }}>
+          <UnknownBrokerInterstitial
+            fileName={unknownFile.file.name}
+            reason={unknownFile.reason}
+            onCancel={() => setUnknownFile(null)}
+            onSelectBroker={async (brokerId) => {
+              try {
+                const result = await parseCSVAdapter(unknownFile.rawFile, 'en-US', brokerId);
+                const trades = convertToAppTrades(result);
+                if (trades.length === 0) {
+                  showAlert('No Trades Found', 'No valid trades found with the selected broker format.', 'warning');
+                  return;
+                }
+                onImport(trades);
+                showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'}.`, 'success');
+                setUnknownFile(null);
+              } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                showAlert('Import Error', msg, 'error');
+              }
+            }}
+            onSmartImport={async () => {
+              try {
+                const result = await parseUniversal(unknownFile.rawFile, 'en-US');
+                if ('type' in result && result.type === 'REQUIRES_MAPPING') {
+                  setPendingUniversal(result);
+                  setUnknownFile(null);
+                  return;
+                }
+                const trades = convertToAppTrades(result as import('@pocket-portfolio/importer').ParseResult);
+                if (trades.length === 0) {
+                  showAlert('No Trades Found', 'No valid trades found. Try adjusting column mapping.', 'warning');
+                  setUnknownFile(null);
+                  return;
+                }
+                onImport(trades);
+                showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} with Smart Import.`, 'success');
+                setUnknownFile(null);
+              } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                showAlert(
+                  'Smart Import failed',
+                  'Smart Import couldn\'t read this file. Try choosing a broker from the list above, or use a different CSV.',
+                  'error'
+                );
+              }
+            }}
+          />
+        </div>
+        {alertModalData && (
+          <AlertModal
+            isOpen={showAlertModal}
+            title={alertModalData.title}
+            message={alertModalData.message}
+            type={alertModalData.type}
+            onClose={() => setShowAlertModal(false)}
+          />
+        )}
+        <InfrastructureUpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          spotsRemaining={getFoundersClubSpotsRemaining()}
+        />
+        {pendingUniversal && (
+          <ColumnMappingModal
+            data={pendingUniversal}
+            onConfirm={handleUniversalMappingConfirm}
+            onCancel={() => setPendingUniversal(null)}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
@@ -2049,10 +2215,10 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
               </svg>
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: 'var(--text)' }}>
-              Drop CSV file here or click to browse
+              Drag & Drop any Broker CSV
             </h3>
             <p style={{ color: 'var(--muted)', fontSize: '14px', marginBottom: '16px' }}>
-              Supports multiple CSV formats: Trading212, eToro, Coinbase, OpenBrokerCSV, and more
+              Auto-detection for 20+ brokers. Smart Mapping for everything else.
             </p>
             <div style={{
               background: 'var(--bg)',
@@ -2063,7 +2229,7 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
               color: 'var(--muted)',
               textAlign: 'left'
             }}>
-              <strong>Supported formats:</strong><br/>
+              <strong>Supported formats (auto-detect):</strong><br/>
               • Trading212: Action, Time, Ticker, No. of shares, Price / share...<br/>
               • eToro: PositionID, OrderID, Action, Ticker, Units, OpenRate...<br/>
               • Coinbase: Timestamp, Transaction Type, Asset, Quantity, Spot Price...<br/>
@@ -2093,6 +2259,15 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       onClose={() => setShowUpgradeModal(false)}
       spotsRemaining={getFoundersClubSpotsRemaining()}
     />
+
+    {/* Column Mapping Modal - Universal import when broker unknown */}
+    {pendingUniversal && (
+      <ColumnMappingModal
+        data={pendingUniversal}
+        onConfirm={handleUniversalMappingConfirm}
+        onCancel={() => setPendingUniversal(null)}
+      />
+    )}
     </>
   );
 }

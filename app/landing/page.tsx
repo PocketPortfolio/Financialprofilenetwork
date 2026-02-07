@@ -589,8 +589,8 @@ export default function LandingPage() {
             letterSpacing: '-0.03em',
             maxWidth: '800px'
           }}>
-            The Last Portfolio Tracker You Will Ever Buy.<br />
-            <span style={{ color: 'var(--accent-warm)' }}>Zero servers. Zero monthly fees. 100% Privacy.</span>
+            Evidence-First Investing.{' '}
+            <span style={{ color: 'var(--accent-warm)' }}>Universal Data.</span>
           </h1>
 
           {/* Subhead - PREMIUM POSITIONING */}
@@ -601,8 +601,9 @@ export default function LandingPage() {
             maxWidth: '700px',
             color: 'var(--text-secondary)'
           }}>
-            Your financial data lives in your Google Drive, not our cloud.{' '}
-            <strong style={{ color: 'var(--text)' }}>Pocket Portfolio</strong> is the sovereign wealth console that works for <em>you</em>.
+            Stop waiting for integrations. Our LLM-powered engine imports trading history from{' '}
+            <strong style={{ color: 'var(--text)' }}>any broker, bank, or spreadsheet</strong>
+            {' '}in seconds.
             <br />
             <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
               <strong style={{ color: 'var(--accent-warm)' }}>£100 Lifetime License.</strong> Own it forever.

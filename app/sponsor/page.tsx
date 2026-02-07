@@ -339,6 +339,7 @@ export default function SponsorPage() {
           previewTheme={previewTheme}
           onPreviewTheme={setPreviewTheme}
           PRICE_IDS={PRICE_IDS}
+          foundersClubScarcity={scarcity}
         />
       </div>
 
@@ -478,7 +479,7 @@ export default function SponsorPage() {
           </div>
           
           <h3 style={{ fontSize: 'clamp(20px, 3vw, 24px)', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
-            Developer Utility
+            Universal Data Engine
           </h3>
           <div style={{ fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '8px' }}>
             $200<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)' }}>/year</span>
@@ -487,9 +488,18 @@ export default function SponsorPage() {
             $240/year if paid monthly
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6' }}>
-            Perfect for developers and power users. Shape the product roadmap and get unlimited API access for your projects.
+            Don&apos;t write parsers. Push any raw broker data to our endpoint, and let our engine normalize it for you.
           </p>
           
+          <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
+              ⚡ <strong>Universal Data Engine:</strong>
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.8' }}>
+              Don&apos;t write parsers. Push any raw broker data to our endpoint, and let our engine normalize it for you.
+            </p>
+          </div>
+
           {/* Developer Benefits */}
           <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
@@ -792,13 +802,13 @@ export default function SponsorPage() {
             textTransform: 'uppercase',
             letterSpacing: '1px'
           }}>
-            Lifetime Access
+            Lifetime Sovereignty
           </div>
           <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 'bold', color: '#f59e0b', marginBottom: '16px' }}>
             £100<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)', fontWeight: 'normal' }}> one-time</span>
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6', fontSize: '15px' }}>
-            <strong style={{ color: 'var(--text)' }}>Never pay monthly.</strong> Get unlimited API access, white-label portfolio reports, Discord priority, and a permanent "Founder" badge. Own a piece of the roadmap.
+            You are not tied to a specific broker. Switch brokerages freely; your data history stays here.
           </p>
           <ul style={{ 
             listStyle: 'none', 

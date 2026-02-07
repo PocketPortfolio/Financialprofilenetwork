@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { getFoundersClubSpotsRemaining, isFoundersClubSoldOut, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
+
+type Scarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number };
 
 /**
  * Sticky banner showing Founders Club scarcity counter
@@ -14,6 +16,14 @@ export default function FoundersClubBanner() {
   const { isAuthenticated, user } = useAuth();
   const { tier } = usePremiumTheme();
   const spotsRemaining = getFoundersClubSpotsRemaining();
+  const [scarcity, setScarcity] = useState<Scarcity | null>(null);
+
+  useEffect(() => {
+    fetch('/api/scarcity')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => data && setScarcity(data))
+      .catch(() => {});
+  }, []);
 
   // Only show for free tier users (not corporate or founders club)
   const isFreeTier = !tier || (tier !== 'corporateSponsor' && tier !== 'foundersClub');
@@ -25,6 +35,10 @@ export default function FoundersClubBanner() {
   if (isFoundersClubSoldOut()) {
     return null; // Don't show if sold out
   }
+
+  const scarcityText = scarcity
+    ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left`
+    : getFoundersClubScarcityMessage();
 
   return (
     <div
@@ -54,7 +68,7 @@ export default function FoundersClubBanner() {
         }}
       >
         <span style={{ fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>
-          🇬🇧 UK FOUNDERS CLUB: Batch 1 Closing. {getFoundersClubScarcityMessage()} Lifetime Spots Remaining.
+          🇬🇧 UK FOUNDERS CLUB: {scarcityText} Lifetime Spots Remaining.
         </span>
         <Link
           href="/sponsor?utm_source=dashboard_banner&utm_medium=sticky_cta&utm_campaign=founders_club"

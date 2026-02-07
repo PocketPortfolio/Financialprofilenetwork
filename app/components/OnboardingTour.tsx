@@ -119,8 +119,8 @@ export default function OnboardingTour() {
         steps.push({
           element: dataInputDeck as HTMLElement,
           popover: {
-            title: '📂 Data Ingestion Engine',
-            description: 'Import CSV files from Trade Republic, Fidelity, or Trading 212, or add trades manually. Your data stays encrypted in your browser—never on our servers.',
+            title: 'Universal Import',
+            description: 'Drag & drop a CSV from any broker. Our engine will auto-detect the format or help you map it instantly.',
             side: 'top' as const,
             align: 'start' as const,
           },
@@ -130,8 +130,8 @@ export default function OnboardingTour() {
         steps.push({
           element: importTrigger as HTMLElement,
           popover: {
-            title: '📂 Start Here',
-            description: 'Drop your CSV from Trade Republic, Fidelity, or Trading 212 here. We parse it instantly.',
+            title: 'Universal Import',
+            description: 'Drag & drop a CSV from any broker. Our engine will auto-detect the format or help you map it instantly.',
             side: 'bottom' as const,
             align: 'start' as const,
           },
@@ -183,8 +183,8 @@ export default function OnboardingTour() {
           steps.push({
             element: importTrigger as HTMLElement,
             popover: {
-              title: '📂 Start Here',
-              description: 'Drop your CSV from Trade Republic, Fidelity, or Trading 212 here. We parse it instantly.',
+              title: 'Universal Import',
+              description: 'Drag & drop a CSV from any broker. Our engine will auto-detect the format or help you map it instantly.',
               side: 'bottom' as const,
               align: 'start' as const,
             },

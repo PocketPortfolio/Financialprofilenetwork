@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 
 /** Approximate banner height so useStickyHeader can reserve space before content loads */
 const BANNER_PLACEHOLDER_HEIGHT = 52;
+
+type Scarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number };
 
 /**
  * Global Founders Club banner shown on all pages.
@@ -19,11 +21,23 @@ const BANNER_PLACEHOLDER_HEIGHT = 52;
  */
 export default function GlobalFoundersClubBanner() {
   const { tier, isLoading } = usePremiumTheme();
+  const [scarcity, setScarcity] = useState<Scarcity | null>(null);
+
+  useEffect(() => {
+    fetch('/api/scarcity')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => data && setScarcity(data))
+      .catch(() => {});
+  }, []);
 
   const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
   const showContent = !isLoading && !isPaid;
   // While loading: same height, invisible so header reserves space. Paid: 0 height so header at top.
   const hidden = isLoading || isPaid;
+
+  const scarcityText = scarcity
+    ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left`
+    : getFoundersClubScarcityMessage();
 
   return (
     <div
@@ -58,7 +72,7 @@ export default function GlobalFoundersClubBanner() {
         }}
       >
         <span style={{ fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>
-          🇬🇧 UK FOUNDERS CLUB: Batch 1 Closing. {getFoundersClubScarcityMessage()} Lifetime Spots Remaining.
+          🇬🇧 UK FOUNDERS CLUB: {scarcityText} Lifetime Spots Remaining.
         </span>
         <Link
           href="/sponsor?utm_source=global_banner&utm_medium=top_cta&utm_campaign=founders_club"

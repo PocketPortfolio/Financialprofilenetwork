@@ -22,6 +22,7 @@ interface TierCardProps {
   onPreviewTheme?: (theme: 'founder' | 'corporate' | null) => void;
   children?: React.ReactNode;
   isFoundersClub?: boolean;
+  foundersClubScarcity?: { count: number; batch: number; label: string; progress: number; remaining: number; max: number } | null;
 }
 
 function TierCard({
@@ -41,7 +42,8 @@ function TierCard({
   previewTheme,
   onPreviewTheme,
   children,
-  isFoundersClub = false
+  isFoundersClub = false,
+  foundersClubScarcity
 }: TierCardProps) {
   return (
     <motion.div
@@ -149,9 +151,9 @@ function TierCard({
                 <div 
                   className="founders-club-counter"
                   style={{
-                    background: 'rgba(220, 38, 38, 0.15)',
-                    border: '2px solid #dc2626',
-                    color: '#dc2626',
+                    background: foundersClubScarcity?.batch === 2 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(220, 38, 38, 0.15)',
+                    border: `2px solid ${foundersClubScarcity?.batch === 2 ? '#f97316' : '#dc2626'}`,
+                    color: foundersClubScarcity?.batch === 2 ? '#ea580c' : '#dc2626',
                     padding: '6px 12px',
                     borderRadius: '20px',
                     fontSize: '11px',
@@ -162,7 +164,7 @@ function TierCard({
                     lineHeight: '1.4'
                   }}
                 >
-                  Batch 1: {getFoundersClubScarcityMessage()}
+                  {foundersClubScarcity ? `${foundersClubScarcity.label} — ${foundersClubScarcity.remaining}/${foundersClubScarcity.max} left` : `Batch 1: ${getFoundersClubScarcityMessage()}`}
                 </div>
                 <div style={{
                   background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
@@ -353,6 +355,8 @@ function TierCard({
   );
 }
 
+export type FoundersClubScarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number } | null;
+
 interface SponsorDeckProps {
   onCheckout: (priceId: string | { monthly: string; annual: string }, tierName: string) => void;
   loading: string | null;
@@ -364,6 +368,7 @@ interface SponsorDeckProps {
     corporateSponsor: { monthly: string; annual: string };
     foundersClub: string;
   };
+  foundersClubScarcity?: FoundersClubScarcity;
 }
 
 export default function SponsorDeck({
@@ -371,7 +376,8 @@ export default function SponsorDeck({
   loading,
   previewTheme,
   onPreviewTheme,
-  PRICE_IDS
+  PRICE_IDS,
+  foundersClubScarcity = null
 }: SponsorDeckProps) {
   const [activeId, setActiveId] = useState('developer'); // Default to Developer Utility
 
@@ -400,10 +406,10 @@ export default function SponsorDeck({
     },
     {
       id: 'developer',
-      title: 'Developer Utility',
+      title: 'Universal Data Engine',
       price: '$200',
       priceSubtext: '/year',
-      description: 'Perfect for developers and power users. Shape the product roadmap and get unlimited API access for your projects.',
+      description: "Don't write parsers. Push any raw broker data to our endpoint, and let our engine normalize it for you.",
       icon: '/brand/archetype-developer-utility.svg',
       iconAlt: 'The Builder',
       color: 'var(--accent-warm)',
@@ -416,6 +422,15 @@ export default function SponsorDeck({
             $240/year if paid monthly
           </div>
           
+          <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
+              ⚡ <strong>Universal Data Engine:</strong>
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.8' }}>
+              Don&apos;t write parsers. Push any raw broker data to our endpoint, and let our engine normalize it for you.
+            </p>
+          </div>
+
           {/* Developer Benefits */}
           <div style={{ marginBottom: '12px', padding: '12px', background: 'var(--surface-elevated)', borderRadius: '8px', border: '1px solid var(--border)' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text)', marginBottom: '8px' }}>
@@ -513,7 +528,7 @@ export default function SponsorDeck({
       title: 'UK FOUNDER\'S CLUB',
       price: '£100',
       priceSubtext: ' one-time',
-      description: 'Never pay monthly. Get unlimited API access, white-label portfolio reports, Discord priority, and a permanent "Founder" badge. Own a piece of the roadmap.',
+      description: "You are not tied to a specific broker. Switch brokerages freely; your data history stays here.",
       icon: '/brand/archetype-founders-club.svg',
       iconAlt: 'The Sovereign',
       color: '#f59e0b',
@@ -531,7 +546,7 @@ export default function SponsorDeck({
             letterSpacing: '1px',
             textAlign: 'center'
           }}>
-            Lifetime Access
+            Lifetime Sovereignty
           </div>
           
           <ul style={{ 
@@ -541,6 +556,10 @@ export default function SponsorDeck({
             color: 'var(--text-secondary)',
             fontSize: '14px'
           }}>
+            <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
+              <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
+              You are not tied to a specific broker. Switch brokerages freely; your data history stays here.
+            </li>
             <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
               <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
               Unlimited API calls forever
@@ -678,6 +697,7 @@ export default function SponsorDeck({
               previewTheme={previewTheme}
               onPreviewTheme={onPreviewTheme}
               isFoundersClub={tier.isFoundersClub}
+              foundersClubScarcity={tier.isFoundersClub ? foundersClubScarcity ?? null : undefined}
             >
               {tier.expandedContent}
             </TierCard>
