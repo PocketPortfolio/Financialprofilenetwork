@@ -62,12 +62,15 @@ npm install
 
 ## ✅ Pre-Deployment Checklist
 
-- [ ] All environment variables added to Vercel
+- [ ] All environment variables added to Vercel (see `env.example`)
+- [ ] **Production env:** Do **not** set `NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS` or set it to `false` (debug ingest is dev-only)
+- [ ] **Optional:** Leave `ENABLE_LLM_IMPORT` / `NEXT_PUBLIC_ENABLE_LLM_IMPORT` unset or `false` unless you use LLM CSV mapping
 - [ ] `public/dashboard-demo-4k.mp4` exists (18.15 MB)
 - [ ] `public/firebase-messaging-sw.js` exists
 - [ ] `public/manifest.webmanifest` updated
 - [ ] No TypeScript errors in production code (test files OK)
 - [ ] No linting errors in production code
+- [ ] `npm run build` completes (importer → sitemaps → inject-firebase → next build; can take several minutes)
 
 ## 🚀 Deployment Steps
 
@@ -139,9 +142,10 @@ Visit: `https://www.pocketportfolio.app/`
 - **Service Workers**: Two SWs coexist (`sw.js` for caching, `firebase-messaging-sw.js` for notifications)
 - **Video**: Falls back to local file if CDN fails
 - **Build Time**: Firebase config injection happens during build, not runtime
+- **Prepare for prod**: Use `env.example` as the source of truth; keep debug flags (`NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS`, `ENABLE_LLM_IMPORT`) unset or false in production. Debug instrumentation in app and sales code is gated or removed.
 
 ---
 
-**Last Updated**: 2025-01-17
+**Last Updated**: 2025-02-06
 **Status**: ✅ Ready for Production Deployment
 

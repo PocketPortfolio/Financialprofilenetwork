@@ -5,32 +5,13 @@ import { toISO, toNumber, toTicker, inferCurrency, hashRow } from '../normalize'
 export const koinly: BrokerAdapter = {
   id: 'koinly',
   detect: (sample) => {
-    // #region agent log
-    // Simplified detection: check for key Koinly identifiers
-    // Must have "Koinly Date" OR ("Pair" + "Sent Amount" + "Received Amount" together)
     const firstLine = sample.split('\n')[0] || '';
     const hasKoinlyDate = /Koinly Date/i.test(firstLine);
     const hasPair = /Pair/i.test(firstLine);
     const hasSentAmount = /Sent Amount/i.test(firstLine);
     const hasReceivedAmount = /Received Amount/i.test(firstLine);
     const hasKoinly = /Koinly/i.test(sample);
-    
-    // Match if: (Koinly Date in first line) OR (Pair + Sent Amount + Received Amount in first line) OR (contains "Koinly" anywhere)
-    const testResult = hasKoinlyDate || (hasPair && hasSentAmount && hasReceivedAmount) || hasKoinly;
-    
-    console.log('[KOINLY DETECT]', { 
-      testResult, 
-      firstLine, 
-      hasKoinlyDate, 
-      hasPair, 
-      hasSentAmount, 
-      hasReceivedAmount, 
-      hasKoinly,
-      samplePreview: sample.slice(0, 200) 
-    });
-    fetch('http://127.0.0.1:7242/ingest/ed1ac4f0-a5ec-4c15-80c2-1ba860d1bcf0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'koinly.ts:7',message:'Koinly detect function',data:{testResult,firstLine,hasKoinlyDate,hasPair,hasSentAmount,hasReceivedAmount,hasKoinly,samplePreview:sample.slice(0,300)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch((e)=>{console.error('[KOINLY FETCH ERROR]',e);});
-    // #endregion
-    return testResult;
+    return hasKoinlyDate || (hasPair && hasSentAmount && hasReceivedAmount) || hasKoinly;
   },
   parse: async (file, locale='en-US') => {
     const t0 = performance.now();

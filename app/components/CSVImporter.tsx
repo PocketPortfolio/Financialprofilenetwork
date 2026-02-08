@@ -33,6 +33,16 @@ function debugLog(step: string, data: Record<string, unknown>) {
   }
 }
 
+// Debug instrumentation: only when explicitly enabled (avoids localhost fetch in production)
+function agentLog(_location: string, _message: string, _data: Record<string, unknown>, _hypothesisId: string) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS !== 'true') return;
+  fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ location: _location, message: _message, data: _data, timestamp: Date.now(), hypothesisId: _hypothesisId }),
+  }).catch(() => {});
+}
+
 export default function CSVImporter({ onImport }: CSVImporterProps) {
   const [dragActive, setDragActive] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -1540,6 +1550,9 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
 
       if (detectedBroker === 'unknown') {
         debugLog('STEP_UNKNOWN', { fileName: file?.name });
+        // #region agent log
+        agentLog('CSVImporter.tsx:unknown', 'Unknown broker: showing dropdown', { fileName: file?.name, firstLine: csvContent.split('\n')[0]?.slice(0, 120) }, 'A');
+        // #endregion
         setUnknownFile({ file, rawFile, csvContent });
         setProcessing(false);
         return;
@@ -1929,6 +1942,9 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
           errorMessage: 'No valid trades found in CSV',
           broker
         });
+        // #region agent log
+        agentLog('CSVImporter.tsx:zero_trades', 'Detected broker produced zero trades', { fileName: file?.name, broker: (parseResultForConvert as { broker?: string })?.broker }, 'C');
+        // #endregion
         setUnknownFile({ file, rawFile, csvContent, reason: 'zero_trades' });
         setProcessing(false);
         return;
@@ -2029,6 +2045,9 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
 
   const handleUniversalMappingConfirm = (mapping: Record<string, string>) => {
     if (!pendingUniversal) return;
+    // #region agent log
+    agentLog('CSVImporter.tsx:handleUniversalMappingConfirm', 'User confirmed column mapping', { mappingKeys: Object.keys(mapping).length, keys: Object.keys(mapping) }, 'E');
+    // #endregion
     try {
       const parseResult = genericParse(pendingUniversal.rawCsvText, mapping as import('@pocket-portfolio/importer').UniversalMapping, 'en-US');
       const trades: Trade[] = parseResult.trades
@@ -2056,6 +2075,9 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
           return isValid;
         });
       if (trades.length === 0) {
+        // #region agent log
+        agentLog('CSVImporter.tsx:handleUniversalMappingConfirm', 'genericParse + filter produced zero trades', { rawTradesCount: parseResult.trades?.length }, 'E');
+        // #endregion
         showAlert(
           'No Trades Found',
           'No valid trades found with this column mapping. Please check your mapping and try again.',
@@ -2075,6 +2097,9 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // #region agent log
+      agentLog('CSVImporter.tsx:handleUniversalMappingConfirm', 'genericParse threw', { errorMessage: msg }, 'E');
+      // #endregion
       showAlert('Import Error', `Failed to parse CSV: ${msg}`, 'error');
     }
     setPendingUniversal(null);
@@ -2089,10 +2114,16 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
             reason={unknownFile.reason}
             onCancel={() => setUnknownFile(null)}
             onSelectBroker={async (brokerId) => {
+              // #region agent log
+              agentLog('CSVImporter.tsx:onSelectBroker', 'User selected broker from dropdown', { brokerId, fileName: unknownFile.file.name }, 'C');
+              // #endregion
               try {
                 const result = await parseCSVAdapter(unknownFile.rawFile, 'en-US', brokerId);
                 const trades = convertToAppTrades(result);
                 if (trades.length === 0) {
+                  // #region agent log
+                  agentLog('CSVImporter.tsx:onSelectBroker', 'Adapter returned zero trades after convert', { brokerId, rawTradesCount: result?.trades?.length }, 'C');
+                  // #endregion
                   showAlert('No Trades Found', 'No valid trades found with the selected broker format.', 'warning');
                   return;
                 }
@@ -2101,28 +2132,46 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
+                // #region agent log
+                agentLog('CSVImporter.tsx:onSelectBroker', 'parseCSVAdapter threw', { brokerId, errorMessage: msg }, 'C');
+                // #endregion
                 showAlert('Import Error', msg, 'error');
               }
             }}
             onSmartImport={async () => {
+              // #region agent log
+              agentLog('CSVImporter.tsx:onSmartImport', 'Smart Import started', { fileName: unknownFile.file.name }, 'D');
+              // #endregion
               try {
                 const result = await parseUniversal(unknownFile.rawFile, 'en-US');
                 if ('type' in result && result.type === 'REQUIRES_MAPPING') {
+                  // #region agent log
+                  agentLog('CSVImporter.tsx:onSmartImport', 'parseUniversal returned REQUIRES_MAPPING', { fileName: unknownFile.file.name }, 'D');
+                  // #endregion
                   setPendingUniversal(result);
                   setUnknownFile(null);
                   return;
                 }
                 const trades = convertToAppTrades(result as import('@pocket-portfolio/importer').ParseResult);
                 if (trades.length === 0) {
+                  // #region agent log
+                  agentLog('CSVImporter.tsx:onSmartImport', 'parseUniversal ParseResult produced zero trades after convert', { rawTradesCount: (result as { trades?: unknown[] })?.trades?.length }, 'E');
+                  // #endregion
                   showAlert('No Trades Found', 'No valid trades found. Try adjusting column mapping.', 'warning');
                   setUnknownFile(null);
                   return;
                 }
+                // #region agent log
+                agentLog('CSVImporter.tsx:onSmartImport', 'Smart Import success', { tradesCount: trades.length }, 'D');
+                // #endregion
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} with Smart Import.`, 'success');
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
+                // #region agent log
+                agentLog('CSVImporter.tsx:onSmartImport', 'parseUniversal threw', { errorMessage: msg }, 'D');
+                // #endregion
                 showAlert(
                   'Smart Import failed',
                   'Smart Import couldn\'t read this file. Try choosing a broker from the list above, or use a different CSV.',

@@ -395,20 +395,12 @@ async function processCity(
     const targetUrl = 'https://www.sjp.co.uk/individuals/find-an-adviser';
     console.log(`   🎯 Loading search page...`);
     
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:293',message:'Before page.goto (V7.2)',data:{city:hub.name,url:targetUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
-    // #endregion
-    
     try {
       await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
     } catch (e) {
       console.error(`   ❌ Failed to load page: ${e}`);
       throw e;
     }
-    
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:299',message:'After page.goto (V7.2)',data:{city:hub.name,url:await page.url()},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
-    // #endregion
     
     // 6. Handle Cookie Consent (Crucial to unblock UI)
     try {
@@ -422,10 +414,6 @@ async function processCity(
     }
     
     // 7. V7.2 EXPLICIT INTERACTION: Type Location & Search
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:310',message:'Before typing interaction (V7.2)',data:{city:hub.name},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
-    // #endregion
-    
     try {
       // Wait for location input field
       const inputSelector = '#edit-location, input[name="location"], input[type="text"]';
@@ -438,19 +426,6 @@ async function processCity(
       let searchTriggered = false;
       
       console.log(`   🔍 V7.3: Force Select Protocol - Triggering React state update`);
-      
-      // #region agent log - Before Force Select
-      const beforeForceSelect = await page.evaluate(() => {
-        const input = document.querySelector('#edit-location, input[name="location"]') as HTMLInputElement;
-        return {
-          inputValue: input?.value || '',
-          inputFocused: document.activeElement === input,
-          pacContainerVisible: !!document.querySelector('.pac-container'),
-          pacItemsCount: document.querySelectorAll('.pac-item').length
-        };
-      });
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:385',message:'Before Force Select (V7.3:ReactStateFix)',data:{city:hub.name,beforeForceSelect},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-      // #endregion
       
       // Step 1: Clear and Focus (Triple Click ensures we clear "Type location" placeholders)
       await page.click(inputSelector, { clickCount: 3 });
@@ -490,25 +465,6 @@ async function processCity(
       // Often the input text changes from "London" to "London, UK" or lat/lng gets populated
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // #region agent log - After Force Select (verify state update)
-      const cityName = hub.name; // Capture for evaluate callback
-      const afterForceSelect = await page.evaluate((city) => {
-        const input = document.querySelector('#edit-location, input[name="location"]') as HTMLInputElement;
-        // Check for hidden fields that might contain lat/lng
-        const hiddenFields = Array.from(document.querySelectorAll('input[type="hidden"]')).map((el: any) => ({
-          name: el.name,
-          value: el.value?.substring(0, 50) || ''
-        }));
-        return {
-          inputValue: input?.value || '',
-          inputValueChanged: input?.value !== city, // Should be different if state updated
-          hiddenFields: hiddenFields.filter(f => f.name.includes('location') || f.name.includes('lat') || f.name.includes('lng')),
-          pacContainerVisible: !!document.querySelector('.pac-container')
-        };
-      }, cityName);
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:425',message:'After Force Select (V7.3:ReactStateFix)',data:{city:hub.name,afterForceSelect},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-      // #endregion
-      
       // Step 6: Wait for dropdown to close (autocomplete dropdown might be covering the button)
       try {
         await page.waitForFunction(
@@ -533,15 +489,9 @@ async function processCity(
       ];
       
       let buttonClicked = false;
-      // #region agent log - Before button click attempt
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:485',message:'Before button click attempt (V7.3:ReactStateFix)',data:{city:hub.name,selectorsToTry:submitSelectors.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-      // #endregion
       for (const selector of submitSelectors) {
         try {
           const submitButton = await page.$(selector);
-          // #region agent log - Selector check
-          fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:489',message:'Selector check (V7.3:ReactStateFix)',data:{city:hub.name,selector,buttonFound:!!submitButton},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-          // #endregion
           if (submitButton) {
             // Scroll button into view and ensure it's clickable
             await page.evaluate((sel) => {
@@ -576,9 +526,6 @@ async function processCity(
               }
             }, selector);
             console.log(`   ✅ Search button clicked via JavaScript (${selector}) - React state should trigger proper search`);
-            // #region agent log - Button clicked successfully
-            fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:522',message:'Button clicked successfully (V7.3:ReactStateFix)',data:{city:hub.name,selector,buttonClicked:true},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-            // #endregion
             buttonClicked = true;
             searchTriggered = true;
             break;
@@ -591,32 +538,6 @@ async function processCity(
       
       if (!buttonClicked) {
         console.log(`   ⚠️  Could not find or click submit button with any selector`);
-        // #region agent log - Button click failed
-        const buttonDebug = await page.evaluate(() => {
-          const selectors = ['#edit-submit--2', '#submitButton', 'input[type="submit"]', 'button[type="submit"]', '.js-form-submit'];
-          const results: any = {};
-          selectors.forEach(sel => {
-            const el = document.querySelector(sel);
-            if (el) {
-              const rect = el.getBoundingClientRect();
-              const style = window.getComputedStyle(el);
-              results[sel] = {
-                exists: true,
-                visible: rect.width > 0 && rect.height > 0,
-                display: style.display,
-                visibility: style.visibility,
-                opacity: style.opacity,
-                disabled: el.hasAttribute('disabled'),
-                zIndex: style.zIndex
-              };
-            } else {
-              results[sel] = { exists: false };
-            }
-          });
-          return results;
-        });
-        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:533',message:'Button click failed - debug info (V7.3:ReactStateFix)',data:{city:hub.name,buttonDebug},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-        // #endregion
       }
       
       if (searchTriggered) {
@@ -642,39 +563,15 @@ async function processCity(
           console.log(`   ⚠️  Waiting for results timed out, but continuing...`);
         }
         
-        // #region agent log - After form submission
-        const afterSubmit = await page.evaluate(() => {
-          return {
-            url: window.location.href,
-            selectors: {
-              partnerCards: document.querySelectorAll('.partner-card').length,
-              adviserCards: document.querySelectorAll('.adviser-card').length,
-              resultItems: document.querySelectorAll('.result-item').length,
-              advisorLinks: document.querySelectorAll('a[href*="/individuals/find-an-adviser/"], a[href*="advisor"], a[href*="adviser"]').length,
-              allArticles: document.querySelectorAll('article').length,
-              allCards: document.querySelectorAll('[class*="card"]').length
-            },
-            pageTitle: document.title
-          };
-        });
-        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:465',message:'After form submission (V7.3:ReactStateFix)',data:{city:hub.name,afterSubmit},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-force-select',hypothesisId:'V7.3'})}).catch(()=>{});
-        // #endregion
       }
       
     } catch (e: any) {
       const errorMsg = e?.message || String(e);
       console.error(`   ⚠️  Interaction Error: ${errorMsg}`);
-      // #region agent log
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:343',message:'Typing interaction error (V7.2)',data:{city:hub.name,error:errorMsg},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
-      // #endregion
       // Continue anyway - results might have loaded
     }
 
     // 8. Wait for Results Grid
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:348',message:'Before waitForFunction (HYP-B:WaitForResults)',data:{city:hub.name},timestamp:Date.now(),sessionId:'debug-session',runId:'debug-extraction',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
-    
     try {
       // Wait for results to appear - check for multiple result indicators
       await page.waitForFunction(
@@ -698,26 +595,6 @@ async function processCity(
         { timeout: 20000 }
       );
       console.log(`   ✅ Results grid loaded`);
-      // #region agent log
-      const afterWait = await page.evaluate(() => {
-        const allSelectors = ['.partner-card', '.adviser-card', '.result-item', 'article', '[class*="card"]', '[class*="profile"]', '[class*="listing"]'];
-        const selectorResults: any = {};
-        allSelectors.forEach(sel => {
-          selectorResults[sel] = document.querySelectorAll(sel).length;
-        });
-        return {
-          partnerCards:document.querySelectorAll('.partner-card').length,
-          adviserCards:document.querySelectorAll('.adviser-card').length,
-          resultItems:document.querySelectorAll('.result-item').length,
-          advisorLinks:document.querySelectorAll('h3 a[href*="sjp.co.uk"], a[href*="/individuals/find-an-adviser/"][href*="sjp.co.uk"]').length,
-          articles:document.querySelectorAll('article').length,
-          sjpLinks:document.querySelectorAll('a[href*="sjp.co.uk"]').length,
-          selectorResults,
-          pageHTML: document.documentElement.outerHTML.substring(0, 1000) // Sample HTML
-        };
-      });
-      fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:360',message:'After waitForFunction success (HYP-B:WaitForResults)',data:{city:hub.name,cardCounts:afterWait},timestamp:Date.now(),sessionId:'debug-session',runId:'debug-extraction',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
     } catch (e) {
       // Fallback: Check if we are on a results page anyway
       const cardCount = await page.evaluate(() => {
@@ -727,38 +604,6 @@ async function processCity(
         console.log(`   ✅ Found ${cardCount} cards (timeout but results present)`);
       } else {
         console.log(`   ⚠️  Timeout waiting for results grid. No cards found.`);
-        // #region agent log
-        const timeoutState = await page.evaluate(() => {
-          const allElements = document.querySelectorAll('*');
-          const commonClasses = Array.from(allElements).reduce((acc: any, el) => {
-            Array.from(el.classList || []).forEach(cls => {
-              if (cls.includes('card') || cls.includes('result') || cls.includes('item') || cls.includes('profile') || cls.includes('advisor') || cls.includes('adviser')) {
-                acc[cls] = (acc[cls] || 0) + 1;
-              }
-            });
-            return acc;
-          }, {});
-          return {
-            partnerCards:document.querySelectorAll('.partner-card').length,
-            adviserCards:document.querySelectorAll('.adviser-card').length,
-            resultItems:document.querySelectorAll('.result-item').length,
-            advisorLinks:document.querySelectorAll('h3 a[href*="sjp.co.uk"], a[href*="/individuals/find-an-adviser/"][href*="sjp.co.uk"]').length,
-            articles:document.querySelectorAll('article').length,
-            bodyText:document.body?.textContent?.substring(0,500)||'',
-            title:document.title,
-            url:window.location.href,
-            commonClasses: Object.entries(commonClasses).slice(0, 20),
-            // Check for any divs/containers that might hold results
-            mainContainers: Array.from(document.querySelectorAll('main, [role="main"], [id*="main"], [class*="main"]')).map(el => ({
-              id: el.id,
-              className: el.className,
-              childCount: el.children.length,
-              textPreview: el.textContent?.substring(0, 200) || ''
-            })).slice(0, 5)
-          };
-        });
-        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:370',message:'waitForFunction timeout (HYP-C:TimeoutNoResults)',data:{city:hub.name,timeoutState,error:String(e)},timestamp:Date.now(),sessionId:'debug-session',runId:'debug-extraction',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         // Take screenshot for debugging
         try {
           await page.screenshot({ path: `error-${hub.name.replace(/\s+/g, '-')}-v7.2.png`, fullPage: true });
@@ -775,20 +620,6 @@ async function processCity(
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // 10. Extract leads - V7.3: Extract from advisor links directly
-    // #region agent log - Before extraction (check page state)
-    const beforeExtractionState = await page.evaluate(() => {
-      const advisorLinks = document.querySelectorAll('a[href*="/individuals/find-an-adviser/"], a[href*="advisor"], a[href*="adviser"]');
-      return {
-        url: window.location.href,
-        pageTitle: document.title,
-        advisorLinksCount: advisorLinks.length,
-        isResultsPage: window.location.href.includes('find-an-advisers') || window.location.href.includes('find-an-adviser'),
-        sampleLinkHref: advisorLinks.length > 0 ? (advisorLinks[0] as HTMLAnchorElement).href : null
-      };
-    });
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:728',message:'Before extraction (V7.3:ExtractionFix)',data:{city:hub.name,beforeExtractionState},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-extraction',hypothesisId:'V7.3-EXTRACT'})}).catch(()=>{});
-    // #endregion
-    
     const extracted = await page.evaluate((cityName) => {
       const results: any[] = [];
       const selectorCounts: any = {};
@@ -1200,9 +1031,6 @@ async function processCity(
           practiceName = `${firstName}'s Practice`;
         }
         
-        // Log practice name extraction for debugging
-        fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:1070',message:'Practice name extraction',data:{practiceName,practiceNameFound,firstName,lastName,cardTextLength:card.textContent?.length||0},timestamp:Date.now(),sessionId:'debug-session',runId:'practice-name-extraction',hypothesisId:'PRACTICE-NAME'})}).catch(()=>{});
-        
         // Reject if firstName is invalid (Share, Visit, Partner, etc.)
         const invalidFirstNames = ['share', 'visit', 'partner', 'view', 'read', 'more', 'click', 'link'];
         const isValidFirstName = firstName && 
@@ -1212,8 +1040,6 @@ async function processCity(
         
         // Add to results if we have a valid email AND valid name
         if (email && isValidEmail && isValidFirstName) {
-          fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:976',message:'Adding lead with extracted data',data:{email:email.toLowerCase().trim(),firstName,lastName,practiceName,linkText,linkHref,nameText,extractedFrom:nameContainer?'nameContainer':'fallback'},timestamp:Date.now(),sessionId:'debug-session',runId:'name-extraction-fix-v2',hypothesisId:'NAME-FIX-V2'})}).catch(()=>{});
-          
           results.push({
             email: email.toLowerCase().trim(),
             firstName: firstName,
@@ -1227,8 +1053,6 @@ async function processCity(
           });
           extractionStats.added++;
         } else if (email && isValidEmail && !isValidFirstName) {
-          // Email is valid but name is invalid - log for debugging
-          fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:990',message:'Rejecting lead - invalid name',data:{email:email.toLowerCase().trim(),firstName,invalidReason:!firstName?'no name':invalidFirstNames.includes(firstName.toLowerCase())?'invalid name':'other'},timestamp:Date.now(),sessionId:'debug-session',runId:'name-extraction-fix',hypothesisId:'NAME-FIX'})}).catch(()=>{});
           extractionStats.emailRejected++;
         } else if (email) {
           extractionStats.emailRejected++;
@@ -1412,22 +1236,12 @@ async function processCity(
     // 8. Deduplicate and add to results
     const extractedResults = (extracted as any).results || extracted;
     
-    // #region agent log - After extraction
-    const extractionDebug = (extracted as any).debug || {};
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:840',message:'After extraction (V7.3:ExtractionFix)',data:{city:hub.name,extractionDebug,extractedCount:extractedResults.length,extractedResults:extractedResults.slice(0, 5)},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.3-extraction',hypothesisId:'V7.3-EXTRACT'})}).catch(()=>{});
-    // #endregion
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:428',message:'Before deduplication (V7.2)',data:{city:hub.name,extractedCount:extractedResults.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
-    // #endregion
     for (const lead of extractedResults) {
       if (!(await leadExists(lead.email))) {
         cityLeads.push(lead);
         emailCache.add(lead.email.toLowerCase());
       }
     }
-    // #region agent log
-    fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'predator-scraper.ts:437',message:'After deduplication (V7.2)',data:{city:hub.name,extractedCount:extractedResults.length,newLeads:cityLeads.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v7.2',hypothesisId:'V7.2'})}).catch(()=>{});
-    // #endregion
     console.log(`   ✅ ${hub.name}: Found ${extractedResults.length} advisors, ${cityLeads.length} new leads captured`);
     
   } catch (error: any) {

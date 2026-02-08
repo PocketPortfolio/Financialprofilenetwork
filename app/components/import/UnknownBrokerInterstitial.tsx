@@ -5,6 +5,16 @@ import type { BrokerId } from '@pocket-portfolio/importer';
 import { GLOBAL_BROKER_OPTIONS } from '../../lib/brokers';
 import type { BrokerOptionId } from '../../lib/brokers';
 
+// Debug instrumentation: only when explicitly enabled (avoids localhost fetch in production)
+function agentLog(_location: string, _message: string, _data: Record<string, unknown>, _hypothesisId: string) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS !== 'true') return;
+  fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ location: _location, message: _message, data: _data, timestamp: Date.now(), hypothesisId: _hypothesisId }),
+  }).catch(() => {});
+}
+
 function isUniversalImportEnabled(): boolean {
   if (typeof process === 'undefined') return true;
   return process.env.NEXT_PUBLIC_ENABLE_UNIVERSAL_IMPORT !== 'false';
@@ -38,6 +48,18 @@ export default function UnknownBrokerInterstitial({
     if (!q) return GLOBAL_BROKER_OPTIONS;
     return GLOBAL_BROKER_OPTIONS.filter((b) => b.label.toLowerCase().includes(q));
   }, [searchQuery]);
+
+  // #region agent log
+  useEffect(() => {
+    agentLog('UnknownBrokerInterstitial.tsx:dropdown', 'Broker dropdown state', {
+      fileName,
+      totalOptions: GLOBAL_BROKER_OPTIONS.length,
+      searchQuery,
+      filteredCount: filteredBrokers.length,
+      sampleLabels: filteredBrokers.slice(0, 8).map((b) => b.label),
+    }, 'A');
+  }, [fileName, searchQuery, filteredBrokers]);
+  // #endregion
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

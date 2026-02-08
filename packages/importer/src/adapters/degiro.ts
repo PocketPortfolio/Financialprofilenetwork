@@ -4,7 +4,7 @@ import { toISO, toNumber, toTicker, inferCurrency, hashRow } from '../normalize'
 
 export const degiro: BrokerAdapter = {
   id: 'degiro',
-  detect: (sample) => /(^|\n)(Date|Time|Product|ISIN|Action|Quantity|Price|DEGIRO)/i.test(sample),
+  detect: (sample) => /DEGIRO/i.test(sample) && /(Date|Time|Product|ISIN|Action|Quantity|Price)/i.test(sample),
   parse: async (file, locale='en-GB') => {
     const t0 = performance.now();
     const text = await csvFrom(file);

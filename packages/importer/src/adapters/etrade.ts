@@ -4,7 +4,7 @@ import { toISO, toNumber, toTicker, inferCurrency, hashRow } from '../normalize'
 
 export const etrade: BrokerAdapter = {
   id: 'etrade',
-  detect: (sample) => /(^|\n)(Trade Date|Symbol|Action|Quantity|Price|E\*TRADE)/i.test(sample),
+  detect: (sample) => /E\*TRADE/i.test(sample) && /(Trade Date|Symbol|Action|Quantity|Price)/i.test(sample),
   parse: async (file, locale='en-US') => {
     const t0 = performance.now();
     const text = await csvFrom(file);

@@ -4,7 +4,7 @@ import { toISO, toNumber, toTicker, inferCurrency, hashRow } from '../normalize'
 
 export const vanguard: BrokerAdapter = {
   id: 'vanguard',
-  detect: (sample) => /(^|\n)(Transaction Date|Symbol|Action|Quantity|Price|Vanguard|Vanguard.*Account)/i.test(sample),
+  detect: (sample) => /Vanguard/i.test(sample) && /(Transaction Date|Symbol|Action|Quantity|Price)/i.test(sample),
   parse: async (file, locale='en-US') => {
     const t0 = performance.now();
     const text = await csvFrom(file);
