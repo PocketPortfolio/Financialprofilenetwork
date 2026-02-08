@@ -1,0 +1,59 @@
+---
+title: How to Use "jq" to Slice JSON Data in the Command Line
+date: '2026-02-08'
+description: >-
+  Learn how to efficiently use jq to slice through JSON data in the command line
+  for precise data manipulation and analysis.
+tags:
+  - json
+  - use
+  - slice
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-jq-to-slice-json-data-in-the-command-line.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Manipulating JSON data directly from the command line can seem daunting, but with the right tool, it becomes a breeze. Enter `jq`, a powerful yet lightweight command-line JSON processor that makes data slicing straightforward.
+
+### Direct Solution with Code
+
+To slice JSON data using `jq`, start by installing `jq` on your machine. Installation methods vary based on your operating system, but once installed, you can immediately start filtering your JSON data. Here's a simple example:
+
+```bash
+echo '{"name": "John Doe", "age": 30, "city": "New York"}' | jq '.name'
+```
+
+This command will output:
+
+```
+"John Doe"
+```
+
+### Explanation of Key Concepts
+
+At its core, `jq` operates by accepting a string of JSON through standard input (`stdin`) and applying a filter specified by the user. The filter `.name` tells `jq` to extract the value associated with the key `name` from the input JSON. Filters can be much more complex, allowing for deep slicing and dicing of the data.
+
+For instance, if you have an array of objects and want to slice out specific fields, you can use the following:
+
+```bash
+echo '[{"name": "John Doe", "age": 30}, {"name": "Jane Doe", "age": 25}]' | jq '.[] | {name, age}'
+```
+
+This command iterates over each item in the array (`.[]`) and creates a new object containing only the `name` and `age` keys for each item.
+
+### Quick Tip
+
+While `jq` is incredibly powerful, remember that it operates on a copy of the data. This means that the original data remains unchanged unless you output the result of `jq` to a new file or overwrite the existing one. For example:
+
+```bash
+jq '.name' input.json > sliced.json
+```
+
+This command reads `input.json`, slices out the `name` fields using `jq`, and writes the output to `sliced.json`.
+
+### Gotcha
+
+Beware of malformed JSON. `jq` is strict about the JSON format, and even a missing comma or misquoted key can cause it to fail. Always validate your JSON before using it with `jq`.
+
+By leveraging `jq` for JSON slicing, developers and data scientists can streamline their workflows, enabling more efficient data processing and analysis directly from the command line. Whether you're filtering arrays, extracting specific fields, or performing complex transformations, `jq` offers a versatile and powerful solution for manipulating JSON data.

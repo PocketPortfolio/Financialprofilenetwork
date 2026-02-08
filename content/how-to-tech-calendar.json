@@ -578,14 +578,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use \"jq\" to Slice JSON Data in the Command Line",
     "slug": "how-to-use-jq-to-slice-json-data-in-the-command-line",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "json",
       "use",
       "slice"
-    ]
+    ],
+    "publishedAt": "2026-02-08T14:21:00.370Z"
   },
   {
     "id": "how-to-why-you-should-version-your-api-v1-vs-v2-feb-9",
