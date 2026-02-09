@@ -1,0 +1,63 @@
+---
+title: Why You Should Version Your API (v1 vs v2)
+date: '2026-02-09'
+description: >-
+  Learn why API versioning is critical for maintaining backward compatibility
+  and introducing new features without breaking changes.
+tags:
+  - api
+  - why
+  - you
+  - should
+author: Pocket Portfolio Team
+image: /images/blog/why-you-should-version-your-api-v1-vs-v2.png
+pillar: technical
+category: how-to-in-tech
+---
+
+In a world where software evolves rapidly, maintaining backward compatibility while rolling out new features or changes can be a significant challenge. API versioning is a strategy to address this challenge, ensuring that existing clients are not broken by changes, providing a clear path for upgrades.
+
+### Direct Solution with Code
+
+Consider an API that returns user information. In version 1 (v1), it returns a user's name and email. In version 2 (v2), we introduce a new field: `username`.
+
+**Version 1 (v1):**
+
+```json
+GET /api/v1/user
+
+Response:
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com"
+}
+```
+
+**Version 2 (v2):**
+
+```json
+GET /api/v2/user
+
+Response:
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "username": "janeDoe"
+}
+```
+
+### Explanation of Key Concepts
+
+**Backward Compatibility:** By versioning the API, v1 continues to work as expected for existing clients, ensuring no disruption to their operations. Clients that can benefit from the new `username` field can opt into v2 at their convenience.
+
+**Version Naming:** The choice between semantic versioning (e.g., 2.0.0) and simpler major versioning (e.g., v2) depends on the API's complexity and the scope of changes. For web APIs, major versioning (v1, v2) is often sufficient and more intuitive for clients.
+
+**Endpoint Strategy:** There are several approaches to versioning, including URI path (as shown above), query parameters, or custom headers. URI path versioning is the most straightforward and widely adopted method due to its visibility and simplicity.
+
+### Quick Tip
+
+When designing a new version of your API, it's tempting to introduce multiple breaking changes at once to minimize the versioning frequency. However, consider the impact on client upgrade paths. It's often better to release more frequent, smaller updates than rare, large ones, making it easier for clients to adopt new features step by step.
+
+### Verdict
+
+Versioning your API is not just about accommodating new features; it's a fundamental part of a forward-thinking development strategy that respects the investment clients have made in integrating with your API. It allows for innovation without sacrifice, ensuring a smoother transition and better client relationships. For comprehensive insights into maintaining a robust API strategy that includes versioning, consider exploring our guide on [Sovereign Financial Tracking](/).

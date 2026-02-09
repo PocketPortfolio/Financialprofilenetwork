@@ -594,7 +594,7 @@
     "scheduledTime": "14:00",
     "title": "Why You Should Version Your API (v1 vs v2)",
     "slug": "why-you-should-version-your-api-v1-vs-v2",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -602,7 +602,8 @@
       "why",
       "you",
       "should"
-    ]
+    ],
+    "publishedAt": "2026-02-09T14:47:27.642Z"
   },
   {
     "id": "how-to-how-to-handle-timezones-in-financial-apps-utc-only-feb-10",
