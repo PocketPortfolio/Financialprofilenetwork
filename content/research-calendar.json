@@ -561,7 +561,7 @@
     "scheduledTime": "18:00",
     "title": "Research: The True Cost of Vendor Lock-in in Financial Technology",
     "slug": "research-the-true-cost-of-vendor-lock-in-in-financial-technology-2026-02-09",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -569,7 +569,9 @@
       "true",
       "cost",
       "vendor"
-    ]
+    ],
+    "videoId": "5c93eUUcalU",
+    "publishedAt": "2026-02-09T18:44:52.571Z"
   },
   {
     "id": "research-local-first-architecture-performance-vs-control-trade-offs-2026-02-10",
