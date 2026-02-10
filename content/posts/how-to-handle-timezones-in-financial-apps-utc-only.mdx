@@ -1,0 +1,73 @@
+---
+title: How to Handle Timezones in Financial Apps (UTC Only!)
+date: '2026-02-10'
+description: >-
+  Master timezone handling in financial apps by enforcing UTC, ensuring
+  accurate, consistent timestamps across global markets.
+tags:
+  - handle
+  - timezones
+  - financial
+author: Pocket Portfolio Team
+image: /images/blog/how-to-handle-timezones-in-financial-apps-utc-only.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Financial applications operate across global markets, where transactions and data timestamps occur in myriad time zones. This diversity can lead to confusion and inaccuracies in data handling and reporting. The solution? Enforce Universal Time Coordinated (UTC) across your application.
+
+## Direct Solution with Code
+
+Here's a straightforward approach to ensure all datetime operations in your financial app are in UTC:
+
+### Python Example
+
+```python
+from datetime import datetime, timezone
+
+# Convert a naive datetime object to UTC
+naive_datetime = datetime.now()
+utc_datetime = naive_datetime.astimezone(timezone.utc)
+
+print(f"UTC datetime: {utc_datetime.isoformat()}")
+```
+
+### JavaScript Example
+
+```javascript
+// Get the current date and time in UTC
+const utcDate = new Date().toISOString();
+
+console.log(`UTC datetime: ${utcDate}`);
+```
+
+### Operating with Financial Data
+
+When dealing with financial transactions or time series data, always convert timestamps to UTC before processing or storing them:
+
+```python
+# Example: Converting transaction timestamp to UTC
+from datetime import timezone
+
+def convert_to_utc(timestamp):
+    return timestamp.astimezone(timezone.utc)
+
+# Assuming 'transaction_time' is a datetime object with tzinfo
+transaction_time_utc = convert_to_utc(transaction_time)
+```
+
+## Explanation of Key Concepts
+
+- **UTC (Coordinated Universal Time)** is the time standard commonly used across the world. Unlike local time zones, which vary, UTC does not change with Daylight Saving Time.
+- **Naive vs. Aware datetime objects**: In Python, a naive datetime object does not contain any timezone information. In contrast, an aware datetime object includes timezone data, crucial for converting between different time zones accurately.
+
+## Quick Tips
+
+- **Always Store in UTC**: When saving timestamps in databases, ensure they are in UTC. This avoids confusion and errors when performing time-based calculations or aggregations.
+- **Convert to Local Time Only When Necessary**: For display purposes, convert UTC timestamps to the user's local time zone. This conversion should happen as late as possible, preferably in the user interface.
+
+## Gotcha
+
+- **Daylight Saving Time (DST)**: Remember, UTC does not observe DST. However, users in time zones that do might expect data displayed in their local time to adjust accordingly. Ensure your application can handle this expectation without affecting the underlying UTC data.
+
+In summary, handling timezones in financial applications demands a consistent and robust approach. Enforcing UTC for all datetime operations eliminates the complexities of dealing with multiple time zones, ensuring your financial data remains accurate and reliable across global markets.

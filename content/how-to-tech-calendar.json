@@ -611,14 +611,15 @@
     "scheduledTime": "14:00",
     "title": "How to Handle Timezones in Financial Apps (UTC Only!)",
     "slug": "how-to-handle-timezones-in-financial-apps-utc-only",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "handle",
       "timezones",
       "financial"
-    ]
+    ],
+    "publishedAt": "2026-02-10T14:53:56.697Z"
   },
   {
     "id": "how-to-compressing-json-payloads-for-faster-sync-feb-11",
