@@ -627,14 +627,15 @@
     "scheduledTime": "14:00",
     "title": "Compressing JSON Payloads for Faster Sync",
     "slug": "compressing-json-payloads-for-faster-sync",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "json",
       "compressing",
       "payloads"
-    ]
+    ],
+    "publishedAt": "2026-02-11T14:47:05.168Z"
   },
   {
     "id": "how-to-how-to-validate-json-schema-at-runtime-feb-12",
