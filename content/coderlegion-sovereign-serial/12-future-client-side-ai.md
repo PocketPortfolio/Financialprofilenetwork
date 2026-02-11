@@ -1,0 +1,34 @@
+<!-- CoderLegion: title=The Future of Finance is Client-Side AI | date=2026-03-20 | tags=vision, client-side, data-sovereignty, local-first, future -->
+
+# The Future of Finance is Client-Side AI
+
+Many fintech products lock data in their own APIs and dashboards. **Universal Import is a step toward user-owned data:** the user exports, holds, and imports; the app is a tool that runs on their data.
+
+## From SaaS rent-seeking to user-owned systems
+
+Subscription value can sit in analysis, UX, and sync—not in exclusive access to the user's own history. The direction is user-owned data and tooling that interprets it, rather than SaaS that holds it.
+
+## LLMs as interpreters, not oracles
+
+LLMs here don't "decide" what the user's trades are. They suggest a mapping; the user can confirm or correct. The system then runs a deterministic parse. That keeps the model in a **supporting role** (interpretation of messy headers) and keeps control and auditability with the user and the code.
+
+## Pocket Portfolio's long-term vision
+
+- **Evidence-first investing:** Decisions based on the user's own data, not black-box feeds.
+- **Universal data:** "Any broker, bank, or spreadsheet" via one import path.
+- **Sovereignty:** Local-first import, optional Drive sync, no server-side trade storage for import.
+- **Longevity:** CSV and open formats reduce dependency on vendor APIs and keep the product useful for years.
+
+Universal LLM Import (CSV) is the technical expression of that: one pipeline, optional LLM assist, user-confirmed mapping, deterministic parse, and data that stays in the user's hands.
+
+## Industry trends and the long tail
+
+Regulation has pushed some banks and brokers to expose APIs, but coverage is uneven and many smaller brokers still offer only CSV or Excel export. "Export your data" is a standard ask; the format is usually CSV. Products that can interpret any trade-like CSV without a dedicated parser per broker are well positioned: they support the long tail without N integration teams, and they align with sovereignty and longevity. The trend toward local-first and "data you own" reinforces the value of designs like Universal Import—where the app is a tool over the user's data, not a silo that holds it.
+
+**Recap: six design decisions.** (1) Mapping not free-form parse. (2) Heuristic first, LLM optional. (3) Headers plus three rows. (4) Confidence 0.9. (5) No fine-tuning. (6) Drive as dumb storage. These keep the system auditable, privacy-preserving, and maintainable.
+
+---
+
+*Part 12 of the **Sovereign Serial**—the final installment. Adapted from [Universal LLM Import: Building Local-First, Sovereign CSV Ingestion](https://www.pocketportfolio.app/book/universal-llm-import).*
+
+**Read the full [Bestseller Edition](https://www.pocketportfolio.app/book/universal-llm-import) or [Try the app](https://www.pocketportfolio.app).**

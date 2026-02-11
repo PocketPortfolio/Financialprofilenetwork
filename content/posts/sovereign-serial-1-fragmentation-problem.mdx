@@ -1,0 +1,47 @@
+---
+title: 'The Fragmentation Problem: Why Financial Data is Broken'
+date: '2026-02-11'
+description: >-
+  Broker-specific CSV parsers don't scale. Here's how we inverted the model—support any trade-like CSV via schema inference instead of a dedicated parser per broker.
+tags:
+  - csv
+  - local-first
+  - schema-inference
+  - data-sovereignty
+  - universal-import
+author: Pocket Portfolio
+image: /book-assets/assets/chapter-headers/chapter-01-header.svg
+pillar: technical
+series: Sovereign Serial
+---
+
+Every broker has a different CSV format. "Deal Date" vs "Trade Date" vs "Execution Date." "Epic" vs "Symbol" vs "Ticker." Supporting one broker means writing a parser; supporting ten means maintaining ten parsers and hoping none of them break when the broker changes their export. Users with exports from "unsupported" brokers hit a wall. **The fragmentation problem is real.**
+
+We built **Universal LLM Import (CSV)** to invert this. Instead of "we support broker X," the system supports **any** CSV that carries the semantic content of trades: date, ticker, action, quantity, price. Recognition is **schema inference**—figuring out which column means what—not a fixed list of formats.
+
+## Why CSV is still the lingua franca
+
+- **Every broker and bank can export CSV.** No API, no partnership, no approval. The user exports a file and brings it to the app.
+- **CSV is human-readable and tool-friendly.** Excel, scripts, archives, and regulators all understand it.
+- **Users already have these files.** The product doesn't need to "pull" data; it only needs to interpret what the user provides.
+
+So the bet is: **CSV is the sovereign format.** The hard part is interpreting messy, inconsistent headers and locales. That's where structure (heuristics) and semantics (LLM) come in.
+
+## Column mapping, not free-form parsing
+
+The system does **column mapping**, not free-form parsing. Given headers and a few sample rows, it answers: *which column is date? ticker? buy/sell? quantity? price?* LLMs help when headers are non-standard—"Deal Date," "Epic," "No. of shares," "Open Rate"—or when multiple columns could match. They map **user vocabulary** to a fixed **normalized schema**. Parsing itself stays deterministic: numbers, dates, tickers are handled by rule-based, locale-aware functions. Only the mapping step can be probabilistic; the user can confirm or correct it before the final parse.
+
+**Example.** A broker might export:
+
+```text
+Deal Date,Epic,Buy/Sell,No. of shares,Deal Price
+15/01/2024,AAPL,Buy,10,185.50
+```
+
+Schema inference produces a mapping: `date → "Deal Date"`, `ticker → "Epic"`, `action → "Buy/Sell"`, `quantity → "No. of shares"`, `price → "Deal Price"`. The deterministic parser then reads each row using that mapping. The output is a list of normalized trade objects. The pipeline never says "we don't support this broker"; it says "we need to map your columns" and then proceeds.
+
+---
+
+*This is part 1 of the **Sovereign Serial**—a 12-part technical series adapted from the book [Universal LLM Import: Building Local-First, Sovereign CSV Ingestion](/book/universal-llm-import).*
+
+**Read the full [Bestseller Edition](/book/universal-llm-import) or [Try the app](https://www.pocketportfolio.app).**

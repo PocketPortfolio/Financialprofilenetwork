@@ -1,0 +1,30 @@
+<!-- CoderLegion: title=Data Normalization: Solving the Date/Locale Nightmare | date=2026-02-27 | tags=csv, locale, normalization, parsing, i18n -->
+
+# Data Normalization: Solving the Date/Locale Nightmare
+
+`03/04/2024` is March 4 in the US and April 3 in the UK. **Get the locale wrong and you silently corrupt trade dates.** We make locale explicit and use deterministic, locale-aware parsers for every value type.
+
+## Locale-aware date parsing
+
+The importer's `toISO` function is locale-aware: for locales such as `en-GB`, `de-DE`, `fr-FR`, `es-ES` it treats the first number in a dd/mm/yyyy pattern as the day; for `en-US` it treats it as the month. That avoids mis-parsing. Numbers are similarly locale-aware: `toNumber` handles decimal comma vs point (e.g. `1 234,56` vs `1,234.56`) and thousands separators. So the same CSV file can be parsed correctly for different locales; the mapping step is independent of locale, but the parse step takes a `locale` argument (default `'en-US'`).
+
+## Standard fields and deterministic parse
+
+Once mapping is fixed, the parser reads only the mapped columns. Required fields: `date`, `ticker`, `action`, `quantity`, `price`. Optional: `currency`, `fees`. Each value is normalized:
+
+- **Dates:** `toISO(value, locale)` → ISO string. Supports dd/mm and mm/dd; locale determines which is which.
+- **Numbers:** `toNumber(value, locale)` → number. Handles decimal comma/point and thousands separators.
+- **Tickers:** `toTicker(value)` → normalized symbol (e.g. strips exchange suffix "AAPL:US" → "AAPL").
+- **Action:** "Buy"/"Sell" (or synonyms) → BUY/SELL; rows with "DIVIDEND", "INTEREST", "TRANSFER" in the action column are skipped.
+
+No guessing. No model inventing values. The LLM only suggests which header maps to which field; all interpretation is done by the same deterministic code path.
+
+## Edge cases and warnings
+
+Bad date, non-numeric quantity, or skip conditions (e.g. dividend rows) produce warnings and skip that row; they don't crash the run. The parser aggregates warnings and returns them in the result so the user or caller can inspect. Explicit locale from user settings or broker hint keeps behavior predictable and avoids silent mis-parsing.
+
+---
+
+*Part 6 of the **Sovereign Serial**. From [Universal LLM Import](https://www.pocketportfolio.app/book/universal-llm-import).*
+
+**Read the full [Bestseller Edition](https://www.pocketportfolio.app/book/universal-llm-import) or [Try the app](https://www.pocketportfolio.app).**

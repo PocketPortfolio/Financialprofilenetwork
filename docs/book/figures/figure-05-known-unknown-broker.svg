@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 488" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 z" fill="#475569"/></marker>
+  </defs>
+  <title>Figure 5 — Known vs unknown broker decision tree</title>
+  <!-- File Dropped (same width and left as Show trades / Dedicated / Broker-branded for alignment) -->
+  <rect x="160" y="8" width="160" height="40" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="240" y="33" text-anchor="middle">File Dropped</text>
+  <path fill="none" d="M240 48 L240 72" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- Decision 1: Known broker / Smart Import? Diamond aligned to block width 160 (x=160–320) -->
+  <path fill-rule="evenodd" d="M240 82 L160 122 L240 162 L320 122 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+  <text x="240" y="115" text-anchor="middle" font-size="10">Known broker /</text>
+  <text x="240" y="129" text-anchor="middle" font-size="10">Smart Import?</text>
+  <!-- Yes → Dedicated path (label above arrow, like Figure 2) -->
+  <path fill="none" d="M240 162 L240 180" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="252" y="168" font-size="10" fill="#64748b">Yes</text>
+  <rect x="160" y="180" width="160" height="36" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="240" y="202" text-anchor="middle">Show trades</text>
+  <path fill="none" d="M240 216 L240 232" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="160" y="232" width="160" height="36" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="240" y="254" text-anchor="middle">Dedicated adapter</text>
+  <path fill="none" d="M240 268 L240 284" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="160" y="284" width="160" height="36" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="240" y="306" text-anchor="middle">Broker-branded flow</text>
+  <!-- No → Universal path (into top-center of parseUniversal so aligned with arrows below) -->
+  <path fill="none" d="M320 122 L390 122 L390 158" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="324" y="112" font-size="10" fill="#64748b">No</text>
+  <rect x="318" y="158" width="144" height="36" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="390" y="180" text-anchor="middle">parseUniversal</text>
+  <path fill="none" d="M390 194 L390 214" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="318" y="214" width="144" height="48" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="390" y="236" text-anchor="middle">infer mapping: heuristic</text>
+  <text x="390" y="252" text-anchor="middle">then optional LLM</text>
+  <path fill="none" d="M390 262 L390 282" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- Decision 2: Conf. diamond aligned to Universal block width 144 (x=318–462) -->
+  <path fill-rule="evenodd" d="M390 292 L318 320 L390 348 L462 320 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+  <text x="390" y="313" text-anchor="middle" font-size="10">Conf. &#8805; 0.9</text>
+  <text x="390" y="327" text-anchor="middle" font-size="10">and all required?</text>
+  <!-- Yes → genericParse (right, up above diagram, then down into top of block — no line along right of genericParse) -->
+  <path fill="none" d="M462 320 L488 320 L488 30 L390 30 L390 88" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="468" y="308" font-size="10" fill="#64748b">Yes</text>
+  <rect x="318" y="88" width="144" height="36" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="390" y="110" text-anchor="middle">genericParse locally</text>
+  <!-- No → User confirms (label beside path, like Figure 2) -->
+  <path fill="none" d="M318 320 L318 358 L80 358 L80 372" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="298" y="338" font-size="10" fill="#64748b">No</text>
+  <rect x="20" y="372" width="260" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="150" y="397" text-anchor="middle">User confirms or edits mapping</text>
+  <path fill="none" d="M150 416 L150 432" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="20" y="432" width="260" height="44" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1"/>
+  <text x="150" y="457" text-anchor="middle">REQUIRES_MAPPING: show mapping UI</text>
+  <!-- Loop: REQUIRES_MAPPING → User confirms (route left of blocks; final segment up so arrow points to block) -->
+  <path fill="none" d="M20 476 L8 476 L8 424 L150 424 L150 418" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+</svg>

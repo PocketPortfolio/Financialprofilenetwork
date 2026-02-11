@@ -1,0 +1,34 @@
+<!-- CoderLegion: title=Security & Threat Modeling for Local Apps | date=2026-03-13 | tags=security, privacy, gdpr, threat-modeling, local-first -->
+
+# Security & Threat Modeling for Local Apps
+
+Full CSV never touches your server. **Here's what the design guarantees—and how we mitigate the rest.**
+
+## What is never transmitted (by design)
+
+- **Full CSV:** Never sent to the server. Only headers and a small sample (e.g. 3 rows) are sent when LLM is enabled.
+- **Portfolio state:** Lives in the client (and optionally in the user's Drive file). Not stored on your servers for import.
+- **Broker credentials:** Not used; user exports CSV themselves.
+
+## What the LLM sees (when enabled)
+
+- **Sent:** Header names and a few sample rows (e.g. first 3). No account IDs, no full history, no PII beyond what's in those cells.
+- **Not sent:** Full file, filename, user id, session.
+
+For maximum privacy, the LLM path can be disabled and only heuristics + user mapping used.
+
+## Attack surfaces and mitigations
+
+- **Malicious CSV:** Parsing is strict (dates, numbers); no eval or code execution. Large files can be bounded (row limit) to avoid DoS. The parser does not interpret formulas or macros.
+- **Mapping API:** Validate input; authenticate and rate-limit in production. No storage of request/response by design; the API is stateless. If the API is disabled, the client never sends data.
+- **Drive:** OAuth and scope limitation (`drive.file`: only app-created files). Token handling is client-side. The app does not trust Drive with schema or business logic—only with storing and retrieving the blob.
+
+## GDPR and "by design"
+
+No server-side processing of full trade history. User initiates export and upload; no profiling or automated decision-making based on server-held data. Data minimization and purpose limitation are straightforward to document. When LLM is off, even header/sample data need not leave the client.
+
+---
+
+*Part 10 of the **Sovereign Serial**. From [Universal LLM Import](https://www.pocketportfolio.app/book/universal-llm-import).*
+
+**Read the full [Bestseller Edition](https://www.pocketportfolio.app/book/universal-llm-import) or [Try the app](https://www.pocketportfolio.app).**

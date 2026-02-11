@@ -1,0 +1,170 @@
+/**
+ * Book styles — Universal LLM Import
+ * Use with HTML export or reference when building PDF/Word.
+ * See BOOK-DESIGN-SYSTEM.md for full design system.
+ * Operation Bestseller Polish: typography, tables, callouts.
+ */
+
+/* ——— Typography (fits page; smaller for PDF) ——— */
+.book-body {
+  font-family: Georgia, "Times New Roman", Merriweather, serif;
+  font-size: 9.5pt;
+  line-height: 1.4;
+  color: #1e293b;
+}
+.book-body h1,
+.book-body h2 {
+  margin-top: 1.25em;
+  margin-bottom: 0.4em;
+  font-weight: 600;
+  color: #0f172a;
+}
+.book-body h1 { font-size: 1.4em; }
+.book-body h2 { font-size: 1.15em; }
+.book-body h3 { margin-top: 1em; margin-bottom: 0.35em; font-size: 1.05em; }
+.book-body p { margin: 0.5em 0; }
+.book-body code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.88em;
+  background: #f1f5f9;
+  padding: 0.08em 0.28em;
+  border-radius: 3px;
+}
+.book-body pre,
+.book-body pre code { background: #f8fafc; padding: 0.75em; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 0.88em; }
+
+/* ——— Callouts (Note / Warning / Design rationale) ——— */
+.callout,
+.callout-note,
+.callout-warning,
+.callout-rationale {
+  margin: 0.6em 0;
+  padding: 0.5em 0.75em;
+  background: #f8fafc;
+  border-left: 4px solid #94a3b8;
+  border-radius: 0 6px 6px 0;
+  font-size: 1em;
+}
+.callout-warning { border-left-color: #f59e0b; background: #fffbeb; }
+.callout-rationale { border-left-color: #ff6b35; }
+
+/* ——— Premium tables (all markdown pipe tables get this when rendered) ——— */
+.book-body table,
+.table-premium {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.9em;
+}
+.book-body table th,
+.book-body table td,
+.table-premium th,
+.table-premium td {
+  border: 1px solid #e2e8f0;
+  padding: 0.35em 0.5em;
+  text-align: left;
+  vertical-align: top;
+}
+.book-body table thead th,
+.table-premium thead th {
+  background: #f1f5f9;
+  font-weight: 700;
+  border-bottom: 2px solid #1e293b;
+  padding: 0.45em 0.5em;
+}
+.book-body table tbody tr:nth-child(even),
+.table-premium tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+.book-body table code,
+.table-premium code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: #f1f5f9;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* Hero ASCII figure (Figure 1) */
+.figure-hero.ascii-pipeline {
+  margin: 0.75em 0;
+  padding: 0.75em;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+.figure-hero.ascii-pipeline pre,
+.figure-hero.ascii-pipeline code {
+  font-family: ui-monospace, SF Mono, Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  line-height: 1.35;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Reference tables (Figure 6, comparison, standard fields, troubleshooting) */
+.reference-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.9em;
+}
+.reference-table th,
+.reference-table td {
+  border: 1px solid #e2e8f0;
+  padding: 0.35em 0.5em;
+  text-align: left;
+  vertical-align: top;
+}
+.reference-table thead th {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #1e293b;
+}
+.reference-table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+.reference-table.data-boundaries tbody th {
+  background: #f8fafc;
+  font-weight: 600;
+  width: 6em;
+}
+.reference-table code {
+  font-family: ui-monospace, SF Mono, Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  background: #f1f5f9;
+  padding: 0.08em 0.28em;
+  border-radius: 3px;
+}
+
+/* Chapter header visuals (bestseller polish): image follows chapter h2 */
+.book-body h2 + p img,
+.book-body h2 + p {
+  margin: 0 0 0.75em 0;
+  text-align: center;
+}
+.book-body h2 + p img {
+  max-width: 100%;
+  height: auto;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* Figures: consistent spacing; block display so PNGs/diagrams render cleanly in PDF and Word */
+.figure-hero + p,
+img[src*="figure-"],
+img[src*="chapter-"],
+.book-body img[src*="_pdf-figures"] {
+  margin-bottom: 0.5em;
+}
+.book-body img[src*="figure-"],
+.book-body img[src*="_pdf-figures"],
+.book-body img[src*="chapter-"] {
+  display: block;
+  max-width: 92%;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+}

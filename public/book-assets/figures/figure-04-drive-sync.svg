@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 320" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 z" fill="#475569"/></marker>
+  </defs>
+  <title>Figure 4 — Local device &#2194; Drive &#2194; restore</title>
+  <!-- Client -->
+  <rect x="24" y="24" width="168" height="140" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="108" y="48" text-anchor="middle" font-weight="600">Client</text>
+  <rect x="40" y="58" width="136" height="36" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="0.8"/>
+  <text x="108" y="80" text-anchor="middle">IndexedDB / Local State</text>
+  <rect x="40" y="100" width="136" height="44" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="0.8"/>
+  <text x="108" y="118" text-anchor="middle" font-size="10">Export:</text>
+  <text x="108" y="132" text-anchor="middle" font-size="10">pocket_portfolio_db.json</text>
+  <!-- Google Drive (moved right to widen gap: gap = 112px so labels fit) -->
+  <rect x="304" y="24" width="168" height="140" rx="8" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="388" y="48" text-anchor="middle" font-weight="600">Google Drive</text>
+  <rect x="320" y="58" width="136" height="64" rx="6" fill="#fff" stroke="#99f6e4" stroke-width="0.8"/>
+  <text x="388" y="98" text-anchor="middle" font-size="10">(pocket_portfolio_db.json)</text>
+  <!-- Export arrow: gap 192–304, arrow ends at Drive inner edge 320 -->
+  <path fill="none" d="M192 120 L320 120" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- Labels centered in widened gap (center 248) with clear line spacing -->
+  <text x="248" y="88" text-anchor="middle" font-size="10" fill="#64748b">Export &amp; Upload</text>
+  <text x="248" y="108" text-anchor="middle" font-size="10" fill="#64748b">Create/Update</text>
+  <!-- Download -->
+  <path fill="none" d="M320 138 L192 138" stroke="#475569" stroke-width="1.2" stroke-dasharray="6 3" marker-end="url(#arr)"/>
+  <text x="248" y="130" text-anchor="middle" font-size="10" fill="#64748b">Download</text>
+  <!-- Import &amp; Load -->
+  <path fill="none" d="M108 144 L108 212" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="118" y="178" text-anchor="start" font-size="10" fill="#64748b">Import &amp; Load</text>
+  <!-- Note -->
+  <rect x="50" y="228" width="400" height="76" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.8"/>
+  <text x="250" y="262" text-anchor="middle" font-size="11" fill="#1e293b">Drive stores file only. No schema logic. User owns file.</text>
+</svg>

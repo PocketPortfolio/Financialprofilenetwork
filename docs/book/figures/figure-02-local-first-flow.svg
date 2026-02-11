@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 432" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 z" fill="#475569"/></marker>
+  </defs>
+  <!-- Row 1: CSV -> Read -> Parse -> Decision (even spacing) -->
+  <rect x="16" y="16" width="92" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="62" y="43" text-anchor="middle">CSV File</text>
+  <path fill="none" d="M108 38 L128 38" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="128" y="16" width="108" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="182" y="43" text-anchor="middle">Read in Browser</text>
+  <path fill="none" d="M236 38 L256 38" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="256" y="16" width="136" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="324" y="43" text-anchor="middle">Parse Headers + Sample</text>
+  <path fill="none" d="M392 38 L418 38" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- Diamond 1: Conf. >= 0.9? -->
+  <path fill-rule="evenodd" d="M438 38 L466 8 L494 38 L466 68 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+  <text x="466" y="42" text-anchor="middle" font-size="10">Conf. &#8805; 0.9?</text>
+  <!-- Yes: to Heuristic Mapping (arrow goes right, clear of blocks) -->
+  <path fill="none" d="M494 38 L518 38" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="502" y="32" font-size="10" fill="#64748b">Yes</text>
+  <rect x="518" y="16" width="118" height="44" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="577" y="43" text-anchor="middle">Heuristic Mapping</text>
+  <!-- No: down to Diamond 2 (arrow clear of Heuristic block) -->
+  <path fill="none" d="M466 68 L466 88 L396 88 L396 98" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="428" y="86" font-size="10" fill="#64748b">No</text>
+  <!-- Diamond 2: LLM Enabled? -->
+  <path fill-rule="evenodd" d="M396 98 L366 128 L396 158 L426 128 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+  <text x="396" y="124" text-anchor="middle" font-size="10">LLM</text>
+  <text x="396" y="138" text-anchor="middle" font-size="10">Enabled?</text>
+  <!-- LLM Yes: to LLM Returns Mapping (arrow left, then down, outside blocks) -->
+  <path fill="none" d="M366 128 L246 128 L246 168" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="302" y="122" font-size="10" fill="#64748b">Yes</text>
+  <rect x="176" y="168" width="140" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="246" y="194" text-anchor="middle">LLM Returns Mapping</text>
+  <!-- LLM Returns -> POST (arrow right, between blocks) -->
+  <path fill="none" d="M316 190 L336 190" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="336" y="168" width="158" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="415" y="194" text-anchor="middle">POST /api/ai/map-csv</text>
+  <!-- LLM No: route right of POST block (x=500), then down to junction - no penetration -->
+  <path fill="none" d="M426 128 L500 128 L500 248 L360 248" stroke="#475569" stroke-width="1.2"/>
+  <text x="438" y="122" font-size="10" fill="#64748b">No</text>
+  <!-- Heuristic Mapping -> down right side to junction -->
+  <path fill="none" d="M577 60 L577 248 L360 248" stroke="#475569" stroke-width="1.2"/>
+  <!-- LLM path (POST) and LLM Returns: meet at (360,227) above block so line doesn't sit on text -->
+  <path fill="none" d="M415 212 L415 227 L360 227" stroke="#475569" stroke-width="1.2"/>
+  <path fill="none" d="M246 212 L246 227 L360 227" stroke="#475569" stroke-width="1.2"/>
+  <path fill="none" d="M360 227 L360 228" stroke="#475569" stroke-width="1.2"/>
+  <!-- Single arrow from junction into Apply Mapping -->
+  <path fill="none" d="M360 248 L360 228" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <!-- Apply Mapping -->
+  <rect x="290" y="228" width="140" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="360" y="254" text-anchor="middle">Apply Mapping</text>
+  <path fill="none" d="M360 272 L360 296" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="270" y="296" width="180" height="44" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="360" y="322" text-anchor="middle">genericParse full CSV locally</text>
+  <path fill="none" d="M360 340 L360 364" stroke="#475569" stroke-width="1.2" marker-end="url(#arr)"/>
+  <rect x="270" y="364" width="180" height="44" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="360" y="390" text-anchor="middle">NormalizedTrade[]</text>
+</svg>

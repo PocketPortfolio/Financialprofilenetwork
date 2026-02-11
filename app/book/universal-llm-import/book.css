@@ -1,0 +1,270 @@
+/* Book page: figures, callouts, print */
+
+/* Hide floating PDF button during client-side PDF capture so it does not appear in the PDF */
+body.book-pdf-capturing .no-print {
+  visibility: hidden !important;
+  pointer-events: none;
+}
+
+/* Prevent any ancestor from clipping book content (SVG figures must stay visible when scrolled) */
+body:has(.book-page),
+.book-page,
+.book-page .book-body,
+.book-page .book-article {
+  overflow: visible !important;
+}
+
+/* Ensure book images (PNG chapter headers + SVG figures) are visible and sized.
+   Override any prose/typography rules that might collapse or hide them. */
+.book-body .book-article img.book-img,
+.book-body .book-article .book-img,
+.book-page main img.book-img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  min-width: 1px !important;
+  min-height: 1px !important;
+  margin: 1rem auto !important;
+  border-radius: 0.5rem;
+  object-fit: contain;
+  position: relative !important;
+  z-index: 0;
+  backface-visibility: visible;
+}
+/* Prevent any prose parent from clipping or zeroing image container */
+.book-body .book-article :has(> img.book-img),
+.book-body .book-article p:has(.book-img-wrapper) {
+  min-height: 0 !important;
+  overflow: visible !important;
+  display: block !important;
+}
+.book-body .book-article p:has(.book-img-wrapper) {
+  margin: 1rem 0 !important;
+}
+
+/* Force image wrapper and placeholder to be visible (images no longer inside <p>) */
+.book-body .book-article .book-fig-wrapper,
+.book-body .book-article .book-img-wrapper {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 1px;
+  width: 100% !important;
+  overflow: visible !important;
+  content-visibility: visible;
+}
+.book-body .book-article .book-img-wrapper {
+  min-height: 2rem;
+  background: var(--surface);
+  font-size: 1rem;
+}
+/* SVG figures: reserve space so they always render visibly */
+.book-body .book-article .book-img-wrapper.book-img-figure {
+  min-height: 12rem;
+}
+.book-body .book-article .book-img-figure {
+  border: 2px solid var(--border);
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+.book-body .book-article .book-img-figure img.book-img {
+  min-height: 8rem;
+  object-fit: contain;
+}
+/* Inline SVG figures (embedded via dangerouslySetInnerHTML) must size to container. */
+.book-body .book-article .book-inline-svg {
+  display: block !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  min-height: 6rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: var(--surface) !important;
+  border-radius: 0.5rem;
+}
+.book-body .book-article .book-inline-svg svg {
+  display: block !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 6rem !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.book-body .book-article img.book-img {
+  vertical-align: top;
+}
+/* Debug: show figure wrapper so we can confirm layout (remove when confirmed) */
+.book-body .book-article .book-fig-wrapper {
+  outline: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+.book-body .book-article .book-img-placeholder {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 8rem;
+  overflow: visible !important;
+  color: var(--text-secondary);
+}
+.book-body .book-article .book-img-placeholder span {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: inherit;
+  min-width: min-content;
+  backface-visibility: visible;
+  font-family: inherit !important;
+}
+
+.book-body .figure-hero.ascii-pipeline pre {
+  background: var(--surface-elevated);
+  color: var(--text);
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.book-body .callout,
+.book-body .callout-note,
+.book-body .callout-rationale,
+.book-body .callout-warning {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  border-left: 4px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.book-body .callout-warning {
+  border-left-color: var(--primary);
+  background: var(--surface-elevated);
+}
+
+.book-body .callout-rationale {
+  border-left-color: var(--primary);
+}
+
+/* Publisher-quality: tables — visible grid and separators (book-standard) */
+.book-body .book-article .book-table,
+.book-body .book-article table {
+  font-size: 0.9375rem;
+  border: 1px solid var(--border);
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.book-body .book-article .book-table th,
+.book-body .book-article .book-table td,
+.book-body .book-article table th,
+.book-body .book-article table td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  vertical-align: top;
+  text-align: left;
+}
+.book-body .book-article .book-table thead th,
+.book-body .book-article table thead th {
+  background: var(--surface-elevated);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.book-body .book-article .book-table tbody tr:nth-child(even),
+.book-body .book-article table tbody tr:nth-child(even) {
+  background: var(--surface);
+}
+.book-body .book-article .book-table th[scope="row"] {
+  white-space: normal;
+  max-width: 12em;
+  font-weight: 600;
+  color: var(--text);
+}
+.book-body .book-article .book-table tbody td:first-child,
+.book-body .book-article table tbody td:first-child {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Appendices and back matter: heading clarity */
+.book-body .book-article h2 {
+  scroll-margin-top: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+/* Lists: spacing and readability */
+.book-body .book-article ul,
+.book-body .book-article ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+.book-body .book-article li {
+  margin: 0.35rem 0;
+}
+.book-body .book-article li > p {
+  margin: 0.25rem 0;
+}
+.book-body .book-article ul ul,
+.book-body .book-article ol ol,
+.book-body .book-article ul ol,
+.book-body .book-article ol ul {
+  margin: 0.35rem 0;
+}
+
+/* Table of Contents: clean alignment for print and screen */
+.book-body .book-article h2:first-of-type + ol {
+  list-style-position: outside;
+  padding-left: 2em;
+}
+.book-body .book-article h2:first-of-type + ol li {
+  margin-bottom: 0.25rem;
+  padding-left: 0;
+}
+.book-body .book-article h2:first-of-type + ol li ul {
+  list-style: none;
+  padding-left: 1.5em;
+  margin-top: 0.15rem;
+}
+
+@media print {
+  .book-page .no-print {
+    display: none !important;
+  }
+  /* Page 1: hide only the duplicate book title (first h1) and its subtitle; leaves "Introduction", "Part I", etc. visible */
+  .book-body .book-article h1:first-of-type,
+  .book-body .book-article h1:first-of-type + p {
+    display: none !important;
+  }
+  .book-hero {
+    break-after: avoid;
+  }
+  .book-body h2 {
+    break-after: page;
+    page-break-after: page;
+  }
+  .book-body h2:first-of-type {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .book-body .book-article .book-table,
+  .book-body .book-article table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .book-body .book-article .book-table + * {
+    break-before: auto;
+  }
+  .book-body .book-article pre,
+  .book-body .book-article .figure-hero {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .book-page {
+    background: white !important;
+  }
+}
