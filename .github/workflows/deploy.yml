@@ -78,12 +78,11 @@ jobs:
           npm run test || echo "⚠️ Test failures (non-blocking)"
         continue-on-error: true
       
-      # Non-blocking: Vercel builds from repo on deploy; avoid Actions build failure blocking deploy
+      # Block deploy if build fails so we never push a broken build to prod
       - name: Build
         run: npm run build
         env:
           NODE_ENV: production
-        continue-on-error: true
       
       - name: Check commit message
         id: commit-check

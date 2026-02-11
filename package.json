@@ -149,6 +149,7 @@
     "react-dom": "^18.3.1",
     "react-email": "^5.2.5",
     "react-is": "^18.3.1",
+    "react-markdown": "^9.0.1",
     "react-plaid-link": "^4.1.1",
     "recharts": "^3.5.1",
     "remark-gfm": "^4.0.0",
