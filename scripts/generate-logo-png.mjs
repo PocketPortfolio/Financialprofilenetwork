@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Generates public/brand/pp-monogram.png from solid brand color (dark blue #0b1220).
- * Use this when SVG/data-URI logo doesn't render in email clients (e.g. Outlook).
- * For a proper "P" logo, run scripts/svg-to-png-puppeteer.mjs with Chrome, or export from design tool.
+ * Generates public/brand/pp-monogram.png for email header.
+ * Baked background: #0d2818 (dark green) so contrast exists even when clients strip CSS.
+ * White "mark" in center so logo is visible regardless of container background.
  */
 import fs from 'fs';
 import path from 'path';
@@ -16,15 +16,29 @@ const outPath = path.join(__dirname, '..', 'public', 'brand', 'pp-monogram.png')
 
 const W = 80;
 const H = 80;
-// Brand dark blue from SVG: #0b1220
-const R = 11, G = 18, B = 32, A = 255;
+// Baked background: header green #0d2818 (R=13, G=40, B=24)
+const BG_R = 13, BG_G = 40, BG_B = 24;
+// White mark in center (simple rect; replace with proper "P" from design tool if needed)
+const WHITE = 255;
+const INSET = 20; // white rect from 20..60 x 20..60
 
 const data = Buffer.alloc(W * H * 4);
-for (let i = 0; i < W * H; i++) {
-  data[i * 4 + 0] = R;
-  data[i * 4 + 1] = G;
-  data[i * 4 + 2] = B;
-  data[i * 4 + 3] = A;
+for (let y = 0; y < H; y++) {
+  for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    const inRect = x >= INSET && x < W - INSET && y >= INSET && y < H - INSET;
+    const v = (x + y) % 2; // slight variation so PNG doesn't collapse to ~200 bytes
+    if (inRect) {
+      data[i + 0] = Math.max(0, WHITE - v);
+      data[i + 1] = Math.max(0, WHITE - v);
+      data[i + 2] = Math.max(0, WHITE - v);
+    } else {
+      data[i + 0] = Math.min(255, BG_R + v);
+      data[i + 1] = Math.min(255, BG_G + v);
+      data[i + 2] = Math.min(255, BG_B + v);
+    }
+    data[i + 3] = 255;
+  }
 }
 
 const png = { width: W, height: H, data };

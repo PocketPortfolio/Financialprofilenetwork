@@ -12,8 +12,8 @@ const SPONSOR_URL = appendUtm('/sponsor');
 const IMPORT_URL = appendUtm('/import');
 const BOOK_URL = appendUtm('/book/universal-llm-import');
 
-/** Logo URL: must be publicly reachable (deploy so /brand/pp-monogram.png is live). Resend preview and strict clients need a URL; cid: often doesn't render in preview. */
-const LOGO_URL = 'https://www.pocketportfolio.app/brand/pp-monogram.png';
+/** Hosted URL only. v=2 busts Gmail cache. Asset must have #0d2818 baked in (see generate-logo-png.mjs). */
+const LOGO_URL = `${BASE_URL}/brand/pp-monogram.png?v=2`;
 /** Pocket Portfolio orange CTA (matches site Launch App / accent-warm). */
 const BRAND_CTA = '#D97706';
 const BRAND_LINK = '#B45309';
@@ -33,7 +33,7 @@ function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): str
         <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
           <tr>
             <td style="vertical-align:middle;">
-              <img src="${LOGO_URL}" alt="Pocket Portfolio" width="40" height="40" style="display:block;width:40px;height:40px;" />
+              <img src="${LOGO_URL}" alt="Pocket Portfolio" width="40" height="40" style="display:block;width:40px;height:40px;border:0;outline:none;text-decoration:none;" />
             </td>
             <td style="vertical-align:middle;padding-left:12px;">
               <span style="font-size:18px;font-weight:700;color:#ffffff;">Pocket Portfolio</span>
