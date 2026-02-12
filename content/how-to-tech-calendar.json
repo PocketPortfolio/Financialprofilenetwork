@@ -643,14 +643,15 @@
     "scheduledTime": "14:00",
     "title": "How to Validate JSON Schema at Runtime",
     "slug": "how-to-validate-json-schema-at-runtime",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "json",
       "validate",
       "schema"
-    ]
+    ],
+    "publishedAt": "2026-02-12T14:42:24.560Z"
   },
   {
     "id": "how-to-the-difference-between-put-and-patch-explained-simply-feb-13",

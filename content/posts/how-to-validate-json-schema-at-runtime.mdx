@@ -1,0 +1,73 @@
+---
+title: How to Validate JSON Schema at Runtime
+date: '2026-02-12'
+description: >-
+  Learn to validate JSON schema at runtime efficiently with this hands-on guide,
+  featuring direct code examples and key concepts.
+tags:
+  - json
+  - validate
+  - schema
+author: Pocket Portfolio Team
+image: /images/blog/how-to-validate-json-schema-at-runtime.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Ensuring the integrity and structure of JSON data at runtime can be crucial, especially when dealing with dynamic and critical data systems. Incorrect or malformed JSON data can lead to errors, data corruption, or even security vulnerabilities. Here's a concise guide on how to validate JSON schema at runtime effectively.
+
+### Direct Solution with Code
+
+To validate JSON schema at runtime, you'll need a JSON schema validator. One popular choice is AJV (Another JSON Schema Validator), which is fast, standards-compliant, and supports JSON Schema drafts 04, 06, and 07.
+
+First, install AJV:
+
+```bash
+npm install ajv
+```
+
+Then, you can use the following code to validate your JSON data against a schema:
+
+```javascript
+const Ajv = require("ajv");
+const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
+
+const schema = {
+  type: "object",
+  properties: {
+    name: {type: "string"},
+    age: {type: "number"},
+    isMember: {type: "boolean"}
+  },
+  required: ["name", "age", "isMember"],
+  additionalProperties: false
+};
+
+const validate = ajv.compile(schema);
+
+const data = {
+  name: "John Doe",
+  age: 30,
+  isMember: true
+};
+
+const valid = validate(data);
+if (!valid) console.log(validate.errors);
+else console.log("JSON is valid!");
+```
+
+### Explanation of Key Concepts
+
+**AJV** works by compiling a JSON schema into a validation function and then using that function to validate your data objects. The `compile` method returns a function that takes the data as an argument and returns a boolean indicating whether the data is valid according to the schema.
+
+The schema in the example specifies that a valid object must have a string `name`, a number `age`, and a boolean `isMember`. It must not have any properties other than these. If the data does not conform to this schema, `validate.errors` will contain an array of error messages indicating why the data is invalid.
+
+### Quick Tip
+
+When dealing with large or complex JSON schemas, consider splitting them into smaller, reusable definitions using `$ref`. This not only makes your schemas easier to manage but also improves readability and maintainability.
+
+### Gotcha
+
+Remember that using runtime validation can impact performance, especially for high-throughput applications. Always measure and optimize your validation logic to ensure it does not become a bottleneck.
+
+Validating JSON schema at runtime is a powerful technique for ensuring data integrity and adherence to expected formats. With tools like AJV and a solid understanding of JSON schemas, developers can easily incorporate schema validation into their applications, enhancing reliability and data quality.
