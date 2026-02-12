@@ -364,7 +364,7 @@
     "date": "2026-02-12",
     "title": "The Security Model of Local-First Finance",
     "slug": "the-security-model-of-local-first-finance",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -374,7 +374,8 @@
       "security"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-02-12T09:43:55.264Z"
   },
   {
     "id": "week-7-post-1",
