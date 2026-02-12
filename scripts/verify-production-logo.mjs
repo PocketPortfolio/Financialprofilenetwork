@@ -3,7 +3,7 @@
  * Run after deploy: node scripts/verify-production-logo.mjs
  * Usage: npm run verify:logo-url
  */
-const LOGO_URL = 'https://www.pocketportfolio.app/brand/pp-monogram.png?v=4';
+const LOGO_URL = 'https://www.pocketportfolio.app/brand/pp-monogram.png';
 
 async function main() {
   const res = await fetch(LOGO_URL, { method: 'HEAD' });

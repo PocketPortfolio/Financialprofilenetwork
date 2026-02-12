@@ -13,8 +13,8 @@ const SPONSOR_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/sponsor');
 const IMPORT_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/import');
 const BOOK_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/book/universal-llm-import');
 
-/** Hosted URL only; always production origin so logo loads when email is opened (test can run from localhost). */
-const LOGO_URL = `${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png?v=4`;
+/** Hosted URL only; no query string to avoid quoted-printable line break in middle of URL (fixes iPhone etc). */
+const LOGO_URL = `${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png`;
 /** Pocket Portfolio orange CTA (matches site Launch App / accent-warm). */
 const BRAND_CTA = '#D97706';
 const BRAND_LINK = '#B45309';
@@ -34,7 +34,7 @@ function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): str
         <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
           <tr>
             <td style="vertical-align:middle;">
-              <img src="${LOGO_URL}" alt="Pocket Portfolio" width="40" height="40" style="display:block;width:40px;height:40px;border:0;outline:none;text-decoration:none;" />
+<img src="${LOGO_URL}" alt="Pocket Portfolio" width="40" height="40" style="display:block;width:40px;height:40px;border:0;outline:none;text-decoration:none;" />
             </td>
             <td style="vertical-align:middle;padding-left:12px;">
               <span style="font-size:18px;font-weight:700;color:#ffffff;">Pocket Portfolio</span>

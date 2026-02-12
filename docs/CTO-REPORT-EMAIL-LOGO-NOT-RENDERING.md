@@ -149,8 +149,8 @@ So we are sending the intended payloads; the failure appears to be downstream (R
 **Post-deploy:**
 
 1. **Verify logo URL:** Run `npm run verify:logo-url` or open in a browser:  
-   `https://www.pocketportfolio.app/brand/pp-monogram.png?v=4`  
-   Expect: HTTP 200, image shows dark green with white "P" monogram.
+   `https://www.pocketportfolio.app/brand/pp-monogram.png`  
+   Expect: HTTP 200, image shows dark green with white "P" monogram. (No query string—avoids quoted-printable line break in URL that broke iPhone etc.)
 2. **Send test email:** `npm run stack-reveal:send-test -- your@email.com`  
    In the inbox, enable "Display images" if needed, then confirm the header logo loads.
 
