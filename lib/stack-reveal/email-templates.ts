@@ -3,17 +3,18 @@
  * Educational value first, sales second. Portal of trust.
  */
 
-import { BASE_URL, appendUtm } from './constants';
+import { EMAIL_ASSET_ORIGIN, appendUtmWithOrigin } from './constants';
 import { createUnsubscribeToken } from './unsubscribe-token';
 import type { StackRevealWeek } from './types';
 
-const PORTAL_URL = appendUtm('/stack-reveal');
-const SPONSOR_URL = appendUtm('/sponsor');
-const IMPORT_URL = appendUtm('/import');
-const BOOK_URL = appendUtm('/book/universal-llm-import');
+/** All email links use production origin so they work when tests run from localhost. */
+const PORTAL_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/stack-reveal');
+const SPONSOR_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/sponsor');
+const IMPORT_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/import');
+const BOOK_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/book/universal-llm-import');
 
-/** Hosted URL only. v=2 busts Gmail cache. Asset must have #0d2818 baked in (see generate-logo-png.mjs). */
-const LOGO_URL = `${BASE_URL}/brand/pp-monogram.png?v=2`;
+/** Hosted URL only; always production origin so logo loads when email is opened (test can run from localhost). */
+const LOGO_URL = `${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png?v=4`;
 /** Pocket Portfolio orange CTA (matches site Launch App / accent-warm). */
 const BRAND_CTA = '#D97706';
 const BRAND_LINK = '#B45309';
@@ -53,7 +54,7 @@ function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): str
         <p style="margin:0 0 8px;font-size:12px;color:#888;">
           <a href="${unsubscribeUrl}" style="color:${BRAND_LINK};text-decoration:underline;">Unsubscribe</a> &middot;
           <a href="${PORTAL_URL}" style="color:${BRAND_LINK};text-decoration:underline;">Portal</a> &middot;
-          <a href="${BASE_URL}" style="color:${BRAND_LINK};text-decoration:underline;">Home</a>
+          <a href="${EMAIL_ASSET_ORIGIN}" style="color:${BRAND_LINK};text-decoration:underline;">Home</a>
         </p>
         <p style="margin:0;font-size:11px;color:#9ca3af;">Pocket Portfolio &middot; www.pocketportfolio.app</p>
       </div>
@@ -82,7 +83,7 @@ export function buildWeek1Html(opts: {
   hasUploadedCsv?: boolean;
   unsubscribeUrl: string;
 }): string {
-  const ctaUrl = opts.hasUploadedCsv ? appendUtm('/sponsor?ref=stack_reveal') : appendUtm('/import');
+  const ctaUrl = opts.hasUploadedCsv ? appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/sponsor?ref=stack_reveal') : appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/import');
   const ctaText = opts.hasUploadedCsv ? 'Unlock unlimited history' : 'Get started with Universal Import';
   const inner = `
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Every broker exports a different CSV. "Deal Date" vs "Trade Date." "Epic" vs "Symbol." Supporting one broker meant maintaining one more parser—and hoping it didn't break.</p>
@@ -146,7 +147,7 @@ export function buildHtmlForWeek(
     isGoogleUser?: boolean;
   }
 ): string {
-  const unsubscribeUrl = `${BASE_URL}/api/unsubscribe?token=${createUnsubscribeToken(opts.uid)}`;
+  const unsubscribeUrl = `${EMAIL_ASSET_ORIGIN}/api/unsubscribe?token=${createUnsubscribeToken(opts.uid)}`;
   switch (week) {
     case 1: return buildWeek1Html({ greeting: opts.greeting, hasUploadedCsv: opts.hasUploadedCsv, unsubscribeUrl });
     case 2: return buildWeek2Html({ greeting: opts.greeting, unsubscribeUrl });
@@ -167,5 +168,5 @@ export function getGreeting(displayName: string | null, firstName: string | null
 
 /** Unsubscribe URL for a user (for List-Unsubscribe header). */
 export function getUnsubscribeUrl(uid: string): string {
-  return `${BASE_URL}/api/unsubscribe?token=${createUnsubscribeToken(uid)}`;
+  return `${EMAIL_ASSET_ORIGIN}/api/unsubscribe?token=${createUnsubscribeToken(uid)}`;
 }

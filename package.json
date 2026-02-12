@@ -40,6 +40,7 @@
     "stack-reveal:send-test": "ts-node --project scripts/tsconfig.json scripts/send-stack-reveal-test-emails.ts",
     "grant-founders-club": "ts-node --project scripts/tsconfig.json scripts/grant-founders-club.ts",
     "verify-env": "ts-node --project scripts/tsconfig.json scripts/verify-env-setup.ts",
+    "verify:logo-url": "node scripts/verify-production-logo.mjs",
     "debug-env": "ts-node --project scripts/tsconfig.json scripts/debug-env.ts",
     "extract-firebase": "ts-node --project scripts/tsconfig.json scripts/extract-firebase-env.ts",
     "generate-blog-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-blog-calendar.ts",
@@ -57,6 +58,7 @@
     "import-external-content": "ts-node --project scripts/tsconfig.json scripts/import-external-content.ts",
     "fix-imported-posts": "ts-node --project scripts/tsconfig.json scripts/fix-imported-posts.ts",
     "fix-tables": "ts-node --project scripts/tsconfig.json scripts/fix-tables.ts",
+    "generate:logo-png": "node scripts/svg-to-png-resvg.mjs",
     "generate-post-images": "ts-node --project scripts/tsconfig.json scripts/generate-post-images.ts",
     "upload-gif": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-vercel-blob.ts",
     "upload-gif-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-cloudinary.ts",
@@ -166,6 +168,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",

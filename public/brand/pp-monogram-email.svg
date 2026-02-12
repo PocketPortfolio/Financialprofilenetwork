@@ -1,0 +1,8 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Email-safe: solid #0d2818 background, white mark (no gradients). -->
+  <rect width="256" height="256" rx="56" fill="#0d2818"/>
+  <g fill="#ffffff">
+    <path d="M62 78a20 20 0 0 1 20-20h52c28 0 44 16 44 40s-16 40-44 40H122v40a20 20 0 0 1-20 20H82a20 20 0 0 1-20-20V78zm40 20v20h32c8 0 12-4 12-10s-4-10-12-10h-32z"/>
+    <rect x="144" y="138" width="36" height="36" rx="8" opacity=".9"/>
+  </g>
+</svg>
