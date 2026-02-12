@@ -618,7 +618,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Encryption at Rest vs Transit - Performance Comparison",
     "slug": "research-encryption-at-rest-vs-transit-performance-comparison-2026-02-12",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -627,7 +627,9 @@
       "encryption",
       "rest",
       "transit"
-    ]
+    ],
+    "videoId": "e5MdzyyAPlI",
+    "publishedAt": "2026-02-12T18:46:45.425Z"
   },
   {
     "id": "research-data-ownership-models-centralized-vs-decentralized-2026-02-13",
