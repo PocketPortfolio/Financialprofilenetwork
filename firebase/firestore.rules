@@ -132,6 +132,11 @@ service cloud.firestore {
       allow read, write: if false; // Only server can access via Admin SDK
     }
     
+    // Users (marketing/cohort): Server-side only - cron & unsubscribe API
+    match /users/{userId} {
+      allow read, write: if false; // Only server can access via Admin SDK
+    }
+    
     // Tool Usage Tracking: anyone can write (for analytics), only admins can read
     match /toolUsage/{eventId} {
       allow create: if true; // Allow anonymous tracking
