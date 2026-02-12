@@ -191,7 +191,7 @@
     "eslint-plugin-security": "^3.0.1",
     "gray-matter": "^4.0.3",
     "jsdom": "^25.0.0",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "openai": "^6.15.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.3.3",
