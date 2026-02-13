@@ -23,7 +23,8 @@ const BOOK_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/book/universal-llm-im
 const BRAND_CTA = '#D97706';
 const BRAND_LINK = '#B45309';
 
-function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): string {
+function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string, signOff?: string): string {
+  const closing = signOff ?? 'Best,<br>The Pocket Portfolio team';
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -49,7 +50,7 @@ function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): str
       <div style="padding:32px 28px;">
         <p style="margin:0 0 20px;font-size:17px;line-height:1.5;color:#1a1a1a;">${greeting}</p>
         ${inner}
-        <p style="margin:24px 0 0;font-size:14px;color:#666;line-height:1.5;">Best,<br>The Pocket Portfolio team</p>
+        <p style="margin:24px 0 0;font-size:14px;color:#666;line-height:1.5;">${closing}</p>
       </div>
       <div style="padding:20px 28px;background:#fafafa;border-top:1px solid #eee;">
         <p style="margin:0 0 8px;font-size:12px;color:#888;">
@@ -81,6 +82,22 @@ export function getSubject(week: StackRevealWeek): string {
     case 4: return 'Your stack, your rules';
     default: return 'Pocket Portfolio: one more thing';
   }
+}
+
+/** Week 0: Welcome email (immediate post-signup). */
+export const WELCOME_SUBJECT = 'Welcome to Sovereign Finance (and what comes next)';
+export const WELCOME_PREHEADER = 'You own your data. Here is how we protect it.';
+
+export function buildWelcomeEmailHtml(opts: { greeting: string; unsubscribeUrl: string }): string {
+  const inner = `
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">You've just taken the first step toward financial sovereignty.</p>
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Most aggregators treat your data as their product. At Pocket Portfolio, <strong>you are the server.</strong> Your data stays on your device, encrypted and owned by you.</p>
+    <p style="margin:0 0 8px;font-size:16px;line-height:1.6;color:#374151;"><strong>What happens next?</strong></p>
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Starting this coming Monday, we will send you a 4-part series called <strong>"Stack Reveal."</strong> It's a technical deep dive into how we built a local-first engine that processes millions of rows without a backend.</p>
+    <p style="margin:0 0 8px;font-size:16px;line-height:1.6;color:#374151;"><strong>Can't wait until Monday?</strong></p>
+    ${ctaButton(IMPORT_URL, 'Import Your First CSV')}
+  `;
+  return wrapEmail(inner, opts.greeting, opts.unsubscribeUrl, 'Welcome to the club.<br>— The Pocket Portfolio Team');
 }
 
 export function buildWeek1Html(opts: {

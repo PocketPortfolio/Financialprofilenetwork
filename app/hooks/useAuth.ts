@@ -35,6 +35,13 @@ export function useAuth() {
           console.error('Failed to track SEO signup conversion:', err);
         });
       }
+      // Trigger Welcome Email (Week 0) — idempotent; API sends at most once per UID
+      user.getIdToken().then((token) => {
+        fetch('/api/welcome-email', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch((err) => console.error('Welcome email trigger failed:', err));
+      }).catch((err) => console.error('Welcome email: getIdToken failed:', err));
     }
     
     previousUserRef.current = user;

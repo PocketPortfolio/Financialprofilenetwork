@@ -38,6 +38,7 @@
     "set-admin": "ts-node --project scripts/tsconfig.json scripts/set-admin-claim.ts",
     "list-google-signups": "ts-node --project scripts/tsconfig.json scripts/list-google-signups-since.ts",
     "stack-reveal:send-test": "ts-node --project scripts/tsconfig.json scripts/send-stack-reveal-test-emails.ts",
+    "welcome-email:send-test": "ts-node --project scripts/tsconfig.json scripts/send-welcome-test-email.ts",
     "grant-founders-club": "ts-node --project scripts/tsconfig.json scripts/grant-founders-club.ts",
     "verify-env": "ts-node --project scripts/tsconfig.json scripts/verify-env-setup.ts",
     "verify:logo-url": "node scripts/verify-production-logo.mjs",
