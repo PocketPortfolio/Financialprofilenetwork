@@ -659,14 +659,15 @@
     "scheduledTime": "14:00",
     "title": "The Difference Between PUT and PATCH (Explained Simply)",
     "slug": "the-difference-between-put-and-patch-explained-simply",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "difference",
       "between",
       "put"
-    ]
+    ],
+    "publishedAt": "2026-02-13T14:35:57.420Z"
   },
   {
     "id": "how-to-valentine-s-special-how-to-fall-in-love-with-typescript-enums-feb-14",

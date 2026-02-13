@@ -1,0 +1,63 @@
+---
+title: The Difference Between PUT and PATCH (Explained Simply)
+date: '2026-02-13'
+description: >-
+  Understand the key difference between PUT and PATCH methods in API design,
+  simplified with code examples.
+tags:
+  - difference
+  - between
+  - put
+author: Pocket Portfolio Team
+image: /images/blog/the-difference-between-put-and-patch-explained-simply.png
+pillar: technical
+category: how-to-in-tech
+---
+
+When working with RESTful APIs, it's crucial to understand the difference between PUT and PATCH methods to manipulate resource states correctly. Both are used for updating resources, but they operate differently.
+
+## Direct Solution with Code
+
+### PUT Example
+
+```http
+PUT /user/123 HTTP/1.1
+Host: example.com
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com"
+}
+```
+
+### PATCH Example
+
+```http
+PATCH /user/123 HTTP/1.1
+Host: example.com
+Content-Type: application/json
+
+{
+  "email": "john.doe@newdomain.com"
+}
+```
+
+## Explanation of Key Concepts
+
+**PUT** is used to update a resource entirely. It replaces the target resource with the payload provided. If fields are omitted in the request, it is assumed that those fields are not part of the resource anymore, and thus they may be cleared or set to default by the server.
+
+**PATCH**, on the other hand, is used for partial updates. It modifies only the fields specified in the request, leaving the rest of the resource untouched. This method is particularly useful for large resources where only a small subset needs updating, reducing the amount of data sent over the network.
+
+### Idempotency
+A key concept to understand in this context is *idempotency*. PUT is idempotent, meaning that multiple identical requests should have the same effect as a single request. PATCH can be idempotent, but it's not a requirement. The outcome of a PATCH request depends on the current state of the resource, which might result in different effects with subsequent identical requests.
+
+## Quick Tip
+
+Always use PUT when you have the complete data set of the resource and want to replace it entirely. Use PATCH for partial updates, especially when dealing with large data sets or when network bandwidth is a concern.
+
+### Gotcha
+
+Remember that not all APIs support PATCH, and its behavior can be less predictable compared to PUT due to its non-idempotent nature. Always check the API documentation to understand how PATCH requests are handled.
+
+In summary, the difference between PUT and PATCH lies in their approach to updating resources: PUT replaces the entire resource, while PATCH only updates specified parts of it. Understanding this distinction is crucial for effective API interaction and data manipulation.
