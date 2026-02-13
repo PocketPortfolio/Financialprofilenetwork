@@ -60,22 +60,37 @@ export async function POST(request: NextRequest) {
   const db = getDb();
   const usersRef = db.collection('users');
   const docRef = usersRef.doc(uid);
-  const snap = await docRef.get();
 
-  if (snap.exists) {
-    const data = snap.data();
-    if (data?.welcomeEmailSentAt) {
+  // Claim the send in a transaction so concurrent requests only result in one send
+  const ALREADY_SENT = 'WELCOME_EMAIL_ALREADY_SENT';
+  let claimed = false;
+  try {
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(docRef);
+      const data = snap.data();
+      if (data?.welcomeEmailSentAt) {
+        throw new Error(ALREADY_SENT);
+      }
+      tx.set(docRef, {
+        welcomeEmailSentAt: Timestamp.now(),
+        email,
+        displayName,
+        createdAt: snap.exists ? undefined : Timestamp.now(),
+        marketingOptIn: true,
+        stackRevealWeek: 0,
+        authProvider: 'google.com',
+      }, { merge: true });
+      claimed = true;
+    });
+  } catch (e: unknown) {
+    if (e instanceof Error && e.message === ALREADY_SENT) {
       return NextResponse.json({ sent: false, alreadySent: true });
     }
-  } else {
-    await docRef.set({
-      email,
-      displayName,
-      createdAt: Timestamp.now(),
-      marketingOptIn: true,
-      stackRevealWeek: 0,
-      authProvider: 'google.com',
-    });
+    throw e;
+  }
+
+  if (!claimed) {
+    return NextResponse.json({ sent: false, alreadySent: true });
   }
 
   const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
@@ -88,18 +103,6 @@ export async function POST(request: NextRequest) {
     console.error('[Welcome Email] Send failed:', result.error);
     return NextResponse.json({ error: result.error }, { status: 500 });
   }
-
-  await docRef.set(
-    {
-      welcomeEmailSentAt: Timestamp.now(),
-      email,
-      displayName,
-      marketingOptIn: true,
-      stackRevealWeek: 0,
-      authProvider: 'google.com',
-    },
-    { merge: true }
-  );
 
   return NextResponse.json({ sent: true });
 }

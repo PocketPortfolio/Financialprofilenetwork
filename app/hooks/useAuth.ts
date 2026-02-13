@@ -22,7 +22,9 @@ export function useAuth() {
 
   // Track previous auth state to detect signups
   const previousUserRef = useRef<User | null>(null);
-  
+  // Ensure we only trigger welcome-email API once per session (avoids duplicate when onAuthStateChanged fires twice)
+  const welcomeEmailTriggeredRef = useRef(false);
+
   // Use stable callback to prevent infinite loops
   const handleAuthStateChange = useCallback((user: User | null) => {
     // Detect new signup: user was null, now has a user
@@ -35,15 +37,18 @@ export function useAuth() {
           console.error('Failed to track SEO signup conversion:', err);
         });
       }
-      // Trigger Welcome Email (Week 0) — idempotent; API sends at most once per UID
-      user.getIdToken().then((token) => {
-        fetch('/api/welcome-email', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-        }).catch((err) => console.error('Welcome email trigger failed:', err));
-      }).catch((err) => console.error('Welcome email: getIdToken failed:', err));
+      // Trigger Welcome Email (Week 0) at most once per session (sync guard so double onAuthStateChange doesn't double-send)
+      if (!welcomeEmailTriggeredRef.current) {
+        welcomeEmailTriggeredRef.current = true;
+        user.getIdToken().then((token) => {
+          fetch('/api/welcome-email', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch((err) => console.error('Welcome email trigger failed:', err));
+        }).catch((err) => console.error('Welcome email: getIdToken failed:', err));
+      }
     }
-    
+
     previousUserRef.current = user;
     setUser(user);
     setLoading(false);
