@@ -637,7 +637,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Data Ownership Models - Centralized vs Decentralized",
     "slug": "research-data-ownership-models-centralized-vs-decentralized-2026-02-13",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -645,7 +645,9 @@
       "data",
       "ownership",
       "models"
-    ]
+    ],
+    "videoId": "MpQsANnmdn8",
+    "publishedAt": "2026-02-13T18:32:49.049Z"
   },
   {
     "id": "research-privacy-preserving-analytics-performance-benchmarks-2026-02-14",
