@@ -1,11 +1,17 @@
 /**
  * Stack Reveal: premium HTML email templates (best-in-class design)
  * Educational value first, sales second. Portal of trust.
+ *
+ * Logo: placeholder is replaced at send time with a hosted URL (default: Cloudinary
+ * CDN so Gmail's image proxy gets it reliably; or EMAIL_LOGO_URL if set).
  */
 
 import { EMAIL_ASSET_ORIGIN, appendUtmWithOrigin } from './constants';
 import { createUnsubscribeToken } from './unsubscribe-token';
 import type { StackRevealWeek } from './types';
+
+/** Placeholder in HTML; resend.ts replaces with hosted logo URL (api/email-logo). */
+export const EMAIL_LOGO_PLACEHOLDER = '__PP_LOGO_DATA_URI__';
 
 /** All email links use production origin so they work when tests run from localhost. */
 const PORTAL_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/stack-reveal');
@@ -13,14 +19,12 @@ const SPONSOR_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/sponsor');
 const IMPORT_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/import');
 const BOOK_URL = appendUtmWithOrigin(EMAIL_ASSET_ORIGIN, '/book/universal-llm-import');
 
-/** Hosted URL only; no query string to avoid quoted-printable line break in middle of URL (fixes iPhone etc). */
-const LOGO_URL = `${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png`;
 /** Pocket Portfolio orange CTA (matches site Launch App / accent-warm). */
 const BRAND_CTA = '#D97706';
 const BRAND_LINK = '#B45309';
 
 function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): string {
-  return `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -33,8 +37,8 @@ function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): str
       <div style="padding:24px 28px 20px;background:#0d2818;border-bottom:3px solid ${BRAND_CTA};">
         <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
           <tr>
-            <td style="vertical-align:middle;">
-<img src="${LOGO_URL}" alt="Pocket Portfolio" width="40" height="40" style="display:block;width:40px;height:40px;border:0;outline:none;text-decoration:none;" />
+            <td style="vertical-align:middle;width:40px;height:40px;">
+              <img src="${EMAIL_LOGO_PLACEHOLDER}" alt="Pocket Portfolio" width="40" height="40" style="display:block;" />
             </td>
             <td style="vertical-align:middle;padding-left:12px;">
               <span style="font-size:18px;font-weight:700;color:#ffffff;">Pocket Portfolio</span>
@@ -62,6 +66,7 @@ function wrapEmail(inner: string, greeting: string, unsubscribeUrl: string): str
   </div>
 </body>
 </html>`;
+  return html;
 }
 
 function ctaButton(url: string, text: string): string {

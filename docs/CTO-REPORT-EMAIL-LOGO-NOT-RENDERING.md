@@ -3,7 +3,7 @@
 **Date:** February 2025  
 **Component:** Stack Reveal weekly emails (Resend)  
 **Symptom:** Header logo (`pp-monogram.png`) does not display in sent emails—neither in Resend dashboard preview nor in recipient inbox (Gmail, Outlook, etc.). Recipients see a broken image placeholder or empty space where the logo should be.  
-**Status:** Resolved per verdict below (hosted URL + baked background). CID and Data URI approaches abandoned.
+**Status:** **Feb 2025 update:** Logo fixed via **CID inline attachment** (Resend best practice). Template uses `img src="cid:logo-image"`; `lib/stack-reveal/resend.ts` attaches the logo with `path: LOGO_ATTACHMENT_URL` (proxy or `EMAIL_LOGO_URL`), `contentId: 'logo-image'`, `filename`, `content_type`. No external image request = no client blocking. See `docs/WHY-EMAIL-LOGO-BREAKS.md` for prior hosted-URL diagnosis.
 
 ---
 
@@ -18,7 +18,7 @@ We send Stack Reveal educational emails via **Resend**. The HTML includes a head
 | Item | Detail |
 |------|--------|
 | **Sender** | Resend API (Node.js), `emails.send()` |
-| **From** | `Pocket Portfolio <noreply@pocketportfolio.app>` (or `MAIL_FROM` env) |
+| **From** | `Pocket Portfolio <ai@pocketportfolio.app>` (or `MAIL_FROM` env) |
 | **Template** | `lib/stack-reveal/email-templates.ts` (HTML built server-side) |
 | **Sending** | `lib/stack-reveal/resend.ts` → Resend Node SDK |
 | **Logo asset** | `public/brand/pp-monogram.png` (80×80 PNG, ~5.7KB, light/white for header `#0d2818`) |
@@ -96,8 +96,8 @@ So we are sending the intended payloads; the failure appears to be downstream (R
 ## 7. Current Implementation (As of This Report)
 
 - **Template (`lib/stack-reveal/email-templates.ts`):**  
-  Logo is **hosted URL only**: `LOGO_URL = \`${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png?v=4\``. All email links (logo, Portal, Unsubscribe, Home, CTAs) use `EMAIL_ASSET_ORIGIN = 'https://www.pocketportfolio.app'` so they work when tests run from localhost.  
-  Header: `<img src="${LOGO_URL}" alt="Pocket Portfolio" width="40" height="40" ... />`.
+  Logo is **hosted URL only**. Logo URL comes from `EMAIL_LOGO_URL` (env) or falls back to `${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png`. **Recommendation:** Use a CDN URL (e.g. Cloudinary) for reliable rendering across Gmail, Apple Mail, etc.; same pattern as using a CDN logo URL in Resend in other projects.  
+  Header: `<img src="${LOGO_URL}" alt="" />` (minimal tag; img line kept ≤76 chars to avoid quoted-printable line break in URL).
 
 - **Send (`lib/stack-reveal/resend.ts`):**  
   No logo attachment. Payload is `from`, `to`, `subject`, `html`, `tags`; optional `headers` for List-Unsubscribe when `unsubscribeUrl` is provided.
@@ -133,7 +133,7 @@ So we are sending the intended payloads; the failure appears to be downstream (R
 **Fix implemented:**
 
 1. **Baked background:** Logo PNG has **solid #0d2818 (dark green) background** and **white "P" mark** (source: `pp-monogram-email.svg`). Contrast is inside the image file, so it survives CSS stripping.
-2. **Hosted URL only:** `lib/stack-reveal/email-templates.ts` uses `LOGO_URL = \`${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png?v=4\``. No CID, no Data URI. `EMAIL_ASSET_ORIGIN` is always `https://www.pocketportfolio.app` so logo and all links work when tests run from localhost.
+2. **Hosted URL only:** Logo URL is `EMAIL_LOGO_URL` (env) or `${EMAIL_ASSET_ORIGIN}/brand/pp-monogram.png`. No CID, no Data URI. For best rendering, set `EMAIL_LOGO_URL` to a CDN URL (e.g. Cloudinary) via `scripts/upload-email-logo-to-cloudinary.ts`.
 3. **Img styling:** `border:0;outline:none;text-decoration:none` for Outlook.
 4. **No logo attachments:** `lib/stack-reveal/resend.ts` sends no attachments for the logo.
 
@@ -148,10 +148,10 @@ So we are sending the intended payloads; the failure appears to be downstream (R
 
 **Post-deploy:**
 
-1. **Verify logo URL:** Run `npm run verify:logo-url` or open in a browser:  
-   `https://www.pocketportfolio.app/brand/pp-monogram.png`  
-   Expect: HTTP 200, image shows dark green with white "P" monogram. (No query string—avoids quoted-printable line break in URL that broke iPhone etc.)
-2. **Send test email:** `npm run stack-reveal:send-test -- your@email.com`  
+1. **Optional — use CDN for logo (recommended for best rendering):**  
+   Run `npx tsx scripts/upload-email-logo-to-cloudinary.ts`, then set `EMAIL_LOGO_URL` in `.env.local` and Vercel to the printed Cloudinary URL. Email clients tend to trust CDN domains (e.g. `res.cloudinary.com`).
+2. **Verify logo URL:** Open the logo URL (app origin or `EMAIL_LOGO_URL`) in a browser. Expect: HTTP 200, image shows dark green with white "P" monogram.
+3. **Send test email:** `npm run stack-reveal:send-test -- your@email.com`  
    In the inbox, enable "Display images" if needed, then confirm the header logo loads.
 
 ---

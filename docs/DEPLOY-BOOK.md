@@ -24,9 +24,9 @@ node scripts/deploy-book-to-prod.js --dry-run
 ## If Git still fails: lock or permission errors
 
 - **"index.lock exists"**  
-  Delete it and retry:  
-  `rm .git/index.lock` (or `del .git\index.lock` on Windows).  
-  The deploy script does this automatically; if it persists, another process (IDE, OneDrive) may be holding the lock.
+  Run `npm run ensure-git-unlocked` (or `node scripts/ensure-git-unlocked.js`), then retry.  
+  Or delete manually: `rm .git/index.lock` (or `del .git\index.lock` on Windows).  
+  The deploy script removes the lock automatically; if it persists, another process (IDE, OneDrive) may be holding the lock.
 
 - **Repo under OneDrive**  
   OneDrive can lock `.git` and cause "Permission denied" or "Invalid argument" when Git writes objects.  

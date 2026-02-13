@@ -41,6 +41,7 @@
     "grant-founders-club": "ts-node --project scripts/tsconfig.json scripts/grant-founders-club.ts",
     "verify-env": "ts-node --project scripts/tsconfig.json scripts/verify-env-setup.ts",
     "verify:logo-url": "node scripts/verify-production-logo.mjs",
+    "ensure-git-unlocked": "node scripts/ensure-git-unlocked.js",
     "debug-env": "ts-node --project scripts/tsconfig.json scripts/debug-env.ts",
     "extract-firebase": "ts-node --project scripts/tsconfig.json scripts/extract-firebase-env.ts",
     "generate-blog-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-blog-calendar.ts",
