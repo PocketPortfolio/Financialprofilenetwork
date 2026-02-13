@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import fs from 'fs';
 import path from 'path';
@@ -144,6 +145,16 @@ export async function GET(request: NextRequest) {
     console.log('[Analytics API] 👥 Fetching leads data...');
     const leadsData = await getLeadsData(startDate);
 
+    // Fetch app signups (Google) from Firebase Auth (isolated so failure doesn't 500 the whole dashboard)
+    let googleSignups: Awaited<ReturnType<typeof getGoogleSignupsData>>;
+    try {
+      console.log('[Analytics API] 🔐 Fetching Google signups...');
+      googleSignups = await getGoogleSignupsData(startDate);
+    } catch (e: any) {
+      console.error('[Analytics API] 🔐 Google signups failed:', e?.message);
+      googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: e?.message };
+    }
+
     return NextResponse.json({
       monetization,
       toolUsage,
@@ -151,6 +162,7 @@ export async function GET(request: NextRequest) {
       npm: npmData,
       blogPosts,
       leads: leadsData,
+      googleSignups,
       timeRange: range,
       lastUpdated: new Date().toISOString()
     });
@@ -1231,6 +1243,73 @@ async function getLeadsData(startDate: Date) {
       byStatus: {},
       bySource: {},
       recent: [],
+    };
+  }
+}
+
+/** Cohort date for "new users" (e.g. Stack Reveal): signups on or after this date. Always used for App Signups so the list is not limited by dashboard time range. */
+const COHORT_DATE_2025_10_27 = new Date('2025-10-27T00:00:00Z');
+
+async function getGoogleSignupsData(_startDate: Date) {
+  try {
+    getDb(); // Ensure Firebase Admin is initialized
+    const auth = getAuth();
+    const signups: Array<{
+      email: string;
+      uid: string;
+      displayName: string | null;
+      firstName: string | null;
+      createdAt: string;
+    }> = [];
+    let nextPageToken: string | undefined;
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    // Always use cohort date so we show full cohort (57+), not filtered by dashboard 7d/30d/90d
+    const cohortStart = COHORT_DATE_2025_10_27;
+
+    do {
+      const listResult = await auth.listUsers(1000, nextPageToken);
+      nextPageToken = listResult.pageToken;
+
+      for (const user of listResult.users) {
+        const creationTime = user.metadata.creationTime ? new Date(user.metadata.creationTime) : null;
+        if (!creationTime || creationTime < cohortStart) continue;
+
+        const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com');
+        if (!isGoogle) continue;
+
+        const displayName = user.displayName || null;
+        const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
+
+        signups.push({
+          email: user.email || '',
+          uid: user.uid,
+          displayName,
+          firstName,
+          createdAt: user.metadata.creationTime || '',
+        });
+      }
+    } while (nextPageToken);
+
+    // Sort by createdAt descending (most recent first)
+    signups.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const last7Days = signups.filter((s) => new Date(s.createdAt) >= sevenDaysAgo).length;
+
+    return {
+      total: signups.length,
+      last7Days,
+      cohortSinceOct2025: signups.length, // Same as total when using cohort start
+      signups: signups.slice(0, 100), // Show full cohort (all since Oct 27 2025)
+    };
+  } catch (error: any) {
+    console.error('Google signups fetch error:', error);
+    return {
+      total: 0,
+      last7Days: 0,
+      cohortSinceOct2025: 0,
+      signups: [],
+      error: error?.message,
     };
   }
 }

@@ -103,6 +103,19 @@ interface AnalyticsData {
       dataSource: string | null;
     }>;
   };
+  googleSignups?: {
+    total: number;
+    last7Days: number;
+    cohortSinceOct2025: number;
+    signups: Array<{
+      email: string;
+      uid: string;
+      displayName: string | null;
+      firstName: string | null;
+      createdAt: string;
+    }>;
+    error?: string;
+  };
   timeRange: '7d' | '30d' | '90d' | 'all';
   lastUpdated?: string;
 }
@@ -991,6 +1004,141 @@ export default function AdminAnalyticsPage() {
                 <strong>⚠️ Warning:</strong> {analyticsData.blogPosts.overdue} post(s) are overdue. 
                 The health check workflow should auto-trigger generation. Check GitHub Actions if posts don't appear.
               </div>
+            )}
+          </section>
+
+          {/* App signups (Google) - always show section when dashboard loaded so it never looks "removed" */}
+          <section style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: 'var(--space-6)',
+            marginTop: 'var(--space-6)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              marginBottom: 'var(--space-4)',
+              color: 'var(--text)'
+            }}>
+              🔐 App Signups (Google)
+            </h2>
+            {!analyticsData.googleSignups ? (
+              <div style={{
+                padding: 'var(--space-3)',
+                background: 'rgba(245, 158, 11, 0.1)',
+                borderRadius: '8px',
+                color: '#f59e0b',
+                fontSize: '14px'
+              }}>
+                Not available — analytics API may be from an older deployment. Redeploy from main to enable.
+              </div>
+            ) : analyticsData.googleSignups.error ? (
+              <div style={{
+                padding: 'var(--space-3)',
+                background: 'rgba(239, 68, 68, 0.1)',
+                borderRadius: '8px',
+                color: '#ef4444',
+                fontSize: '14px'
+              }}>
+                {analyticsData.googleSignups.error}
+              </div>
+            ) : (
+              <>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gap: 'var(--space-4)',
+                  marginBottom: 'var(--space-4)'
+                }}>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--signal)', marginBottom: '4px' }}>
+                      {analyticsData.googleSignups.total}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Total (cohort ≥ Oct 27, 2025)</div>
+                  </div>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '4px' }}>
+                      {analyticsData.googleSignups.last7Days}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Last 7 Days</div>
+                  </div>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--brand)', marginBottom: '4px' }}>
+                      {analyticsData.googleSignups.cohortSinceOct2025}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Cohort ≥ Oct 27, 2025</div>
+                  </div>
+                </div>
+                {analyticsData.googleSignups.signups.length > 0 && (
+                  <div>
+                    <h3 style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-3)',
+                      color: 'var(--text)'
+                    }}>
+                      Recent signups (full cohort)
+                    </h3>
+                    <div style={{
+                      maxHeight: '400px',
+                      overflowY: 'auto',
+                      border: '1px solid var(--border)',
+                      borderRadius: '8px'
+                    }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+                        <thead style={{
+                          position: 'sticky',
+                          top: 0,
+                          background: 'var(--surface-elevated)',
+                          borderBottom: '2px solid var(--border)',
+                          zIndex: 1
+                        }}>
+                          <tr>
+                            <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Email</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Name</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Signed up</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {analyticsData.googleSignups.signups.map((s) => (
+                            <tr
+                              key={s.uid}
+                              style={{
+                                borderBottom: '1px solid var(--border)',
+                                background: 'var(--surface)'
+                              }}
+                            >
+                              <td style={{ padding: '10px 12px', color: 'var(--text)' }}>{s.email}</td>
+                              <td style={{ padding: '10px 12px', color: 'var(--text)' }}>
+                                {s.displayName || s.firstName || '—'}
+                              </td>
+                              <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+                                {new Date(s.createdAt).toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </section>
 
