@@ -1,0 +1,64 @@
+---
+title: 'Valentine''s Special: How to Fall in Love with TypeScript Enums'
+date: '2026-02-14'
+description: >-
+  This Valentine's, let TypeScript enums steal your heart with their simplicity
+  and power in coding structures.
+tags:
+  - typescript
+  - valentine
+  - special
+  - fall
+author: Pocket Portfolio Team
+image: /images/blog/valentine-s-special-how-to-fall-in-love-with-typescript-enums.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Enums in TypeScript can sometimes feel as enigmatic as love itself: you know they’re important, but you might not be sure why or how to use them effectively. This Valentine’s Day, let’s demystify TypeScript enums and discover how to fall in love with their functionality and ease of use.
+
+### The Problem: How to Manage a Set of Related Constants
+
+Often in programming, you need to manage a set of related constants, which can be cumbersome and error-prone if not handled properly. Here's where TypeScript enums come to the rescue.
+
+### The Direct Solution: Embrace TypeScript Enums
+
+```typescript
+enum RelationshipStatus {
+  Single = "SINGLE",
+  InARelationship = "IN_A_RELATIONSHIP",
+  ItComplicated = "IT_COMPLICATED",
+  Engaged = "ENGAGED",
+  Married = "MARRIED"
+}
+
+const myStatus: RelationshipStatus = RelationshipStatus.Single;
+console.log(myStatus); // Outputs: SINGLE
+```
+
+### Explanation of Key Concepts
+
+Enums (short for enumerations) are a feature in TypeScript that allows you to define a set of named constants. Using enums can make your code more readable and maintainable by providing meaningful names for your values. Enums can be numeric or string-based, and they can help you avoid the use of magic numbers or strings throughout your code.
+
+### Quick Tip: Enums are Real Objects
+
+Remember, TypeScript enums are real objects at runtime. This means you can iterate over them and even extend their functionality:
+
+```typescript
+Object.keys(RelationshipStatus).forEach(key => {
+  console.log(RelationshipStatus[key]);
+});
+
+// Outputs:
+// SINGLE
+// IN_A_RELATIONSHIP
+// IT_COMPLICATED
+// ENGAGED
+// MARRIED
+```
+
+### Gotcha: Be Careful with Numeric Enums
+
+Numeric enums can introduce subtle bugs if you’re not careful. For instance, reverse mapping (accessing an enum value by its numeric key) can be confusing, especially if enums have custom numeric values. Stick to string enums for a clearer, more predictable behavior.
+
+This Valentine's Day, let TypeScript enums charm their way into your codebase, making your relationship with TypeScript stronger and your code cleaner and more expressive. Fall in love with the simplicity and power of enums, and watch as they make managing sets of constants a breeze, leaving more time for the real valentine’s celebration.

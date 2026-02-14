@@ -675,7 +675,7 @@
     "scheduledTime": "14:00",
     "title": "Valentine's Special: How to Fall in Love with TypeScript Enums",
     "slug": "valentine-s-special-how-to-fall-in-love-with-typescript-enums",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -683,7 +683,8 @@
       "valentine",
       "special",
       "fall"
-    ]
+    ],
+    "publishedAt": "2026-02-14T14:19:57.998Z"
   },
   {
     "id": "how-to-how-to-scrape-data-respectfully-headers-rates-feb-15",
