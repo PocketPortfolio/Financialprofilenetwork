@@ -655,7 +655,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Privacy-Preserving Analytics - Performance Benchmarks",
     "slug": "research-privacy-preserving-analytics-performance-benchmarks-2026-02-14",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -664,7 +664,9 @@
       "privacy",
       "preserving",
       "analytics"
-    ]
+    ],
+    "videoId": "aQaRFQpDi_4",
+    "publishedAt": "2026-02-14T18:21:47.818Z"
   },
   {
     "id": "research-zero-knowledge-proofs-computational-overhead-analysis-2026-02-15",
