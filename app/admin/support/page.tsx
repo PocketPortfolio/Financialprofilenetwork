@@ -56,8 +56,11 @@ export default function AdminSupportPage() {
         if (!res.ok) {
           if (res.status === 403 && (data.code === 'ADMIN_CLAIM_REQUIRED' || data.hint)) {
             setError(`Admin access required. ${data.hint ?? 'Sign out and sign back in.'}`);
+          } else if (res.status === 401) {
+            setError('Please sign in to view support submissions.');
           } else {
-            setError(data.error ?? 'Failed to fetch submissions');
+            const msg = data.error ?? 'Failed to fetch submissions';
+            setError(res.status >= 500 ? `${msg} In production, set FIREBASE_* and ADMIN_EMAIL_OVERRIDE in Vercel (see docs/VERCEL-ENV-SUPPORT-ADMIN.md).` : msg);
           }
           setSubmissions([]);
           return;

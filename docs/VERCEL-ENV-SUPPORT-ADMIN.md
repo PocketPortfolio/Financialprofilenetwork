@@ -24,4 +24,11 @@ Add these in **Vercel → Project → Settings → Environment Variables**. Use 
 
 - [ ] FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY (required for Firestore + auth)
 - [ ] RESEND_API_KEY (required for support + marketing emails)
-- [ ] ADMIN_EMAIL_OVERRIDE (recommended so admin can open Support submissions without claim issues)
+- [ ] **ADMIN_EMAIL_OVERRIDE** (required in prod so admin can view Support submissions; use the admin’s login email, e.g. `abbalawal22s@gmail.com`)
+
+## Admin can’t view support in production?
+
+1. In **Vercel → Settings → Environment Variables**, add **ADMIN_EMAIL_OVERRIDE** = `abbalawal22s@gmail.com` (or your admin email). Apply to **Production**.
+2. Ensure **FIREBASE_PROJECT_ID**, **FIREBASE_CLIENT_EMAIL**, **FIREBASE_PRIVATE_KEY** are set for Production (needed for `/api/admin/support`).
+3. **Redeploy** the project (e.g. trigger a new deployment or push a commit) so the new env is picked up.
+4. Open the Support submissions page again while signed in with that email.
