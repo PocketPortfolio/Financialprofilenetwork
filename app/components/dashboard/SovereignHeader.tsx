@@ -9,6 +9,7 @@ import ThemeSwitcher from '../ThemeSwitcher';
 import { usePremiumTheme } from '../../hooks/usePremiumTheme';
 import { useAuth } from '../../hooks/useAuth';
 import { UserAvatarDropdown } from './UserAvatarDropdown';
+import { SupportFormModal } from './SupportFormModal';
 import { useStickyHeader } from '../../hooks/useStickyHeader';
 
 interface SovereignHeaderProps {
@@ -24,6 +25,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
   const [isDesktop, setIsDesktop] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showSyncTooltip, setShowSyncTooltip] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
   const { tier } = usePremiumTheme();
   const { signInWithGoogle, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -522,17 +524,23 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                 Settings
               </Link>
               
-              <Link 
-                href="/sponsor"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setShowSupportModal(true);
+                }}
                 style={{
+                  width: '100%',
+                  textAlign: 'left',
                   padding: '12px 16px',
                   borderRadius: '6px',
                   color: 'hsl(var(--foreground))',
-                  textDecoration: 'none',
                   fontSize: '14px',
                   fontWeight: '500',
                   background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'hsl(var(--muted))';
@@ -542,7 +550,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                 }}
               >
                 Support
-              </Link>
+              </button>
               
               {/* Admin Links - Only show if user is admin */}
               {isAdmin && (
@@ -596,12 +604,39 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   >
                     Sales
                   </Link>
+                  
+                  <Link 
+                    href="/admin/support"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '6px',
+                      color: 'hsl(var(--foreground))',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      background: 'transparent',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'hsl(var(--muted))';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    View support
+                  </Link>
                 </>
               )}
             </div>
           </div>
         </div>
       )}
+      <SupportFormModal
+        open={showSupportModal}
+        onClose={() => setShowSupportModal(false)}
+        user={user ? { email: user.email, displayName: user.displayName } : null}
+      />
     </>
   );
 }

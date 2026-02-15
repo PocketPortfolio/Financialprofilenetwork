@@ -156,6 +156,12 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false; // Only server can write via Admin SDK
     }
+
+    // Support form submissions: written by server via POST /api/support (Admin SDK), read by admin
+    match /supportSubmissions/{submissionId} {
+      allow read: if isAdmin();
+      allow write: if false; // Only server can write via Admin SDK
+    }
     
     // Default deny all other paths
     match /{document=**} {

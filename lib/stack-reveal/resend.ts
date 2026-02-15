@@ -80,3 +80,53 @@ export async function sendWeeklySnapshotEmail(
   if (error) return { error: error.message };
   return { id: data?.id };
 }
+
+/** Support form: always send to ai@pocketportfolio.app; if SUPPORT_EMAIL_TO is set and different, add it so both receive. */
+const SUPPORT_INBOX = 'ai@pocketportfolio.app';
+const SUPPORT_EMAIL_TO_EXTRA = process.env.SUPPORT_EMAIL_TO?.trim();
+/** Use a different "from" than "to" to avoid self-send filtering; set SUPPORT_MAIL_FROM if only ai@ is verified in Resend. */
+const SUPPORT_FROM = process.env.SUPPORT_MAIL_FROM?.trim() || 'Pocket Portfolio Support <support@pocketportfolio.app>';
+
+/** Support form: send to ai@pocketportfolio.app (and optionally SUPPORT_EMAIL_TO) with optional attachments. */
+export async function sendSupportEmail(
+  fromEmail: string,
+  fromName: string,
+  subject: string,
+  message: string,
+  attachments?: { filename: string; content: string }[]
+): Promise<{ id?: string; error?: string }> {
+  const toAddresses = [SUPPORT_INBOX];
+  if (SUPPORT_EMAIL_TO_EXTRA && SUPPORT_EMAIL_TO_EXTRA !== SUPPORT_INBOX) {
+    toAddresses.push(SUPPORT_EMAIL_TO_EXTRA);
+  }
+  const html = `
+    <p><strong>From:</strong> ${escapeHtml(fromName)} &lt;${escapeHtml(fromEmail)}&gt;</p>
+    <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+    <p><strong>Submitted:</strong> ${new Date().toISOString()}</p>
+    <hr/>
+    <pre style="white-space:pre-wrap;font-family:inherit;">${escapeHtml(message)}</pre>
+    <p style="margin-top:16px;color:#6b7280;font-size:12px;">Submitted via Pocket Portfolio support form.</p>
+  `;
+  const payload: Record<string, unknown> = {
+    from: SUPPORT_FROM,
+    to: toAddresses,
+    replyTo: fromEmail,
+    subject: `[Support] ${subject}`,
+    html,
+    tags: [{ name: 'campaign', value: 'support_form' }],
+  };
+  if (attachments?.length) {
+    (payload as any).attachments = attachments;
+  }
+  const { data, error } = await getStackRevealResend().emails.send(payload as any);
+  if (error) return { error: error.message };
+  return { id: data?.id };
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
