@@ -25,7 +25,7 @@ export function trackViralShare(metrics: ShareMetrics): void {
 }
 
 /**
- * Track referral event
+ * Track referral event (GA4 + Firestore via /api/referral-event for admin analytics)
  */
 export function trackViralReferral(data: {
   action: 'click' | 'conversion';
@@ -41,6 +41,17 @@ export function trackViralReferral(data: {
       // @ts-ignore - custom parameter not in base type but allowed by GA4
       custom_parameter_referral_code: data.referralCode
     } as any);
+  }
+  if (typeof window !== 'undefined') {
+    fetch('/api/referral-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: data.action,
+        referralCode: data.referralCode,
+        source: data.source || 'unknown',
+      }),
+    }).catch(() => {});
   }
 }
 

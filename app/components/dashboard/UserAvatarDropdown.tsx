@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { Settings, LogOut, User } from 'lucide-react';
+import { Settings, LogOut, User, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserAvatarDropdownProps {
@@ -146,6 +146,31 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
             >
               <Settings style={{ width: '16px', height: '16px' }} />
               Settings
+            </Link>
+
+            <Link
+              href="/invite"
+              onClick={() => setIsOpen(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '8px 12px',
+                fontSize: '14px',
+                color: 'hsl(var(--foreground))',
+                textDecoration: 'none',
+                borderRadius: '4px',
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'hsl(var(--muted))';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <UserPlus style={{ width: '16px', height: '16px' }} />
+              Invite
             </Link>
             
             <Link

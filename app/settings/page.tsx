@@ -52,7 +52,12 @@ export default function SettingsPage() {
   
   // Premium theme preference state
   const [isPremiumThemeEnabled, setIsPremiumThemeEnabled] = useState<boolean>(true);
-  
+
+  // Weekly snapshot email preference (default true)
+  const [weeklySnapshotEnabled, setWeeklySnapshotEnabled] = useState<boolean>(true);
+  const [weeklySnapshotLoading, setWeeklySnapshotLoading] = useState(false);
+  const [weeklySnapshotPrefLoaded, setWeeklySnapshotPrefLoaded] = useState(false);
+
   const { deleteAllTrades } = useTrades();
 
   useEffect(() => {
@@ -90,6 +95,48 @@ export default function SettingsPage() {
       setIsPremiumThemeEnabled(saved === null || saved === 'true');
     }
   }, [hasFounderTheme, hasCorporateTheme]);
+
+  // Load weekly snapshot preference
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const token = await user.getIdToken();
+        const res = await fetch('/api/user/preferences', { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (!cancelled) {
+          setWeeklySnapshotEnabled(data.weekly_snapshot_enabled !== false);
+        }
+      } catch (e) {
+        if (!cancelled) setWeeklySnapshotEnabled(true);
+      } finally {
+        if (!cancelled) setWeeklySnapshotPrefLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, user]);
+
+  const handleWeeklySnapshotToggle = async (enabled: boolean) => {
+    if (!user || weeklySnapshotLoading) return;
+    setWeeklySnapshotLoading(true);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ weekly_snapshot_enabled: enabled }),
+      });
+      if (res.ok) {
+        setWeeklySnapshotEnabled(enabled);
+      }
+    } catch (e) {
+      console.error('Failed to update weekly snapshot preference:', e);
+    } finally {
+      setWeeklySnapshotLoading(false);
+    }
+  };
 
   const fetchSeats = async () => {
     if (!auth || !user) return;
@@ -558,6 +605,57 @@ export default function SettingsPage() {
             onRevoke={handleSeatRevoke}
             loading={loadingSeats}
           />
+        )}
+
+        {/* Email: Weekly Snapshot */}
+        {weeklySnapshotPrefLoaded && (
+          <div style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            padding: '24px',
+            marginBottom: '24px'
+          }}>
+            <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>Email</h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+              <div>
+                <p style={{ fontWeight: '600', margin: '0 0 4px 0' }}>Weekly portfolio snapshot</p>
+                <p style={{ fontSize: '14px', color: 'var(--muted)', margin: 0 }}>
+                  Every Sunday: one number (e.g. your portfolio change) and a link to share with friends.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={weeklySnapshotEnabled}
+                disabled={weeklySnapshotLoading}
+                onClick={() => handleWeeklySnapshotToggle(!weeklySnapshotEnabled)}
+                style={{
+                  width: '48px',
+                  height: '26px',
+                  borderRadius: '13px',
+                  border: 'none',
+                  background: weeklySnapshotEnabled ? 'hsl(var(--primary))' : 'hsl(var(--muted))',
+                  cursor: weeklySnapshotLoading ? 'not-allowed' : 'pointer',
+                  position: 'relative',
+                  flexShrink: 0
+                }}
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '2px',
+                    left: weeklySnapshotEnabled ? '24px' : '2px',
+                    width: '22px',
+                    height: '22px',
+                    borderRadius: '50%',
+                    background: '#fff',
+                    transition: 'left 0.2s ease'
+                  }}
+                />
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Push Notifications Section */}

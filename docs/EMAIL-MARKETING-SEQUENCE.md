@@ -46,9 +46,20 @@ New users (Google signups in cohort ≥ Oct 27, 2025) receive a **Welcome (Week 
 
 ---
 
+## Weekly Snapshot (separate cadence)
+
+- **When:** Friday 21:00 UTC (market close). Bookends Monday Stack Reveal to avoid two emails in 24h.
+- **Eligibility:** `weekly_snapshot_enabled !== false` on `users/{uid}`; at most one per user per week.
+- **Test:** `npm run weekly-snapshot:send-test -- <email>`
+- **Spec:** [docs/marketing/WEEKLY-SNAPSHOT-EMAIL.md](marketing/WEEKLY-SNAPSHOT-EMAIL.md)
+
+---
+
 ## Test commands
 
 - **Welcome (Week 0) to a specific address:**  
   `npm run welcome-email:send-test -- <email>`
 - **All 4 Stack Reveal emails (Weeks 1–4):**  
   `npm run stack-reveal:send-test -- <email>`
+- **Weekly Snapshot (one test email):**  
+  `npm run weekly-snapshot:send-test -- <email>`

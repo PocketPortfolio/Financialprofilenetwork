@@ -116,6 +116,13 @@ interface AnalyticsData {
     }>;
     error?: string;
   };
+  referral?: {
+    clicks: number;
+    conversions: number;
+    last7DaysClicks: number;
+    last7DaysConversions: number;
+    bySource: Record<string, { clicks: number; conversions: number }>;
+  };
   timeRange: '7d' | '30d' | '90d' | 'all';
   lastUpdated?: string;
 }
@@ -1141,6 +1148,107 @@ export default function AdminAnalyticsPage() {
               </>
             )}
           </section>
+
+          {/* Referral (Viral Loop) Section */}
+          {analyticsData.referral && (
+            <section style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: 'var(--space-6)'
+            }}>
+              <h2 style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: 'var(--space-4)',
+                color: 'var(--text)'
+              }}>
+                Referrals
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: 'var(--space-4)',
+                marginBottom: 'var(--space-4)'
+              }}>
+                <div style={{
+                  background: 'var(--bg)',
+                  padding: 'var(--space-4)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)'
+                }}>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text)', marginBottom: '4px' }}>
+                    {analyticsData.referral.clicks}
+                  </div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Link Clicks</div>
+                </div>
+                <div style={{
+                  background: 'var(--bg)',
+                  padding: 'var(--space-4)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)'
+                }}>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--pos)', marginBottom: '4px' }}>
+                    {analyticsData.referral.conversions}
+                  </div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Signups (conversions)</div>
+                </div>
+                <div style={{
+                  background: 'var(--bg)',
+                  padding: 'var(--space-4)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)'
+                }}>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text)', marginBottom: '4px' }}>
+                    {analyticsData.referral.last7DaysClicks}
+                  </div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Clicks (7d)</div>
+                </div>
+                <div style={{
+                  background: 'var(--bg)',
+                  padding: 'var(--space-4)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)'
+                }}>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--pos)', marginBottom: '4px' }}>
+                    {analyticsData.referral.last7DaysConversions}
+                  </div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Conversions (7d)</div>
+                </div>
+              </div>
+              {Object.keys(analyticsData.referral.bySource).length > 0 && (
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)', color: 'var(--text)' }}>
+                    By source
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                    {Object.entries(analyticsData.referral.bySource)
+                      .sort(([, a], [, b]) => (b.clicks + b.conversions) - (a.clicks + a.conversions))
+                      .map(([source, counts]) => (
+                        <div
+                          key={source}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '12px',
+                            background: 'var(--bg)',
+                            borderRadius: '6px',
+                            border: '1px solid var(--border)',
+                            fontSize: '14px'
+                          }}
+                        >
+                          <span style={{ fontWeight: '500' }}>{source}</span>
+                          <span style={{ color: 'var(--text-secondary)' }}>
+                            {counts.clicks} clicks · {counts.conversions} conversions
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Leads Section */}
           <section style={{

@@ -57,7 +57,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
         marginBottom: '12px',
         color: 'var(--text)'
       }}>
-        Invite Friends & Earn Rewards
+        Invite Friends
       </h3>
       <p style={{ 
         fontSize: 'var(--font-size-sm)', 

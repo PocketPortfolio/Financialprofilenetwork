@@ -1949,6 +1949,14 @@ export default function Dashboard() {
             >
               🎮 Play with Demo Data
             </button>
+            <p style={{ marginTop: '20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
+              <Link
+                href="/invite"
+                style={{ color: 'hsl(var(--primary))', textDecoration: 'underline', fontWeight: '500' }}
+              >
+                Invite a friend to try Pocket Portfolio
+              </Link>
+            </p>
           </div>
         )}
 

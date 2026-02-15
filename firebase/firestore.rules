@@ -150,6 +150,12 @@ service cloud.firestore {
       allow read: if isAdmin(); // Only admins can read analytics
       allow update, delete: if false; // Immutable once written
     }
+
+    // Referral events: written by server via POST /api/referral-event (Admin SDK), read by admin analytics
+    match /referralEvents/{eventId} {
+      allow read: if isAdmin();
+      allow write: if false; // Only server can write via Admin SDK
+    }
     
     // Default deny all other paths
     match /{document=**} {

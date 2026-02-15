@@ -155,6 +155,16 @@ export async function GET(request: NextRequest) {
       googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: e?.message };
     }
 
+    // Fetch referral events (clicks + conversions)
+    let referral: Awaited<ReturnType<typeof getReferralData>>;
+    try {
+      console.log('[Analytics API] 🔗 Fetching referral data...');
+      referral = await getReferralData(startDate);
+    } catch (e: any) {
+      console.error('[Analytics API] 🔗 Referral data failed:', e?.message);
+      referral = { clicks: 0, conversions: 0, last7DaysClicks: 0, last7DaysConversions: 0, bySource: {} };
+    }
+
     return NextResponse.json({
       monetization,
       toolUsage,
@@ -163,6 +173,7 @@ export async function GET(request: NextRequest) {
       blogPosts,
       leads: leadsData,
       googleSignups,
+      referral,
       timeRange: range,
       lastUpdated: new Date().toISOString()
     });
@@ -643,6 +654,63 @@ async function getSEOPageData(startDate: Date) {
       totalViews: 0,
       topPages: [],
       conversionRate: 0
+    };
+  }
+}
+
+async function getReferralData(startDate: Date) {
+  try {
+    const db = getDb();
+    const ref = db.collection('referralEvents');
+    const startTimestamp = Timestamp.fromDate(startDate);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+
+    const snapshot = await ref
+      .where('timestamp', '>=', startTimestamp)
+      .get();
+
+    let clicks = 0;
+    let conversions = 0;
+    let last7DaysClicks = 0;
+    let last7DaysConversions = 0;
+    const bySource: Record<string, { clicks: number; conversions: number }> = {};
+
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const action = data?.action;
+      const source = (data?.source as string) || 'unknown';
+      const ts = data?.timestamp as Timestamp;
+      const isLast7Days = ts && ts.toMillis ? ts.toMillis() >= sevenDaysAgo.getTime() : false;
+
+      if (!bySource[source]) bySource[source] = { clicks: 0, conversions: 0 };
+
+      if (action === 'click') {
+        clicks++;
+        bySource[source].clicks++;
+        if (isLast7Days) last7DaysClicks++;
+      } else if (action === 'conversion') {
+        conversions++;
+        bySource[source].conversions++;
+        if (isLast7Days) last7DaysConversions++;
+      }
+    });
+
+    return {
+      clicks,
+      conversions,
+      last7DaysClicks,
+      last7DaysConversions,
+      bySource,
+    };
+  } catch (error) {
+    console.error('Referral data fetch error:', error);
+    return {
+      clicks: 0,
+      conversions: 0,
+      last7DaysClicks: 0,
+      last7DaysConversions: 0,
+      bySource: {},
     };
   }
 }

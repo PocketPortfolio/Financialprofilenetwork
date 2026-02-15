@@ -50,3 +50,33 @@ export async function sendStackRevealEmail(
   if (error) return { error: error.message };
   return { id: data?.id };
 }
+
+/** Send Weekly Snapshot email (same Resend instance, tag campaign: weekly_snapshot). */
+export async function sendWeeklySnapshotEmail(
+  to: string,
+  subject: string,
+  html: string,
+  unsubscribeUrl?: string
+): Promise<{ id?: string; error?: string }> {
+  const finalHtml = html.replace(
+    new RegExp(EMAIL_LOGO_PLACEHOLDER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+    HOSTED_LOGO_URL
+  );
+
+  const payload: Record<string, unknown> = {
+    from: FROM,
+    to,
+    subject,
+    html: finalHtml,
+    tags: [{ name: 'campaign', value: 'weekly_snapshot' }],
+  };
+  if (unsubscribeUrl) {
+    payload.headers = {
+      'List-Unsubscribe': `<${unsubscribeUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    };
+  }
+  const { data, error } = await getStackRevealResend().emails.send(payload as any);
+  if (error) return { error: error.message };
+  return { id: data?.id };
+}

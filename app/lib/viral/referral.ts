@@ -22,18 +22,36 @@ export function generateReferralCode(userId?: string): string {
 }
 
 /**
- * Get referral link for a user
+ * Get referral link for a user (client-side; uses window.location.origin when available)
  */
 export function getReferralLink(referralCode: string, source?: string): string {
-  const baseUrl = typeof window !== 'undefined' 
-    ? window.location.origin 
+  const baseUrl = typeof window !== 'undefined'
+    ? window.location.origin
     : 'https://www.pocketportfolio.app';
-  
+
   const params = new URLSearchParams();
   params.set('ref', referralCode);
   if (source) params.set('source', source);
-  
+
   return `${baseUrl}/?${params.toString()}`;
+}
+
+/**
+ * Get referral link for server-side use (e.g. emails). Uses EMAIL_ASSET_ORIGIN so links point to production.
+ */
+export function getReferralLinkServer(
+  referralCode: string,
+  source: string,
+  baseUrl?: string
+): string {
+  const base = baseUrl || process.env.EMAIL_ASSET_ORIGIN || 'https://www.pocketportfolio.app';
+  const params = new URLSearchParams();
+  params.set('ref', referralCode);
+  params.set('source', source);
+  params.set('utm_source', 'weekly_snapshot');
+  params.set('utm_medium', 'email');
+  params.set('utm_campaign', 'referral');
+  return `${base}/?${params.toString()}`;
 }
 
 /**
