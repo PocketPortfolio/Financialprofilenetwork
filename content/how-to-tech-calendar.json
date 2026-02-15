@@ -692,14 +692,15 @@
     "scheduledTime": "14:00",
     "title": "How to Scrape Data Respectfully (Headers & Rates)",
     "slug": "how-to-scrape-data-respectfully-headers-rates",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "scrape",
       "data",
       "respectfully"
-    ]
+    ],
+    "publishedAt": "2026-02-15T14:19:42.798Z"
   },
   {
     "id": "how-to-building-a-retry-logic-for-flaky-apis-feb-16",

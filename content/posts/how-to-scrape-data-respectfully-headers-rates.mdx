@@ -1,0 +1,69 @@
+---
+title: How to Scrape Data Respectfully (Headers & Rates)
+date: '2026-02-15'
+description: >-
+  Learn how to scrape data respectfully by managing headers and rate limits,
+  ensuring ethical data extraction practices.
+tags:
+  - scrape
+  - data
+  - respectfully
+author: Pocket Portfolio Team
+image: /images/blog/how-to-scrape-data-respectfully-headers-rates.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Scraping data from websites can quickly turn into a contentious issue if not done with respect for the website's rules and infrastructure. It's crucial to understand and implement respectful scraping practices to maintain a healthy relationship between data consumers and providers.
+
+### Direct Solution with Code
+
+To scrape data respectfully, you must adjust your request headers and adhere to the website’s rate limits. Here’s a Python example using the `requests` library:
+
+```python
+import requests
+import time
+
+# Target URL
+url = "http://example.com/data"
+
+# Custom headers
+headers = {
+    'User-Agent': 'My Data Collection Bot (+http://mywebsite.com/bot.html)',
+    'From': 'myemail@example.com'  # This is another optional good practice
+}
+
+# Respect rate limits: pause execution for 1 second between requests
+rate_limit_pause = 1
+
+response = requests.get(url, headers=headers)
+data = response.json()  # Assuming the target data is in JSON format
+
+# Always check and respect the status code
+if response.status_code == 200:
+    print("Data fetched successfully!")
+    print(data)
+else:
+    print(f"Failed to fetch data. Status Code: {response.status_code}")
+
+# Pause to respect rate limit
+time.sleep(rate_limit_pause)
+```
+
+### Explanation of Key Concepts
+
+- **Custom Headers**: Including a `User-Agent` that identifies your bot and a contact email (`From`) in your request headers is a sign of good faith. It allows website owners to contact you if your bot causes issues.
+- **Rate Limiting**: To avoid overloading the website’s servers, introduce pauses between your requests. The appropriate duration depends on the specific website’s policies, but as a rule of thumb, a 1-second pause is a respectful start.
+- **Status Codes**: Pay attention to HTTP status codes in responses. A `200` code means success, while codes like `429` (Too Many Requests) indicate you’re being rate-limited. Respect these signals by adjusting your request rate accordingly.
+
+### Quick Tip
+
+When possible, look for an official API provided by the website for data extraction. APIs are designed to handle requests efficiently and come with clear guidelines on rate limits and acceptable use, reducing the need for scraping and ensuring more stable data access.
+
+### Gotcha
+
+Avoid scraping data from websites that explicitly forbid it in their `robots.txt` file or terms of service. Disregarding these rules can lead to legal issues or your IP being banned from the site.
+
+**Verdict**
+
+Respectful data scraping is about more than just accessing the data you need; it's about fostering a sustainable relationship between data providers and consumers. By setting custom headers, respecting rate limits, and adhering to site policies, you ensure that your data collection efforts remain ethical and welcomed. Always remember to check if the website offers a [Google Drive Portfolio Sync](/features/google-drive-sync) or an official API for a more reliable data source.
