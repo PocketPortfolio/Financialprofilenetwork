@@ -674,14 +674,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Zero-Knowledge Proofs - Computational Overhead Analysis",
     "slug": "research-zero-knowledge-proofs-computational-overhead-analysis-2026-02-15",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "zero",
       "knowledge",
       "proofs"
-    ]
+    ],
+    "videoId": "dt5MjSx2CVg",
+    "publishedAt": "2026-02-15T18:22:07.962Z"
   },
   {
     "id": "research-federated-learning-privacy-vs-performance-2026-02-16",
