@@ -1,0 +1,65 @@
+---
+title: Building a 'Retry' Logic for Flaky APIs
+date: '2026-02-16'
+description: >-
+  Learn to build a robust retry logic for flaky APIs using modern JavaScript
+  approaches, ensuring data integrity and service reliability.
+tags:
+  - api
+  - ky
+  - building
+  - retry
+  - logic
+author: Pocket Portfolio Team
+image: /images/blog/building-a-retry-logic-for-flaky-apis.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Integrating with third-party APIs can often be a frustrating experience due to their unpredictable nature. Flaky APIs can lead to partial data, unexpected errors, and a degraded user experience. Implementing a retry logic is a critical step in ensuring your application remains resilient and reliable, even when external services are not.
+
+### Direct Solution with Code
+
+To tackle this, we'll use the `ky` library, a tiny and elegant HTTP client for the browser and Node.js. It comes with built-in support for retries with exponential backoff, making it an ideal choice for this task.
+
+```javascript
+import ky from 'ky';
+
+const retryOptions = {
+  limit: 3, // Maximum number of retries
+  methods: ['get'], // HTTP methods to retry
+  statusCodes: [503], // HTTP status codes to retry
+  backoff: 250, // Initial backoff duration in milliseconds
+};
+
+const fetchWithRetry = async (url, options = {}) => {
+  try {
+    return await ky(url, { ...options, retry: retryOptions }).json();
+  } catch (error) {
+    console.error('Failed to fetch:', error);
+    throw error;
+  }
+};
+
+// Usage
+(async () => {
+  const data = await fetchWithRetry('https://flaky-api.com/data');
+  console.log(data);
+})();
+```
+
+### Explanation of Key Concepts
+
+- **Retries with Exponential Backoff**: The essence of implementing retries is not just about making another request upon failure. It's about intelligently spacing out retries to give the flaky service time to recover. Exponential backoff increases the delay between retries exponentially, reducing the load on the service and increasing the chance of recovery.
+
+- **Selective Retries**: It's crucial to retry only when it makes sense. Not all HTTP methods and status codes are safe or appropriate to retry. For instance, retrying on a `503 Service Unavailable` status makes sense, but retrying on a `400 Bad Request` does not, as the latter indicates a client-side error.
+
+### Quick Tip
+
+Be mindful of idempotency when implementing retries. Not all operations are safe to retry without unintended side effects. GET requests are generally safe, but POST, PUT, or DELETE requests might not be, depending on the API's design. Always check the API documentation to understand the behavior of each endpoint under retry scenarios.
+
+### Gotcha
+
+Remember to configure the `limit` option carefully. Too many retries can exacerbate problems for the service you're calling and lead to rate limiting or even IP bans. Balance is key to a respectful and resilient integration.
+
+Implementing a retry logic for flaky APIs using the `ky` library and these principles ensures that your application can handle external uncertainties gracefully, providing a consistent and reliable user experience.
