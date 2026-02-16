@@ -691,7 +691,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Federated Learning - Privacy vs Performance",
     "slug": "research-federated-learning-privacy-vs-performance-2026-02-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -699,7 +699,9 @@
       "privacy",
       "federated",
       "learning"
-    ]
+    ],
+    "videoId": "lKoQfsmdHqE",
+    "publishedAt": "2026-02-16T18:30:20.060Z"
   },
   {
     "id": "research-homomorphic-encryption-practical-performance-analysis-2026-02-17",
