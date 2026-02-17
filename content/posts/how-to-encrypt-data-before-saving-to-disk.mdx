@@ -1,0 +1,59 @@
+---
+title: How to Encrypt Data Before Saving to Disk
+date: '2026-02-17'
+description: >-
+  Learn to securely encrypt data before saving to disk, ensuring your sensitive
+  information is protected from unauthorized access.
+tags:
+  - encrypt
+  - data
+  - before
+author: Pocket Portfolio Team
+image: /images/blog/how-to-encrypt-data-before-saving-to-disk.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Storing sensitive information without proper encryption is like leaving the door to your house unlocked. To safeguard this data from unauthorized access, it's crucial to encrypt it before it hits the disk.
+
+Here's a straightforward approach to encrypting your data using Python's `cryptography` library:
+
+```python
+from cryptography.fernet import Fernet
+
+# Generate a key and instantiate a Fernet instance
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
+
+# Your data to encrypt
+data = "Sensitive data that needs encryption"
+encoded_data = data.encode()
+
+# Encrypt the data
+encrypted_data = cipher_suite.encrypt(encoded_data)
+
+# Now, you can safely save `encrypted_data` to disk
+with open('encrypted_data.file', 'wb') as file:
+    file.write(encrypted_data)
+
+# When you need to read the data, decrypt it
+with open('encrypted_data.file', 'rb') as file:
+    encrypted_data_from_file = file.read()
+
+decrypted_data = cipher_suite.decrypt(encrypted_data_from_file)
+print(decrypted_data.decode())  # This should print your original data
+```
+
+### Key Concepts
+
+- **Encryption**: The process of converting information or data into a code, especially to prevent unauthorized access.
+- **Fernet**: A symmetric encryption method provided by the cryptography library in Python, ensuring that data encrypted by a key is only decryptable by the same key.
+- **Symmetric Encryption**: An encryption method where the same key is used for both encryption and decryption.
+
+### Quick Tip
+
+Always securely store your encryption keys. Exposing your keys is akin to giving away the keys to the safe. Consider using environment variables or a secure key management system to handle your keys.
+
+### Gotcha
+
+Remember, encrypting data before saving it to disk is a crucial step, but it's not the only one. Ensure your application is secure by also implementing secure authentication, using HTTPS for network communications, and regularly updating your dependencies to patch known vulnerabilities.

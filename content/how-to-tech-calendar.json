@@ -708,7 +708,7 @@
     "scheduledTime": "14:00",
     "title": "Building a \"Retry\" Logic for Flaky APIs",
     "slug": "building-a-retry-logic-for-flaky-apis",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -717,7 +717,8 @@
       "building",
       "retry",
       "logic"
-    ]
+    ],
+    "publishedAt": "2026-02-16T14:36:45.265Z"
   },
   {
     "id": "how-to-how-to-encrypt-data-before-saving-to-disk-feb-17",
@@ -725,14 +726,15 @@
     "scheduledTime": "14:00",
     "title": "How to Encrypt Data Before Saving to Disk",
     "slug": "how-to-encrypt-data-before-saving-to-disk",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "encrypt",
       "data",
       "before"
-    ]
+    ],
+    "publishedAt": "2026-02-17T14:40:29.931Z"
   },
   {
     "id": "how-to-monitoring-vercel-serverless-function-usage-feb-18",
