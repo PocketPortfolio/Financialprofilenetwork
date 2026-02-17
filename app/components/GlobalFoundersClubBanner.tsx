@@ -32,7 +32,7 @@ export default function GlobalFoundersClubBanner() {
 
   const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
   const showContent = !isLoading && !isPaid;
-  // While loading: same height, invisible so header reserves space. Paid: 0 height so header at top.
+  // When hidden (loading or paid): use 0 height so nav sits at top from first paint (no 52px gap / floating).
   const hidden = isLoading || isPaid;
 
   const scarcityText = scarcity
@@ -48,8 +48,8 @@ export default function GlobalFoundersClubBanner() {
         left: 0,
         right: 0,
         zIndex: 1001,
-        height: hidden ? (isPaid ? 0 : BANNER_PLACEHOLDER_HEIGHT) : undefined,
-        minHeight: isPaid ? 0 : undefined,
+        height: hidden ? 0 : undefined,
+        minHeight: hidden ? 0 : undefined,
         overflow: 'hidden',
         visibility: hidden ? 'hidden' : 'visible',
         pointerEvents: hidden ? 'none' : 'auto',

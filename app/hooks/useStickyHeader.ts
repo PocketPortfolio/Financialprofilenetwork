@@ -36,6 +36,8 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
       // Add padding to body so content starts below fixed header and banner
       const totalHeaderHeight = bannerHeight + headerHeight;
       document.body.style.paddingTop = `${totalHeaderHeight}px`;
+      document.body.style.setProperty('--header-offset', `${totalHeaderHeight}px`);
+      document.body.style.setProperty('--header-top', `${bannerHeight}px`);
     };
 
     // Apply immediately, after a short delay (banner may not be in DOM yet), and on resize
@@ -68,6 +70,8 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
       const otherHeaders = document.querySelectorAll(headerSelector);
       if (otherHeaders.length === 1) {
         document.body.style.paddingTop = '';
+        document.body.style.removeProperty('--header-offset');
+        document.body.style.removeProperty('--header-top');
       }
     };
   }, [headerSelector]);
