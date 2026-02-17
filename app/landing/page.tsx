@@ -17,6 +17,9 @@ import DynamicDownloadCount from '../components/DynamicDownloadCount';
 import { useStickyHeader } from '../hooks/useStickyHeader';
 import TickerSearch from '../components/TickerSearch';
 import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
+import LivingPipeline from '../components/landing/LivingPipeline';
+import Typewriter from '../components/ui/Typewriter';
+import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -553,8 +556,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Hero Section - PREMIUM POSITIONING */}
-      <main className="brand-surface brand-grid mobile-container" style={{ 
+      {/* Hero Section - PREMIUM POSITIONING (High-Tech Low-Drag: Living Pipeline + Typewriter + grid pulse) */}
+      <main className="brand-surface brand-grid brand-grid-pulse mobile-container" style={{ 
         width: '100%',
         maxWidth: '100vw',
         padding: 'clamp(24px, 6vw, 60px) clamp(12px, 3vw, 24px)',
@@ -580,17 +583,23 @@ export default function LandingPage() {
           padding: 'clamp(20px, 4vw, 32px)',
           boxSizing: 'border-box'
         }}>
-          {/* Headline - PREMIUM POSITIONING */}
+          {/* Living Pipeline: CSV -> Processor -> JSON (motion as meaning) */}
+          <LivingPipeline />
+          {/* Headline - Terminal Typer */}
           <h1 className="brand-text" style={{ 
-            fontSize: 'clamp(2.5rem, 5vw, 4rem)', 
+            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', 
             fontWeight: 'bold', 
             lineHeight: '1.1', 
             marginBottom: '24px',
             letterSpacing: '-0.03em',
-            maxWidth: '800px'
+            maxWidth: '800px',
+            minHeight: '1.2em'
           }}>
-            Evidence-First Investing.{' '}
-            <span style={{ color: 'var(--accent-warm)' }}>Universal Data.</span>
+            <Typewriter
+              strings={['Stop waiting for API integrations.', 'Import any CSV. Instantly.']}
+              cursorColor="#f59e0b"
+            />
+            <noscript>Import any CSV. Instantly.</noscript>
           </h1>
 
           {/* Subhead - PREMIUM POSITIONING */}
@@ -1047,7 +1056,8 @@ $ npx pocket-init --sovereign
       </section>
 
       <main className="brand-surface brand-grid mobile-container">
-        {/* SECTION 4: THE FEATURE GRID (SPLIT) */}
+        {/* SECTION 4: THE FEATURE GRID (SPLIT) - Scroll Reveal */}
+        <ScrollReveal>
         <section id="features" className="mobile-container" style={{ 
           marginBottom: 'clamp(60px, 10vw, 120px)',
           width: '100%',
@@ -1357,6 +1367,7 @@ $ npx pocket-init --sovereign
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* Popular Stocks Section - Developer Data Utility */}
         <section id="popular-stocks" className="mobile-container" style={{ 
@@ -1599,7 +1610,8 @@ $ npx pocket-init --sovereign
           </div>
         </section>
 
-        {/* Mission Section */}
+        {/* Mission Section (Scroll Reveal) */}
+        <ScrollReveal>
         <section id="mission" style={{ marginBottom: '120px', textAlign: 'center' }}>
           <h2 style={{ 
             fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
@@ -1619,8 +1631,10 @@ $ npx pocket-init --sovereign
             Pocket Portfolio exists to help people make better investment decisions, together. We are building a community-led, open-source platform that turns market noise into clear, actionable insight—so anyone can learn, evaluate, and act with confidence.
           </p>
         </section>
+        </ScrollReveal>
 
         {/* FIN Pillars Section */}
+        <ScrollReveal>
         <section id="fin-pillars" style={{ marginBottom: '120px', textAlign: 'center' }}>
           <h2 style={{ 
             fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
@@ -1717,6 +1731,7 @@ $ npx pocket-init --sovereign
             </div>
           </div>
         </section>
+        </ScrollReveal>
 
         {/* Early Access Section */}
         <section style={{ marginBottom: '120px', textAlign: 'center' }}>

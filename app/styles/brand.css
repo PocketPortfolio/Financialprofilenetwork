@@ -391,6 +391,28 @@ body:has(header.brand-header) {
   pointer-events: none;
 }
 
+/* Optional: gentle pulse on grid dot layer (Sovereign Grid). Disabled when prefers-reduced-motion. */
+@keyframes grid-pulse {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.16; }
+}
+
+.brand-grid.brand-grid-pulse::before {
+  animation: grid-pulse 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-grid.brand-grid-pulse::before {
+    animation: none;
+  }
+}
+
+/* Typewriter cursor blink (used by app/components/ui/Typewriter.tsx) */
+@keyframes typewriter-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
 .brand-grid-dense {
   background-image: 
     linear-gradient(to right, var(--border-subtle) 1px, transparent 1px),
