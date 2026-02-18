@@ -742,7 +742,7 @@
     "scheduledTime": "14:00",
     "title": "Monitoring Vercel Serverless Function Usage",
     "slug": "monitoring-vercel-serverless-function-usage",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -750,7 +750,8 @@
       "monitoring",
       "less",
       "serverless"
-    ]
+    ],
+    "publishedAt": "2026-02-18T14:40:09.203Z"
   },
   {
     "id": "how-to-how-to-debounce-search-inputs-for-performance-feb-19",

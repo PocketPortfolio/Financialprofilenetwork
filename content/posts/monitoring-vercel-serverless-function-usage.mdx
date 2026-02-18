@@ -1,0 +1,76 @@
+---
+title: Monitoring Vercel Serverless Function Usage
+date: '2026-02-18'
+description: >-
+  Learn how to effectively monitor your Vercel serverless function usage with
+  real-time tracking and insights.
+tags:
+  - vercel
+  - monitoring
+  - less
+  - serverless
+author: Pocket Portfolio Team
+image: /images/blog/monitoring-vercel-serverless-function-usage.png
+pillar: technical
+category: how-to-in-tech
+---
+
+In the realm of serverless architectures, keeping a vigilant eye on function executions is pivotal for ensuring performance and cost-efficiency. Vercel, a leading platform for serverless functions, provides no exception to this rule. The challenge lies not just in deploying but in effectively monitoring these functions to avoid unexpected bills and degraded performance. 
+
+### Direct Solution with Code
+
+To embark on monitoring your Vercel serverless function usage, you can harness the Vercel API coupled with a Node.js script for fetching and analyzing your function logs. Here’s a quick dive into how you can set this up:
+
+```javascript
+const fetch = require('node-fetch');
+const { VERCEL_TOKEN } = process.env;
+
+async function fetchVercelDeployments(teamId = '') {
+  const url = `https://api.vercel.com/v5/now/deployments?teamId=${teamId}`;
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${VERCEL_TOKEN}`,
+    },
+  });
+  const data = await response.json();
+  return data.deployments;
+}
+
+async function fetchVercelFunctionLogs(deploymentId, teamId = '') {
+  const url = `https://api.vercel.com/v2/now/deployments/${deploymentId}/functions?teamId=${teamId}`;
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${VERCEL_TOKEN}`,
+    },
+  });
+  const data = await response.json();
+  return data.functions;
+}
+
+(async () => {
+  const deployments = await fetchVercelDeployments('your_team_id_here');
+  for (const deployment of deployments) {
+    const functions = await fetchVercelFunctionLogs(deployment.uid, 'your_team_id_here');
+    console.log(`Deployment: ${deployment.url}`);
+    functions.forEach(fn => {
+      console.log(`Function: ${fn.name}, Invocations: ${fn.invocations}, Runtime: ${fn.runtime}`);
+    });
+  }
+})();
+```
+
+### Explanation of Key Concepts
+
+- **Vercel API**: Provides programmatic access to your deployment information, including serverless function logs.
+- **Node.js Script**: Utilizes the `fetch` method to communicate with the Vercel API, retrieving data on deployments and their respective function logs.
+- **Environment Variables**: Storing your Vercel token in an environment variable (`VERCEL_TOKEN`) ensures security and ease of configuration.
+
+### Quick Tip
+
+Remember to generate and use a Vercel API token with the appropriate permissions. This token allows your script to interact with your Vercel deployments securely. Store this token safely and never expose it in your codebase.
+
+### Gotcha
+
+Be aware of rate limits when making API requests to Vercel. If your deployment count is high, consider implementing a delay between requests or using pagination to avoid hitting these limits and ensure reliable script execution.
+
+In conclusion, monitoring your serverless function usage on Vercel is crucial for maintaining optimal performance and cost. With a simple Node.js script and the Vercel API, you can achieve comprehensive visibility into your functions' execution metrics, laying the groundwork for informed decision-making and efficient resource management.
