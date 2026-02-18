@@ -727,7 +727,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Real-Time Trading System Latency - Microsecond Analysis",
     "slug": "research-real-time-trading-system-latency-microsecond-analysis-2026-02-18",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "market",
     "keywords": [
@@ -735,7 +735,9 @@
       "trading",
       "real",
       "time"
-    ]
+    ],
+    "videoId": "iwRaNYa8yTw",
+    "publishedAt": "2026-02-18T18:40:46.254Z"
   },
   {
     "id": "research-portfolio-rebalancing-algorithms-performance-comparison-2026-02-19",
