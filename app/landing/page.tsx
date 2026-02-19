@@ -18,6 +18,7 @@ import { useStickyHeader } from '../hooks/useStickyHeader';
 import TickerSearch from '../components/TickerSearch';
 import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import LivingPipeline from '../components/landing/LivingPipeline';
+import { AnalystVideo } from '../components/landing/AnalystVideo';
 import Typewriter from '../components/ui/Typewriter';
 import ScrollReveal from '../components/ui/ScrollReveal';
 
@@ -765,6 +766,9 @@ export default function LandingPage() {
           </div>
         </div>
       </main>
+
+      {/* Pocket Analyst: Your Personal Quantitative Analyst (video + CTAs) */}
+      <AnalystVideo />
 
       {/* SECTION 2: THE BRIDGE - TRUST ANCHOR */}
       <section style={{

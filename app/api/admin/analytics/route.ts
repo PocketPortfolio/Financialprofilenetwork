@@ -396,6 +396,16 @@ async function getToolUsageData(startDate: Date) {
       byTicker: {} as Record<string, number>
     };
 
+    const pocketAnalyst = {
+      questions: 0,
+      errors: 0,
+      quotaExceeded: 0,
+      uniqueUsers: new Set<string>(),
+      last7Days: 0,
+      byTier: {} as Record<string, number>,
+      byProvider: {} as Record<string, number>,
+    };
+
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -471,6 +481,23 @@ async function getToolUsageData(startDate: Date) {
             }
           }
           break;
+
+        case 'pocket_analyst': {
+          const uid = data.metadata?.uid;
+          if (typeof uid === 'string') pocketAnalyst.uniqueUsers.add(uid);
+          const tier = typeof data.metadata?.tier === 'string' ? data.metadata.tier : 'unknown';
+          const provider = typeof data.metadata?.provider === 'string' ? data.metadata.provider : 'unknown';
+          if (data.action === 'question') {
+            pocketAnalyst.questions++;
+            if (isLast7Days) pocketAnalyst.last7Days++;
+            pocketAnalyst.byTier[tier] = (pocketAnalyst.byTier[tier] || 0) + 1;
+            pocketAnalyst.byProvider[provider] = (pocketAnalyst.byProvider[provider] || 0) + 1;
+          } else if (data.action === 'error') {
+            pocketAnalyst.errors++;
+            if (data.metadata?.errorCode === 'quota_exceeded') pocketAnalyst.quotaExceeded++;
+          }
+          break;
+        }
         
         default:
           // Unknown tool type - log but don't break
@@ -483,7 +510,16 @@ async function getToolUsageData(startDate: Date) {
       taxConverter,
       googleSheets,
       advisorTool,
-      csvDownloads
+      csvDownloads,
+      pocketAnalyst: {
+        questions: pocketAnalyst.questions,
+        errors: pocketAnalyst.errors,
+        quotaExceeded: pocketAnalyst.quotaExceeded,
+        uniqueUsers: pocketAnalyst.uniqueUsers.size,
+        last7Days: pocketAnalyst.last7Days,
+        byTier: pocketAnalyst.byTier,
+        byProvider: pocketAnalyst.byProvider,
+      },
     };
   } catch (error) {
     console.error('Tool usage fetch error:', error);
@@ -491,7 +527,8 @@ async function getToolUsageData(startDate: Date) {
       taxConverter: { total: 0, successful: 0, byPair: {}, last7Days: 0 },
       googleSheets: { total: 0, formulasGenerated: 0, copies: 0, last7Days: 0 },
       advisorTool: { total: 0, pdfsGenerated: 0, last7Days: 0 },
-      csvDownloads: { total: 0, last7Days: 0, last24Hours: 0, byTicker: {} }
+      csvDownloads: { total: 0, last7Days: 0, last24Hours: 0, byTicker: {} },
+      pocketAnalyst: { questions: 0, errors: 0, quotaExceeded: 0, uniqueUsers: 0, last7Days: 0, byTier: {}, byProvider: {} },
     };
   }
 }

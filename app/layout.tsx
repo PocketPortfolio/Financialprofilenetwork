@@ -16,6 +16,7 @@ import PremiumThemeProvider from './components/PremiumThemeProvider';
 import GlobalFooter from './components/layout/GlobalFooter';
 import PWAInstallPromptWrapper from './components/PWAInstallPromptWrapper';
 import GlobalFoundersClubBanner from './components/GlobalFoundersClubBanner';
+import { PocketAnalystProvider } from './components/ai/PocketAnalystProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -167,6 +168,7 @@ export default function RootLayout({
         <BrandProvider>
           <ErrorBoundary scope="app-root">
             <PremiumThemeProvider />
+            <PocketAnalystProvider>
             <GlobalFoundersClubBanner />
             <LandingPageTracker />
             <div className="safe-area-all" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -181,6 +183,7 @@ export default function RootLayout({
               </ErrorBoundary>
               <PWAInstallPromptWrapper />
             </div>
+            </PocketAnalystProvider>
           </ErrorBoundary>
         </BrandProvider>
       </body>

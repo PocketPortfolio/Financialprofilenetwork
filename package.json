@@ -66,6 +66,7 @@
     "generate-post-images": "ts-node --project scripts/tsconfig.json scripts/generate-post-images.ts",
     "upload-gif": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-vercel-blob.ts",
     "upload-gif-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-cloudinary.ts",
+    "upload-pocket-analyst-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-pocket-analyst-video-to-cloudinary.ts",
     "upload-gif-s3": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-s3.ts",
     "convert-gif-to-mp4": "ts-node --project scripts/tsconfig.json scripts/convert-gif-to-mp4.ts",
     "enforce-pocket-mdx": "ts-node --project scripts/tsconfig.json scripts/enforce-pocket-mdx.ts",
@@ -84,6 +85,7 @@
     "db:migrate:prod": "ts-node --project scripts/tsconfig.json scripts/production-migration.ts",
     "db:add-scheduled-status": "ts-node --project scripts/tsconfig.json scripts/add-scheduled-status-migration.ts",
     "db:create-system-settings": "ts-node --project scripts/tsconfig.json scripts/create-system-settings-table.ts",
+    "db:enable-rls-system-settings": "ts-node --project scripts/tsconfig.json scripts/enable-rls-system-settings.ts",
     "db:verify": "ts-node --project scripts/tsconfig.json scripts/verify-schema.ts",
     "db:studio": "drizzle-kit studio",
     "source-leads-autonomous": "ts-node --project scripts/tsconfig.json scripts/source-leads-autonomous.ts",
@@ -123,7 +125,9 @@
     "test-metronome:post": "ts-node --project scripts/tsconfig.json scripts/test-metronome.ts --post"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.0",
     "@ai-sdk/openai": "^3.0.19",
+    "@ai-sdk/react": "^2.0.138",
     "@aws-sdk/client-s3": "^3.966.0",
     "@aws-sdk/lib-storage": "^3.966.0",
     "@pocket-portfolio/importer": "file:packages/importer",

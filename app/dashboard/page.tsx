@@ -58,6 +58,8 @@ import {
   validateTrades 
 } from '../lib/utils/portfolioCalculations';
 import { Trade } from '../services/tradeService';
+import { buildPortfolioContext } from '../lib/ai/contextBuilder';
+import { usePocketAnalyst } from '../components/ai/PocketAnalystProvider';
 
 // Extend Window interface for portfolio summary logging
 declare global {
@@ -89,7 +91,8 @@ export default function Dashboard() {
   const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
   const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
   const { tier } = usePremiumTheme();
-  
+  const { setPortfolioContext, setTier } = usePocketAnalyst();
+
   // Map tier to data-tier attribute for CSS targeting
   const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
     if (tier === 'foundersClub') return 'founder';
@@ -702,6 +705,14 @@ export default function Dashboard() {
       setStorePositions(positionsArray);
     }
   }, [positionsKey, positionsArray, useNewDashboard, setStorePositions]);
+
+  // Sync portfolio context and tier for Pocket Analyst (Ask AI)
+  useEffect(() => {
+    setTier(tier);
+  }, [tier, setTier]);
+  useEffect(() => {
+    setPortfolioContext(buildPortfolioContext(displayTrades, positions));
+  }, [displayTrades, positions, setPortfolioContext]);
 
   // Save daily snapshot (only once per day, using stable key)
   const snapshotKey = useMemo(() => {

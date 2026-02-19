@@ -46,6 +46,15 @@ interface AnalyticsData {
       last24Hours: number;
       byTicker: Record<string, number>;
     };
+    pocketAnalyst?: {
+      questions: number;
+      errors: number;
+      quotaExceeded: number;
+      uniqueUsers: number;
+      last7Days: number;
+      byTier: Record<string, number>;
+      byProvider: Record<string, number>;
+    };
   };
   seoPages: {
     totalViews: number;
@@ -515,6 +524,85 @@ export default function AdminAnalyticsPage() {
               />
             </div>
           </section>
+
+          {/* Pocket Analyst (Ask AI) Section */}
+          {analyticsData.toolUsage.pocketAnalyst && (
+            <section style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: 'var(--space-6)'
+            }}>
+              <h2 style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: 'var(--space-4)',
+                color: 'var(--text)'
+              }}>
+                🤖 Pocket Analyst (Ask AI)
+              </h2>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                gap: 'var(--space-4)',
+                marginBottom: 'var(--space-4)'
+              }}>
+                <MetricCard
+                  label="Questions asked"
+                  value={analyticsData.toolUsage.pocketAnalyst.questions.toLocaleString()}
+                  subtitle="Total in range"
+                />
+                <MetricCard
+                  label="Last 7 days"
+                  value={analyticsData.toolUsage.pocketAnalyst.last7Days.toLocaleString()}
+                  subtitle="Recent questions"
+                />
+                <MetricCard
+                  label="Unique users"
+                  value={analyticsData.toolUsage.pocketAnalyst.uniqueUsers.toLocaleString()}
+                  subtitle="Distinct users"
+                />
+                <MetricCard
+                  label="Errors"
+                  value={analyticsData.toolUsage.pocketAnalyst.errors.toLocaleString()}
+                  subtitle="Failed requests"
+                />
+                <MetricCard
+                  label="Quota exceeded (429)"
+                  value={analyticsData.toolUsage.pocketAnalyst.quotaExceeded.toLocaleString()}
+                  subtitle="Free tier cap"
+                />
+              </div>
+              {(Object.keys(analyticsData.toolUsage.pocketAnalyst.byTier).length > 0 || Object.keys(analyticsData.toolUsage.pocketAnalyst.byProvider).length > 0) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-6)', marginTop: 'var(--space-4)' }}>
+                  {Object.keys(analyticsData.toolUsage.pocketAnalyst.byTier).length > 0 && (
+                    <div>
+                      <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: 'var(--space-2)' }}>By tier</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                        {Object.entries(analyticsData.toolUsage.pocketAnalyst.byTier)
+                          .sort(([, a], [, b]) => b - a)
+                          .map(([tier, count]) => (
+                            <span key={tier} style={{ color: 'var(--text-secondary)' }}>{tier}: {count}</span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                  {Object.keys(analyticsData.toolUsage.pocketAnalyst.byProvider).length > 0 && (
+                    <div>
+                      <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: 'var(--space-2)' }}>By provider</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                        {Object.entries(analyticsData.toolUsage.pocketAnalyst.byProvider)
+                          .sort(([, a], [, b]) => b - a)
+                          .map(([provider, count]) => (
+                            <span key={provider} style={{ color: 'var(--text-secondary)' }}>{provider}: {count}</span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          )}
 
           {/* CSV Downloads Section */}
           <section style={{

@@ -836,6 +836,13 @@ body:has(header.brand-header) {
   }
 }
 
+/* Pocket Analyst landing video grid: 2 columns on large screens */
+@media (min-width: 1024px) {
+  .analyst-video-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
 /* Additional desktop breakpoint for extra safety */
 @media (min-width: 1024px) {
   .hamburger-btn,
