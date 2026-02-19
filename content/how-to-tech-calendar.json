@@ -759,7 +759,7 @@
     "scheduledTime": "14:00",
     "title": "How to Debounce Search Inputs for Performance",
     "slug": "how-to-debounce-search-inputs-for-performance",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -767,7 +767,8 @@
       "debounce",
       "search",
       "inputs"
-    ]
+    ],
+    "publishedAt": "2026-02-19T14:42:06.504Z"
   },
   {
     "id": "how-to-understanding-http-status-codes-401-vs-403-feb-20",
