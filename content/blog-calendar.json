@@ -400,7 +400,7 @@
     "date": "2026-02-19",
     "title": "The Open Source Advantage: Why Transparency Beats Trust",
     "slug": "the-open-source-advantage-why-transparency-beats-trust",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -410,7 +410,8 @@
       "source"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-02-19T09:43:27.751Z"
   },
   {
     "id": "week-8-post-1",
