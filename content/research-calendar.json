@@ -745,7 +745,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Portfolio Rebalancing Algorithms - Performance Comparison",
     "slug": "research-portfolio-rebalancing-algorithms-performance-comparison-2026-02-19",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "market",
     "keywords": [
@@ -753,7 +753,9 @@
       "portfolio",
       "algorithms",
       "rebalancing"
-    ]
+    ],
+    "videoId": "pwyR9uAM0iU",
+    "publishedAt": "2026-02-19T18:40:27.181Z"
   },
   {
     "id": "research-risk-calculation-performance-monte-carlo-vs-analytical-2026-02-20",
