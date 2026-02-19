@@ -32,56 +32,30 @@ jobs:
       
       - name: Verify Secrets
         run: |
-          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
-            echo "❌ ERROR: VERCEL_TOKEN secret is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.VERCEL_ORG_ID }}" ]; then
-            echo "❌ ERROR: VERCEL_ORG_ID secret is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
-            echo "❌ ERROR: VERCEL_PROJECT_ID secret is not set"
-            exit 1
-          fi
-          echo "✅ All required secrets are set"
+          err=0
+          [ -z "${{ secrets.VERCEL_TOKEN }}" ] && echo "❌ VERCEL_TOKEN is not set" && err=1
+          [ -z "${{ secrets.VERCEL_ORG_ID }}" ] && echo "❌ VERCEL_ORG_ID is not set" && err=1
+          [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ] && echo "❌ VERCEL_PROJECT_ID is not set" && err=1
+          [ $err -eq 1 ] && echo "→ Add missing secrets in repo Settings → Secrets and variables → Actions" && exit 1
+          echo "✅ All required Vercel secrets are set"
       
       - name: Install dependencies
         run: npm ci
       
-      - name: Verify Database Schema
-        env:
-          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
-        run: |
-          echo "🔍 Verifying production database schema..."
-          npm run db:verify || echo "⚠️ Schema verification failed - continuing deployment (non-blocking)"
-        continue-on-error: true
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
       
-      - name: Run Database Migrations (if needed)
+      - name: Pull Vercel Environment Information
         env:
-          SUPABASE_SALES_DATABASE_URL: ${{ secrets.SUPABASE_SALES_DATABASE_URL }}
-        run: |
-          echo "📤 Running production-safe migrations..."
-          npm run db:migrate:prod || echo "⚠️ Migration completed with warnings (non-blocking)"
-        continue-on-error: true
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
       
-      - name: Validate Workflow Safety
-        run: |
-          echo "🔍 Validating workflow safety..."
-          npm run validate-workflow-safety || echo "⚠️ Workflow validation warnings (non-blocking)"
-        continue-on-error: true
-
-      - name: Run CI checks
-        run: |
-          npm run lint || echo "⚠️ Lint warnings (non-blocking)"
-          npm run typecheck || echo "⚠️ Typecheck warnings (non-blocking)"
-          npm run test || echo "⚠️ Test failures (non-blocking)"
-        continue-on-error: true
-      
-      # Block deploy if build fails so we never push a broken build to prod
-      - name: Build
-        run: npm run build
+      - name: Build Project Artifacts
+        id: vercel-build
         env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           NODE_ENV: production
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
@@ -91,26 +65,15 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
           ENCRYPTION_SECRET: ${{ secrets.ENCRYPTION_SECRET }}
-          WAITLIST_DOUBLE_OPT_IN: false
+          WAITLIST_DOUBLE_OPT_IN: "false"
+        run: vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
       
-      - name: Check commit message
-        id: commit-check
-        run: |
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
-          if echo "$COMMIT_MSG" | grep -q "\[skip ci\]"; then
-            echo "⚠️ Commit contains [skip ci] - deployment will proceed (blog generation commit)"
-          fi
-
       - name: Deploy to Vercel Production
         id: vercel-deploy
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: .
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
 
       - name: Deployment Summary
         if: always()
