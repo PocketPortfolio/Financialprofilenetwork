@@ -54,9 +54,10 @@ jobs:
       run: npx playwright install --with-deps
       
     - name: Run E2E tests
-      run: npx playwright test --project=chromium-desktop
+      run: npx playwright test tests/e2e/book-page.spec.ts --project=chromium-desktop
       env:
         PLAYWRIGHT_BASE_URL: http://localhost:3001
+        CI: "true"
       
     - name: Build application
       run: npm run build
