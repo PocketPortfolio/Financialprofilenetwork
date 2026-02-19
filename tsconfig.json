@@ -63,6 +63,7 @@
     "src_backup",
     "scripts_backup",
     "tests_backup",
+    "tests",
     "scripts",
     "drizzle.config.ts",
     "lib/sales/sourcing/predator-scraper.ts",
