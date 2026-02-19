@@ -63,6 +63,7 @@ export function AskAIModal({
   const [attachedContent, setAttachedContent] = useState('');
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
   const [showQuotaExceededModal, setShowQuotaExceededModal] = useState(false);
+  const [showAttachmentUpsellModal, setShowAttachmentUpsellModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -93,6 +94,7 @@ export function AskAIModal({
     if (open) {
       document.body.style.overflow = 'hidden';
       setShowQuotaExceededModal(false);
+      setShowAttachmentUpsellModal(false);
     }
     return () => {
       document.body.style.overflow = '';
@@ -382,8 +384,8 @@ export function AskAIModal({
               {error}
             </p>
           )}
-          {isPaid && (
-            <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            {isPaid && (
               <input
                 ref={fileInputRef}
                 type="file"
@@ -391,40 +393,43 @@ export function AskAIModal({
                 onChange={handleFileAttach}
                 style={{ display: 'none' }}
               />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Add file"
-                style={{
-                  padding: '6px 10px',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  background: 'hsl(var(--muted))',
-                  color: 'hsl(var(--foreground))',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '13px',
-                }}
-              >
-                <Paperclip size={14} />
-                Add file (CSV or text)
-              </button>
-              {attachedFileName && (
-                <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {attachedFileName}
-                  <button
-                    type="button"
-                    onClick={() => { setAttachedContent(''); setAttachedFileName(null); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'hsl(var(--destructive))', fontSize: '12px' }}
-                  >
-                    Remove
-                  </button>
-                </span>
-              )}
-            </div>
-          )}
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (isPaid) fileInputRef.current?.click();
+                else setShowAttachmentUpsellModal(true);
+              }}
+              aria-label="Add file"
+              style={{
+                padding: '6px 10px',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '8px',
+                background: 'hsl(var(--muted))',
+                color: 'hsl(var(--foreground))',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '13px',
+              }}
+            >
+              <Paperclip size={14} />
+              Add file (CSV or text)
+            </button>
+            {isPaid && attachedFileName && (
+              <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                {attachedFileName}
+                <button
+                  type="button"
+                  onClick={() => { setAttachedContent(''); setAttachedFileName(null); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'hsl(var(--destructive))', fontSize: '12px' }}
+                >
+                  Remove
+                </button>
+              </span>
+            )}
+          </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
             <textarea
               value={input}
@@ -506,6 +511,63 @@ export function AskAIModal({
                 <button
                   type="button"
                   onClick={() => { setShowQuotaExceededModal(false); setError(null); }}
+                  style={{
+                    padding: '10px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'hsl(var(--muted-foreground))',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Maybe later
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAttachmentUpsellModal && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '12px',
+              background: 'hsl(var(--card))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '24px',
+              zIndex: 10,
+            }}
+          >
+            <div style={{ textAlign: 'center', maxWidth: '320px' }}>
+              <p style={{ margin: '0 0 8px', fontSize: '15px', fontWeight: 600 }}>
+                Attach files
+              </p>
+              <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
+                Upgrade to Founder's Club or Corporate to attach CSV or text files to your questions.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <a
+                  href="/sponsor?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=founders_club"
+                  style={{
+                    display: 'block',
+                    padding: '12px 20px',
+                    borderRadius: '8px',
+                    background: 'var(--warning)',
+                    color: '#000',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                  }}
+                >
+                  Upgrade to Founder's Club or Corporate
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setShowAttachmentUpsellModal(false)}
                   style={{
                     padding: '10px',
                     background: 'transparent',
