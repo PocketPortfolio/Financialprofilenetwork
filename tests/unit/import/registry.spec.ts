@@ -5,12 +5,13 @@ test('registry has all expected adapters', () => {
   const expectedBrokers = [
     'schwab', 'vanguard', 'etrade', 'fidelity',
     'trading212', 'freetrade', 'degiro', 'ig', 'saxo', 'interactive_investor', 'revolut',
-    'ibkr_flex', 'kraken', 'binance', 'coinbase'
+    'ibkr_flex', 'kraken', 'binance', 'coinbase',
+    'koinly', 'turbotax', 'ghostfolio', 'sharesight'
   ];
   
   const actualBrokers = ADAPTERS.map(a => a.id);
   expect(actualBrokers).toEqual(expect.arrayContaining(expectedBrokers));
-  expect(ADAPTERS.length).toBe(15);
+  expect(ADAPTERS.length).toBe(19);
 });
 
 test('detectBroker identifies Trading212', () => {

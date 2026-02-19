@@ -103,22 +103,27 @@ jobs:
           fi
 
       - name: Deploy to Vercel Production
+        id: vercel-deploy
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
-          working-directory: ./
+          working-directory: .
 
       - name: Deployment Summary
         if: always()
         run: |
           echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ **Deployment to Vercel Production**" >> $GITHUB_STEP_SUMMARY
-          echo "- Build completed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "- Changes deployed to production" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.vercel-deploy.outcome }}" = "success" ]; then
+            echo "✅ **Deployment to Vercel Production**" >> $GITHUB_STEP_SUMMARY
+            echo "- Build completed successfully" >> $GITHUB_STEP_SUMMARY
+            echo "- Changes deployed to production" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Deploy step failed** (exit code 1). Check Vercel dashboard and action logs (e.g. \`vercel inspect\`)." >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📝 **Commit:** \`$(git log -1 --pretty=%h)\` - $(git log -1 --pretty=%s)" >> $GITHUB_STEP_SUMMARY
 

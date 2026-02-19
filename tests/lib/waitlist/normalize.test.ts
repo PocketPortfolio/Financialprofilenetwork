@@ -14,8 +14,10 @@ describe('waitlist normalize', () => {
     });
 
     it('should validate email length', () => {
-      expect(() => normalizeEmail('ab@c.d')).toThrow('Email must be between 3 and 254 characters');
       expect(() => normalizeEmail('a@b.c')).not.toThrow();
+      const longLocal = 'a'.repeat(251) + '@b.c';
+      expect(longLocal.length).toBeGreaterThan(254);
+      expect(() => normalizeEmail(longLocal)).toThrow('Email must be between 3 and 254 characters');
     });
 
     it('should handle empty or invalid input', () => {

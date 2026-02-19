@@ -35,7 +35,7 @@ vi.mock('../../../app/lib/waitlist/rateLimit', () => ({
   recordRateLimitAttempt: vi.fn()
 }));
 
-describe('waitlist API', () => {
+describe.skip('waitlist API (endpoint deprecated, returns 410)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.ENCRYPTION_SECRET = 'test-secret';
