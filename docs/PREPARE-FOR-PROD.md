@@ -10,7 +10,7 @@ Unified checklist before deploying to production. Covers build, env, Pocket Anal
 npm run build
 ```
 
-Resolves to: `build:importer` → `build:sitemaps` → `build:inject-firebase` → `next build`. Fix any TypeScript or lint errors.
+Resolves to: `build:importer` → `build:sitemaps` → `build:inject-firebase` → `build:book-assets` → `next build`. Fix any TypeScript or lint errors.
 
 **Optional pre-deploy:**
 
@@ -44,11 +44,7 @@ Use **Vercel → Project → Settings → Environment Variables** for **Producti
 
 ## 3. Book (Sovereign Intelligence + Universal LLM Import)
 
-- **Figures:** Book images (including Sovereign Intelligence SVGs) are served by **`/api/book-assets`** from `docs/book/` (figures, assets). No copy step is required for the API route; ensure `docs/book/figures/` and `docs/book/assets/` are committed.
-- **Optional static copy:** If anything serves from `public/book-assets`, run before deploy:
-  ```bash
-  node scripts/copy-book-assets.js
-  ```
+- **Figures & covers:** Book images are served from **`/book-assets/`** (static). The build runs `npm run build:book-assets` (copies `docs/book/figures` and `docs/book/assets` to `public/book-assets`), so no manual copy is needed. Ensure `docs/book/figures/` and `docs/book/assets/` are committed.
 - **Deploy script:** Use `node scripts/deploy-book-to-prod.js` (or push the same paths) to deploy book-related changes. See **`docs/DEPLOY-BOOK.md`**.
 
 **Live URLs after deploy:**
@@ -65,7 +61,7 @@ Use **Vercel → Project → Settings → Environment Variables** for **Producti
 - [ ] **At least one LLM key** in Vercel (Production): `GOOGLE_GENERATIVE_AI_API_KEY` and/or `OPENAI_API_KEY`
 - [ ] **CRON_SECRET** set in Vercel if using crons (recommended for Pocket Analyst monthly quota reset)
 - [ ] `NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS` not set (or `false`) in production
-- [ ] Book: `docs/book/figures/` and `docs/book/assets/` committed (figures load via `/api/book-assets`)
+- [ ] Book: `docs/book/figures/` and `docs/book/assets/` committed (figures/covers load via `/book-assets/` after build copy)
 
 ---
 
@@ -82,7 +78,7 @@ Use **Vercel → Project → Settings → Environment Variables** for **Producti
 
 ### Book
 
-- [ ] **Sovereign Intelligence:** https://www.pocketportfolio.app/book/sovereign-intelligence — loads; all 10 figures (si-figure-01 … si-figure-10) load via `/api/book-assets`
+- [ ] **Sovereign Intelligence:** https://www.pocketportfolio.app/book/sovereign-intelligence — loads; all 10 figures (si-figure-01 … si-figure-10) and cover load via `/book-assets/`
 - [ ] **Universal LLM Import:** https://www.pocketportfolio.app/book/universal-llm-import — loads; chapter images and content render
 
 ---

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ErrorBoundary } from '@/app/components/ErrorBoundary';
 
-const BOOK_ASSETS = '/api/book-assets';
+const BOOK_ASSETS = '/book-assets';
 const isDev = process.env.NODE_ENV !== 'production';
 
 /** Rehype plugin: ensure every node has a defined children array so nothing in the pipeline reads .children of undefined. Mutates in place, no dependency on unist-util-visit. */

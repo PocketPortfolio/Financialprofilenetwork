@@ -38,6 +38,10 @@ const nextConfig = {
   // Enable standalone output for Docker (Vercel handles this automatically)
   // Only use standalone for Docker deployments, not for Vercel
   // output: 'standalone', // Commented out - Vercel uses serverless functions
+  // Include docs/book in serverless bundle if /api/book-assets is used (app uses static /book-assets/ now)
+  outputFileTracingIncludes: {
+    '/api/book-assets': ['./docs/book/**'],
+  },
   compiler: {
     // Keep console.warn and console.error in production for debugging
     // Only remove console.log (but keep DIVIDEND_DEBUG logs via console.warn)

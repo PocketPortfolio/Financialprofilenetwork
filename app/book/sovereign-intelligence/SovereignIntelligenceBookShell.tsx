@@ -98,7 +98,7 @@ export function SovereignIntelligenceBookShell({ content }: { content: string })
             <figure className="mb-8 rounded-xl overflow-hidden border-2 shadow-xl w-full" style={{ borderColor: 'var(--border)' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/api/book-assets/assets/covers/sovereign-intelligence-cover.svg"
+                src="/book-assets/assets/covers/sovereign-intelligence-cover.svg"
                 alt="Sovereign Intelligence: Building Local-First RAG for Finance"
                 className="w-full h-auto block"
                 style={{ minHeight: '200px', objectFit: 'contain' }}

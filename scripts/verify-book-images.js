@@ -13,27 +13,37 @@ async function get(url) {
 
 async function main() {
   const checks = [];
-  const pageUrl = `${base}/book/universal-llm-import`;
-  const pageRes = await fetch(pageUrl, { redirect: 'follow' });
-  const html = await pageRes.text();
+  const baseUrl = (p) => base + p;
 
-  checks.push({ name: 'book page', status: pageRes.status, ok: pageRes.ok });
-  checks.push({
-    name: 'page contains chapter SVG ref',
-    ok: /chapter-headers\/chapter-\d+-header\.svg/.test(html),
-  });
-  checks.push({
-    name: 'page contains figures SVG ref',
-    ok: /figures\/figure-\d+-.*\.svg/.test(html),
-  });
+  // Both book pages
+  for (const slug of ['universal-llm-import', 'sovereign-intelligence']) {
+    const pageRes = await fetch(baseUrl(`/book/${slug}`), { redirect: 'follow' });
+    const html = await pageRes.text();
+    checks.push({ name: `page /book/${slug}`, status: pageRes.status, ok: pageRes.ok });
+    if (slug === 'universal-llm-import') {
+      checks.push({
+        name: 'universal-llm-import contains figure refs',
+        ok: /figures\/figure-\d+-.*\.svg/.test(html),
+      });
+    } else {
+      checks.push({
+        name: 'sovereign-intelligence contains si-figure refs',
+        ok: /figures\/si-figure-\d+-.*\.svg/.test(html),
+      });
+    }
+  }
 
+  // Covers and figures (both books)
   const assets = [
-    '/book-assets/assets/chapter-headers/chapter-01-header.svg',
+    '/book-assets/assets/covers/sovereign-intelligence-cover.svg',
+    '/book-assets/assets/covers/universal-llm-import-cover.svg',
     '/book-assets/figures/figure-02-local-first-flow.svg',
+    '/book-assets/figures/si-figure-01-data-chasm.svg',
+    '/book-assets/assets/chapter-headers/chapter-01-header.svg',
   ];
-  for (const path of assets) {
-    const r = await get(base + path);
-    checks.push({ name: path, status: r.status, ok: r.ok });
+  for (const p of assets) {
+    const r = await get(baseUrl(p));
+    checks.push({ name: p, status: r.status, ok: r.ok });
   }
 
   const failed = checks.filter((c) => !c.ok);
@@ -41,7 +51,7 @@ async function main() {
     console.error('Failed checks:', failed);
     process.exit(1);
   }
-  console.log('All checks passed:', checks.length);
+  console.log('All book image checks passed:', checks.length);
 }
 
 main().catch((err) => {
