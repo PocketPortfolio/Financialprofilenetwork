@@ -776,14 +776,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding HTTP Status Codes: 401 vs 403",
     "slug": "understanding-http-status-codes-401-vs-403",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "http",
       "understanding",
       "status"
-    ]
+    ],
+    "publishedAt": "2026-02-20T14:35:46.989Z"
   },
   {
     "id": "how-to-how-to-use-github-actions-for-automated-linting-feb-21",

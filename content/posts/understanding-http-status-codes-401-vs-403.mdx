@@ -1,0 +1,49 @@
+---
+title: 'Understanding HTTP Status Codes: 401 vs 403'
+date: '2026-02-20'
+description: >-
+  A concise guide to differentiate HTTP status codes 401 and 403, helping
+  developers handle authentication and authorization errors correctly.
+tags:
+  - http
+  - understanding
+  - status
+author: Pocket Portfolio Team
+image: /images/blog/understanding-http-status-codes-401-vs-403.png
+pillar: technical
+category: how-to-in-tech
+---
+
+When developing web applications, handling HTTP status codes correctly is crucial for both security and user experience. Specifically, distinguishing between 401 Unauthorized and 403 Forbidden errors often causes confusion. Here's a straightforward guide to understanding and implementing these status codes correctly.
+
+### Direct Solution with Code
+
+**401 Unauthorized:**
+
+```http
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Basic realm="Access to the staging site", charset="UTF-8"
+```
+
+**403 Forbidden:**
+
+```http
+HTTP/1.1 403 Forbidden
+Content-Length: 0
+```
+
+### Explanation of Key Concepts
+
+- **401 Unauthorized** indicates that the request has not been applied because it lacks valid authentication credentials for the target resource. The server must send a `WWW-Authenticate` header containing the details on how to authenticate.
+
+- **403 Forbidden** signifies that the server understands the request but refuses to authorize it. This status is not related to authentication but rather to whether the authenticated user has permissions to access the resource.
+
+### Quick Tip
+
+Remember, a **401** status should prompt the client to authenticate themselves by providing credentials. It's a nudge to say, "Hey, you might want to log in to access this." Conversely, receiving a **403** status means "You're logged in, but you're not allowed here." No matter how many times the request is repeated, the result will be the same unless permissions change.
+
+### Gotcha
+
+A common mistake is treating **401 Unauthorized** as a catch-all for authentication and authorization errors. This not only confuses users but can also expose sensitive information about your server's security. Always use **403 Forbidden** to indicate that the authenticated user is not permitted to access the requested resource.
+
+Understanding and correctly implementing HTTP status codes 401 and 403 enhances the security and usability of your web applications. By clearly distinguishing between authentication and authorization errors, you ensure a smoother, more intuitive user experience.
