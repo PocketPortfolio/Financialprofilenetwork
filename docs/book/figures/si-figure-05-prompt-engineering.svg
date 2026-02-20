@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 280" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <rect x="20" y="44" width="340" height="228" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="190" y="68" text-anchor="middle" font-weight="600" font-size="12">System Prompt</text>
+  <!-- Sections -->
+  <rect x="36" y="82" width="308" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="52" y="100" font-size="10">Role: Pocket Portfolio Financial Analyst</text>
+  <rect x="36" y="118" width="308" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="52" y="136" font-size="10">Scope: finance, markets, portfolio, economic data</text>
+  <rect x="36" y="154" width="308" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="52" y="172" font-size="10">Data usage: context = summary only; attachment = this turn only</text>
+  <rect x="36" y="190" width="308" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="52" y="208" font-size="10">Output format: Markdown, links to official sources</text>
+  <rect x="36" y="226" width="308" height="28" rx="4" fill="#fef2f2" stroke="#b91c1c" stroke-width="1"/>
+  <text x="52" y="244" font-size="10">Refusal policy: no advice, no execution, redirect off-topic</text>
+  <!-- Title -->
+  <text x="190" y="28" text-anchor="middle" font-weight="600" font-size="12">Figure 5 — Prompt Engineering</text>
+</svg>
