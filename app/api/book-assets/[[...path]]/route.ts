@@ -51,7 +51,8 @@ export async function GET(
   };
   const contentType = types[ext] ?? 'application/octet-stream';
   const cacheControl = ext === '.svg' ? 'public, max-age=3600' : 'public, max-age=86400';
-  return new NextResponse(content, {
+  const body = new Uint8Array(content);
+  return new NextResponse(body as unknown as BodyInit, {
     headers: {
       'Content-Type': contentType,
       'Cache-Control': cacheControl,
