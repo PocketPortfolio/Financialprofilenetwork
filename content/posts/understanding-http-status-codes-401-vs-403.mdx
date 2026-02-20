@@ -1,0 +1,46 @@
+---
+title: 'Understanding HTTP Status Codes: 401 vs 403'
+date: '2026-02-20'
+description: >-
+  Grasp the key differences between HTTP status codes 401 and 403 to debug and
+  secure web applications more effectively.
+tags:
+  - http
+  - understanding
+  - status
+author: Pocket Portfolio Team
+image: /images/blog/understanding-http-status-codes-401-vs-403.png
+pillar: technical
+category: how-to-in-tech
+---
+
+When building or interacting with web applications, encountering HTTP status codes 401 and 403 can be a common occurrence. Understanding the subtle differences between these two is crucial for proper error handling and security.
+
+```http
+GET /protected-resource HTTP/1.1
+Host: example.com
+
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Basic realm="Access to the protected resource", charset="UTF-8"
+```
+
+```http
+GET /protected-resource HTTP/1.1
+Host: example.com
+
+HTTP/1.1 403 Forbidden
+```
+
+### Key Concepts
+
+- **401 Unauthorized**: This status code indicates that the request has not been applied because it lacks valid authentication credentials for the target resource. The server might want to respond with this status code to a request for a protected resource, prompting the client to provide credentials. If the client has already provided credentials and they are invalid or insufficient, 401 is the correct response.
+
+- **403 Forbidden**: Unlike 401, a 403 status means that the server understands the request but refuses to authorize it. This response is sent when the server wishes to make it clear that the client is authenticated correctly but does not have permission to access the resource. In other words, the client's credentials may be valid but do not grant them access to the resource.
+
+### Quick Tip
+
+A common **gotcha** when dealing with these status codes is confusing authentication (verifying who you are) with authorization (what you are allowed to do). A 401 error indicates a problem with authentication, while a 403 error deals with authorization. Make sure your application logic and error handling clearly distinguish between these two cases to avoid security loopholes and ensure a smooth user experience.
+
+Also, be mindful of the information you reveal with a 403 status code. Providing too much detail can inadvertently help an attacker understand your application's security model or discover hidden resources.
+
+Understanding the nuances between HTTP status codes 401 and 403 is essential for securing web applications and providing meaningful feedback to users about authentication and authorization issues. Always ensure your application's response codes align with the standard definitions to maintain clarity and security.

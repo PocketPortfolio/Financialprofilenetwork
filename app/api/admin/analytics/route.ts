@@ -1165,74 +1165,65 @@ async function getBlogPostsData() {
     }
 
     const today = new Date().toISOString().split('T')[0];
-    
-    // Check which posts have actual files
+    const todayDate = new Date(today);
+    const isVercel = typeof process.env.VERCEL === 'string';
+
+    // Check which posts have actual files (only possible when filesystem is available, e.g. local/build)
     const postsDir = path.join(process.cwd(), 'content', 'posts');
     const imagesDir = path.join(process.cwd(), 'public', 'images', 'blog');
-    
-    // ✅ FIX: Use direct filesystem checks instead of array includes
-    // This is more reliable and handles edge cases (case sensitivity, timing, exact path matching)
+
     const posts = deduplicatedCalendar.map((post: any) => {
-      // Direct filesystem check - more reliable than array includes
       const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
       const imagePath = path.join(imagesDir, `${post.slug}.png`);
-      
-      // ✅ ENHANCED: Add error handling and logging for production debugging
+
+      // On Vercel serverless, content/posts and public/images/blog are not in the function bundle,
+      // so fs checks always fail. Infer from calendar: published + date <= today => assume files deployed.
       let hasFiles = false;
-      try {
-        const mdxExists = fs.existsSync(mdxPath);
-        const imageExists = fs.existsSync(imagePath);
-        hasFiles = mdxExists && imageExists;
-        
-        // Log missing files for debugging (only for published research posts to reduce noise)
-        if (!hasFiles && post.category === 'research' && post.status === 'published') {
-          console.warn(`[Analytics] Research post files missing: ${post.slug}`, {
-            mdxPath,
-            imagePath,
-            mdxExists,
-            imageExists,
-            postsDirExists: fs.existsSync(postsDir),
-            imagesDirExists: fs.existsSync(imagesDir),
-            cwd: process.cwd(),
-          });
+      if (isVercel) {
+        hasFiles = post.status === 'published' && new Date(post.date) <= todayDate;
+      } else {
+        try {
+          const mdxExists = fs.existsSync(mdxPath);
+          const imageExists = fs.existsSync(imagePath);
+          hasFiles = mdxExists && imageExists;
+          if (!hasFiles && post.category === 'research' && post.status === 'published') {
+            console.warn(`[Analytics] Research post files missing: ${post.slug}`, {
+              mdxPath, imagePath, mdxExists, imageExists,
+              postsDirExists: fs.existsSync(postsDir),
+              imagesDirExists: fs.existsSync(imagesDir),
+              cwd: process.cwd(),
+            });
+          }
+        } catch (error: any) {
+          console.error(`[Analytics] Error checking files for ${post.slug}:`, error.message);
+          hasFiles = false;
         }
-      } catch (error: any) {
-        console.error(`[Analytics] Error checking files for ${post.slug}:`, error.message);
-        // If we can't check, assume files don't exist (safer default)
-        hasFiles = false;
       }
+
       const postDate = new Date(post.date);
-      const todayDate = new Date(today);
-      
-      // ✅ FIX: If files exist and date has passed, treat as published (auto-detect)
-      // This handles cases where calendar wasn't updated but files were generated
-      const effectiveStatus = hasFiles && postDate <= todayDate 
-        ? 'published' 
+      // If we inferred hasFiles from calendar (Vercel), effectiveStatus is already post.status for published
+      const effectiveStatus = !isVercel && hasFiles && postDate <= todayDate
+        ? 'published'
         : post.status;
-      
-      // ✅ FIX: Only mark as overdue if status is pending AND no files exist
       const isOverdue = postDate < todayDate && effectiveStatus === 'pending';
-      
-      // Get published time from calendar (publishedAt) - this is the actual publish time
-      // Fall back to file modification time if publishedAt is not available (actual publish time)
+
+      // Published time: from calendar (publishedAt), file mtime (local), or scheduled time when published
+      const scheduledDateTime = post.scheduledTime
+        ? `${post.date}T${post.scheduledTime}:00Z`
+        : `${post.date}T00:00:00Z`;
       let publishedTime: string | null = null;
-      if (hasFiles && effectiveStatus === 'published') {
-        // Prefer publishedAt from calendar (actual publish time)
+      const consideredPublished = effectiveStatus === 'published' || (isVercel && hasFiles);
+      if (consideredPublished) {
         if (post.publishedAt) {
           publishedTime = post.publishedAt;
-        } else {
-          // ✅ FIX: Use file modification time instead of scheduled time (actual publish time)
-          // We already know the file exists (hasFiles is true), so we can safely use mdxPath
-          if (fs.existsSync(mdxPath)) {
-            const mdxStats = fs.statSync(mdxPath);
-            publishedTime = mdxStats.mtime.toISOString();
-          } else {
-            // Fallback to scheduled time only if file doesn't exist (shouldn't happen)
-            const scheduledDateTime = post.scheduledTime 
-              ? `${post.date}T${post.scheduledTime}:00Z`
-              : `${post.date}T00:00:00Z`;
+        } else if (!isVercel && fs.existsSync(mdxPath)) {
+          try {
+            publishedTime = fs.statSync(mdxPath).mtime.toISOString();
+          } catch {
             publishedTime = scheduledDateTime;
           }
+        } else {
+          publishedTime = scheduledDateTime;
         }
       }
       

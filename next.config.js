@@ -42,6 +42,12 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/book-assets': ['./docs/book/**'],
   },
+  // Exclude public/images/blog from API serverless bundles (233MB); served as static assets
+  outputFileTracingExcludes: {
+    '/api/admin/analytics': ['public/images/blog/**'],
+    '/api/blog/health': ['public/images/blog/**'],
+    '/api/**': ['public/images/blog/**'],
+  },
   compiler: {
     // Keep console.warn and console.error in production for debugging
     // Only remove console.log (but keep DIVIDEND_DEBUG logs via console.warn)

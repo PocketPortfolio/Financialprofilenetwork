@@ -743,15 +743,11 @@ pillar: "${post.pillar}"
       throw new Error('Failed to download image after all retries');
     }
 
-    // Save files with atomic write operations and verification
+    // Save image (direct write to avoid EPERM on rename under Windows/OneDrive)
     const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
     fs.mkdirSync(path.dirname(imagePath), { recursive: true });
-    
-    // Atomic write: write to temp file first, then rename
-    const imageTempPath = `${imagePath}.tmp`;
-    fs.writeFileSync(imageTempPath, Buffer.from(imageBuffer));
-    fs.renameSync(imageTempPath, imagePath);
-    
+    fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
+
     // Verify image was written correctly
     if (!fs.existsSync(imagePath)) {
       throw new Error(`Image file was not created: ${imagePath}`);
@@ -781,10 +777,8 @@ pillar: "${post.pillar}"
     }
     
     // Atomic write: write to temp file first, then rename
-    const mdxTempPath = `${mdxPath}.tmp`;
-    fs.writeFileSync(mdxTempPath, content, 'utf-8');
-    fs.renameSync(mdxTempPath, mdxPath);
-    
+    fs.writeFileSync(mdxPath, content, 'utf-8');
+
     // Verify MDX was written correctly and is valid
     if (!fs.existsSync(mdxPath)) {
       throw new Error(`MDX file was not created: ${mdxPath}`);

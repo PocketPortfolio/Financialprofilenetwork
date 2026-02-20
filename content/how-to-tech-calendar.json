@@ -776,7 +776,8 @@
     "scheduledTime": "14:00",
     "title": "Understanding HTTP Status Codes: 401 vs 403",
     "slug": "understanding-http-status-codes-401-vs-403",
-    "status": "pending",
+    "status": "published",
+    "publishedAt": "2026-02-20T19:55:00.000Z",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
