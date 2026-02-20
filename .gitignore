@@ -8,6 +8,9 @@ dist/
 .env.*
 !.env.example
 
+# Test / tooling output
+coverage/
+
 # OS / editor
 .DS_Store
 Thumbs.db
