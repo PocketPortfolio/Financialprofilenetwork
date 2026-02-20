@@ -172,7 +172,7 @@ function BookImage({ src, alt }: { src?: string | null; alt?: string | null }) {
     minHeight: isSvg ? 80 : 1,
     objectFit: 'contain',
   };
-  // Use <object> for SVG so the browser renders it as document content; <img> can fail with same-origin SVG in some environments.
+  // Use <img> for SVG so figures are not blocked by CSP object-src 'none' (object-src blocks <object>).
   if (isSvg) {
     return (
       <span
@@ -180,12 +180,14 @@ function BookImage({ src, alt }: { src?: string | null; alt?: string | null }) {
         style={wrapperStyle}
         data-book-img="true"
       >
-        <object
-          data={final}
-          type="image/svg+xml"
-          aria-label={altText}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={final}
+          alt={altText}
           className="book-img mx-auto max-w-full rounded-lg block w-full"
           style={{ ...imgStyle, minHeight: 80 }}
+          loading="eager"
+          decoding="async"
           onLoad={() => logImgStatus(final, 'load')}
           onError={() => logImgStatus(final, 'error')}
         />
