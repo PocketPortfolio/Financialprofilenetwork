@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ErrorBoundary } from '@/app/components/ErrorBoundary';
-import { BookMarkdown } from './BookMarkdown';
-import { DownloadPdfButton } from './DownloadPdfButton';
+import { BookMarkdown } from '../universal-llm-import/BookMarkdown';
 
 const neutralFallback = (
   <div className="book-page min-h-screen" style={{ background: 'var(--bg)' }}>
@@ -16,7 +15,7 @@ const neutralFallback = (
       }}
     >
       <div className="relative max-w-3xl mx-auto text-center">
-        <h1 className="text-2xl font-bold">Universal LLM Import</h1>
+        <h1 className="text-2xl font-bold">Sovereign Intelligence</h1>
       </div>
     </header>
     <main className="max-w-3xl mx-auto px-6 py-12">
@@ -35,7 +34,7 @@ const neutralFallback = (
   </div>
 );
 
-export function BookPageShell({ content }: { content: string }) {
+export function SovereignIntelligenceBookShell({ content }: { content: string }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -54,7 +53,7 @@ export function BookPageShell({ content }: { content: string }) {
           }}
         >
           <div className="relative max-w-3xl mx-auto text-center">
-            <h1 className="text-2xl font-bold">Universal LLM Import</h1>
+            <h1 className="text-2xl font-bold">Sovereign Intelligence</h1>
           </div>
         </header>
         <main className="max-w-3xl mx-auto px-6 py-12">
@@ -99,21 +98,22 @@ export function BookPageShell({ content }: { content: string }) {
             <figure className="mb-8 rounded-xl overflow-hidden border-2 shadow-xl w-full" style={{ borderColor: 'var(--border)' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/api/book-assets/assets/covers/universal-llm-import-cover.svg"
-                alt="Universal LLM Import: Building Local-First, Sovereign CSV Ingestion"
+                src="/api/book-assets/assets/covers/sovereign-intelligence-cover.svg"
+                alt="Sovereign Intelligence: Building Local-First RAG for Finance"
                 className="w-full h-auto block"
                 style={{ minHeight: '200px', objectFit: 'contain' }}
                 aria-hidden
               />
             </figure>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">Universal LLM Import</h1>
-            <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>Building Local-First, Sovereign CSV Ingestion</p>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">Sovereign Intelligence</h1>
+            <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+              Building Local-First RAG for Finance
+            </p>
             <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Schema inference, confidence thresholds, and sovereign data in financial CSV import
+              Architecture of a local-first financial AI — Pocket Analyst, context engine, and data sovereignty
             </p>
           </div>
         </header>
-        <DownloadPdfButton />
         <main className="book-body max-w-3xl mx-auto px-6 py-12 print:py-8">
           <article className="prose prose-slate dark:prose-invert prose-headings:font-sans max-w-none book-article">
             <BookMarkdown content={content} />

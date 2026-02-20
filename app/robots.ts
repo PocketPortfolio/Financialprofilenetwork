@@ -35,40 +35,40 @@ export default function robots(): MetadataRoute.Robots {
           '*.json',
         ],
       },
-      // AI Crawlers - Explicitly Invited to Blog & API
+      // AI Crawlers - Explicitly Invited to Blog, Book (Technical Press), API
       {
         userAgent: 'GPTBot',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'ChatGPT-User',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'CCBot',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'anthropic-ai',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'Claude-Web',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'Google-Extended',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'PerplexityBot',
-        allow: ['/', '/blog/', '/api/tickers/'],
+        allow: ['/', '/blog/', '/book/', '/api/tickers/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
     ],

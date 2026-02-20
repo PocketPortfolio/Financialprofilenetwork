@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ErrorBoundary } from '@/app/components/ErrorBoundary';
 
-const BOOK_ASSETS = '/book-assets';
+const BOOK_ASSETS = '/api/book-assets';
 const isDev = process.env.NODE_ENV !== 'production';
 
 /** Rehype plugin: ensure every node has a defined children array so nothing in the pipeline reads .children of undefined. Mutates in place, no dependency on unist-util-visit. */
@@ -45,8 +45,8 @@ declare global {
 function bookAssetUrl(href: string): string {
   if (!href || href.startsWith('http') || href.startsWith('data:')) return href;
   const clean = href.replace(/^\//, '');
-  // Cache-bust Figure 5 so alignment fixes load (bump version when figure changes)
-  const q = clean.includes('figure-04') ? '?v=10' : clean.includes('figure-05') ? '?v=9' : '';
+  // Cache-bust SVGs so browsers fetch fixed versions (no invalid PCDATA chars); bump when figures change
+  const q = /si-figure-\d+-/.test(clean) ? '?v=3' : clean.includes('figure-04') ? '?v=10' : clean.includes('figure-05') ? '?v=9' : '';
   return `${BOOK_ASSETS}/${clean}${q}`;
 }
 
@@ -83,24 +83,6 @@ function logImgStatus(
     console.log(oneLine, data);
     if (placeholder) {
       console.warn('[Book] Placeholder PNG (1×1). Replace: docs/book/assets/chapter-headers/ → npm run book:copy-assets', src);
-    }
-    if (typeof window !== 'undefined') {
-      const rect = el?.getBoundingClientRect?.();
-      fetch('/api/book-debug-img', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          src: data.src,
-          status,
-          naturalW: el?.naturalWidth,
-          naturalH: el?.naturalHeight,
-          rectW: rect?.width,
-          rectH: rect?.height,
-          display: data.computedDisplay,
-          visibility: data.computedVisibility,
-          placeholder: !!placeholder,
-        }),
-      }).catch(() => {});
     }
     if (typeof window !== 'undefined') {
       if (!window.__bookImgDebug) {
@@ -173,7 +155,7 @@ function BookImage({ src, alt }: { src?: string | null; alt?: string | null }) {
     );
   }
 
-  const isSvg = /\.svg$/i.test(final);
+  const isSvg = /\.svg$/i.test(final.split('?')[0] ?? final);
   const wrapperStyle: React.CSSProperties = {
     display: 'block',
     overflow: 'visible',
@@ -190,9 +172,29 @@ function BookImage({ src, alt }: { src?: string | null; alt?: string | null }) {
     minHeight: isSvg ? 80 : 1,
     objectFit: 'contain',
   };
+  // Use <object> for SVG so the browser renders it as document content; <img> can fail with same-origin SVG in some environments.
+  if (isSvg) {
+    return (
+      <span
+        className={`book-img-wrapper block my-4 book-img-figure`}
+        style={wrapperStyle}
+        data-book-img="true"
+      >
+        <object
+          data={final}
+          type="image/svg+xml"
+          aria-label={altText}
+          className="book-img mx-auto max-w-full rounded-lg block w-full"
+          style={{ ...imgStyle, minHeight: 80 }}
+          onLoad={() => logImgStatus(final, 'load')}
+          onError={() => logImgStatus(final, 'error')}
+        />
+      </span>
+    );
+  }
   return (
     <span
-      className={`book-img-wrapper block my-4 ${isSvg ? 'book-img-figure' : ''}`}
+      className="book-img-wrapper block my-4"
       style={wrapperStyle}
       data-book-img="true"
     >
@@ -211,16 +213,7 @@ function BookImage({ src, alt }: { src?: string | null; alt?: string | null }) {
             setShowPlaceholder(true);
           }
         }}
-        onError={() => {
-          logImgStatus(final, 'error');
-          if (isDev && typeof window !== 'undefined') {
-            fetch('/api/book-debug-img', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ src: final, status: 'error', ts: new Date().toISOString() }),
-            }).catch(() => {});
-          }
-        }}
+        onError={() => logImgStatus(final, 'error')}
       />
     </span>
   );

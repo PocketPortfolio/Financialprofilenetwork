@@ -22,10 +22,27 @@ export async function GET(
   if (!withinAllowed || !exists || !isFile) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
-  const content = fs.readFileSync(absolutePath);
+  let content: Buffer | Uint8Array = fs.readFileSync(absolutePath);
+  const buf = Buffer.isBuffer(content) ? content : Buffer.from(content);
   const ext = path.extname(absolutePath).toLowerCase();
+
+  // Strip invalid XML control chars (0x00-0x1F except tab, LF, CR) from SVG so parsers never see PCDATA errors
+  let didSanitize = false;
+  if (ext === '.svg') {
+    let sanitized: Buffer | null = null;
+    for (let i = 0; i < buf.length; i++) {
+      const b = buf[i];
+      if (b < 32 && b !== 9 && b !== 10 && b !== 13) {
+        if (sanitized === null) sanitized = Buffer.from(buf);
+        sanitized[i] = 0x20;
+        didSanitize = true;
+      }
+    }
+    if (sanitized !== null) content = sanitized;
+  }
+
   const types: Record<string, string> = {
-    '.svg': 'image/svg+xml',
+    '.svg': 'image/svg+xml; charset=utf-8',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
@@ -33,10 +50,11 @@ export async function GET(
     '.webp': 'image/webp',
   };
   const contentType = types[ext] ?? 'application/octet-stream';
+  const cacheControl = ext === '.svg' ? 'public, max-age=3600' : 'public, max-age=86400';
   return new NextResponse(content, {
     headers: {
       'Content-Type': contentType,
-      'Cache-Control': 'public, max-age=86400',
+      'Cache-Control': cacheControl,
     },
   });
 }
