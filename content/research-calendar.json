@@ -780,7 +780,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Market Data Processing - Throughput Benchmarks",
     "slug": "research-market-data-processing-throughput-benchmarks-2026-02-21",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "market",
     "keywords": [
@@ -788,7 +788,9 @@
       "market",
       "data",
       "processing"
-    ]
+    ],
+    "videoId": "a4cUEyqSLmU",
+    "publishedAt": "2026-02-21T18:22:50.225Z"
   },
   {
     "id": "research-order-matching-engine-performance-exchange-comparison-2026-02-22",
