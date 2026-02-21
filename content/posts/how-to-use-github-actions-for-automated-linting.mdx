@@ -1,0 +1,75 @@
+---
+title: How to Use GitHub Actions for Automated Linting
+date: '2026-02-21'
+description: >-
+  Learn how to set up automated linting with GitHub Actions to ensure code
+  quality and style consistency across projects.
+tags:
+  - github
+  - git
+  - github-actions
+  - use
+  - actions
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-github-actions-for-automated-linting.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Ensuring code quality and consistency across large projects can be a tedious task. Automated linting with GitHub Actions can streamline this process by checking your code for errors and style violations on every push or pull request.
+
+### Direct Solution with Code
+
+To set up automated linting with GitHub Actions, you need to create a `.github/workflows/lint.yml` file in your repository with the following content:
+
+```yaml
+name: Lint Code Base
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install Dependencies
+      run: npm install
+    - name: Run Linter
+      run: npm run lint
+```
+
+This workflow is triggered on every `push` and `pull_request` event. It checks out the code, sets up a Node.js environment, installs dependencies, and finally runs the `npm run lint` command which should be defined in your `package.json`.
+
+### Explanation of Key Concepts
+
+- **GitHub Actions**: A CI/CD feature within GitHub that allows you to automate your build, test, and deployment pipelines.
+- **Workflows**: Configured via YAML files, workflows are automated processes that run one or more jobs.
+- **Jobs**: A set of steps that execute on the same runner. In our case, linting is a job.
+- **Steps**: Individual tasks that run commands in a job. Our steps include checking out the code, setting up Node.js, installing dependencies, and running the linter.
+
+### Quick Tip
+
+If your project uses a different language or linter, adjust the "Set up Node.js" and "Run Linter" steps according to your stack. For instance, for a Python project using Flake8, replace those steps with:
+
+```yaml
+- name: Set up Python
+  uses: actions/setup-python@v2
+  with:
+    python-version: '3.8'
+- name: Install Dependencies
+  run: pip install flake8
+- name: Run Linter
+  run: flake8 .
+```
+
+### Gotcha
+
+Make sure your linter is configured with a `.lintrc`, `pyproject.toml`, or equivalent in your repository. Without it, the linter may not know your preferred coding styles and rules, leading to inconsistent results.
+
+Automating linting with GitHub Actions not only saves time but also helps maintain a high code quality standard across contributions. By integrating this into your workflow, you ensure that your projects stay clean, readable, and free of simple errors.

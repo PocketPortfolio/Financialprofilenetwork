@@ -792,7 +792,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use GitHub Actions for Automated Linting",
     "slug": "how-to-use-github-actions-for-automated-linting",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -801,7 +801,8 @@
       "github actions",
       "use",
       "actions"
-    ]
+    ],
+    "publishedAt": "2026-02-21T14:18:58.172Z"
   },
   {
     "id": "how-to-the-basics-of-indexeddb-for-local-storage-feb-22",
