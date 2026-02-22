@@ -1,0 +1,60 @@
+---
+title: The Basics of IndexedDB for Local Storage
+date: '2026-02-22'
+description: >-
+  Learn the basics of IndexedDB for efficient, large-scale local storage in web
+  applications, with direct code examples.
+tags:
+  - indexeddb
+  - basics
+  - local
+author: Pocket Portfolio Team
+image: /images/blog/the-basics-of-indexeddb-for-local-storage.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Storing large amounts of data locally in web applications can be challenging. Cookies and LocalStorage fall short due to their size limitations and lack of query capabilities. Enter IndexedDB, a low-level API for client-side storage of significant amounts of structured data, including files/blobs, which allows for high performance with a rich set of features.
+
+### Direct Solution with Code
+
+Here is a quick dive into setting up and using IndexedDB:
+
+```javascript
+// Opening a database
+var db;
+var request = indexedDB.open("MyTestDatabase", 1);
+
+request.onerror = function(event) {
+  console.error("Database error: ", event.target.errorCode);
+};
+
+request.onsuccess = function(event) {
+  db = event.target.result;
+};
+
+// Handling database version updates
+request.onupgradeneeded = function(event) { 
+  var db = event.target.result;
+
+  // Create an object store for this database
+  var objectStore = db.createObjectStore("name", { keyPath: "myKey" });
+};
+```
+
+### Explanation of Key Concepts
+
+- **indexedDB.open:** Opens a connection to your database. The "1" is the version number, which can be used in the `onupgradeneeded` event to trigger database schema updates.
+- **request.onsuccess:** This event handler will run once the connection is successfully opened, allowing you to assign the database instance to a variable.
+- **request.onerror:** Handles errors opening the database.
+- **request.onupgradeneeded:** This is where you define or update the database structure. This example creates an object store named "name", with "myKey" as its primary key.
+
+### Quick Tip
+
+Always handle the `onupgradeneeded` event when opening a database connection with IndexedDB. It's crucial for initializing or updating the database's structure and ensures your app can accommodate schema changes over time without losing data.
+
+### Gotcha
+
+Remember that IndexedDB is asynchronous. This means that operations like opening a database or reading and writing to it will not block the main thread but will instead complete at a future point in time. Always use callbacks or promises to handle the results of these operations.
+
+IndexedDB is a powerful tool for web developers needing to store large amounts of data locally, offering both scale and flexibility. With the basics in hand, you're ready to explore more advanced features and use cases of IndexedDB in your web applications.

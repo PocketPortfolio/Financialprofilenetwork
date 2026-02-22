@@ -810,14 +810,15 @@
     "scheduledTime": "14:00",
     "title": "The Basics of IndexedDB for Local Storage",
     "slug": "the-basics-of-indexeddb-for-local-storage",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "indexeddb",
       "basics",
       "local"
-    ]
+    ],
+    "publishedAt": "2026-02-22T14:19:54.844Z"
   },
   {
     "id": "how-to-how-to-export-data-to-csv-from-json-feb-23",
