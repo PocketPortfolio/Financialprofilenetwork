@@ -22,6 +22,7 @@ interface SovereignHeaderProps {
 export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user, setShowImportModal }: SovereignHeaderProps) {
   const [time, setTime] = useState<string>('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showSyncTooltip, setShowSyncTooltip] = useState(false);
@@ -523,6 +524,45 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
               >
                 Settings
               </Link>
+              
+              {/* Tools (collapsible, default closed) */}
+              <div style={{ marginTop: '4px' }}>
+                <button
+                  type="button"
+                  onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '12px 16px',
+                    borderRadius: '6px',
+                    color: 'hsl(var(--foreground))',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'hsl(var(--muted))';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  Tools
+                  <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))' }}>{toolsMenuOpen ? '▾' : '▸'}</span>
+                </button>
+                {toolsMenuOpen && (
+                  <div style={{ paddingLeft: '12px', marginTop: '2px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <Link href="/live" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(var(--muted))'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Live Market Data</Link>
+                    <Link href="/tools" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(var(--muted))'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Tax Converters</Link>
+                    <Link href="/s/directory" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(var(--muted))'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>JSON API Directory</Link>
+                  </div>
+                )}
+              </div>
               
               <button
                 type="button"
