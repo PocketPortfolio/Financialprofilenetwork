@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" font-family="system-ui, -apple-system, Segoe UI, sans-serif">
+  <defs>
+    <linearGradient id="bg8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="url(#bg8)" rx="8"/>
+  <rect x="0" y="192" width="800" height="8" fill="#34d399" opacity="0.9" rx="4"/>
+  <text x="400" y="108" text-anchor="middle" fill="#f8fafc" font-size="22" font-weight="600">Part 8 - Economic Modeling</text>
+  <text x="400" y="148" text-anchor="middle" fill="#94a3b8" font-size="14">Running a free AI tier without going bankrupt</text>
+</svg>

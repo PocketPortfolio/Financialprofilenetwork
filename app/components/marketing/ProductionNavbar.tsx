@@ -1,7 +1,8 @@
 'use client';
 
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
@@ -12,6 +13,10 @@ export default function ProductionNavbar() {
   const [isMobile, setIsMobile] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [toolsPanelRect, setToolsPanelRect] = useState<{ top: number; left: number } | null>(null);
+  const toolsTriggerRef = useRef<HTMLDivElement>(null);
+  const toolsCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -23,6 +28,33 @@ export default function ProductionNavbar() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const updateToolsPanelRect = () => {
+    const el = toolsTriggerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setToolsPanelRect({ top: r.bottom + 4, left: r.left });
+  };
+
+  useLayoutEffect(() => {
+    if (!toolsOpen) {
+      setToolsPanelRect(null);
+      return;
+    }
+    updateToolsPanelRect();
+    window.addEventListener('scroll', updateToolsPanelRect, true);
+    window.addEventListener('resize', updateToolsPanelRect);
+    return () => {
+      window.removeEventListener('scroll', updateToolsPanelRect, true);
+      window.removeEventListener('resize', updateToolsPanelRect);
+    };
+  }, [toolsOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (toolsCloseTimeoutRef.current) clearTimeout(toolsCloseTimeoutRef.current);
+    };
   }, []);
 
   const toggleMobileMenu = () => {
@@ -40,8 +72,13 @@ export default function ProductionNavbar() {
     { label: 'Features', href: isLandingPage ? '#features' : '/landing#features' },
     { label: 'Stocks', href: isLandingPage ? '#popular-stocks' : '/landing#popular-stocks' },
     { label: 'FIN Pillars', href: isLandingPage ? '#fin-pillars' : '/landing#fin-pillars' },
-    { label: 'Community', href: isLandingPage ? '#community' : '/landing#community' },
     { label: 'FAQ', href: isLandingPage ? '#faq' : '/landing#faq' },
+  ];
+
+  const toolsLinks = [
+    { label: 'Live Market Data', href: '/live' },
+    { label: 'Tax Converters', href: '/tools' },
+    { label: 'JSON API Directory', href: '/s/directory' },
   ];
 
   return (
@@ -85,58 +122,111 @@ export default function ProductionNavbar() {
               }}>
                 {navLinks.map((link) => {
                   const isAnchor = link.href.startsWith('#');
-                  
-                  if (isAnchor) {
+                  const linkStyle = {
+                    fontSize: '15px',
+                    padding: '8px 0',
+                    borderBottom: '2px solid transparent',
+                    textDecoration: 'none',
+                    color: 'var(--text)' as const
+                  };
+                  const linkEl = isAnchor ? (
+                    <a key={link.label} href={link.href} className="brand-link" style={linkStyle}
+                      onMouseEnter={(e) => { (e.target as HTMLElement).style.color = 'var(--signal)'; (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)'; }}
+                      onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'var(--text)'; (e.target as HTMLElement).style.borderBottomColor = 'transparent'; }}
+                    >{link.label}</a>
+                  ) : (
+                    <Link key={link.label} href={link.href} className="brand-link" style={linkStyle}
+                      onMouseEnter={(e) => { (e.target as HTMLElement).style.color = 'var(--signal)'; (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)'; }}
+                      onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'var(--text)'; (e.target as HTMLElement).style.borderBottomColor = 'transparent'; }}
+                    >{link.label}</Link>
+                  );
+                  if (link.label === 'FIN Pillars') {
                     return (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        className="brand-link"
-                        style={{ 
-                          fontSize: '15px',
-                          padding: '8px 0',
-                          borderBottom: '2px solid transparent',
-                          textDecoration: 'none',
-                          color: 'var(--text)'
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.target as HTMLElement).style.color = 'var(--signal)';
-                          (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.target as HTMLElement).style.color = 'var(--text)';
-                          (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                        }}
-                      >
-                        {link.label}
-                      </a>
+                      <React.Fragment key={link.label}>
+                        {linkEl}
+                        <div
+                          key="tools"
+                          ref={toolsTriggerRef}
+                          style={{ position: 'relative', display: 'inline-block' }}
+                          onMouseEnter={() => {
+                            if (toolsCloseTimeoutRef.current) {
+                              clearTimeout(toolsCloseTimeoutRef.current);
+                              toolsCloseTimeoutRef.current = null;
+                            }
+                            setToolsOpen(true);
+                          }}
+                          onMouseLeave={() => {
+                            toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
+                          }}
+                        >
+                          <span
+                            className="brand-link"
+                            style={{
+                              ...linkStyle,
+                              cursor: 'pointer',
+                              borderBottomColor: toolsOpen ? 'var(--signal)' : 'transparent',
+                              color: toolsOpen ? 'var(--signal)' : 'var(--text)'
+                            }}
+                            onClick={() => setToolsOpen(!toolsOpen)}
+                          >
+                            Tools ▾
+                          </span>
+                          {toolsOpen && toolsPanelRect && typeof document !== 'undefined' && createPortal(
+                            <div
+                              role="menu"
+                              onMouseEnter={() => {
+                                if (toolsCloseTimeoutRef.current) {
+                                  clearTimeout(toolsCloseTimeoutRef.current);
+                                  toolsCloseTimeoutRef.current = null;
+                                }
+                                setToolsOpen(true);
+                              }}
+                              onMouseLeave={() => {
+                                toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
+                              }}
+                              style={{
+                                position: 'fixed',
+                                top: toolsPanelRect.top,
+                                left: toolsPanelRect.left,
+                                minWidth: '180px',
+                                background: 'var(--surface-elevated)',
+                                border: '1px solid var(--border)',
+                                borderRadius: '8px',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                padding: '8px 0',
+                                zIndex: 10050
+                              }}
+                            >
+                              {toolsLinks.map((t) => (
+                                <Link
+                                  key={t.label}
+                                  href={t.href}
+                                  onClick={() => setToolsOpen(false)}
+                                  style={{
+                                    display: 'block',
+                                    padding: '10px 16px',
+                                    fontSize: '14px',
+                                    color: 'var(--text)',
+                                    textDecoration: 'none'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'var(--muted)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'transparent';
+                                  }}
+                                >
+                                  {t.label}
+                                </Link>
+                              ))}
+                            </div>,
+                            document.body
+                          )}
+                        </div>
+                      </React.Fragment>
                     );
                   }
-                  
-                  return (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      className="brand-link"
-                      style={{ 
-                        fontSize: '15px',
-                        padding: '8px 0',
-                        borderBottom: '2px solid transparent',
-                        textDecoration: 'none',
-                        color: 'var(--text)'
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.target as HTMLElement).style.color = 'var(--signal)';
-                        (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLElement).style.color = 'var(--text)';
-                        (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  );
+                  return linkEl;
                 })}
               </nav>
 
@@ -326,69 +416,46 @@ export default function ProductionNavbar() {
           onClick={(e) => e.stopPropagation()}
           >
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {navLinks.map((link) => {
+              {navLinks.flatMap((link) => {
                 const isAnchor = link.href.startsWith('#');
                 const handleClick = () => setIsMobileMenuOpen(false);
-                
-                if (isAnchor) {
-                  return (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      onClick={handleClick}
-                      className="brand-link"
-                      style={{
-                        fontSize: '16px',
-                        padding: '12px 16px',
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        color: 'var(--text)',
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        transition: 'all 0.2s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.target as HTMLElement).style.background = 'var(--signal)';
-                        (e.target as HTMLElement).style.color = 'white';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.target as HTMLElement).style.background = 'var(--surface)';
-                        (e.target as HTMLElement).style.color = 'var(--text)';
-                      }}
-                    >
-                      {link.label}
-                    </a>
-                  );
-                }
-                
-                return (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    onClick={handleClick}
-                    className="brand-link"
-                    style={{
-                      fontSize: '16px',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      color: 'var(--text)',
-                      background: 'var(--surface)',
-                      border: '1px solid var(--border)',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.background = 'var(--signal)';
-                      (e.target as HTMLElement).style.color = 'white';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.background = 'var(--surface)';
-                      (e.target as HTMLElement).style.color = 'var(--text)';
-                    }}
-                  >
-                    {link.label}
-                  </Link>
+                const linkStyle = {
+                  fontSize: '16px',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  textDecoration: 'none' as const,
+                  color: 'var(--text)',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  transition: 'all 0.2s ease'
+                };
+                const linkEl = isAnchor ? (
+                  <a key={link.label} href={link.href} onClick={handleClick} className="brand-link" style={linkStyle}
+                    onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'var(--signal)'; (e.target as HTMLElement).style.color = 'white'; }}
+                    onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'var(--surface)'; (e.target as HTMLElement).style.color = 'var(--text)'; }}
+                  >{link.label}</a>
+                ) : (
+                  <Link key={link.label} href={link.href} onClick={handleClick} className="brand-link" style={linkStyle}
+                    onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'var(--signal)'; (e.target as HTMLElement).style.color = 'white'; }}
+                    onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'var(--surface)'; (e.target as HTMLElement).style.color = 'var(--text)'; }}
+                  >{link.label}</Link>
                 );
+                if (link.label === 'FAQ') {
+                  return [
+                    <details key="tools" style={{ margin: 0 }}>
+                      <summary style={{ ...linkStyle, cursor: 'pointer', listStyle: 'none' }}>Tools</summary>
+                      <div style={{ paddingLeft: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {toolsLinks.map((t) => (
+                          <Link key={t.label} href={t.href} onClick={handleClick} style={{ ...linkStyle, padding: '10px 16px' }}>
+                            {t.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </details>,
+                    linkEl
+                  ];
+                }
+                return [linkEl];
               })}
               
               <div style={{ 

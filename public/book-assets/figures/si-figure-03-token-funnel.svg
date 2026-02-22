@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <defs>
+    <marker id="si-a3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 z" fill="#475569"/></marker>
+  </defs>
+  <!-- Title -->
+  <text x="200" y="28" text-anchor="middle" font-weight="600" font-size="12">Figure 3 — The Token Funnel</text>
+  <!-- Funnel: wide top -->
+  <path fill="#f1f5f9" stroke="#475569" stroke-width="1.2" d="M80 56 L320 56 L280 96 L120 96 Z"/>
+  <text x="200" y="82" text-anchor="middle" font-weight="600">Trades + Positions</text>
+  <text x="200" y="96" text-anchor="middle" font-size="9" fill="#64748b">(full state)</text>
+  <path fill="none" d="M200 96 L200 116" stroke="#475569" stroke-width="1.2" marker-end="url(#si-a3)"/>
+  <!-- Middle -->
+  <rect x="140" y="116" width="120" height="36" rx="4" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+  <text x="200" y="138" text-anchor="middle" font-size="10">Aggregation</text>
+  <path fill="none" d="M200 152 L200 172" stroke="#475569" stroke-width="1.2" marker-end="url(#si-a3)"/>
+  <!-- Narrow: Top N + Totals -->
+  <path fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2" d="M160 172 L240 172 L220 212 L180 212 Z"/>
+  <text x="200" y="195" text-anchor="middle" font-size="10">Top N + Totals</text>
+  <path fill="none" d="M200 212 L200 232" stroke="#475569" stroke-width="1.2" marker-end="url(#si-a3)"/>
+  <!-- Bottom -->
+  <rect x="170" y="232" width="60" height="24" rx="4" fill="#0f766e" stroke="#0f766e" stroke-width="1"/>
+  <text x="200" y="248" text-anchor="middle" font-size="9" fill="#fff">≤4K tokens</text>
+  <!-- Labels: below bottom bar -->
+  <text x="200" y="272" text-anchor="middle" font-size="9" fill="#64748b">Signal preserved; noise dropped</text>
+</svg>

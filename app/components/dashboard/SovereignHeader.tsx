@@ -91,13 +91,13 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
         data-tour="sovereign-header"
         style={{
           borderBottom: '1px solid hsl(var(--border))',
-          background: 'hsl(var(--background) / 0.8)',
+          background: 'hsl(var(--background))',
           backdropFilter: 'blur(12px)',
           position: 'sticky', // Will be converted to 'fixed' by useStickyHeader hook
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 1000, // Increased to match landing page
+          zIndex: 1002, // Above GlobalFoundersClubBanner (1001) so nav is never hidden behind it
           padding: '0', // Padding moved to inner container to reduce white space
           display: 'flex',
           justifyContent: 'space-between',

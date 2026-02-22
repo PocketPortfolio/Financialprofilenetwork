@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Logo from '../components/Logo';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import CommunityContent from '../components/CommunityContent';
@@ -11,6 +12,7 @@ import SocialProof from '../components/viral/SocialProof';
 import FunnelTracker from '../components/analytics/FunnelTracker';
 import CSVImporter from '../components/CSVImporter';
 import { useTrades } from '../hooks/useTrades';
+import { useAuth } from '../hooks/useAuth';
 import { WebOneBadge } from '../components/hero/WebOneBadge';
 import NPMStats from '../components/NPMStats';
 import DynamicDownloadCount from '../components/DynamicDownloadCount';
@@ -24,11 +26,27 @@ import ScrollReveal from '../components/ui/ScrollReveal';
 
 export default function LandingPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const { user } = useAuth();
   const { importTrades } = useTrades();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Redirect to dashboard only when user just landed on / after sign-in (not when they clicked logo to visit /)
+  const POST_AUTH_REDIRECT_KEY = 'pp-post-auth-redirect-done';
+  useEffect(() => {
+    if (!user || pathname !== '/') return;
+    if (typeof window === 'undefined') return;
+    if (sessionStorage.getItem(POST_AUTH_REDIRECT_KEY)) return;
+    sessionStorage.setItem(POST_AUTH_REDIRECT_KEY, '1');
+    router.replace('/dashboard');
+  }, [user, pathname, router]);
   const [isMobile, setIsMobile] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
   const [csvUploaded, setCsvUploaded] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [toolsPanelRect, setToolsPanelRect] = useState<{ top: number; left: number } | null>(null);
+  const toolsTriggerRef = useRef<HTMLDivElement>(null);
+  const toolsCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
   useEffect(() => {
@@ -57,6 +75,33 @@ export default function LandingPage() {
 
   // Header positioning is now handled globally by useStickyHeader hook
   useStickyHeader('header.brand-header');
+
+  const updateToolsPanelRect = () => {
+    const el = toolsTriggerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setToolsPanelRect({ top: r.bottom + 4, left: r.left });
+  };
+
+  useLayoutEffect(() => {
+    if (!toolsOpen) {
+      setToolsPanelRect(null);
+      return;
+    }
+    updateToolsPanelRect();
+    window.addEventListener('scroll', updateToolsPanelRect, true);
+    window.addEventListener('resize', updateToolsPanelRect);
+    return () => {
+      window.removeEventListener('scroll', updateToolsPanelRect, true);
+      window.removeEventListener('resize', updateToolsPanelRect);
+    };
+  }, [toolsOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (toolsCloseTimeoutRef.current) clearTimeout(toolsCloseTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <>
@@ -174,20 +219,67 @@ export default function LandingPage() {
                   (e.target as HTMLElement).style.borderBottomColor = 'transparent';
                 }}
                 >FIN Pillars</a>
-                <a href="#community" className="brand-link" style={{ 
-                  fontSize: '15px',
-                  padding: '8px 0',
-                  borderBottom: '2px solid transparent'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--signal)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--text)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                }}
-                >Community</a>
+                <div
+                  ref={toolsTriggerRef}
+                  style={{ position: 'relative', display: 'inline-block' }}
+                  onMouseEnter={() => {
+                    if (toolsCloseTimeoutRef.current) {
+                      clearTimeout(toolsCloseTimeoutRef.current);
+                      toolsCloseTimeoutRef.current = null;
+                    }
+                    setToolsOpen(true);
+                  }}
+                  onMouseLeave={() => {
+                    toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
+                  }}
+                >
+                  <span
+                    className="brand-link"
+                    style={{
+                      fontSize: '15px',
+                      padding: '8px 0',
+                      borderBottom: '2px solid transparent',
+                      cursor: 'pointer',
+                      color: toolsOpen ? 'var(--signal)' : 'var(--text)',
+                      borderBottomColor: toolsOpen ? 'var(--signal)' : 'transparent'
+                    }}
+                    onClick={() => setToolsOpen(!toolsOpen)}
+                  >
+                    Tools ▾
+                  </span>
+                  {toolsOpen && toolsPanelRect && typeof document !== 'undefined' && createPortal(
+                    <div
+                      role="menu"
+                      onMouseEnter={() => {
+                        if (toolsCloseTimeoutRef.current) {
+                          clearTimeout(toolsCloseTimeoutRef.current);
+                          toolsCloseTimeoutRef.current = null;
+                        }
+                        setToolsOpen(true);
+                      }}
+                      onMouseLeave={() => {
+                        toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
+                      }}
+                      style={{
+                        position: 'fixed',
+                        top: toolsPanelRect.top,
+                        left: toolsPanelRect.left,
+                        minWidth: '180px',
+                        background: 'var(--surface-elevated)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px',
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                        padding: '8px 0',
+                        zIndex: 10050
+                      }}
+                    >
+                      <Link href="/live" style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: 'var(--text)', textDecoration: 'none' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Live Market Data</Link>
+                      <Link href="/tools" style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: 'var(--text)', textDecoration: 'none' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Tax Converters</Link>
+                      <Link href="/s/directory" style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: 'var(--text)', textDecoration: 'none' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>JSON API Directory</Link>
+                    </div>,
+                    document.body
+                  )}
+                </div>
                 <a href="#faq" className="brand-link" style={{ 
                   fontSize: '15px',
                   padding: '8px 0',
@@ -463,20 +555,14 @@ export default function LandingPage() {
             >
               FIN Pillars
             </a>
-            <a 
-              href="#community" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '18px', 
-                fontWeight: '500',
-                padding: '12px 0',
-                borderBottom: '1px solid var(--card-border)'
-              }}
-            >
-              Community
-            </a>
+            <details style={{ margin: 0 }}>
+              <summary style={{ color: 'var(--text)', fontSize: '18px', fontWeight: '500', padding: '12px 0', borderBottom: '1px solid var(--card-border)', cursor: 'pointer', listStyle: 'none' }}>Tools</summary>
+              <div style={{ paddingLeft: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Link href="/live" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '16px', padding: '10px 0' }}>Live Market Data</Link>
+                <Link href="/tools" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '16px', padding: '10px 0' }}>Tax Converters</Link>
+                <Link href="/s/directory" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '16px', padding: '10px 0' }}>JSON API Directory</Link>
+              </div>
+            </details>
             <a 
               href="#faq" 
               onClick={() => setIsMobileMenuOpen(false)}

@@ -4,9 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
-
-/** Approximate banner height so useStickyHeader can reserve space before content loads */
-const BANNER_PLACEHOLDER_HEIGHT = 52;
+import { useTrades } from '../hooks/useTrades';
 
 type Scarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number };
 
@@ -14,13 +12,11 @@ type Scarcity = { count: number; batch: number; label: string; progress: number;
  * Global Founders Club banner shown on all pages.
  * Fixed at the very top, above all navigation.
  * Hidden for Corporate and UK Founders tier members.
- *
- * Always renders a DOM node with .founder-banner so useStickyHeader can find it
- * and attach ResizeObserver immediately (fixes nav disappearing in production when
- * tier check is slow and banner would otherwise mount after the hook's timeouts).
+ * PLG: Hidden until user has at least one trade (post-activation).
  */
 export default function GlobalFoundersClubBanner() {
   const { tier, isLoading } = usePremiumTheme();
+  const { trades } = useTrades();
   const [scarcity, setScarcity] = useState<Scarcity | null>(null);
 
   useEffect(() => {
@@ -31,9 +27,13 @@ export default function GlobalFoundersClubBanner() {
   }, []);
 
   const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
-  const showContent = !isLoading && !isPaid;
-  // When hidden (loading or paid): use 0 height so nav sits at top from first paint (no 52px gap / floating).
-  const hidden = isLoading || isPaid;
+  const hasTrades = trades && trades.length > 0;
+  // Do not show banner before activation (no trades yet)
+  if (!isLoading && !isPaid && !hasTrades) {
+    return null;
+  }
+  const showContent = !isLoading && !isPaid && hasTrades;
+  const hidden = isLoading || isPaid || !hasTrades;
 
   const scarcityText = scarcity
     ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left`

@@ -13,7 +13,7 @@
  * ```
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ADAPTERS = exports.detectBroker = void 0;
+exports.inferMapping = exports.genericRowToTrade = exports.genericParse = exports.parseUniversal = exports.ADAPTERS = exports.detectBroker = void 0;
 exports.detectBrokerFromSample = detectBrokerFromSample;
 exports.parseCSV = parseCSV;
 const registry_1 = require("./registry");
@@ -77,3 +77,9 @@ async function parseCSV(file, locale = 'en-US', brokerId) {
 var registry_2 = require("./registry");
 Object.defineProperty(exports, "detectBroker", { enumerable: true, get: function () { return registry_2.detectBroker; } });
 Object.defineProperty(exports, "ADAPTERS", { enumerable: true, get: function () { return registry_2.ADAPTERS; } });
+// Re-export Universal Import (Smart Mapping) API
+var universal_1 = require("./universal");
+Object.defineProperty(exports, "parseUniversal", { enumerable: true, get: function () { return universal_1.parseUniversal; } });
+Object.defineProperty(exports, "genericParse", { enumerable: true, get: function () { return universal_1.genericParse; } });
+Object.defineProperty(exports, "genericRowToTrade", { enumerable: true, get: function () { return universal_1.genericRowToTrade; } });
+Object.defineProperty(exports, "inferMapping", { enumerable: true, get: function () { return universal_1.inferMapping; } });

@@ -65,10 +65,15 @@ export function useAuth() {
     const unsubscribe = onAuthStateChanged(auth, handleAuthStateChange);
     
     // Check for redirect result on mount
+    const POST_AUTH_REDIRECT_KEY = 'pp-post-auth-redirect-done';
     getRedirectResult(auth).then((result) => {
       if (result) {
         console.log('Redirect authentication successful');
-        
+        if (typeof window !== 'undefined' && window.location.pathname === '/') {
+          try { sessionStorage.setItem(POST_AUTH_REDIRECT_KEY, '1'); } catch (_) {}
+          window.location.replace('/dashboard');
+          return;
+        }
         // Track successful Google Sign-In after redirect
         const landingPage = getLandingPage();
         const utmParams = getStoredUTMParameters();
@@ -144,7 +149,11 @@ export function useAuth() {
         utmCampaign: utmParams?.utmCampaign,
         utmContent: utmParams?.utmContent,
       });
-      
+      if (typeof window !== 'undefined' && window.location.pathname === '/') {
+        try { sessionStorage.setItem('pp-post-auth-redirect-done', '1'); } catch (_) {}
+        window.location.replace('/dashboard');
+        return null;
+      }
       return result.user;
     } catch (error: any) {
       console.log('Popup failed, trying redirect:', error);
@@ -210,8 +219,9 @@ export function useAuth() {
         }
       }
       
-      // 3. Force Reload to reset SDK state and clear any remaining cache
-      // This ensures a clean state for the next user session
+      // 3. Clear post-auth redirect flag so next sign-in can redirect to dashboard again
+      try { sessionStorage.removeItem('pp-post-auth-redirect-done'); } catch (_) {}
+      // 4. Force Reload to reset SDK state and clear any remaining cache
       window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);

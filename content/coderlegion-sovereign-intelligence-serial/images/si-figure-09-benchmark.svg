@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 250" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <text x="210" y="24" text-anchor="middle" font-weight="600" font-size="12">Figure 9 — Benchmark (Flash vs Pro vs GPT-4o)</text>
+  <!-- Vertical axis: labels at x=48 aligned -->
+  <line x1="55" y1="40" x2="55" y2="204" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2 2"/>
+  <text x="48" y="165" text-anchor="end" font-size="9">Latency</text>
+  <text x="48" y="213" text-anchor="end" font-size="9">Cost</text>
+  <!-- Latency baseline -->
+  <line x1="55" y1="160" x2="380" y2="160" stroke="#475569" stroke-width="1"/>
+  <!-- Bars centered at 110, 200, 290 -->
+  <rect x="80" y="100" width="60" height="60" rx="2" fill="#0f766e"/>
+  <text x="110" y="178" text-anchor="middle" font-size="9">Flash</text>
+  <text x="110" y="92" text-anchor="middle" font-size="8" fill="#fff">Fast</text>
+  <rect x="170" y="80" width="60" height="80" rx="2" fill="#0369a1"/>
+  <text x="200" y="178" text-anchor="middle" font-size="9">Pro</text>
+  <text x="200" y="72" text-anchor="middle" font-size="8" fill="#fff">Mid</text>
+  <rect x="260" y="70" width="60" height="90" rx="2" fill="#64748b"/>
+  <text x="290" y="178" text-anchor="middle" font-size="9">GPT-4o</text>
+  <text x="290" y="62" text-anchor="middle" font-size="8" fill="#fff">Slower</text>
+  <!-- Cost baseline and row: rects centered under bars -->
+  <line x1="55" y1="204" x2="380" y2="204" stroke="#475569" stroke-width="1"/>
+  <rect x="95" y="192" width="30" height="12" rx="2" fill="#0f766e"/>
+  <rect x="185" y="192" width="30" height="12" rx="2" fill="#0369a1"/>
+  <rect x="275" y="192" width="30" height="12" rx="2" fill="#64748b"/>
+  <text x="210" y="235" text-anchor="middle" font-size="9" fill="#64748b">Flash = default; Pro = upgrade path</text>
+</svg>

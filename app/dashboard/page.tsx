@@ -245,6 +245,7 @@ export default function Dashboard() {
   const [showFeatureAnnouncement, setShowFeatureAnnouncement] = useState(false);
   const modalScheduledRef = useRef(false); // Persist across re-renders
   const [showImportModal, setShowImportModal] = useState(false);
+  const [importModalFile, setImportModalFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<'performance' | 'insights'>('performance');
   const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty'>('value');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -1329,7 +1330,7 @@ export default function Dashboard() {
                 justifyContent: 'center',
                 padding: '16px'
               }}
-              onClick={() => setShowImportModal(false)}
+              onClick={() => { setShowImportModal(false); setImportModalFile(null); }}
             >
               <div 
                 className="dashboard-card"
@@ -1346,7 +1347,7 @@ export default function Dashboard() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'hsl(var(--foreground))', margin: 0 }}>Import CSV Data</h2>
                   <button
-                    onClick={() => setShowImportModal(false)}
+                    onClick={() => { setShowImportModal(false); setImportModalFile(null); }}
                     style={{
                       background: 'transparent',
                       border: 'none',
@@ -1362,10 +1363,14 @@ export default function Dashboard() {
                     ×
                   </button>
                 </div>
-                <CSVImporter onImport={(trades) => {
-                  handleCSVImport(trades);
-                  setShowImportModal(false);
-                }} />
+                <CSVImporter
+                  initialFile={importModalFile}
+                  onImport={(trades) => {
+                    handleCSVImport(trades);
+                    setShowImportModal(false);
+                    setImportModalFile(null);
+                  }}
+                />
               </div>
             </div>
           )}
@@ -1827,7 +1832,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Empty State with Demo Data Button */}
+        {/* Empty State: 3-step CSV onboarding + dropzone (Audit Patch 1.0) */}
         {trades.length === 0 && (
           <div style={{ 
             textAlign: 'center', 
@@ -1835,136 +1840,111 @@ export default function Dashboard() {
             color: 'hsl(var(--muted-foreground))',
             background: 'hsl(var(--card))',
             borderRadius: '12px',
-            border: `1px solid hsl(var(--border))`,
+            border: '1px solid hsl(var(--border))',
             marginBottom: '12px'
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
-                <rect x="14" y="3" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
-                <rect x="14" y="14" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
-                <rect x="3" y="14" width="7" height="7" rx="1" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0', color: 'hsl(var(--foreground))' }}>
-              No trades yet
+            <h3 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 24px 0', color: 'hsl(var(--foreground))' }}>
+              Get started in 3 steps
             </h3>
-            <p style={{ fontSize: '14px', margin: '0 0 24px 0', color: 'hsl(var(--muted-foreground))' }}>
-              {(() => {
-                const isPremium = tier === 'corporateSponsor' || tier === 'foundersClub';
-                return isPremium 
-                  ? 'Inject via JSON or add manually. Configure Drive Sync in Settings.'
-                  : 'Import your CSV file or add trades manually to get started';
-              })()}
-            </p>
-            {(() => {
-              const isPremium = tier === 'corporateSponsor' || tier === 'foundersClub';
-              if (isPremium) {
-                return (
-                  <Link
-                    href="/settings"
-                    style={{
-                      display: 'inline-block',
-                      marginBottom: '16px',
-                      padding: '12px 24px',
-                      background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
-                      color: 'hsl(var(--primary-foreground))',
-                      textDecoration: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      transition: 'all 0.2s ease',
-                      boxShadow: `0 4px 12px hsla(var(--primary), 0.3)`,
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = `0 6px 16px hsla(var(--primary), 0.4)`;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = `0 4px 12px hsla(var(--primary), 0.3)`;
-                    }}
-                  >
-                    Configure Drive Sync
-                  </Link>
-                );
-              }
-              return null;
-            })()}
+
+            {/* Step 1: Export */}
+            <div style={{ marginBottom: '20px', textAlign: 'left', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+              <span style={{ display: 'inline-block', width: '28px', height: '28px', borderRadius: '50%', background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', fontWeight: '700', lineHeight: '28px', marginRight: '12px', fontSize: '14px' }}>1</span>
+              <strong style={{ color: 'hsl(var(--foreground))' }}>Export.</strong>{' '}
+              Download your transaction history (.csv) from your broker.
+              <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', marginLeft: '40px', display: 'block' }}>e.g. IBKR, Fidelity, Robinhood, Degiro</span>
+            </div>
+
+            {/* Step 2: Drop zone */}
+            <div style={{ marginBottom: '20px' }}>
+              <span style={{ display: 'inline-block', width: '28px', height: '28px', borderRadius: '50%', background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', fontWeight: '700', lineHeight: '28px', marginRight: '12px', fontSize: '14px', verticalAlign: 'middle' }}>2</span>
+              <strong style={{ color: 'hsl(var(--foreground))' }}>Drop.</strong>{' '}
+              Drag and drop the file below. Your data never leaves your browser.
+            </div>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => { setImportModalFile(null); setShowImportModal(true); }}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setImportModalFile(null); setShowImportModal(true); } }}
+              onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); e.currentTarget.style.background = 'hsl(var(--muted) / 0.6)'; e.currentTarget.style.borderColor = 'hsl(var(--primary))'; }}
+              onDragLeave={(e) => { e.preventDefault(); e.currentTarget.style.background = ''; e.currentTarget.style.borderColor = ''; }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.currentTarget.style.background = '';
+                e.currentTarget.style.borderColor = '';
+                const file = e.dataTransfer?.files?.[0];
+                if (file && (file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv' || file.type === 'application/vnd.ms-excel')) {
+                  setImportModalFile(file);
+                  setShowImportModal(true);
+                }
+              }}
+              style={{
+                border: '2px dashed hsl(var(--border))',
+                borderRadius: '12px',
+                padding: '48px 24px',
+                margin: '0 auto 24px',
+                maxWidth: '560px',
+                background: 'hsl(var(--muted) / 0.2)',
+                cursor: 'pointer',
+                transition: 'background 0.2s, border-color 0.2s'
+              }}
+            >
+              <span style={{ fontSize: '15px', color: 'hsl(var(--muted-foreground))' }}>Drop your CSV here or click to browse</span>
+            </div>
+
+            {/* Step 3: Analyze */}
+            <div style={{ marginBottom: '28px', textAlign: 'left', maxWidth: '480px', marginLeft: 'auto', marginRight: 'auto' }}>
+              <span style={{ display: 'inline-block', width: '28px', height: '28px', borderRadius: '50%', background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', fontWeight: '700', lineHeight: '28px', marginRight: '12px', fontSize: '14px' }}>3</span>
+              <strong style={{ color: 'hsl(var(--foreground))' }}>Analyze.</strong>{' '}
+              Our local engine normalizes the data instantly.
+            </div>
+
+            {tier === 'corporateSponsor' || tier === 'foundersClub' ? (
+              <Link
+                href="/settings"
+                style={{
+                  display: 'inline-block',
+                  marginBottom: '16px',
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)',
+                  color: 'hsl(var(--primary-foreground))',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              >
+                Configure Drive Sync
+              </Link>
+            ) : null}
+
             <button
               onClick={() => {
-                // Inject demo trades (Apple, Tesla, NVIDIA)
-                // CRITICAL: Set mock: true so demo trades are filtered out from real portfolio calculations
                 const demoTrades = [
-                  { 
-                    ticker: 'AAPL', 
-                    qty: 10, 
-                    price: 150, 
-                    date: new Date().toISOString().split('T')[0], 
-                    type: 'BUY' as const,
-                    currency: 'USD',
-                    mock: true
-                  },
-                  { 
-                    ticker: 'TSLA', 
-                    qty: 5, 
-                    price: 200, 
-                    date: new Date().toISOString().split('T')[0], 
-                    type: 'BUY' as const,
-                    currency: 'USD',
-                    mock: true
-                  },
-                  { 
-                    ticker: 'NVDA', 
-                    qty: 8, 
-                    price: 400, 
-                    date: new Date().toISOString().split('T')[0], 
-                    type: 'BUY' as const,
-                    currency: 'USD',
-                    mock: true
-                  },
+                  { ticker: 'AAPL', qty: 10, price: 150, date: new Date().toISOString().split('T')[0], type: 'BUY' as const, currency: 'USD', mock: true },
+                  { ticker: 'TSLA', qty: 5, price: 200, date: new Date().toISOString().split('T')[0], type: 'BUY' as const, currency: 'USD', mock: true },
+                  { ticker: 'NVDA', qty: 8, price: 400, date: new Date().toISOString().split('T')[0], type: 'BUY' as const, currency: 'USD', mock: true },
                 ];
-                // Use importTrades to add all demo trades at once
                 importTrades(demoTrades);
               }}
               style={{
-                marginTop: '24px',
-                padding: '16px 32px',
-                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)`,
+                marginTop: '8px',
+                padding: '14px 28px',
+                background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)',
                 border: 'none',
                 borderRadius: '12px',
                 color: 'hsl(var(--primary-foreground))',
                 cursor: 'pointer',
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: '600',
-                transition: 'all 0.3s ease',
-                boxShadow: 'hsl(var(--foreground) / 0.15) 0 4px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                width: '100%',
-                maxWidth: '320px',
-                margin: '24px auto 0',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = `hsl(var(--foreground) / 0.2) 0 6px 20px`;
-                e.currentTarget.style.opacity = '0.95';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = `hsl(var(--foreground) / 0.15) 0 4px 12px`;
-                e.currentTarget.style.opacity = '1';
+                display: 'inline-block'
               }}
             >
               🎮 Play with Demo Data
             </button>
             <p style={{ marginTop: '20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
-              <Link
-                href="/invite"
-                style={{ color: 'hsl(var(--primary))', textDecoration: 'underline', fontWeight: '500' }}
-              >
+              <Link href="/invite" style={{ color: 'hsl(var(--primary))', textDecoration: 'underline', fontWeight: '500' }}>
                 Invite a friend to try Pocket Portfolio
               </Link>
             </p>

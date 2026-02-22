@@ -28,3 +28,5 @@ export declare function detectBrokerFromSample(sampleCsvHead: string): BrokerId 
 export declare function parseCSV(file: RawFile, locale?: string, brokerId?: BrokerId): Promise<ParseResult>;
 export type { BrokerId, RawFile, NormalizedTrade, ParseResult, BrokerAdapter, } from './adapters/types';
 export { detectBroker, ADAPTERS } from './registry';
+export { parseUniversal, genericParse, genericRowToTrade, inferMapping } from './universal';
+export type { UniversalMapping, RequiresMappingResult, StandardField, InferMappingInput, InferMappingOutput, } from './universal';

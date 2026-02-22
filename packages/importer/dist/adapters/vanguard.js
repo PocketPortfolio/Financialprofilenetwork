@@ -5,7 +5,7 @@ const csvFrom_1 = require("../io/csvFrom");
 const normalize_1 = require("../normalize");
 exports.vanguard = {
     id: 'vanguard',
-    detect: (sample) => /(^|\n)(Transaction Date|Symbol|Action|Quantity|Price|Vanguard|Vanguard.*Account)/i.test(sample),
+    detect: (sample) => /Vanguard/i.test(sample) && /(Transaction Date|Symbol|Action|Quantity|Price)/i.test(sample),
     parse: async (file, locale = 'en-US') => {
         const t0 = performance.now();
         const text = await (0, csvFrom_1.csvFrom)(file);

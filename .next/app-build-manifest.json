@@ -1,5 +1,10 @@
 {
   "pages": {
+    "/api/health-price/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/health-price/route.js"
+    ],
     "/global-error": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -16,10 +21,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/not-found.js"
     ],
-    "/admin/sales/page": [
+    "/dashboard/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/sales/page.js"
+      "static/chunks/app/dashboard/layout.js"
+    ],
+    "/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/dashboard/page.css",
+      "static/chunks/app/dashboard/page.js"
     ],
     "/api/api-keys/route": [
       "static/chunks/webpack.js",
@@ -31,35 +42,90 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/most-traded/route.js"
     ],
+    "/api/scarcity/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/scarcity/route.js"
+    ],
+    "/api/welcome-email/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/welcome-email/route.js"
+    ],
+    "/api/portfolio/history/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/portfolio/history/route.js"
+    ],
     "/api/api-keys/user/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/api/api-keys/user/route.js"
     ],
-    "/api/agent/health/route": [
+    "/api/quote/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/health/route.js"
+      "static/chunks/app/api/quote/route.js"
     ],
-    "/api/agent/leads/route": [
+    "/api/portfolio/sector-classification/batch/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/leads/route.js"
+      "static/chunks/app/api/portfolio/sector-classification/batch/route.js"
     ],
-    "/api/agent/metrics/route": [
+    "/api/news/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/metrics/route.js"
+      "static/chunks/app/api/news/route.js"
     ],
-    "/api/agent/audit-feed/route": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/audit-feed/route.js"
+      "static/chunks/app/page.js"
     ],
-    "/api/agent/kill-switch/route": [
+    "/api/npm-stats/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/agent/kill-switch/route.js"
+      "static/chunks/app/api/npm-stats/route.js"
+    ],
+    "/api/blog/posts/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/blog/posts/route.js"
+    ],
+    "/api/blog/external-posts/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/blog/external-posts/route.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
+    ],
+    "/s/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/s/layout.js"
+    ],
+    "/s/[symbol]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/s/[symbol]/page.js"
+    ],
+    "/api/page-views/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/page-views/route.js"
+    ],
+    "/api/tickers/[...ticker]/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/tickers/[...ticker]/route.js"
+    ],
+    "/watchlist/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/watchlist/page.js"
     ]
   }
 }

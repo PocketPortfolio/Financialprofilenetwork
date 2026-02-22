@@ -173,6 +173,15 @@ const nextConfig = {
     }
     
     return [
+      // Prevent caching root and dashboard HTML so post-auth always gets fresh layout (avoids "nav lost" from cache)
+      {
+        source: '/',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
+      {
+        source: '/dashboard',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
       // Note: Static sitemap files in public/ folder are served by Vercel CDN
       // Vercel automatically sets proper Content-Type and Cache-Control headers
       // No explicit headers needed - Vercel handles static file headers optimally

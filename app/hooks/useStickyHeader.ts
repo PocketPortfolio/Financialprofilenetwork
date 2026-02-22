@@ -68,7 +68,8 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
       resizeObserver?.disconnect();
       // Cleanup body padding only if this is the last header
       const otherHeaders = document.querySelectorAll(headerSelector);
-      if (otherHeaders.length === 1) {
+      const didClear = otherHeaders.length === 1;
+      if (didClear) {
         document.body.style.paddingTop = '';
         document.body.style.removeProperty('--header-offset');
         document.body.style.removeProperty('--header-top');

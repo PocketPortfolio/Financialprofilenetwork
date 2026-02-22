@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <defs>
+    <marker id="si-a4" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 z" fill="#475569"/></marker>
+  </defs>
+  <!-- User question -->
+  <rect x="160" y="44" width="160" height="40" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="240" y="69" text-anchor="middle" font-weight="600">User question</text>
+  <path fill="none" d="M240 84 L240 104" stroke="#475569" stroke-width="1.2" marker-end="url(#si-a4)"/>
+  <!-- Diamond: Needs live data? -->
+  <path fill-rule="evenodd" d="M240 104 L280 134 L240 164 L200 134 Z" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+  <text x="240" y="128" text-anchor="middle" font-size="9">Needs live</text>
+  <text x="240" y="142" text-anchor="middle" font-size="9">data?</text>
+  <!-- Yes branch -->
+  <path fill="none" d="M280 134 L320 134" stroke="#0f766e" stroke-width="1.2" marker-end="url(#si-a4)"/>
+  <text x="298" y="128" font-size="9" fill="#0f766e">Yes</text>
+  <rect x="320" y="114" width="120" height="40" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="380" y="139" text-anchor="middle" font-size="10">Gemini + Search</text>
+  <!-- No branch -->
+  <path fill="none" d="M200 134 L160 134" stroke="#64748b" stroke-width="1.2" marker-end="url(#si-a4)"/>
+  <text x="178" y="128" font-size="9" fill="#64748b">No</text>
+  <rect x="40" y="114" width="120" height="40" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="100" y="139" text-anchor="middle" font-size="10">Context only</text>
+  <!-- Both to Response -->
+  <path fill="none" d="M380 154 L380 194 L240 194" stroke="#475569" stroke-width="1.2" marker-end="url(#si-a4)"/>
+  <path fill="none" d="M100 154 L100 194 L240 194" stroke="#475569" stroke-width="1.2"/>
+  <rect x="180" y="194" width="120" height="40" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="240" y="219" text-anchor="middle" font-size="10">Response streamed back</text>
+  <!-- Title -->
+  <text x="240" y="24" text-anchor="middle" font-weight="600" font-size="12">Figure 4 — Grounding Flow</text>
+</svg>

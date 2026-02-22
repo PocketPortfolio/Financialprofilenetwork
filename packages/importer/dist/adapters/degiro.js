@@ -5,7 +5,7 @@ const csvFrom_1 = require("../io/csvFrom");
 const normalize_1 = require("../normalize");
 exports.degiro = {
     id: 'degiro',
-    detect: (sample) => /(^|\n)(Date|Time|Product|ISIN|Action|Quantity|Price|DEGIRO)/i.test(sample),
+    detect: (sample) => /DEGIRO/i.test(sample) && /(Date|Time|Product|ISIN|Action|Quantity|Price)/i.test(sample),
     parse: async (file, locale = 'en-GB') => {
         const t0 = performance.now();
         const text = await (0, csvFrom_1.csvFrom)(file);

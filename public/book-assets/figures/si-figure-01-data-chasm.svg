@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 200" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="11" fill="#1e293b">
+  <defs>
+    <marker id="si-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 z" fill="#475569"/></marker>
+  </defs>
+  <!-- Left: Raw Ledger -->
+  <rect x="20" y="40" width="140" height="120" rx="6" fill="#fef2f2" stroke="#b91c1c" stroke-width="1.2"/>
+  <text x="90" y="72" text-anchor="middle" font-weight="600">Raw Ledger</text>
+  <text x="90" y="92" text-anchor="middle" font-size="10">(User's Device)</text>
+  <text x="90" y="115" text-anchor="middle" font-size="9" fill="#64748b">Full CSV / trades</text>
+  <text x="90" y="130" text-anchor="middle" font-size="9" fill="#64748b">in IndexedDB</text>
+  <text x="90" y="148" text-anchor="middle" font-size="9" fill="#b91c1c">Never crosses</text>
+  <!-- Middle: Sanitized Context -->
+  <rect x="200" y="60" width="160" height="80" rx="6" fill="#e0f2f1" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="280" y="88" text-anchor="middle" font-weight="600">Sanitized Context</text>
+  <text x="280" y="108" text-anchor="middle" font-size="10">(4K tokens max)</text>
+  <text x="280" y="128" text-anchor="middle" font-size="9" fill="#64748b">Only bridge</text>
+  <!-- Right: LLM -->
+  <rect x="400" y="40" width="140" height="120" rx="6" fill="#f8fafc" stroke="#475569" stroke-width="1.2"/>
+  <text x="470" y="72" text-anchor="middle" font-weight="600">LLM</text>
+  <text x="470" y="92" text-anchor="middle" font-size="10">(Cloud)</text>
+  <text x="470" y="115" text-anchor="middle" font-size="9" fill="#64748b">Gemini</text>
+  <text x="470" y="148" text-anchor="middle" font-size="9" fill="#0f766e">Stream back</text>
+  <!-- Arrow: summary only left to middle -->
+  <path fill="none" d="M160 100 L200 100" stroke="#0f766e" stroke-width="2" marker-end="url(#si-arr)"/>
+  <text x="180" y="92" text-anchor="middle" font-size="9" fill="#0f766e">Summary only</text>
+  <!-- Arrow: middle to right -->
+  <path fill="none" d="M360 100 L400 100" stroke="#0f766e" stroke-width="2" marker-end="url(#si-arr)"/>
+  <!-- Arrow: stream right to left (below) -->
+  <path fill="none" d="M400 160 L200 160" stroke="#475569" stroke-width="1.2" marker-end="url(#si-arr)"/>
+  <text x="300" y="152" text-anchor="middle" font-size="9" fill="#475569">Streaming response</text>
+  <!-- Title -->
+  <text x="280" y="24" text-anchor="middle" font-weight="600" font-size="12">Figure 1 — The Data Chasm</text>
+</svg>

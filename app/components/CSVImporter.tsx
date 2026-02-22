@@ -25,6 +25,8 @@ interface Trade {
 
 interface CSVImporterProps {
   onImport: (trades: Trade[]) => void;
+  /** When set (e.g. from dashboard empty-state dropzone), process this file on mount */
+  initialFile?: File | null;
 }
 
 function debugLog(step: string, data: Record<string, unknown>) {
@@ -43,9 +45,10 @@ function agentLog(_location: string, _message: string, _data: Record<string, unk
   }).catch(() => {});
 }
 
-export default function CSVImporter({ onImport }: CSVImporterProps) {
+export default function CSVImporter({ onImport, initialFile }: CSVImporterProps) {
   const [dragActive, setDragActive] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const initialFileProcessedRef = React.useRef(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -2016,6 +2019,13 @@ export default function CSVImporter({ onImport }: CSVImporterProps) {
       debugLog('STEP_END', {});
     }
   };
+
+  // When opened with a file from empty-state dropzone, process it once
+  React.useEffect(() => {
+    if (!initialFile || initialFileProcessedRef.current) return;
+    initialFileProcessedRef.current = true;
+    handleFileUpload(initialFile);
+  }, [initialFile]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
