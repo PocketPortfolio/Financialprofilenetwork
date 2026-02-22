@@ -798,7 +798,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Order Matching Engine Performance - Exchange Comparison",
     "slug": "research-order-matching-engine-performance-exchange-comparison-2026-02-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -806,7 +806,9 @@
       "order",
       "matching",
       "engine"
-    ]
+    ],
+    "videoId": "i2jMAxns7U0",
+    "publishedAt": "2026-02-22T18:22:58.009Z"
   },
   {
     "id": "research-blockchain-transaction-throughput-layer-2-solutions-2026-02-23",
