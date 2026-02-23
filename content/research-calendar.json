@@ -816,7 +816,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Blockchain Transaction Throughput - Layer 2 Solutions",
     "slug": "research-blockchain-transaction-throughput-layer-2-solutions-2026-02-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -824,7 +824,9 @@
       "blockchain",
       "transaction",
       "throughput"
-    ]
+    ],
+    "videoId": "9fZwZob3lGA",
+    "publishedAt": "2026-02-23T18:49:06.395Z"
   },
   {
     "id": "research-cryptocurrency-exchange-latency-centralized-vs-dex-2026-02-24",
