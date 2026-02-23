@@ -418,7 +418,7 @@
     "date": "2026-02-23",
     "title": "Sovereign Sync: Frequently Asked Questions",
     "slug": "sovereign-sync-frequently-asked-questions",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -428,7 +428,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-02-23T09:48:38.530Z"
   },
   {
     "id": "week-8-post-2",
