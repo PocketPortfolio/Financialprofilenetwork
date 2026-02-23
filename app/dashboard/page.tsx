@@ -1672,10 +1672,7 @@ export default function Dashboard() {
             </div>
             {/* 🎨 ASSET TERMINAL - Replace ConsolidatedPortfolioTable */}
             <div className="mb-6">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h2 className="text-sm font-mono text-muted-foreground uppercase" style={{fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace', margin: 0}}>
-                  / Portfolio_Assets
-                </h2>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <button
                     onClick={() => setPortfolioView('positions')}

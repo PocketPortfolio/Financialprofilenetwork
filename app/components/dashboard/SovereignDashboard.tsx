@@ -84,9 +84,7 @@ export default function SovereignDashboard({
           
           {/* Main Terminal (Assets) */}
           <div className="lg:col-span-8 space-y-6">
-             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-mono text-slate-500 uppercase" style={{color: '#64748b', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace'}}>/ Portfolio_Assets</h3>
-                
+             <div className="flex items-center justify-end mb-4">
                 {/* 🟢 RESTORED: Core Actions */}
                 <div className="flex gap-2">
                   {onImportCSV && (
