@@ -125,7 +125,7 @@ jobs:
         npm run lint -- --max-warnings 0
         
     - name: Check for secrets
-      uses: trufflesecurity/trufflehog@v3.0.0
+      uses: trufflesecurity/trufflehog@v3.93.4
       with:
         path: ./
         base: main
