@@ -73,7 +73,15 @@ const CATCH_ALL_PATTERNS = [
  * 
  * Safety First: If DNS validation fails, err on the side of caution (do not send)
  */
+/** Max email length (RFC 5321) to avoid ReDoS from long inputs */
+const MAX_EMAIL_LENGTH = 254;
+
 export async function validateEmail(email: string): Promise<EmailValidationResult> {
+  // 0. Cap length before any regex (ReDoS mitigation)
+  if (typeof email !== 'string' || email.length > MAX_EMAIL_LENGTH) {
+    return { isValid: false, reason: 'Invalid email or too long' };
+  }
+
   // 1. Check placeholder
   if (isPlaceholderEmail(email)) {
     return { isValid: false, reason: 'Placeholder email detected' };

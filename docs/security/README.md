@@ -52,6 +52,14 @@ git ls-files --cached -- .env .env.local .env.*
 
 Expected: no output (or only `.env.example` if you explicitly track it). If any `.env` or `.env.production.local` is listed, remove it from the index, ensure `.gitignore` covers it, and rotate any exposed secrets.
 
+## Code scanning (CodeQL)
+
+**Fixed in this repo (no business logic change):**
+- **Server-side request forgery (SSRF):** Ticker/symbol from request is allowlisted via `app/lib/utils/sanitizeTicker.ts` before use in any `fetch()` URL in `app/api/dividend/route.ts`, `app/api/dividend/test-sources/route.ts`, `app/lib/services/sectorApiService.ts`.
+- **Polynomial regular expression (ReDoS):** Email length capped at 254 in `lib/sales/email-validation.ts` before regex; angle-bracket email extraction in `app/api/agent/webhooks/resend/route.ts` changed from `/<(.+)>/` to `/<([^>]+)>/`.
+
+**Triage remaining findings:** Open [Security → Code scanning](https://github.com/PocketPortfolio/Financialprofilenetwork/security/code-scanning), filter by Open / Severity / Rule. Fix by: adding validation or allowlists for user input that reaches dangerous sinks (fetch, regex, DOM), or close as "Won't fix" / "False positive" with a short note. Export the list (e.g. CSV) to fix by rule in batch.
+
 ## Branch protection (GitHub UI)
 
 In **Settings → Branches**, configure branch protection for `main` (and optionally `develop`): require a pull request before merge, and require status checks (e.g. CI, dependency-review, gitleaks, codeql) to pass. This is repository policy only; no workflow or code changes required.

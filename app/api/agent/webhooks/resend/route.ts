@@ -413,8 +413,8 @@ async function extractLeadIdFromThread(threadId: string): Promise<string | null>
  */
 async function extractLeadIdFromEmail(email: string): Promise<string | null> {
   try {
-    // Extract email address from "Name <email@domain.com>" format
-    const emailMatch = email.match(/<(.+)>/);
+    // Extract email address from "Name <email@domain.com>" format (use [^>]+ to avoid ReDoS)
+    const emailMatch = email.match(/<([^>]+)>/);
     const emailAddress = emailMatch ? emailMatch[1] : email;
 
     // Look up lead by email
