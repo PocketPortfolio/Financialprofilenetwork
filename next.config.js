@@ -39,8 +39,18 @@ const nextConfig = {
   // Only use standalone for Docker deployments, not for Vercel
   // output: 'standalone', // Commented out - Vercel uses serverless functions
   // Include docs/book in serverless bundle if /api/book-assets is used (app uses static /book-assets/ now)
+  // Use project root for file tracing (avoids "multiple lockfiles" warning when parent dir has a lockfile)
+  outputFileTracingRoot: __dirname,
+  // Include content/posts and calendars so blog listing and post pages work in Vercel serverless
   outputFileTracingIncludes: {
     '/api/book-assets': ['./docs/book/**'],
+    '/api/blog/posts': ['./content/posts/**'],
+    '/blog': [
+      './content/posts/**',
+      './content/blog-calendar.json',
+      './content/how-to-tech-calendar.json',
+      './content/research-calendar.json',
+    ],
   },
   // Exclude public/images/blog from API serverless bundles (233MB); served as static assets
   outputFileTracingExcludes: {

@@ -2,8 +2,15 @@
 
 ## What was fixed
 
+### 1. Serverless 250 MB limit (admin/analytics)
 - **Cause:** `/api/admin/analytics` was bundling `public/images/blog` (233 MB) into the serverless function, exceeding Vercel’s 250 MB limit.
-- **Change:** `next.config.js` now has `outputFileTracingExcludes` so `public/images/blog/**` is not traced into API routes. Blog images stay as static assets.
+- **Change:** `next.config.js` has `outputFileTracingExcludes` so `public/images/blog/**` is not traced into API routes. Blog images stay as static assets.
+
+### 2. No generated blog posts live (Building in Public + post pages)
+- **Cause:** In production, `/api/blog/posts` and `/blog/[slug]` run as serverless functions that read `content/posts` and calendar JSON via `fs`. Those paths were **not** included in the serverless bundle, so the API returned `[]` and post pages threw "Something went wrong".
+- **Change:** `next.config.js` has `outputFileTracingIncludes` so:
+  - **`/api/blog/posts`** gets `./content/posts/**` (listing works).
+  - **`/blog`** (dynamic post page) gets `./content/posts/**` and the three calendar JSON files (post pages render).
 
 ## 1. Deploy (run locally)
 
