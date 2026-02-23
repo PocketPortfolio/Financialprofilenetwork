@@ -3,6 +3,9 @@ name: Diagnostic Workflow
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   diagnose:
     name: Diagnose Issues

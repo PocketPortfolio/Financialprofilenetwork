@@ -9,6 +9,7 @@ export async function csvFrom(file: { name: string; mime: string; arrayBuffer: (
   }
 
   if (/sheet|excel/i.test(file.mime) || /\.(xlsx|xls)$/i.test(file.name)) {
+    // Security: only pass buffers from user upload or trusted sources (xlsx has known vulns, no upstream fix).
     const wb = XLSX.read(buf, { type: 'array' });
     const first = wb.SheetNames[0];
     const csv = XLSX.utils.sheet_to_csv(wb.Sheets[first], { FS: ',', RS: '\n', strip: true });

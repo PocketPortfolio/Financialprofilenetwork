@@ -259,6 +259,10 @@ The parser is designed to be resilient:
 
 Always check `result.warnings` for parsing issues.
 
+## Security
+
+**xlsx dependency:** This package uses [xlsx](https://www.npmjs.com/package/xlsx) (SheetJS) for Excel (.xlsx, .xls) support. xlsx has known high-severity vulnerabilities (prototype pollution, ReDoS); no patched version exists on npm. Use only with **trusted or user-uploaded** files. Do not parse unsanitized server-supplied Excel in security-sensitive contexts. Consider restricting uploads to authenticated users and/or size limits.
+
 ## Try It Live
 
 See this library in action at [pocketportfolio.app](https://www.pocketportfolio.app) - a free, open-source portfolio tracker.

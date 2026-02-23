@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-title = "Pocket Portfolio â€“ Gitleaks config"
+title = "Pocket Portfolio ? Gitleaks config"
 
 ###############################################################################
 # Global allowlist: ONLY safe, non-secret content
@@ -40,18 +39,3 @@ regexes = [
 #   '''^docs/''',
 #   '''^fixtures/''',
 # ]
-=======
-title = "Pocket Portfolio – Gitleaks config"
-
-[allowlist]
-paths = [
-  '''^docs/''',
-  '''^fixtures/''',
-  '''^fixture/'''     # old path, in case it appears in history
-]
-
-# Firebase Web API keys are public; they often trigger false positives
-regexes = [
-  '''AIza[0-9A-Za-z\-_]{35}'''
-]
->>>>>>> feat/hardening-alignment
