@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10  # Gitleaks scan should complete quickly
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0   # scan full history on PRs; set to 1 to scan only HEAD
       - name: Run Gitleaks
