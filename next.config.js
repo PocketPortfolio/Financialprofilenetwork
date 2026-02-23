@@ -45,6 +45,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/book-assets': ['./docs/book/**'],
     '/api/blog/posts': ['./content/posts/**'],
+    '/api/blog/health': ['./content/posts/**'],
     '/blog': [
       './content/posts/**',
       './content/blog-calendar.json',

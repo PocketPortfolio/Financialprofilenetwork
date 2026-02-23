@@ -52,6 +52,7 @@
     "generate-research-calendar": "ts-node --project scripts/tsconfig.json scripts/generate-research-calendar.ts",
     "generate-blog": "ts-node --project scripts/tsconfig.json scripts/generate-autonomous-blog.ts",
     "verify-blog-posts": "ts-node --project scripts/tsconfig.json scripts/verify-blog-posts.ts",
+    "verify-blog-tracing": "node scripts/verify-blog-tracing-config.js",
     "check-workflow-execution": "ts-node --project scripts/tsconfig.json scripts/check-workflow-execution.ts",
     "cancel-stuck-deployments": "ts-node --project scripts/tsconfig.json scripts/cancel-stuck-deployments.ts",
     "diagnose-all-workflows": "ts-node --project scripts/tsconfig.json scripts/diagnose-all-workflows.ts",

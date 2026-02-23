@@ -49,6 +49,11 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@33
       
+      - name: Verify blog tracing config (guardrail)
+        run: node scripts/verify-blog-tracing-config.js
+        env:
+          NODE_ENV: production
+
       - name: Pull Vercel project link
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -61,6 +66,21 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes
+
+      - name: Verify blog posts in production (guardrail)
+        if: success() && steps.vercel-deploy.outcome == 'success'
+        run: |
+          echo "Waiting 45s for production to serve new deployment..."
+          sleep 45
+          curl -sSf -o /tmp/blog-posts.json "https://www.pocketportfolio.app/api/blog/posts" || true
+          COUNT=$(node -e "const fs=require('fs'); let d=[]; try { d=JSON.parse(fs.readFileSync('/tmp/blog-posts.json','utf8')); } catch(e) {} console.log(Array.isArray(d)?d.length:0);")
+          if [ -z "$COUNT" ] || [ "$COUNT" -lt 5 ]; then
+            echo "❌ GUARDRAIL FAIL: /api/blog/posts returned too few posts (count=$COUNT). Expected >= 5."
+            echo "   This usually means content/posts was not included in the serverless bundle (outputFileTracingIncludes)."
+            echo "   See docs/ZERO-TOUCH-BLOG-VERIFICATION.md"
+            exit 1
+          fi
+          echo "✅ Blog posts in production: $COUNT (guardrail passed)"
 
       - name: Deployment Summary
         if: always()

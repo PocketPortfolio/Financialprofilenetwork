@@ -1,6 +1,6 @@
 # Zero-Touch Blog Engine – Verification
 
-This doc describes how the autonomous blog works and how to verify it in production.
+This doc describes how the autonomous blog works, how to verify it in production, and guardrails so the "posts disappeared" regression cannot recur (§7–§8).
 
 ---
 
@@ -78,3 +78,25 @@ These will be generated on the next successful run of “Generate Blog Posts” 
 - **Prepare for prod (full app):** `docs/PREPARE-FOR-PROD.md`
 - **Workflow:** `.github/workflows/generate-blog.yml`
 - **Generator script:** `scripts/generate-autonomous-blog.ts`
+
+---
+
+## 7. Guardrails (so this never happens again)
+
+| Guardrail | What it does |
+|-----------|----------------|
+| **Config assertion** | Before every deploy, `scripts/verify-blog-tracing-config.js` runs (in deploy workflow). It checks that `next.config.js` contains the required `outputFileTracingIncludes` keys and paths. If someone removes them, the deploy workflow **fails** before `vercel deploy`. Run locally: `npm run verify-blog-tracing`. |
+| **Health endpoint** | `GET /api/blog/health` reads `content/posts` the same way the posts API does. If the directory is missing or has **zero** `.mdx` files, it returns **503** with a message pointing to `outputFileTracingIncludes`. You can monitor this URL (e.g. uptime check); 503 means the bundle regressed. |
+| **Post-deploy check** | After a successful Vercel deploy, the deploy workflow waits 45s then calls `GET https://www.pocketportfolio.app/api/blog/posts`. If the response has fewer than 5 posts, the workflow **fails** (step turns red). So a deploy that would cause "posts disappeared" is caught immediately. |
+
+Together: **wrong config** → deploy never completes (config assertion). **Right config but broken bundle** → deploy completes but verification step fails (post-deploy check). **Runtime regression** → health returns 503 (monitoring).
+
+---
+
+## 8. Never remove
+
+- **In `next.config.js`:** Do **not** remove or rename:
+  - `outputFileTracingIncludes['/api/blog/posts']` → `['./content/posts/**']`
+  - `outputFileTracingIncludes['/api/blog/health']` → `['./content/posts/**']`
+  - `outputFileTracingIncludes['/blog']` → `['./content/posts/**', ...calendars]`
+- If you change the structure (e.g. move posts to another dir), update the includes **and** the posts API, health route, and blog page to use the new path; then run `npm run verify-blog-tracing` and the deploy workflow will keep enforcing the new paths once you update the script.

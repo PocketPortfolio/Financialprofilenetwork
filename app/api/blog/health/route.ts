@@ -33,12 +33,23 @@ export async function GET() {
     if (!fs.existsSync(postsDir)) {
       return NextResponse.json({
         status: 'error',
-        message: 'Posts directory does not exist',
+        message: 'Posts directory does not exist. In production this usually means content/posts was not included in the serverless bundle.',
         postsDir,
+        guardrail: 'Check next.config.js outputFileTracingIncludes for /api/blog/posts and /blog. See docs/ZERO-TOUCH-BLOG-VERIFICATION.md',
       }, { status: 500 });
     }
 
     const files = fs.readdirSync(postsDir).filter(file => file.endsWith('.mdx'));
+
+    // GUARDRAIL: Zero posts = serverless bundle likely missing content/posts (regression)
+    if (files.length === 0) {
+      return NextResponse.json({
+        status: 'critical',
+        message: 'No MDX posts found. In production this usually means content/posts was not included in the serverless bundle.',
+        postsDir,
+        guardrail: 'Do not remove outputFileTracingIncludes for /api/blog/posts or /blog in next.config.js. See docs/ZERO-TOUCH-BLOG-VERIFICATION.md',
+      }, { status: 503 });
+    }
     const results: HealthCheckResult[] = [];
     let healthyCount = 0;
     let unhealthyCount = 0;
