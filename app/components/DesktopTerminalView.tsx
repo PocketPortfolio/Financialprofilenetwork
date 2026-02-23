@@ -187,7 +187,9 @@ export default function DesktopTerminalView({
                 $ pocket-portfolio track {normalizedSymbol}
               </div>
               <div style={{ color: 'var(--text)' }}>
-                {loading ? '⏳ Fetching data...' : `✓ Data loaded • ${historicalData.length} rows available`}
+                {loading ? '⏳ Fetching data...' : historicalData.length > 0
+                  ? `✓ Data loaded • ${historicalData.length} rows available`
+                  : '✓ Data loaded • 0 rows (see note below)'}
               </div>
             </div>
 
@@ -400,8 +402,13 @@ export default function DesktopTerminalView({
                   {error}
                 </div>
               ) : historicalData.length === 0 ? (
-                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  No data available
+                <div style={{ padding: '32px 24px', textAlign: 'left', color: 'var(--text-secondary)', maxWidth: '560px', margin: '0 auto' }}>
+                  <p style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '12px' }}>
+                    No historical data available for this symbol
+                  </p>
+                  <p style={{ margin: 0, lineHeight: 1.6, fontSize: '14px' }}>
+                    Mutual funds and some ETFs report NAV once per day; our data source may not provide a full OHLCV history for this security. You can still track {normalizedSymbol} in your portfolio and export positions via CSV or JSON.
+                  </p>
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>

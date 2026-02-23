@@ -86,15 +86,13 @@ function normalizeSymbols(symbols: string[]): { original: string; ticker: string
     // Skip invalid/partial company names that are not real tickers
     const invalidPatterns = ['ADR', 'INC.', 'CORPORATION', 'COMPANY', 'CO.', 'LTD', 'LLC', 'INC', 'CORP'];
     if (invalidPatterns.includes(normalized) || normalized.length < 2) {
-      console.log(`⚠️ Skipping invalid ticker: "${normalized}"`);
       return { original: symbol, ticker: null }; // Will be filtered out
     }
-    
+
     // Check commodity map FIRST (for "GOLD", "SILVER", "US TECH 100", etc.)
     // This must happen before the "already a ticker" check
     if (COMMODITY_TICKER_MAP[normalized]) {
       const mappedTicker = COMMODITY_TICKER_MAP[normalized];
-      console.log(`✅ Commodity mapping: "${normalized}" -> "${mappedTicker}"`);
       return { original: symbol, ticker: mappedTicker };
     }
     
@@ -118,7 +116,6 @@ function normalizeSymbols(symbols: string[]): { original: string; ticker: string
 // Yahoo batch (fast path) - simplified to reduce 401 errors
 async function yahooBatch(symbols: string[]) {
   // Skip batch API for now due to frequent 401 errors, rely on individual chart API
-  console.log(`Skipping Yahoo batch API to avoid 401 errors, using individual chart API for: ${symbols.join(',')}`);
   return [];
 }
 
@@ -172,6 +169,43 @@ async function yahooChart(sym: string) {
   };
 }
 
+// Yahoo quoteSummary fallback (NAV/price for mutual funds and symbols with no intraday chart)
+const JUA_QUOTE: Record<string, string> = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  Accept: "application/json",
+  "Accept-Language": "en-US,en;q=0.9",
+};
+async function yahooQuoteSummary(sym: string): Promise<{ symbol: string; name: string; price: number; change: number | null; changePct: number | null; currency: string }> {
+  const urls = [
+    `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(sym)}?modules=summaryDetail`,
+    `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(sym)}?modules=summaryDetail`,
+  ];
+  for (const u of urls) {
+    const r = await fetch(u, { headers: JUA_QUOTE });
+    if (!r.ok) continue;
+    const j = await r.json();
+    const summary = j?.quoteSummary?.result?.[0]?.summaryDetail;
+    if (!summary) continue;
+    const raw = (x: any) => (x != null && typeof x === 'object' && 'raw' in x ? (x as { raw: number }).raw : typeof x === 'number' ? x : undefined);
+    const price = raw(summary.regularMarketPrice);
+    const prevClose = raw(summary.previousClose) ?? price;
+    if (typeof price !== 'number' || !Number.isFinite(price)) continue;
+    const prev = typeof prevClose === 'number' && Number.isFinite(prevClose) ? prevClose : price;
+    const change = prev !== 0 ? price - prev : null;
+    const changePct = change !== null && prev !== 0 ? (change / prev) * 100 : null;
+    const returnSymbol = sym.endsWith('.L') ? sym.replace('.L', '') : sym.toUpperCase();
+    return {
+      symbol: returnSymbol,
+      name: returnSymbol,
+      price,
+      change,
+      changePct: changePct != null && Number.isFinite(changePct) ? changePct : null,
+      currency: summary.currency || 'USD',
+    };
+  }
+  throw new Error("no_quote_summary");
+}
+
 // Stooq fallback
 async function stooqTwo(sym: string) {
   const u = `https://stooq.com/q/l/?s=${encodeURIComponent(sym.toLowerCase())}&f=sd2t2ohlcv&h&e=csv`;
@@ -206,23 +240,16 @@ export async function GET(request: NextRequest) {
     // Normalize company names to ticker symbols
     const normalizedSymbols = normalizeSymbols(symbols);
     const tickers = [...new Set(normalizedSymbols.map(n => n.ticker))];
-    
-    
-    
-    console.log('🔥 Normalized symbols:', normalizedSymbols);
-    console.log('🔥 Unique tickers:', tickers);
 
     // 1) Try Yahoo batch
     let batch: any[] = [];
     try {
       batch = await yahooBatch(tickers);
-      console.log('🔥 Yahoo batch response:', batch);
-    } catch (error) {
-      console.warn('Yahoo batch failed:', error);
+    } catch {
+      // Batch disabled; use chart/quoteSummary per symbol
     }
 
     const by = new Map(batch.map((r) => [r.symbol, r]));
-    console.log('🔥 Batch map:', Array.from(by.entries()));
     const out: any[] = [];
 
     // 2) Ensure price/changePct per symbol with chart → stooq fallbacks
@@ -254,7 +281,7 @@ export async function GET(request: NextRequest) {
         } catch {
           try {
             const s = await stooqTwo(ticker);
-            rec.symbol = ticker.toUpperCase(); // Use the normalized ticker as the symbol
+            rec.symbol = ticker.toUpperCase();
             rec.name = ticker.toUpperCase();
             rec.price ??= s.price;
             rec.change ??= s.change;
@@ -262,8 +289,18 @@ export async function GET(request: NextRequest) {
             if (!rec.currency) rec.currency = s.currency;
             if (rec.source === "none") rec.source = "stooq";
           } catch {
-            // Keep normalized ticker as symbol even if quote fetch fails
-            rec.symbol = ticker.toUpperCase();
+            try {
+              const q = await yahooQuoteSummary(ticker);
+              rec.symbol = q.symbol;
+              rec.name = q.name;
+              rec.price = q.price;
+              rec.change = q.change;
+              rec.changePct = q.changePct;
+              rec.currency = q.currency;
+              rec.source = "yahoo_quote_summary";
+            } catch {
+              rec.symbol = ticker.toUpperCase();
+            }
           }
         }
       } else {
@@ -275,10 +312,7 @@ export async function GET(request: NextRequest) {
       out.push(rec);
     }
 
-    console.log('🔥 Final output:', out);
     const src = out.every((x) => x.source === "yahoo") ? "yahoo" : out.every((x) => x.source === "stooq") ? "stooq" : "mixed";
-    
-    
 
     return NextResponse.json(out, {
       headers: {

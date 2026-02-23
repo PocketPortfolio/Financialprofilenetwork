@@ -110,8 +110,64 @@ function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
   return '\uFEFF' + csvContent;
 }
 
+const YAHOO_QUOTE_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+  'Accept': 'application/json',
+};
+
 /**
- * Fetch historical stock data from Yahoo Finance
+ * Fallback for mutual funds / symbols with no chart: build 1–2 rows from quoteSummary (NAV).
+ */
+async function fetchNavFromQuoteSummary(ticker: string): Promise<HistoricalDataPoint[] | null> {
+  const urls = [
+    `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?modules=summaryDetail`,
+    `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ticker)}?modules=summaryDetail`,
+  ];
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { headers: YAHOO_QUOTE_HEADERS, next: { revalidate: 3600 } });
+      if (!r.ok) continue;
+      const data = await r.json();
+      const summary = data?.quoteSummary?.result?.[0]?.summaryDetail;
+      if (!summary) continue;
+      const raw = (x: any) => (x != null && typeof x === 'object' && 'raw' in x ? (x as { raw: number }).raw : typeof x === 'number' ? x : undefined);
+      const price = raw(summary.regularMarketPrice);
+      const previousClose = raw(summary.previousClose);
+      if (typeof price !== 'number' || !Number.isFinite(price)) continue;
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      const points: HistoricalDataPoint[] = [
+        { date: todayStr, open: price, high: price, low: price, close: price, volume: 0 },
+      ];
+      if (typeof previousClose === 'number' && Number.isFinite(previousClose)) {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yyyy2 = yesterday.getFullYear();
+        const mm2 = String(yesterday.getMonth() + 1).padStart(2, '0');
+        const dd2 = String(yesterday.getDate()).padStart(2, '0');
+        points.unshift({
+          date: `${yyyy2}-${mm2}-${dd2}`,
+          open: previousClose,
+          high: previousClose,
+          low: previousClose,
+          close: previousClose,
+          volume: 0,
+        });
+      }
+      return points;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+/**
+ * Fetch historical stock data from Yahoo Finance.
+ * For mutual funds with no chart data, falls back to quoteSummary (NAV) to return 1–2 rows.
  */
 async function fetchHistoricalData(ticker: string, range: string = '1y'): Promise<HistoricalDataPoint[] | null> {
   try {
@@ -124,29 +180,32 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
 
     // Yahoo Finance chart API - supports different ranges: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=${range}`;
-    
+
     const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-      },
+      headers: YAHOO_QUOTE_HEADERS,
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
       console.error(`Yahoo Finance API error for ${ticker}: ${response.status}`);
+      const navFallback = await fetchNavFromQuoteSummary(ticker);
+      if (navFallback?.length) {
+        if (dataCache.size >= MAX_CACHE_SIZE) {
+          const entries = Array.from(dataCache.entries());
+          entries.sort((a, b) => a[1].expiresAt - b[1].expiresAt);
+          entries.slice(0, Math.floor(MAX_CACHE_SIZE * 0.2)).forEach(([k]) => dataCache.delete(k));
+        }
+        dataCache.set(cacheKey, { data: navFallback, expiresAt: Date.now() + 3600 * 1000 });
+        return navFallback;
+      }
       return null;
     }
 
     const data = await response.json();
     const result = data?.chart?.result?.[0];
 
-    if (!result) {
-      return null;
-    }
-
-    const timestamps = result.timestamp || [];
-    const quotes = result.indicators?.quote?.[0] || {};
+    const timestamps = result?.timestamp || [];
+    const quotes = result?.indicators?.quote?.[0] || {};
     const opens = quotes.open || [];
     const highs = quotes.high || [];
     const lows = quotes.low || [];
@@ -163,7 +222,6 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
       const close = closes[i];
       const volume = volumes[i];
 
-      // Skip if any required field is missing or null
       if (
         timestamp &&
         typeof open === 'number' &&
@@ -172,14 +230,12 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
         typeof close === 'number' &&
         typeof volume === 'number'
       ) {
-        // Convert timestamp to date string using UTC to avoid timezone shifts
-        // Yahoo Finance timestamps are in UTC, so we use UTC methods to get the correct date
         const dateObj = new Date(timestamp * 1000);
         const year = dateObj.getUTCFullYear();
         const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
         const day = String(dateObj.getUTCDate()).padStart(2, '0');
         const date = `${year}-${month}-${day}`;
-        
+
         historicalData.push({
           date,
           open: Number(open.toFixed(2)),
@@ -190,34 +246,43 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
         });
       }
     }
-    
-    // Sort by date to ensure chronological order (Yahoo Finance sometimes returns unsorted data)
+
+    // If chart returned no usable rows (e.g. mutual fund), try quoteSummary for NAV
+    if (historicalData.length === 0) {
+      const navFallback = await fetchNavFromQuoteSummary(ticker);
+      if (navFallback?.length) {
+        if (dataCache.size >= MAX_CACHE_SIZE) {
+          const entries = Array.from(dataCache.entries());
+          entries.sort((a, b) => a[1].expiresAt - b[1].expiresAt);
+          entries.slice(0, Math.floor(MAX_CACHE_SIZE * 0.2)).forEach(([k]) => dataCache.delete(k));
+        }
+        dataCache.set(cacheKey, { data: navFallback, expiresAt: Date.now() + 3600 * 1000 });
+        return navFallback;
+      }
+    }
+
     historicalData.sort((a, b) => {
       const dateA = new Date(a.date).getTime();
       const dateB = new Date(b.date).getTime();
       return dateA - dateB;
     });
 
-    // Cache the result with size limit to prevent memory leaks
-    // Evict oldest 20% of entries if cache is full
     if (dataCache.size >= MAX_CACHE_SIZE) {
       const entries = Array.from(dataCache.entries());
-      // Sort by expiration time (oldest first)
       entries.sort((a, b) => a[1].expiresAt - b[1].expiresAt);
-      // Remove oldest 20% of entries
-      const toRemove = entries.slice(0, Math.floor(MAX_CACHE_SIZE * 0.2));
-      toRemove.forEach(([key]) => dataCache.delete(key));
+      entries.slice(0, Math.floor(MAX_CACHE_SIZE * 0.2)).forEach(([k]) => dataCache.delete(k));
     }
-    
+
     dataCache.set(cacheKey, {
       data: historicalData,
-      expiresAt: Date.now() + 3600 * 1000, // 1 hour
+      expiresAt: Date.now() + 3600 * 1000,
     });
 
     return historicalData;
   } catch (error) {
     console.error(`Error fetching historical data for ${ticker}:`, error);
-    return null;
+    const navFallback = await fetchNavFromQuoteSummary(ticker);
+    return navFallback;
   }
 }
 
@@ -284,36 +349,27 @@ export async function GET(
     const resolvedParams = await params;
     const pathname = request.nextUrl.pathname;
     
-    // Log for debugging (production-safe)
-    console.warn(`[TICKERS_JSON_API] Route handler ENTRY | Path: ${pathname} | Method: ${request.method} | Params: ${JSON.stringify(resolvedParams)} | Timestamp: ${new Date().toISOString()}`);
-  
   // Extract ticker and format from pathname as fallback (more reliable than params on Vercel)
   // Path format: /api/tickers/{TICKER}/json or /api/tickers/{TICKER}/csv
   const pathMatchJson = pathname.match(/^\/api\/tickers\/([^\/]+)\/json$/i);
   const pathMatchCsv = pathname.match(/^\/api\/tickers\/([^\/]+)\/csv$/i);
   const searchParams = request.nextUrl.searchParams;
   const formatParam = searchParams.get('format'); // Support ?format=csv
-  
+
   let ticker: string | undefined;
   let format: string | undefined;
-  
+
   if (pathMatchJson) {
-    // Extract from pathname (most reliable) - JSON
     ticker = pathMatchJson[1]?.toUpperCase();
     format = formatParam || 'json';
-    console.warn(`[TICKERS_API] Extracted from pathname: ticker=${ticker}, format=${format}`);
   } else if (pathMatchCsv) {
-    // Extract from pathname - CSV
     ticker = pathMatchCsv[1]?.toUpperCase();
     format = 'csv';
-    console.warn(`[TICKERS_API] Extracted from pathname: ticker=${ticker}, format=${format}`);
   } else {
-    // Fallback to params (catch-all route)
     const tickerArray = resolvedParams.ticker || [];
     ticker = tickerArray[0]?.toUpperCase();
     const lastParam = tickerArray[tickerArray.length - 1]?.toLowerCase();
     format = formatParam || (lastParam === 'csv' ? 'csv' : 'json');
-    console.warn(`[TICKERS_API] Extracted from params: ticker array=${JSON.stringify(tickerArray)}, ticker=${ticker}, format=${format}`);
   }
   
   // Verify format is "json" or "csv"
@@ -339,7 +395,6 @@ export async function GET(
   }
   
   if (!ticker) {
-    console.warn(`[TICKERS_JSON_API] No ticker found | Pathname: ${pathname} | Params: ${JSON.stringify(resolvedParams)}`);
     return NextResponse.json(
       { 
         error: 'Ticker parameter required. Use /api/tickers/{SYMBOL}/json',
@@ -504,28 +559,62 @@ export async function GET(
     // Fetch historical data
     const historicalData = await fetchHistoricalData(ticker, requestedRange);
 
+    // No data (e.g. mutual funds, delisted, or unsupported symbols) → 200 with empty data, not 404
+    // So /s/[symbol] and API stay consistent: symbol exists, data may be empty
     if (!historicalData || historicalData.length === 0) {
-      // Return format-appropriate error response
+      const metadata = await getTickerMetadata(ticker);
+      const name = metadata?.name || `${ticker} Inc.`;
+      const exchange = metadata?.exchange || 'Unknown';
+
       if (format === 'csv') {
-        // Return CSV error response for CSV requests
-        const errorCsv = `Date,Error\n${new Date().toISOString().split('T')[0]},Historical data not found for ticker: ${ticker}`;
-        return new NextResponse(errorCsv, {
-          status: 404,
-          headers: {
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${ticker}-error.csv"`,
-          },
-        });
+        // Valid CSV with headers + one note row (200, not 404)
+        const note = `No historical data available for ${ticker} (e.g. mutual funds may have limited data).`;
+        const noteRow = [new Date().toISOString().split('T')[0], '', '', '', '', '0', note].map(escapeCsvCell).join(',');
+        const csvContent = '\uFEFFDate,Open,High,Low,Close,Volume,SOURCE: Pocket Portfolio API\n' + noteRow + '\n';
+        const headers: Record<string, string> = {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${ticker}-historical-data.csv"`,
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+          'X-Data-Status': 'no-data',
+        };
+        if (hasValidApiKey) {
+          headers['X-RateLimit-Limit'] = 'unlimited';
+          headers['X-RateLimit-Remaining'] = 'unlimited';
+        } else if (rateLimitResult) {
+          headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+          headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
+          headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
+        }
+        return new NextResponse(csvContent, { status: 200, headers });
       }
-      
-      // JSON error response for JSON requests
-      return NextResponse.json(
-        { 
-          error: `Historical data not found for ticker: ${ticker}`,
-          symbol: ticker
+
+      // JSON: same shape as success response, with empty data array (200)
+      const emptyResponse = {
+        symbol: ticker,
+        name,
+        exchange,
+        data: [] as HistoricalDataPoint[],
+        meta: {
+          range: requestedRange,
+          dataPoints: 0,
+          lastUpdated: new Date().toISOString(),
+          message: 'No historical data available for this symbol (e.g. mutual funds may have limited data).',
         },
-        { status: 404 }
-      );
+      };
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+        'X-Data-Status': 'no-data',
+      };
+      if (hasValidApiKey) {
+        headers['X-RateLimit-Limit'] = 'unlimited';
+        headers['X-RateLimit-Remaining'] = 'unlimited';
+      } else if (rateLimitResult) {
+        headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+        headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
+        headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
+      }
+      return NextResponse.json(emptyResponse, { status: 200, headers });
     }
 
     // Get ticker metadata for name and exchange
