@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizeTickerForUrl } from '@/app/lib/utils/sanitizeTicker';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const ticker = (searchParams.get('ticker') || 'AAPL').toUpperCase();
+  const ticker = sanitizeTickerForUrl(searchParams.get('ticker') || 'AAPL') ?? 'AAPL';
   
   const results: any = {
     ticker,

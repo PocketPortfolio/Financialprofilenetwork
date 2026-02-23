@@ -5,6 +5,7 @@
  */
 
 import { GICSSector, AssetType, SectorClassification, detectAssetType, normalizeSector } from '@/app/lib/portfolio/sectorClassification';
+import { sanitizeTickerForUrl } from '@/app/lib/utils/sanitizeTicker';
 
 /**
  * Yahoo Finance API Response
@@ -35,8 +36,10 @@ interface YahooFinanceQuoteSummary {
 export async function fetchSectorFromYahooFinance(
   ticker: string
 ): Promise<{ sector: string; industry?: string } | null> {
+  const safe = sanitizeTickerForUrl(ticker);
+  if (!safe) return null;
   try {
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=assetProfile,summaryProfile`;
+    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${safe}?modules=assetProfile,summaryProfile`;
     
     const response = await fetch(url, {
       headers: {
@@ -70,7 +73,7 @@ export async function fetchSectorFromYahooFinance(
       industry: industry?.trim(),
     };
   } catch (error) {
-    console.error(`Error fetching sector from Yahoo Finance for ${ticker}:`, error);
+    console.error(`Error fetching sector from Yahoo Finance for ${safe}:`, error);
     return null;
   }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizeTickerForUrl } from '@/app/lib/utils/sanitizeTicker';
 
 // Module loaded - log only in development to avoid production issues
 if (process.env.NODE_ENV !== 'production') {
@@ -842,23 +843,22 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    const ticker = tickerParam.toUpperCase();
-    
-    console.warn(`[DIVIDEND_DEBUG] Ticker extracted: ${ticker}`);
-    
+    const ticker = sanitizeTickerForUrl(tickerParam);
     if (!ticker) {
-      console.warn(`[DIVIDEND_DEBUG] Empty ticker after extraction | Path: ${request.nextUrl.pathname}`);
+      console.warn(`[DIVIDEND_DEBUG] Invalid ticker (SSRF-safe allowlist) | Path: ${request.nextUrl.pathname} | Raw: ${tickerParam?.substring(0, 50)}`);
       return NextResponse.json(
-        { error: 'Ticker parameter required' }, 
-        { 
+        { error: 'Invalid ticker. Use only letters, numbers, and dot (e.g. AAPL, BRK.B)' },
+        {
           status: 400,
           headers: {
             'X-Dividend-Route': 'called',
-            'X-Dividend-Error': 'empty-ticker'
-          }
+            'X-Dividend-Error': 'invalid-ticker',
+          },
         }
       );
     }
+
+    console.warn(`[DIVIDEND_DEBUG] Ticker extracted: ${ticker}`);
 
   console.log(`[Dividend API] Request received for ${ticker}`);
   console.log(`[Dividend API] EODHD_API_KEY configured: ${EODHD_API_KEY ? 'YES (' + EODHD_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
