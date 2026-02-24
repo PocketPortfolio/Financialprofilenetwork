@@ -843,7 +843,7 @@
     "scheduledTime": "14:00",
     "title": "Lazy Loading Components in React for Speed",
     "slug": "lazy-loading-components-in-react-for-speed",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -851,7 +851,8 @@
       "lazy",
       "loading",
       "components"
-    ]
+    ],
+    "publishedAt": "2026-02-24T14:45:35.987Z"
   },
   {
     "id": "how-to-how-to-detect-offline-state-in-react-feb-25",
