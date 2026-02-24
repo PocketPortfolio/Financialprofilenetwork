@@ -834,14 +834,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Cryptocurrency Exchange Latency - Centralized vs DEX",
     "slug": "research-cryptocurrency-exchange-latency-centralized-vs-dex-2026-02-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "latency",
       "cryptocurrency",
       "exchange"
-    ]
+    ],
+    "videoId": "CdUuAeUPRLA",
+    "publishedAt": "2026-02-24T18:01:33.002Z"
   },
   {
     "id": "research-financial-data-aggregation-api-rate-limits-analysis-2026-02-25",
