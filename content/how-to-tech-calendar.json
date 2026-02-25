@@ -860,7 +860,7 @@
     "scheduledTime": "14:00",
     "title": "How to Detect \"Offline\" State in React",
     "slug": "how-to-detect-offline-state-in-react",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -868,7 +868,8 @@
       "offline",
       "detect",
       "state"
-    ]
+    ],
+    "publishedAt": "2026-02-25T14:44:43.508Z"
   },
   {
     "id": "how-to-the-power-of-middleware-in-next-js-feb-26",

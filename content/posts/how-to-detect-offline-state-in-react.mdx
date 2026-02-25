@@ -1,0 +1,77 @@
+---
+title: How to Detect 'Offline' State in React
+date: '2026-02-25'
+description: >-
+  Learn to efficiently detect offline state in React apps with a simple,
+  code-first approach. Ensure robust app behavior offline.
+tags:
+  - react
+  - offline
+  - detect
+  - state
+author: Pocket Portfolio Team
+image: /images/blog/how-to-detect-offline-state-in-react.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Detecting an offline state in React applications is crucial for enhancing user experience, ensuring the app behaves correctly even without an internet connection. Here’s how to implement this with React Hooks.
+
+## Direct Solution with Code
+
+To detect the offline state, we will use the `useState` and `useEffect` hooks from React. The solution involves listening to the browser's `online` and `offline` events.
+
+```jsx
+import React, { useState, useEffect } from 'react';
+
+const useOfflineDetector = () => {
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const goOnline = () => setIsOffline(false);
+    const goOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
+  return isOffline;
+};
+
+const App = () => {
+  const isOffline = useOfflineDetector();
+
+  return (
+    <div>
+      {isOffline ? (
+        <p>You are currently offline. Some features may not be available.</p>
+      ) : (
+        <p>You are online.</p>
+      )}
+    </div>
+  );
+};
+
+export default App;
+```
+
+## Explanation of Key Concepts
+
+- **useState Hook**: Initializes the `isOffline` state to the current browser online status using `navigator.onLine`. This state will reflect whether the app is offline or online.
+- **useEffect Hook**: Sets up event listeners for `online` and `offline` events when the component mounts. These listeners update the `isOffline` state accordingly. It's important to clean up the listeners when the component unmounts to avoid memory leaks.
+- **navigator.onLine**: A read-only Boolean value that returns `true` if the browser has network access; otherwise, `false`. It serves as our initial state value.
+
+## Quick Tip
+
+While `navigator.onLine` provides a quick way to check the online status, it's not always reliable, especially in complex network conditions. For critical features, consider implementing additional checks, such as attempting to fetch a small resource from your server to verify connectivity.
+
+## Gotcha
+
+Remember, the `online` and `offline` events only tell you about the browser's network status, not the actual internet access. A device connected to a router without internet access will still trigger an `online` event. 
+
+Incorporating offline detection enhances user experience by providing feedback on their connection status and potentially enabling offline functionalities. This simple yet effective approach ensures your React app remains responsive and informative, regardless of network conditions.
