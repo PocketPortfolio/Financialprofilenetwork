@@ -851,7 +851,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Financial Data Aggregation - API Rate Limits Analysis",
     "slug": "research-financial-data-aggregation-api-rate-limits-analysis-2026-02-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -860,7 +860,9 @@
       "financial",
       "data",
       "aggregation"
-    ]
+    ],
+    "videoId": "pPy3sbeGNjQ",
+    "publishedAt": "2026-02-25T18:04:24.662Z"
   },
   {
     "id": "research-backtesting-performance-historical-data-processing-2026-02-26",
