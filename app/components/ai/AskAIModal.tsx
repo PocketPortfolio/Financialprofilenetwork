@@ -64,7 +64,46 @@ export function AskAIModal({
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
   const [showQuotaExceededModal, setShowQuotaExceededModal] = useState(false);
   const [showAttachmentUpsellModal, setShowAttachmentUpsellModal] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const FOUNDERS_CLUB_PRICE_ID =
+    process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1Sg3ykD4sftWa1Wtheztc1hR';
+
+  const handleQuotaUpgradeToStripe = async () => {
+    if (!FOUNDERS_CLUB_PRICE_ID || FOUNDERS_CLUB_PRICE_ID.includes('XXXXX')) {
+      setError('Checkout not configured. Please visit /sponsor to upgrade.');
+      return;
+    }
+    setCheckoutLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId: FOUNDERS_CLUB_PRICE_ID,
+          tierName: "UK Founder's Club",
+          email: user?.email ?? undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Checkout failed (${res.status})`);
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      if (data.sessionId) {
+        window.location.href = `https://checkout.stripe.com/c/pay/${data.sessionId}`;
+        return;
+      }
+      throw new Error('No checkout URL returned');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -476,7 +515,10 @@ export function AskAIModal({
               position: 'absolute',
               inset: 0,
               borderRadius: '12px',
-              background: 'hsl(var(--card))',
+              background: 'var(--surface)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -484,30 +526,49 @@ export function AskAIModal({
               zIndex: 10,
             }}
           >
-            <div style={{ textAlign: 'center', maxWidth: '320px' }}>
-              <p style={{ margin: '0 0 8px', fontSize: '15px', fontWeight: 600 }}>
+            <div style={{ textAlign: 'center', maxWidth: '340px' }}>
+              <p style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 600, color: 'var(--text)' }}>
                 Monthly limit reached
               </p>
-              <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
-                You've used your 20 questions this month. Upgrade to Founder's Club for unlimited Pocket Analyst questions.
+              <p style={{ margin: '0 0 16px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                You've used your 20 questions this month. Unlock unlimited Pocket Analyst with Founder's Club.
               </p>
+              <ul
+                style={{
+                  margin: '0 0 20px',
+                  padding: '0 0 0 20px',
+                  textAlign: 'left',
+                  fontSize: '14px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                <li style={{ marginBottom: '6px' }}>
+                  <strong style={{ color: 'var(--accent-warm)' }}>Unlimited AI Context</strong> — no monthly cap
+                </li>
+                <li style={{ marginBottom: '6px' }}>
+                  <strong style={{ color: 'var(--accent-warm)' }}>CSV File Attachments</strong> — ask about your statements
+                </li>
+              </ul>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <a
-                  href="/sponsor?utm_source=pocket_analyst&utm_medium=quota_modal&utm_campaign=founders_club"
+                <button
+                  type="button"
+                  onClick={handleQuotaUpgradeToStripe}
+                  disabled={checkoutLoading}
                   style={{
-                    display: 'block',
                     padding: '12px 20px',
                     borderRadius: '8px',
-                    background: 'var(--warning)',
+                    background: 'var(--accent-warm)',
                     color: '#000',
                     fontSize: '14px',
                     fontWeight: 600,
-                    textDecoration: 'none',
-                    textAlign: 'center',
+                    border: 'none',
+                    cursor: checkoutLoading ? 'wait' : 'pointer',
+                    opacity: checkoutLoading ? 0.85 : 1,
                   }}
                 >
-                  Upgrade to Founder's Club
-                </a>
+                  {checkoutLoading ? 'Taking you to checkout…' : "Upgrade Now — Founder's Club £100"}
+                </button>
                 <button
                   type="button"
                   onClick={() => { setShowQuotaExceededModal(false); setError(null); }}
@@ -515,7 +576,7 @@ export function AskAIModal({
                     padding: '10px',
                     background: 'transparent',
                     border: 'none',
-                    color: 'hsl(var(--muted-foreground))',
+                    color: 'var(--text-secondary)',
                     fontSize: '13px',
                     cursor: 'pointer',
                   }}
@@ -523,6 +584,9 @@ export function AskAIModal({
                   Maybe later
                 </button>
               </div>
+              {error && (
+                <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--danger)' }}>{error}</p>
+              )}
             </div>
           </div>
         )}

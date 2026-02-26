@@ -48,6 +48,8 @@ import MobileHeader from '../components/nav/MobileHeader';
 import OnboardingTour from '../components/OnboardingTour';
 import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import { MorningBrief } from '../components/dashboard/MorningBrief';
+import { useWeeklySnapshotToast } from '../hooks/useWeeklySnapshotToast';
+import { WeeklySnapshotToast } from '../components/WeeklySnapshotToast';
 import { AssetTerminal } from '../components/dashboard/AssetTerminal';
 import { TerminalSummary } from '../components/dashboard/TerminalSummary';
 import { DataInputDeck } from '../components/dashboard/DataInputDeck';
@@ -813,6 +815,12 @@ export default function Dashboard() {
   }, 0);
   
   const totalUnrealizedPLPercent = totalInvested > 0 ? (totalUnrealizedPL / totalInvested) * 100 : 0;
+
+  const { showToast: showWeeklySnapshotToast, dismiss: dismissWeeklySnapshotToast } =
+    useWeeklySnapshotToast(isAuthenticated ?? false, {
+      totalInvested,
+      unrealizedPL: totalUnrealizedPL,
+    });
   
   // Track dashboard re-renders and modal state
   const hasModalOpen = showDeleteModal || showAlertModal;
@@ -2415,6 +2423,13 @@ export default function Dashboard() {
       <FeatureAnnouncementModal
         isOpen={showFeatureAnnouncement}
         onClose={handleCloseAnnouncement}
+      />
+
+      {/* Weekly Portfolio Snapshot toast (7-day return, local-only P&L) */}
+      <WeeklySnapshotToast
+        show={showWeeklySnapshotToast}
+        onDismiss={dismissWeeklySnapshotToast}
+        summary={{ totalInvested, unrealizedPL: totalUnrealizedPL }}
       />
     </>
   );

@@ -1,0 +1,53 @@
+# Pocket Portfolio - Claude Code Ignore
+# Privacy-first: never read, ingest, or upload these to Anthropic.
+
+# Environment and secrets
+.env
+.env.local
+.env.*
+!.env.example
+
+# Firebase Admin SDK / service account credentials (any *.json that looks like creds)
+*service*account*.json
+*firebase*admin*.json
+*-credentials*.json
+*serviceAccount*.json
+credentials/*.json
+**/service-account*.json
+
+# Test/fixture data that may contain raw financial data
+**/test/**/*.csv
+**/test/**/*.xlsx
+**/test/**/*.xls
+**/tests/**/*.csv
+**/tests/**/*.xlsx
+**/tests/**/*.xls
+**/__tests__/**/*.csv
+**/__tests__/**/*.xlsx
+**/__tests__/**/*.xls
+**/fixtures/**/*.csv
+**/fixtures/**/*.xlsx
+**/fixtures/**/*.json
+**/test-data/**/*.csv
+**/test-data/**/*.json
+
+# Build and runtime artifacts
+node_modules/
+.next/
+build/
+dist/
+.vite/
+.vercel/
+coverage/
+
+# Version control
+.git/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Explicit secrets
+temp_api_key.txt
+*.key

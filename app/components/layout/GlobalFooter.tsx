@@ -229,6 +229,23 @@ export default function GlobalFooter() {
               </li>
               <li>
                 <a
+                  href="https://www.linkedin.com/company/pocket-portfolio-community/?viewAsMember=true"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a
                   href="https://coderlegion.com/5738/welcome-to-coderlegion-22s"
                   target="_blank"
                   rel="noopener noreferrer"
