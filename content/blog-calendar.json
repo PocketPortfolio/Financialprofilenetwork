@@ -436,7 +436,7 @@
     "date": "2026-02-26",
     "title": "Building a Financial Data Pipeline: From CSV to JSON",
     "slug": "building-a-financial-data-pipeline-from-csv-to-json",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -446,7 +446,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-02-26T09:45:25.725Z"
   },
   {
     "id": "week-9-post-1",
