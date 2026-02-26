@@ -877,7 +877,7 @@
     "scheduledTime": "14:00",
     "title": "The Power of \"Middleware\" in Next.js",
     "slug": "the-power-of-middleware-in-next-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -885,7 +885,8 @@
       "power",
       "middleware",
       "next"
-    ]
+    ],
+    "publishedAt": "2026-02-26T14:44:56.346Z"
   },
   {
     "id": "how-to-how-to-structure-a-monorepo-for-side-projects-feb-27",
