@@ -870,14 +870,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Backtesting Performance - Historical Data Processing",
     "slug": "research-backtesting-performance-historical-data-processing-2026-02-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "backtesting",
       "historical"
-    ]
+    ],
+    "videoId": "R3T1zRyZdMc",
+    "publishedAt": "2026-02-26T18:39:47.476Z"
   },
   {
     "id": "research-algorithmic-trading-latency-execution-speed-analysis-2026-02-27",
