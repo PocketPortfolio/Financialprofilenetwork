@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { sendStackRevealEmail } from '@/lib/stack-reveal/resend';
 
 export const dynamic = 'force-dynamic';
@@ -6,6 +8,23 @@ export const runtime = 'nodejs';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DASHBOARD_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.pocketportfolio.app';
+
+function getDb() {
+  if (!getApps().length) {
+    try {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+      });
+    } catch (e) {
+      console.error('[setup-link] Firebase init error:', e);
+    }
+  }
+  return getFirestore();
+}
 
 /**
  * POST /api/setup-link
@@ -61,29 +80,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Ops handoff: add contact to Resend audience/segment so Marketing can run Day 2 / Day 4 drip in Resend UI.
-    const audienceId = process.env.RESEND_SETUP_LINK_AUDIENCE_ID?.trim();
-    if (audienceId) {
-      try {
-        const addRes = await fetch('https://api.resend.com/contacts', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            unsubscribed: false,
-            segments: [{ id: audienceId }],
-          }),
+    // Drip engine: save to Firestore for Day 2 / Day 4 cron (single source of truth in codebase).
+    try {
+      const db = getDb();
+      const docId = email.replace(/\//g, '_'); // Firestore doc IDs cannot contain /
+      const ref = db.collection('mobileLeads').doc(docId);
+      const snap = await ref.get();
+      if (!snap.exists) {
+        await ref.set({
+          email,
+          createdAt: Timestamp.now(),
+          day2EmailSent: false,
+          day4EmailSent: false,
         });
-        if (!addRes.ok) {
-          const errBody = await addRes.text();
-          console.warn('[setup-link] Resend audience add failed:', addRes.status, errBody);
-        }
-      } catch (e) {
-        console.warn('[setup-link] Failed to add contact to audience:', e);
       }
+    } catch (e) {
+      console.warn('[setup-link] Failed to save mobile lead:', e);
     }
 
     console.log('[setup-link] Email sent to:', email, 'id:', result.id);
