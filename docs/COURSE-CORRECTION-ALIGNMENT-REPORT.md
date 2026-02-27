@@ -35,7 +35,7 @@
 | Priority | Directive | Codebase status |
 |----------|-----------|------------------|
 | **1. Quota → Revenue** | 429 modal → direct Stripe (no `/sponsor`). Copy: Unlimited AI Context + CSV Attachments. | ✅ Already in place (`AskAIModal.tsx`: `handleQuotaUpgradeToStripe` → `/api/create-checkout-session` → redirect). |
-| **2. Mobile-to-Desktop** | Mobile dashboard: “Enter email to send secure setup link to your computer.” | 🔲 Not yet implemented (planned: MobileSetupHandoff + `POST /api/setup-link`). |
+| **2. Mobile-to-Desktop** | Mobile dashboard: “Enter email to send secure setup link to your computer.” | ✅ Implemented (Mandate 3): viewport &lt; 768 + empty portfolio → email capture + `POST /api/setup-link`; desktop unchanged. |
 | **3. SEO intent** | Sovereign Intelligence / CoderLegion; high-intent keywords. | Marketing / content (no code change). |
 | **4. GA4 cohort** | Custom report excluding `/s/*` and `/import/*`; dashboard-only engagement. | Analytics (no code change). |
 | **API pages** | Lead Magnet CTA above data; **no** gate, blur, or hostile paywall. | ✅ Implemented (this course correction). |
@@ -53,7 +53,7 @@
 ## 4. Next Steps (from Command Team)
 
 1. **Merge** this PR (course correction complete).
-2. **Execute Priority 2** when ready: Mobile handoff (email capture + setup-link API).
+2. **Priority 2 (Mobile handoff)** — ✅ Done: `app/dashboard/page.tsx` (isMobile + empty state), `app/api/setup-link/route.ts`.
 3. Priorities 3 and 4 remain with Marketing and Data.
 
 ---

@@ -230,6 +230,11 @@ export default function Dashboard() {
   // newTrade state already declared above
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [setupLinkEmail, setSetupLinkEmail] = useState('');
+  const [setupLinkSending, setSetupLinkSending] = useState(false);
+  const [setupLinkSent, setSetupLinkSent] = useState(false);
+  const [setupLinkError, setSetupLinkError] = useState<string | null>(null);
   
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -319,14 +324,21 @@ export default function Dashboard() {
   useEffect(() => {
     let resizeTimeout: NodeJS.Timeout;
     
+    const updateMobile = (mobile: boolean) => {
+      setShowHamburger(mobile);
+      setIsMobile(mobile);
+    };
     const checkMobile = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        setShowHamburger(window.innerWidth <= 768);
+        const mobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        updateMobile(mobile);
       }, 150); // Debounce resize events to prevent flickering
     };
-    
-    checkMobile(); // Initial check
+    // Initial check immediately (no debounce) so mobile sees correct empty state on first paint
+    if (typeof window !== 'undefined') {
+      updateMobile(window.innerWidth < 768);
+    }
     window.addEventListener('resize', checkMobile);
     
     return () => {
@@ -1837,8 +1849,101 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Empty State: 3-step CSV onboarding + dropzone (Audit Patch 1.0) */}
-        {trades.length === 0 && (
+        {/* Empty State: Mobile handoff (Mandate 3) vs Desktop 3-step CSV onboarding */}
+        {trades.length === 0 && isMobile && (
+          <div
+            style={{
+              padding: '32px 24px',
+              background: 'var(--surface-hover, hsl(var(--muted) / 0.3))',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              marginBottom: '12px',
+            }}
+          >
+            <p style={{ margin: '0 0 20px', fontSize: '16px', lineHeight: 1.5, color: 'hsl(var(--foreground))' }}>
+              Pocket Portfolio is a desktop-grade pro tool. Enter your email to send a secure setup link to your computer.
+            </p>
+            {setupLinkSent ? (
+              <p style={{ margin: 0, fontSize: '14px', color: 'hsl(var(--primary))', fontWeight: 500 }}>
+                Check your email — we sent you a link to get started on desktop.
+              </p>
+            ) : (
+              <>
+                <input
+                  type="email"
+                  value={setupLinkEmail}
+                  onChange={(e) => { setSetupLinkEmail(e.target.value); setSetupLinkError(null); }}
+                  placeholder="you@example.com"
+                  disabled={setupLinkSending}
+                  style={{
+                    width: '100%',
+                    maxWidth: '320px',
+                    padding: '12px 16px',
+                    marginBottom: '12px',
+                    fontSize: '16px',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
+                    background: 'hsl(var(--background))',
+                    color: 'hsl(var(--foreground))',
+                    boxSizing: 'border-box',
+                  }}
+                  aria-label="Email for setup link"
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const email = setupLinkEmail.trim();
+                    if (!email) {
+                      setSetupLinkError('Please enter your email.');
+                      return;
+                    }
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                      setSetupLinkError('Please enter a valid email address.');
+                      return;
+                    }
+                    setSetupLinkSending(true);
+                    setSetupLinkError(null);
+                    try {
+                      const res = await fetch('/api/setup-link', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email }),
+                      });
+                      const data = await res.json().catch(() => ({}));
+                      if (!res.ok) {
+                        throw new Error(data.error || data.message || `Request failed (${res.status})`);
+                      }
+                      setSetupLinkSent(true);
+                    } catch (err) {
+                      setSetupLinkError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
+                    } finally {
+                      setSetupLinkSending(false);
+                    }
+                  }}
+                  disabled={setupLinkSending}
+                  style={{
+                    padding: '12px 24px',
+                    background: 'var(--accent-warm)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: setupLinkSending ? 'wait' : 'pointer',
+                    opacity: setupLinkSending ? 0.85 : 1,
+                  }}
+                >
+                  {setupLinkSending ? 'Sending…' : 'Send Link'}
+                </button>
+                {setupLinkError && (
+                  <p style={{ margin: '12px 0 0', fontSize: '13px', color: 'var(--danger, #ef4444)' }}>{setupLinkError}</p>
+                )}
+              </>
+            )}
+          </div>
+        )}
+        {trades.length === 0 && !isMobile && (
           <div style={{ 
             textAlign: 'center', 
             padding: '48px 24px',
