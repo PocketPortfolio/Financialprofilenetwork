@@ -83,9 +83,9 @@ function normalizeSymbols(symbols: string[]): { original: string; ticker: string
       normalized = normalized.split(':')[0];
     }
     
-    // Skip invalid/partial company names that are not real tickers
+    // Skip invalid/partial company names that are not real tickers (allow single-letter tickers e.g. V, A)
     const invalidPatterns = ['ADR', 'INC.', 'CORPORATION', 'COMPANY', 'CO.', 'LTD', 'LLC', 'INC', 'CORP'];
-    if (invalidPatterns.includes(normalized) || normalized.length < 2) {
+    if (invalidPatterns.includes(normalized) || normalized.length < 1) {
       return { original: symbol, ticker: null }; // Will be filtered out
     }
 
