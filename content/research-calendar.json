@@ -887,14 +887,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Algorithmic Trading Latency - Execution Speed Analysis",
     "slug": "research-algorithmic-trading-latency-execution-speed-analysis-2026-02-27",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "market",
     "keywords": [
       "latency",
       "trading",
       "algorithmic"
-    ]
+    ],
+    "videoId": "i2jMAxns7U0",
+    "publishedAt": "2026-02-27T18:28:07.246Z"
   },
   {
     "id": "research-kubernetes-cluster-autoscaling-response-time-analysis-2026-02-28",
