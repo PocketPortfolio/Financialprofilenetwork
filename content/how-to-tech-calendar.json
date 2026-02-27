@@ -894,14 +894,15 @@
     "scheduledTime": "14:00",
     "title": "How to structure a \"Monorepo\" for Side Projects",
     "slug": "how-to-structure-a-monorepo-for-side-projects",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "structure",
       "monorepo",
       "side"
-    ]
+    ],
+    "publishedAt": "2026-02-27T17:48:40.185Z"
   },
   {
     "id": "how-to-february-retro-3-tools-we-deprecated-this-month-feb-28",

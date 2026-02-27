@@ -1,0 +1,99 @@
+---
+title: How to Structure a Monorepo for Side Projects
+date: '2026-02-27'
+description: >-
+  Learn the essential steps to structure a monorepo for your side projects
+  effectively, ensuring streamlined development and maintenance.
+tags:
+  - structure
+  - monorepo
+  - side
+author: Pocket Portfolio Team
+image: /images/blog/how-to-structure-a-monorepo-for-side-projects.png
+pillar: technical
+category: how-to-in-tech
+---
+
+When embarking on side projects, developers often face the challenge of managing multiple codebases. A **monorepo** offers a unified version control system for easier maintenance and development. This guide introduces a straightforward approach to structuring a monorepo for side projects.
+
+## Direct Solution with Code
+
+To create a monorepo, you'll need to first decide on a tool. For this guide, we'll use **Yarn Workspaces** due to its simplicity and robustness. 
+
+1. **Initialize a New Project**
+
+   Start by creating a new directory for your monorepo and initialize it with `yarn`.
+
+   
+```bash
+   mkdir my-monorepo && cd my-monorepo
+   yarn init -y
+   
+```
+
+2. **Enable Workspaces in `package.json`**
+
+   Edit your `package.json` to include a workspaces field, specifying the packages directory.
+
+   
+```json
+   {
+     "name": "my-monorepo",
+     "private": true,
+     "workspaces": [
+       "packages/*"
+     ]
+   }
+   
+```
+
+3. **Create Sub-packages**
+
+   Each side project or component of your monorepo lives in its own sub-directory under `packages/`. 
+
+   
+```bash
+   mkdir packages/project-a && cd packages/project-a
+   yarn init -y
+   
+```
+
+   Repeat for as many projects or components as you have.
+
+4. **Install Dependencies Globally**
+
+   Dependencies used across projects can be added to the root `package.json`, reducing duplication.
+
+   
+```bash
+   yarn add react -W
+   
+```
+
+   The `-W` flag adds the dependency to the workspace root.
+
+5. **Running Scripts Across Workspaces**
+
+   Utilize Yarn's workspace command to run scripts in individual packages.
+
+   
+```bash
+   yarn workspace project-a add lodash
+   yarn workspace project-a run build
+   
+```
+
+## Explanation of Key Concepts
+
+- **Monorepo:** A version control strategy where multiple projects or packages are stored in a single repository.
+- **Yarn Workspaces:** A feature of Yarn that allows you to automatically link together and manage multiple packages within a single repository.
+
+## Quick Tip
+
+To streamline working with multiple packages, consider using **Lerna**, a tool that optimizes the workflow around managing multi-package repositories with git and npm. Lerna can work in tandem with Yarn Workspaces to handle versioning and publishing of packages.
+
+## Gotcha
+
+Avoid the temptation to overly generalize or share code between projects in the early stages. This can add complexity and reduce the flexibility of your monorepo structure. Focus on establishing clear boundaries and interfaces between packages, only abstracting shared logic when it's proven necessary and beneficial.
+
+By following this straightforward structure, developers can effectively manage multiple side projects within a single repository, enhancing productivity and maintainability.
