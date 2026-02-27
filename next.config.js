@@ -35,6 +35,8 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Keep server-only packages external so API routes (e.g. /api/ai/*) resolve at build
+  serverExternalPackages: ['firebase-admin'],
   // Enable standalone output for Docker (Vercel handles this automatically)
   // Only use standalone for Docker deployments, not for Vercel
   // output: 'standalone', // Commented out - Vercel uses serverless functions

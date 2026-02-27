@@ -2267,7 +2267,7 @@ export default function Dashboard() {
                     </div>
                     <div style={{ 
                       fontSize: '11px', 
-                      color: (quote?.change || 0) >= 0 ? 'var(--signal)' : 'var(--danger)',
+                      color: (quote?.changePct ?? 0) >= 0 ? 'var(--signal)' : 'var(--danger)',
                       fontWeight: '600',
                       textAlign: 'right',
                       display: 'flex',
@@ -2275,8 +2275,8 @@ export default function Dashboard() {
                       justifyContent: 'flex-end',
                       gap: '2px'
                     }}>
-                      {(quote?.change || 0) >= 0 ? '↗' : '↘'}
-                      {(quote?.change || 0) >= 0 ? '+' : ''}{(quote?.change || 0).toFixed(2)}%
+                      {(quote?.changePct ?? 0) >= 0 ? '↗' : '↘'}
+                      {quote?.changePct != null ? (quote.changePct >= 0 ? '+' : '') + Number(quote.changePct).toFixed(2) + '%' : 'N/A%'}
                     </div>
                 </div>
               ))}
@@ -2382,7 +2382,7 @@ export default function Dashboard() {
           </div>
           <div style={{ 
                       fontSize: '11px', 
-                      color: stock.change >= 0 ? 'var(--signal)' : 'var(--danger)',
+                      color: (stock.changePct ?? 0) >= 0 ? 'var(--signal)' : 'var(--danger)',
                       fontWeight: '600',
                       textAlign: 'right',
                       display: 'flex',
@@ -2390,8 +2390,8 @@ export default function Dashboard() {
                       justifyContent: 'flex-end',
                       gap: '2px'
                     }}>
-                      {stock.change >= 0 ? '↗' : '↘'}
-                      {stock.change >= 0 ? '+' : ''}{stock.change?.toFixed(2) || 'N/A'}%
+                      {(stock.changePct ?? 0) >= 0 ? '↗' : '↘'}
+                      {stock.changePct != null ? (stock.changePct >= 0 ? '+' : '') + Number(stock.changePct).toFixed(2) + '%' : 'N/A%'}
               </div>
             </div>
                 ))}

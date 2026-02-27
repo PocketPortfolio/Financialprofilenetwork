@@ -29,16 +29,27 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     const quotes = data?.finance?.result?.[0]?.quotes || data?.quotes || [];
     
-    const result = quotes.slice(0, count).map((q: any, i: number) => ({
-      rank: i + 1,
-      symbol: q.symbol,
-      price: q.regularMarketPrice ?? null,
-      changePct: q.regularMarketChangePercent ?? null,
-      volume: q.regularMarketVolume ?? q.volume ?? null,
-      marketCap: q.marketCap ?? null,
-      currency: q.currency ?? null,
-      source: 'yahoo_finance',
-    }));
+    const result = quotes.slice(0, count).map((q: any, i: number) => {
+      const price = q.regularMarketPrice ?? null;
+      const change = q.regularMarketChange ?? null;
+      const changePctRaw = q.regularMarketChangePercent ?? null;
+      const changePct =
+        changePctRaw != null
+          ? changePctRaw
+          : price != null && change != null && price !== 0
+            ? (change / price) * 100
+            : null;
+      return {
+        rank: i + 1,
+        symbol: q.symbol,
+        price,
+        changePct,
+        volume: q.regularMarketVolume ?? q.volume ?? null,
+        marketCap: q.marketCap ?? null,
+        currency: q.currency ?? null,
+        source: 'yahoo_finance',
+      };
+    });
     
     return NextResponse.json(result, {
       headers: {

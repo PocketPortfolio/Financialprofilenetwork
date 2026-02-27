@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
+/** Quote from /api/quote. Use changePct for % display; change is absolute (e.g. dollar) change. */
 interface Quote {
   symbol: string;
   name: string;
   price: number | null;
-  change: number | null;
-  changePct: number | null;
+  change: number | null;   // absolute change (e.g. $)
+  changePct: number | null; // percent change — use for "%" displays (align with Most Traded)
   currency: string;
   source: string;
 }
