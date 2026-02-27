@@ -95,6 +95,38 @@ export default function JsonApiLivePreview({
           {loading ? '● Loading...' : '● 200 OK (Live)'}
         </span>
       </div>
+      {/* Lead Magnet CTA: native, above data — no gate */}
+      <div style={{
+        padding: '16px',
+        margin: '0 16px 16px',
+        background: 'var(--surface-hover, hsl(var(--muted) / 0.4))',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '8px'
+      }}>
+        <p style={{
+          margin: '0 0 12px',
+          fontSize: '14px',
+          color: 'var(--text, hsl(var(--foreground)))',
+          lineHeight: 1.5
+        }}>
+          Tired of exporting to Excel? Track {symbol.toUpperCase()} and analyze your portfolio locally with Pocket Portfolio.
+        </p>
+        <a
+          href="/dashboard"
+          style={{
+            display: 'inline-block',
+            padding: '10px 18px',
+            background: 'var(--accent-warm)',
+            color: '#000',
+            borderRadius: '8px',
+            textDecoration: 'none',
+            fontSize: '14px',
+            fontWeight: 600
+          }}
+        >
+          Start Free — Local First
+        </a>
+      </div>
       <div style={{
         padding: '16px',
         overflowX: 'auto'
