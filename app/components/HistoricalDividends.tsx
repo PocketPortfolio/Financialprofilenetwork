@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { trackEvent } from '@/app/lib/analytics/events';
 
 interface HistoricalDividend {
   date: string;
@@ -111,6 +112,7 @@ export default function HistoricalDividends({ symbol }: HistoricalDividendsProps
         </p>
         <a
           href="/dashboard"
+          onClick={() => trackEvent('lead_magnet_clicked', { ticker: symbol })}
           style={{
             display: 'inline-block',
             padding: '10px 18px',

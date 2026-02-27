@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import { X, Sparkles, Paperclip } from 'lucide-react';
 import Papa from 'papaparse';
 import type { User } from 'firebase/auth';
+import { trackEvent } from '@/app/lib/analytics/events';
 
 /** Renders assistant message content as Markdown (bold, lists, links). */
 function AssistantMessageContent({ content }: { content: string }) {
@@ -90,10 +91,12 @@ export function AskAIModal({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `Checkout failed (${res.status})`);
       if (data.url) {
+        trackEvent('quota_upgrade_initiated');
         window.location.href = data.url;
         return;
       }
       if (data.sessionId) {
+        trackEvent('quota_upgrade_initiated');
         window.location.href = `https://checkout.stripe.com/c/pay/${data.sessionId}`;
         return;
       }

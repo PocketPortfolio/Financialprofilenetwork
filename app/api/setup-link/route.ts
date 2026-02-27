@@ -61,6 +61,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Ops handoff: add contact to Resend audience/segment so Marketing can run Day 2 / Day 4 drip in Resend UI.
+    const audienceId = process.env.RESEND_SETUP_LINK_AUDIENCE_ID?.trim();
+    if (audienceId) {
+      try {
+        const addRes = await fetch('https://api.resend.com/contacts', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            unsubscribed: false,
+            segments: [{ id: audienceId }],
+          }),
+        });
+        if (!addRes.ok) {
+          const errBody = await addRes.text();
+          console.warn('[setup-link] Resend audience add failed:', addRes.status, errBody);
+        }
+      } catch (e) {
+        console.warn('[setup-link] Failed to add contact to audience:', e);
+      }
+    }
+
     console.log('[setup-link] Email sent to:', email, 'id:', result.id);
     return NextResponse.json({ success: true, message: 'Setup link sent. Check your email.' });
   } catch (err) {

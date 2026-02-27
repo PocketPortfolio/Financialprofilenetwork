@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { trackEvent } from '@/app/lib/analytics/events';
 
 interface JsonApiLivePreviewProps {
   symbol: string;
@@ -113,6 +114,7 @@ export default function JsonApiLivePreview({
         </p>
         <a
           href="/dashboard"
+          onClick={() => trackEvent('lead_magnet_clicked', { ticker: symbol })}
           style={{
             display: 'inline-block',
             padding: '10px 18px',

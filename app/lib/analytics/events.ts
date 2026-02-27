@@ -169,6 +169,30 @@ export function trackError(error: string, context?: string) {
   }
 }
 
+const CONVERSION_FUNNEL_EVENTS = ['lead_magnet_clicked', 'mobile_setup_requested', 'quota_upgrade_initiated'] as const;
+
+// Conversion funnel events (Lead Magnet, Mobile Setup, Quota Upgrade) — GA4 + /admin/analytics.
+export function trackEvent(
+  eventName: string,
+  params?: Record<string, string | number | boolean | undefined>
+) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, {
+      event_category: 'Conversion',
+      ...params,
+    });
+  }
+  // Also log to backend for /admin/analytics
+  if (typeof window !== 'undefined' && CONVERSION_FUNNEL_EVENTS.includes(eventName as (typeof CONVERSION_FUNNEL_EVENTS)[number])) {
+    const ticker = params && typeof params.ticker === 'string' ? params.ticker : undefined;
+    fetch('/api/analytics/conversion-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: eventName, ...(ticker ? { ticker } : {}) }),
+    }).catch(() => {});
+  }
+}
+
 // Feature Announcement tracking
 export function trackFeatureAnnouncementView() {
   if (typeof window !== 'undefined' && window.gtag) {

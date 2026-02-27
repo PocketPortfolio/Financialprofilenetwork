@@ -165,6 +165,20 @@ export async function GET(request: NextRequest) {
       referral = { clicks: 0, conversions: 0, last7DaysClicks: 0, last7DaysConversions: 0, bySource: {} };
     }
 
+    // Fetch conversion funnel (lead_magnet_clicked, mobile_setup_requested, quota_upgrade_initiated)
+    let conversionFunnel: Awaited<ReturnType<typeof getConversionFunnelData>>;
+    try {
+      console.log('[Analytics API] 📊 Fetching conversion funnel data...');
+      conversionFunnel = await getConversionFunnelData(startDate);
+    } catch (e: any) {
+      console.error('[Analytics API] 📊 Conversion funnel failed:', e?.message);
+      conversionFunnel = {
+        leadMagnetClicked: { total: 0, last7Days: 0, byTicker: {} },
+        mobileSetupRequested: { total: 0, last7Days: 0 },
+        quotaUpgradeInitiated: { total: 0, last7Days: 0 },
+      };
+    }
+
     return NextResponse.json({
       monetization,
       toolUsage,
@@ -174,6 +188,7 @@ export async function GET(request: NextRequest) {
       leads: leadsData,
       googleSignups,
       referral,
+      conversionFunnel,
       timeRange: range,
       lastUpdated: new Date().toISOString()
     });
@@ -748,6 +763,58 @@ async function getReferralData(startDate: Date) {
       last7DaysClicks: 0,
       last7DaysConversions: 0,
       bySource: {},
+    };
+  }
+}
+
+async function getConversionFunnelData(startDate: Date) {
+  try {
+    const db = getDb();
+    const ref = db.collection('conversionEvents');
+    const startTimestamp = Timestamp.fromDate(startDate);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+
+    const snapshot = await ref.where('timestamp', '>=', startTimestamp).get();
+
+    const leadMagnetClicked = { total: 0, last7Days: 0, byTicker: {} as Record<string, number> };
+    const mobileSetupRequested = { total: 0, last7Days: 0 };
+    const quotaUpgradeInitiated = { total: 0, last7Days: 0 };
+
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const event = data?.event as string;
+      const ticker = typeof data?.ticker === 'string' ? data.ticker : undefined;
+      const ts = data?.timestamp as Timestamp;
+      const isLast7Days = ts && ts.toMillis ? ts.toMillis() >= sevenDaysAgo.getTime() : false;
+
+      if (event === 'lead_magnet_clicked') {
+        leadMagnetClicked.total++;
+        if (isLast7Days) leadMagnetClicked.last7Days++;
+        if (ticker) {
+          const t = ticker.toUpperCase();
+          leadMagnetClicked.byTicker[t] = (leadMagnetClicked.byTicker[t] || 0) + 1;
+        }
+      } else if (event === 'mobile_setup_requested') {
+        mobileSetupRequested.total++;
+        if (isLast7Days) mobileSetupRequested.last7Days++;
+      } else if (event === 'quota_upgrade_initiated') {
+        quotaUpgradeInitiated.total++;
+        if (isLast7Days) quotaUpgradeInitiated.last7Days++;
+      }
+    });
+
+    return {
+      leadMagnetClicked,
+      mobileSetupRequested,
+      quotaUpgradeInitiated,
+    };
+  } catch (error) {
+    console.error('Conversion funnel fetch error:', error);
+    return {
+      leadMagnetClicked: { total: 0, last7Days: 0, byTicker: {} },
+      mobileSetupRequested: { total: 0, last7Days: 0 },
+      quotaUpgradeInitiated: { total: 0, last7Days: 0 },
     };
   }
 }

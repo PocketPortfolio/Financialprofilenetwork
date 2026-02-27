@@ -132,6 +132,11 @@ interface AnalyticsData {
     last7DaysConversions: number;
     bySource: Record<string, { clicks: number; conversions: number }>;
   };
+  conversionFunnel?: {
+    leadMagnetClicked: { total: number; last7Days: number; byTicker: Record<string, number> };
+    mobileSetupRequested: { total: number; last7Days: number };
+    quotaUpgradeInitiated: { total: number; last7Days: number };
+  };
   timeRange: '7d' | '30d' | '90d' | 'all';
   lastUpdated?: string;
 }
@@ -457,6 +462,63 @@ export default function AdminAnalyticsPage() {
               </div>
             )}
           </section>
+
+          {/* Conversion Funnel (Lead Magnet, Mobile Setup, Quota Upgrade) */}
+          {analyticsData.conversionFunnel && (
+            <section style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: 'var(--space-6)'
+            }}>
+              <h2 style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: 'var(--space-4)',
+                color: 'var(--text)'
+              }}>
+                📊 Conversion Funnel
+              </h2>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+                Lead Magnet CTR, Mobile Setup, Quota → Checkout (also in GA4).
+              </p>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: 'var(--space-4)',
+                marginBottom: 'var(--space-4)'
+              }}>
+                <MetricCard
+                  label="Lead Magnet Clicks"
+                  value={analyticsData.conversionFunnel.leadMagnetClicked.total.toLocaleString()}
+                  subtitle={`${analyticsData.conversionFunnel.leadMagnetClicked.last7Days} last 7 days`}
+                />
+                <MetricCard
+                  label="Mobile Setup Requested"
+                  value={analyticsData.conversionFunnel.mobileSetupRequested.total.toLocaleString()}
+                  subtitle={`${analyticsData.conversionFunnel.mobileSetupRequested.last7Days} last 7 days`}
+                />
+                <MetricCard
+                  label="Quota Upgrade Initiated"
+                  value={analyticsData.conversionFunnel.quotaUpgradeInitiated.total.toLocaleString()}
+                  subtitle={`${analyticsData.conversionFunnel.quotaUpgradeInitiated.last7Days} last 7 days`}
+                />
+              </div>
+              {Object.keys(analyticsData.conversionFunnel.leadMagnetClicked.byTicker).length > 0 && (
+                <div style={{ marginTop: 'var(--space-4)' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: 'var(--space-2)' }}>Lead Magnet by ticker</h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                    {Object.entries(analyticsData.conversionFunnel.leadMagnetClicked.byTicker)
+                      .sort(([, a], [, b]) => b - a)
+                      .slice(0, 15)
+                      .map(([ticker, count]) => (
+                        <span key={ticker} style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{ticker}: {count}</span>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Tool Usage Section */}
           <section style={{

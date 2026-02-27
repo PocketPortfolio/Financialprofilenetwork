@@ -44,6 +44,7 @@ import FeatureAnnouncementModal from '../components/modals/FeatureAnnouncementMo
 // import PortfolioSelector from '../components/PortfolioSelector';
 import { getDeviceInfo } from '../lib/utils/device';
 import { initializeMobileAnalytics } from '../lib/analytics/device';
+import { trackEvent } from '../lib/analytics/events';
 import MobileHeader from '../components/nav/MobileHeader';
 import OnboardingTour from '../components/OnboardingTour';
 import { SovereignHeader } from '../components/dashboard/SovereignHeader';
@@ -1915,6 +1916,7 @@ export default function Dashboard() {
                         throw new Error(data.error || data.message || `Request failed (${res.status})`);
                       }
                       setSetupLinkSent(true);
+                      trackEvent('mobile_setup_requested');
                     } catch (err) {
                       setSetupLinkError(err instanceof Error ? err.message : 'Something went wrong. Try again.');
                     } finally {
