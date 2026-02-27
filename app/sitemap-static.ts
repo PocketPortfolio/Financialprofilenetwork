@@ -148,6 +148,12 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    {
+      url: `${baseUrl}/compare/trade-republic`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
     // ✅ Learn Section (Knowledge Graph - Step 2)
     {
       url: `${baseUrl}/learn`,

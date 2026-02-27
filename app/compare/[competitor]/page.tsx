@@ -34,6 +34,13 @@ const COMPETITORS = {
     painPoints: ['Monthly subscription', 'Limited free tier', 'Cloud-only'],
     ourAdvantages: ['Free local-first', 'Unlimited portfolios', 'One-time £100 lifetime deal'],
   },
+  'trade-republic': {
+    name: 'Trade Republic',
+    cost: 'Free (EU) / Analytics varies',
+    description: 'Broker & portfolio analytics',
+    painPoints: ['EU-focused', 'Limited export options', 'Analytics tied to broker'],
+    ourAdvantages: ['Global tickers, any broker CSV', 'Free JSON/CSV API', 'One-time £100 lifetime deal'],
+  },
 };
 
 export async function generateStaticParams() {
