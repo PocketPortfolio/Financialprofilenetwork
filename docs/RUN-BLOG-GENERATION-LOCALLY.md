@@ -5,7 +5,7 @@ When the **Generate Blog Posts** workflow cannot run (e.g. billing/budget blocki
 ## Posts due today (2026-02-28)
 
 1. **How-to 14:00:** "February Retro: 3 Tools We Deprecated This Month" — ✅ generated (local run).
-2. **Research 18:00:** "Research: Kubernetes Cluster Autoscaling - Response Time Analysis" — run `npm run generate-blog` after 18:00 UTC to generate.
+2. **Research 18:00:** "Research: Kubernetes Cluster Autoscaling - Response Time Analysis" — ✅ generated (local run).
 
 ## Prerequisites
 
