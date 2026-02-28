@@ -910,14 +910,15 @@
     "scheduledTime": "14:00",
     "title": "February Retro: 3 Tools We Deprecated This Month",
     "slug": "february-retro-3-tools-we-deprecated-this-month",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "february",
       "retro",
       "tools"
-    ]
+    ],
+    "publishedAt": "2026-02-28T15:24:07.806Z"
   },
   {
     "id": "how-to-how-to-optimize-images-for-the-modern-web-avif-webp-mar-1",
