@@ -2,10 +2,10 @@
 
 When the **Generate Blog Posts** workflow cannot run (e.g. billing/budget blocking Actions), you can generate due posts locally and push them so they go live today.
 
-## Posts due today (2026-02-28)
+## Posts due today (2026-03-01)
 
-1. **How-to 14:00:** "February Retro: 3 Tools We Deprecated This Month" — ✅ generated (local run).
-2. **Research 18:00:** "Research: Kubernetes Cluster Autoscaling - Response Time Analysis" — ✅ generated (local run).
+1. **How-to 14:00:** "How to Optimize Images for the Modern Web (AVIF/WebP)" — ✅ generated (local run).
+2. **Research 18:00:** "Research: Service Mesh Overhead - Istio vs Linkerd Performance" — run `npm run generate-blog` after 18:00 UTC to generate.
 
 ## Prerequisites
 

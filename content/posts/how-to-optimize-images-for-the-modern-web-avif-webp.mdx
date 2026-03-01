@@ -1,0 +1,51 @@
+---
+title: How to Optimize Images for the Modern Web (AVIF/WebP)
+date: '2026-03-01'
+description: >-
+  Learn to efficiently optimize images for the modern web using AVIF and WebP
+  formats for faster loading times.
+tags:
+  - optimize
+  - images
+  - modern
+author: Pocket Portfolio Team
+image: /images/blog/how-to-optimize-images-for-the-modern-web-avif-webp.png
+pillar: technical
+category: how-to-in-tech
+---
+
+The modern web demands high-quality images at the smallest possible file sizes to enhance page load speeds without sacrificing visual fidelity. This guide dives into using AVIF and WebP, the forefront formats in image optimization.
+
+### Direct Solution with Code
+
+**Converting an image to WebP with `cwebp`:**
+
+```bash
+cwebp input.png -q 80 -o output.webp
+```
+
+**Converting an image to AVIF with `avifenc`:**
+
+```bash
+avifenc input.png output.avif
+```
+
+These commands rely on the `cwebp` tool from the WebP package and `avifenc` from the AVIF toolkit to convert images to their respective formats. Adjust quality settings (e.g., `-q 80` for WebP) based on your needs for balance between size and visual quality.
+
+### Explanation of Key Concepts
+
+- **WebP** is a modern image format that provides superior lossless and lossy compression for images on the web. Developed by Google, it's designed to create smaller, better looking images that speed up the web.
+
+- **AVIF** is the newest image format derived from the AV1 video codec. It offers significant file size reduction compared to its predecessors while maintaining high image quality, making it a strong choice for web optimization.
+
+Both formats are supported by major browsers, with AVIF support growing rapidly. Choosing between them often depends on the specific use case and browser compatibility requirements.
+
+### Quick Tip
+
+When optimizing images, consider the context in which they are used. For background images or those not requiring high detail, increasing compression (lower quality setting) can significantly reduce file sizes without noticeable quality loss to the end user. Testing different compression levels is key to finding the right balance for your specific needs.
+
+### Gotcha
+
+While AVIF offers superior compression, its encoding process is more computationally intensive than WebP's. This means converting large batches of images to AVIF might take longer, which is an important consideration when automating build processes for web projects.
+
+Optimizing images for the modern web is not just about reducing file sizes—it's about enhancing the overall user experience while conserving bandwidth and improving load times. By leveraging AVIF and WebP, developers can meet these goals with technology designed for the future of the internet.

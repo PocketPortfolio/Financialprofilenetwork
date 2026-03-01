@@ -926,14 +926,15 @@
     "scheduledTime": "14:00",
     "title": "How to Optimize Images for the Modern Web (AVIF/WebP)",
     "slug": "how-to-optimize-images-for-the-modern-web-avif-webp",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "optimize",
       "images",
       "modern"
-    ]
+    ],
+    "publishedAt": "2026-03-01T14:09:28.006Z"
   },
   {
     "id": "how-to-reducing-bundle-size-finding-the-heavy-dependencies-mar-2",
