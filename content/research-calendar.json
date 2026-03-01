@@ -921,7 +921,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Service Mesh Overhead - Istio vs Linkerd Performance",
     "slug": "research-service-mesh-overhead-istio-vs-linkerd-performance-2026-03-01",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -929,7 +929,9 @@
       "service",
       "mesh",
       "overhead"
-    ]
+    ],
+    "videoId": "ltBpFzvmqZc",
+    "publishedAt": "2026-03-01T19:06:48.559Z"
   },
   {
     "id": "research-container-registry-performance-docker-hub-vs-ghcr-vs-ecr-2026-03-02",

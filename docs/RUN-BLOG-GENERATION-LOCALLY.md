@@ -5,7 +5,7 @@ When the **Generate Blog Posts** workflow cannot run (e.g. billing/budget blocki
 ## Posts due today (2026-03-01)
 
 1. **How-to 14:00:** "How to Optimize Images for the Modern Web (AVIF/WebP)" — ✅ generated (local run).
-2. **Research 18:00:** "Research: Service Mesh Overhead - Istio vs Linkerd Performance" — run `npm run generate-blog` after 18:00 UTC to generate.
+2. **Research 18:00:** "Research: Service Mesh Overhead - Istio vs Linkerd Performance" — ✅ generated (local run).
 
 ## Prerequisites
 
