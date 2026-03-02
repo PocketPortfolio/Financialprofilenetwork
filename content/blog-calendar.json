@@ -454,7 +454,7 @@
     "date": "2026-03-02",
     "title": "Privacy is Profit: The Business Case for Local-First Finance",
     "slug": "privacy-is-profit-the-business-case-for-local-first-finance",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -464,7 +464,8 @@
       "privacy"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-02T10:21:49.469Z"
   },
   {
     "id": "week-9-post-2",
