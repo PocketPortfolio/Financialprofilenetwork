@@ -1,0 +1,47 @@
+---
+title: 'Reducing Bundle Size: Finding the Heavy Dependencies'
+date: '2026-03-02'
+description: >-
+  Learn how to identify and reduce heavy dependencies in your project,
+  optimizing bundle size for better performance.
+tags:
+  - dependencies
+  - bun
+  - reducing
+  - bundle
+  - size
+author: Pocket Portfolio Team
+image: /images/blog/reducing-bundle-size-finding-the-heavy-dependencies.png
+pillar: technical
+category: how-to-in-tech
+---
+
+In the realm of web development, a bulky bundle size can severely hinder application performance and user experience. Identifying and reducing heavy dependencies is crucial for optimization.
+
+```bash
+npx depcheck
+```
+
+or for a more visual analysis:
+
+```bash
+npx source-map-explorer 'build/static/js/*.js'
+```
+
+**Direct Solution:**
+
+1. **Identify heavy dependencies** using tools like `depcheck` or `source-map-explorer`. These tools help pinpoint which dependencies are bloating your bundle.
+2. **Evaluate necessity and alternatives** for each heavy dependency found. Consider if the dependency is essential or if there are lighter alternatives.
+3. **Implement code splitting** to lazy load parts of your application using dynamic `import()` statements. This ensures only necessary code is loaded and executed.
+
+**Explanation of Key Concepts:**
+
+- **Dependencies**: Libraries or packages your project relies on. Heavy dependencies are those taking up significant space in your bundle.
+- **Bundle Size**: The total size of files delivered to the client, including all dependencies, which can impact load time and performance.
+- **Code Splitting**: A technique to split your code into various bundles which can then be loaded on demand, reducing the initial load time.
+
+**Quick Tip:**
+
+Watch out for "tree shaking" support in your build tool (e.g., Webpack, Rollup). Tree shaking eliminates unused code from your bundle, further reducing its size. Ensure your import statements are statically analyzable to maximize tree shaking effectiveness.
+
+Reducing bundle size by finding and optimizing heavy dependencies enhances application performance, providing a smoother user experience. With the right tools and techniques, developers can significantly improve their project's efficiency.

@@ -942,7 +942,7 @@
     "scheduledTime": "14:00",
     "title": "Reducing Bundle Size: Finding the Heavy Dependencies",
     "slug": "reducing-bundle-size-finding-the-heavy-dependencies",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -951,7 +951,8 @@
       "reducing",
       "bundle",
       "size"
-    ]
+    ],
+    "publishedAt": "2026-03-02T18:09:24.112Z"
   },
   {
     "id": "how-to-how-to-use-prefetching-to-make-links-feel-instant-mar-3",
