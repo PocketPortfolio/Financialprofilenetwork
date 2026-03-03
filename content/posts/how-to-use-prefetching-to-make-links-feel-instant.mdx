@@ -1,0 +1,53 @@
+---
+title: How to Use 'Prefetching' to Make Links Feel Instant
+date: '2026-03-03'
+description: >-
+  Learn how to use prefetching with JavaScript to make navigating your web app
+  feel instant, enhancing user experience.
+tags:
+  - fetch
+  - use
+  - prefetching
+  - make
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-prefetching-to-make-links-feel-instant.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Navigating web apps often involves a frustrating wait time as new pages load. **Prefetching** is a strategy to eliminate this delay, preloading data or pages the user is likely to access next.
+
+## Direct Solution with Code
+
+To implement prefetching, you'll typically use JavaScript's `fetch` API. Here's a straightforward approach:
+
+```javascript
+document.addEventListener("mouseover", event => {
+  if (event.target.tagName === "A") {
+    const url = event.target.href;
+    fetch(url, {mode: 'no-cors'})
+      .then(response => {
+        // response logic here, like caching the data
+      })
+      .catch(error => console.error('Prefetching failed:', error));
+  }
+});
+```
+
+This script listens for `mouseover` events on links (`<a>` tags). When the mouse hovers over a link, it prefetches the content from the link's `href` attribute. The `{mode: 'no-cors'}` option is used to prevent CORS errors, a common issue when fetching resources from different origins.
+
+## Explanation of Key Concepts
+
+**Prefetching** is about loading resources before they're needed. When done right, it can make web applications feel significantly faster, as resources are ready to be used immediately when requested.
+
+The **Fetch API** provides a powerful and flexible interface for fetching resources. However, it's crucial to manage prefetching carefully to avoid unnecessary network traffic and resource consumption.
+
+## Quick Tip
+
+Be strategic about what you prefetch to avoid overloading the user's network or browser. Prefetching everything could backfire, making the app slower or more resource-intensive than it needs to be. A good strategy is to prefetch content that's highly likely to be accessed next, based on user behavior or explicit cues in the UI.
+
+## Gotcha
+
+Remember that prefetching can consume data and resources. Be mindful of prefetching too aggressively, especially for users on limited data plans or slower connections. It might be wise to implement logic that limits prefetching under certain conditions.
+
+By implementing prefetching wisely, you can significantly enhance the user experience of your web application, making interactions feel seamless and instant.

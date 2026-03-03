@@ -960,7 +960,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use \"Prefetching\" to Make Links Feel Instant",
     "slug": "how-to-use-prefetching-to-make-links-feel-instant",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -968,7 +968,8 @@
       "use",
       "prefetching",
       "make"
-    ]
+    ],
+    "publishedAt": "2026-03-03T14:31:13.444Z"
   },
   {
     "id": "how-to-understanding-core-web-vitals-lcp-cls-inp-mar-4",
