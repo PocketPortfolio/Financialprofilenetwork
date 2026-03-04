@@ -975,14 +975,16 @@
     "scheduledTime": "18:00",
     "title": "Research: Secret Management Performance - Vault vs AWS Secrets Manager",
     "slug": "research-secret-management-performance-vault-vs-aws-secrets-manager-2026-03-04",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "secret",
       "management"
-    ]
+    ],
+    "videoId": "szagwwSLbXo",
+    "publishedAt": "2026-03-04T18:19:18.969Z"
   },
   {
     "id": "research-configuration-management-performance-overhead-analysis-2026-03-05",
