@@ -1,0 +1,79 @@
+---
+title: 'Understanding Core Web Vitals (LCP, CLS, INP)'
+date: '2026-03-04'
+description: >-
+  A hacker-style guide to mastering Core Web Vitals: LCP, CLS, INP, with direct
+  solutions and practical code examples.
+tags:
+  - understanding
+  - core
+  - web
+author: Pocket Portfolio Team
+image: /images/blog/understanding-core-web-vitals-lcp-cls-inp.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Poor web performance not only affects user experience but also your site's search engine ranking. Understanding and optimizing Core Web Vitals—Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS), and Interaction to Next Paint (INP)—is critical.
+
+### Direct Solution with Code
+
+**Largest Contentful Paint (LCP)** measures the load time of the largest content element visible within the viewport. To monitor and improve LCP:
+
+```javascript
+// Measure LCP
+new PerformanceObserver((entryList) => {
+  const lcp = entryList.getEntries().pop();
+  console.log(`Largest Contentful Paint: ${lcp.startTime}`);
+}).observe({type: 'largest-contentful-paint', buffered: true});
+
+// Improve LCP
+// Preload key assets
+<link rel="preload" href="path/to/large/image.jpg" as="image">
+```
+
+**Cumulative Layout Shift (CLS)** quantifies unexpected layout shifts. To track and reduce CLS:
+
+```javascript
+// Measure CLS
+let clsValue = 0;
+new PerformanceObserver((entryList) => {
+  for (const entry of entryList.getEntries()) {
+    if (!entry.hadRecentInput) {
+      clsValue += entry.value;
+    }
+  }
+  console.log(`Cumulative Layout Shift: ${clsValue}`);
+}).observe({type: 'layout-shift', buffered: true});
+
+// Minimize CLS
+// Ensure elements have a reserved space to prevent shifts
+```
+
+**Interaction to Next Paint (INP)** focuses on the responsiveness of a page. To assess and enhance INP:
+
+```javascript
+// Measure INP
+new PerformanceObserver((entryList) => {
+  const inpEntries = entryList.getEntries();
+  const lastInp = inpEntries.pop();
+  console.log(`Interaction to Next Paint: ${lastInp.duration}`);
+}).observe({type: 'event', buffered: true});
+
+// Optimize INP
+// Utilize web workers for heavy JS tasks
+```
+
+### Explanation of Key Concepts
+
+- **LCP** targets the rendering time of the main content, aiming for 2.5 seconds or faster.
+- **CLS** measures visual stability, with a good score being less than 0.1.
+- **INP** evaluates the responsiveness of interactive elements, aiming for less than 100 milliseconds.
+
+### Quick Tip
+
+For CLS, applying width and height attributes to images and video elements can significantly reduce layout shifts, as the browser can allocate space for these elements even before they fully load.
+
+### Verdict
+
+Optimizing for Core Web Vitals is essential for a superior user experience and search engine ranking. By incorporating the provided code examples into your website's performance optimization strategy, you can effectively monitor and enhance LCP, CLS, and INP. Remember, a faster, more stable, and responsive website not only satisfies users but also ranks better on search engines.
