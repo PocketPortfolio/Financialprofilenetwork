@@ -472,7 +472,7 @@
     "date": "2026-03-05",
     "title": "The Small-Cap Advantage: Myth or Reality?",
     "slug": "the-small-cap-advantage-myth-or-reality",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -482,7 +482,8 @@
       "small-cap"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-05T09:57:25.196Z"
   },
   {
     "id": "week-10-post-1",
