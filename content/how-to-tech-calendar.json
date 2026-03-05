@@ -993,14 +993,15 @@
     "scheduledTime": "14:00",
     "title": "How to Profile React Performance with DevTools",
     "slug": "how-to-profile-react-performance-with-devtools",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "react",
       "performance",
       "profile"
-    ]
+    ],
+    "publishedAt": "2026-03-05T14:35:01.445Z"
   },
   {
     "id": "how-to-server-side-rendering-vs-static-site-generation-the-2026-verdict-mar-6",
