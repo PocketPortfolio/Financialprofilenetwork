@@ -91,9 +91,9 @@ export default function BlogPage() {
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              border: `2px solid ${filter === 'all' ? 'var(--primary)' : 'var(--border)'}`,
-              background: filter === 'all' ? 'var(--primary)' : 'transparent',
-              color: filter === 'all' ? 'white' : 'var(--text)',
+              border: `2px solid ${filter === 'all' ? 'var(--accent-warm)' : 'var(--border-warm)'}`,
+              background: filter === 'all' ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+              color: filter === 'all' ? 'var(--accent-warm)' : 'var(--text)',
               cursor: 'pointer',
               fontSize: '14px',
               fontWeight: '600',
@@ -107,7 +107,7 @@ export default function BlogPage() {
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              border: `2px solid ${filter === 'dev.to' ? 'rgb(59, 73, 223)' : 'var(--border)'}`,
+              border: `2px solid ${filter === 'dev.to' ? 'rgb(59, 73, 223)' : 'var(--border-warm)'}`,
               background: filter === 'dev.to' ? 'rgba(59, 73, 223, 0.1)' : 'transparent',
               color: filter === 'dev.to' ? 'rgb(59, 73, 223)' : 'var(--text)',
               cursor: 'pointer',
@@ -123,7 +123,7 @@ export default function BlogPage() {
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              border: `2px solid ${filter === 'coderlegion' ? 'rgb(139, 92, 246)' : 'var(--border)'}`,
+              border: `2px solid ${filter === 'coderlegion' ? 'rgb(139, 92, 246)' : 'var(--border-warm)'}`,
               background: filter === 'coderlegion' ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
               color: filter === 'coderlegion' ? 'rgb(139, 92, 246)' : 'var(--text)',
               cursor: 'pointer',
@@ -139,7 +139,7 @@ export default function BlogPage() {
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              border: `2px solid ${filter === 'generated' ? 'var(--accent-warm)' : 'var(--border)'}`,
+              border: `2px solid ${filter === 'generated' ? 'var(--accent-warm)' : 'var(--border-warm)'}`,
               background: filter === 'generated' ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
               color: filter === 'generated' ? 'var(--accent-warm)' : 'var(--text)',
               cursor: 'pointer',
@@ -155,7 +155,7 @@ export default function BlogPage() {
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              border: `2px solid ${filter === 'how-to-in-tech' ? '#00ff41' : 'var(--border)'}`,
+              border: `2px solid ${filter === 'how-to-in-tech' ? '#00ff41' : 'var(--border-warm)'}`,
               background: filter === 'how-to-in-tech' ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
               color: filter === 'how-to-in-tech' ? '#00ff41' : 'var(--text)',
               cursor: 'pointer',
@@ -171,7 +171,7 @@ export default function BlogPage() {
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              border: `2px solid ${filter === 'research' ? '#3b82f6' : 'var(--border)'}`,
+              border: `2px solid ${filter === 'research' ? '#3b82f6' : 'var(--border-warm)'}`,
               background: filter === 'research' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
               color: filter === 'research' ? '#3b82f6' : 'var(--text)',
               cursor: 'pointer',
