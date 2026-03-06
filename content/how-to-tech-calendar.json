@@ -1009,14 +1009,15 @@
     "scheduledTime": "14:00",
     "title": "Server-Side Rendering vs. Static Site Generation: The 2026 Verdict",
     "slug": "server-side-rendering-vs-static-site-generation-the-2026-verdict",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "server",
       "side",
       "rendering"
-    ]
+    ],
+    "publishedAt": "2026-03-06T14:11:39.591Z"
   },
   {
     "id": "how-to-how-to-implement-virtual-scrolling-for-long-lists-mar-7",
