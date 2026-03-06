@@ -59,7 +59,7 @@ async function MDXContent({ content, slug }: { content: string; slug: string }) 
         padding: '2em',
         background: 'var(--surface-elevated)',
         borderRadius: '8px',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         color: 'var(--text)',
       }}>
         <h2 style={{ color: 'var(--accent-warm)', marginBottom: '1em' }}>
@@ -423,7 +423,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 padding: '4px 12px',
                 borderRadius: '6px',
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 fontSize: '12px',
                 textTransform: 'capitalize',
               }}>
@@ -456,7 +456,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     background: 'var(--surface-elevated)',
                     borderRadius: '6px',
                     color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
+                    border: '2px solid var(--border-warm)',
                   }}
                 >
                   #{tag}
@@ -535,7 +535,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             padding: 'clamp(20px, 4vw, 32px)',
             background: 'var(--surface-elevated)',
             borderRadius: '12px',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             textAlign: 'center',
             width: '100%',
             boxSizing: 'border-box'

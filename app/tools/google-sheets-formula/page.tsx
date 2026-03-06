@@ -214,7 +214,7 @@ export default function GoogleSheetsFormulaPage() {
               background: 'var(--surface-elevated)',
               padding: 'var(--space-4)',
               borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               fontSize: 'var(--font-size-sm)',
               fontFamily: 'var(--font-mono)',
               color: 'var(--text)',

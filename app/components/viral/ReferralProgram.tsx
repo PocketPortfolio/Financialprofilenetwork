@@ -182,7 +182,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
               gap: '6px',
               padding: '8px 16px',
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: 'var(--font-size-sm)',
@@ -198,7 +198,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'var(--surface)';
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
@@ -217,7 +217,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
               gap: '6px',
               padding: '8px 16px',
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: 'var(--font-size-sm)',
@@ -233,7 +233,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'var(--surface)';
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
@@ -252,7 +252,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
               gap: '6px',
               padding: '8px 16px',
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               cursor: 'pointer',
               fontSize: 'var(--font-size-sm)',
@@ -268,7 +268,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'var(--surface)';
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}

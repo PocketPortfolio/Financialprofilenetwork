@@ -47,7 +47,7 @@ export default function GlobalFooter() {
         style={{
           marginTop: 'auto',
           padding: '24px 16px',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--border-warm)',
           textAlign: 'center',
           background: 'var(--bg)',
         }}
@@ -75,7 +75,7 @@ export default function GlobalFooter() {
       style={{
         marginTop: 'clamp(40px, 8vw, 80px)',
         paddingTop: 'clamp(20px, 4vw, 32px)',
-        borderTop: '1px solid var(--border)',
+        borderTop: '1px solid var(--border-warm)',
         background: 'var(--bg)',
         padding: 'clamp(32px, 6vw, 48px) clamp(16px, 4vw, 32px)',
         width: '100%',
@@ -670,7 +670,7 @@ export default function GlobalFooter() {
           style={{
             marginTop: '32px',
             paddingTop: '24px',
-            borderTop: '1px solid var(--border)',
+            borderTop: '1px solid var(--border-warm)',
             textAlign: 'center',
           }}
         >

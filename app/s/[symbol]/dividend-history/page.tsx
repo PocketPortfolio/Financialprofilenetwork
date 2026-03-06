@@ -136,7 +136,7 @@ export default async function DividendHistoryPage({ params }: { params: Promise<
 
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             padding: '24px',
@@ -163,7 +163,7 @@ export default async function DividendHistoryPage({ params }: { params: Promise<
           {/* NEW: JSON Export CTA */}
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px',
             marginBottom: '32px',
@@ -203,7 +203,7 @@ export default async function DividendHistoryPage({ params }: { params: Promise<
 
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             padding: '24px',

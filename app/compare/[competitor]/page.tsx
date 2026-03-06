@@ -128,7 +128,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
           maxWidth: '900px',
           margin: '0 auto',
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: 'var(--space-8)',
           marginBottom: 'var(--space-8)'
@@ -147,7 +147,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
             marginBottom: 'var(--space-6)'
           }}>
             <thead>
-              <tr style={{ borderBottom: '2px solid var(--border)' }}>
+              <tr style={{ borderBottom: '2px solid var(--border-warm)' }}>
                 <th style={{
                   padding: 'var(--space-4)',
                   textAlign: 'left',
@@ -178,7 +178,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+              <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                 <td style={{ padding: 'var(--space-4)' }}>Price</td>
                 <td style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   {competitor.cost}
@@ -187,7 +187,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
                   Free (Local) or £100 (Lifetime)
                 </td>
               </tr>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+              <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                 <td style={{ padding: 'var(--space-4)' }}>Data Privacy</td>
                 <td style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   Cloud-based
@@ -196,7 +196,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
                   Local-first (100% private)
                 </td>
               </tr>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+              <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                 <td style={{ padding: 'var(--space-4)' }}>Login Required</td>
                 <td style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--text-secondary)' }}>
                   Yes

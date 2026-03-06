@@ -225,7 +225,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             style={{
               padding: '14px 28px',
               background: 'transparent',
-              border: '2px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               color: 'var(--text-secondary)',
               borderRadius: '12px',
               fontSize: 'var(--font-size-base)',

@@ -89,7 +89,7 @@ export default function GoogleSheetsTool() {
             style={{
               flex: 1,
               padding: 'var(--space-3) var(--space-4)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: 'var(--radius-md)',
               background: 'var(--surface-elevated)',
               color: 'var(--text)',
@@ -217,7 +217,7 @@ export default function GoogleSheetsTool() {
               flex: 1,
               padding: 'var(--space-3) var(--space-4)',
               background: 'var(--surface-elevated)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: 'var(--radius-md)',
               fontSize: 'var(--font-size-sm)',
               fontFamily: 'var(--font-mono)',
@@ -263,7 +263,7 @@ export default function GoogleSheetsTool() {
       {formula && (
         <div className="brand-card" style={{
           padding: 'var(--space-4)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           background: 'var(--surface-elevated)'
         }}>
           <h3 style={{

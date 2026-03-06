@@ -40,7 +40,7 @@ export default function TermsPage() {
           <div
             style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: 'clamp(24px, 4vw, 40px)',
               lineHeight: '1.8',
@@ -141,7 +141,7 @@ export default function TermsPage() {
                 marginTop: '32px',
                 padding: '16px',
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
               }}
             >

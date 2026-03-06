@@ -142,7 +142,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
 
       <div style={{ 
         backgroundColor: 'var(--card-bg, var(--surface))', 
-        border: '1px solid var(--border)', 
+        border: '2px solid var(--border-warm)', 
         borderRadius: '12px', 
         padding: '32px',
         marginBottom: '32px',
@@ -165,7 +165,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
               onChange={(e) => updateHolding(index, 'symbol', e.target.value.toUpperCase())}
               style={{
                 padding: '12px',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 fontSize: '1rem',
                 backgroundColor: 'var(--input-bg, var(--surface-elevated))',
@@ -179,7 +179,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
               onChange={(e) => updateHolding(index, 'shares', parseFloat(e.target.value) || 0)}
               style={{
                 padding: '12px',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 fontSize: '1rem',
                 backgroundColor: 'var(--input-bg, var(--surface-elevated))',
@@ -261,7 +261,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
       {!loading && Object.keys(assetProfiles).length > 0 && (
         <div style={{ 
           backgroundColor: 'var(--card-bg, var(--surface))', 
-          border: '1px solid var(--border)', 
+          border: '2px solid var(--border-warm)', 
           borderRadius: '12px', 
           padding: '32px',
           marginBottom: '32px',
@@ -279,7 +279,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
                   padding: '20px', 
                   backgroundColor: 'var(--bg-secondary, var(--surface-elevated))', 
                   borderRadius: '8px',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   color: 'var(--text)'
                 }}>
                   <h3 style={{ fontSize: '1.25rem', marginBottom: '12px', color: 'var(--text)' }}>{symbol}</h3>
@@ -310,7 +310,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
 
       <div style={{ 
         backgroundColor: 'var(--card-bg, var(--surface))', 
-        border: '1px solid var(--border)', 
+        border: '2px solid var(--border-warm)', 
         borderRadius: '12px', 
         padding: '32px',
         textAlign: 'center',

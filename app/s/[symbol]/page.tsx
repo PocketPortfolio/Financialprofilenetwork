@@ -165,7 +165,7 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
             </p>
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '32px',

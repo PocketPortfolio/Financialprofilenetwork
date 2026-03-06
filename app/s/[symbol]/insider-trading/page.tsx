@@ -101,7 +101,7 @@ export default async function InsiderTradingPage({ params }: { params: Promise<{
             </h1>
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '32px',
               marginBottom: '32px',
@@ -219,7 +219,7 @@ export default async function InsiderTradingPage({ params }: { params: Promise<{
 
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             padding: '24px',
@@ -357,7 +357,7 @@ export default async function InsiderTradingPage({ params }: { params: Promise<{
           {insiderDataResult.holders && insiderDataResult.holders.length > 0 && (
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
               padding: '24px',
@@ -440,7 +440,7 @@ export default async function InsiderTradingPage({ params }: { params: Promise<{
 
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             padding: '24px',
@@ -473,7 +473,7 @@ export default async function InsiderTradingPage({ params }: { params: Promise<{
 
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             padding: '24px',

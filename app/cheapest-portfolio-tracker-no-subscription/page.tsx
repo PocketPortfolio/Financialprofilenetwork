@@ -150,7 +150,7 @@ export default function CheapestPortfolioTrackerPage() {
                   fontWeight: '600',
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
-                  border: '2px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--accent-warm)';
@@ -158,7 +158,7 @@ export default function CheapestPortfolioTrackerPage() {
                   e.currentTarget.style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.borderColor = 'var(--border-warm)';
                   e.currentTarget.style.color = 'var(--text)';
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
@@ -171,7 +171,7 @@ export default function CheapestPortfolioTrackerPage() {
           {/* Direct Answer Section */}
           <section style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '16px',
             padding: 'clamp(24px, 4vw, 40px)',
             marginBottom: 'clamp(32px, 5vw, 48px)'
@@ -270,7 +270,7 @@ export default function CheapestPortfolioTrackerPage() {
             <div style={{
               overflowX: 'auto',
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '16px',
               padding: '24px'
             }}>
@@ -281,7 +281,7 @@ export default function CheapestPortfolioTrackerPage() {
               }}>
                 <thead>
                   <tr style={{
-                    borderBottom: '2px solid var(--border)'
+                    borderBottom: '2px solid var(--border-warm)'
                   }}>
                     <th style={{
                       textAlign: 'left',
@@ -311,7 +311,7 @@ export default function CheapestPortfolioTrackerPage() {
                 </thead>
                 <tbody>
                   <tr style={{
-                    borderBottom: '1px solid var(--border)',
+                    borderBottom: '1px solid var(--border-warm)',
                     background: 'rgba(245, 158, 11, 0.05)'
                   }}>
                     <td style={{ padding: '12px', fontWeight: '600', color: 'var(--accent-warm)' }}>Pocket Portfolio</td>
@@ -319,19 +319,19 @@ export default function CheapestPortfolioTrackerPage() {
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✓ £100</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>£0</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>Wealthfolio</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✓ Yes</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✗ No</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>N/A</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>Getquin</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✓ Yes</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✗ No</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>N/A</td>
                   </tr>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>Yahoo Finance</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✓ Yes</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✗ No</td>
@@ -351,7 +351,7 @@ export default function CheapestPortfolioTrackerPage() {
           {/* FAQ Section */}
           <section style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '16px',
             padding: 'clamp(24px, 4vw, 40px)',
             marginBottom: 'clamp(32px, 5vw, 48px)'
@@ -371,7 +371,7 @@ export default function CheapestPortfolioTrackerPage() {
             }}>
               <div style={{
                 paddingBottom: '24px',
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid var(--border-warm)'
               }}>
                 <h3 style={{
                   fontSize: '18px',
@@ -391,7 +391,7 @@ export default function CheapestPortfolioTrackerPage() {
               </div>
               <div style={{
                 paddingBottom: '24px',
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid var(--border-warm)'
               }}>
                 <h3 style={{
                   fontSize: '18px',
@@ -411,7 +411,7 @@ export default function CheapestPortfolioTrackerPage() {
               </div>
               <div style={{
                 paddingBottom: '24px',
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid var(--border-warm)'
               }}>
                 <h3 style={{
                   fontSize: '18px',
@@ -431,7 +431,7 @@ export default function CheapestPortfolioTrackerPage() {
               </div>
               <div style={{
                 paddingBottom: '24px',
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid var(--border-warm)'
               }}>
                 <h3 style={{
                   fontSize: '18px',
@@ -451,7 +451,7 @@ export default function CheapestPortfolioTrackerPage() {
               </div>
               <div style={{
                 paddingBottom: '24px',
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid var(--border-warm)'
               }}>
                 <h3 style={{
                   fontSize: '18px',
@@ -494,7 +494,7 @@ export default function CheapestPortfolioTrackerPage() {
             textAlign: 'center',
             padding: 'clamp(32px, 5vw, 48px)',
             background: 'linear-gradient(135deg, var(--surface) 0%, rgba(245, 158, 11, 0.05) 100%)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '16px'
           }}>
             <h2 style={{
@@ -557,14 +557,14 @@ export default function CheapestPortfolioTrackerPage() {
                   fontWeight: '600',
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
-                  border: '2px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--accent-warm)';
                   e.currentTarget.style.color = 'var(--accent-warm)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.borderColor = 'var(--border-warm)';
                   e.currentTarget.style.color = 'var(--text)';
                 }}
               >

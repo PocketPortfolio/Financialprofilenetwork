@@ -212,7 +212,7 @@ export default function EtoroConverterPage() {
                 style={{
                   marginBottom: '1rem',
                   padding: '8px',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   borderRadius: '6px',
                   width: '100%',
                   maxWidth: '300px',

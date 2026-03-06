@@ -266,7 +266,7 @@ export default function LandingPage() {
                         left: toolsPanelRect.left,
                         minWidth: '180px',
                         background: 'var(--surface-elevated)',
-                        border: '1px solid var(--border)',
+                        border: '2px solid var(--border-warm)',
                         borderRadius: '8px',
                         boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                         padding: '8px 0',
@@ -335,7 +335,7 @@ export default function LandingPage() {
                     gap: '6px',
                     padding: '8px 16px',
                     background: 'transparent',
-                    border: '1px solid var(--border)',
+                    border: '2px solid var(--border-warm)',
                     borderRadius: '12px',
                     color: 'var(--text)',
                     textDecoration: 'none',
@@ -349,7 +349,7 @@ export default function LandingPage() {
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.borderColor = 'var(--border-warm)';
                     e.currentTarget.style.color = 'var(--text)';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}

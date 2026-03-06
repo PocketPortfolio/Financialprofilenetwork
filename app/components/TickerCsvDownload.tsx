@@ -115,19 +115,31 @@ export default function TickerCsvDownload({ symbol, name }: TickerCsvDownloadPro
           alignItems: 'center',
           gap: '8px',
           padding: '12px 24px',
-          background: downloading ? 'var(--text-secondary)' : 'var(--accent-warm)',
+          background: downloading ? 'var(--text-secondary)' : 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
           color: '#ffffff',
-          border: 'none',
+          border: '2px solid var(--border-warm)',
           borderRadius: '8px',
           fontSize: '14px',
           fontWeight: '600',
           cursor: downloading ? 'not-allowed' : 'pointer',
-          transition: 'background-color 0.2s',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
           opacity: downloading ? 0.7 : 1
         }}
-        onMouseEnter={(e) => { if (!downloading) e.currentTarget.style.background = 'var(--accent-warm-dark)'; }}
-        onMouseLeave={(e) => { if (!downloading) e.currentTarget.style.background = 'var(--accent-warm)'; }}
+        onMouseEnter={(e) => { 
+          if (!downloading) {
+            e.currentTarget.style.background = 'linear-gradient(135deg, #d97706 0%, #fbbf24 100%)';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
+          }
+        }}
+        onMouseLeave={(e) => { 
+          if (!downloading) {
+            e.currentTarget.style.background = 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+          }
+        }}
       >
         {downloading ? (<><span>⏳</span> Downloading...</>) : (<><span>📥</span> Download {symbol} Historical Data (CSV)</>)}
       </button>

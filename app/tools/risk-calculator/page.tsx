@@ -90,7 +90,7 @@ export default function RiskCalculatorPage() {
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
         maxWidth: '500px',
         width: '100%',
-        border: '1px solid var(--border)'
+        border: '2px solid var(--border-warm)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <span style={{
@@ -140,7 +140,7 @@ export default function RiskCalculatorPage() {
             style={{
               width: '100%',
               padding: '12px 16px',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               fontSize: '16px',
               textTransform: 'uppercase',

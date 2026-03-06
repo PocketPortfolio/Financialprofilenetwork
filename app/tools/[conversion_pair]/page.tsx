@@ -108,7 +108,7 @@ export default async function ConversionPage({ params }: { params: Promise<{ con
           <div className="brand-card" style={{
             marginBottom: 'var(--space-6)',
             padding: 'var(--space-5)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: 'var(--radius-md)'
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)' }}>

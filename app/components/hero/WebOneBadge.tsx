@@ -16,22 +16,22 @@ export function WebOneBadge() {
         marginTop: '16px',
         fontSize: '12px',
         fontWeight: '500',
-        color: 'var(--text-secondary)',
+        color: 'var(--accent-warm)',
         textDecoration: 'none',
         background: 'var(--surface)',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '999px', // Pill shape
         transition: 'all 0.2s ease',
         backdropFilter: 'blur(8px)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = '#E1306C'; // Pink to match brand
-        e.currentTarget.style.color = '#E1306C';
+        e.currentTarget.style.borderColor = 'var(--accent-warm)';
+        e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
         e.currentTarget.style.transform = 'translateY(-1px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--border)';
-        e.currentTarget.style.color = 'var(--text-secondary)';
+        e.currentTarget.style.borderColor = 'var(--border-warm)';
+        e.currentTarget.style.background = 'var(--surface)';
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
@@ -46,7 +46,7 @@ export function WebOneBadge() {
           display: 'inline-flex',
           width: '100%',
           height: '100%',
-          background: '#3b82f6',
+          background: 'var(--accent-warm)',
           borderRadius: '50%',
           opacity: 0.75,
           animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
@@ -56,7 +56,7 @@ export function WebOneBadge() {
           display: 'inline-flex',
           width: '8px',
           height: '8px',
-          background: '#3b82f6',
+          background: 'var(--accent-warm)',
           borderRadius: '50%'
         }}></span>
       </span>

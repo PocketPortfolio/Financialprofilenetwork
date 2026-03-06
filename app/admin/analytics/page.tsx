@@ -1538,7 +1538,7 @@ export default function AdminAnalyticsPage() {
             e.currentTarget.style.color = 'var(--signal)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
             e.currentTarget.style.color = 'var(--text)';
           }}
         >

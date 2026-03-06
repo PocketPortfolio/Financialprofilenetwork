@@ -114,7 +114,7 @@ export default function TickerStockInfo({ symbol, initialData }: TickerStockInfo
   return (
     <div style={{ overflowX: 'auto', margin: '0 -24px', padding: '0 24px' }}>
       <div style={{
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '12px',
         overflow: 'hidden',
         background: 'var(--surface-elevated)',
@@ -128,7 +128,7 @@ export default function TickerStockInfo({ symbol, initialData }: TickerStockInfo
           <thead>
             <tr style={{
               background: 'var(--surface-elevated)',
-              borderBottom: '2px solid var(--border)'
+              borderBottom: '2px solid var(--border-warm)'
             }}>
               <th style={{
                 textAlign: 'left',

@@ -84,7 +84,7 @@ export default function MobileTickerView({
           {/* Product Hunt Badge */}
           <div style={{
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '20px',
             maxWidth: '500px',
@@ -183,7 +183,7 @@ export default function MobileTickerView({
           {/* CSV Download Section - Above the fold */}
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px',
             marginBottom: '24px',
@@ -222,7 +222,7 @@ export default function MobileTickerView({
           {/* Stock Information Card */}
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px',
             marginBottom: '32px',
@@ -264,7 +264,7 @@ export default function MobileTickerView({
           <div 
             style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '32px',
@@ -278,7 +278,7 @@ export default function MobileTickerView({
           {/* Portfolio Integration */}
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px',
             marginBottom: '32px',
@@ -330,7 +330,7 @@ export default function MobileTickerView({
                   padding: '12px 24px',
                   background: 'var(--surface-elevated)',
                   color: 'var(--text)',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   borderRadius: '8px',
                   textDecoration: 'none',
                   fontWeight: '500',
@@ -348,7 +348,7 @@ export default function MobileTickerView({
           {content.internalLinks.length > 0 && (
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '32px',
@@ -394,7 +394,7 @@ export default function MobileTickerView({
           }}>
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
@@ -425,7 +425,7 @@ export default function MobileTickerView({
             
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'

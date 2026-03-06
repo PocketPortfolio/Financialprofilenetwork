@@ -19,11 +19,17 @@ export default function CompanyLogo({
   const [currentSourceIndex, setCurrentSourceIndex] = useState(0);
   const [hasError, setHasError] = useState(false);
   const [imgKey, setImgKey] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const prevSymbolRef = useRef<string>('');
   
   const fallbacks = getCompanyLogoFallbacks(symbol, metadata);
   const currentUrl = fallbacks[currentSourceIndex] || fallbacks[0];
   
+  // Mark as mounted after hydration to avoid SSR mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Reset everything when symbol changes
   useEffect(() => {
     if (prevSymbolRef.current !== symbol) {
@@ -59,7 +65,7 @@ export default function CompanyLogo({
         height: `${size}px`,
         borderRadius: '8px',
         background: 'var(--surface)',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -78,9 +84,10 @@ export default function CompanyLogo({
   const useCrossOrigin = currentUrl.includes('clearbit.com') || currentUrl.includes('logo.dev');
   
   // Add cache-busting parameter to force browser to reload image when symbol changes
-  // Only add cache-bust on first load (imgKey === 0 or 1) to avoid unnecessary reloads during fallback
-  const imageUrlWithCacheBust = imgKey <= 1 
-    ? `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}t=${Date.now()}`
+  // Only add cache-bust on client-side (after mount) to avoid SSR hydration mismatch
+  // Use imgKey as cache-bust instead of Date.now() to ensure consistency
+  const imageUrlWithCacheBust = mounted && imgKey <= 1 
+    ? `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}t=${imgKey}`
     : currentUrl;
   
   return (
@@ -100,7 +107,7 @@ export default function CompanyLogo({
         objectFit: 'contain',
         background: 'var(--surface)',
         padding: '8px',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         flexShrink: 0
       }}
       loading="lazy"

@@ -175,7 +175,7 @@ export default function DesktopTerminalView({
             {/* Terminal Header */}
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               padding: '16px',
               marginBottom: '24px',
@@ -252,7 +252,7 @@ export default function DesktopTerminalView({
               {/* Stock Info */}
               <div style={{
                 background: 'var(--card)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '12px',
                 padding: '24px',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
@@ -328,7 +328,7 @@ export default function DesktopTerminalView({
             {/* Data Table with Quick Copy */}
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               overflow: 'hidden',
               marginBottom: '24px',
@@ -336,7 +336,7 @@ export default function DesktopTerminalView({
             }}>
               <div style={{
                 padding: '16px 20px',
-                borderBottom: '2px solid var(--border)',
+                borderBottom: '2px solid var(--border-warm)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -356,7 +356,7 @@ export default function DesktopTerminalView({
                       gap: '6px',
                       padding: '8px 16px',
                       background: copied ? 'var(--signal)' : 'var(--surface)',
-                      border: '1px solid var(--border)',
+                      border: '2px solid var(--border-warm)',
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '500',
@@ -428,7 +428,7 @@ export default function DesktopTerminalView({
                         <tr 
                           key={idx} 
                           style={{ 
-                            borderBottom: '1px solid var(--border)',
+                            borderBottom: '1px solid var(--border-warm)',
                             transition: 'background-color 0.15s'
                           }}
                           onMouseEnter={(e) => {
@@ -471,7 +471,7 @@ export default function DesktopTerminalView({
               position: 'sticky',
               top: '24px',
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               padding: '20px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
@@ -590,7 +590,7 @@ export default function DesktopTerminalView({
               {/* Data Points Info */}
               <div style={{
                 paddingTop: '20px',
-                borderTop: '1px solid var(--border)',
+                borderTop: '1px solid var(--border-warm)',
                 fontSize: '12px',
                 color: 'var(--text-secondary)'
               }}>
@@ -613,7 +613,7 @@ export default function DesktopTerminalView({
           <div 
             style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '32px',
@@ -627,7 +627,7 @@ export default function DesktopTerminalView({
           {/* Portfolio Integration */}
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px',
             marginBottom: '32px',
@@ -679,7 +679,7 @@ export default function DesktopTerminalView({
                   padding: '12px 24px',
                   background: 'var(--surface-elevated)',
                   color: 'var(--text)',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   borderRadius: '8px',
                   textDecoration: 'none',
                   fontWeight: '500',
@@ -697,7 +697,7 @@ export default function DesktopTerminalView({
           {content.internalLinks.length > 0 && (
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '32px',
@@ -743,7 +743,7 @@ export default function DesktopTerminalView({
           }}>
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
@@ -774,7 +774,7 @@ export default function DesktopTerminalView({
             
             <div style={{
               background: 'var(--card)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'

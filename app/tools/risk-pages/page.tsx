@@ -90,7 +90,7 @@ export default function RiskPagesBrowser() {
             href={`/tools/track-${ticker.toLowerCase().replace(/\./g, '')}-risk`}
             style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               padding: '12px',
               textDecoration: 'none',
@@ -123,7 +123,7 @@ export default function RiskPagesBrowser() {
           textAlign: 'center',
           padding: '24px',
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           color: 'var(--text-secondary)'
         }}>

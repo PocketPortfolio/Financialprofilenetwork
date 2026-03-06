@@ -127,7 +127,7 @@ export default function LearnPage() {
             href={`/learn/${concept.slug}`}
             style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               textDecoration: 'none',
@@ -142,7 +142,7 @@ export default function LearnPage() {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = 'none';
             }}
@@ -246,4 +246,5 @@ export default function LearnPage() {
     </div>
   );
 }
+
 

@@ -291,7 +291,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           {/* CSV Download Option */}
           <div style={{
             background: 'var(--card)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px',
             marginBottom: '24px',
@@ -410,7 +410,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
               {/* SEO BREADCRUMBS / SCHEMA */}
               <div style={{
                 background: 'var(--card)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '12px',
                 padding: '24px'
               }}>

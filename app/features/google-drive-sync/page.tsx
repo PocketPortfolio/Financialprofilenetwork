@@ -114,7 +114,7 @@ export default function GoogleDriveSyncFeaturePage() {
           <div
             style={{
               background: 'var(--surface-elevated)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: 'clamp(16px, 4vw, 24px)',
               marginBottom: 'clamp(24px, 5vw, 32px)',
@@ -269,7 +269,7 @@ export default function GoogleDriveSyncFeaturePage() {
             <div
               style={{
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 padding: 'clamp(16px, 4vw, 20px)',
               }}
@@ -284,7 +284,7 @@ export default function GoogleDriveSyncFeaturePage() {
             <div
               style={{
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 padding: 'clamp(16px, 4vw, 20px)',
               }}
@@ -299,7 +299,7 @@ export default function GoogleDriveSyncFeaturePage() {
             <div
               style={{
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 padding: 'clamp(16px, 4vw, 20px)',
               }}
@@ -314,7 +314,7 @@ export default function GoogleDriveSyncFeaturePage() {
             <div
               style={{
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 padding: 'clamp(16px, 4vw, 20px)',
               }}
@@ -382,7 +382,7 @@ export default function GoogleDriveSyncFeaturePage() {
                 borderRadius: '8px',
                 fontSize: 'clamp(14px, 3vw, 16px)',
                 fontWeight: '600',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 transition: 'all 0.2s ease',
                 textAlign: 'center',
                 whiteSpace: 'nowrap',

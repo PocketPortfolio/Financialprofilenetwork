@@ -111,7 +111,7 @@ export default function RealisedVsUnrealisedPage() {
           </p>
           <div style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '8px',
             padding: '20px',
             marginTop: '16px'
@@ -244,4 +244,5 @@ export default function RealisedVsUnrealisedPage() {
     </>
   );
 }
+
 

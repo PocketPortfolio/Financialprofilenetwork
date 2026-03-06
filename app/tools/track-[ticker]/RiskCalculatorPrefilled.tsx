@@ -158,7 +158,7 @@ export default function RiskCalculatorPrefilled({
             style={{
               width: '100%',
               padding: '12px 16px',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               fontSize: '16px',
               textTransform: 'uppercase',

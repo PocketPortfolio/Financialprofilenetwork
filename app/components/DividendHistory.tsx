@@ -155,7 +155,7 @@ export default function DividendHistory({ symbol }: DividendHistoryProps) {
     return (
       <div style={{
         background: 'var(--card)',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         padding: '24px',
@@ -249,7 +249,7 @@ export default function DividendHistory({ symbol }: DividendHistoryProps) {
     return (
       <div style={{
         background: 'var(--card)',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         padding: '24px',
@@ -289,7 +289,7 @@ export default function DividendHistory({ symbol }: DividendHistoryProps) {
     return (
       <div style={{
         background: 'var(--card)',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         padding: '24px',
@@ -320,7 +320,7 @@ export default function DividendHistory({ symbol }: DividendHistoryProps) {
   return (
     <div style={{
       background: 'var(--card)',
-      border: '1px solid var(--border)',
+      border: '2px solid var(--border-warm)',
       borderRadius: '12px',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
       padding: '24px',

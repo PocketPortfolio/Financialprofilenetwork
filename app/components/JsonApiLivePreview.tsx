@@ -67,16 +67,16 @@ export default function JsonApiLivePreview({
 
   return (
     <div style={{
-      background: 'rgba(15, 23, 42, 0.5)',
-      border: '1px solid var(--border)',
+      background: 'var(--surface)',
+      border: '2px solid var(--border-warm)',
       borderRadius: '12px',
       overflow: 'hidden',
       marginBottom: '24px'
     }}>
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
+        background: 'var(--surface-elevated)',
         padding: '12px 16px',
-        borderBottom: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border-warm)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
@@ -91,7 +91,7 @@ export default function JsonApiLivePreview({
         <span style={{
           fontSize: '12px',
           fontFamily: 'monospace',
-          color: loading ? '#fbbf24' : '#34d399'
+          color: loading ? 'var(--accent-warm)' : 'var(--signal)'
         }}>
           {loading ? '● Loading...' : '● 200 OK (Live)'}
         </span>

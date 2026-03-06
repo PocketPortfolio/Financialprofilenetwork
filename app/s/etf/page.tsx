@@ -1,12 +1,8 @@
-import { Metadata } from 'next';
+'use client';
+
 import { getAllTickers } from '@/app/lib/pseo/data';
 import { detectAssetType, AssetType } from '@/app/lib/portfolio/sectorClassification';
 import Link from 'next/link';
-
-export const metadata: Metadata = {
-  title: 'Browse All ETFs | Pocket Portfolio',
-  description: 'Browse all Exchange-Traded Funds (ETFs). Find market data, dividend history, and performance metrics.',
-};
 
 export default function ETFDirectoryPage() {
   const allTickers = getAllTickers();
@@ -48,13 +44,22 @@ export default function ETFDirectoryPage() {
             href={`/s/${ticker.toLowerCase()}`}
             style={{
               padding: '16px',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               color: 'var(--text)',
               textDecoration: 'none',
               fontSize: '16px',
               fontWeight: '500',
               display: 'block',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-warm)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             {ticker.toUpperCase()}

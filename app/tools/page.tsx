@@ -52,7 +52,7 @@ export default function ToolsPage() {
           href="/tools/risk-calculator"
           style={{
             background: 'var(--surface)',
-            border: '2px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '16px',
             padding: '32px',
             textDecoration: 'none',
@@ -68,7 +68,7 @@ export default function ToolsPage() {
             e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.1)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = 'none';
           }}
@@ -131,7 +131,7 @@ export default function ToolsPage() {
           href="/tools/google-sheets-formula"
           style={{
             background: 'var(--surface)',
-            border: '2px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '16px',
             padding: '32px',
             textDecoration: 'none',
@@ -146,7 +146,7 @@ export default function ToolsPage() {
             e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.1)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = 'none';
           }}
@@ -194,7 +194,7 @@ export default function ToolsPage() {
           href="/for/advisors"
           style={{
             background: 'var(--surface)',
-            border: '2px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '16px',
             padding: '32px',
             textDecoration: 'none',
@@ -209,7 +209,7 @@ export default function ToolsPage() {
             e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.1)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
             e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.boxShadow = 'none';
           }}

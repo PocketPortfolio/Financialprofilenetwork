@@ -86,7 +86,7 @@ export default function TickerJsonData({ symbol, name, exchange, sector }: Ticke
   return (
     <div style={{
       background: 'var(--card)',
-      border: '1px solid var(--border)',
+      border: '2px solid var(--border-warm)',
       borderRadius: '12px',
       padding: '24px',
       marginBottom: '32px',
@@ -147,7 +147,7 @@ export default function TickerJsonData({ symbol, name, exchange, sector }: Ticke
               padding: '10px 20px',
               background: 'var(--surface-elevated)',
               color: 'var(--text)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               fontSize: '14px',
               fontWeight: '500',
@@ -191,7 +191,7 @@ export default function TickerJsonData({ symbol, name, exchange, sector }: Ticke
           borderRadius: '8px',
           fontSize: '13px',
           overflowX: 'auto',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           margin: 0,
           fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
           lineHeight: '1.6'

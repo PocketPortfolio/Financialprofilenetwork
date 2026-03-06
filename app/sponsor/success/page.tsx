@@ -212,7 +212,7 @@ function SuccessContent() {
                 flex: 1,
                 padding: '12px',
                 background: 'var(--surface)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '6px',
                 fontFamily: 'monospace',
                 fontSize: '14px',
@@ -297,7 +297,7 @@ function SuccessContent() {
                 flex: 1,
                 padding: '12px',
                 background: 'var(--surface)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '6px',
                 fontFamily: 'monospace',
                 fontSize: '14px',
@@ -352,7 +352,7 @@ function SuccessContent() {
         {!apiKey && !corporateLicense && (
           <div style={{
             background: 'var(--bg)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '8px',
             padding: '24px',
             marginBottom: '24px',
@@ -416,7 +416,7 @@ function SuccessContent() {
             style={{
               padding: '12px 24px',
               background: 'transparent',
-              border: '2px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               color: 'var(--text)',
               textDecoration: 'none',
               borderRadius: '8px',
@@ -429,7 +429,7 @@ function SuccessContent() {
               e.currentTarget.style.color = 'var(--accent-warm)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
           >

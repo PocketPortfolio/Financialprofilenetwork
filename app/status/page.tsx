@@ -74,7 +74,7 @@ export default function StatusPage() {
           <div
             style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px',
               marginBottom: '32px',
@@ -106,7 +106,7 @@ export default function StatusPage() {
                 key={service.name}
                 style={{
                   background: 'var(--surface)',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   borderRadius: '8px',
                   padding: '20px',
                   display: 'flex',
@@ -155,7 +155,7 @@ export default function StatusPage() {
               marginTop: '48px',
               padding: '20px',
               background: 'var(--surface-elevated)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               textAlign: 'center',
             }}

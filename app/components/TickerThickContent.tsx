@@ -203,8 +203,8 @@ export default function TickerThickContent({
 
       {/* 🛠️ LAYER 3: DEVELOPER UTILITY (The "NPM Hook") */}
       <div style={{
-        background: 'rgba(0, 0, 0, 0.8)',
-        border: '1px solid var(--border)',
+        background: 'var(--surface)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '8px',
         padding: '16px',
         fontFamily: 'monospace',
@@ -230,8 +230,8 @@ export default function TickerThickContent({
               Developer? Import this asset data:
             </p>
             <code style={{
-              color: '#34d399',
-              background: 'rgba(5, 46, 22, 0.3)',
+              color: 'var(--accent-warm)',
+              background: 'var(--surface-elevated)',
               padding: '8px 12px',
               borderRadius: '4px',
               display: 'inline-block',
@@ -246,7 +246,7 @@ export default function TickerThickContent({
           style={{
             padding: '8px 16px',
             background: 'transparent',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '6px',
             color: 'var(--text)',
             cursor: 'pointer',

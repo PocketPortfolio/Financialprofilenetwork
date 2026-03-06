@@ -269,7 +269,7 @@ export default function ProductionNavbar() {
                     gap: '6px',
                     padding: '8px 16px',
                     background: 'transparent',
-                    border: '1px solid var(--border)',
+                    border: '2px solid var(--border-warm)',
                     borderRadius: '12px',
                     color: 'var(--text)',
                     textDecoration: 'none',
@@ -283,7 +283,7 @@ export default function ProductionNavbar() {
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.borderColor = 'var(--border-warm)';
                     e.currentTarget.style.color = 'var(--text)';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }}

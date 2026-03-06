@@ -99,7 +99,7 @@ export default function RetrieveApiKeyPage() {
 
         <div style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: '32px',
           marginBottom: '24px'
@@ -124,7 +124,7 @@ export default function RetrieveApiKeyPage() {
                 style={{
                   width: '100%',
                   padding: '12px',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   borderRadius: '6px',
                   background: 'var(--bg)',
                   color: 'var(--text)',
@@ -193,7 +193,7 @@ export default function RetrieveApiKeyPage() {
                 flex: 1,
                 padding: '12px',
                 background: 'var(--bg)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '6px',
                 fontFamily: 'monospace',
                 fontSize: '14px',
@@ -262,7 +262,7 @@ export default function RetrieveApiKeyPage() {
                 flex: 1,
                 padding: '12px',
                 background: 'var(--bg)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '6px',
                 fontFamily: 'monospace',
                 fontSize: '14px',

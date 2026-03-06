@@ -130,7 +130,7 @@ export default function NewsPage() {
         {loading ? (
           <div style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '40px',
             textAlign: 'center'
@@ -141,7 +141,7 @@ export default function NewsPage() {
         ) : error ? (
           <div style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '40px',
             textAlign: 'center'
@@ -170,7 +170,7 @@ export default function NewsPage() {
         ) : news.length === 0 ? (
           <div style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '40px',
             textAlign: 'center'
@@ -188,7 +188,7 @@ export default function NewsPage() {
                 key={index}
                 style={{
                   background: 'var(--surface)',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   borderRadius: '12px',
                   padding: '20px',
                   cursor: 'pointer',

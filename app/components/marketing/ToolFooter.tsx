@@ -127,7 +127,7 @@ export default function ToolFooter() {
               href="/openbrokercsv"
               style={{
                 padding: '12px 24px',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 color: 'var(--text)',
                 textDecoration: 'none',
@@ -140,7 +140,7 @@ export default function ToolFooter() {
                 e.currentTarget.style.color = '#D97706';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
                 e.currentTarget.style.color = '#1a1a1a';
               }}
             >
@@ -150,7 +150,7 @@ export default function ToolFooter() {
               href="/static/portfolio-tracker"
               style={{
                 padding: '12px 24px',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 color: 'var(--text)',
                 textDecoration: 'none',
@@ -163,7 +163,7 @@ export default function ToolFooter() {
                 e.currentTarget.style.color = '#D97706';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
                 e.currentTarget.style.color = '#1a1a1a';
               }}
             >
@@ -173,7 +173,7 @@ export default function ToolFooter() {
               href="/static/csv-etoro-to-openbrokercsv"
               style={{
                 padding: '12px 24px',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 color: 'var(--text)',
                 textDecoration: 'none',
@@ -186,7 +186,7 @@ export default function ToolFooter() {
                 e.currentTarget.style.color = '#D97706';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
                 e.currentTarget.style.color = '#1a1a1a';
               }}
             >
@@ -196,7 +196,7 @@ export default function ToolFooter() {
               href="/tools/risk-pages"
               style={{
                 padding: '12px 24px',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 color: 'var(--text)',
                 textDecoration: 'none',
@@ -209,7 +209,7 @@ export default function ToolFooter() {
                 e.currentTarget.style.color = '#D97706';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
                 e.currentTarget.style.color = '#1a1a1a';
               }}
             >

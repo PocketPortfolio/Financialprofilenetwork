@@ -17,8 +17,8 @@ export default function JsonApiNpmSnippet({ symbol }: JsonApiNpmSnippetProps) {
 
   return (
     <div style={{
-      background: 'rgba(0, 0, 0, 0.8)',
-      border: '1px solid var(--border)',
+      background: 'var(--surface)',
+      border: '2px solid var(--border-warm)',
       borderRadius: '12px',
       padding: '24px',
       marginBottom: '24px'
@@ -48,7 +48,7 @@ export default function JsonApiNpmSnippet({ symbol }: JsonApiNpmSnippetProps) {
         Don't scrape. Use our open-source importer to normalize this dataset directly into your local database.
       </p>
       <div style={{
-        background: 'rgba(0, 0, 0, 0.5)',
+        background: 'var(--surface-elevated)',
         borderRadius: '8px',
         padding: '12px 16px',
         display: 'flex',
@@ -58,7 +58,7 @@ export default function JsonApiNpmSnippet({ symbol }: JsonApiNpmSnippetProps) {
         marginBottom: '12px'
       }}>
         <code style={{
-          color: '#34d399',
+          color: 'var(--accent-warm)',
           fontFamily: 'monospace',
           fontSize: '14px',
           flex: 1
@@ -70,7 +70,7 @@ export default function JsonApiNpmSnippet({ symbol }: JsonApiNpmSnippetProps) {
           style={{
             padding: '6px 12px',
             background: 'transparent',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '6px',
             color: 'var(--text)',
             cursor: 'pointer',

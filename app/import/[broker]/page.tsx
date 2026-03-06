@@ -259,7 +259,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
           </h2>
           <div style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '8px',
             padding: '20px',
             overflow: 'auto'
@@ -291,7 +291,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div id="step1" style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px'
             }}>
@@ -316,7 +316,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
 
             <div id="step2" style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px'
             }}>
@@ -341,7 +341,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
 
             <div id="step3" style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px'
             }}>
@@ -366,7 +366,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
 
             <div id="step4" style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px'
             }}>
@@ -391,7 +391,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
 
             <div id="step5" style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '12px',
               padding: '24px'
             }}>

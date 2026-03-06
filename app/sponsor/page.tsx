@@ -276,8 +276,8 @@ export default function SponsorPage() {
 
       {/* WebOne Discovery Partner - Diamond Slot */}
       <div style={{
-        background: 'linear-gradient(135deg, var(--surface) 0%, rgba(59, 130, 246, 0.05) 100%)',
-        border: '2px solid rgba(59, 130, 246, 0.2)',
+        background: 'linear-gradient(135deg, var(--surface) 0%, rgba(245, 158, 11, 0.05) 100%)',
+        border: '2px solid var(--border-warm)',
         borderRadius: '16px',
         padding: 'clamp(20px, 4vw, 32px)',
         marginBottom: '48px',
@@ -310,21 +310,21 @@ export default function SponsorPage() {
             display: 'inline-block',
             padding: '12px 24px',
             background: 'transparent',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '8px',
-            color: '#3b82f6',
+            color: 'var(--accent-warm)',
             textDecoration: 'none',
             fontSize: '14px',
             fontWeight: '500',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)';
-            e.currentTarget.style.borderColor = '#3b82f6';
+            e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+            e.currentTarget.style.borderColor = 'var(--accent-warm)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
           }}
         >
           Review on WebOne →
@@ -355,7 +355,7 @@ export default function SponsorPage() {
         {/* Code Supporter - $5/month */}
         <div style={{
           background: 'var(--surface)',
-          border: '2px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: 'clamp(20px, 4vw, 32px)',
           display: 'flex',
@@ -552,7 +552,7 @@ export default function SponsorPage() {
         {/* Corporate Ecosystem - $1,000/year */}
         <div style={{
           background: 'var(--surface)',
-          border: '2px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: 'clamp(20px, 4vw, 32px)',
           display: 'flex',
@@ -666,7 +666,7 @@ export default function SponsorPage() {
                 padding: '12px 20px',
                 background: previewTheme === 'corporate' ? 'var(--muted)' : 'transparent',
                 color: previewTheme === 'corporate' ? 'var(--text)' : 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '2px solid var(--border-warm)',
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontWeight: '500',

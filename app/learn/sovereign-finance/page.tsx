@@ -99,7 +99,7 @@ export default function SovereignFinancePage() {
           }}>
             <div style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               padding: '20px'
             }}>
@@ -121,7 +121,7 @@ export default function SovereignFinancePage() {
             </div>
             <div style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               padding: '20px'
             }}>
@@ -143,7 +143,7 @@ export default function SovereignFinancePage() {
             </div>
             <div style={{
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               padding: '20px'
             }}>
@@ -269,4 +269,5 @@ export default function SovereignFinancePage() {
     </>
   );
 }
+
 

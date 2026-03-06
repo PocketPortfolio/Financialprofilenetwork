@@ -101,7 +101,7 @@ export default function WaitlistPage() {
           maxWidth: '600px',
           width: '100%',
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '16px',
           padding: 'clamp(32px, 5vw, 48px)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'

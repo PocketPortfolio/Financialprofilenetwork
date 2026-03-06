@@ -114,7 +114,7 @@ export default function LandingFooter() {
           }}>
             <Link href="/tools/risk-calculator" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -130,7 +130,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -150,7 +150,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/tools/risk-pages" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -163,7 +163,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -171,7 +171,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/tools/google-sheets-formula" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -184,7 +184,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -192,7 +192,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/for/advisors" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -205,7 +205,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -213,7 +213,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/tools" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -226,7 +226,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -423,7 +423,7 @@ export default function LandingFooter() {
           }}>
             <Link href="/blog" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -436,7 +436,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -444,7 +444,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/learn" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -457,7 +457,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -465,7 +465,7 @@ export default function LandingFooter() {
             </Link>
             <a href="https://github.com/PocketPortfolio/Financialprofilenetwork#readme" target="_blank" rel="noopener noreferrer" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -478,7 +478,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -486,7 +486,7 @@ export default function LandingFooter() {
             </a>
             <Link href="/status" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -499,7 +499,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -507,7 +507,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/privacy" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -520,7 +520,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -528,7 +528,7 @@ export default function LandingFooter() {
             </Link>
             <Link href="/terms" style={{ 
               padding: '10px 20px', 
-              border: '1px solid var(--border)', 
+              border: '2px solid var(--border-warm)', 
               borderRadius: '8px', 
               color: 'var(--text)', 
               textDecoration: 'none', 
@@ -541,7 +541,7 @@ export default function LandingFooter() {
               e.currentTarget.style.color = '#D97706';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.color = 'var(--text)';
             }}
             >
@@ -555,7 +555,7 @@ export default function LandingFooter() {
           marginTop: '16px',
           padding: '12px 16px',
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '8px',
           maxWidth: '800px',
           marginLeft: 'auto',

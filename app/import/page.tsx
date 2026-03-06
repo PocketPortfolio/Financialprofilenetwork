@@ -182,7 +182,7 @@ export default function ImportPage() {
         {/* Supported Brokers */}
         <div style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '32px'
@@ -225,7 +225,7 @@ export default function ImportPage() {
         {/* CSV Importer */}
         <div style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '32px'
@@ -238,7 +238,7 @@ export default function ImportPage() {
         {importHistory.length > 0 && (
           <div style={{
             background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             padding: '24px'
           }}>
@@ -279,7 +279,7 @@ export default function ImportPage() {
         {/* Features */}
         <div style={{
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: '24px',
           marginTop: '32px'
