@@ -106,7 +106,7 @@ export default function RiskCalculatorPrefilled({
         boxShadow: '0 4px 24px rgba(0, 0, 0, 0.1)',
         maxWidth: '600px',
         width: '100%',
-        border: '1px solid var(--border)'
+        border: '2px solid var(--border-warm)'
       }}>
         {/* SEO-Optimized Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -217,7 +217,7 @@ export default function RiskCalculatorPrefilled({
           <div style={{
             marginTop: '32px',
             paddingTop: '32px',
-            borderTop: '1px solid var(--border)',
+            borderTop: '1px solid var(--border-warm)',
             animation: 'fadeIn 0.3s ease-in'
           }}>
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
@@ -272,7 +272,7 @@ export default function RiskCalculatorPrefilled({
                 padding: '16px',
                 background: 'var(--bg)',
                 borderRadius: '8px',
-                border: '1px solid var(--border)'
+                border: '2px solid var(--border-warm)'
               }}>
                 <p style={{
                   fontSize: '12px',
@@ -291,7 +291,7 @@ export default function RiskCalculatorPrefilled({
                       background: 'var(--surface)',
                       borderRadius: '6px',
                       fontSize: '12px',
-                      border: '1px solid var(--border)'
+                      border: '2px solid var(--border-warm)'
                     }}>
                       <strong>{profile.ticker}:</strong> {profile.beta.toFixed(2)}
                     </div>
@@ -349,7 +349,7 @@ export default function RiskCalculatorPrefilled({
         <div style={{
           marginTop: '24px',
           paddingTop: '24px',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--border-warm)',
           display: 'flex',
           flexWrap: 'wrap',
           gap: '12px',

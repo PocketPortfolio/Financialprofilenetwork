@@ -178,7 +178,7 @@ export default async function ConversionPage({ params }: { params: Promise<{ con
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 'var(--space-4)',
-                  border: '1px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}>
                   <span style={{
                     fontSize: 'var(--font-size-xl)',
@@ -210,7 +210,7 @@ export default async function ConversionPage({ params }: { params: Promise<{ con
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 'var(--space-4)',
-                  border: '1px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}>
                   <span style={{
                     fontSize: 'var(--font-size-xl)',
@@ -242,7 +242,7 @@ export default async function ConversionPage({ params }: { params: Promise<{ con
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 'var(--space-4)',
-                  border: '1px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}>
                   <span style={{
                     fontSize: 'var(--font-size-xl)',

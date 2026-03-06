@@ -107,7 +107,7 @@ export default function GoogleSheetsFormulaPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 'var(--space-4)',
-                  border: '1px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}>
                   <span style={{
                     fontSize: 'var(--font-size-xl)',
@@ -139,7 +139,7 @@ export default function GoogleSheetsFormulaPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 'var(--space-4)',
-                  border: '1px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}>
                   <span style={{
                     fontSize: 'var(--font-size-xl)',
@@ -171,7 +171,7 @@ export default function GoogleSheetsFormulaPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 'var(--space-4)',
-                  border: '1px solid var(--border)'
+                  border: '2px solid var(--border-warm)'
                 }}>
                   <span style={{
                     fontSize: 'var(--font-size-xl)',

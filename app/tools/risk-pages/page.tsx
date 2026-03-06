@@ -60,7 +60,7 @@ export default function RiskPagesBrowser() {
           style={{
             width: '100%',
             padding: '16px 20px',
-            border: '2px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             borderRadius: '12px',
             fontSize: '16px',
             backgroundColor: 'var(--surface)',
@@ -72,7 +72,7 @@ export default function RiskPagesBrowser() {
             e.currentTarget.style.borderColor = 'var(--accent-warm)';
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
           }}
         />
       </div>
@@ -107,7 +107,7 @@ export default function RiskPagesBrowser() {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = 'none';
             }}

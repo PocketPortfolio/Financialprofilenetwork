@@ -103,7 +103,7 @@ export default function GoogleSheetsTool() {
               e.currentTarget.style.boxShadow = '0 0 0 2px rgba(255, 107, 53, 0.1)';
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.boxShadow = 'none';
             }}
             autoFocus

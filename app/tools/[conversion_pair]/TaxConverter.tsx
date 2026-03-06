@@ -233,7 +233,7 @@ export default function TaxConverter({
       {/* File Upload Area */}
       <div
         style={{
-          border: `2px dashed ${file ? 'var(--signal)' : isHovering ? 'var(--signal)' : 'var(--border)'}`,
+          border: `2px dashed ${file ? 'var(--signal)' : isHovering ? 'var(--signal)' : 'var(--border-warm)'}`,
           borderRadius: 'var(--radius-md)',
           padding: 'var(--space-8)',
           textAlign: 'center',
