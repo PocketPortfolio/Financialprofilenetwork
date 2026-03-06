@@ -65,7 +65,7 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
   return (
     <div className={`social-proof-full brand-card brand-spine ${className}`} style={{
       background: 'var(--surface)',
-      border: '1px solid var(--border)',
+      border: '2px solid var(--border-warm)',
       borderRadius: '12px',
       padding: 'clamp(20px, 4vw, 32px) clamp(16px, 3vw, 28px)',
       width: '100%',

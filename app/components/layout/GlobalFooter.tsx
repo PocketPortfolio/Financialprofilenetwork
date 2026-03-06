@@ -635,7 +635,7 @@ export default function GlobalFooter() {
               marginTop: '24px',
               padding: '16px',
               background: 'var(--surface)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '8px',
               textAlign: 'center',
             }}

@@ -1988,12 +1988,18 @@ $ npx pocket-init --sovereign
               style={{ 
                 padding: '12px 24px', 
                 background: 'transparent', 
-                border: '1px solid #d1d5db', 
-                color: '#374151', 
+                border: '2px solid var(--border-warm)', 
+                color: 'var(--text)', 
                 textDecoration: 'none', 
                 borderRadius: '6px', 
                 fontWeight: '500',
                 transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-warm)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-warm)';
               }}
             >
               Join Discord
@@ -2378,7 +2384,7 @@ $ npx pocket-init --sovereign
           maxWidth: 'min(1200px, 95vw)',
           margin: '0 auto',
           background: 'var(--surface)',
-          border: '1px solid var(--border)',
+          border: '2px solid var(--border-warm)',
           borderRadius: '12px',
           padding: '32px 28px'
         }}>

@@ -122,7 +122,7 @@ export default function SocialShare({
             justifyContent: 'center',
             padding: '8px 16px',
             borderRadius: '8px',
-            border: '1px solid var(--border)',
+            border: '2px solid var(--border-warm)',
             background: 'var(--surface)',
             color: 'var(--text)',
             cursor: 'pointer',
@@ -139,7 +139,7 @@ export default function SocialShare({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'var(--surface)';
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--border-warm)';
             e.currentTarget.style.color = 'var(--text)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}

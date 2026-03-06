@@ -149,18 +149,20 @@ export function AnalystVideo() {
                   padding: '12px 24px',
                   borderRadius: '10px',
                   background: 'transparent',
-                  border: '1px solid var(--border)',
+                  border: '2px solid var(--border-warm)',
                   color: 'var(--foreground)',
                   fontSize: '15px',
                   fontWeight: 500,
                   cursor: 'pointer',
-                  transition: 'background 0.2s, color 0.2s',
+                  transition: 'background 0.2s, color 0.2s, border-color 0.2s',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'var(--surface-hover, hsl(var(--muted)))';
+                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = '';
+                  e.currentTarget.style.borderColor = 'var(--border-warm)';
                 }}
               >
                 Watch Demo
