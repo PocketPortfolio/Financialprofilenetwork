@@ -1025,14 +1025,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement \"Virtual Scrolling\" for Long Lists",
     "slug": "how-to-implement-virtual-scrolling-for-long-lists",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "implement",
       "virtual",
       "scrolling"
-    ]
+    ],
+    "publishedAt": "2026-03-07T15:07:34.989Z"
   },
   {
     "id": "how-to-speeding-up-your-ci-cd-pipeline-mar-8",

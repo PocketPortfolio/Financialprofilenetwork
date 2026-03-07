@@ -1,0 +1,74 @@
+---
+title: How to Implement 'Virtual Scrolling' for Long Lists
+date: '2026-03-07'
+description: >-
+  Learn to efficiently implement virtual scrolling for handling long lists in
+  your web applications, enhancing user experience.
+tags:
+  - implement
+  - virtual
+  - scrolling
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-virtual-scrolling-for-long-lists.png
+pillar: technical
+category: how-to-in-tech
+---
+
+Rendering long lists of data efficiently in a web application can lead to significant performance issues due to the heavy DOM manipulation required. Virtual scrolling offers a solution by only rendering items in the list that are currently visible to the user, improving both performance and user experience.
+
+## Direct Solution with Code
+
+To implement virtual scrolling, we'll use a simple JavaScript example. Assume you have a long list of items you want to display in a scrollable container.
+
+```html
+<div id="scrollContainer" style="height: 500px; overflow-y: auto;">
+  <div id="content"></div>
+</div>
+```
+
+```javascript
+const itemCount = 10000; // Total number of items
+const itemHeight = 30; // Height of each item in pixels
+const visibleCount = 20; // Number of items to display at a time
+
+const content = document.getElementById('content');
+const container = document.getElementById('scrollContainer');
+content.style.height = `${itemCount * itemHeight}px`;
+
+let startIndex = 0;
+
+function render() {
+  content.innerHTML = ''; // Clear current content
+  const fragment = document.createDocumentFragment();
+
+  for (let i = startIndex; i < startIndex + visibleCount && i < itemCount; i++) {
+    const item = document.createElement('div');
+    item.style.height = `${itemHeight}px`;
+    item.textContent = `Item ${i}`;
+    fragment.appendChild(item);
+  }
+
+  content.style.transform = `translateY(${startIndex * itemHeight}px)`;
+  content.appendChild(fragment);
+}
+
+container.addEventListener('scroll', () => {
+  const scrollTop = container.scrollTop;
+  startIndex = Math.floor(scrollTop / itemHeight);
+  render();
+});
+
+render();
+```
+
+## Explanation of Key Concepts
+
+This implementation dynamically adjusts which items are rendered based on the user's scroll position in the container. By calculating the `startIndex` based on the scroll position and only rendering the `visibleCount` number of items at any given time, we can maintain a smooth scrolling experience without loading all items into the DOM simultaneously.
+
+The key concept here is the use of a container with a fixed height and overflow set to auto, creating a scrollable area. The `content` div's height is set to the total height of all items, ensuring the scrollbar accurately reflects the size of the list. As the user scrolls, the `scrollTop` property of the container is used to calculate which items should be displayed, and the content is re-rendered accordingly.
+
+## Quick Tip
+
+One potential gotcha with virtual scrolling is handling fast scrolls. When users scroll very quickly, the browser may not fire scroll events frequently enough to update the content in real-time, potentially leading to a blank screen momentarily. To mitigate this, consider implementing a debounce function that delays the rendering until the scrolling has slowed down, ensuring a more consistent experience.
+
+Implementing virtual scrolling can significantly enhance the performance and user experience of your web applications when dealing with long lists. By only rendering what's visible, you minimize the strain on the browser, making your application faster and more responsive.
