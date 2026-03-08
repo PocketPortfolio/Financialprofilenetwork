@@ -1041,7 +1041,7 @@
     "scheduledTime": "14:00",
     "title": "Speeding Up Your CI/CD Pipeline",
     "slug": "speeding-up-your-ci-cd-pipeline",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1049,7 +1049,8 @@
       "speeding",
       "your",
       "pipeline"
-    ]
+    ],
+    "publishedAt": "2026-03-08T14:33:02.431Z"
   },
   {
     "id": "how-to-how-to-use-cdns-effectively-for-static-assets-mar-9",
