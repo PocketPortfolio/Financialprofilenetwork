@@ -34,7 +34,23 @@ async function githubRequest(path: string, options: RequestInit = {}) {
 }
 
 async function getFileSha(path: string): Promise<string | null> {
-  const res = await githubRequest(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`);
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw new Error('GITHUB_TOKEN not set');
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    }
+  );
+  if (res.status === 404) return null; // file doesn't exist yet (new post)
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`GitHub API ${res.status}: ${text}`);
+  }
   const data = await res.json();
   return data.sha ?? null;
 }
