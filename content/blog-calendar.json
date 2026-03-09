@@ -490,7 +490,7 @@
     "date": "2026-03-09",
     "title": "Schema Evolution: Managing Changes in Financial Data Structures",
     "slug": "schema-evolution-managing-changes-in-financial-data-structur",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -500,7 +500,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-09T10:17:37.891Z"
   },
   {
     "id": "week-10-post-2",
