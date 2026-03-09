@@ -55,14 +55,26 @@ function parseScheduledTime(scheduledTime: string | undefined): { hour: number; 
   return { hour, minute, valid: true };
 }
 
+/** Unwrap content if AI wrapped entire response in ```mdx or ``` code block */
+function unwrapCodeBlock(content: string): string {
+  const trimmed = content.trim();
+  const match = trimmed.match(/^```(?:mdx?)?\s*\n([\s\S]*?)\n```\s*$/);
+  if (match) return match[1].trim();
+  return content;
+}
+
 function sanitizeMDXContent(content: string): string {
-  let cleaned = content.replace(/````+/g, '```');
+  let cleaned = unwrapCodeBlock(content);
+  cleaned = cleaned.replace(/````+/g, '```');
   const codeBlockMatches = cleaned.match(/```/g);
   if (codeBlockMatches && codeBlockMatches.length % 2 !== 0 && !cleaned.trim().endsWith('```')) {
     cleaned = cleaned.trim() + '\n```';
   }
   cleaned = cleaned.replace(/````+(\w+)?/g, '```$1');
   cleaned = cleaned.replace(/\n{4,}/g, '\n\n\n');
+  // Remove Video component - blog template renders video from frontmatter videoId
+  cleaned = cleaned.replace(/\n*import Video from ['"].*['"];?\s*\n?/g, '\n');
+  cleaned = cleaned.replace(/\n*<Video\s+id=\{[^}]+\}\s*\/>\s*\n?/g, '\n');
   return cleaned;
 }
 
@@ -136,13 +148,13 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
   }
 
   const systemPrompt = isResearch
-    ? `You are a Lead Technical Researcher. Write MDX with frontmatter. Min 1500 words, max 2500. Include at least 3 external citations. Use plain text for formulas (e.g. \`V_f\`). MUST include link with anchor "${selected.text}" to "${selected.route}".`
+    ? `You are a Lead Technical Researcher. Write MDX with frontmatter. Min 1500 words, max 2500. Include at least 3 external citations. Use plain text for formulas (e.g. \`V_f\`). MUST include link with anchor "${selected.text}" to "${selected.route}". CRITICAL: Output raw MDX only - NO \`\`\`mdx or \`\`\` code block wrapper. NO import statements. NO Video component - the template renders video from frontmatter.`
     : isHowTo
       ? `You are a CTO. Write a concise technical guide (300-500 words). MDX format with frontmatter. Code-first.`
       : `You are a CTO. Write comprehensive blog post (1200-2000 words). MDX with frontmatter. MUST include "Sovereign Sync" in Key Takeaways. Link "${selected.text}" to "${selected.route}".`;
 
   const userPrompt = isResearch
-    ? `Research report: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Abstract, Methodology, Key Findings, References (3+), Future Trends, Verdict.${videoResult ? ` Reference video: ${videoResult.title} by ${videoResult.channelTitle}.` : ''} Format as MDX with frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "research"${videoResult ? `, videoId: "${videoResult.videoId}"` : ''}.`
+    ? `Research report: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Abstract, Methodology, Key Findings, References (3+), Future Trends, Verdict.${videoResult ? ` Include a "Video Reference" section referencing "${videoResult.title}" by ${videoResult.channelTitle}.` : ''} Output ONLY the MDX file content - start with --- frontmatter --- then markdown body. Frontmatter: title, date: "${post.date}", description (150-160 chars), tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "research"${videoResult ? `, videoId: "${videoResult.videoId}"` : ''}. Do NOT wrap in code blocks.`
     : isHowTo
       ? `How-to guide: "${post.title}". Keywords: ${post.keywords.join(', ')}. Structure: problem, solution with code, key concepts. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "how-to-in-tech".`
       : `Blog post: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Hook, Problem, Deep dive, Solution, Key Takeaways (include Sovereign Sync), Verdict. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar.`;
