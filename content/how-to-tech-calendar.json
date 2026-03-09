@@ -1058,7 +1058,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use CDNs Effectively for Static Assets",
     "slug": "how-to-use-cdns-effectively-for-static-assets",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1066,7 +1066,8 @@
       "use",
       "cdns",
       "effectively"
-    ]
+    ],
+    "publishedAt": "2026-03-09T14:35:01.967Z"
   },
   {
     "id": "how-to-memoization-in-react-when-and-when-not-to-use-it-mar-10",
