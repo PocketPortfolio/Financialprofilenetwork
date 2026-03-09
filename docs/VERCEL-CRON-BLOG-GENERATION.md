@@ -69,6 +69,21 @@ When GitHub Actions is working again:
 2. You can remove the generate-blog cron entries from `vercel.json` if you prefer
 3. Or leave them as a fallback – they only run when posts are due
 
+## Gold standard
+
+Generated posts must match the **100+ deployed posts** on GitHub. Format is defined in [BLOG-POST-GOLD-STANDARD.md](./BLOG-POST-GOLD-STANDARD.md). Do not deviate from that formatting.
+
+## Quality bar (SEO / AEO / GEO)
+
+Generated posts are treated as SEO, AEO, and GEO assets. The cron generator enforces:
+
+- **References = hyperlinks:** Research posts must have at least 3 references in the form `[Source Title](https://url)` so users can verify sources. Plain-text citations are rejected.
+- **Validation:** Before push, research content is checked for ≥3 markdown links; if not met, generation fails and nothing is pushed.
+- **No code-block wrapping:** Output is unwrapped if the model returns content inside \`\`\`mdx.
+- **No inline Video:** Video is rendered from frontmatter by the template; import/component in the body are stripped.
+
+These rules are in `lib/blog-generator-cron.ts`. Do not relax them without a product decision.
+
 ## Files
 
 - **API route:** `app/api/cron/generate-blog/route.ts`

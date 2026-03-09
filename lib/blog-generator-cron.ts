@@ -2,6 +2,7 @@
  * Blog Generator for Vercel Cron
  * Fetches calendars from GitHub, determines due posts, generates content and image.
  * Used by /api/cron/generate-blog when GitHub Actions is suspended.
+ * Output must match gold standard: docs/BLOG-POST-GOLD-STANDARD.md (100+ deployed posts).
  */
 
 import OpenAI from 'openai';
@@ -148,13 +149,17 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
   }
 
   const systemPrompt = isResearch
-    ? `You are a Lead Technical Researcher. Write MDX with frontmatter. Min 1500 words, max 2500. Include at least 3 external citations. Use plain text for formulas (e.g. \`V_f\`). MUST include link with anchor "${selected.text}" to "${selected.route}". CRITICAL: Output raw MDX only - NO \`\`\`mdx or \`\`\` code block wrapper. NO import statements. NO Video component - the template renders video from frontmatter.`
+    ? `You are a Lead Technical Researcher. Match our gold-standard research format (100+ deployed posts). Min 1500 words, max 2500. Use plain text for formulas (e.g. \`V_f\`). MUST include link with anchor "${selected.text}" to "${selected.route}" in Verdict. CRITICAL: (1) Output raw MDX only - NO \`\`\`mdx or \`\`\` code block wrapper. NO import statements. NO Video component. (2) Section order exactly: Abstract, Methodology, Key Findings, [Video Reference if video], References, Future Trends, Verdict. (3) References: bullet list only, each line "- [Source Title](https://real-url) - one sentence description." At least 3 entries with real, clickable URLs. No plain-text citations without links.`
     : isHowTo
       ? `You are a CTO. Write a concise technical guide (300-500 words). MDX format with frontmatter. Code-first.`
       : `You are a CTO. Write comprehensive blog post (1200-2000 words). MDX with frontmatter. MUST include "Sovereign Sync" in Key Takeaways. Link "${selected.text}" to "${selected.route}".`;
 
+  const videoRefSection = videoResult
+    ? `, ## Video Reference (mention ${videoResult.title} by ${videoResult.channelTitle})`
+    : '';
+  const videoIdFm = videoResult ? `, videoId: "${videoResult.videoId}"` : '';
   const userPrompt = isResearch
-    ? `Research report: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Abstract, Methodology, Key Findings, References (3+), Future Trends, Verdict.${videoResult ? ` Include a "Video Reference" section referencing "${videoResult.title}" by ${videoResult.channelTitle}.` : ''} Output ONLY the MDX file content - start with --- frontmatter --- then markdown body. Frontmatter: title, date: "${post.date}", description (150-160 chars), tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "research"${videoResult ? `, videoId: "${videoResult.videoId}"` : ''}. Do NOT wrap in code blocks.`
+    ? `Research report: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Use EXACT section order (do not deviate from our deployed posts): ## Abstract, ## Methodology, ## Key Findings${videoRefSection}, ## References, ## Future Trends, ## Verdict. References: bullet list with "- [Exact Source Title](https://real-url) - one sentence." At least 3 entries, real docs/whitepapers/official blogs only. Output ONLY raw MDX: --- frontmatter --- then body. Frontmatter: title, date: "${post.date}", description (150-160 chars), tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "research"${videoIdFm}. No code block wrapper.`
     : isHowTo
       ? `How-to guide: "${post.title}". Keywords: ${post.keywords.join(', ')}. Structure: problem, solution with code, key concepts. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "how-to-in-tech".`
       : `Blog post: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Hook, Problem, Deep dive, Solution, Key Takeaways (include Sovereign Sync), Verdict. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar.`;
@@ -188,6 +193,17 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
     if (videoResult) fm.videoId = videoResult.videoId;
   }
   content = matter.stringify(parsed.content, fm);
+
+  // SEO/AEO/GEO: Research posts must have clickable reference links so users can verify sources
+  if (isResearch) {
+    const referenceLinkMatches = content.match(/\[[^\]]+\]\(https?:\/\/[^)]+\)/g);
+    const refLinkCount = referenceLinkMatches?.length ?? 0;
+    if (refLinkCount < 3) {
+      throw new Error(
+        `Research post must have at least 3 reference hyperlinks (found ${refLinkCount}). References must use [Title](URL) format for SEO and source verification.`
+      );
+    }
+  }
 
   const imagePrompt = isHowTo
     ? `Minimalist terminal, dark mode, green on black, no text. Theme: ${post.title}.`
