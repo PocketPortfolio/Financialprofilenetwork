@@ -136,12 +136,27 @@ export async function GET(request: Request) {
       await createOrUpdateFile(calendarPath, JSON.stringify(calendarData, null, 2), msg);
     }
 
+    // Trigger Vercel production deploy (needed when GitHub → Vercel auto-deploy is broken)
+    let deployTriggered = false;
+    const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+    if (deployHookUrl) {
+      try {
+        const hookRes = await fetch(deployHookUrl, { method: 'POST' });
+        deployTriggered = hookRes.ok;
+      } catch (e) {
+        console.warn('[CRON] Deploy hook failed:', e);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       generated: 1,
       slug: post.slug,
       title: post.title,
-      message: 'Post generated and pushed to GitHub. Vercel will auto-deploy.',
+      deployTriggered: deployTriggered || undefined,
+      message: deployTriggered
+        ? 'Post pushed to GitHub and production deploy triggered.'
+        : 'Post pushed to GitHub. Set VERCEL_DEPLOY_HOOK_URL to trigger deploy when GitHub→Vercel is broken.',
       timestamp: now.toISOString(),
     });
   } catch (error: unknown) {

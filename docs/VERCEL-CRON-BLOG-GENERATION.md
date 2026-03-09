@@ -7,7 +7,7 @@ When GitHub Actions is suspended (e.g. billing issues), blog posts can be genera
 1. **Vercel Cron** triggers `/api/cron/generate-blog` on schedule (9:00, 14:00, 18:00 UTC + hourly)
 2. The API route fetches calendars from GitHub (raw URLs), finds due posts, generates one post via OpenAI + DALL-E
 3. Pushes MDX, image, and updated calendar to GitHub via the GitHub API
-4. **Vercel auto-deploys** when it detects the new commit
+4. If **`VERCEL_DEPLOY_HOOK_URL`** is set, the route POSTs to it to trigger a production deploy (use this when GitHub → Vercel auto-deploy is broken)
 
 ## Required Environment Variables
 
@@ -18,7 +18,18 @@ Add these to **Vercel Project Settings → Environment Variables** (Production):
 | `OPENAI_API_KEY` | OpenAI API key (for GPT-4 + DALL-E 3) |
 | `GITHUB_TOKEN` | GitHub Personal Access Token with `repo` scope (to push files) |
 | `CRON_SECRET` | Secret to verify cron requests (Vercel sets this automatically for crons) |
+| `VERCEL_DEPLOY_HOOK_URL` | **Recommended when GitHub → Vercel deploy is broken.** Deploy Hook URL so the cron can trigger a production deploy after pushing. Create in Vercel → Project → Settings → Git → Deploy Hooks. |
 | `YOUTUBE_API_KEY` | Optional – for Research posts to fetch relevant videos |
+
+## Deploy Hook (when GitHub → Vercel is broken)
+
+If Vercel doesn’t deploy from GitHub (e.g. billing), the cron can still deploy after pushing:
+
+1. Vercel → your project → **Settings** → **Git** → **Deploy Hooks**
+2. Create a hook (e.g. “Blog cron”), branch **main**
+3. Copy the URL and add it in Vercel env vars as **`VERCEL_DEPLOY_HOOK_URL`**
+
+After each successful post generation, the cron will POST to that URL and trigger a production deploy.
 
 ## Creating the GitHub Token
 
@@ -34,6 +45,10 @@ Matches the original GitHub Actions schedule:
 - `0 14 * * *` – 14:00 UTC (how-to posts)
 - `0 18 * * *` – 18:00 UTC (research posts)
 - `0 * * * *` – Every hour (catch missed posts)
+
+## Past 18:00 / missed run
+
+Posts stay **due** until they’re generated: `date <= today`, `status === 'pending'`, and (if set) `current time >= scheduledTime`. So a post scheduled for 18:00 is still due at 18:04, 19:00, or on the next hourly run. The next time the cron runs it will pick that post up and generate it. Nothing is lost.
 
 ## Manual Trigger
 

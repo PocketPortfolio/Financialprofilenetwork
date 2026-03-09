@@ -38,6 +38,7 @@ When GitHub Actions is suspended, blog generation runs via **Vercel Cron** (`/ap
 | Variable | Description |
 |----------|-------------|
 | GITHUB_TOKEN | GitHub PAT with `repo` scope (to push generated posts) |
+| VERCEL_DEPLOY_HOOK_URL | Deploy Hook URL so cron triggers production deploy after push (use when GitHub→Vercel deploy is broken) |
 | OPENAI_API_KEY | Already set for other features |
 | CRON_SECRET | Auto-set by Vercel for cron routes |
 | YOUTUBE_API_KEY | Optional, for Research posts |
