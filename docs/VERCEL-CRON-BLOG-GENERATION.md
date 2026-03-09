@@ -1,0 +1,61 @@
+# Vercel Cron Blog Generation
+
+When GitHub Actions is suspended (e.g. billing issues), blog posts can be generated via **Vercel Cron** instead.
+
+## How It Works
+
+1. **Vercel Cron** triggers `/api/cron/generate-blog` on schedule (9:00, 14:00, 18:00 UTC + hourly)
+2. The API route fetches calendars from GitHub (raw URLs), finds due posts, generates one post via OpenAI + DALL-E
+3. Pushes MDX, image, and updated calendar to GitHub via the GitHub API
+4. **Vercel auto-deploys** when it detects the new commit
+
+## Required Environment Variables
+
+Add these to **Vercel Project Settings → Environment Variables** (Production):
+
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | OpenAI API key (for GPT-4 + DALL-E 3) |
+| `GITHUB_TOKEN` | GitHub Personal Access Token with `repo` scope (to push files) |
+| `CRON_SECRET` | Secret to verify cron requests (Vercel sets this automatically for crons) |
+| `YOUTUBE_API_KEY` | Optional – for Research posts to fetch relevant videos |
+
+## Creating the GitHub Token
+
+1. Go to [GitHub → Settings → Developer settings → Personal access tokens](https://github.com/settings/tokens)
+2. Generate a new token (classic) with scope: **`repo`** (full control of private repositories)
+3. Copy the token and add it to Vercel as `GITHUB_TOKEN`
+
+## Cron Schedule
+
+Matches the original GitHub Actions schedule:
+
+- `0 9 * * *` – 9:00 UTC (finance/deep-dive posts)
+- `0 14 * * *` – 14:00 UTC (how-to posts)
+- `0 18 * * *` – 18:00 UTC (research posts)
+- `0 * * * *` – Every hour (catch missed posts)
+
+## Manual Trigger
+
+You can trigger the cron manually for testing:
+
+```bash
+curl -H "Authorization: Bearer YOUR_CRON_SECRET" \
+  https://www.pocketportfolio.app/api/cron/generate-blog
+```
+
+Get `CRON_SECRET` from Vercel Project Settings → Environment Variables.
+
+## Switching Back to GitHub Actions
+
+When GitHub Actions is working again:
+
+1. The Vercel cron will continue to run – it’s harmless (no-op when no posts are due)
+2. You can remove the generate-blog cron entries from `vercel.json` if you prefer
+3. Or leave them as a fallback – they only run when posts are due
+
+## Files
+
+- **API route:** `app/api/cron/generate-blog/route.ts`
+- **Lib:** `lib/blog-generator-cron.ts`
+- **Cron config:** `vercel.json` (crons array)

@@ -30,6 +30,19 @@ Configure these in **Settings → Secrets and variables → Actions**. Do not co
 | KV_REST_API_URL | autonomous-revenue-engine.yml |
 | KV_REST_API_TOKEN | autonomous-revenue-engine.yml |
 | YOUTUBE_API_KEY | generate-blog.yml |
+
+## Vercel Cron fallback (blog generation)
+
+When GitHub Actions is suspended, blog generation runs via **Vercel Cron** (`/api/cron/generate-blog`). Add to **Vercel Project Settings → Environment Variables**:
+
+| Variable | Description |
+|----------|-------------|
+| GITHUB_TOKEN | GitHub PAT with `repo` scope (to push generated posts) |
+| OPENAI_API_KEY | Already set for other features |
+| CRON_SECRET | Auto-set by Vercel for cron routes |
+| YOUTUBE_API_KEY | Optional, for Research posts |
+
+See [VERCEL-CRON-BLOG-GENERATION.md](./VERCEL-CRON-BLOG-GENERATION.md).
 | NEXT_PUBLIC_GA_MEASUREMENT_ID | lighthouse-ci.yml |
 | LHCI_GITHUB_APP_TOKEN | lighthouse-ci.yml |
 | ZAP_TARGET_URL | zap-baseline.yml (optional; default: https://pocketportfolio.app) |
