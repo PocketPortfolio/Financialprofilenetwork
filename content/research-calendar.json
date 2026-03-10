@@ -1079,7 +1079,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Time-Series Database Performance - InfluxDB vs TimescaleDB",
     "slug": "research-time-series-database-performance-influxdb-vs-timescaledb-2026-03-10",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1087,7 +1087,8 @@
       "database",
       "time",
       "series"
-    ]
+    ],
+    "publishedAt": "2026-03-10T18:02:23.813Z"
   },
   {
     "id": "research-object-storage-performance-s3-vs-r2-vs-backblaze-2026-03-11",
