@@ -2,68 +2,81 @@
 title: 'Memoization in React: When (and When Not) to Use It'
 date: '2026-03-10'
 description: >-
-  Learn when to utilize memoization in React to optimize your application's
-  performance, and equally important, when to avoid it.
+  Explore the concept of memoization in React, understand when to implement it
+  for optimizing your applications, and learn when it’s better to avoid it.
 tags:
   - React
-  - Performance Optimization
   - Memoization
+  - Performance Optimization
+  - JavaScript
 author: Pocket Portfolio Team
 image: /images/blog/memoization-in-react-when-and-when-not-to-use-it.png
-pillar: Tech
+pillar: Development
 category: how-to-in-tech
 ---
 
-Memoization is a powerful optimization technique in React for reducing unnecessary re-rendering of components, thus enhancing your application's performance. However, it's crucial to understand not only how to implement memoization but also when to use it and when it might be counterproductive.
+import CodeBlock from '@theme/CodeBlock';
 
-## The Problem
+Memoization is an optimization technique that involves caching the results of expensive function calls and returning the cached result when the same inputs occur again. In the context of React, memoization can help prevent unnecessary re-renders of components, making your application faster and more efficient. However, it's not a silver bullet and should be used judiciously.
 
-React components re-render in response to prop or state changes. For complex components or those that render frequently, this can lead to performance issues. Re-rendering can be expensive when it involves complex calculations or DOM manipulations.
+### Problem
 
-## The Solution with Code
+Consider a React component that renders a list of items. If the parent component re-renders, all child components re-render by default, even if their props haven't changed. This can lead to performance bottlenecks in applications with complex UIs.
 
-### Using `React.memo`
+### Solution with Code
 
-`React.memo` is a higher-order component that memoizes your component, preventing re-renders if props haven't changed.
+React provides `React.memo` for memoizing components and `useMemo` for memoizing values within components.
+
+#### Using `React.memo`
+
+`React.memo` is a higher-order component that wraps a functional component. It shallowly compares its previous props with the new ones and re-renders the component only if the props have changed.
 
 ```jsx
 import React from 'react';
 
-const MyComponent = React.memo(({ propA, propB }) => {
-  console.log('Rendering MyComponent');
-  return <div>{propA} and {propB}</div>;
+const MemoizedChildComponent = React.memo(function ChildComponent(props) {
+  console.log('Rendering:', props.name);
+  return <div>{props.name}</div>;
 });
+
+function ParentComponent({ childrenNames }) {
+  return (
+    <div>
+      {childrenNames.map(name => (
+        <MemoizedChildComponent key={name} name={name} />
+      ))}
+    </div>
+  );
+}
 ```
 
-### Custom Comparison Function
+#### Using `useMemo`
 
-For more control, you can provide a custom comparison function as the second argument to `React.memo`.
+`useMemo` is a hook that memoizes a value. It's useful when you have expensive calculations that shouldn't be run on every render.
 
 ```jsx
-const areEqual = (prevProps, nextProps) => {
-  return prevProps.propA === nextProps.propA && prevProps.propB === nextProps.propB;
-}
+import React, { useMemo } from 'react';
 
-const MyComponent = React.memo(({ propA, propB }) => {
-  // Component logic
-}, areEqual);
+function ExpensiveComponent({ value }) {
+  const expensiveValue = useMemo(() => {
+    // Simulate an expensive operation
+    return computeExpensiveValue(value);
+  }, [value]);
+
+  return <div>{expensiveValue}</div>;
+}
 ```
 
-## Key Concepts
+### Key Concepts
 
-- **When to Use:** Memoization is most beneficial for components that:
-  - Render frequently.
-  - Have expensive rendering calculations.
-  - Render with the same props multiple times.
+- **Shallow Comparison**: Both `React.memo` and `useMemo` perform a shallow comparison. They only check if the primitive values have changed or if the object references have changed. They won't detect changes deep within objects.
+- **When to Use**: Implement memoization when:
+  - Rendering a component is expensive.
+  - A component renders often with the same props.
+  - You notice performance issues in your application due to unnecessary re-renders.
+- **When Not to Use**: Avoid memoization when:
+  - A component always receives new props or the props are likely to change frequently.
+  - The cost of re-rendering the component is low.
+  - The effort to implement memoization outweighs its benefits (e.g., for simple components or those with very few props).
 
-- **When Not to Use:** Avoid memoization when:
-  - Components are simple or render infrequently, as the overhead of memoization may outweigh its benefits.
-  - Props change frequently, causing memoized components to re-render often anyway.
-
-- **Side Effects:** Be cautious of memoizing components with side effects in their rendering phase. Since memoized components might skip re-renders, side effects might not run as expected.
-
-- **Deep Comparison:** `React.memo` performs shallow prop comparison by default. For deep comparisons, you need a custom comparison function, but beware of its performance implications.
-
-## Conclusion
-
-Memoization in React is a nuanced tool. It can significantly improve your application's performance when used correctly but can also introduce complexity and overhead when misapplied. Always profile your application before and after implementing memoization to ensure it's having the desired effect.
+Memoization in React can significantly enhance your application's performance, but it's crucial to use it appropriately. Overuse or misuse can lead to more complex code and potential performance issues, so evaluate the need case by case.
