@@ -1075,14 +1075,15 @@
     "scheduledTime": "14:00",
     "title": "Memoization in React: When (and When Not) to Use It",
     "slug": "memoization-in-react-when-and-when-not-to-use-it",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "react",
       "memoization",
       "when"
-    ]
+    ],
+    "publishedAt": "2026-03-10T14:00:49.100Z"
   },
   {
     "id": "how-to-how-to-optimize-font-loading-no-flash-of-invisible-text-mar-11",
