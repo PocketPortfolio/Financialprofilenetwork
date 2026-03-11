@@ -1091,14 +1091,15 @@
     "scheduledTime": "14:00",
     "title": "How to Optimize Font Loading (No Flash of Invisible Text)",
     "slug": "how-to-optimize-font-loading-no-flash-of-invisible-text",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "optimize",
       "font",
       "loading"
-    ]
+    ],
+    "publishedAt": "2026-03-11T14:00:45.593Z"
   },
   {
     "id": "how-to-tree-shaking-removing-dead-code-automatically-mar-12",
