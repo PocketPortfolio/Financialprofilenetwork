@@ -1,0 +1,58 @@
+---
+title: How to Optimize Font Loading (No Flash of Invisible Text)
+date: '2026-03-11'
+description: >-
+  Learn how to optimize font loading on your website, enhancing user experience
+  by eliminating the Flash of Invisible Text (FOIT).
+tags:
+  - Web Development
+  - Performance Optimization
+  - CSS
+  - Font Loading
+author: Pocket Portfolio Team
+image: /images/blog/how-to-optimize-font-loading-no-flash-of-invisible-text.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+Web performance is paramount in providing a smooth user experience. One common issue that degrades this experience is the Flash of Invisible Text (FOIT), where text on a webpage is invisible until the font has fully loaded. This guide will walk you through optimizing font loading to eliminate FOIT, ensuring your text is visible and styled immediately as your page loads.
+
+## Problem
+
+When a browser encounters a custom font, it must download it before rendering the text. By default, browsers might not display any text (rendering it invisible) until the custom font is downloaded, leading to FOIT. This not only affects the aesthetics but can also impact the usability and accessibility of your website.
+
+## Solution with Code
+
+To solve this, we'll use CSS font-display property and preload the font in the HTML. These methods allow the text to be visible with a fallback font, then switch to the custom font once it's loaded, thus eliminating FOIT.
+
+### Step 1: Use `font-display` in CSS
+
+The `font-display` property in your `@font-face` rule controls how a font is displayed based on whether and when it is downloaded. The `swap` value is particularly useful for combating FOIT.
+
+```css
+@font-face {
+  font-family: 'CustomFont';
+  src: url('/fonts/custom-font.woff2') format('woff2');
+  font-display: swap;
+}
+```
+
+This CSS rule tells the browser to use the fallback font immediately and swap it with the custom font once it's loaded.
+
+### Step 2: Preload your fonts
+
+To further optimize loading, use `<link rel="preload">` in your HTML to indicate that a font is needed soon, instructing the browser to download it earlier.
+
+```html
+<link rel="preload" href="/fonts/custom-font.woff2" as="font" type="font/woff2" crossorigin>
+```
+
+This tells the browser to prioritize downloading the font, making it available more quickly when the CSS requests it.
+
+## Key Concepts
+
+- **Flash of Invisible Text (FOIT):** A phenomenon where text is not visible until the custom fonts have loaded.
+- **font-display: swap;** A CSS rule that uses a fallback font and swaps it with the custom font once loaded, reducing the impact of FOIT.
+- **Preloading fonts:** An optimization technique that instructs the browser to download fonts early in the page load process, ensuring they are available as soon as possible.
+
+By implementing these strategies, you can significantly improve your website's perceived performance, providing a better user experience by ensuring text is readable from the moment your page starts loading.
