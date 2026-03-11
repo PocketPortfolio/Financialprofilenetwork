@@ -1096,14 +1096,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Object Storage Performance - S3 vs R2 vs Backblaze",
     "slug": "research-object-storage-performance-s3-vs-r2-vs-backblaze-2026-03-11",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "object",
       "storage"
-    ]
+    ],
+    "publishedAt": "2026-03-11T18:01:13.268Z"
   },
   {
     "id": "research-database-sharding-strategies-performance-analysis-2026-03-12",
