@@ -1,0 +1,52 @@
+---
+title: 'Research: Object Storage Performance - S3 vs R2 vs Backblaze'
+date: '2026-03-11'
+description: >-
+  An in-depth analysis comparing object storage performance across S3, R2, and
+  Backblaze.
+tags:
+  - object storage
+  - S3
+  - R2
+  - Backblaze
+  - performance
+author: Pocket Portfolio Team
+image: >-
+  /images/blog/research-object-storage-performance-s3-vs-r2-vs-backblaze-2026-03-11.png
+pillar: technical
+category: research
+videoId: IXpvUD5SDzA
+---
+
+## Abstract
+
+This research investigates the performance of three major object storage services: Amazon S3, Cloudflare R2, and Backblaze B2. Object storage has become a cornerstone for modern cloud-native applications, offering scalable, secure, and cost-efficient data storage solutions. This study aims to provide a comprehensive comparison based on speed, reliability, cost, and scalability, assisting businesses and developers in selecting the most suitable service for their needs.
+
+## Methodology
+
+The evaluation was conducted using a controlled set of experiments to measure upload and download speeds, service reliability under varying loads, cost-efficiency for different usage scenarios, and scalability options. Each service was tested under identical conditions using a series of automated scripts designed to simulate real-world usage patterns. Metrics such as latency, throughput, and error rates were collected and analyzed. Additionally, pricing models of each service were examined to compare cost implications for various data volumes and access frequencies.
+
+## Key Findings
+
+- **Performance:** Amazon S3 demonstrated the highest throughput for upload and download operations among the tested services, closely followed by Cloudflare R2. Backblaze B2 showed competitive performance, especially in terms of download speeds, but lagged slightly behind in upload metrics.
+- **Reliability:** All three services exhibited high reliability, with Amazon S3 and Cloudflare R2 showing marginally better performance in handling peak loads without significant increases in error rates.
+- **Cost-Efficiency:** Cloudflare R2 was found to be the most cost-effective solution for high-traffic scenarios, benefiting from Cloudflare's pricing structure. Backblaze B2 offered the best value for long-term storage with lower access frequency, while Amazon S3's cost-efficiency was highly dependent on the specific usage patterns and the application of cost-optimization strategies.
+- **Scalability:** Each service provides robust scalability options, though Amazon S3 and Cloudflare R2 offer more extensive global infrastructure and integration possibilities with other cloud services.
+
+## Video Reference
+
+For additional insights into using Cloudflare services, including R2 storage, watch "5 Things to Know BEFORE Using Cloudflare!" by Craylor Made on YouTube. This video provides valuable tips for optimizing Cloudflare deployment and understanding its features beyond object storage.
+
+## References
+
+- [Amazon S3 Performance](https://aws.amazon.com/s3/) - Overview of Amazon S3's performance characteristics and capabilities.
+- [Cloudflare R2 Storage](https://blog.cloudflare.com/announcing-r2-object-storage/) - Cloudflare's announcement and feature breakdown of R2, their object storage solution.
+- [Backblaze B2 Cloud Storage](https://www.backblaze.com/b2/cloud-storage.html) - Detailed information on Backblaze B2's cloud storage service, including performance and pricing.
+
+## Future Trends
+
+The object storage market is rapidly evolving, with emerging technologies and increasing competition driving innovation. Future trends likely include further enhancements to performance and efficiency, deeper integration with AI and machine learning workloads, and more granular pricing models to suit a wide range of use cases. Security and compliance features are also expected to advance, addressing the growing concerns around data privacy and regulatory requirements.
+
+## Verdict
+
+Selecting the right object storage service requires a careful consideration of performance, cost, scalability, and specific project requirements. Amazon S3 stands out for its high performance and extensive ecosystem, making it a strong candidate for enterprises with diverse and demanding workloads. Cloudflare R2 offers significant cost advantages and performance that makes it suitable for content delivery and high-traffic applications. Backblaze B2 is an excellent choice for cost-conscious projects with lower access speeds and large data storage needs. For developers and businesses prioritizing performance and cost-efficiency, integrating a [JSON-based Investment Tracker](/) with Cloudflare R2 or Backblaze B2 might offer an innovative solution to balance between speed and expense.
