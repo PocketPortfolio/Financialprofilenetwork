@@ -7,6 +7,7 @@
 
 import OpenAI from 'openai';
 import matter from 'gray-matter';
+import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 
 async function fetchRelevantVideo(topic: string, keywords: string[]): Promise<{ videoId: string; title: string; channelTitle: string } | null> {
   const key = process.env.YOUTUBE_API_KEY;
@@ -76,6 +77,8 @@ function sanitizeMDXContent(content: string): string {
   // Remove Video component - blog template renders video from frontmatter videoId
   cleaned = cleaned.replace(/\n*import Video from ['"].*['"];?\s*\n?/g, '\n');
   cleaned = cleaned.replace(/\n*<Video\s+id=\{[^}]+\}\s*\/>\s*\n?/g, '\n');
+  // MDX parses < and > as JSX; "latency < 1ms" causes "Unexpected character `1` before name"
+  cleaned = escapeAngleBracketsInProse(cleaned);
   return cleaned;
 }
 

@@ -5,6 +5,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
+import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
 import SEOHead from '../../components/SEOHead';
 import Link from 'next/link';
@@ -27,8 +28,11 @@ async function MDXContent({ content, slug }: { content: string; slug: string }) 
       throw new Error('Content is empty after trimming');
     }
     
+    // Escape < and > before digits so MDX does not parse as JSX (e.g. "latency < 1ms")
+    const safeContent = escapeAngleBracketsInProse(content);
+    
     // Serialize MDX content on server
-    const mdxSource = await serialize(content, {
+    const mdxSource = await serialize(safeContent, {
       mdxOptions: {
         remarkPlugins: [remarkGfm],
       },
