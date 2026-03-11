@@ -1,58 +1,63 @@
 ---
-title: How to Optimize Font Loading (No Flash of Invisible Text)
+title: How to Optimize Font Loading to Eliminate the Flash of Invisible Text
 date: '2026-03-11'
 description: >-
-  Learn how to optimize font loading on your website, enhancing user experience
-  by eliminating the Flash of Invisible Text (FOIT).
+  Learn how to optimize your website's font loading process to eliminate the
+  Flash of Invisible Text (FOIT), improving user experience and performance.
 tags:
-  - Web Development
-  - Performance Optimization
-  - CSS
+  - Web Performance
   - Font Loading
+  - CSS
+  - JavaScript
 author: Pocket Portfolio Team
 image: /images/blog/how-to-optimize-font-loading-no-flash-of-invisible-text.png
-pillar: Technology
+pillar: Frontend Development
 category: how-to-in-tech
 ---
 
-Web performance is paramount in providing a smooth user experience. One common issue that degrades this experience is the Flash of Invisible Text (FOIT), where text on a webpage is invisible until the font has fully loaded. This guide will walk you through optimizing font loading to eliminate FOIT, ensuring your text is visible and styled immediately as your page loads.
-
-## Problem
-
-When a browser encounters a custom font, it must download it before rendering the text. By default, browsers might not display any text (rendering it invisible) until the custom font is downloaded, leading to FOIT. This not only affects the aesthetics but can also impact the usability and accessibility of your website.
+The **Flash of Invisible Text (FOIT)** is a common issue that occurs when text on a web page is invisible until the font has fully loaded. This can significantly impact user experience, making content inaccessible for brief moments. The key to solving this problem is to optimize font loading on your website.
 
 ## Solution with Code
 
-To solve this, we'll use CSS font-display property and preload the font in the HTML. These methods allow the text to be visible with a fallback font, then switch to the custom font once it's loaded, thus eliminating FOIT.
+To eliminate FOIT, we recommend using a combination of CSS and JavaScript. Here's a step-by-step guide:
 
-### Step 1: Use `font-display` in CSS
+### Step 1: Use `font-display` CSS Property
 
-The `font-display` property in your `@font-face` rule controls how a font is displayed based on whether and when it is downloaded. The `swap` value is particularly useful for combating FOIT.
+The `font-display` property in CSS allows you to control how fonts are displayed as they load. To prevent FOIT, set it to `swap`, which uses a fallback font until the custom font has loaded.
 
 ```css
 @font-face {
-  font-family: 'CustomFont';
-  src: url('/fonts/custom-font.woff2') format('woff2');
-  font-display: swap;
+  font-family: 'YourCustomFont';
+  src: url('/path/to/your-custom-font.woff2') format('woff2');
+  font-display: swap; /* This is the key property */
 }
 ```
 
-This CSS rule tells the browser to use the fallback font immediately and swap it with the custom font once it's loaded.
+### Step 2: Preload Your Fonts
 
-### Step 2: Preload your fonts
-
-To further optimize loading, use `<link rel="preload">` in your HTML to indicate that a font is needed soon, instructing the browser to download it earlier.
+Preloading your fonts tells the browser to prioritize downloading fonts early in the page load process. Add a `link` element in the `<head>` of your HTML:
 
 ```html
-<link rel="preload" href="/fonts/custom-font.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/path/to/your-custom-font.woff2" as="font" type="font/woff2" crossorigin>
 ```
 
-This tells the browser to prioritize downloading the font, making it available more quickly when the CSS requests it.
+### Step 3: Use JavaScript for Enhanced Control (Optional)
+
+For even more control over font loading, consider using a JavaScript library like Font Face Observer. This method provides granular control, such as loading fonts in groups or applying styles only after font load.
+
+```javascript
+const font = new FontFaceObserver('YourCustomFont');
+
+font.load().then(function() {
+  document.documentElement.className += " fonts-loaded";
+  // Apply class-based styles to the document once fonts are loaded
+});
+```
 
 ## Key Concepts
 
-- **Flash of Invisible Text (FOIT):** A phenomenon where text is not visible until the custom fonts have loaded.
-- **font-display: swap;** A CSS rule that uses a fallback font and swaps it with the custom font once loaded, reducing the impact of FOIT.
-- **Preloading fonts:** An optimization technique that instructs the browser to download fonts early in the page load process, ensuring they are available as soon as possible.
+- **font-display: swap;**: This CSS rule is crucial for eliminating FOIT by immediately displaying text in a fallback font until the custom font loads.
+- **Preloading Fonts**: By preloading your fonts, you ensure they are downloaded early in the page load process, reducing the time users see invisible text.
+- **Font Loading Libraries**: Libraries like Font Face Observer offer more sophisticated control over font loading, useful for complex web applications.
 
-By implementing these strategies, you can significantly improve your website's perceived performance, providing a better user experience by ensuring text is readable from the moment your page starts loading.
+Optimizing font loading not only addresses the FOIT issue but also contributes to overall website performance and user satisfaction. By implementing these strategies, you can enhance the visual and functional quality of your web applications.
