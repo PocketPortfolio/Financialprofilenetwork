@@ -73,10 +73,12 @@ Example (from deployed posts):
 - **No** wrapping body in ` ```mdx ` or ` ``` ` code blocks.
 - **No** `import` statements or `<Video />` in the body; video is rendered from frontmatter `videoId`.
 - Output is **raw MDX**: frontmatter between `---`, then markdown body only.
+- **MDX-safe prose:** Do not use raw `<` or `>` for numeric comparisons in body text (e.g. write "less than 1 ms" or "under 100 ms", not "< 1 ms"). Raw angle brackets before digits break the MDX compiler ("Unexpected character `1` before name"). The renderer applies `lib/mdx-escape.ts` at build time; the cron generator also escapes and validates so bad content is never pushed.
 
 ---
 
 ## Enforcement
 
-- **Cron generator** (`lib/blog-generator-cron.ts`): Prompts and validation enforce this standard. Research posts are rejected if they have fewer than 3 reference hyperlinks.
+- **Cron generator** (`lib/blog-generator-cron.ts`): Prompts and validation enforce this standard. Research posts are rejected if they have fewer than 3 reference hyperlinks. Posts are rejected if prose contains unescaped `<` or `>` before digits (MDX would fail to compile).
+- **MDX escape** (`lib/mdx-escape.ts`): Used by the blog page and the cron generator. Do not remove; required so posts with "&lt; 1 ms"–style text render.
 - **Do not relax** these rules without a product decision; they protect SEO/AEO/GEO quality.

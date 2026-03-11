@@ -81,8 +81,9 @@ Generated posts are treated as SEO, AEO, and GEO assets. The cron generator enfo
 - **Validation:** Before push, research content is checked for ≥3 markdown links; if not met, generation fails and nothing is pushed.
 - **No code-block wrapping:** Output is unwrapped if the model returns content inside \`\`\`mdx.
 - **No inline Video:** Video is rendered from frontmatter by the template; import/component in the body are stripped.
+- **MDX-safe prose:** No raw `<` or `>` before numbers in body text (e.g. use "less than 1 ms" not "< 1 ms"). Prompts instruct the model; `lib/mdx-escape.ts` escapes any that slip through; validation rejects and does not push if any remain.
 
-These rules are in `lib/blog-generator-cron.ts`. Do not relax them without a product decision.
+These rules are in `lib/blog-generator-cron.ts` and `docs/BLOG-POST-GOLD-STANDARD.md`. Do not relax them without a product decision.
 
 ## Files
 

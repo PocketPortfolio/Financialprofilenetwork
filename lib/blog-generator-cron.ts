@@ -7,7 +7,7 @@
 
 import OpenAI from 'openai';
 import matter from 'gray-matter';
-import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
+import { escapeAngleBracketsInProse, hasUnescapedAngleBracketsBeforeDigits } from '@/lib/mdx-escape';
 
 async function fetchRelevantVideo(topic: string, keywords: string[]): Promise<{ videoId: string; title: string; channelTitle: string } | null> {
   const key = process.env.YOUTUBE_API_KEY;
@@ -152,17 +152,17 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
   }
 
   const systemPrompt = isResearch
-    ? `You are a Lead Technical Researcher. Match our gold-standard research format (100+ deployed posts). Min 1500 words, max 2500. Use plain text for formulas (e.g. \`V_f\`). MUST include link with anchor "${selected.text}" to "${selected.route}" in Verdict. CRITICAL: (1) Output raw MDX only - NO \`\`\`mdx or \`\`\` code block wrapper. NO import statements. NO Video component. (2) Section order exactly: Abstract, Methodology, Key Findings, [Video Reference if video], References, Future Trends, Verdict. (3) References: bullet list only, each line "- [Source Title](https://real-url) - one sentence description." At least 3 entries with real, clickable URLs. No plain-text citations without links.`
+    ? `You are a Lead Technical Researcher. Match our gold-standard research format (100+ deployed posts). Min 1500 words, max 2500. Use plain text for formulas (e.g. \`V_f\`). MUST include link with anchor "${selected.text}" to "${selected.route}" in Verdict. CRITICAL: (1) Output raw MDX only - NO \`\`\`mdx or \`\`\` code block wrapper. NO import statements. NO Video component. (2) Section order exactly: Abstract, Methodology, Key Findings, [Video Reference if video], References, Future Trends, Verdict. (3) References: bullet list only, each line "- [Source Title](https://real-url) - one sentence description." At least 3 entries with real, clickable URLs. No plain-text citations without links. (4) MDX-safe prose: never use raw < or > for comparisons (e.g. write "less than 1 ms" or "under 100 ms", not "< 1 ms"); raw angle brackets before numbers break the renderer.`
     : isHowTo
-      ? `You are a CTO. Write a concise technical guide (300-500 words). MDX format with frontmatter. Code-first.`
-      : `You are a CTO. Write comprehensive blog post (1200-2000 words). MDX with frontmatter. MUST include "Sovereign Sync" in Key Takeaways. Link "${selected.text}" to "${selected.route}".`;
+      ? `You are a CTO. Write a concise technical guide (300-500 words). MDX format with frontmatter. Code-first. Never use raw < or > for comparisons in prose—use "less than", "under", "greater than" so MDX does not break.`
+      : `You are a CTO. Write comprehensive blog post (1200-2000 words). MDX with frontmatter. MUST include "Sovereign Sync" in Key Takeaways. Link "${selected.text}" to "${selected.route}". Never use raw < or > for comparisons in prose—use "less than", "under", "greater than" so MDX does not break.`;
 
   const videoRefSection = videoResult
     ? `, ## Video Reference (mention ${videoResult.title} by ${videoResult.channelTitle})`
     : '';
   const videoIdFm = videoResult ? `, videoId: "${videoResult.videoId}"` : '';
   const userPrompt = isResearch
-    ? `Research report: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Use EXACT section order (do not deviate from our deployed posts): ## Abstract, ## Methodology, ## Key Findings${videoRefSection}, ## References, ## Future Trends, ## Verdict. References: bullet list with "- [Exact Source Title](https://real-url) - one sentence." At least 3 entries, real docs/whitepapers/official blogs only. Output ONLY raw MDX: --- frontmatter --- then body. Frontmatter: title, date: "${post.date}", description (150-160 chars), tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "research"${videoIdFm}. No code block wrapper.`
+    ? `Research report: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Use EXACT section order (do not deviate from our deployed posts): ## Abstract, ## Methodology, ## Key Findings${videoRefSection}, ## References, ## Future Trends, ## Verdict. References: bullet list with "- [Exact Source Title](https://real-url) - one sentence." At least 3 entries, real docs/whitepapers/official blogs only. For any numeric comparisons use words (e.g. "less than 1 ms", "under 100 ms", "greater than 50")—never raw < or > in prose. Output ONLY raw MDX: --- frontmatter --- then body. Frontmatter: title, date: "${post.date}", description (150-160 chars), tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "research"${videoIdFm}. No code block wrapper.`
     : isHowTo
       ? `How-to guide: "${post.title}". Keywords: ${post.keywords.join(', ')}. Structure: problem, solution with code, key concepts. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "how-to-in-tech".`
       : `Blog post: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Hook, Problem, Deep dive, Solution, Key Takeaways (include Sovereign Sync), Verdict. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar.`;
@@ -206,6 +206,13 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
         `Research post must have at least 3 reference hyperlinks (found ${refLinkCount}). References must use [Title](URL) format for SEO and source verification.`
       );
     }
+  }
+
+  // MDX-safe: refuse to push if prose still has <digit or >digit (would cause "Unexpected character `1` before name")
+  if (hasUnescapedAngleBracketsBeforeDigits(content)) {
+    throw new Error(
+      'Post content contains unescaped < or > before numbers in prose, which breaks MDX. Use "less than" / "greater than" or ensure escapeAngleBracketsInProse is applied.'
+    );
   }
 
   const imagePrompt = isHowTo
