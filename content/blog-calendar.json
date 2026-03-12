@@ -508,7 +508,7 @@
     "date": "2026-03-12",
     "title": "The Community Behind Sovereign Sync",
     "slug": "the-community-behind-sovereign-sync",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -518,7 +518,8 @@
       "community"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-12T09:01:17.453Z"
   },
   {
     "id": "week-11-post-1",
