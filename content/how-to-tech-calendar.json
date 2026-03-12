@@ -1107,14 +1107,15 @@
     "scheduledTime": "14:00",
     "title": "Tree Shaking: Removing Dead Code Automatically",
     "slug": "tree-shaking-removing-dead-code-automatically",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "tree",
       "shaking",
       "removing"
-    ]
+    ],
+    "publishedAt": "2026-03-12T14:00:46.070Z"
   },
   {
     "id": "how-to-how-to-use-web-workers-for-heavy-calculations-mar-13",
