@@ -1123,14 +1123,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Web Workers for Heavy Calculations",
     "slug": "how-to-use-web-workers-for-heavy-calculations",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "web",
       "workers"
-    ]
+    ],
+    "publishedAt": "2026-03-13T14:00:54.010Z"
   },
   {
     "id": "how-to-pi-day-calculating-portfolio-mathematics-efficiently-mar-14",
