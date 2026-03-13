@@ -143,14 +143,21 @@ export async function GET(request: Request) {
 
     const calendarJson = await getFileContent(calendarPath);
     const calendarData: BlogPost[] = JSON.parse(calendarJson);
-    const idx = calendarData.findIndex(
+    let idx = calendarData.findIndex(
       (p) => (p.category === 'research' ? p.id === post.id : p.slug === post.slug)
     );
-    if (idx >= 0) {
-      calendarData[idx].status = 'published';
-      calendarData[idx].publishedAt = new Date().toISOString();
-      await createOrUpdateFile(calendarPath, JSON.stringify(calendarData, null, 2), msg);
+    if (idx < 0 && post.category === 'research') {
+      idx = calendarData.findIndex((p) => p.slug === post.slug);
     }
+    if (idx < 0) {
+      throw new Error(
+        `[CRON] Calendar update required but entry not found. Post id=${post.id} slug=${post.slug} category=${post.category}. ` +
+          `Calendar ${calendarPath} has ${calendarData.length} entries. Refusing to leave repo inconsistent (content pushed, calendar still pending).`
+      );
+    }
+    calendarData[idx].status = 'published';
+    calendarData[idx].publishedAt = new Date().toISOString();
+    await createOrUpdateFile(calendarPath, JSON.stringify(calendarData, null, 2), msg);
 
     // Trigger Vercel production deploy (needed when GitHub → Vercel auto-deploy is broken)
     let deployTriggered = false;

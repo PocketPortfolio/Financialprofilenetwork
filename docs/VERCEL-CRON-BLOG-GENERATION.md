@@ -6,7 +6,7 @@ When GitHub Actions is suspended (e.g. billing issues), blog posts can be genera
 
 1. **Vercel Cron** triggers `/api/cron/generate-blog` on schedule (9:00, 14:00, 18:00 UTC + hourly)
 2. The API route fetches calendars from GitHub (raw URLs), finds due posts, generates one post via OpenAI + DALL-E
-3. Pushes MDX, image, and updated calendar to GitHub via the GitHub API
+3. Pushes MDX, image, and **updated calendar** (status → published, publishedAt) to GitHub via the GitHub API. **The calendar update is mandatory:** if the calendar entry cannot be found (by id or slug), the route **throws** and returns 500 so the run never succeeds with content pushed but calendar still "pending". This prevents the admin from showing "Overdue" for posts that are already live.
 4. If **`VERCEL_DEPLOY_HOOK_URL`** is set, the route POSTs to it to trigger a production deploy (use this when GitHub → Vercel auto-deploy is broken)
 
 ## Required Environment Variables

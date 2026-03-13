@@ -1112,7 +1112,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Sharding Strategies - Performance Analysis",
     "slug": "research-database-sharding-strategies-performance-analysis-2026-03-12",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1120,7 +1120,8 @@
       "database",
       "sharding",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-03-12T18:00:00.000Z"
   },
   {
     "id": "research-read-replica-performance-consistency-vs-latency-2026-03-13",
