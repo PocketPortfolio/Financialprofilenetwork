@@ -69,7 +69,7 @@ export function AskAIModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const FOUNDERS_CLUB_PRICE_ID =
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1Sg3ykD4sftWa1Wtheztc1hR';
+    process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1TAWCxD4sftWa1WtEZtg2Oli';
 
   const handleQuotaUpgradeToStripe = async () => {
     if (!FOUNDERS_CLUB_PRICE_ID || FOUNDERS_CLUB_PRICE_ID.includes('XXXXX')) {
@@ -570,7 +570,7 @@ export function AskAIModal({
                     opacity: checkoutLoading ? 0.85 : 1,
                   }}
                 >
-                  {checkoutLoading ? 'Taking you to checkout…' : "Upgrade Now — Founder's Club £100"}
+                  {checkoutLoading ? 'Taking you to checkout…' : "Upgrade Now — Founder's Club £100/yr or £12/mo"}
                 </button>
                 <button
                   type="button"

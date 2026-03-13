@@ -165,7 +165,7 @@ export default function InfrastructureUpgradeModal({
               margin: 0,
             }}
           >
-            Included with UK Founders Club. Only {currentSpotsRemaining} Spots Left.
+            Included with UK Founders Club (£12/mo or £100/yr). {currentSpotsRemaining} spots remaining.
           </p>
         </div>
 
@@ -201,7 +201,7 @@ export default function InfrastructureUpgradeModal({
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            Upgrade to Sovereign - £100
+            Upgrade to Founders Club – £12/mo or £100/yr
           </Link>
           <button
             onClick={onClose}

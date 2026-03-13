@@ -345,7 +345,7 @@ export default function RiskCalculatorPrefilled({ ticker, tickerName }: RiskCalc
             e.currentTarget.style.boxShadow = '0 2px 4px rgba(245, 158, 11, 0.3)';
           }}
         >
-          Join Founder's Club (£100 Lifetime)
+          Join Founder's Club (£12/mo or £100/yr)
         </Link>
       </div>
     </div>

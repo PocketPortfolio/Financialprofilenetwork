@@ -50,8 +50,11 @@ const SPONSOR_PRICE_IDS = {
   codeSupporterAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_CODE_SUPPORTER_ANNUAL || 'price_1SgPGYD4sftWa1WtLgEjFV93',
   featureVoterAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_FEATURE_VOTER_ANNUAL || 'price_1SgPHJD4sftWa1WtW03Tzald',
   corporateSponsorAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORPORATE_ANNUAL || 'price_1SgPLzD4sftWa1WtzrgPU5tj',
-  // One-time payments
-  foundersClub: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1Sg3ykD4sftWa1Wtheztc1hR',
+  // Founders Club subscription (monthly £12, annual £100)
+  foundersClubMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_MONTHLY || 'price_1TAWC9D4sftWa1WtO7Nwk7Vd',
+  foundersClubAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || 'price_1TAWCxD4sftWa1WtEZtg2Oli',
+  // Legacy one-time (for backward compatibility with old checkout sessions)
+  foundersClubLegacy: 'price_1Sg3ykD4sftWa1Wtheztc1hR',
   oneTimeDonation: process.env.NEXT_PUBLIC_STRIPE_PRICE_DONATION || 'price_1SeZj0D4sftWa1WtXkkVps9a',
 };
 
@@ -63,7 +66,9 @@ const PRICE_ID_TO_TIER: Record<string, string> = {
   [SPONSOR_PRICE_IDS.featureVoterAnnual]: 'Developer Utility (Annual)',
   [SPONSOR_PRICE_IDS.corporateSponsorMonthly]: 'Corporate Ecosystem (Monthly)',
   [SPONSOR_PRICE_IDS.corporateSponsorAnnual]: 'Corporate Ecosystem (Annual)',
-  [SPONSOR_PRICE_IDS.foundersClub]: "Founder's Club",
+  [SPONSOR_PRICE_IDS.foundersClubMonthly]: "Founder's Club (Monthly)",
+  [SPONSOR_PRICE_IDS.foundersClubAnnual]: "Founder's Club (Annual)",
+  [SPONSOR_PRICE_IDS.foundersClubLegacy]: "Founder's Club (Legacy one-time)",
   [SPONSOR_PRICE_IDS.oneTimeDonation]: 'One-Time Donation',
 };
 
@@ -75,8 +80,16 @@ const VALID_PRICE_IDS = new Set([
   SPONSOR_PRICE_IDS.featureVoterAnnual,
   SPONSOR_PRICE_IDS.corporateSponsorMonthly,
   SPONSOR_PRICE_IDS.corporateSponsorAnnual,
-  SPONSOR_PRICE_IDS.foundersClub,
+  SPONSOR_PRICE_IDS.foundersClubMonthly,
+  SPONSOR_PRICE_IDS.foundersClubAnnual,
+  SPONSOR_PRICE_IDS.foundersClubLegacy,
   SPONSOR_PRICE_IDS.oneTimeDonation,
+]);
+
+const FOUNDERS_CLUB_PRICE_IDS = new Set([
+  SPONSOR_PRICE_IDS.foundersClubMonthly,
+  SPONSOR_PRICE_IDS.foundersClubAnnual,
+  SPONSOR_PRICE_IDS.foundersClubLegacy,
 ]);
 
 // NPM packages to track
@@ -211,7 +224,8 @@ async function getMonetizationData(startDate: Date) {
       subscriptions: [],
       foundersClub: {
         revenue: 0,
-        count: 0
+        count: 0,
+        cashCollected: 0
       },
       oneTimeDonations: 0 // Deprecated
     };
@@ -224,9 +238,13 @@ async function getMonetizationData(startDate: Date) {
       expand: ['data.customer', 'data.items.data.price']
     });
 
+    const startTimestamp = Math.floor(startDate.getTime() / 1000);
     let totalMRR = 0;
     const uniquePatrons = new Set<string>();
     const subscriptionBreakdown: Record<string, { count: number; revenue: number }> = {};
+    let foundersClubMRR = 0;
+    const foundersClubSubscriberIds = new Set<string>();
+    let foundersClubCashCollected = 0;
 
     for (const sub of subscriptions.data) {
       for (const item of sub.items.data) {
@@ -235,29 +253,31 @@ async function getMonetizationData(startDate: Date) {
         
         // Only track subscriptions from /sponsor page (filter by Price ID)
         if (!VALID_PRICE_IDS.has(priceId)) {
-          continue; // Skip subscriptions not from /sponsor page
+          continue;
         }
         
         // Handle both monthly and annual subscriptions
         if (price.recurring && price.unit_amount) {
           const interval = price.recurring.interval as 'day' | 'week' | 'month' | 'year';
-          const intervalCount = price.recurring.interval_count || 1;
           const annualAmount = price.unit_amount / 100;
           
-          // Convert to monthly equivalent for MRR calculation
           let monthlyAmount = annualAmount;
           if (interval === 'year') {
-            monthlyAmount = annualAmount / 12; // Annual subscription = MRR is 1/12th
+            monthlyAmount = annualAmount / 12;
           } else if (interval === 'month') {
-            monthlyAmount = annualAmount; // Already monthly
+            monthlyAmount = annualAmount;
           } else {
-            // For other intervals, skip or handle as needed
             continue;
           }
           
           totalMRR += monthlyAmount;
           
-          // Get tier name from Price ID mapping (most reliable)
+          if (FOUNDERS_CLUB_PRICE_IDS.has(priceId)) {
+            foundersClubMRR += monthlyAmount;
+            const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id;
+            if (customerId) foundersClubSubscriberIds.add(customerId);
+          }
+          
           const tierName = PRICE_ID_TO_TIER[priceId] || 
                           price.metadata?.tierName || 
                           price.nickname || 
@@ -267,11 +287,10 @@ async function getMonetizationData(startDate: Date) {
             subscriptionBreakdown[tierName] = { count: 0, revenue: 0 };
           }
           subscriptionBreakdown[tierName].count += 1;
-          subscriptionBreakdown[tierName].revenue += monthlyAmount; // Store MRR equivalent
+          subscriptionBreakdown[tierName].revenue += monthlyAmount;
         }
       }
       
-      // Only count patrons if they have at least one valid subscription item (monthly or annual)
       const hasValidItem = sub.items.data.some(item => {
         if (!VALID_PRICE_IDS.has(item.price.id) || !item.price.recurring) {
           return false;
@@ -281,19 +300,13 @@ async function getMonetizationData(startDate: Date) {
       });
       
       if (hasValidItem && sub.customer) {
-        const customerId = typeof sub.customer === 'string' 
-          ? sub.customer 
-          : sub.customer.id;
+        const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
         uniquePatrons.add(customerId);
       }
     }
 
-    // Get Founder's Club purchases - only from /sponsor page
-    // Use Checkout Sessions as primary source (has price_id directly)
-    const startTimestamp = Math.floor(startDate.getTime() / 1000);
-    let foundersClubTotal = 0;
-    let foundersClubCount = 0;
-    
+    // Founders Club: legacy one-time checkout sessions (cash collected)
+    let foundersClubLegacyCount = 0;
     try {
       const checkoutSessions = await stripe.checkout.sessions.list({
         created: { gte: startTimestamp },
@@ -302,44 +315,43 @@ async function getMonetizationData(startDate: Date) {
       });
       
       for (const session of checkoutSessions.data) {
-        // Only process completed one-time payments
         if (session.mode === 'payment' && session.payment_status === 'paid') {
-          // Get line items to check price ID
           const lineItems = session.line_items?.data || [];
-          
           for (const item of lineItems) {
             const priceId = item.price?.id;
-            
-            // Only track Founder's Club (donations removed from sponsor page)
-            if (priceId === SPONSOR_PRICE_IDS.foundersClub && item.amount_total) {
-              foundersClubTotal += item.amount_total / 100;
-              foundersClubCount += 1;
+            if (priceId === SPONSOR_PRICE_IDS.foundersClubLegacy && item.amount_total) {
+              foundersClubCashCollected += item.amount_total / 100;
+              foundersClubLegacyCount += 1;
             }
           }
         }
       }
     } catch (error) {
       console.error('Error fetching checkout sessions for Founder\'s Club:', error);
-      // Fallback: Check PaymentIntents by metadata
-      try {
-        const paymentIntents = await stripe.paymentIntents.list({
-          created: { gte: startTimestamp },
-          limit: 100
-        });
-
-        for (const pi of paymentIntents.data) {
-          const tierName = pi.metadata?.tierName?.toLowerCase() || '';
-          const isFoundersClub = tierName.includes('founder') || tierName.includes('founder\'s club');
-          
-          if (pi.status === 'succeeded' && pi.amount && isFoundersClub) {
-            foundersClubTotal += pi.amount / 100;
-            foundersClubCount += 1;
-          }
-        }
-      } catch (fallbackError) {
-        console.error('Error fetching payment intents for Founder\'s Club:', fallbackError);
-      }
     }
+
+    // Founders Club: cash collected from subscription invoices in period (for runway)
+    try {
+      const invoices = await stripe.invoices.list({
+        created: { gte: startTimestamp },
+        status: 'paid',
+        limit: 100
+      });
+      for (const inv of invoices.data) {
+        const subRef = (inv as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }).subscription;
+        const subId = typeof subRef === 'string' ? subRef : subRef?.id;
+        if (!subId) continue;
+        const sub = await stripe.subscriptions.retrieve(subId, { expand: ['items.data.price'] });
+        const hasFC = sub.items.data.some((item: { price: Stripe.Price }) => FOUNDERS_CLUB_PRICE_IDS.has(item.price.id));
+        if (hasFC && inv.amount_paid) {
+          foundersClubCashCollected += inv.amount_paid / 100;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching invoices for Founder\'s Club cash:', error);
+    }
+
+    const foundersClubCount = foundersClubSubscriberIds.size + foundersClubLegacyCount;
 
     return {
       totalMRR: Math.round(totalMRR * 100) / 100,
@@ -351,10 +363,11 @@ async function getMonetizationData(startDate: Date) {
         revenue: Math.round(data.revenue * 100) / 100
       })),
       foundersClub: {
-        revenue: Math.round(foundersClubTotal * 100) / 100,
-        count: foundersClubCount
+        revenue: Math.round(foundersClubMRR * 100) / 100,
+        count: foundersClubCount,
+        cashCollected: Math.round(foundersClubCashCollected * 100) / 100
       },
-      oneTimeDonations: 0 // Deprecated - kept for backwards compatibility
+      oneTimeDonations: 0
     };
   } catch (error) {
     console.error('Stripe fetch error:', error);
@@ -365,9 +378,10 @@ async function getMonetizationData(startDate: Date) {
       subscriptions: [],
       foundersClub: {
         revenue: 0,
-        count: 0
+        count: 0,
+        cashCollected: 0
       },
-      oneTimeDonations: 0 // Deprecated
+      oneTimeDonations: 0
     };
   }
 }

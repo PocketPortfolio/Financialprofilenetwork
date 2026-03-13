@@ -50,8 +50,29 @@ export async function POST(request: NextRequest) {
         isOneTime 
       });
     } catch (priceError: any) {
+      const isNoSuchPrice = priceError?.message?.includes('No such price');
+      if (isNoSuchPrice) {
+        const mode = process.env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'Live' : 'Test';
+        const monthlyId = process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_MONTHLY;
+        let monthlyExistsInStripe = false;
+        if (monthlyId && monthlyId !== priceId) {
+          try {
+            await stripe.prices.retrieve(monthlyId);
+            monthlyExistsInStripe = true;
+          } catch (_) {
+            monthlyExistsInStripe = false;
+          }
+        }
+        console.error(`Stripe price not found (${priceId}). Mode=${mode}. Monthly FC price exists in same account: ${monthlyExistsInStripe}. If monthly works, the annual price ID may be from Test or wrong — copy the Live annual price ID from Dashboard.`);
+        const hint = monthlyExistsInStripe
+          ? ' The monthly Founders Club price exists in this Stripe account; the annual price ID is missing or from another mode. In Stripe Dashboard (Live), open Founders Club (Annual) → copy the correct Live price ID into NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL.'
+          : ` Create both Founders Club products in Dashboard under ${mode} mode and set the price IDs in your environment.`;
+        return NextResponse.json(
+          { error: `Price not found in Stripe (${priceId}). Your app is using Stripe ${mode} mode.${hint}` },
+          { status: 400 }
+        );
+      }
       console.warn('⚠️ Could not fetch price from Stripe, falling back to tier name check:', priceError.message);
-      // Fallback to tier name check if price fetch fails
       isOneTime = tierName?.toLowerCase().includes('donation') || 
                   tierName?.toLowerCase().includes('one-time') ||
                   tierName?.toLowerCase().includes('founder') ||

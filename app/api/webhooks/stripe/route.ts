@@ -61,9 +61,13 @@ function getTierFromPriceId(priceId: string): {
     codeSupporterAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_CODE_SUPPORTER_ANNUAL || 'price_1SgPGYD4sftWa1WtLgEjFV93',
     featureVoterAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_FEATURE_VOTER_ANNUAL || 'price_1SgPHJD4sftWa1WtW03Tzald',
     corporateSponsorAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORPORATE_ANNUAL || 'price_1SgPLzD4sftWa1WtzrgPU5tj',
+    // Founders Club subscription (monthly £12, annual £100)
+    foundersClubMonthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_MONTHLY || 'price_1TAWC9D4sftWa1WtO7Nwk7Vd',
+    foundersClubAnnual: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || 'price_1TAWCxD4sftWa1WtEZtg2Oli',
     // One-time payments
     oneTimeDonation: process.env.NEXT_PUBLIC_STRIPE_PRICE_DONATION || 'price_1SeZj0D4sftWa1WtXkkVps9a',
-    foundersClub: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1Sg3ykD4sftWa1Wtheztc1hR',
+    // Legacy Founders Club one-time (isLifetime: true); do not use for new subscription products
+    foundersClubLegacy: 'price_1Sg3ykD4sftWa1Wtheztc1hR',
   };
 
   // Check monthly subscriptions
@@ -76,7 +80,12 @@ function getTierFromPriceId(priceId: string): {
   if (priceId === PRICE_IDS.corporateSponsorMonthly || priceId === PRICE_IDS.corporateSponsorAnnual) {
     return { tier: 'corporateSponsor', hasApiKey: true, hasCorporateLicense: true, isLifetime: false };
   }
-  if (priceId === PRICE_IDS.foundersClub) {
+  // Founders Club subscription (monthly or annual) — access while subscription active
+  if (priceId === PRICE_IDS.foundersClubMonthly || priceId === PRICE_IDS.foundersClubAnnual) {
+    return { tier: 'foundersClub', hasApiKey: true, hasCorporateLicense: false, isLifetime: false };
+  }
+  // Legacy Founders Club one-time payment — lifetime access
+  if (priceId === PRICE_IDS.foundersClubLegacy) {
     return { tier: 'foundersClub', hasApiKey: true, hasCorporateLicense: false, isLifetime: true };
   }
   return { tier: 'oneTimeDonation', hasApiKey: false, hasCorporateLicense: false, isLifetime: false };
@@ -354,19 +363,40 @@ async function handleSubscriptionCancelled(subscription: Stripe.Subscription) {
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
   if (!customerId) return;
 
-  // Mark API key as cancelled (don't delete, for audit trail)
   const db = getDb();
   const apiKeySnapshot = await db.collection('apiKeys')
     .where('customerId', '==', customerId)
     .limit(1)
     .get();
 
+  let email: string | null = null;
   if (!apiKeySnapshot.empty) {
     const doc = apiKeySnapshot.docs[0];
+    const data = doc.data();
+    email = data?.email ?? null;
     await doc.ref.update({
       status: 'cancelled',
       cancelledAt: new Date(),
     });
+  }
+  if (!email) {
+    const customer = await stripe!.customers.retrieve(customerId);
+    email = typeof customer === 'object' && !customer.deleted ? customer.email ?? null : null;
+  }
+  // Revoke tier access in apiKeysByEmail so user loses premium access (e.g. Founders Club)
+  if (email) {
+    const existingEmailDoc = await db.collection('apiKeysByEmail').doc(email).get();
+    const existing = existingEmailDoc.exists ? existingEmailDoc.data() : null;
+    const isManuallyGrantedLifetime = existing?.manuallyGranted === true && existing?.isLifetime === true;
+    if (!isManuallyGrantedLifetime) {
+      await db.collection('apiKeysByEmail').doc(email).set({
+        tier: null,
+        themeAccess: null,
+        isLifetime: false,
+        expiresAt: new Date(),
+        updatedAt: new Date(),
+      }, { merge: true });
+    }
   }
 }
 

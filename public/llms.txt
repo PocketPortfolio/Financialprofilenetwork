@@ -20,7 +20,7 @@ A privacy-first portfolio tracker that turns Google Drive into your personal dat
 
 ## Pricing
 - **Free Tier**: Available with full functionality
-- **Founders Club**: £100 Lifetime License (one-time payment)
+- **Founders Club**: £12/mo or £100/yr (cancel anytime)
 - No subscription required
 
 ## Use Cases

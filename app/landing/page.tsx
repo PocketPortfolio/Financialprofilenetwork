@@ -702,7 +702,7 @@ export default function LandingPage() {
             {' '}in seconds.
             <br />
             <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
-              <strong style={{ color: 'var(--accent-warm)' }}>£100 Lifetime License.</strong> Own it forever.
+              <strong style={{ color: 'var(--accent-warm)' }}>£12/mo or £100/yr.</strong> Cancel anytime.
             </span>
           </p>
           
@@ -741,7 +741,7 @@ export default function LandingPage() {
                 e.currentTarget.style.boxShadow = '0 4px 14px rgba(245, 158, 11, 0.4)';
               }}
             >
-              Join Founder's Club (£100 Lifetime)
+              Join Founder's Club (£12/mo or £100/yr)
             </Link>
             <Link 
               href="/tools/risk-calculator?utm_source=landing&utm_medium=hero_cta&utm_campaign=risk_calculator"

@@ -931,7 +931,7 @@ export default function SettingsPage() {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                Join Founders Club - £100
+                Join Founders Club – £12/mo or £100/yr
               </Link>
               <Link
                 href="/sponsor"

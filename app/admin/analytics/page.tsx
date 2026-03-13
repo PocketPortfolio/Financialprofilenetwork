@@ -19,6 +19,7 @@ interface AnalyticsData {
     foundersClub: {
       revenue: number;
       count: number;
+      cashCollected?: number;
     };
     oneTimeDonations: number; // Deprecated - kept for backwards compatibility
   };
@@ -424,9 +425,14 @@ export default function AdminAnalyticsPage() {
                 subtitle="Monthly subscribers"
               />
               <MetricCard
-                label="UK Founder's Club"
+                label="Founders Club MRR"
                 value={`£${analyticsData.monetization.foundersClub.revenue.toFixed(2)}`}
-                subtitle={`${analyticsData.monetization.foundersClub.count} lifetime members`}
+                subtitle={`${analyticsData.monetization.foundersClub.count} members (valuation / run rate)`}
+              />
+              <MetricCard
+                label="Founders Club Cash Collected"
+                value={`£${(analyticsData.monetization.foundersClub.cashCollected ?? 0).toFixed(2)}`}
+                subtitle="Total cash in period (runway)"
               />
             </div>
 

@@ -41,7 +41,10 @@ const PRICE_IDS = {
     monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORPORATE || 'price_1SeZigD4sftWa1WtTODsYpwE', // $100/month
     annual: process.env.NEXT_PUBLIC_STRIPE_PRICE_CORPORATE_ANNUAL || 'price_1SgPLzD4sftWa1WtzrgPU5tj', // $1,000/year (save $200)
   },
-  foundersClub: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1Sg3ykD4sftWa1Wtheztc1hR', // £100 lifetime
+  foundersClub: {
+    monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_MONTHLY || 'price_1TAWC9D4sftWa1WtO7Nwk7Vd', // £12/mo
+    annual: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || 'price_1TAWCxD4sftWa1WtEZtg2Oli', // £100/yr
+  },
 };
 
 export default function SponsorPage() {
@@ -103,14 +106,14 @@ export default function SponsorPage() {
     };
   }, [previewTheme]);
 
-  const handleCheckout = async (priceId: string | { monthly: string; annual: string }, tierName: string) => {
-    // For Code Supporter and Developer Utility, default to annual
+  const handleCheckout = async (priceId: string | { monthly: string; annual: string }, tierName: string, chosenInterval?: 'monthly' | 'annual') => {
+    // For tiers with monthly/annual (Code Supporter, Feature Voter, Founders Club), use chosen interval or default annual
     let finalPriceId: string;
     let billingInterval: 'monthly' | 'annual' = 'annual';
     
     if (typeof priceId === 'object') {
-      // Default to annual for Code Supporter and Developer Utility
-      finalPriceId = priceId.annual;
+      billingInterval = chosenInterval ?? 'annual';
+      finalPriceId = priceId[billingInterval];
     } else {
       finalPriceId = priceId;
       billingInterval = undefined as any; // Not applicable for one-time or corporate
@@ -682,7 +685,7 @@ export default function SponsorPage() {
           </div>
         </div>
 
-        {/* UK Founder's Club - £100 Lifetime */}
+        {/* UK Founder's Club - £12/mo or £100/yr subscription */}
         <div style={{
           background: 'linear-gradient(135deg, var(--surface) 0%, rgba(245, 158, 11, 0.05) 100%)',
           border: '3px solid #f59e0b', // Gold/Amber border
@@ -705,70 +708,6 @@ export default function SponsorPage() {
           e.currentTarget.style.boxShadow = '0 4px 16px rgba(245, 158, 11, 0.3)';
         }}
         >
-          {/* Badge Container - Top Row */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '12px',
-            marginBottom: '16px',
-            flexWrap: 'wrap'
-          }}>
-            {/* Scarcity Counter - Red (Batch 1) / Orange (Batch 2), progress bar */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '140px' }}>
-              <div
-                className="founders-club-counter"
-                style={{
-                  background: scarcity?.batch === 2 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(220, 38, 38, 0.15)',
-                  border: `2px solid ${scarcity?.batch === 2 ? '#f97316' : '#dc2626'}`,
-                  color: scarcity?.batch === 2 ? '#ea580c' : '#dc2626',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.4',
-                  animation: 'pulse-red 2s ease-in-out infinite',
-                  boxShadow: scarcity?.batch === 2 ? '0 0 0 0 rgba(249, 115, 22, 0.5)' : '0 0 0 0 rgba(220, 38, 38, 0.7)'
-                }}
-              >
-                {scarcity ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left` : `Batch 1: ${getFoundersClubScarcityMessage()}`}
-              </div>
-              {scarcity != null && (
-                <div style={{ width: '100%', height: '4px', background: 'var(--surface)', borderRadius: '2px', overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      width: `${Math.min(100, scarcity.progress * 100)}%`,
-                      height: '100%',
-                      background: scarcity.batch === 2 ? '#f97316' : '#dc2626',
-                      borderRadius: '2px',
-                      transition: 'width 0.3s ease'
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Limited Edition Badge */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              color: 'white',
-              padding: '6px 16px',
-              borderRadius: '20px',
-              fontSize: '11px',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
-              whiteSpace: 'nowrap',
-              lineHeight: '1.4'
-            }}>
-              Limited Edition
-            </div>
-          </div>
-
           {/* Archetype Icon - "The Sovereign" */}
           <div style={{
             width: '80px',
@@ -802,10 +741,15 @@ export default function SponsorPage() {
             textTransform: 'uppercase',
             letterSpacing: '1px'
           }}>
-            Lifetime Sovereignty
+            Per month or per year — cancel anytime
           </div>
-          <div style={{ fontSize: 'clamp(32px, 6vw, 42px)', fontWeight: 'bold', color: '#f59e0b', marginBottom: '16px' }}>
-            £100<span style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', color: 'var(--text-secondary)', fontWeight: 'normal' }}> one-time</span>
+          <div style={{ fontSize: 'clamp(24px, 4.5vw, 32px)', fontWeight: 'bold', color: '#f59e0b', marginBottom: '8px', display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+            <span>£12<span style={{ fontSize: '0.85em', fontWeight: '600', opacity: 0.9 }}>/mo</span></span>
+            <span style={{ color: '#f59e0b', fontWeight: 'bold', fontSize: '1em' }}>or</span>
+            <span>£100<span style={{ fontSize: '0.85em', fontWeight: '600', opacity: 0.9 }}>/yr</span></span>
+          </div>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            Save vs monthly with annual (billed yearly)
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', flexGrow: 1, lineHeight: '1.6', fontSize: '15px' }}>
             You are not tied to a specific broker. Switch brokerages freely; your data history stays here.
@@ -885,27 +829,49 @@ export default function SponsorPage() {
           </div>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button
-              onClick={() => handleCheckout(PRICE_IDS.foundersClub, "UK Founder's Club")}
-              disabled={loading === PRICE_IDS.foundersClub || loading !== null}
+              onClick={() => handleCheckout(PRICE_IDS.foundersClub, "UK Founder's Club", 'annual')}
+              disabled={loading === PRICE_IDS.foundersClub.annual || loading === PRICE_IDS.foundersClub.monthly || loading !== null}
               style={{
                 flex: '1',
-                minWidth: 'clamp(140px, 30vw, 180px)',
-                padding: 'clamp(12px, 3vw, 16px) clamp(20px, 5vw, 32px)',
-                background: loading === PRICE_IDS.foundersClub ? 'var(--muted)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                minWidth: 'clamp(120px, 25vw, 160px)',
+                padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px)',
+                background: (loading === PRICE_IDS.foundersClub.annual || loading === PRICE_IDS.foundersClub.monthly) ? 'var(--muted)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
-                fontSize: 'clamp(14px, 3vw, 18px)',
+                fontSize: 'clamp(13px, 2.5vw, 16px)',
                 fontWeight: '700',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
-                opacity: loading && loading !== PRICE_IDS.foundersClub ? 0.6 : 1,
+                opacity: loading && loading !== PRICE_IDS.foundersClub.annual && loading !== PRICE_IDS.foundersClub.monthly ? 0.6 : 1,
                 boxShadow: loading ? 'none' : '0 4px 12px rgba(245, 158, 11, 0.4)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}
             >
-              {loading === PRICE_IDS.foundersClub ? 'Processing...' : 'Join UK Founder\'s Club'}
+              {(loading === PRICE_IDS.foundersClub.annual || loading === PRICE_IDS.foundersClub.monthly) ? 'Processing...' : 'Join Annual (£100/yr)'}
+            </button>
+            <button
+              onClick={() => handleCheckout(PRICE_IDS.foundersClub, "UK Founder's Club", 'monthly')}
+              disabled={loading === PRICE_IDS.foundersClub.annual || loading === PRICE_IDS.foundersClub.monthly || loading !== null}
+              style={{
+                flex: '1',
+                minWidth: 'clamp(120px, 25vw, 160px)',
+                padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px)',
+                background: (loading === PRICE_IDS.foundersClub.annual || loading === PRICE_IDS.foundersClub.monthly) ? 'var(--muted)' : 'var(--surface-elevated)',
+                color: '#f59e0b',
+                border: '2px solid #f59e0b',
+                borderRadius: '8px',
+                fontSize: 'clamp(13px, 2.5vw, 16px)',
+                fontWeight: '700',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: loading && loading !== PRICE_IDS.foundersClub.annual && loading !== PRICE_IDS.foundersClub.monthly ? 0.6 : 1,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+            >
+              Join Monthly (£12/mo)
             </button>
             <button
               onClick={() => setPreviewTheme(previewTheme === 'founder' ? null : 'founder')}
@@ -970,7 +936,7 @@ export default function SponsorPage() {
               ? PRICE_IDS.foundersClub 
               : PRICE_IDS.corporateSponsor.annual;
             setPreviewTheme(null);
-            handleCheckout(priceId, tierName);
+            handleCheckout(priceId, tierName, previewTheme === 'founder' ? 'annual' : undefined);
           }}
           style={{
             background: 'var(--accent-warm)',

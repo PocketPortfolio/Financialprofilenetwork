@@ -14,7 +14,7 @@ export default function CheapestPortfolioTrackerPage() {
         "name": "What is the cheapest portfolio tracker with no subscription?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Pocket Portfolio offers a £100 lifetime deal with no subscription fees. This is a one-time payment that gives you unlimited access forever, making it the cheapest portfolio tracker with no subscription. We also offer a free tier with basic portfolio tracking tools."
+          "text": "Pocket Portfolio offers a free tier with no subscription required — use it forever at no cost. Optional Founders Club from £12/mo or £100/yr adds premium features. Making it the cheapest portfolio tracker with no subscription for the free tier."
         }
       },
       {
@@ -27,10 +27,10 @@ export default function CheapestPortfolioTrackerPage() {
       },
       {
         "@type": "Question",
-        "name": "What is the Pocket Portfolio lifetime deal?",
+        "name": "What is the Pocket Portfolio Founders Club?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "The Pocket Portfolio UK Founder's Club is a £100 one-time payment that gives you lifetime access to all premium features, including unlimited API access, Discord priority, advanced analytics, and a permanent Founder badge. No monthly fees ever."
+          "text": "The Pocket Portfolio UK Founder's Club is an optional paid tier from £12/mo or £100/yr (cancel anytime) that includes unlimited API access, Discord priority, advanced analytics, and a permanent Founder badge."
         }
       },
       {
@@ -38,7 +38,7 @@ export default function CheapestPortfolioTrackerPage() {
         "name": "How much does Pocket Portfolio cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Pocket Portfolio offers a free tier with basic features, and a £100 lifetime deal (UK Founder's Club) for premium features. There are no monthly subscription fees. Annual subscription options are also available starting at $50/year for Code Supporter tier."
+          "text": "Pocket Portfolio offers a free tier with no subscription required. Optional UK Founder's Club (£12/mo or £100/yr) adds premium features. Other tiers like Code Supporter start at $50/year."
         }
       },
       {
@@ -46,7 +46,7 @@ export default function CheapestPortfolioTrackerPage() {
         "name": "Is there a monthly subscription for Pocket Portfolio?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "No, Pocket Portfolio does not require a monthly subscription. The free tier is completely free forever, and the UK Founder's Club is a one-time £100 payment for lifetime access. Annual subscriptions are optional and start at $50/year."
+          "text": "No subscription is required for the free tier — it is completely free forever. The optional UK Founder's Club is £12/mo or £100/yr. Other annual options start at $50/year."
         }
       },
       {
@@ -54,7 +54,7 @@ export default function CheapestPortfolioTrackerPage() {
         "name": "How does Pocket Portfolio compare to other free portfolio trackers?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Pocket Portfolio is unique because it's local-first (your data stays on your device), open-source, and offers a lifetime deal option. Unlike other trackers that may sell your data or require cloud storage, Pocket Portfolio prioritizes privacy and data sovereignty."
+          "text": "Pocket Portfolio is unique because it's local-first (your data stays on your device), open-source, and the free tier requires no subscription. Unlike other trackers that may sell your data or require cloud storage, Pocket Portfolio prioritizes privacy and data sovereignty."
         }
       }
     ]
@@ -101,8 +101,8 @@ export default function CheapestPortfolioTrackerPage() {
               maxWidth: '700px',
               margin: '0 auto 32px auto'
             }}>
-              Pocket Portfolio offers a <strong style={{ color: 'var(--accent-warm)' }}>£100 lifetime deal</strong> with no monthly fees. 
-              Or use our <strong>completely free tier</strong> forever.
+              Use our <strong>completely free tier</strong> forever — no subscription required. 
+              Or optionally upgrade to <strong style={{ color: 'var(--accent-warm)' }}>Founders Club</strong> from £12/mo or £100/yr.
             </p>
             <div style={{
               display: 'flex',
@@ -228,9 +228,9 @@ export default function CheapestPortfolioTrackerPage() {
                   fontWeight: 'bold'
                 }}>✓</span>
                 <div>
-                  <strong style={{ color: 'var(--text)', fontSize: '18px' }}>£100 Lifetime Deal:</strong>
+                  <strong style={{ color: 'var(--text)', fontSize: '18px' }}>Optional Founders Club:</strong>
                   <p style={{ color: 'var(--text-secondary)', margin: '4px 0 0 0', lineHeight: '1.6' }}>
-                    One-time payment. No monthly fees ever. Includes all premium features, unlimited API access, and priority support.
+                    From £12/mo or £100/yr. Cancel anytime. Includes all premium features, unlimited API access, and priority support.
                   </p>
                 </div>
               </li>
@@ -300,7 +300,7 @@ export default function CheapestPortfolioTrackerPage() {
                       padding: '12px',
                       color: 'var(--text)',
                       fontWeight: '600'
-                    }}>Lifetime Deal</th>
+                    }}>Premium option</th>
                     <th style={{
                       textAlign: 'left',
                       padding: '12px',
@@ -316,8 +316,8 @@ export default function CheapestPortfolioTrackerPage() {
                   }}>
                     <td style={{ padding: '12px', fontWeight: '600', color: 'var(--accent-warm)' }}>Pocket Portfolio</td>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✓ Yes</td>
-                    <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>✓ £100</td>
-                    <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>£0</td>
+                    <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>£12/mo or £100/yr</td>
+                    <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>£0 (free tier)</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
                     <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>Wealthfolio</td>
@@ -386,7 +386,7 @@ export default function CheapestPortfolioTrackerPage() {
                   lineHeight: '1.7',
                   color: 'var(--text-secondary)'
                 }}>
-                  Pocket Portfolio offers a £100 lifetime deal with no subscription fees. This is a one-time payment that gives you unlimited access forever, making it the cheapest portfolio tracker with no subscription. We also offer a free tier with basic portfolio tracking tools.
+                  Pocket Portfolio offers a free tier with no subscription required — use it forever at no cost. Optional Founders Club from £12/mo or £100/yr adds premium features. Making it the cheapest portfolio tracker with no subscription for the free tier.
                 </p>
               </div>
               <div style={{
@@ -419,14 +419,14 @@ export default function CheapestPortfolioTrackerPage() {
                   marginBottom: '12px',
                   color: 'var(--text)'
                 }}>
-                  What is the Pocket Portfolio lifetime deal?
+                  What is the Pocket Portfolio Founders Club?
                 </h3>
                 <p style={{
                   fontSize: '16px',
                   lineHeight: '1.7',
                   color: 'var(--text-secondary)'
                 }}>
-                  The Pocket Portfolio UK Founder's Club is a £100 one-time payment that gives you lifetime access to all premium features, including unlimited API access, white-label portfolio reports, Discord priority, advanced analytics, and a permanent Founder badge. No monthly fees ever.
+                  The Pocket Portfolio UK Founder's Club is an optional paid tier from £12/mo or £100/yr (cancel anytime) that includes unlimited API access, white-label portfolio reports, Discord priority, advanced analytics, and a permanent Founder badge.
                 </p>
               </div>
               <div style={{
@@ -446,7 +446,7 @@ export default function CheapestPortfolioTrackerPage() {
                   lineHeight: '1.7',
                   color: 'var(--text-secondary)'
                 }}>
-                  Pocket Portfolio offers a free tier with basic features, and a £100 lifetime deal (UK Founder's Club) for premium features. There are no monthly subscription fees. Annual subscription options are also available starting at $50/year for Code Supporter tier.
+                  Pocket Portfolio offers a free tier with no subscription required. Optional UK Founder's Club (£12/mo or £100/yr) adds premium features. Other tiers like Code Supporter start at $50/year.
                 </p>
               </div>
               <div style={{
@@ -466,7 +466,7 @@ export default function CheapestPortfolioTrackerPage() {
                   lineHeight: '1.7',
                   color: 'var(--text-secondary)'
                 }}>
-                  No, Pocket Portfolio does not require a monthly subscription. The free tier is completely free forever, and the UK Founder's Club is a one-time £100 payment for lifetime access. Annual subscriptions are optional and start at $50/year.
+                  No subscription is required for the free tier — it is completely free forever. The optional UK Founder's Club is £12/mo or £100/yr. Other annual options start at $50/year.
                 </p>
               </div>
               <div>
@@ -483,7 +483,7 @@ export default function CheapestPortfolioTrackerPage() {
                   lineHeight: '1.7',
                   color: 'var(--text-secondary)'
                 }}>
-                  Pocket Portfolio is unique because it's local-first (your data stays on your device), open-source, and offers a lifetime deal option. Unlike other trackers that may sell your data or require cloud storage, Pocket Portfolio prioritizes privacy and data sovereignty.
+                  Pocket Portfolio is unique because it's local-first (your data stays on your device), open-source, and the free tier requires no subscription. Unlike other trackers that may sell your data or require cloud storage, Pocket Portfolio prioritizes privacy and data sovereignty.
                 </p>
               </div>
             </div>
@@ -512,7 +512,7 @@ export default function CheapestPortfolioTrackerPage() {
               maxWidth: '600px',
               margin: '0 auto 32px auto'
             }}>
-              Start tracking your portfolio for free, or unlock lifetime access with our £100 Founder's Club deal.
+              Start tracking your portfolio for free (no subscription), or optionally upgrade to Founders Club from £12/mo or £100/yr.
             </p>
             <div style={{
               display: 'flex',
@@ -543,7 +543,7 @@ export default function CheapestPortfolioTrackerPage() {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                View Lifetime Deal →
+                View Founders Club →
               </Link>
               <Link
                 href="/dashboard"

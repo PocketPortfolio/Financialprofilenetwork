@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { getFoundersClubScarcityMessage } from '../../lib/utils/foundersClub';
 
 interface TierCardProps {
   id: string;
@@ -16,13 +15,15 @@ interface TierCardProps {
   isPopular?: boolean;
   isExpanded: boolean;
   onExpand: () => void;
-  onCheckout: () => void;
+  onCheckout: (interval?: 'monthly' | 'annual') => void;
   loading?: boolean;
   previewTheme?: 'founder' | 'corporate' | null;
   onPreviewTheme?: (theme: 'founder' | 'corporate' | null) => void;
   children?: React.ReactNode;
   isFoundersClub?: boolean;
   foundersClubScarcity?: { count: number; batch: number; label: string; progress: number; remaining: number; max: number } | null;
+  founderCheckoutIntervals?: { label: string; interval: 'monthly' | 'annual' }[];
+  priceId?: string | { monthly: string; annual: string };
 }
 
 function TierCard({
@@ -43,7 +44,9 @@ function TierCard({
   onPreviewTheme,
   children,
   isFoundersClub = false,
-  foundersClubScarcity
+  foundersClubScarcity,
+  founderCheckoutIntervals,
+  priceId: tierPriceId
 }: TierCardProps) {
   return (
     <motion.div
@@ -138,52 +141,6 @@ function TierCard({
             }}
             className="sponsor-deck-scrollbar"
           >
-            {/* Founders Club Badges */}
-            {isFoundersClub && (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '16px',
-                flexWrap: 'wrap'
-              }}>
-                <div 
-                  className="founders-club-counter"
-                  style={{
-                    background: foundersClubScarcity?.batch === 2 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(220, 38, 38, 0.15)',
-                    border: `2px solid ${foundersClubScarcity?.batch === 2 ? '#f97316' : '#dc2626'}`,
-                    color: foundersClubScarcity?.batch === 2 ? '#ea580c' : '#dc2626',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    whiteSpace: 'nowrap',
-                    lineHeight: '1.4'
-                  }}
-                >
-                  {foundersClubScarcity ? `${foundersClubScarcity.label} — ${foundersClubScarcity.remaining}/${foundersClubScarcity.max} left` : `Batch 1: ${getFoundersClubScarcityMessage()}`}
-                </div>
-                <div style={{
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                  color: 'white',
-                  padding: '6px 16px',
-                  borderRadius: '20px',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)',
-                  whiteSpace: 'nowrap',
-                  lineHeight: '1.4'
-                }}>
-                  Limited Edition
-                </div>
-              </div>
-            )}
-
             {/* Icon */}
             <div style={{
               width: '80px',
@@ -258,28 +215,56 @@ function TierCard({
               ? 'linear-gradient(135deg, var(--surface) 0%, rgba(245, 158, 11, 0.05) 100%)'
               : 'var(--surface)'
           }}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCheckout();
-              }}
-              disabled={loading}
-              style={{
-                padding: '12px 24px',
-                background: loading ? 'var(--muted)' : color,
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                opacity: loading ? 0.6 : 1,
-                width: '100%'
-              }}
-            >
-              {loading ? 'Processing...' : (isFoundersClub ? 'Join UK Founder\'s Club' : 'Subscribe (Annual)')}
-            </button>
+            {founderCheckoutIntervals && founderCheckoutIntervals.length > 0 ? (
+              founderCheckoutIntervals.map(({ label, interval }) => (
+                <button
+                  key={interval}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCheckout(interval);
+                  }}
+                  disabled={loading}
+                  style={{
+                    padding: '12px 24px',
+                    background: loading ? 'var(--muted)' : interval === 'annual' ? color : 'transparent',
+                    color: loading ? 'var(--text-secondary)' : interval === 'annual' ? 'white' : color,
+                    border: `2px solid ${color}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    opacity: loading ? 0.6 : 1,
+                    width: '100%'
+                  }}
+                >
+                  {loading ? 'Processing...' : label}
+                </button>
+              ))
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCheckout();
+                }}
+                disabled={loading}
+                style={{
+                  padding: '12px 24px',
+                  background: loading ? 'var(--muted)' : color,
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  opacity: loading ? 0.6 : 1,
+                  width: '100%'
+                }}
+              >
+                {loading ? 'Processing...' : (isFoundersClub ? 'Join UK Founder\'s Club' : 'Subscribe (Annual)')}
+              </button>
+            )}
             
             {/* Preview Theme Button for Corporate/Founder */}
             {(id === 'corporate' || id === 'founder') && onPreviewTheme && (
@@ -358,7 +343,7 @@ function TierCard({
 export type FoundersClubScarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number } | null;
 
 interface SponsorDeckProps {
-  onCheckout: (priceId: string | { monthly: string; annual: string }, tierName: string) => void;
+  onCheckout: (priceId: string | { monthly: string; annual: string }, tierName: string, chosenInterval?: 'monthly' | 'annual') => void;
   loading: string | null;
   previewTheme: 'founder' | 'corporate' | null;
   onPreviewTheme: (theme: 'founder' | 'corporate' | null) => void;
@@ -366,7 +351,7 @@ interface SponsorDeckProps {
     codeSupporter: { monthly: string; annual: string };
     featureVoter: { monthly: string; annual: string };
     corporateSponsor: { monthly: string; annual: string };
-    foundersClub: string;
+    foundersClub: { monthly: string; annual: string };
   };
   foundersClubScarcity?: FoundersClubScarcity;
 }
@@ -526,15 +511,19 @@ export default function SponsorDeck({
     {
       id: 'founder',
       title: 'UK FOUNDER\'S CLUB',
-      price: '£100',
-      priceSubtext: ' one-time',
-      description: "You are not tied to a specific broker. Switch brokerages freely; your data history stays here.",
+      price: '£12/mo or £100/yr',
+      priceSubtext: '',
+      description: "You are not tied to a specific broker. Switch brokerages freely; your data history stays here. Cancel anytime.",
       icon: '/brand/archetype-founders-club.svg',
       iconAlt: 'The Sovereign',
       color: '#f59e0b',
       priceId: PRICE_IDS.foundersClub,
       tierName: 'UK Founder\'s Club',
       isFoundersClub: true,
+      founderCheckoutIntervals: [
+        { label: 'Join Annual (£100/yr)', interval: 'annual' as const },
+        { label: 'Join Monthly (£12/mo)', interval: 'monthly' as const }
+      ],
       expandedContent: (
         <>
           <div style={{ 
@@ -546,7 +535,7 @@ export default function SponsorDeck({
             letterSpacing: '1px',
             textAlign: 'center'
           }}>
-            Lifetime Sovereignty
+            Per month or per year — cancel anytime
           </div>
           
           <ul style={{ 
@@ -692,12 +681,14 @@ export default function SponsorDeck({
               isPopular={tier.isPopular}
               isExpanded={activeId === tier.id}
               onExpand={() => setActiveId(tier.id)}
-              onCheckout={() => onCheckout(tier.priceId, tier.tierName)}
-              loading={loading === (typeof tier.priceId === 'object' ? tier.priceId.annual : tier.priceId)}
+              onCheckout={(interval) => onCheckout(tier.priceId, tier.tierName, interval)}
+              loading={loading === (typeof tier.priceId === 'object' ? tier.priceId.annual : tier.priceId) || (typeof tier.priceId === 'object' && 'monthly' in tier.priceId && loading === tier.priceId.monthly)}
               previewTheme={previewTheme}
               onPreviewTheme={onPreviewTheme}
               isFoundersClub={tier.isFoundersClub}
               foundersClubScarcity={tier.isFoundersClub ? foundersClubScarcity ?? null : undefined}
+              founderCheckoutIntervals={'founderCheckoutIntervals' in tier ? tier.founderCheckoutIntervals : undefined}
+              priceId={tier.priceId}
             >
               {tier.expandedContent}
             </TierCard>

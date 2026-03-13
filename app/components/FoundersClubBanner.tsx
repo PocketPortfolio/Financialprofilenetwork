@@ -1,44 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { useAuth } from '../hooks/useAuth';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
-import { getFoundersClubSpotsRemaining, isFoundersClubSoldOut, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
-
-type Scarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number };
 
 /**
- * Sticky banner showing Founders Club scarcity counter
- * Only visible to free/anonymous users on dashboard
+ * Sticky banner: Join Founders Club CTA.
+ * Only visible to free tier users on dashboard.
  */
 export default function FoundersClubBanner() {
-  const { isAuthenticated, user } = useAuth();
   const { tier } = usePremiumTheme();
-  const spotsRemaining = getFoundersClubSpotsRemaining();
-  const [scarcity, setScarcity] = useState<Scarcity | null>(null);
 
-  useEffect(() => {
-    fetch('/api/scarcity')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => data && setScarcity(data))
-      .catch(() => {});
-  }, []);
-
-  // Only show for free tier users (not corporate or founders club)
   const isFreeTier = !tier || (tier !== 'corporateSponsor' && tier !== 'foundersClub');
-  
-  if (!isFreeTier) {
-    return null; // Don't show to premium users
-  }
-
-  if (isFoundersClubSoldOut()) {
-    return null; // Don't show if sold out
-  }
-
-  const scarcityText = scarcity
-    ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left`
-    : getFoundersClubScarcityMessage();
+  if (!isFreeTier) return null;
 
   return (
     <div
@@ -68,7 +42,7 @@ export default function FoundersClubBanner() {
         }}
       >
         <span style={{ fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>
-          🇬🇧 UK FOUNDERS CLUB: {scarcityText} Lifetime Spots Remaining.
+          🇬🇧 UK FOUNDERS CLUB
         </span>
         <Link
           href="/sponsor?utm_source=dashboard_banner&utm_medium=sticky_cta&utm_campaign=founders_club"
@@ -93,7 +67,7 @@ export default function FoundersClubBanner() {
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
-          Secure Lifetime Access £100
+          Join Founders Club – £12/mo or £100/yr
         </Link>
       </div>
     </div>

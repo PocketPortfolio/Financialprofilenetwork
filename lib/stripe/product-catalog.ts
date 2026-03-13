@@ -22,14 +22,26 @@ export const PRODUCT_CATALOG: Product[] = [
   {
     id: 'foundersClub',
     name: 'Founders Club',
-    displayName: 'Founder\'s Club (Lifetime)',
+    displayName: "Founder's Club (Annual)",
     price: 100,
     currency: 'GBP',
-    billing: 'one-time',
+    billing: 'annual',
     targetAudience: 'CTOs, Solo Devs, Early Adopters',
-    aiPitchStrategy: 'Lifetime access, influence the roadmap, sovereign data. Perfect for technical leaders who value privacy and want to own their financial data forever.',
-    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1Sg3ykD4sftWa1Wtheztc1hR',
-    dealValue: 100, // One-time, so annualized = 100
+    aiPitchStrategy: 'Unlimited API access, Discord priority, Founder badge. Perfect for technical leaders who value privacy. Cancel anytime.',
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || 'price_1TAWCxD4sftWa1WtEZtg2Oli',
+    dealValue: 100, // Annual, so monthly = 8.33
+  },
+  {
+    id: 'foundersClubMonthly',
+    name: 'Founders Club (Monthly)',
+    displayName: "Founder's Club (Monthly)",
+    price: 12,
+    currency: 'GBP',
+    billing: 'monthly',
+    targetAudience: 'CTOs, Solo Devs, Early Adopters',
+    aiPitchStrategy: 'Unlimited API access, Discord priority, Founder badge. Cancel anytime.',
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_MONTHLY || 'price_1TAWC9D4sftWa1WtO7Nwk7Vd',
+    dealValue: 12, // Monthly
   },
   {
     id: 'corporateSponsor', // Keep ID for backward compatibility

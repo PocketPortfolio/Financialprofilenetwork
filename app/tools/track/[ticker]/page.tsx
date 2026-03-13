@@ -118,11 +118,11 @@ export default async function TrackTickerRiskPage({ params }: { params: Promise<
               offers: [
                 {
                   '@type': 'Offer',
-                  name: 'Founders Club Lifetime License',
+                  name: 'Founders Club (Annual or Monthly)',
                   price: '100.00',
                   priceCurrency: 'GBP',
                   availability: 'https://schema.org/LimitedAvailability',
-                  description: 'One-time payment of £100. Lifetime access with Sovereign Sync (Google Drive), unlimited API access, priority support, and permanent Founder badge.',
+                  description: '£12/mo or £100/yr. Sovereign Sync (Google Drive), unlimited API access, priority support, and permanent Founder badge. Cancel anytime.',
                   url: 'https://www.pocketportfolio.app/sponsor',
                   priceValidUntil: '2026-12-31'
                 },

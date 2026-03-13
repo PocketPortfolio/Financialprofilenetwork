@@ -11,35 +11,35 @@ const COMPETITORS = {
     cost: '$99/year',
     description: 'Crypto tax software',
     painPoints: ['Monthly subscription fees', 'Cloud-based (privacy concerns)', 'Limited customization'],
-    ourAdvantages: ['Free local-first option', 'One-time £100 lifetime deal', 'Full data privacy'],
+    ourAdvantages: ['Free local-first option', 'Founders Club £12/mo or £100/yr', 'Full data privacy'],
   },
   turbotax: {
     name: 'TurboTax',
     cost: '$99/year',
     description: 'Tax preparation software',
     painPoints: ['Expensive annual fees', 'Complex interface', 'Limited CSV import options'],
-    ourAdvantages: ['Free CSV converters', 'No login required', 'One-time £100 lifetime deal'],
+    ourAdvantages: ['Free CSV converters', 'No login required', 'Founders Club £12/mo or £100/yr'],
   },
   ghostfolio: {
     name: 'Ghostfolio',
     cost: 'Self-hosted (complex)',
     description: 'Portfolio tracker',
     painPoints: ['Requires self-hosting', 'Complex setup', 'Limited broker support'],
-    ourAdvantages: ['Zero setup required', '50+ broker imports', 'One-time £100 lifetime deal'],
+    ourAdvantages: ['Zero setup required', '50+ broker imports', 'Founders Club £12/mo or £100/yr'],
   },
   sharesight: {
     name: 'Sharesight',
     cost: '$19/month',
     description: 'Portfolio tracking',
     painPoints: ['Monthly subscription', 'Limited free tier', 'Cloud-only'],
-    ourAdvantages: ['Free local-first', 'Unlimited portfolios', 'One-time £100 lifetime deal'],
+    ourAdvantages: ['Free local-first', 'Unlimited portfolios', 'Founders Club £12/mo or £100/yr'],
   },
   'trade-republic': {
     name: 'Trade Republic',
     cost: 'Free (EU) / Analytics varies',
     description: 'Broker & portfolio analytics',
     painPoints: ['EU-focused', 'Limited export options', 'Analytics tied to broker'],
-    ourAdvantages: ['Global tickers, any broker CSV', 'Free JSON/CSV API', 'One-time £100 lifetime deal'],
+    ourAdvantages: ['Global tickers, any broker CSV', 'Free JSON/CSV API', 'Founders Club £12/mo or £100/yr'],
   },
 };
 
@@ -62,11 +62,11 @@ export async function generateMetadata({ params }: { params: Promise<{ competito
 
   return {
     title: `${competitor.name} Free Alternative - No Login Required | Pocket Portfolio`,
-    description: `${competitor.name} costs ${competitor.cost}. Pocket Portfolio is Free (Local) or £100 (Lifetime Founder). Import your ${competitor.name} CSV now.`,
+    description: `${competitor.name} costs ${competitor.cost}. Pocket Portfolio is Free (Local) or Founders Club £12/mo or £100/yr. Import your ${competitor.name} CSV now.`,
     keywords: [`${competitor.name} alternative`, `${competitor.name} free`, 'privacy-first portfolio tracker', 'local-first finance'],
     openGraph: {
       title: `${competitor.name} vs Pocket Portfolio: The Privacy-First Alternative`,
-      description: `${competitor.name} costs ${competitor.cost}. We're free (local) or £100 (lifetime).`,
+      description: `${competitor.name} costs ${competitor.cost}. We're free (local) or Founders Club £12/mo or £100/yr.`,
       type: 'website',
       url: `https://www.pocketportfolio.app/compare/${resolvedParams.competitor}`,
     },
@@ -119,7 +119,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
             maxWidth: '700px',
             margin: '0 auto var(--space-8)'
           }}>
-            {competitor.name} costs {competitor.cost}. Pocket Portfolio is <strong>Free (Local)</strong> or <strong>£100 (Lifetime Founder)</strong>.
+            {competitor.name} costs {competitor.cost}. Pocket Portfolio is <strong>Free (Local)</strong> or <strong>Founders Club £12/mo or £100/yr</strong>.
           </p>
         </div>
 
@@ -184,7 +184,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
                   {competitor.cost}
                 </td>
                 <td style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--signal)', fontWeight: 'var(--font-semibold)' }}>
-                  Free (Local) or £100 (Lifetime)
+                  Free (Local) or Founders Club £12/mo or £100/yr
                 </td>
               </tr>
               <tr style={{ borderBottom: '1px solid var(--border-warm)' }}>
@@ -304,7 +304,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
             color: 'var(--text-secondary)',
             marginBottom: 'var(--space-6)'
           }}>
-            Import your {competitor.name} CSV now. Or join the <strong>UK Founder's Club</strong> for a one-time £100 fee and get lifetime access.
+            Import your {competitor.name} CSV now. Or join the <strong>UK Founder's Club</strong> from £12/mo or £100/yr — cancel anytime.
           </p>
           <div style={{
             display: 'flex',
@@ -338,7 +338,7 @@ export default async function ComparePage({ params }: { params: Promise<{ compet
                 transition: 'all 0.2s ease'
               }}
             >
-              Join UK Founder's Club (£100) →
+              Join UK Founder's Club (£12/mo or £100/yr) →
             </HoverableLink>
           </div>
         </div>

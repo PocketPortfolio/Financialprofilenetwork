@@ -171,7 +171,7 @@ export default function FeeDragPage() {
             lineHeight: '1.6',
             marginBottom: '20px'
           }}>
-            We charge a <strong>flat £100 lifetime fee</strong>. Not 1% per year. Not 0.5% per year. One payment, forever. As your portfolio grows from £100k to £500k, your fee stays the same. That's <strong>Sovereign Ownership</strong> vs. <strong>Renting your wealth stack</strong>.
+            We offer Founders Club at <strong>£12/mo or £100/yr</strong>. Not 1% per year. Not 0.5% per year. Cancel anytime. As your portfolio grows from £100k to £500k, your subscription stays the same. That's <strong>Sovereign Ownership</strong> vs. <strong>Renting your wealth stack</strong>.
           </p>
           <Link
             href="/sponsor"

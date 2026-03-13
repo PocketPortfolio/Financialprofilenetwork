@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useTrades } from '../hooks/useTrades';
-
-type Scarcity = { count: number; batch: number; label: string; progress: number; remaining: number; max: number };
 
 /**
  * Global Founders Club banner shown on all pages.
@@ -17,14 +14,6 @@ type Scarcity = { count: number; batch: number; label: string; progress: number;
 export default function GlobalFoundersClubBanner() {
   const { tier, isLoading } = usePremiumTheme();
   const { trades } = useTrades();
-  const [scarcity, setScarcity] = useState<Scarcity | null>(null);
-
-  useEffect(() => {
-    fetch('/api/scarcity')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => data && setScarcity(data))
-      .catch(() => {});
-  }, []);
 
   const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
   const hasTrades = trades && trades.length > 0;
@@ -34,10 +23,6 @@ export default function GlobalFoundersClubBanner() {
   }
   const showContent = !isLoading && !isPaid && hasTrades;
   const hidden = isLoading || isPaid || !hasTrades;
-
-  const scarcityText = scarcity
-    ? `${scarcity.label} — ${scarcity.remaining}/${scarcity.max} left`
-    : getFoundersClubScarcityMessage();
 
   return (
     <div
@@ -72,7 +57,7 @@ export default function GlobalFoundersClubBanner() {
         }}
       >
         <span style={{ fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>
-          🇬🇧 UK FOUNDERS CLUB: {scarcityText} Lifetime Spots Remaining.
+          🇬🇧 UK FOUNDERS CLUB
         </span>
         <Link
           href="/sponsor?utm_source=global_banner&utm_medium=top_cta&utm_campaign=founders_club"
@@ -97,7 +82,7 @@ export default function GlobalFoundersClubBanner() {
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
-          Secure Lifetime Access £100
+          Join Founders Club – £12/mo or £100/yr
         </Link>
       </div>
     </div>
