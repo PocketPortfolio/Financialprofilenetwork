@@ -527,8 +527,9 @@ pillar: "${post.pillar}"
       attempts++;
       try {
         console.log(`📝 Generating content (attempt ${attempts}/${maxAttempts})...`);
+        // gpt-4o: same quality bar as cron (gold-standard); migrated from gpt-4-turbo-preview Mar 2026
         const completion = await openai.chat.completions.create({
-          model: 'gpt-4-turbo-preview',
+          model: 'gpt-4o',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }

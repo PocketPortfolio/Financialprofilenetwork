@@ -49,7 +49,7 @@ Output is constrained to match the **gold standard** of 100+ existing deployed p
 │  • getDuePosts: status===pending, date<=today, time>=scheduledTime           │
 │  • generatePostForCron:                                                        │
 │    - Optional YouTube video (research), prompts by category                    │
-│    - OpenAI Chat (gpt-4-turbo-preview) → MDX                                  │
+│    - OpenAI Chat (gpt-4o) → MDX                                               │
 │    - sanitizeMDXContent (unwrap ```mdx, strip Video import/component)          │
 │    - Research: validate ≥3 reference hyperlinks                                 │
 │    - DALL-E 3 → image buffer                                                   │
@@ -121,7 +121,7 @@ So a research post with `date: "2026-03-09"` and `scheduledTime: "18:00"` become
 
 ### 5.2 Content generation (OpenAI)
 
-- **Model:** `gpt-4-turbo-preview`.
+- **Model:** `gpt-4o` (migrated from `gpt-4-turbo-preview` Mar 2026; same quality bar: gold-standard section order, References format, validation unchanged).
 - **System/user prompts** depend on category:
   - **Research:** Gold-standard section order (Abstract → Methodology → Key Findings → [Video Reference] → References → Future Trends → Verdict), Verdict link to product, **References as bullet list with `[Title](URL)`** (≥3 real URLs). Raw MDX only; no ```mdx wrapper, no `import` or `<Video />`.
   - **How-to:** Short guide (300–500 words), code-first, frontmatter.

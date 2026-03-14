@@ -167,8 +167,9 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
       ? `How-to guide: "${post.title}". Keywords: ${post.keywords.join(', ')}. Structure: problem, solution with code, key concepts. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar, category: "how-to-in-tech".`
       : `Blog post: "${post.title}". Pillar: ${post.pillar}. Keywords: ${post.keywords.join(', ')}. Structure: Hook, Problem, Deep dive, Solution, Key Takeaways (include Sovereign Sync), Verdict. MDX frontmatter: title, date: "${post.date}", description, tags, author: "Pocket Portfolio Team", image: "/images/blog/${post.slug}.png", pillar.`;
 
+  // gpt-4o: flagship model for gold-standard output (BLOG-POST-GOLD-STANDARD.md); migrated from gpt-4-turbo-preview Mar 2026
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-4o',
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
