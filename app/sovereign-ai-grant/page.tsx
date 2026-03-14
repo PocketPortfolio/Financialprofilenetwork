@@ -16,11 +16,9 @@ import {
   Wallet,
   Users,
   Globe,
-  ArrowRight,
-  ArrowDown,
   CheckCircle,
-  Smartphone,
 } from 'lucide-react';
+import AnimatedBlueprint from '@/app/components/marketing/AnimatedBlueprint';
 
 const PILLARS = [
   {
@@ -218,7 +216,7 @@ export default function SovereignAIGrantPage() {
                 key={stat.value}
                 style={{
                   background: 'var(--surface)',
-                  border: '1px solid var(--border-subtle)',
+                  border: '1px solid var(--border-warm)',
                   borderRadius: 'var(--radius-md)',
                   padding: 'var(--space-8)',
                   textAlign: 'center',
@@ -266,7 +264,7 @@ export default function SovereignAIGrantPage() {
             <div
               style={{
                 background: 'var(--surface)',
-                border: '1px solid var(--border-subtle)',
+                border: '1px solid var(--border-warm)',
                 borderRadius: 'var(--radius-md)',
                 padding: 'var(--space-8)',
                 opacity: 0.9,
@@ -420,7 +418,7 @@ export default function SovereignAIGrantPage() {
                             padding: 'var(--space-5)',
                             borderRadius: 'var(--radius-md)',
                             background: 'var(--surface)',
-                            border: '1px solid var(--border-subtle)',
+                            border: '1px solid var(--border-warm)',
                           }}
                         >
                           <Icon
@@ -458,7 +456,7 @@ export default function SovereignAIGrantPage() {
           </div>
         </section>
 
-        {/* Visual Architecture Flowchart — icons + Data Boundary pill */}
+        {/* Visual Architecture Flowchart — animated data flow (CEO mandate: digital storytelling) */}
         <section
           id="architecture"
           className="py-24"
@@ -475,255 +473,7 @@ export default function SovereignAIGrantPage() {
           >
             The Sovereign Architecture Blueprint
           </h2>
-          <div
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-8)',
-            }}
-          >
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-4 flex-wrap md:flex-nowrap">
-              {/* User Device */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  padding: 'var(--space-6)',
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  minWidth: 160,
-                  width: '100%',
-                  maxWidth: 264,
-                }}
-              >
-                <Smartphone
-                  size={32}
-                  style={{ color: 'var(--text)', marginBottom: 'var(--space-3)' }}
-                  aria-hidden
-                />
-                <div
-                  style={{
-                    fontWeight: 600,
-                    color: 'var(--text)',
-                    marginBottom: 'var(--space-1)',
-                  }}
-                >
-                  User Device
-                </div>
-                <div
-                  style={{
-                    fontSize: 'var(--font-size-xs)',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  IndexedDB & Zustand
-                </div>
-              </div>
-
-              <ArrowDown
-                className="md:hidden flex-shrink-0"
-                size={24}
-                style={{ color: 'var(--border-subtle)' }}
-                aria-hidden
-              />
-              <ArrowRight
-                className="hidden md:block flex-shrink-0"
-                size={24}
-                style={{ color: 'var(--border-subtle)' }}
-                aria-hidden
-              />
-
-              {/* Context Engine */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  padding: 'var(--space-6)',
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  minWidth: 160,
-                  width: '100%',
-                  maxWidth: 264,
-                }}
-              >
-                <Cpu
-                  size={32}
-                  style={{ color: 'var(--text)', marginBottom: 'var(--space-3)' }}
-                  aria-hidden
-                />
-                <div
-                  style={{
-                    fontWeight: 600,
-                    color: 'var(--text)',
-                    marginBottom: 'var(--space-1)',
-                  }}
-                >
-                  Context Engine
-                </div>
-                <div
-                  style={{
-                    fontSize: 'var(--font-size-xs)',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  Browser execution
-                </div>
-              </div>
-
-              {/* Data Boundary + Sanitized Context — width/position constrain dashed line; visibility by breakpoint via scoped CSS */}
-              <style>{`
-                @media (max-width: 767px) {
-                  .sovereign-dashed-h { display: none !important; }
-                  .sovereign-dashed-v { display: block !important; }
-                }
-                @media (min-width: 768px) {
-                  .sovereign-dashed-h { display: block !important; }
-                  .sovereign-dashed-v { display: none !important; }
-                }
-              `}</style>
-              <div
-                className="relative flex flex-col items-center justify-center flex-shrink-0"
-                style={{
-                  position: 'relative',
-                  minHeight: 96,
-                  width: 192,
-                  maxWidth: '100%',
-                  padding: 'var(--space-6)',
-                }}
-                aria-hidden
-              >
-                <div
-                  className="sovereign-dashed-h hidden md:block"
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    right: 0,
-                    borderTop: '2px dashed var(--accent-warm)',
-                    transform: 'translateY(-50%)',
-                  }}
-                />
-                <div
-                  className="sovereign-dashed-v md:hidden"
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: 0,
-                    bottom: 0,
-                    borderLeft: '2px dashed var(--accent-warm)',
-                    transform: 'translateX(-50%)',
-                  }}
-                />
-                <div
-                  style={{
-                    background: 'var(--surface)',
-                    padding: 'var(--space-1) var(--space-3)',
-                    borderRadius: 9999,
-                    border: '1px solid var(--accent-warm)',
-                    color: 'var(--accent-warm)',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  Data Boundary
-                </div>
-                <div
-                  style={{
-                    background: 'var(--bg)',
-                    padding: 'var(--space-1) var(--space-2)',
-                    marginTop: 'var(--space-2)',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: 'var(--font-size-xs)',
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border-subtle)',
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  Sanitized Context Only
-                </div>
-                <ArrowRight
-                  className="hidden md:block"
-                  size={20}
-                  style={{
-                    color: 'var(--accent-warm)',
-                    position: 'absolute',
-                    right: 0,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 1,
-                    background: 'var(--surface)',
-                  }}
-                  aria-hidden
-                />
-                <ArrowDown
-                  className="md:hidden"
-                  size={20}
-                  style={{
-                    color: 'var(--accent-warm)',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1,
-                    background: 'var(--surface)',
-                  }}
-                  aria-hidden
-                />
-              </div>
-
-              {/* Stateless Cloud API */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  padding: 'var(--space-6)',
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  minWidth: 160,
-                  width: '100%',
-                  maxWidth: 264,
-                }}
-              >
-                <Cloud
-                  size={32}
-                  style={{ color: 'var(--text)', marginBottom: 'var(--space-3)' }}
-                  aria-hidden
-                />
-                <div
-                  style={{
-                    fontWeight: 600,
-                    color: 'var(--text)',
-                    marginBottom: 'var(--space-1)',
-                  }}
-                >
-                  Stateless Cloud API
-                </div>
-                <div
-                  style={{
-                    fontSize: 'var(--font-size-xs)',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  Zero Portfolio Storage
-                </div>
-              </div>
-            </div>
-          </div>
+          <AnimatedBlueprint />
         </section>
 
         {/* Grant Alignment — outcome cards + ARIA */}
@@ -749,7 +499,7 @@ export default function SovereignAIGrantPage() {
                 role="listitem"
                 style={{
                   background: 'var(--surface)',
-                  border: '1px solid var(--border-subtle)',
+                  border: '1px solid var(--border-warm)',
                   borderRadius: 'var(--radius-md)',
                   padding: 'var(--space-6)',
                   display: 'flex',
