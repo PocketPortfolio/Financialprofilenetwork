@@ -1155,14 +1155,15 @@
     "scheduledTime": "14:00",
     "title": "How to Analyze Your Network Waterfall",
     "slug": "how-to-analyze-your-network-waterfall",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "analyze",
       "your",
       "network"
-    ]
+    ],
+    "publishedAt": "2026-03-15T14:00:28.357Z"
   },
   {
     "id": "how-to-reducing-ttfb-time-to-first-byte-on-serverless-mar-16",
