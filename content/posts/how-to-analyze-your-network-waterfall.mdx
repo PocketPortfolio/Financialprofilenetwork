@@ -1,59 +1,73 @@
 ---
 title: How to Analyze Your Network Waterfall
 date: '2026-03-15'
-description: >-
-  A guide to analyzing network waterfalls for performance optimization using
-  browser developer tools.
+description: 'How to Analyze Your Network Waterfall - analyze, your, network'
 tags:
-  - network analysis
-  - performance optimization
-  - developer tools
+  - analyze
+  - your
+  - network
 author: Pocket Portfolio Team
 image: /images/blog/how-to-analyze-your-network-waterfall.png
-pillar: Technology
+pillar: technical
 category: how-to-in-tech
 ---
+```mdx
+---
+title: "How to Analyze Your Network Waterfall"
+date: "2026-03-15"
+description: Learn how to efficiently analyze your network waterfall to optimize web performance.
+tags: ["network", "analysis", "waterfall"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-analyze-your-network-waterfall.png"
+pillar: "Technology"
+category: "how-to-in-tech"
+---
 
-# Problem
+## Problem
 
-Understanding the performance of your web application often requires analyzing the network requests it makes. By analyzing the network waterfall, you can identify bottlenecks, detect slow-loading resources, and optimize the overall user experience. However, many developers are unsure how to effectively interpret this data to enhance their applications.
+As a web developer or IT professional, understanding the performance of a web application is critical. The network waterfall provides a visual representation of all HTTP requests and their respective load times, which can be quite daunting to analyze without the right approach. This guide will help you efficiently analyze your network waterfall to identify bottlenecks and optimize your web performance.
 
-# Solution with Code
+## Solution with Code
 
-The most common and accessible way to analyze your network waterfall is via the browser's developer tools. Below, we provide a step-by-step guide to help you utilize these tools effectively.
+To analyze your network waterfall, follow these steps:
 
-1. **Open Developer Tools**: In Chrome, you can open Developer Tools by pressing `Ctrl+Shift+I` (Windows/Linux) or `Cmd+Option+I` (Mac).
+1. **Open Developer Tools**: In your web browser, open the Developer Tools. This is typically done by right-clicking on the page, selecting "Inspect," and navigating to the "Network" tab.
 
-2. **Access the Network Tab**: Navigate to the "Network" tab. Ensure that the recording button (a grey circle) is active. This tab records all network requests made by the page.
+2. **Record and Refresh**: Make sure the "Record" button (a circle) is red, indicating that it is capturing network activity. Refresh the page to capture the network waterfall.
 
-3. **Refresh the Page**: Reload the page to populate the network tab with requests. This will display a waterfall chart of all network activity.
+3. **Analyze the Waterfall**: Look at the breakdown of each request. Pay attention to the following key metrics:
+   - **DNS Lookup**: Time taken to resolve the domain name.
+   - **Initial Connection**: Time taken to establish a TCP connection.
+   - **SSL/TLS Handshake**: Time taken for a secure connection.
+   - **Time to First Byte (TTFB)**: Time taken to receive the first byte of the response.
+   - **Content Download**: Time taken to download the content.
 
-4. **Filter Requests**: Use filters to focus on specific types of requests (e.g., XHR, CSS, JS). This helps in isolating issues related to particular resources.
+4. **Identify Bottlenecks**: Look for requests with long durations in any of the above metrics. These are potential bottlenecks that need optimization.
 
-5. **Analyze the Waterfall**: Look for requests that take unusually long to load. The waterfall chart will show the timeline of these requests, helping you pinpoint where delays occur.
+5. **Optimizing Assets**: Use techniques such as lazy loading, code splitting, or optimizing images and scripts to reduce load times.
 
-6. **Inspect Individual Requests**: By clicking on a request, you can see detailed headers, payload, and timing information. Look for high "Waiting (TTFB)" times, which indicate server-side delays.
-
-7. **Evaluate Resource Loading Order**: Ensure critical resources load first. Resources like CSS and JS that block rendering should be optimized for faster loading.
-
-Here's a sample JavaScript snippet to simulate network latency for testing purposes:
+Here's a basic example using JavaScript to log network request details programmatically:
 
 ```javascript
-function simulateNetworkLatency(milliseconds) {
-  const start = Date.now();
-  while (Date.now() - start < milliseconds) {
-    // Busy-wait to simulate latency
-  }
-  console.log(`Simulated ${milliseconds}ms network latency`);
-}
+const logNetworkDetails = () => {
+  window.performance.getEntriesByType('resource').forEach((resource) => {
+    console.log(`Resource: ${resource.name}`);
+    console.log(`DNS Lookup Time: ${resource.domainLookupEnd - resource.domainLookupStart} ms`);
+    console.log(`TCP Connection Time: ${resource.connectEnd - resource.connectStart} ms`);
+    console.log(`Time to First Byte (TTFB): ${resource.responseStart - resource.startTime} ms`);
+    console.log(`Content Download Time: ${resource.responseEnd - resource.responseStart} ms`);
+  });
+};
 
-simulateNetworkLatency(200);
+// Run this function after the page has loaded
+window.addEventListener('load', logNetworkDetails);
 ```
 
-# Key Concepts
+## Key Concepts
 
-- **Waterfall Chart**: Visual representation of resource loading over time. It helps identify which resources are delaying page load.
-- **Time to First Byte (TTFB)**: The time taken for the first byte of a resource to be received by the browser. High TTFB indicates server-side issues.
-- **Critical Path**: The sequence of resources that must be loaded before the page can be rendered. Prioritize minimizing the number of resources in this path.
+- **Performance Timing API**: This API provides detailed timing data related to the document loading and resource fetching, crucial for analyzing network waterfalls.
+- **Optimization Techniques**: Minimizing the number of requests, compressing assets, or leveraging browser caching can significantly reduce load times.
+- **Asynchronous Loading**: Use async or defer for script tags to prevent render-blocking.
 
-By effectively analyzing your network waterfall, you can significantly enhance the performance of your application, delivering a smoother and faster experience to users.
+By understanding and utilizing these techniques and tools, you can effectively analyze and optimize your network waterfall, leading to improved site performance and user experience.
+```
