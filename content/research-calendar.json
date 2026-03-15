@@ -1164,14 +1164,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Data Archival Performance - Hot vs Cold Storage",
     "slug": "research-data-archival-performance-hot-vs-cold-storage-2026-03-15",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "data",
       "archival"
-    ]
+    ],
+    "publishedAt": "2026-03-15T18:00:26.737Z"
   },
   {
     "id": "research-database-connection-limits-scaling-strategies-2026-03-16",
