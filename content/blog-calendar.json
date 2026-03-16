@@ -526,7 +526,7 @@
     "date": "2026-03-16",
     "title": "The Impact of Inflation on Portfolio Returns",
     "slug": "the-impact-of-inflation-on-portfolio-returns",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -536,7 +536,8 @@
       "impact"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-16T09:00:41.370Z"
   },
   {
     "id": "week-11-post-2",
