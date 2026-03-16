@@ -1,7 +1,9 @@
 ---
 title: Reducing TTFB (Time to First Byte) on Serverless
 date: '2026-03-16'
-description: 'Reducing TTFB (Time to First Byte) on Serverless - less, serverless, reducing'
+description: >-
+  A guide to optimizing Time to First Byte in serverless environments through
+  practical code examples and key concepts.
 tags:
   - less
   - serverless
@@ -10,88 +12,83 @@ tags:
   - time
 author: Pocket Portfolio Team
 image: /images/blog/reducing-ttfb-time-to-first-byte-on-serverless.png
-pillar: technical
+pillar: Performance Optimization
 category: how-to-in-tech
 ---
-```mdx
----
-title: "Reducing TTFB (Time to First Byte) on Serverless"
-date: "2026-03-16"
-description: "A guide to reducing Time to First Byte (TTFB) in serverless applications for improved performance."
-tags: ["serverless", "TTFB", "performance", "optimization"]
-author: "Pocket Portfolio Team"
-image: "/images/blog/reducing-ttfb-time-to-first-byte-on-serverless.png"
-pillar: "Performance Optimization"
-category: "how-to-in-tech"
----
 
-Reducing Time to First Byte (TTFB) is crucial for enhancing the performance of serverless applications. TTFB measures the time from a client making a request to the first byte of a response being received. A high TTFB can lead to slow page loads, impacting user experience and SEO rankings.
+Reducing Time to First Byte (TTFB) is crucial in optimizing serverless environments, as high TTFB can degrade user experience and affect application performance. This guide walks you through strategies to achieve lower TTFB in a serverless setup.
 
 ## Problem
 
-Serverless architectures can suffer from increased TTFB due to cold starts, inefficient code, or network latency. Cold starts occur when a serverless function is invoked for the first time or after a period of inactivity, causing delays as the environment is initialized.
+In serverless architectures, TTFB can be high due to cold starts, inefficient code execution, and latency in network communication. Cold starts occur when a serverless function is invoked after a period of inactivity, leading to increased response times.
 
 ## Solution with Code
 
-### Step 1: Minimize Cold Starts
+### 1. Minimize Cold Starts
 
-To reduce the impact of cold starts, consider increasing the memory allocation for your functions, as this often results in faster initialization times. Here is an example for AWS Lambda:
+Cold starts can be minimized by ensuring your serverless function is warm. You can achieve this by keeping a lightweight version of your function running at all times.
 
-```yaml
-Resources:
-  MyFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Handler: index.handler
-      Runtime: nodejs16.x
-      MemorySize: 512 # Increase memory allocation
-      Timeout: 10
-```
-
-### Step 2: Optimize Function Code
-
-Ensure your code is efficient. For instance, avoid unnecessary dependencies and initialize connections outside of the function handler to prevent repeated initialization:
+#### Example: AWS Lambda with Provisioned Concurrency
 
 ```javascript
-// Initialize outside the handler
-const dbConnection = require('db-connection-module');
+// AWS Lambda configuration
+const lambda = new AWS.Lambda();
 
-// Function handler
+const params = {
+  FunctionName: 'your-function-name',
+  ProvisionedConcurrentExecutions: 1
+};
+
+lambda.putProvisionedConcurrencyConfig(params, (err, data) => {
+  if (err) console.log(err, err.stack);
+  else console.log(data);
+});
+```
+
+### 2. Optimize Function Code
+
+Ensure that your function code is optimized to execute quickly. Utilize asynchronous operations and minimize external calls.
+
+#### Example: Optimizing Node.js Function
+
+```javascript
 exports.handler = async (event) => {
-  const data = await dbConnection.query('SELECT * FROM my_table');
+  const data = await fetchDataFromCache(event.key); // Use caching to reduce external calls
   return {
     statusCode: 200,
     body: JSON.stringify(data),
   };
 };
+
+const fetchDataFromCache = async (key) => {
+  // Simulate cache fetch
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ key: key, value: 'cachedData' }), 10); // Simulate quick cache access
+  });
+};
 ```
 
-### Step 3: Implement Caching Strategies
+### 3. Reduce Network Latency
 
-Use caching to reduce redundant function executions and database queries. Integrate a caching service like AWS ElastiCache or use edge caching with services like AWS CloudFront:
+Deploy your serverless functions in regions closer to your users to reduce latency. Use content delivery networks (CDNs) for static assets.
 
-```yaml
-Resources:
-  MyDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Origins:
-          - DomainName: myapi.execute-api.us-east-1.amazonaws.com
-            Id: MyApi
-        DefaultCacheBehavior:
-          TargetOriginId: MyApi
-          ViewerProtocolPolicy: redirect-to-https
-          MinTTL: 0
-          DefaultTTL: 60 # Cache for 60 seconds
-          MaxTTL: 300
+#### Example: Deploying in AWS Regions
+
+```json
+{
+  "provider": {
+    "name": "aws",
+    "runtime": "nodejs18.x",
+    "region": "us-east-1" // Choose a region close to your users
+  }
+}
 ```
 
 ## Key Concepts
 
-- **Cold Starts**: Initial delays when a serverless function is invoked for the first time. Reduced by optimizing memory and keeping functions warm.
-- **Efficient Code**: Minimize dependencies and initialize connections outside of function handlers to improve execution times.
-- **Caching**: Utilize caching mechanisms to reduce load times and minimize redundant processing.
+- **Cold Start**: The delay caused by initializing a serverless function that has been inactive.
+- **Provisioned Concurrency**: A feature that keeps functions initialized and ready to respond, reducing cold starts.
+- **Optimization**: Writing efficient code and using async operations for faster execution.
+- **Network Latency**: The delay in data transfer over the network, which can be minimized by strategic deployment.
 
-By following these practices, you can effectively reduce TTFB in your serverless applications, leading to a smoother and faster user experience.
-```
+By implementing these strategies, you can effectively reduce TTFB in your serverless applications, improving overall performance and user satisfaction.
