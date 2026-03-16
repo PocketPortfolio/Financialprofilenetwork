@@ -1171,7 +1171,7 @@
     "scheduledTime": "14:00",
     "title": "Reducing TTFB (Time to First Byte) on Serverless",
     "slug": "reducing-ttfb-time-to-first-byte-on-serverless",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1180,7 +1180,8 @@
       "reducing",
       "ttfb",
       "time"
-    ]
+    ],
+    "publishedAt": "2026-03-16T14:00:55.533Z"
   },
   {
     "id": "how-to-how-to-use-edge-caching-for-dynamic-content-mar-17",
