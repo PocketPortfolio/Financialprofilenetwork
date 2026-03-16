@@ -1,0 +1,97 @@
+---
+title: Reducing TTFB (Time to First Byte) on Serverless
+date: '2026-03-16'
+description: 'Reducing TTFB (Time to First Byte) on Serverless - less, serverless, reducing'
+tags:
+  - less
+  - serverless
+  - reducing
+  - ttfb
+  - time
+author: Pocket Portfolio Team
+image: /images/blog/reducing-ttfb-time-to-first-byte-on-serverless.png
+pillar: technical
+category: how-to-in-tech
+---
+```mdx
+---
+title: "Reducing TTFB (Time to First Byte) on Serverless"
+date: "2026-03-16"
+description: "A guide to reducing Time to First Byte (TTFB) in serverless applications for improved performance."
+tags: ["serverless", "TTFB", "performance", "optimization"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/reducing-ttfb-time-to-first-byte-on-serverless.png"
+pillar: "Performance Optimization"
+category: "how-to-in-tech"
+---
+
+Reducing Time to First Byte (TTFB) is crucial for enhancing the performance of serverless applications. TTFB measures the time from a client making a request to the first byte of a response being received. A high TTFB can lead to slow page loads, impacting user experience and SEO rankings.
+
+## Problem
+
+Serverless architectures can suffer from increased TTFB due to cold starts, inefficient code, or network latency. Cold starts occur when a serverless function is invoked for the first time or after a period of inactivity, causing delays as the environment is initialized.
+
+## Solution with Code
+
+### Step 1: Minimize Cold Starts
+
+To reduce the impact of cold starts, consider increasing the memory allocation for your functions, as this often results in faster initialization times. Here is an example for AWS Lambda:
+
+```yaml
+Resources:
+  MyFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      MemorySize: 512 # Increase memory allocation
+      Timeout: 10
+```
+
+### Step 2: Optimize Function Code
+
+Ensure your code is efficient. For instance, avoid unnecessary dependencies and initialize connections outside of the function handler to prevent repeated initialization:
+
+```javascript
+// Initialize outside the handler
+const dbConnection = require('db-connection-module');
+
+// Function handler
+exports.handler = async (event) => {
+  const data = await dbConnection.query('SELECT * FROM my_table');
+  return {
+    statusCode: 200,
+    body: JSON.stringify(data),
+  };
+};
+```
+
+### Step 3: Implement Caching Strategies
+
+Use caching to reduce redundant function executions and database queries. Integrate a caching service like AWS ElastiCache or use edge caching with services like AWS CloudFront:
+
+```yaml
+Resources:
+  MyDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: myapi.execute-api.us-east-1.amazonaws.com
+            Id: MyApi
+        DefaultCacheBehavior:
+          TargetOriginId: MyApi
+          ViewerProtocolPolicy: redirect-to-https
+          MinTTL: 0
+          DefaultTTL: 60 # Cache for 60 seconds
+          MaxTTL: 300
+```
+
+## Key Concepts
+
+- **Cold Starts**: Initial delays when a serverless function is invoked for the first time. Reduced by optimizing memory and keeping functions warm.
+- **Efficient Code**: Minimize dependencies and initialize connections outside of function handlers to improve execution times.
+- **Caching**: Utilize caching mechanisms to reduce load times and minimize redundant processing.
+
+By following these practices, you can effectively reduce TTFB in your serverless applications, leading to a smoother and faster user experience.
+```
