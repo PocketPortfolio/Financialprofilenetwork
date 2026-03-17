@@ -1196,14 +1196,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Query Optimization Techniques - Execution Plan Analysis",
     "slug": "research-query-optimization-techniques-execution-plan-analysis-2026-03-17",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "query",
       "optimization",
       "techniques"
-    ]
+    ],
+    "publishedAt": "2026-03-17T18:00:52.360Z"
   },
   {
     "id": "research-database-lock-contention-performance-impact-2026-03-18",
