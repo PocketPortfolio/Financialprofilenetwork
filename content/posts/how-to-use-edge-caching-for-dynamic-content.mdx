@@ -2,74 +2,71 @@
 title: How to Use Edge Caching for Dynamic Content
 date: '2026-03-17'
 description: >-
-  Learn how to implement edge caching for dynamic content to improve performance
-  and reduce latency.
+  Learn how to implement edge caching for dynamic content to improve load times
+  and performance.
 tags:
   - caching
   - edge
   - dynamic content
 author: Pocket Portfolio Team
 image: /images/blog/how-to-use-edge-caching-for-dynamic-content.png
-pillar: Engineering
+pillar: Performance Optimization
 category: how-to-in-tech
 ---
 
 ## Problem
 
-When serving dynamic content from a centralized server, users experience increased latency and slower load times, particularly when they are situated far from the server's location. This can result in poor user experience and increased server load. Traditional caching solutions are typically designed for static content, which poses a challenge for dynamic content that changes frequently.
+Dynamic content poses a challenge for caching strategies as it changes based on user interactions, time, or other variables. Traditional caching mechanisms often struggle with maintaining up-to-date content while providing quick access. This results in slower load times and increased server load, negatively impacting user experience and operational costs.
 
-## Solution with Code
+## Solution
 
-Edge caching provides a solution by caching dynamic content closer to the user's location, which minimizes latency and improves performance. Platforms like Cloudflare Workers or AWS Lambda@Edge can be employed to achieve this.
+Edge caching for dynamic content involves storing content closer to the user by utilizing Content Delivery Networks (CDNs) equipped with advanced caching strategies. These strategies allow for the caching of dynamic content by intelligently determining what to cache and when to serve fresh content.
 
-### Example with Cloudflare Workers
+### Key Concepts
 
-Here's how you can use Cloudflare Workers to cache dynamic content at the edge:
+- **Edge Nodes**: Servers located strategically around the globe to minimize latency.
+- **Cache Invalidation**: The process of updating or replacing cached data when the original data changes.
+- **Stale-While-Revalidate**: A strategy that serves stale content while fetching fresh content in the background.
+- **Surrogate-Control Headers**: HTTP headers used to control caching behavior at intermediary caches like CDNs.
 
-```javascript
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+### Implementing Edge Caching
 
-async function handleRequest(request) {
-  const cache = caches.default
-  const cachedResponse = await cache.match(request)
+To implement edge caching for dynamic content, you can use tools such as AWS CloudFront, Fastly, or Cloudflare. The following example demonstrates setting up a basic edge caching strategy using AWS CloudFront with Lambda@Edge for custom logic:
 
-  if (cachedResponse) {
-    return cachedResponse
+```js
+// AWS Lambda@Edge function to add custom caching logic
+exports.handler = async (event) => {
+  const request = event.Records[0].cf.request;
+  const response = event.Records[0].cf.response;
+
+  // Set caching headers based on the content type
+  if (request.uri.endsWith('.html')) {
+    response.headers['cache-control'] = [{
+      key: 'Cache-Control',
+      value: 'public, max-age=60, stale-while-revalidate=30'
+    }];
+  } else {
+    response.headers['cache-control'] = [{
+      key: 'Cache-Control',
+      value: 'public, max-age=31536000, immutable'
+    }];
   }
 
-  // Fetch from origin server if not in cache
-  const response = await fetch(request)
-
-  // Cache the response with a custom TTL
-  const responseToCache = new Response(response.body, response)
-  responseToCache.headers.append('Cache-Control', 'max-age=300') // Cache for 5 minutes
-
-  event.waitUntil(cache.put(request, responseToCache.clone()))
-
-  return responseToCache
-}
+  return response;
+};
 ```
 
-In this example, the worker checks if a request is already cached. If not, it fetches the response from the origin server and caches it for 5 minutes. Adjust the `max-age` based on your application's needs.
+### Steps to Deploy
 
-## Key Concepts
+1. **Create a CloudFront Distribution**: Use your AWS Management Console to set up a CloudFront distribution.
+2. **Attach Lambda@Edge Function**: Deploy the function to AWS Lambda and associate it with the CloudFront distribution.
+3. **Configure Behaviors**: Define caching behaviors based on content types and paths.
 
-### Edge Caching
+## Key Concepts Recap
 
-Edge caching involves storing content on servers located at the edge of a network, closer to users. This reduces latency as content does not have to travel over long distances from the origin server.
+- **Edge Nodes** help reduce latency by serving content closer to the user.
+- **Cache Invalidation** ensures users receive updated content.
+- **Stale-While-Revalidate** allows for seamless content updates without noticeable delays.
+- **Surrogate-Control Headers** give granular control over cache behavior.
 
-### Dynamic Content
-
-Dynamic content is data that changes frequently and is generated in real-time based on user interactions or other variables. Examples include user dashboards, live feeds, or personalized recommendations.
-
-### Cache-Control
-
-The `Cache-Control` header is pivotal in managing how responses are cached. The `max-age` directive specifies the length of time a response is considered fresh.
-
-### Cloudflare Workers
-
-Cloudflare Workers allow you to run JavaScript at the edge, offering a serverless environment to handle HTTP requests and manage caching logic.
-
-Using edge caching for dynamic content requires careful consideration of how often the content changes and the appropriate caching strategy to ensure that users always receive relevant and timely data. By placing cache servers close to your users, edge caching can significantly boost your application's performance and scalability.
+Implementing edge caching for dynamic content improves website performance and scalability, providing users with fast and responsive experiences even when dealing with frequently changing data.
