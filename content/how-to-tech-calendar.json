@@ -1205,14 +1205,15 @@
     "scheduledTime": "14:00",
     "title": "Optimizing SQL Queries (Even if You Use an ORM)",
     "slug": "optimizing-sql-queries-even-if-you-use-an-orm",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "sql",
       "optimizing",
       "queries"
-    ]
+    ],
+    "publishedAt": "2026-03-18T14:00:56.698Z"
   },
   {
     "id": "how-to-how-to-lazy-load-third-party-scripts-mar-19",
