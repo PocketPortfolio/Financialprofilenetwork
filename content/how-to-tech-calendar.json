@@ -1221,14 +1221,15 @@
     "scheduledTime": "14:00",
     "title": "How to Lazy Load Third-Party Scripts",
     "slug": "how-to-lazy-load-third-party-scripts",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "lazy",
       "load",
       "third"
-    ]
+    ],
+    "publishedAt": "2026-03-19T14:00:39.802Z"
   },
   {
     "id": "how-to-understanding-the-critical-rendering-path-mar-20",
