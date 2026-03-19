@@ -1,0 +1,61 @@
+---
+title: How to Lazy Load Third-Party Scripts
+date: '2026-03-19'
+description: Improve performance by lazy loading third-party scripts in web applications.
+tags:
+  - lazy load
+  - third-party scripts
+  - web performance
+author: Pocket Portfolio Team
+image: /images/blog/how-to-lazy-load-third-party-scripts.png
+pillar: Performance Optimization
+category: how-to-in-tech
+---
+
+## Problem
+
+Loading third-party scripts eagerly can lead to performance bottlenecks in web applications. These scripts might be large or loaded from external servers, causing delays in page rendering and negatively impacting user experience. To enhance performance, scripts should be loaded only when necessary—this is where lazy loading comes into play.
+
+## Solution with Code
+
+Lazy loading third-party scripts can be efficiently handled using JavaScript. The goal is to defer the loading of these scripts until they are needed, typically when a user interacts with a specific feature on the webpage.
+
+Below is a basic example of how to implement lazy loading for a third-party script:
+
+```javascript
+function loadScript(src, callback) {
+  const script = document.createElement('script');
+  script.src = src;
+  script.async = true;
+
+  script.onload = () => {
+    if (callback) callback();
+  };
+
+  document.body.appendChild(script);
+}
+
+// Example usage: Lazy load Google Analytics script
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.getElementById('loadAnalytics');
+
+  button.addEventListener('click', () => {
+    loadScript('https://www.google-analytics.com/analytics.js', () => {
+      console.log('Google Analytics script loaded.');
+      // Initialize Google Analytics here
+    });
+  });
+});
+```
+
+In this example, the `loadScript` function creates a new `<script>` element with the `async` attribute, ensuring the script is loaded asynchronously. The function accepts two parameters: the source URL of the script and a callback function to execute once the script has loaded successfully. The script is appended to the document body, and the loading is triggered by a button click event, demonstrating lazy loading.
+
+## Key Concepts
+
+- **Lazy Loading**: The practice of loading resources only when they are needed, rather than at the initial loading of the application. This reduces initial load time and improves performance.
+  
+- **Asynchronous Loading**: By using the `async` attribute, scripts are loaded in parallel with other resources, minimizing delays in rendering.
+
+- **Event-driven Loading**: Scripts are loaded in response to specific user interactions (e.g., button clicks), ensuring that they are only loaded when necessary.
+
+By implementing lazy loading, you can significantly improve the performance of your web applications, leading to faster load times and a better user experience. This approach is particularly beneficial for sites with numerous third-party scripts that may not be required on initial page load.
