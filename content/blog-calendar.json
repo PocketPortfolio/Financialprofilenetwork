@@ -544,7 +544,7 @@
     "date": "2026-03-19",
     "title": "The Local-First Movement: Finance's Next Evolution",
     "slug": "the-local-first-movement-finance-s-next-evolution",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -554,7 +554,8 @@
       "local-first"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-19T09:01:23.905Z"
   },
   {
     "id": "week-12-post-1",
