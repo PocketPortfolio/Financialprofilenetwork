@@ -1237,14 +1237,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding the \"Critical Rendering Path\"",
     "slug": "understanding-the-critical-rendering-path",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "critical",
       "rendering"
-    ]
+    ],
+    "publishedAt": "2026-03-20T14:01:12.038Z"
   },
   {
     "id": "how-to-how-to-use-dns-prefetch-for-external-apis-mar-21",
