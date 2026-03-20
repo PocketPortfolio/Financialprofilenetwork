@@ -1248,7 +1248,7 @@
     "scheduledTime": "18:00",
     "title": "Research: DDoS Mitigation Performance - Cloudflare vs AWS Shield",
     "slug": "research-ddos-mitigation-performance-cloudflare-vs-aws-shield-2026-03-20",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1256,7 +1256,8 @@
       "cloud",
       "ddos",
       "mitigation"
-    ]
+    ],
+    "publishedAt": "2026-03-20T18:00:41.528Z"
   },
   {
     "id": "research-waf-performance-overhead-security-vs-speed-2026-03-21",
