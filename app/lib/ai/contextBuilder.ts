@@ -1,6 +1,10 @@
 /**
  * Portfolio context builder for Pocket Analyst (Ask AI).
- * Produces a sanitized, minimal summary for the LLM—no PII, only aggregates and ticker-level stats.
+ *
+ * Deterministic pure function: converts trades + positions into a fixed-schema
+ * aggregate string only (totals + top-N holdings). No raw ledger rows, no PII,
+ * no account identifiers—sanitization by construction. Output is safe to send
+ * as the sole portfolio context to the stateless inference API.
  */
 
 import type { Position, Trade } from '../utils/portfolioCalculations';

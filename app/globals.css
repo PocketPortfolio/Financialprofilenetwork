@@ -2,6 +2,7 @@
 
 /* ROLLBACK: Tailwind CSS v4 import disabled to prevent style conflicts with production dashboard */
 /* @import "tailwindcss"; */
+/* Note: Tailwind utilities in arbitrary .tsx files will NOT compile. Use CSS Modules or inline styles (e.g. app/playbooks/sovereign-strike/SovereignStrikeMatrix.module.css). */
 
 /* Sovereign V2 - Terminal Aesthetic */
 .font-mono {

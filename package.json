@@ -27,6 +27,7 @@
     "e2e:headed": "playwright test --headed",
     "e2e:ui": "playwright test --ui",
     "csv:validate": "node scripts/validate-csv.js",
+    "gen:playbook-secret": "node scripts/generate-playbook-secret.js",
     "book:carousel": "node scripts/build-sovereign-launch-carousel.js",
     "firebase:rules:test": "firebase emulators:exec --only firestore \"npm run test:rules\"",
     "precommit": "npm run lint && npm run typecheck && npm run test",

@@ -1,3 +1,10 @@
+/**
+ * POST /api/ai/chat — Pocket Analyst inference.
+ *
+ * Stateless: request payload (message, context, attachedContent) is used only
+ * to build the LLM prompt and stream the response. No database write or cache
+ * of the payload; only analytics/quota metadata are persisted. See docs/IP-TECHNICAL-MECHANISMS.md.
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';

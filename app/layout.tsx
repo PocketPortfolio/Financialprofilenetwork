@@ -172,9 +172,18 @@ export default function RootLayout({
             <GlobalFoundersClubBanner />
             <LandingPageTracker />
             <div className="safe-area-all" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-              <ErrorBoundary scope="main-content">
-                {children}
-              </ErrorBoundary>
+              {/* flex-1 + minHeight 0 keeps bottom TabBar/footer in view when pages use full viewport height */}
+              <div
+                style={{
+                  flex: '1 1 auto',
+                  minHeight: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%',
+                }}
+              >
+                <ErrorBoundary scope="main-content">{children}</ErrorBoundary>
+              </div>
               <ErrorBoundary scope="tab-bar">
                 <TabBar />
               </ErrorBoundary>

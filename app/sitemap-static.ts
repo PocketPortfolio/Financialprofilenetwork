@@ -198,7 +198,13 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
-    // ✅ Technical Press: Books (SEO, AEO, GEO)
+    // ✅ Technical Press: Books index + titles (SEO, AEO, GEO)
+    {
+      url: `${baseUrl}/book`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.88,
+    },
     {
       url: `${baseUrl}/book/universal-llm-import`,
       lastModified: now,

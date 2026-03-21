@@ -1,3 +1,15 @@
+/**
+ * POST /api/ai/map-csv — CSV column mapping for universal import.
+ *
+ * Contract: accepts { headers: string[], sampleRows?: Record<string,string>[] }.
+ * Returns { mapping: Record<string, string> } (header name → standard field).
+ *
+ * Implementation note: This route currently performs heuristic mapping only
+ * (synonym-based match on headers). The API and request/response contract are
+ * designed for optional LLM-based mapping when ENABLE_LLM_IMPORT is true
+ * (constructive reduction to practice). Client sends at most headers + a small
+ * sample of rows; full CSV never leaves the client. See docs/IP-TECHNICAL-MECHANISMS.md.
+ */
 import { NextResponse } from 'next/server';
 
 const ENABLE_LLM_IMPORT = process.env.ENABLE_LLM_IMPORT === 'true';
