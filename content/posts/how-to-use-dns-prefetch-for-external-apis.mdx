@@ -1,0 +1,59 @@
+---
+title: How to Use dns-prefetch for External APIs
+date: '2026-03-21'
+description: >-
+  Enhance your web application's performance by using dns-prefetch for external
+  API calls.
+tags:
+  - api
+  - fetch
+  - dns
+  - prefetch
+  - performance
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-dns-prefetch-for-external-apis.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+When your web application makes requests to external APIs, DNS resolution can introduce latency, impacting the overall performance. This latency occurs because the browser needs to resolve the domain name to an IP address before it can initiate the network request. This process can slow down the loading time of your application, especially when dealing with multiple external resources.
+
+## Solution with Code
+
+To mitigate this issue, you can leverage the `dns-prefetch` hint, allowing the browser to resolve domain names ahead of time, thus reducing the DNS resolution time when the actual request is made.
+
+### Step-by-step Implementation
+
+1. **Add `dns-prefetch` Link in HTML Head:**
+
+   Incorporate the following `<link>` element in the `<head>` section of your HTML document. This informs the browser to perform DNS prefetching for the specified domain:
+
+   ```html
+   <head>
+     <!-- DNS Prefetch for External API -->
+     <link rel="dns-prefetch" href="//api.example.com">
+   </head>
+   ```
+
+   Replace `api.example.com` with the actual domain of your external API.
+
+2. **Verify Prefetching:**
+
+   To ensure that DNS prefetching is working, you can use browser developer tools:
+
+   - Open Developer Tools in your browser.
+   - Navigate to the "Network" tab.
+   - Refresh the page and observe the network requests.
+   - Look for the domains in the DNS column to confirm that prefetching has occurred.
+
+## Key Concepts
+
+- **DNS Prefetching:** This is a browser mechanism that resolves domain names in advance of their actual usage, reducing latency for future requests.
+
+- **Link Rel Attribute:** The `rel` attribute in the `<link>` tag with the value `dns-prefetch` is a hint to the browser to start resolving the specified domain name before it is needed.
+
+- **Performance Optimization:** Using DNS prefetching can significantly enhance the perceived performance of web applications by reducing wait times for external API requests.
+
+By implementing `dns-prefetch`, you proactively optimize your application's performance, ensuring that DNS resolution does not become a bottleneck during critical API requests. This simple enhancement can lead to noticeable improvements in loading speeds, particularly for applications that rely heavily on external APIs. Always remember to test the impact of such optimizations in your specific application environment to ensure they provide the desired benefits.
