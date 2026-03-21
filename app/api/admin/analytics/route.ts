@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { getArchitectureChallengeLeadsAnalytics } from '@/lib/challenge/challenge-leads-firestore';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
@@ -192,6 +193,21 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    // Architecture Challenge (/challenge) — CTO funnel emails (Firestore)
+    let architectureChallengeLeads: Awaited<ReturnType<typeof getArchitectureChallengeLeadsAnalytics>>;
+    try {
+      console.log('[Analytics API] 🎯 Fetching architecture challenge leads...');
+      architectureChallengeLeads = await getArchitectureChallengeLeadsAnalytics(startDate);
+    } catch (e: any) {
+      console.error('[Analytics API] 🎯 Architecture challenge leads failed:', e?.message);
+      architectureChallengeLeads = {
+        total: 0,
+        last7Days: 0,
+        signups: [],
+        error: e?.message,
+      };
+    }
+
     return NextResponse.json({
       monetization,
       toolUsage,
@@ -202,6 +218,7 @@ export async function GET(request: NextRequest) {
       googleSignups,
       referral,
       conversionFunnel,
+      architectureChallengeLeads,
       timeRange: range,
       lastUpdated: new Date().toISOString()
     });

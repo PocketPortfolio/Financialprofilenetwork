@@ -1,0 +1,76 @@
+/* Public challenge — email capture on victory (SovereignStrikeMatrix.module.css for rest) */
+.emailForm {
+  margin-top: 1.5rem;
+  text-align: left;
+  max-width: 22rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.emailLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.emailInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #020617;
+  color: #f1f5f9;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.emailInput:focus {
+  outline: 2px solid var(--accent-warm, #f59e0b);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+
+.emailSubmit {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  background: var(--accent-warm, #f59e0b);
+  color: #0f172a;
+}
+
+.emailSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.emailFinePrint {
+  font-size: 0.6875rem;
+  color: #64748b;
+  line-height: 1.45;
+  margin-top: 0.75rem;
+}
+
+.emailSuccess {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+  font-size: 0.875rem;
+}
+
+.emailError {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  color: #f87171;
+}

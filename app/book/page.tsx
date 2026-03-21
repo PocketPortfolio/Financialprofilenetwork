@@ -154,6 +154,61 @@ export default function BookIndexPage() {
                 marginBottom: '1rem',
               }}
             >
+              Public architecture challenge
+            </h2>
+            <Link
+              href="/challenge"
+              style={{
+                display: 'block',
+                borderRadius: '0.75rem',
+                border: '1px solid var(--border)',
+                padding: '1.5rem',
+                background: 'var(--surface-elevated)',
+                color: 'var(--text)',
+                textDecoration: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                marginBottom: '1.5rem',
+              }}
+            >
+              <h3 style={{ fontSize: 'clamp(1.125rem, 2.5vw, 1.35rem)', fontWeight: 700 }}>
+                Zero-Trust Architecture Challenge
+              </h3>
+              <p style={{ marginTop: '0.35rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--accent-warm)' }}>
+                For CTOs &amp; lead engineers
+              </p>
+              <p
+                style={{
+                  marginTop: '1rem',
+                  fontSize: '0.9375rem',
+                  lineHeight: 1.6,
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                Three levels: truncated CSV ingest, fixed-schema aggregates vs. cloud RAG, and stateless inference.
+                Finish to unlock email with technical reading and join links.
+              </p>
+              <span
+                style={{
+                  marginTop: '1.25rem',
+                  display: 'inline-flex',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  color: 'var(--accent-warm)',
+                }}
+              >
+                Start challenge →
+              </span>
+            </Link>
+            <h2
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.15em',
+                color: 'var(--text-secondary)',
+                marginBottom: '1rem',
+              }}
+            >
               Sales enablement
             </h2>
             <Link

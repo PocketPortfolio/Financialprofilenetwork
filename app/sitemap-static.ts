@@ -205,6 +205,13 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.88,
     },
+    // Public lead magnet: Zero-Trust Architecture Challenge (LinkedIn / CTO funnel)
+    {
+      url: `${baseUrl}/challenge`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.92,
+    },
     {
       url: `${baseUrl}/book/universal-llm-import`,
       lastModified: now,
