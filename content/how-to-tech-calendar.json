@@ -1271,7 +1271,7 @@
     "scheduledTime": "14:00",
     "title": "CSS Containment: Improving Rendering Performance",
     "slug": "css-containment-improving-rendering-performance",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1279,7 +1279,8 @@
       "css",
       "containment",
       "improving"
-    ]
+    ],
+    "publishedAt": "2026-03-22T14:00:42.144Z"
   },
   {
     "id": "how-to-how-to-compress-text-responses-brotli-vs-gzip-mar-23",
