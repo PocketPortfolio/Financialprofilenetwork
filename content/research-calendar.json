@@ -1282,7 +1282,7 @@
     "scheduledTime": "18:00",
     "title": "Research: SSL/TLS Handshake Performance - Protocol Comparison",
     "slug": "research-ssl-tls-handshake-performance-protocol-comparison-2026-03-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1290,7 +1290,8 @@
       "ssl",
       "tls",
       "handshake"
-    ]
+    ],
+    "publishedAt": "2026-03-22T18:00:48.200Z"
   },
   {
     "id": "research-certificate-rotation-zero-downtime-strategies-2026-03-23",
