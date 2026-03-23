@@ -1288,7 +1288,7 @@
     "scheduledTime": "14:00",
     "title": "How to Compress Text Responses (Brotli vs Gzip)",
     "slug": "how-to-compress-text-responses-brotli-vs-gzip",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1296,7 +1296,8 @@
       "compress",
       "text",
       "responses"
-    ]
+    ],
+    "publishedAt": "2026-03-23T14:01:01.372Z"
   },
   {
     "id": "how-to-optimizing-svg-icons-for-the-web-mar-24",
