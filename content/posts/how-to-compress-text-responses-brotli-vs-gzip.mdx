@@ -3,35 +3,38 @@ title: How to Compress Text Responses (Brotli vs Gzip)
 date: '2026-03-23'
 description: >-
   Learn how to efficiently compress text responses using Brotli and Gzip to
-  optimize performance and reduce bandwidth in your applications.
+  optimize your web applications.
 tags:
-  - ses
-  - compress
-  - text
-  - responses
+  - compression
+  - Brotli
+  - Gzip
+  - text responses
+  - web development
 author: Pocket Portfolio Team
 image: /images/blog/how-to-compress-text-responses-brotli-vs-gzip.png
 pillar: Technology
 category: how-to-in-tech
 ---
 
+When building web applications, optimizing the transmission of data between server and client is crucial for performance. Text responses can be compressed to reduce bandwidth usage and improve load times. Two popular compression algorithms are **Brotli** and **Gzip**. Understanding how to implement these can significantly enhance your application's efficiency.
+
 ## Problem
 
-When serving text-based responses from web servers, such as HTML, CSS, or JSON, uncompressed data can lead to higher bandwidth consumption and slower loading times. This issue is critical when dealing with a large number of requests, as it can degrade user experience and increase costs. 
+Web applications often send large amounts of text data, such as HTML, CSS, and JSON, which can slow down response times and increase bandwidth costs if not compressed. Choosing the right compression algorithm can minimize these issues.
 
 ## Solution with Code
 
-To address this, you can compress text responses using Brotli or Gzip, two widely-used compression algorithms. Brotli typically offers better compression rates compared to Gzip, but Gzip is more universally supported across browsers and older systems. Below is a step-by-step guide to implement both methods using Node.js and the `express` framework.
+Both Brotli and Gzip can be implemented in Node.js applications using middleware. Here's how you can set it up using the Express framework:
 
-### Using Gzip
+### Install Dependencies
 
-First, ensure you have the required packages:
+First, ensure you have the necessary packages:
 
 ```bash
-npm install express compression
+npm install express compression zlib
 ```
 
-Then, set up Gzip compression in your `express` app:
+### Implement Gzip Compression
 
 ```javascript
 const express = require('express');
@@ -40,10 +43,10 @@ const compression = require('compression');
 const app = express();
 
 // Enable Gzip compression
-app.use(compression());
+app.use(compression({ level: 6 })); // Default compression level
 
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Hello World!');
 });
 
 app.listen(3000, () => {
@@ -51,31 +54,35 @@ app.listen(3000, () => {
 });
 ```
 
-### Using Brotli
+### Implement Brotli Compression
 
-For Brotli, you may need a different middleware, `express-static-gzip`:
-
-```bash
-npm install express-static-gzip
-```
-
-Integrate Brotli compression as follows:
+For Brotli, you need to use the `zlib` module:
 
 ```javascript
 const express = require('express');
-const { createBrotliCompress } = require('zlib');
-const expressStaticGzip = require('express-static-gzip');
+const zlib = require('zlib');
 
 const app = express();
 
-// Serve Brotli compressed files
-app.use('/', expressStaticGzip('public', {
-  enableBrotli: true,
-  orderPreference: ['br', 'gz'],
-}));
+// Custom middleware for Brotli compression
+app.use((req, res, next) => {
+  const _send = res.send;
+  res.send = function (body) {
+    if (req.headers['accept-encoding'] && req.headers['accept-encoding'].includes('br')) {
+      zlib.brotliCompress(body, (err, result) => {
+        if (err) return next(err);
+        res.set('Content-Encoding', 'br');
+        _send.call(this, result);
+      });
+    } else {
+      _send.call(this, body);
+    }
+  };
+  next();
+});
 
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Hello World!');
 });
 
 app.listen(3000, () => {
@@ -85,10 +92,10 @@ app.listen(3000, () => {
 
 ## Key Concepts
 
-- **Compression Algorithms**: Both Brotli and Gzip compress text to reduce size. Brotli is advantageous for higher compression rates, while Gzip is more compatible with older systems.
+- **Compression Level**: Gzip allows for different compression levels from 0 to 9, where 6 is a good balance between speed and compression ratio. Brotli also offers different levels, providing even better compression at the cost of speed.
   
-- **Middleware Integration**: Compression is implemented in Node.js using middleware, which automatically compresses responses based on client support.
+- **Content-Encoding Header**: Ensure the response headers correctly reflect the compression type with `Content-Encoding: gzip` or `Content-Encoding: br` for Brotli.
 
-- **Performance Impact**: Compressed responses are smaller, which can lead to faster load times and reduced bandwidth usage, significantly improving user experience.
+- **Client Compatibility**: Verify that the client's browser supports Brotli as not all might, though most modern browsers do.
 
-In conclusion, choosing between Brotli and Gzip depends on your specific needs, such as browser support and desired compression efficiency. Implementing either can lead to substantial performance gains for your applications.
+By choosing the appropriate compression algorithm based on your needs, you can significantly enhance the performance and efficiency of your web applications. Brotli generally offers better compression ratios, particularly for text, while Gzip is faster and more universally supported. Always profile and test to ensure the best choice for your specific scenario.
