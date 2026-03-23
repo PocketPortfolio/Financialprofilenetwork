@@ -932,6 +932,7 @@ async function getNPMData() {
         try {
           let last7Days = 0;
           let monthlyDownloads = 0;
+          let allTimeDownloads = 0;
           let version = 'unknown';
 
           // Fetch last 7 days downloads with retry
@@ -1000,6 +1001,30 @@ async function getNPMData() {
             console.warn(`Error fetching monthly stats for ${packageName}:`, error.message);
           }
 
+          // Fetch all-time downloads (from npm stats epoch to today)
+          try {
+            const endDate = new Date();
+            const allTimeStartDate = new Date('2010-01-01');
+            const startDateStr = allTimeStartDate.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+
+            const allTimeResponse = await fetchWithRetry(
+              `https://api.npmjs.org/downloads/point/${startDateStr}:${endDateStr}/${encodeURIComponent(packageName)}`,
+              {
+                headers: { 'Accept': 'application/json' },
+              },
+              3,
+              1000
+            );
+
+            if (allTimeResponse.ok) {
+              const allTimeData = await allTimeResponse.json();
+              allTimeDownloads = allTimeData.downloads || 0;
+            }
+          } catch (error: any) {
+            console.warn(`Error fetching all-time stats for ${packageName}:`, error.message);
+          }
+
           // Fetch package metadata for version info with retry
           try {
             const metaResponse = await fetchWithRetry(
@@ -1024,6 +1049,7 @@ async function getNPMData() {
             version,
             monthlyDownloads,
             last7Days,
+            allTimeDownloads,
             error: false,
           };
         } catch (error: any) {
@@ -1033,6 +1059,7 @@ async function getNPMData() {
             version: 'unknown',
             monthlyDownloads: 0,
             last7Days: 0,
+            allTimeDownloads: 0,
             error: true,
           };
         }
@@ -1049,11 +1076,16 @@ async function getNPMData() {
       (sum, pkg) => sum + pkg.last7Days,
       0
     );
+    const totalAllTimeDownloads = packageStats.reduce(
+      (sum, pkg) => sum + pkg.allTimeDownloads,
+      0
+    );
 
     // Log totals for debugging
     console.log('📊 NPM Stats Summary:', {
       totalMonthlyDownloads,
       totalLast7Days,
+      totalAllTimeDownloads,
       packageCount: packageStats.length,
       packagesWithMonthlyData: packageStats.filter(p => p.monthlyDownloads > 0).length,
       packagesWithWeeklyData: packageStats.filter(p => p.last7Days > 0).length,
@@ -1068,6 +1100,7 @@ async function getNPMData() {
       packages: packageStats,
       totalMonthlyDownloads,
       totalLast7Days,
+      totalAllTimeDownloads,
       packageCount: packageStats.length,
     };
   } catch (error) {
@@ -1076,6 +1109,7 @@ async function getNPMData() {
       packages: [],
       totalMonthlyDownloads: 0,
       totalLast7Days: 0,
+      totalAllTimeDownloads: 0,
       packageCount: 0,
     };
   }

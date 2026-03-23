@@ -68,10 +68,12 @@ interface AnalyticsData {
       version: string;
       monthlyDownloads: number;
       last7Days: number;
+      allTimeDownloads?: number;
       error?: boolean;
     }>;
     totalMonthlyDownloads: number;
     totalLast7Days: number;
+    totalAllTimeDownloads: number;
     packageCount: number;
   };
   blogPosts: {
@@ -859,6 +861,11 @@ export default function AdminAnalyticsPage() {
               gap: 'var(--space-4)',
               marginBottom: 'var(--space-4)'
             }}>
+              <MetricCard
+                label="All Time"
+                value={analyticsData.npm.totalAllTimeDownloads.toLocaleString()}
+                subtitle="All packages combined"
+              />
               <MetricCard
                 label="This Month"
                 value={analyticsData.npm.totalMonthlyDownloads.toLocaleString()}

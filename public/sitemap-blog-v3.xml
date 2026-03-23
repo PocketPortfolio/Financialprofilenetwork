@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.pocketportfolio.app/blog</loc>
-    <lastmod>2026-03-21</lastmod>
+    <lastmod>2026-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -109,6 +109,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-analyze-your-network-waterfall</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/how-to-audit-your-github-repo-for-leaked-secrets</loc>
     <lastmod>2026-01-07</lastmod>
     <changefreq>weekly</changefreq>
@@ -183,6 +189,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/how-to-implement-virtual-scrolling-for-long-lists</loc>
     <lastmod>2026-03-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-lazy-load-third-party-scripts</loc>
+    <lastmod>2026-03-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -271,6 +283,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-use-dns-prefetch-for-external-apis</loc>
+    <lastmod>2026-03-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/how-to-use-edge-caching-for-dynamic-content</loc>
+    <lastmod>2026-03-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/how-to-use-github-actions-for-automated-linting</loc>
     <lastmod>2026-02-21</lastmod>
     <changefreq>weekly</changefreq>
@@ -355,6 +379,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/optimizing-sql-queries-even-if-you-use-an-orm</loc>
+    <lastmod>2026-03-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/pi-day-calculating-portfolio-mathematics-efficiently</loc>
     <lastmod>2026-03-14</lastmod>
     <changefreq>weekly</changefreq>
@@ -399,6 +429,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/reducing-bundle-size-finding-the-heavy-dependencies</loc>
     <lastmod>2026-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/reducing-ttfb-time-to-first-byte-on-serverless</loc>
+    <lastmod>2026-03-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -583,6 +619,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/research-data-archival-performance-hot-vs-cold-storage-2026-03-15</loc>
+    <lastmod>2026-03-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/research-data-ownership-models-centralized-vs-decentralized-2026-02-13</loc>
     <lastmod>2026-02-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -597,6 +639,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/research-database-backup-strategies-performance-impact-2026-03-14</loc>
     <lastmod>2026-03-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-database-connection-limits-scaling-strategies-2026-03-16</loc>
+    <lastmod>2026-03-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -621,6 +669,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/research-database-index-maintenance-performance-impact-2026-02-04</loc>
     <lastmod>2026-02-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-database-lock-contention-performance-impact-2026-03-18</loc>
+    <lastmod>2026-03-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -657,6 +711,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/research-database-sharding-strategies-performance-analysis-2026-03-12</loc>
     <lastmod>2026-03-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-ddos-mitigation-performance-cloudflare-vs-aws-shield-2026-03-20</loc>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -729,6 +789,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/research-financial-data-aggregation-api-rate-limits-analysis-2026-02-25</loc>
     <lastmod>2026-02-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-full-text-search-performance-postgresql-vs-elasticsearch-2026-03-19</loc>
+    <lastmod>2026-03-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -853,6 +919,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/research-query-optimization-techniques-execution-plan-analysis-2026-03-17</loc>
+    <lastmod>2026-03-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/research-read-replica-performance-consistency-vs-latency-2026-03-13</loc>
     <lastmod>2026-03-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -921,6 +993,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/research-time-series-database-performance-influxdb-vs-timescaledb-2026-03-10</loc>
     <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/research-waf-performance-overhead-security-vs-speed-2026-03-21</loc>
+    <lastmod>2026-03-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -1129,6 +1207,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.pocketportfolio.app/blog/the-impact-of-inflation-on-portfolio-returns</loc>
+    <lastmod>2026-03-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/the-local-first-movement-finance-s-next-evolution</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.pocketportfolio.app/blog/the-nvidia-problem-500-retail-portfolios-60-percent-dangerously-exposed</loc>
     <lastmod>2026-01-22</lastmod>
     <changefreq>weekly</changefreq>
@@ -1221,6 +1311,12 @@
   <url>
     <loc>https://www.pocketportfolio.app/blog/understanding-stale-while-revalidate-in-next-js</loc>
     <lastmod>2026-01-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.pocketportfolio.app/blog/understanding-the-critical-rendering-path</loc>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
