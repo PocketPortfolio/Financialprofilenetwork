@@ -18,8 +18,8 @@ export default function SocialProof({ className = '', variant = 'compact' }: Soc
     // Simulate loading stats (in production, fetch from API)
     // For now, use placeholder values
     setStats({
-      totalUsers: 2000, // Placeholder - would come from API
-      totalPortfolios: 1000, // Placeholder
+      totalUsers: 4000, // Placeholder - would come from API
+      totalPortfolios: 2000, // Placeholder
       recentActivity: [
         { action: 'New portfolio created', timestamp: new Date(Date.now() - 5 * 60000) },
         { action: 'Trades imported', timestamp: new Date(Date.now() - 15 * 60000) },
