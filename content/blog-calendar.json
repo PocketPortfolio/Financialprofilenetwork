@@ -562,7 +562,7 @@
     "date": "2026-03-23",
     "title": "Sovereign Sync: Security and Privacy Deep Dive",
     "slug": "sovereign-sync-security-and-privacy-deep-dive",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -572,7 +572,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-23T09:00:42.411Z"
   },
   {
     "id": "week-12-post-2",
