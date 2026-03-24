@@ -1315,14 +1315,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Security Scanning Performance - SAST vs DAST Overhead",
     "slug": "research-security-scanning-performance-sast-vs-dast-overhead-2026-03-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "security",
       "scanning"
-    ]
+    ],
+    "publishedAt": "2026-03-24T18:01:00.910Z"
   },
   {
     "id": "research-penetration-testing-performance-impact-analysis-2026-03-25",
