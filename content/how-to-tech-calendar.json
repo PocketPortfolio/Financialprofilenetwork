@@ -1305,14 +1305,15 @@
     "scheduledTime": "14:00",
     "title": "Optimizing SVG Icons for the Web",
     "slug": "optimizing-svg-icons-for-the-web",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "optimizing",
       "svg",
       "icons"
-    ]
+    ],
+    "publishedAt": "2026-03-24T14:01:09.086Z"
   },
   {
     "id": "how-to-how-to-use-the-performance-api-in-javascript-mar-25",
