@@ -1331,14 +1331,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Penetration Testing - Performance Impact Analysis",
     "slug": "research-penetration-testing-performance-impact-analysis-2026-03-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "penetration",
       "testing"
-    ]
+    ],
+    "publishedAt": "2026-03-25T18:00:51.219Z"
   },
   {
     "id": "research-compliance-audit-overhead-gdpr-vs-soc-2-2026-03-26",
