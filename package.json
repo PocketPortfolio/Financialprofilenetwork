@@ -43,6 +43,7 @@
     "stack-reveal:send-test": "ts-node --project scripts/tsconfig.json scripts/send-stack-reveal-test-emails.ts",
     "welcome-email:send-test": "ts-node --project scripts/tsconfig.json scripts/send-welcome-test-email.ts",
     "weekly-snapshot:send-test": "ts-node --project scripts/tsconfig.json scripts/send-weekly-snapshot-test-email.ts",
+    "sovereign-campaign:send-test": "ts-node --project scripts/tsconfig.json scripts/send-sovereign-challenge-campaign-test.ts",
     "grant-founders-club": "ts-node --project scripts/tsconfig.json scripts/grant-founders-club.ts",
     "verify-env": "ts-node --project scripts/tsconfig.json scripts/verify-env-setup.ts",
     "verify:logo-url": "node scripts/verify-production-logo.mjs",

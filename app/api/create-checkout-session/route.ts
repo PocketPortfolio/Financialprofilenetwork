@@ -27,8 +27,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { priceId, tierName, email } = await request.json();
-    console.log('🔄 Creating Stripe checkout session:', { priceId, tierName, email });
+    const body = await request.json();
+    const { priceId, tierName, email, utm_campaign } = body as {
+      priceId?: string;
+      tierName?: string;
+      email?: string;
+      utm_campaign?: string;
+    };
+    const utmCampaignMeta =
+      typeof utm_campaign === 'string' && utm_campaign.trim().length > 0
+        ? utm_campaign.trim().slice(0, 500)
+        : 'organic';
+    console.log('🔄 Creating Stripe checkout session:', { priceId, tierName, email, utm_campaign: utmCampaignMeta });
 
     if (!priceId || priceId.includes('XXXXX')) {
       return NextResponse.json(
@@ -73,10 +83,12 @@ export async function POST(request: NextRequest) {
         );
       }
       console.warn('⚠️ Could not fetch price from Stripe, falling back to tier name check:', priceError.message);
-      isOneTime = tierName?.toLowerCase().includes('donation') || 
-                  tierName?.toLowerCase().includes('one-time') ||
-                  tierName?.toLowerCase().includes('founder') ||
-                  tierName?.toLowerCase().includes('lifetime');
+      const tn = tierName?.toLowerCase() ?? '';
+      isOneTime =
+        tn.includes('donation') ||
+        tn.includes('one-time') ||
+        tn.includes('founder') ||
+        tn.includes('lifetime');
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.pocketportfolio.app';
@@ -95,6 +107,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         tierName: tierName || 'Unknown',
         email: email || '',
+        utm_campaign: utmCampaignMeta,
       },
     });
 

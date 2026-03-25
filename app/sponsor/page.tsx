@@ -1,8 +1,9 @@
 'use client';
 
 import { loadStripe } from '@stripe/stripe-js';
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import SponsorModal from '../components/SponsorModal';
 import AlertModal from '../components/modals/AlertModal';
@@ -47,7 +48,9 @@ const PRICE_IDS = {
   },
 };
 
-export default function SponsorPage() {
+function SponsorPageContent() {
+  const searchParams = useSearchParams();
+  const utmCampaign = searchParams.get('utm_campaign');
   const [loading, setLoading] = useState<string | null>(null);
   const [stripeStatus, setStripeStatus] = useState<'checking' | 'ready' | 'error'>('checking');
   const [isModalOpen, setModalOpen] = useState(false);
@@ -165,7 +168,12 @@ export default function SponsorPage() {
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: finalPriceId, tierName: selectedTier.tierName, email }),
+        body: JSON.stringify({
+          priceId: finalPriceId,
+          tierName: selectedTier.tierName,
+          email,
+          ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
+        }),
       });
 
       if (!response.ok) {
@@ -989,3 +997,25 @@ export default function SponsorPage() {
   );
 }
 
+export default function SponsorPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+          }}
+        >
+          Loading…
+        </div>
+      }
+    >
+      <SponsorPageContent />
+    </Suspense>
+  );
+}
