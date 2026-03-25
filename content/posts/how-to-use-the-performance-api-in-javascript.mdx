@@ -1,0 +1,81 @@
+---
+title: How to Use the Performance API in JavaScript
+date: '2026-03-25'
+description: >-
+  Learn how to utilize the Performance API in JavaScript to measure and optimize
+  application performance effectively.
+tags:
+  - api
+  - javascript
+  - performance
+  - ava
+  - use
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-the-performance-api-in-javascript.png
+pillar: Development
+category: how-to-in-tech
+---
+
+# Problem
+
+In modern web applications, performance is critical for user experience and retention. Developers often struggle with pinpointing performance bottlenecks in their JavaScript code. The Performance API, a part of the Web Performance specification, provides a standardized way to collect high-resolution performance metrics in web applications, helping developers identify and address performance issues.
+
+# Solution with Code
+
+The Performance API in JavaScript provides multiple methods and properties to measure various aspects of web performance. Let's explore how to use it to measure the execution time of a specific function.
+
+## Step 1: Marking the Start and End of a Measurement
+
+To measure the execution time, you can use the `performance.mark()` method to create timestamps.
+
+```javascript
+// Mark the start time
+performance.mark('start');
+
+// Execute the function you want to measure
+function processData() {
+  // Simulate a time-consuming process
+  for (let i = 0; i < 1000000; i++) {
+    // some operation
+  }
+}
+
+processData();
+
+// Mark the end time
+performance.mark('end');
+```
+
+## Step 2: Measuring the Duration
+
+After marking the start and end, use `performance.measure()` to calculate the duration between these marks.
+
+```javascript
+// Measure the duration between 'start' and 'end'
+performance.measure('processDataDuration', 'start', 'end');
+
+// Retrieve and log the measurement
+const measures = performance.getEntriesByName('processDataDuration');
+console.log(`Duration: ${measures[0].duration} milliseconds`);
+```
+
+## Step 3: Clearing Marks and Measures
+
+To avoid cluttering the performance entry buffer, it's good practice to clear the marks and measures once you've collected the data.
+
+```javascript
+// Clear specific marks and measures
+performance.clearMarks('start');
+performance.clearMarks('end');
+performance.clearMeasures('processDataDuration');
+```
+
+# Key Concepts
+
+- **Performance API**: A collection of interfaces providing methods and properties to measure various performance metrics.
+- **performance.mark(name)**: Creates a timestamp with the specified name.
+- **performance.measure(name, startMark, endMark)**: Records the duration between two marks.
+- **performance.getEntriesByName(name)**: Retrieves recorded performance entries by name.
+- **performance.clearMarks(name)** and **performance.clearMeasures(name)**: Clear specific marks and measures to free up resources.
+
+Using the Performance API, developers can gain insights into where their JavaScript code may be causing performance issues and make informed decisions on optimization strategies. The ability to measure precise durations allows for fine-tuning of web applications, leading to faster load times and a better user experience.
