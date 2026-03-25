@@ -1321,7 +1321,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use the Performance API in JavaScript",
     "slug": "how-to-use-the-performance-api-in-javascript",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1330,7 +1330,8 @@
       "performance",
       "ava",
       "use"
-    ]
+    ],
+    "publishedAt": "2026-03-25T14:00:44.494Z"
   },
   {
     "id": "how-to-reducing-layout-thrashing-in-dom-manipulations-mar-26",
