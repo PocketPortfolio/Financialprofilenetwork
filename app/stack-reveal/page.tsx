@@ -120,7 +120,7 @@ function StackRevealContent() {
               3. Founder's Club: stop paying monthly
             </h2>
             <p style={{ marginBottom: 'var(--space-3)', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
-              One lifetime unlock. No recurring fees—just the full stack (Universal Import, themes, API, Sovereign Sync) for good. We've capped spots so it stays meaningful.
+              Founder's Club is the paid membership that funds the mission and unlocks the full stack (Universal Import, themes, API, Sovereign Sync). We've capped spots so it stays meaningful.
             </p>
             <Link
               href={`/sponsor${utm}`}

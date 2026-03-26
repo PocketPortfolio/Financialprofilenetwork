@@ -139,7 +139,7 @@ export function buildWeek3Html(opts: {
     : '';
   const inner = `
     ${googleLine}
-    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Subscriptions add up. <strong>Founder's Club</strong> is different: one lifetime unlock. No monthly fees, no recurring decision—just the full stack (Universal Import, themes, API, Sovereign Sync) for good.</p>
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Subscriptions add up. <strong>Founder's Club</strong> is different: one membership that funds the mission and unlocks the full stack (Universal Import, themes, API, Sovereign Sync)—without selling your data.</p>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">It's the sovereign choice: own your tooling, stop renting. We've capped spots so it stays meaningful.</p>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Details and the full story are in the <a href="${PORTAL_URL}" style="color:${BRAND_LINK};text-decoration:underline;">Stack Reveal portal</a>.</p>
     ${ctaButton(SPONSOR_URL, 'Explore Founder\'s Club')}
@@ -153,7 +153,7 @@ export function buildWeek4Html(opts: {
 }): string {
   const inner = `
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">You've had four weeks of the story: broken data → Universal Import → local-first → Founder's Club. Your stack, your rules.</p>
-    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">If you're ready to lock in lifetime access or just want to keep exploring, everything is in one place: our <a href="${PORTAL_URL}" style="color:${BRAND_LINK};text-decoration:underline;">Stack Reveal portal</a>. We'll keep adding guides and product updates there.</p>
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">If you're ready to upgrade or just want to keep exploring, everything is in one place: our <a href="${PORTAL_URL}" style="color:${BRAND_LINK};text-decoration:underline;">Stack Reveal portal</a>. We'll keep adding guides and product updates there.</p>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Thanks for being part of Pocket Portfolio.</p>
     ${ctaButton(PORTAL_URL, 'Open the portal')}
   `;

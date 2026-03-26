@@ -157,7 +157,7 @@ export default function OnboardingTour() {
           element: foundersClubBanner as HTMLElement,
           popover: {
             title: '✨ Unlock Premium Sovereign Themes',
-            description: 'Join the Founder\'s Club to unlock exclusive premium themes (Gold & Corporate), Google Drive sync, lifetime API access, and support the project. Limited spots available!',
+            description: 'Join the Founder\'s Club to unlock exclusive premium themes (Gold & Corporate), Google Drive sync, expanded API access, and support the project. Limited spots available!',
             side: 'bottom' as const,
             align: 'center' as const,
           },
@@ -168,7 +168,7 @@ export default function OnboardingTour() {
           element: foundersClubLink as HTMLElement,
           popover: {
             title: '✨ Unlock Premium Sovereign Themes',
-            description: 'Join the Founder\'s Club to unlock exclusive premium themes (Gold & Corporate), Google Drive sync, lifetime API access, and support the project.',
+            description: 'Join the Founder\'s Club to unlock exclusive premium themes (Gold & Corporate), Google Drive sync, expanded API access, and support the project.',
             side: 'bottom' as const,
             align: 'center' as const,
           },
