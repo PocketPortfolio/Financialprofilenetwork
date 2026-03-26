@@ -1347,7 +1347,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Compliance Audit Overhead - GDPR vs SOC 2",
     "slug": "research-compliance-audit-overhead-gdpr-vs-soc-2-2026-03-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1355,7 +1355,8 @@
       "compliance",
       "audit",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-03-26T18:00:39.962Z"
   },
   {
     "id": "research-identity-provider-performance-auth0-vs-okta-vs-cognito-2026-03-27",
