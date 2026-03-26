@@ -1,56 +1,76 @@
 ---
 title: Reducing Layout Thrashing in DOM Manipulations
 date: '2026-03-26'
-description: >-
-  Learn how to reduce layout thrashing in your web applications to improve
-  performance and user experience.
+description: A guide to minimize layout thrashing for efficient DOM manipulations.
 tags:
   - DOM
-  - Performance
-  - Layout Thrashing
-  - Web Development
+  - layout thrashing
+  - performance optimization
 author: Pocket Portfolio Team
 image: /images/blog/reducing-layout-thrashing-in-dom-manipulations.png
 pillar: Engineering
 category: how-to-in-tech
 ---
 
-# Reducing Layout Thrashing in DOM Manipulations
+## Understanding the Problem: Layout Thrashing
 
-## Problem
+Layout thrashing occurs when JavaScript forces the browser to recalculate the layout multiple times during a script execution. This can significantly degrade the performance of web applications, especially those with frequent DOM manipulations. It happens when DOM reads and writes are interleaved, causing the browser to recalculate styles and layout repeatedly, leading to janky animations and slow response times.
 
-Layout thrashing occurs when the browser recalculates the layout of a webpage multiple times unnecessarily during DOM manipulations. This can lead to performance issues, especially in complex web applications, as it forces the browser to perform costly reflows. These reflows can cause jankiness and a poor user experience.
+## Solution: Batch DOM Reads and Writes
 
-## Solution with Code
+The key to mitigating layout thrashing is to separate DOM reads from writes. By batching read operations and write operations, you can reduce the number of layout recalculations.
 
-To reduce layout thrashing, you can batch your DOM reads and writes. This minimizes the number of reflows by ensuring that all necessary style calculations are performed before the DOM is updated.
+### Step-by-Step Solution with Code
 
-Here's a code example demonstrating this approach:
+Here's a guide to reduce layout thrashing:
 
-```javascript
-function updateDOM(elements) {
-  // Batch read operations
-  const heights = elements.map(el => el.offsetHeight);
+1. **Batch DOM Reads:**
+
+   First, gather all necessary DOM measurements before making any changes to the DOM.
+
+   ```javascript
+   // Batch DOM reads
+   const element = document.getElementById('myElement');
+   const width = element.offsetWidth;
+   const height = element.offsetHeight;
+   const position = element.getBoundingClientRect();
+   ```
+
+2. **Batch DOM Writes:**
+
+   After gathering all the necessary measurements, perform all the writes.
+
+   ```javascript
+   // Batch DOM writes
+   element.style.width = width + 'px';
+   element.style.height = height + 'px';
+   element.style.transform = `translate(${position.left}px, ${position.top}px)`;
+   ```
+
+3. **Use requestAnimationFrame:**
+
+   For operations that need to be synchronized with the browser's repaint cycle, use `requestAnimationFrame`.
+
+   ```javascript
+   function updateDOM() {
+     // Read
+     const width = element.offsetWidth;
+
+     // Write
+     requestAnimationFrame(() => {
+       element.style.width = width + 'px';
+     });
+   }
+
+   updateDOM();
+   ```
+
+### Key Concepts
+
+- **Layout Thrashing:** This occurs when a script repeatedly reads and writes to the DOM in a way that forces the browser to recalculate the layout multiple times.
   
-  // Batch write operations
-  elements.forEach((el, index) => {
-    el.style.height = `${heights[index] * 2}px`;
-  });
-}
+- **Batching:** Grouping similar operations together reduces the number of times the browser recalculates layout, improving performance.
 
-// Example usage with a collection of DOM elements
-const elements = document.querySelectorAll('.resize-me');
-updateDOM(elements);
-```
+- **requestAnimationFrame:** This method allows you to optimize animations and DOM manipulations by syncing them with the browser's rendering loop, reducing unnecessary recalculations.
 
-In the above code, all DOM reads are performed first (reading `offsetHeight`), followed by all DOM writes (updating `style.height`). This method reduces the number of layout recalculations to one rather than multiple times as each element is manipulated.
-
-## Key Concepts
-
-- **Layout Thrashing**: This is when excessive reflows occur because of alternating DOM reads and writes. Each read could cause the browser to recompute the layout and style information, which is resource-intensive.
-  
-- **Reflow**: A reflow is the process by which the browser calculates the position and size of elements on a web page. It’s a performance bottleneck when triggered frequently in rapid succession.
-  
-- **Batching Reads and Writes**: By grouping all read operations together and then all write operations together, you minimize reflows. This is because the browser can calculate the styles once, perform necessary reflows, and then apply all writes without additional recalculations.
-
-Reducing layout thrashing is essential for creating smooth and efficient web applications. By understanding and applying the concept of batching DOM reads and writes, developers can significantly improve the performance and responsiveness of their web pages. Always aim to manipulate the DOM efficiently and avoid unnecessary back-and-forth reads and writes to optimize user experience.
+By carefully managing when and how often the layout is recalculated, you can significantly improve the performance of web applications. Reducing layout thrashing is crucial for creating smooth and responsive user experiences.
