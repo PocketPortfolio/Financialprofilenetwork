@@ -580,7 +580,7 @@
     "date": "2026-03-26",
     "title": "Building Resilient Sync: Handling Network Failures",
     "slug": "building-resilient-sync-handling-network-failures",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -590,7 +590,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-26T09:01:13.548Z"
   },
   {
     "id": "week-13-post-1",
