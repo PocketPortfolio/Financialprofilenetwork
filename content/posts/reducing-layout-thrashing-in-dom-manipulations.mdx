@@ -1,0 +1,56 @@
+---
+title: Reducing Layout Thrashing in DOM Manipulations
+date: '2026-03-26'
+description: >-
+  Learn how to reduce layout thrashing in your web applications to improve
+  performance and user experience.
+tags:
+  - DOM
+  - Performance
+  - Layout Thrashing
+  - Web Development
+author: Pocket Portfolio Team
+image: /images/blog/reducing-layout-thrashing-in-dom-manipulations.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+# Reducing Layout Thrashing in DOM Manipulations
+
+## Problem
+
+Layout thrashing occurs when the browser recalculates the layout of a webpage multiple times unnecessarily during DOM manipulations. This can lead to performance issues, especially in complex web applications, as it forces the browser to perform costly reflows. These reflows can cause jankiness and a poor user experience.
+
+## Solution with Code
+
+To reduce layout thrashing, you can batch your DOM reads and writes. This minimizes the number of reflows by ensuring that all necessary style calculations are performed before the DOM is updated.
+
+Here's a code example demonstrating this approach:
+
+```javascript
+function updateDOM(elements) {
+  // Batch read operations
+  const heights = elements.map(el => el.offsetHeight);
+  
+  // Batch write operations
+  elements.forEach((el, index) => {
+    el.style.height = `${heights[index] * 2}px`;
+  });
+}
+
+// Example usage with a collection of DOM elements
+const elements = document.querySelectorAll('.resize-me');
+updateDOM(elements);
+```
+
+In the above code, all DOM reads are performed first (reading `offsetHeight`), followed by all DOM writes (updating `style.height`). This method reduces the number of layout recalculations to one rather than multiple times as each element is manipulated.
+
+## Key Concepts
+
+- **Layout Thrashing**: This is when excessive reflows occur because of alternating DOM reads and writes. Each read could cause the browser to recompute the layout and style information, which is resource-intensive.
+  
+- **Reflow**: A reflow is the process by which the browser calculates the position and size of elements on a web page. It’s a performance bottleneck when triggered frequently in rapid succession.
+  
+- **Batching Reads and Writes**: By grouping all read operations together and then all write operations together, you minimize reflows. This is because the browser can calculate the styles once, perform necessary reflows, and then apply all writes without additional recalculations.
+
+Reducing layout thrashing is essential for creating smooth and efficient web applications. By understanding and applying the concept of batching DOM reads and writes, developers can significantly improve the performance and responsiveness of their web pages. Always aim to manipulate the DOM efficiently and avoid unnecessary back-and-forth reads and writes to optimize user experience.
