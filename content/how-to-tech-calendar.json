@@ -1339,14 +1339,15 @@
     "scheduledTime": "14:00",
     "title": "Reducing Layout Thrashing in DOM Manipulations",
     "slug": "reducing-layout-thrashing-in-dom-manipulations",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "reducing",
       "layout",
       "thrashing"
-    ]
+    ],
+    "publishedAt": "2026-03-26T14:00:36.836Z"
   },
   {
     "id": "how-to-how-to-optimize-your-package-json-dependencies-mar-27",
