@@ -6,6 +6,7 @@ import { calculatePortfolioBeta, groupBySector, generateRebalancingPlan } from '
 import { fetchAssetProfiles } from '../../services/enrichmentService';
 import { Trade } from '../../services/tradeService';
 import { Position } from '../../lib/utils/portfolioCalculations';
+import { isPaidTier } from '@/app/lib/tier';
 
 // Brand-safe chart palette (no generic fintech blues)
 const COLORS = [
@@ -31,7 +32,7 @@ export function AnalyticsDashboard({ trades, positions, tier, betaOverride = nul
   const [chartWidth, setChartWidth] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const chartContainerRef = React.useRef<HTMLDivElement>(null);
-  const isPremium = tier === 'foundersClub' || tier === 'corporateSponsor';
+  const isPremium = isPaidTier(tier);
 
   // 1. Aggregation Logic - Convert positions to holdings format
   const holdings = useMemo(() => {

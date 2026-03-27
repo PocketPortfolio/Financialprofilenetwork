@@ -17,6 +17,7 @@ import { usePortfolioStore } from '../lib/store/portfolioStore';
 import { usePortfolioHistory } from '../hooks/usePortfolioHistory';
 import { calculatePortfolioAnalytics } from '../lib/portfolio/analytics';
 import type { PortfolioSnapshot } from '@/app/lib/portfolio/types';
+import { isPaidTier } from '@/app/lib/tier';
 import { saveDailySnapshot } from '../lib/portfolio/snapshot';
 import { usePortfolioNews } from '../hooks/useDataFetching';
 import { getSectorSync } from '../lib/portfolio/sectorService';
@@ -94,7 +95,7 @@ export default function Dashboard() {
   // const { selectedPortfolio, selectedPortfolioId } = usePortfolios();
   const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
   const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
-  const { tier } = usePremiumTheme();
+  const { tier, isLoading: tierLoading } = usePremiumTheme();
   const { setPortfolioContext, setTier } = usePocketAnalyst();
 
   // Map tier to data-tier attribute for CSS targeting
@@ -1796,8 +1797,8 @@ export default function Dashboard() {
                 <div style={{ marginBottom: 'var(--space-4)' }}>
                   <AnalyticsPanel
                     analytics={analytics}
-                    loading={historyLoading || syntheticSnapshotsLoading}
-                    isPremium={tier === 'foundersClub' || tier === 'corporateSponsor'}
+                    loading={historyLoading || syntheticSnapshotsLoading || tierLoading}
+                    isPremium={isPaidTier(tier)}
                   />
                 </div>
               )}
@@ -1937,15 +1938,17 @@ export default function Dashboard() {
                       tier={tier}
                       betaOverride={analytics?.beta ?? null}
                     />
-                    <AllocationRecommendations
-                      positions={Object.values(positions)}
-                      totalValue={Object.values(positions).reduce(
-                        (sum, pos) => sum + pos.currentValue,
-                        0
-                      )}
-                      portfolioAnalytics={analytics}
-                      historicalSnapshots={historicalSnapshots}
-                    />
+                    {isPaidTier(tier) && (
+                      <AllocationRecommendations
+                        positions={Object.values(positions)}
+                        totalValue={Object.values(positions).reduce(
+                          (sum, pos) => sum + pos.currentValue,
+                          0
+                        )}
+                        portfolioAnalytics={analytics}
+                        historicalSnapshots={historicalSnapshots}
+                      />
+                    )}
                   </div>
                 )}
               </div>
@@ -2411,7 +2414,7 @@ export default function Dashboard() {
               Our local engine normalizes the data instantly.
             </div>
 
-            {tier === 'corporateSponsor' || tier === 'foundersClub' ? (
+            {isPaidTier(tier) ? (
               <Link
                 href="/settings"
                 style={{

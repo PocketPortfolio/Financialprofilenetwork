@@ -101,6 +101,7 @@ export default function AnalyticsPanel({
       value: `${analytics.annualizedReturn >= 0 ? '+' : ''}${analytics.annualizedReturn.toFixed(2)}%`,
       color: analytics.annualizedReturn >= 0 ? 'var(--signal)' : 'var(--danger)',
       description: 'Average annual return',
+      premium: true,
     },
     {
       label: 'Volatility',
@@ -112,6 +113,7 @@ export default function AnalyticsPanel({
       label: 'Sharpe Ratio',
       value: analytics.sharpeRatio.toFixed(2),
       description: 'Risk-adjusted return (higher is better)',
+      premium: true,
     },
     {
       label: 'Beta',
@@ -124,6 +126,7 @@ export default function AnalyticsPanel({
       value: `${analytics.maxDrawdown.toFixed(2)}%`,
       color: 'var(--danger)',
       description: 'Largest peak-to-trough decline',
+      premium: true,
     },
   ];
 
@@ -214,13 +217,12 @@ export default function AnalyticsPanel({
               fontWeight: 'var(--font-semibold)',
               color: metric.color || 'var(--text)',
               marginBottom: metric.valuePercent ? 'var(--space-1)' : 0,
-              filter: metric.premium && !isPremium ? 'blur(4px)' : 'none',
               userSelect: metric.premium && !isPremium ? 'none' : 'auto',
             }}
           >
-            {metric.value}
+            {metric.premium && !isPremium ? '—' : metric.value}
           </div>
-          {metric.valuePercent && (
+          {metric.valuePercent && !(metric.premium && !isPremium) && (
             <div
               style={{
                 fontSize: 'var(--font-size-sm)',

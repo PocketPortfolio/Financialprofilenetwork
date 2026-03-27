@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { isPaidTier } from '@/app/lib/tier';
 import { AskAIFab } from './AskAIFab';
 import { AskAIModal } from './AskAIModal';
 
@@ -35,7 +36,7 @@ export function PocketAnalystProvider({ children }: { children: React.ReactNode 
     [portfolioContext, tier]
   );
 
-  const isPaid = tier === 'foundersClub' || tier === 'corporateSponsor';
+  const isPaid = isPaidTier(tier);
 
   return (
     <PocketAnalystContext.Provider value={value}>
