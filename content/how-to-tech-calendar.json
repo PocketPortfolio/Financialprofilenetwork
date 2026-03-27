@@ -1355,7 +1355,7 @@
     "scheduledTime": "14:00",
     "title": "How to optimize your package.json dependencies",
     "slug": "how-to-optimize-your-package-json-dependencies",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1364,7 +1364,8 @@
       "dependencies",
       "optimize",
       "your"
-    ]
+    ],
+    "publishedAt": "2026-03-27T14:01:06.686Z"
   },
   {
     "id": "how-to-service-workers-caching-assets-for-offline-use-mar-28",
