@@ -359,15 +359,24 @@ export async function GET(
   let ticker: string | undefined;
   let format: string | undefined;
 
+  const decodeTicker = (raw: string | undefined): string | undefined => {
+    if (!raw) return raw;
+    try {
+      return decodeURIComponent(raw).toUpperCase();
+    } catch {
+      return raw.toUpperCase();
+    }
+  };
+
   if (pathMatchJson) {
-    ticker = pathMatchJson[1]?.toUpperCase();
+    ticker = decodeTicker(pathMatchJson[1]);
     format = formatParam || 'json';
   } else if (pathMatchCsv) {
-    ticker = pathMatchCsv[1]?.toUpperCase();
+    ticker = decodeTicker(pathMatchCsv[1]);
     format = 'csv';
   } else {
     const tickerArray = resolvedParams.ticker || [];
-    ticker = tickerArray[0]?.toUpperCase();
+    ticker = decodeTicker(tickerArray[0]);
     const lastParam = tickerArray[tickerArray.length - 1]?.toLowerCase();
     format = formatParam || (lastParam === 'csv' ? 'csv' : 'json');
   }
@@ -416,7 +425,7 @@ export async function GET(
   
   // Validate ticker format (alphanumeric, dots, hyphens, max 10 chars)
   // Prevents path traversal attacks and invalid input
-  const TICKER_REGEX = /^[A-Z0-9.\-]{1,10}$/i;
+  const TICKER_REGEX = /^[A-Z0-9.\-^=]{1,12}$/i;
   if (!TICKER_REGEX.test(ticker)) {
     return NextResponse.json(
       { 
@@ -501,11 +510,12 @@ export async function GET(
   const isDevelopment = process.env.NODE_ENV === 'development';
   const isCsvDownload = format === 'csv';
   const isDesktopView = searchParams.get('desktop') === 'true'; // Desktop view requests from ticker pages
+  const isDashboardAnalytics = searchParams.get('source') === 'dashboard-analytics';
   
   let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
   // Only apply rate limiting to external JSON API calls, not CSV downloads or desktop view requests
   // Desktop view requests are exempt because Risk Metrics and Historical Data Table must always render
-  if (!hasValidApiKey && !isDevelopment && !isCsvDownload && !isDesktopView) {
+  if (!hasValidApiKey && !isDevelopment && !isCsvDownload && !isDesktopView && !isDashboardAnalytics) {
     rateLimitResult = await checkRateLimit(ip);
     
     if (!rateLimitResult.allowed) {

@@ -398,7 +398,9 @@ export default function Dashboard() {
               return;
             }
             try {
-              const r = await fetch(`/api/tickers/${encodeURIComponent(ticker)}/json?range=1y`);
+              const r = await fetch(
+                `/api/tickers/${encodeURIComponent(ticker)}/json?range=1y&desktop=true&source=dashboard-analytics`
+              );
               const j = await r.json().catch(() => null);
               const rows = (j?.data || []) as Array<{ date: string; close: number }>;
               const series = rows
@@ -415,7 +417,7 @@ export default function Dashboard() {
         // Benchmark series (S&P 500) for beta when available.
         let benchmarkSeries: Array<{ date: string; close: number }> = [];
         try {
-          const br = await fetch(`/api/tickers/%5EGSPC/json?range=1y`);
+          const br = await fetch('/api/tickers/%5EGSPC/json?range=1y&desktop=true&source=dashboard-analytics');
           const bj = await br.json().catch(() => null);
           const rows = (bj?.data || []) as Array<{ date: string; close: number }>;
           benchmarkSeries = rows
@@ -427,7 +429,7 @@ export default function Dashboard() {
         // Fallback benchmark if ^GSPC unavailable.
         if (benchmarkSeries.length < 3) {
           try {
-            const br = await fetch(`/api/tickers/SPY/json?range=1y`);
+            const br = await fetch('/api/tickers/SPY/json?range=1y&desktop=true&source=dashboard-analytics');
             const bj = await br.json().catch(() => null);
             const rows = (bj?.data || []) as Array<{ date: string; close: number }>;
             benchmarkSeries = rows
