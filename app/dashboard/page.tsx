@@ -16,6 +16,7 @@ import SharePortfolio from '../components/portfolio/SharePortfolio';
 import { usePortfolioStore } from '../lib/store/portfolioStore';
 import { usePortfolioHistory } from '../hooks/usePortfolioHistory';
 import { calculatePortfolioAnalytics } from '../lib/portfolio/analytics';
+import type { PortfolioSnapshot } from '@/app/lib/portfolio/types';
 import { saveDailySnapshot } from '../lib/portfolio/snapshot';
 import { usePortfolioNews } from '../hooks/useDataFetching';
 import { getSectorSync } from '../lib/portfolio/sectorService';
@@ -309,6 +310,216 @@ export default function Dashboard() {
     userId: user?.uid || null,
     enabled: useNewDashboard && !!user?.uid,
   });
+
+  const [syntheticSnapshots, setSyntheticSnapshots] = useState<PortfolioSnapshot[]>([]);
+  const [syntheticSnapshotsLoading, setSyntheticSnapshotsLoading] = useState(false);
+  const [syntheticBenchmarkReturns, setSyntheticBenchmarkReturns] = useState<number[]>([]);
+  const syntheticBuildKeyRef = useRef<string>('');
+  const syntheticSeriesCacheRef = useRef<Map<string, Array<{ date: string; close: number }>>>(new Map());
+
+  // Build a local snapshot series from trades + historical closes when Firestore history is empty.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!useNewDashboard) return;
+    if (!trades || trades.length === 0) return;
+
+    const shouldBuild = historicalSnapshots.length === 0;
+    if (!shouldBuild) return;
+
+    const tickersForKey = Array.from(
+      new Set(trades.map((t) => String(t.ticker || '').trim().toUpperCase()).filter(Boolean))
+    )
+      .sort()
+      .join(',');
+    const tradesFingerprint = trades
+      .map((t) => `${String(t.date).slice(0, 10)}|${String(t.ticker || '').toUpperCase()}|${t.type}|${t.qty}|${t.price}`)
+      .sort()
+      .join(';');
+    const buildKey = `${user?.uid || 'local'}::${tickersForKey}::${tradesFingerprint.length}`;
+
+    // Avoid expensive repeat rebuilds for identical data/state.
+    if (syntheticBuildKeyRef.current === buildKey && syntheticSnapshots.length > 0) return;
+
+    let cancelled = false;
+    const run = async () => {
+      setSyntheticSnapshotsLoading(true);
+      try {
+        const tickers = Array.from(
+          new Set(trades.map((t) => String(t.ticker || '').trim().toUpperCase()).filter(Boolean))
+        ).slice(0, 40);
+
+        // Fetch 1y daily close series per ticker via existing local API.
+        const seriesByTicker = new Map<string, Array<{ date: string; close: number }>>();
+        await Promise.all(
+          tickers.map(async (ticker) => {
+            const cached = syntheticSeriesCacheRef.current.get(ticker);
+            if (cached) {
+              seriesByTicker.set(ticker, cached);
+              return;
+            }
+            try {
+              const r = await fetch(`/api/tickers/${encodeURIComponent(ticker)}/json?range=1y`);
+              const j = await r.json().catch(() => null);
+              const rows = (j?.data || []) as Array<{ date: string; close: number }>;
+              const series = rows
+                .filter((x) => x && typeof x.date === 'string' && typeof x.close === 'number' && Number.isFinite(x.close))
+                .map((x) => ({ date: x.date, close: x.close }));
+              seriesByTicker.set(ticker, series);
+              syntheticSeriesCacheRef.current.set(ticker, series);
+            } catch {
+              seriesByTicker.set(ticker, []);
+            }
+          })
+        );
+
+        // Benchmark series (S&P 500) for beta when available.
+        let benchmarkSeries: Array<{ date: string; close: number }> = [];
+        try {
+          const br = await fetch(`/api/tickers/%5EGSPC/json?range=1y`);
+          const bj = await br.json().catch(() => null);
+          const rows = (bj?.data || []) as Array<{ date: string; close: number }>;
+          benchmarkSeries = rows
+            .filter((x) => x && typeof x.date === 'string' && typeof x.close === 'number' && Number.isFinite(x.close))
+            .map((x) => ({ date: x.date, close: x.close }));
+        } catch {
+          benchmarkSeries = [];
+        }
+        // Fallback benchmark if ^GSPC unavailable.
+        if (benchmarkSeries.length < 3) {
+          try {
+            const br = await fetch(`/api/tickers/SPY/json?range=1y`);
+            const bj = await br.json().catch(() => null);
+            const rows = (bj?.data || []) as Array<{ date: string; close: number }>;
+            benchmarkSeries = rows
+              .filter((x) => x && typeof x.date === 'string' && typeof x.close === 'number' && Number.isFinite(x.close))
+              .map((x) => ({ date: x.date, close: x.close }));
+          } catch {
+            benchmarkSeries = [];
+          }
+        }
+
+        // Build a sorted set of all dates present across series (and benchmark, if any).
+        const dateSet = new Set<string>();
+        for (const series of seriesByTicker.values()) {
+          for (const p of series) dateSet.add(p.date);
+        }
+        for (const p of benchmarkSeries) dateSet.add(p.date);
+        const dates = Array.from(dateSet).sort();
+
+        const tradesSorted = [...trades]
+          .map((t) => ({
+            date: String(t.date).slice(0, 10),
+            ticker: String(t.ticker || '').trim().toUpperCase(),
+            type: t.type,
+            qty: Number(t.qty),
+            price: Number(t.price),
+          }))
+          .filter((t) => t.ticker && t.date && Number.isFinite(t.qty) && Number.isFinite(t.price))
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        // Rolling holdings per ticker and invested cashflow.
+        const shares = new Map<string, number>();
+        let netInvested = 0;
+        let tradeIdx = 0;
+
+        const closeLookup = (ticker: string, date: string): number | null => {
+          const series = seriesByTicker.get(ticker) || [];
+          // Fast path: assume series is ordered; walk from end for nearest <= date.
+          for (let i = series.length - 1; i >= 0; i--) {
+            const p = series[i];
+            if (p.date <= date) return p.close;
+          }
+          return null;
+        };
+
+        const snaps: PortfolioSnapshot[] = [];
+        for (const date of dates) {
+          while (tradeIdx < tradesSorted.length && tradesSorted[tradeIdx].date <= date) {
+            const tr = tradesSorted[tradeIdx];
+            const prev = shares.get(tr.ticker) || 0;
+            const delta = tr.type === 'SELL' ? -tr.qty : tr.qty;
+            shares.set(tr.ticker, prev + delta);
+            // Net invested: buys add, sells subtract (cash returned).
+            netInvested += (tr.type === 'SELL' ? -1 : 1) * tr.qty * tr.price;
+            tradeIdx++;
+          }
+
+          let totalValue = 0;
+          const positionsData: Array<{ ticker: string; shares: number; value: number; allocation: number }> = [];
+          for (const [ticker, sh] of shares.entries()) {
+            if (sh <= 0) continue;
+            const close = closeLookup(ticker, date);
+            if (close == null) continue;
+            const value = sh * close;
+            totalValue += value;
+            positionsData.push({ ticker, shares: sh, value, allocation: 0 });
+          }
+          if (totalValue > 0) {
+            for (const p of positionsData) {
+              p.allocation = (p.value / totalValue) * 100;
+            }
+          }
+
+          // Only store days where we can value at least something.
+          if (totalValue > 0 && positionsData.length > 0) {
+            snaps.push({
+              userId: user?.uid || 'local',
+              date,
+              totalValue,
+              totalInvested: netInvested,
+              positions: positionsData,
+              metadata: { timestamp: Date.now(), version: 'synthetic-1' },
+            });
+          }
+        }
+
+        // Build benchmark returns aligned to synthetic snapshot dates.
+        const benchmarkCloseByDate = new Map<string, number>(benchmarkSeries.map((p) => [p.date, p.close]));
+        const alignedBenchmarkCloses: number[] = [];
+        for (const s of snaps) {
+          let close: number | undefined = benchmarkCloseByDate.get(s.date);
+          if (close == null) {
+            // nearest <= date
+            for (let i = benchmarkSeries.length - 1; i >= 0; i--) {
+              if (benchmarkSeries[i].date <= s.date) {
+                close = benchmarkSeries[i].close;
+                break;
+              }
+            }
+          }
+          alignedBenchmarkCloses.push(typeof close === 'number' && Number.isFinite(close) ? close : NaN);
+        }
+        const benchReturns: number[] = [];
+        for (let i = 1; i < alignedBenchmarkCloses.length; i++) {
+          const prev = alignedBenchmarkCloses[i - 1];
+          const curr = alignedBenchmarkCloses[i];
+          if (Number.isFinite(prev) && Number.isFinite(curr) && prev > 0) {
+            benchReturns.push((curr - prev) / prev);
+          } else {
+            benchReturns.push(0);
+          }
+        }
+
+        if (!cancelled) {
+          setSyntheticSnapshots(snaps);
+          setSyntheticBenchmarkReturns(benchReturns);
+          syntheticBuildKeyRef.current = buildKey;
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setSyntheticSnapshots([]);
+          setSyntheticBenchmarkReturns([]);
+        }
+      } finally {
+        if (!cancelled) setSyntheticSnapshotsLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [useNewDashboard, trades, historicalSnapshots.length, user?.uid, syntheticSnapshots.length]);
 
   // Portfolio news (commented out - positions calculated later)
   // const portfolioNews = usePortfolioNews(Object.values(positions), 5);
@@ -786,11 +997,67 @@ export default function Dashboard() {
     }
   }, [snapshotKey, user?.uid, useNewDashboard, positions]);
 
-  // Calculate analytics
+  // Calculate analytics (prefer real snapshots, else synthetic from trades, else current positions)
   const analytics = useMemo(() => {
-    if (historicalSnapshots.length === 0) return null;
-    return calculatePortfolioAnalytics(historicalSnapshots);
-  }, [historicalSnapshots]);
+    const snapshotsForAnalytics =
+      historicalSnapshots.length > 0
+        ? historicalSnapshots
+        : syntheticSnapshots.length > 0
+          ? syntheticSnapshots
+          : null;
+
+    if (snapshotsForAnalytics && snapshotsForAnalytics.length > 0) {
+      const useSyntheticWithBenchmark =
+        historicalSnapshots.length === 0 &&
+        snapshotsForAnalytics === syntheticSnapshots &&
+        syntheticBenchmarkReturns.length === Math.max(0, syntheticSnapshots.length - 1);
+      const computed = calculatePortfolioAnalytics(
+        snapshotsForAnalytics,
+        useSyntheticWithBenchmark ? syntheticBenchmarkReturns : undefined
+      );
+      return computed;
+    }
+
+    // Fallback: compute truthy daily change from quotes + current value from positions.
+    const positionsArray = Object.values(positions);
+    const totalValue = positionsArray.reduce(
+      (sum, pos) => sum + (pos.currentValue ?? pos.avgCost * pos.shares),
+      0
+    );
+    const totalInvestedFromPositions = positionsArray.reduce(
+      (sum, pos) => sum + (pos.totalInvested ?? pos.avgCost * pos.shares),
+      0
+    );
+
+    // Daily change can be computed from quote change * shares (truthy intraday delta).
+    let dailyChange = 0;
+    for (const pos of positionsArray) {
+      const q = quotesData?.[pos.ticker];
+      if (q && typeof q.change === 'number' && Number.isFinite(q.change)) {
+        dailyChange += q.change * pos.shares;
+      }
+    }
+    const prevValue = totalValue - dailyChange;
+    const dailyChangePercent = prevValue > 0 ? (dailyChange / prevValue) * 100 : 0;
+
+    const computed = {
+      totalValue,
+      dailyChange,
+      dailyChangePercent,
+      allTimeReturn: totalValue - totalInvestedFromPositions,
+      allTimeReturnPercent:
+        totalInvestedFromPositions > 0
+          ? ((totalValue - totalInvestedFromPositions) / totalInvestedFromPositions) * 100
+          : 0,
+      annualizedReturn: 0,
+      volatility: 0,
+      sharpeRatio: 0,
+      beta: 0,
+      maxDrawdown: 0,
+    };
+
+    return computed;
+  }, [historicalSnapshots, syntheticSnapshots, syntheticBenchmarkReturns, positions, quotesData]);
 
   // Filter positions by selected sectors
   const filteredPositions = useMemo(() => {
@@ -1402,7 +1669,11 @@ export default function Dashboard() {
               {/* Analytics Panel */}
               {analytics && (
                 <div style={{ marginBottom: 'var(--space-4)' }}>
-                  <AnalyticsPanel analytics={analytics} loading={historyLoading} />
+                  <AnalyticsPanel
+                    analytics={analytics}
+                    loading={historyLoading || syntheticSnapshotsLoading}
+                    isPremium={tier === 'foundersClub' || tier === 'corporateSponsor'}
+                  />
                 </div>
               )}
 
@@ -1539,6 +1810,7 @@ export default function Dashboard() {
                       trades={trades}
                       positions={Object.values(positions)}
                       tier={tier}
+                      betaOverride={analytics?.beta ?? null}
                     />
                     <AllocationRecommendations
                       positions={Object.values(positions)}
@@ -1557,6 +1829,7 @@ export default function Dashboard() {
 
           {/* Portfolio Chart - Legacy Simple Version (fallback) */}
           {trades.length > 0 && !useNewDashboard && (
+            <>
             <div className="dashboard-card" style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <div style={{ fontSize: '14px', fontWeight: '600', color: 'hsl(var(--foreground))' }}>
@@ -1608,6 +1881,7 @@ export default function Dashboard() {
                 />
               )}
           </div>
+            </>
         )}
 
         {/* Portfolio Holdings - Full Width Layout */}

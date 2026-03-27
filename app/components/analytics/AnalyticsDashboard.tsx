@@ -7,16 +7,26 @@ import { fetchAssetProfiles } from '../../services/enrichmentService';
 import { Trade } from '../../services/tradeService';
 import { Position } from '../../lib/utils/portfolioCalculations';
 
-// Colors for the charts
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#ff7300'];
+// Brand-safe chart palette (no generic fintech blues)
+const COLORS = [
+  'var(--accent-warm)',
+  'var(--signal)',
+  'var(--text-secondary)',
+  'var(--surface-elevated)',
+  'var(--border-warm)',
+  'var(--text-warm)',
+  'var(--warning)',
+  'var(--muted)',
+];
 
 interface AnalyticsDashboardProps {
   trades: Trade[]; // Your existing trade data
   positions: Position[]; // Calculated positions
   tier: 'codeSupporter' | 'featureVoter' | 'corporateSponsor' | 'foundersClub' | null;
+  betaOverride?: number | null;
 }
 
-export function AnalyticsDashboard({ trades, positions, tier }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({ trades, positions, tier, betaOverride = null }: AnalyticsDashboardProps) {
   const [profiles, setProfiles] = useState<Record<string, any>>({});
   const [chartWidth, setChartWidth] = useState<number>(0);
   const [isMobile, setIsMobile] = useState<boolean>(false);
@@ -80,7 +90,11 @@ export function AnalyticsDashboard({ trades, positions, tier }: AnalyticsDashboa
   const sectorData = useMemo(() => {
     return groupBySector(holdings, profiles);
   }, [holdings, profiles]);
-  const portfolioBeta = useMemo(() => calculatePortfolioBeta(holdings, profiles), [holdings, profiles]);
+  const derivedPortfolioBeta = useMemo(() => calculatePortfolioBeta(holdings, profiles), [holdings, profiles]);
+  const portfolioBeta =
+    typeof betaOverride === 'number' && Number.isFinite(betaOverride)
+      ? betaOverride
+      : derivedPortfolioBeta;
   
   // 4. Mock Rebalancing Targets (User would set these in settings)
   // For now, we'll use equal weighting as a default example
@@ -114,8 +128,8 @@ export function AnalyticsDashboard({ trades, positions, tier }: AnalyticsDashboa
           href="/sponsor"
           style={{
             display: 'inline-block',
-            background: 'var(--signal)',
-            color: 'var(--bg)',
+            background: 'var(--accent-warm)',
+            color: '#000',
             padding: 'var(--space-3) var(--space-6)',
             borderRadius: 'var(--radius-md)',
             textDecoration: 'none',
@@ -198,7 +212,7 @@ export function AnalyticsDashboard({ trades, positions, tier }: AnalyticsDashboa
                     dataKey="value"
                     labelLine={false}
                     label={false}
-                    fill="#8884d8"
+                    fill="var(--accent-warm)"
                   >
                     {sectorData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
