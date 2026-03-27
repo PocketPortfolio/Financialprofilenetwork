@@ -321,21 +321,61 @@ export default function Dashboard() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!useNewDashboard) return;
-    if (!trades || trades.length === 0) return;
+    if (!displayTrades || displayTrades.length === 0) return;
 
     const shouldBuild = historicalSnapshots.length === 0;
     if (!shouldBuild) return;
 
+    const toIsoDate = (value: unknown): string | null => {
+      if (!value) return null;
+      if (typeof value === 'string') {
+        const direct = value.slice(0, 10);
+        if (/^\d{4}-\d{2}-\d{2}$/.test(direct)) return direct;
+        const parsed = new Date(value);
+        if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+        return null;
+      }
+      if (value instanceof Date) {
+        if (!Number.isNaN(value.getTime())) return value.toISOString().slice(0, 10);
+        return null;
+      }
+      if (typeof value === 'object' && value !== null) {
+        const maybe = value as {
+          toDate?: () => Date;
+          seconds?: number;
+          _seconds?: number;
+        };
+        if (typeof maybe.toDate === 'function') {
+          const d = maybe.toDate();
+          if (d instanceof Date && !Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+        }
+        const sec =
+          typeof maybe.seconds === 'number'
+            ? maybe.seconds
+            : typeof maybe._seconds === 'number'
+              ? maybe._seconds
+              : null;
+        if (typeof sec === 'number' && Number.isFinite(sec)) {
+          const d = new Date(sec * 1000);
+          if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+        }
+      }
+      return null;
+    };
+
     const tickersForKey = Array.from(
-      new Set(trades.map((t) => String(t.ticker || '').trim().toUpperCase()).filter(Boolean))
+      new Set(displayTrades.map((t) => String(t.ticker || '').trim().toUpperCase()).filter(Boolean))
     )
       .sort()
       .join(',');
-    const tradesFingerprint = trades
-      .map((t) => `${String(t.date).slice(0, 10)}|${String(t.ticker || '').toUpperCase()}|${t.type}|${t.qty}|${t.price}`)
+    const tradesFingerprint = displayTrades
+      .map((t) => {
+        const safeDate = toIsoDate((t as { date?: unknown }).date) || 'unknown-date';
+        return `${safeDate}|${String(t.ticker || '').toUpperCase()}|${t.type}|${t.qty}|${t.price}`;
+      })
       .sort()
       .join(';');
-    const buildKey = `${user?.uid || 'local'}::${tickersForKey}::${tradesFingerprint.length}`;
+    const buildKey = `${user?.uid || 'local'}::${tickersForKey}::${tradesFingerprint}`;
 
     // Avoid expensive repeat rebuilds for identical data/state.
     if (syntheticBuildKeyRef.current === buildKey && syntheticSnapshots.length > 0) return;
@@ -345,7 +385,7 @@ export default function Dashboard() {
       setSyntheticSnapshotsLoading(true);
       try {
         const tickers = Array.from(
-          new Set(trades.map((t) => String(t.ticker || '').trim().toUpperCase()).filter(Boolean))
+          new Set(displayTrades.map((t) => String(t.ticker || '').trim().toUpperCase()).filter(Boolean))
         ).slice(0, 40);
 
         // Fetch 1y daily close series per ticker via existing local API.
@@ -406,9 +446,12 @@ export default function Dashboard() {
         for (const p of benchmarkSeries) dateSet.add(p.date);
         const dates = Array.from(dateSet).sort();
 
-        const tradesSorted = [...trades]
+        const tradesSorted = [...displayTrades]
           .map((t) => ({
-            date: String(t.date).slice(0, 10),
+            date:
+              toIsoDate((t as { date?: unknown }).date) ||
+              toIsoDate((t as { createdAt?: unknown }).createdAt) ||
+              '',
             ticker: String(t.ticker || '').trim().toUpperCase(),
             type: t.type,
             qty: Number(t.qty),
@@ -519,7 +562,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [useNewDashboard, trades, historicalSnapshots.length, user?.uid, syntheticSnapshots.length]);
+  }, [useNewDashboard, displayTrades, historicalSnapshots.length, user?.uid, syntheticSnapshots.length]);
 
   // Portfolio news (commented out - positions calculated later)
   // const portfolioNews = usePortfolioNews(Object.values(positions), 5);
