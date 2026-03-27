@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
+    "clean:next": "node -e \"const fs=require('fs'); fs.rmSync('.next',{recursive:true,force:true});\"",
     "build:sitemaps": "ts-node --project scripts/tsconfig.json scripts/build-static-sitemaps.ts",
     "build:inject-firebase": "node scripts/inject-firebase-config.js",
     "build": "npm run build:importer && npm run build:sitemaps && npm run build:inject-firebase && npm run build:book-assets && next build",
@@ -31,7 +32,7 @@
     "book:carousel": "node scripts/build-sovereign-launch-carousel.js",
     "firebase:rules:test": "firebase emulators:exec --only firestore \"npm run test:rules\"",
     "precommit": "npm run lint && npm run typecheck && npm run test",
-    "ci": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "ci": "npm run lint && npm run typecheck && npm run test && npm run clean:next && npm run build",
     "analyze-sitemap": "ts-node --project scripts/tsconfig.json scripts/analyze-sitemap.ts",
     "verify-tickers": "ts-node --project scripts/tsconfig.json scripts/verify-ticker-pages.ts --sample 50",
     "investigate-gap": "ts-node --project scripts/tsconfig.json scripts/investigate-sitemap-gap.ts 869",

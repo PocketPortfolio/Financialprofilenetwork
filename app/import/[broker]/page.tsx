@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 import SovereignSyncCTA from '@/app/components/SovereignSyncCTA';
+import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 
 // Generate static params for supported brokers (50 brokers for Operation Velocity)
 export async function generateStaticParams() {
@@ -25,9 +26,41 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     };
   }
 
+  // CTR-focused SEO template (local-first trust signal)
+  if (broker === 'ghostfolio') {
+    return {
+      title: 'Ghostfolio CSV Import | The Local-First Portfolio Alternative',
+      description:
+        'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
+      openGraph: {
+        title: 'Ghostfolio CSV Import | The Local-First Portfolio Alternative',
+        description:
+          'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
+        images: [
+          {
+            url: `/og?title=${encodeURIComponent('Ghostfolio CSV Import')}`,
+            width: 1200,
+            height: 630,
+            alt: 'Ghostfolio CSV Import - Pocket Portfolio',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Ghostfolio CSV Import | The Local-First Portfolio Alternative',
+        description:
+          'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
+        images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+      },
+      alternates: {
+        canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
+      },
+    };
+  }
+
   return {
-    title: `${config.displayName} CSV Export & Import Guide | Free Converter | Pocket Portfolio`,
-    description: `Export your ${config.displayName} trading data to CSV, then import into Pocket Portfolio. Convert ${config.displayName} CSV to JSON format. Step-by-step guide with required columns, sample data, and troubleshooting tips.`,
+    title: `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`,
+    description: `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads. Your financial history never leaves your device.`,
     keywords: [
       `${config.displayName} CSV export`,
       `${config.displayName} CSV import`,
@@ -40,8 +73,8 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       `${config.displayName} account statement`
     ],
     openGraph: {
-      title: `${config.displayName} CSV Export & Import Guide | Free Converter`,
-      description: `Export your ${config.displayName} trading data to CSV, then import into Pocket Portfolio. Convert CSV to JSON format.`,
+      title: `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`,
+      description: `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
       images: [
         {
           url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
@@ -53,8 +86,8 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${config.displayName} CSV Export & Import Guide | Free Converter`,
-      description: `Export your ${config.displayName} trading data to CSV, then import into Pocket Portfolio.`,
+      title: `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`,
+      description: `Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
       images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
     },
     alternates: {
@@ -72,6 +105,29 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
   if (!config) {
     notFound();
   }
+
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `How do I export my CSV from ${config.displayName}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `In ${config.displayName}, look for a section like Statements, Reports, Activity, or History, then choose an Export/Download option and select CSV. If you see multiple report types, export your full trading history or account statement in CSV format.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name: `Is my ${config.displayName} data safe with Pocket Portfolio?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Yes. Pocket Portfolio is local-first: your ${config.displayName} CSV can be parsed inside your browser. Your raw financial data does not need to be uploaded to our servers to be converted or visualized.`,
+        },
+      },
+    ],
+  };
 
   // JSON-LD structured data for HowTo
   const howToJsonLd = {
@@ -129,6 +185,10 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
       {/* JSON-LD structured data */}
       <script
         type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />
 
@@ -167,6 +227,15 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             Learn how to import your {config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.
           </p>
         </header>
+
+        <BridgeToTerminalCTA
+          title={`Visualize your ${config.displayName} CSV locally — drag & drop into the Terminal.`}
+          subtitle="No uploads. Parsed on-device."
+          href={`/dashboard?utm_source=import_page&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(broker)}`}
+          primaryLabel="Open Terminal"
+          secondaryHref="/learn/local-first"
+          secondaryLabel="How local-first works"
+        />
 
         {/* NEW: Sovereign Sync CTA Section */}
         <SovereignSyncCTA brokerName={config.displayName} />

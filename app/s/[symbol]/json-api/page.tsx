@@ -11,6 +11,7 @@ import { getDatasetStats } from '@/app/lib/utils/dataset';
 import JsonApiNpmSnippet from '@/app/components/JsonApiNpmSnippet';
 import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import TickerCsvDownload from '@/app/components/TickerCsvDownload';
+import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 import Link from 'next/link';
 
 
@@ -27,6 +28,24 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   const resolvedParams = await params;
   const symbol = resolvedParams.symbol.toUpperCase();
   const metadata = await getTickerMetadata(symbol);
+
+  if (symbol.replace(/-/g, '') === 'NSE') {
+    return {
+      title: 'Free NSE JSON API & Stock Data Export | Pocket Portfolio',
+      description:
+        'Get instant, free JSON API endpoints for National Stock Exchange (NSE) tickers. No API keys or registration required. Query NSE financial data securely.',
+      openGraph: {
+        title: 'Free NSE JSON API & Stock Data Export | Pocket Portfolio',
+        description:
+          'Get instant, free JSON API endpoints for National Stock Exchange (NSE) tickers. No API keys or registration required. Query NSE financial data securely.',
+        type: 'website',
+        url: 'https://www.pocketportfolio.app/s/nse/json-api',
+      },
+      alternates: {
+        canonical: 'https://www.pocketportfolio.app/s/nse/json-api',
+      },
+    };
+  }
   
   if (!metadata) {
     return {
@@ -153,7 +172,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
   const stats = getDatasetStats(tickerData?.data || null);
   const uniqueDescription = stats 
     ? `Access ${stats.count} data points for ${normalizedSymbol} spanning ${stats.years} years (${stats.startYear}–${stats.lastUpdate}). Optimized JSON format (${stats.sizeKB} KB).`
-    : `Real-time normalized JSON data for ${normalizedSymbol}. Free API for developers. No login required.`;
+    : `Instant, normalized JSON data for ${normalizedSymbol}. Free API for developers. No login required.`;
   
   // Generate Dataset schema for AI agents and search engines
   const datasetSchema = getDatasetSchema(
@@ -268,6 +287,15 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           }}>
             {uniqueDescription}
           </p>
+
+          <BridgeToTerminalCTA
+            title="Turn this JSON into charts instantly — open the Terminal."
+            subtitle="Local-first. No uploads required to start."
+            href={`/dashboard?utm_source=json_api&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
+            primaryLabel="Open Terminal"
+            secondaryHref="/learn/local-first"
+            secondaryLabel="How local-first works"
+          />
           
           {/* CROSS-LINK (Internal SEO Juice) */}
           <div style={{ marginBottom: '32px' }}>

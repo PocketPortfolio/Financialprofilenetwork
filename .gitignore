@@ -9,8 +9,14 @@ dist/
 .env.*
 !.env.example
 
+# Generated at build-time (do not commit)
+public/sitemap*.xml
+public/sitemap.xml
+public/sw.js
+
 # Test / tooling output
 coverage/
+*.tsbuildinfo
 
 # OS / editor
 .DS_Store
