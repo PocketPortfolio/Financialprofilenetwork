@@ -1364,14 +1364,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Identity Provider Performance - Auth0 vs Okta vs Cognito",
     "slug": "research-identity-provider-performance-auth0-vs-okta-vs-cognito-2026-03-27",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "identity",
       "provider"
-    ]
+    ],
+    "publishedAt": "2026-03-27T18:00:45.527Z"
   },
   {
     "id": "research-multi-factor-authentication-ux-vs-security-trade-offs-2026-03-28",
