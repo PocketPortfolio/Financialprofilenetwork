@@ -147,6 +147,15 @@ interface AnalyticsData {
     mobileSetupRequested: { total: number; last7Days: number };
     quotaUpgradeInitiated: { total: number; last7Days: number };
   };
+  /** Traffic → intent → checkout → Founders (Firestore monetizationFunnelEvents + apiKeysByEmail) */
+  monetizationFunnelBoard?: {
+    organicTraffic: number;
+    paywallImpressions: number;
+    checkoutStarts: number;
+    paidFoundersActive: number;
+    paywallToCheckoutPercent: number | null;
+    checkoutToPaidDropoffPercent: number | null;
+  };
   timeRange: '7d' | '30d' | '90d' | 'all';
   lastUpdated?: string;
 }
@@ -400,6 +409,94 @@ export default function AdminAnalyticsPage() {
       {/* Analytics Data */}
       {analyticsData && !loadingData && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {analyticsData.monetizationFunnelBoard && (
+            <section
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: 'var(--space-6)',
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: 'var(--space-2)',
+                  color: 'var(--text)',
+                }}
+              >
+                Command funnel (organic → intent → checkout → Founders)
+              </h2>
+              <p
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  marginBottom: 'var(--space-4)',
+                  lineHeight: 1.5,
+                }}
+              >
+                Paywall and checkout counts are from in-app events in the selected period. Founders count is active{' '}
+                <code style={{ fontSize: '12px' }}>tiers</code> in Firestore (not period-cohort). Drop-off compares checkout
+                starts in period to all-time Founders (directional).
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gap: 'var(--space-4)',
+                }}
+              >
+                <MetricCard
+                  label="Organic traffic"
+                  value={analyticsData.monetizationFunnelBoard.organicTraffic.toLocaleString()}
+                  subtitle="Unique page views (period)"
+                />
+                <MetricCard
+                  label="Paywall impressions"
+                  value={analyticsData.monetizationFunnelBoard.paywallImpressions.toLocaleString()}
+                  subtitle="Firestore monetizationFunnelEvents (period)"
+                />
+                <MetricCard
+                  label="Checkout starts"
+                  value={analyticsData.monetizationFunnelBoard.checkoutStarts.toLocaleString()}
+                  subtitle="In-app checkout_start events"
+                />
+                <MetricCard
+                  label="Founders (active)"
+                  value={analyticsData.monetizationFunnelBoard.paidFoundersActive.toLocaleString()}
+                  subtitle="apiKeysByEmail tier = foundersClub"
+                />
+              </div>
+              <div
+                style={{
+                  marginTop: 'var(--space-4)',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 'var(--space-4)',
+                  fontSize: '14px',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <span>
+                  Paywall → checkout:{' '}
+                  <strong style={{ color: 'var(--text)' }}>
+                    {analyticsData.monetizationFunnelBoard.paywallToCheckoutPercent != null
+                      ? `${analyticsData.monetizationFunnelBoard.paywallToCheckoutPercent}%`
+                      : '—'}
+                  </strong>
+                </span>
+                <span>
+                  Checkout → paid drop-off (proxy):{' '}
+                  <strong style={{ color: 'var(--text)' }}>
+                    {analyticsData.monetizationFunnelBoard.checkoutToPaidDropoffPercent != null
+                      ? `${analyticsData.monetizationFunnelBoard.checkoutToPaidDropoffPercent}%`
+                      : '—'}
+                  </strong>
+                </span>
+              </div>
+            </section>
+          )}
           {/* Monetization Section */}
           <section style={{
             background: 'var(--surface)',

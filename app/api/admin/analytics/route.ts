@@ -193,6 +193,21 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    let monetizationFunnelBoard: Awaited<ReturnType<typeof getMonetizationFunnelBoardData>>;
+    try {
+      monetizationFunnelBoard = await getMonetizationFunnelBoardData(startDate, seoPages.totalViews);
+    } catch (e: any) {
+      console.error('[Analytics API] 📈 Monetization funnel board failed:', e?.message);
+      monetizationFunnelBoard = {
+        organicTraffic: seoPages.totalViews,
+        paywallImpressions: 0,
+        checkoutStarts: 0,
+        paidFoundersActive: 0,
+        paywallToCheckoutPercent: null,
+        checkoutToPaidDropoffPercent: null,
+      };
+    }
+
     // Architecture Challenge (/challenge) — CTO funnel emails (Firestore)
     let architectureChallengeLeads: Awaited<ReturnType<typeof getArchitectureChallengeLeadsAnalytics>>;
     try {
@@ -218,6 +233,7 @@ export async function GET(request: NextRequest) {
       googleSignups,
       referral,
       conversionFunnel,
+      monetizationFunnelBoard,
       architectureChallengeLeads,
       timeRange: range,
       lastUpdated: new Date().toISOString()
@@ -794,6 +810,56 @@ async function getReferralData(startDate: Date) {
       last7DaysClicks: 0,
       last7DaysConversions: 0,
       bySource: {},
+    };
+  }
+}
+
+async function getMonetizationFunnelBoardData(startDate: Date, organicTraffic: number) {
+  try {
+    const db = getDb();
+    const startTimestamp = Timestamp.fromDate(startDate);
+    const snap = await db.collection('monetizationFunnelEvents').where('timestamp', '>=', startTimestamp).get();
+    let paywallImpressions = 0;
+    let checkoutStarts = 0;
+    snap.docs.forEach((doc) => {
+      const t = doc.data()?.eventType;
+      if (t === 'paywall_impression') paywallImpressions++;
+      else if (t === 'checkout_start') checkoutStarts++;
+    });
+    let paidFoundersActive = 0;
+    try {
+      const agg = await db.collection('apiKeysByEmail').where('tier', '==', 'foundersClub').count().get();
+      paidFoundersActive = agg.data().count;
+    } catch {
+      const q = await db.collection('apiKeysByEmail').limit(5000).get();
+      q.docs.forEach((d) => {
+        if (d.data()?.tier === 'foundersClub') paidFoundersActive++;
+      });
+    }
+    const paywallToCheckoutPercent =
+      paywallImpressions > 0 ? Math.round((checkoutStarts / paywallImpressions) * 1000) / 10 : null;
+    let checkoutToPaidDropoffPercent: number | null = null;
+    if (checkoutStarts > 0) {
+      const ratio = Math.min(1, paidFoundersActive / checkoutStarts);
+      checkoutToPaidDropoffPercent = Math.round((1 - ratio) * 1000) / 10;
+    }
+    return {
+      organicTraffic,
+      paywallImpressions,
+      checkoutStarts,
+      paidFoundersActive,
+      paywallToCheckoutPercent,
+      checkoutToPaidDropoffPercent,
+    };
+  } catch (error) {
+    console.error('Monetization funnel board error:', error);
+    return {
+      organicTraffic,
+      paywallImpressions: 0,
+      checkoutStarts: 0,
+      paidFoundersActive: 0,
+      paywallToCheckoutPercent: null,
+      checkoutToPaidDropoffPercent: null,
     };
   }
 }

@@ -201,6 +201,43 @@ function getCurrentUtm() {
   };
 }
 
+async function syncMonetizationIntentToFirestore(
+  kind: 'paywall_impression' | 'checkout_start',
+  triggerSource: string
+) {
+  if (typeof window === 'undefined') return;
+  try {
+    const { auth } = await import('@/app/lib/firebase');
+    if (!auth?.currentUser) return;
+    const idToken = await auth.currentUser.getIdToken();
+    await fetch('/api/user/monetization-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ kind, triggerSource }),
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+function logMonetizationFunnelEvent(
+  eventType: 'paywall_impression' | 'checkout_start',
+  triggerSource: string,
+  pagePath?: string
+) {
+  if (typeof window === 'undefined') return;
+  void fetch('/api/analytics/monetization-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      eventType,
+      trigger_source: triggerSource,
+      page_path: pagePath || window.location.pathname,
+      session_id: getMonetizationSessionId(),
+    }),
+  });
+}
+
 export function trackPaywallImpression(triggerSource: MonetizationTriggerSource, pagePath?: string, tier?: string | null) {
   if (typeof window === 'undefined') return;
   const key = `${triggerSource}::${window.location.pathname}`;
@@ -222,6 +259,8 @@ export function trackPaywallImpression(triggerSource: MonetizationTriggerSource,
     utm_content: utm.utm_content || triggerSource,
     timestamp: new Date().toISOString(),
   });
+  void syncMonetizationIntentToFirestore('paywall_impression', triggerSource);
+  logMonetizationFunnelEvent('paywall_impression', triggerSource, pagePath || window.location.pathname);
 }
 
 export function trackPaywallCtaClick(
@@ -267,6 +306,8 @@ export function trackCheckoutStart(
     utm_content: utm.utm_content || triggerSource,
     timestamp: new Date().toISOString(),
   });
+  void syncMonetizationIntentToFirestore('checkout_start', triggerSource);
+  logMonetizationFunnelEvent('checkout_start', triggerSource);
 }
 
 export function trackCheckoutSessionCreated(stripeSessionId: string, priceId: string, tierName: string, triggerSource: MonetizationTriggerSource) {

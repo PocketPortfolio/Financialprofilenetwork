@@ -354,6 +354,8 @@ interface SponsorDeckProps {
     foundersClub: { monthly: string; annual: string };
   };
   foundersClubScarcity?: FoundersClubScarcity;
+  /** Sponsor A/B: A = Join Founders + monthly default; B = AI/Risk headline + annual default */
+  abVariant?: 'A' | 'B';
 }
 
 export default function SponsorDeck({
@@ -362,9 +364,23 @@ export default function SponsorDeck({
   previewTheme,
   onPreviewTheme,
   PRICE_IDS,
-  foundersClubScarcity = null
+  foundersClubScarcity = null,
+  abVariant = 'A',
 }: SponsorDeckProps) {
   const [activeId, setActiveId] = useState('developer'); // Default to Developer Utility
+
+  const v = abVariant === 'B' ? 'B' : 'A';
+  const founderTitle = v === 'B' ? 'Unlock the AI + Risk Terminal' : 'Join the Founders Club';
+  const founderIntervals =
+    v === 'B'
+      ? [
+          { label: 'Join Annual (£100/yr)', interval: 'annual' as const },
+          { label: 'Join Monthly (£12/mo)', interval: 'monthly' as const },
+        ]
+      : [
+          { label: 'Join Monthly (£12/mo)', interval: 'monthly' as const },
+          { label: 'Join Annual (£100/yr)', interval: 'annual' as const },
+        ];
 
   const tiers = [
     {
@@ -510,7 +526,7 @@ export default function SponsorDeck({
     },
     {
       id: 'founder',
-      title: 'UK FOUNDER\'S CLUB',
+      title: founderTitle,
       price: '£12/mo or £100/yr',
       priceSubtext: '',
       description: "You are not tied to a specific broker. Switch brokerages freely; your data history stays here. Cancel anytime.",
@@ -520,10 +536,7 @@ export default function SponsorDeck({
       priceId: PRICE_IDS.foundersClub,
       tierName: 'UK Founder\'s Club',
       isFoundersClub: true,
-      founderCheckoutIntervals: [
-        { label: 'Join Annual (£100/yr)', interval: 'annual' as const },
-        { label: 'Join Monthly (£12/mo)', interval: 'monthly' as const }
-      ],
+      founderCheckoutIntervals: founderIntervals,
       expandedContent: (
         <>
           <div style={{ 

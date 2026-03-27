@@ -56,9 +56,20 @@ const PRICE_IDS = {
   },
 };
 
+function getInitialSponsorAbVariant(): 'A' | 'B' {
+  if (typeof window === 'undefined') return 'A';
+  const key = 'pp_sponsor_ab_variant_v1';
+  const existing = sessionStorage.getItem(key);
+  if (existing === 'A' || existing === 'B') return existing;
+  const v = Math.random() < 0.5 ? 'A' : 'B';
+  sessionStorage.setItem(key, v);
+  return v;
+}
+
 function SponsorPageContent() {
   const searchParams = useSearchParams();
   const utmCampaign = searchParams.get('utm_campaign');
+  const [abVariant] = useState<'A' | 'B'>(getInitialSponsorAbVariant);
   const triggerSourceParam = (searchParams.get('trigger_source') || 'sponsor_page_direct') as
     | 'csv_import_success'
     | 'risk_metric_unlock_attempt'
@@ -128,7 +139,7 @@ function SponsorPageContent() {
     let billingInterval: 'monthly' | 'annual' = 'annual';
     
     if (typeof priceId === 'object') {
-      billingInterval = chosenInterval ?? 'annual';
+      billingInterval = chosenInterval ?? (abVariant === 'A' ? 'monthly' : 'annual');
       finalPriceId = priceId[billingInterval];
     } else {
       finalPriceId = priceId;
@@ -197,6 +208,7 @@ function SponsorPageContent() {
           email,
           billing_interval: selectedTier.billingInterval || null,
           trigger_source: triggerSourceParam,
+          ab_test_variant: abVariant,
           utm_source: searchParams.get('utm_source') || 'sponsor',
           utm_medium: searchParams.get('utm_medium') || 'checkout',
           ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
@@ -294,7 +306,7 @@ function SponsorPageContent() {
           marginBottom: '16px',
           color: 'var(--text)'
         }}>
-          Enterprise Portfolio Analytics & White Label Solutions
+          {abVariant === 'B' ? 'Unlock the AI + Risk Terminal' : 'Join the Founders Club'}
         </h1>
         <p style={{
           fontSize: '1.125rem',
@@ -303,7 +315,9 @@ function SponsorPageContent() {
           margin: '0 auto',
           lineHeight: '1.6'
         }}>
-          Professional-grade portfolio tracking, risk analysis, and client reporting tools for wealth managers and financial advisors. Sovereign data architecture meets enterprise needs.
+          {abVariant === 'B'
+            ? 'Advanced portfolio risk, sector analytics, and Pocket Analyst — local-first, cancel anytime.'
+            : 'Professional-grade portfolio tracking, risk analysis, and client reporting tools for wealth managers and financial advisors. Sovereign data architecture meets enterprise needs.'}
         </p>
         {/* Stripe Status Indicator */}
         {process.env.NODE_ENV === 'development' && (
@@ -390,6 +404,7 @@ function SponsorPageContent() {
           onPreviewTheme={setPreviewTheme}
           PRICE_IDS={PRICE_IDS}
           foundersClubScarcity={scarcity}
+          abVariant={abVariant}
         />
       </div>
 

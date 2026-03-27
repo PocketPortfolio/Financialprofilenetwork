@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -17,6 +20,18 @@ const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null;
 
+function initAdmin() {
+  if (!getApps().length) {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      }),
+    });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!stripe) {
@@ -28,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { priceId, tierName, email, utm_campaign, utm_source, utm_medium, utm_content, trigger_source, billing_interval } = body as {
+    const { priceId, tierName, email, utm_campaign, utm_source, utm_medium, utm_content, trigger_source, billing_interval, ab_test_variant } = body as {
       priceId?: string;
       tierName?: string;
       email?: string;
@@ -38,6 +53,7 @@ export async function POST(request: NextRequest) {
       utm_content?: string;
       trigger_source?: string;
       billing_interval?: 'monthly' | 'annual' | null;
+      ab_test_variant?: string;
     };
     const utmCampaignMeta =
       typeof utm_campaign === 'string' && utm_campaign.trim().length > 0
@@ -48,6 +64,8 @@ export async function POST(request: NextRequest) {
     const utmContentMeta = typeof utm_content === 'string' && utm_content.trim() ? utm_content.trim().slice(0, 200) : 'none';
     const triggerSourceMeta = typeof trigger_source === 'string' && trigger_source.trim() ? trigger_source.trim().slice(0, 200) : 'sponsor_page_direct';
     const billingIntervalMeta = billing_interval === 'monthly' || billing_interval === 'annual' ? billing_interval : 'unknown';
+    const abTestMeta =
+      ab_test_variant === 'A' || ab_test_variant === 'B' ? ab_test_variant : 'none';
     console.log('🔄 Creating Stripe checkout session:', {
       priceId,
       tierName,
@@ -133,8 +151,28 @@ export async function POST(request: NextRequest) {
         utm_content: utmContentMeta,
         trigger_source: triggerSourceMeta,
         billing_interval: billingIntervalMeta,
+        ab_test_variant: abTestMeta,
       },
     });
+
+    try {
+      const em = typeof email === 'string' ? email.trim().toLowerCase() : '';
+      if (em) {
+        initAdmin();
+        const auth = getAuth();
+        const userRecord = await auth.getUserByEmail(em);
+        const db = getFirestore();
+        await db.collection('users').doc(userRecord.uid).set(
+          {
+            lastCheckoutStartAt: Timestamp.now(),
+            lastIntentTriggerSource: triggerSourceMeta,
+          },
+          { merge: true }
+        );
+      }
+    } catch {
+      /* no Firebase user for this email — lifecycle cron uses auth users only */
+    }
 
     console.log('✅ Stripe checkout session created:', session.id);
     return NextResponse.json({ 
