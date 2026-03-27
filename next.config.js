@@ -153,6 +153,12 @@ const nextConfig = {
         destination: '/import',
         permanent: true,
       },
+      // US SEO: full broker name → canonical slug (single authoritative URL)
+      {
+        source: '/import/charles-schwab',
+        destination: '/import/schwab',
+        permanent: true,
+      },
       // Sector pages not yet implemented - redirect to dashboard
       {
         source: '/sector',

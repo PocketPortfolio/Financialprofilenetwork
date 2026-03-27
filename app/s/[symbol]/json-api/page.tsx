@@ -31,13 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
 
   if (symbol.replace(/-/g, '') === 'NSE') {
     return {
-      title: 'Free NSE JSON API & Stock Data Export | Pocket Portfolio',
+      title: 'NSE Historical Data & CSV Export | Pocket Portfolio',
       description:
-        'Get instant, free JSON API endpoints for National Stock Exchange (NSE) tickers. No API keys or registration required. Query NSE financial data securely.',
+        'Download NSE historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint for National Stock Exchange tickers.',
       openGraph: {
-        title: 'Free NSE JSON API & Stock Data Export | Pocket Portfolio',
+        title: 'NSE Historical Data & CSV Export | Pocket Portfolio',
         description:
-          'Get instant, free JSON API endpoints for National Stock Exchange (NSE) tickers. No API keys or registration required. Query NSE financial data securely.',
+          'Download NSE historical CSVs instantly. No login required. Parse normalized JSON via our free local-first API endpoint.',
         type: 'website',
         url: 'https://www.pocketportfolio.app/s/nse/json-api',
       },
@@ -49,14 +49,14 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: `${symbol} Historical Data & JSON API | Free Download | Pocket Portfolio`,
-      description: `Download ${symbol} historical stock data in JSON format. Free API for developers. Export ${symbol} price, volume, and dividend data. No login required.`,
+      title: `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+      description: `Download ${symbol} historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
     };
   }
 
   return {
-    title: `${symbol} Historical Data & JSON/CSV API | Free Download | Pocket Portfolio`,
-    description: `Download ${metadata.name} (${symbol}) historical stock data in JSON or CSV format. Free API for developers. Export price, volume, and dividend data. No login required.`,
+    title: `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+    description: `Download ${metadata.name} (${symbol}) historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
     keywords: [
       `${symbol} historical data json format`,
       `${symbol} historical data csv`,
@@ -76,8 +76,8 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
       `download ${symbol} CSV data`
     ],
     openGraph: {
-      title: `${symbol} Historical Data & JSON/CSV API | Free Download`,
-      description: `Download ${symbol} historical stock data in JSON or CSV format. Free API for developers.`,
+      title: `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+      description: `Download ${metadata.name} (${symbol}) historical CSVs instantly. No login required. Free local-first JSON API.`,
       type: 'website',
       url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
     },

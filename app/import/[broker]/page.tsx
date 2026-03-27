@@ -4,6 +4,24 @@ import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 import SovereignSyncCTA from '@/app/components/SovereignSyncCTA';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 
+/** US retail CSV-export intent pages — dedicated title/meta/H1 + export copy */
+const US_RETAIL_SEO_BROKERS = new Set(['robinhood', 'schwab', 'fidelity', 'vanguard']);
+
+function getUsBrokerExportStep1Text(broker: string, displayName: string): string {
+  switch (broker) {
+    case 'robinhood':
+      return `Open Robinhood on the web or in the app. Go to Account → Statements or Documents and download account statements or trade confirmations. Export your full trading activity as CSV wherever Robinhood offers a CSV download.`;
+    case 'fidelity':
+      return `Sign in to Fidelity. Open Accounts & Trade, then use Positions, Activity & orders, or Reports to download or export your transaction history as CSV.`;
+    case 'schwab':
+      return `Sign in at Charles Schwab (schwab.com). Open Accounts → History or Statements, then export or download your transaction history or account activity as CSV.`;
+    case 'vanguard':
+      return `Sign in to Vanguard. Under My Accounts, open transaction history, cost basis, or investment activity, then export or download your transactions as CSV.`;
+    default:
+      return `Log into your ${displayName} account and export your trading history or account statement as a CSV file.`;
+  }
+}
+
 // Generate static params for supported brokers (50 brokers for Operation Velocity)
 export async function generateStaticParams() {
   return SUPPORTED_BROKERS.map((broker) => ({
@@ -51,6 +69,44 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         description:
           'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
         images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+      },
+      alternates: {
+        canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
+      },
+    };
+  }
+
+  if (US_RETAIL_SEO_BROKERS.has(broker)) {
+    const title = `Free ${config.displayName} CSV Import | Local-First Portfolio — Pocket Portfolio`;
+    const description = `Export your ${config.displayName} transaction history to CSV, then import in seconds. Runs in your browser — data stays on your device. Download historical CSVs instantly.`;
+    return {
+      title,
+      description,
+      keywords: [
+        `${config.displayName} CSV export`,
+        `${config.displayName} CSV import`,
+        `export ${config.displayName} to CSV`,
+        `import ${config.displayName} trades`,
+        `${config.displayName} transaction history`,
+        `${config.displayName} account statement`,
+      ],
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
+            width: 1200,
+            height: 630,
+            alt: `${config.displayName} CSV Import - Pocket Portfolio`,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -106,6 +162,11 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
     notFound();
   }
 
+  const isUsRetailSeo = US_RETAIL_SEO_BROKERS.has(broker);
+  const exportStep1Text = isUsRetailSeo
+    ? getUsBrokerExportStep1Text(broker, config.displayName)
+    : `Log into your ${config.displayName} account and export your trading history or account statement as a CSV file.`;
+
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -150,7 +211,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
       {
         '@type': 'HowToStep',
         name: 'Export Your Data',
-        text: `Log into your ${config.displayName} account and export your trading history or account statement as a CSV file.`,
+        text: exportStep1Text,
         url: `https://www.pocketportfolio.app/import/${broker}#step1`
       },
       {
@@ -215,7 +276,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             color: 'var(--text)',
             letterSpacing: '-0.5px'
           }}>
-            {config.displayName} CSV Import Guide
+            {isUsRetailSeo
+              ? `Import ${config.displayName} CSV into Pocket Portfolio`
+              : `${config.displayName} CSV Import Guide`}
           </h1>
           <p style={{
             fontSize: '18px',
@@ -224,7 +287,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             margin: '0 auto',
             lineHeight: '1.6'
           }}>
-            Learn how to import your {config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.
+            {isUsRetailSeo
+              ? `Export your ${config.displayName} transaction history to CSV, then import in seconds. Everything runs in your browser — your data stays on your device.`
+              : `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.`}
           </p>
         </header>
 
@@ -378,8 +443,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
                 color: 'var(--text-secondary)',
                 margin: '0'
               }}>
-                Log into your {config.displayName} account and navigate to the export or account statement section. 
-                Download your trading history or account statement as a CSV file.
+                {isUsRetailSeo
+                  ? exportStep1Text
+                  : `Log into your ${config.displayName} account and navigate to the export or account statement section. Download your trading history or account statement as a CSV file.`}
               </p>
             </div>
 
