@@ -21,42 +21,8 @@ export function usePremiumTheme() {
   const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Check localStorage first for cached tier with timestamp
     const cachedTier = localStorage.getItem('pocket-portfolio-tier') as Tier;
     const cachedTheme = localStorage.getItem('pocket-portfolio-premium-theme') as PremiumTheme;
-    const cacheTimestamp = localStorage.getItem('pocket-portfolio-tier-timestamp');
-
-    // Use cached data if it's less than 5 minutes old - CRITICAL for quota management
-    if (cachedTier && cachedTheme && cacheTimestamp) {
-      const age = Date.now() - parseInt(cacheTimestamp, 10);
-      if (age < 5 * 60 * 1000) { // 5 minutes
-        setTier(cachedTier);
-        setUnlockedTheme(cachedTheme);
-        setIsLoading(false);
-        // Background revalidate: if user was revoked, we clear cache and update state so revoke is seamless
-        if (isAuthenticated && user?.email) {
-          user.getIdToken().then((idToken) => {
-            fetch('/api/api-keys/user', { headers: { Authorization: `Bearer ${idToken}` } })
-              .then((r) => r.ok ? r.json() : null)
-              .then((data) => {
-                if (data && !data.tier) {
-                  localStorage.removeItem('pocket-portfolio-tier');
-                  localStorage.removeItem('pocket-portfolio-premium-theme');
-                  localStorage.removeItem('pocket-portfolio-tier-timestamp');
-                  localStorage.removeItem('CORPORATE_KEY');
-                  const ek = `apiKeys_${user.email}`;
-                  localStorage.removeItem(ek);
-                  localStorage.removeItem(`${ek}_timestamp`);
-                  setTier(null);
-                  setUnlockedTheme(null);
-                }
-              })
-              .catch(() => {});
-          }).catch(() => {});
-        }
-        return;
-      }
-    }
 
     // Determine which email to use and which endpoint to call
     let emailToCheck: string | null = null;
@@ -76,6 +42,8 @@ export function usePremiumTheme() {
     }
 
     if (!emailToCheck) {
+      setTier(null);
+      setUnlockedTheme(null);
       setIsLoading(false);
       return;
     }
@@ -105,12 +73,14 @@ export function usePremiumTheme() {
         }
 
         if (!response.ok) {
-          // If quota error, use cached data if available
-          if (response.status === 503) {
-            if (cachedTier && cachedTheme) {
-              setTier(cachedTier);
-              setUnlockedTheme(cachedTheme);
-            }
+          // 503: only unauthenticated flows may fall back to cache (avoid false premium for signed-in users)
+          if (response.status === 503 && !isAuthenticated && cachedTier && cachedTheme) {
+            setTier(cachedTier);
+            setUnlockedTheme(cachedTheme);
+          } else if (isAuthenticated && user?.email) {
+            // Any other error: do not keep a stale paid tier in memory
+            setTier(null);
+            setUnlockedTheme(null);
           }
           setIsLoading(false);
           return;
@@ -140,7 +110,9 @@ export function usePremiumTheme() {
             localStorage.setItem('pocket-portfolio-premium-theme', theme);
           }
         } else {
-          // No tier found (e.g. revoked) - clear all tier/API caches so revoke is seamless
+          // No tier found (e.g. revoked or free) — must reset React state, not only localStorage
+          setTier(null);
+          setUnlockedTheme(null);
           localStorage.removeItem('pocket-portfolio-tier');
           localStorage.removeItem('pocket-portfolio-premium-theme');
           localStorage.removeItem('pocket-portfolio-tier-timestamp');
@@ -153,8 +125,8 @@ export function usePremiumTheme() {
         }
       } catch (error) {
         console.error('Error checking tier:', error);
-        // Use cached data on error
-        if (cachedTier && cachedTheme) {
+        // Unauthenticated only: fall back to cache. Authenticated: prefer no tier over false premium.
+        if (!isAuthenticated && cachedTier && cachedTheme) {
           setTier(cachedTier);
           setUnlockedTheme(cachedTheme);
         }
