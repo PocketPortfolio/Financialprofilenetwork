@@ -1,7 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { trackCSVImportSuccess, trackCSVImportStart, trackCSVImportError } from '../lib/analytics/events';
+import {
+  trackCSVImportSuccess,
+  trackCSVImportStart,
+  trackCSVImportError,
+  trackPaywallCtaClick,
+  trackPaywallImpression,
+} from '../lib/analytics/events';
 import { parseCSV as parseCSVAdapter, detectBrokerFromSample, genericParse, parseUniversal } from '@pocket-portfolio/importer';
 import { detectBroker } from '@pocket-portfolio/importer';
 import type { BrokerId, NormalizedTrade, RequiresMappingResult } from '@pocket-portfolio/importer';
@@ -52,6 +58,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [alertModalData, setAlertModalData] = useState<{title: string; message: string; type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showIntentUpsellModal, setShowIntentUpsellModal] = useState(false);
   const [pendingUniversal, setPendingUniversal] = useState<RequiresMappingResult | null>(null);
   const [unknownFile, setUnknownFile] = useState<{ file: File; rawFile: import('@pocket-portfolio/importer').RawFile; csvContent: string; reason?: 'unknown' | 'zero_trades' } | null>(null);
 
@@ -1995,6 +2002,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} from ${file.name}`,
         'success'
       );
+      trackPaywallImpression('csv_import_success', '/dashboard');
+      setShowIntentUpsellModal(true);
       
       
       
@@ -2105,6 +2114,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} using your column mapping.`,
         'success'
       );
+      trackPaywallImpression('csv_import_success', '/dashboard');
+      setShowIntentUpsellModal(true);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // #region agent log
@@ -2139,6 +2150,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 }
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'}.`, 'success');
+                trackPaywallImpression('csv_import_success', '/dashboard');
+                setShowIntentUpsellModal(true);
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -2176,6 +2189,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 // #endregion
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} with Smart Import.`, 'success');
+                trackPaywallImpression('csv_import_success', '/dashboard');
+                setShowIntentUpsellModal(true);
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -2318,6 +2333,78 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
       onClose={() => setShowUpgradeModal(false)}
       spotsRemaining={getFoundersClubSpotsRemaining()}
     />
+
+    {showIntentUpsellModal && (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.55)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10050,
+          padding: '16px',
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '460px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '20px',
+          }}
+        >
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: 'var(--text)' }}>Import complete. Unlock advanced risk next.</h3>
+          <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
+            Your data is in. Upgrade to Founders Club to unlock Beta, Volatility, and deeper AI analysis for this portfolio.
+          </p>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <a
+              href="/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success"
+              onClick={() =>
+                trackPaywallCtaClick(
+                  'csv_import_success',
+                  '/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success',
+                  '/dashboard'
+                )
+              }
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                background: 'var(--accent-warm)',
+                color: '#000',
+                textDecoration: 'none',
+                fontWeight: 700,
+                fontSize: '14px',
+              }}
+            >
+              Unlock Founders Features
+            </a>
+            <button
+              type="button"
+              onClick={() => setShowIntentUpsellModal(false)}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '8px',
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-secondary)',
+                fontSize: '14px',
+                cursor: 'pointer',
+              }}
+            >
+              Continue free
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
 
     {/* Column Mapping Modal - Universal import when broker unknown */}
     {pendingUniversal && (

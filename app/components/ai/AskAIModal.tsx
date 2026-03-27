@@ -7,7 +7,15 @@ import remarkGfm from 'remark-gfm';
 import { X, Sparkles, Paperclip } from 'lucide-react';
 import Papa from 'papaparse';
 import type { User } from 'firebase/auth';
-import { trackEvent } from '@/app/lib/analytics/events';
+import {
+  trackCheckoutError,
+  trackCheckoutRedirected,
+  trackCheckoutSessionCreated,
+  trackCheckoutStart,
+  trackEvent,
+  trackPaywallCtaClick,
+  trackPaywallImpression,
+} from '@/app/lib/analytics/events';
 
 /** Renders assistant message content as Markdown (bold, lists, links). */
 function AssistantMessageContent({ content }: { content: string }) {
@@ -71,13 +79,14 @@ export function AskAIModal({
   const FOUNDERS_CLUB_PRICE_ID =
     process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1TAWCxD4sftWa1WtEZtg2Oli';
 
-  const handleQuotaUpgradeToStripe = async () => {
+  const launchCheckoutFromTrigger = async (triggerSource: 'ai_file_attachment_attempt' | 'sponsor_page_direct') => {
     if (!FOUNDERS_CLUB_PRICE_ID || FOUNDERS_CLUB_PRICE_ID.includes('XXXXX')) {
       setError('Checkout not configured. Please visit /sponsor to upgrade.');
       return;
     }
     setCheckoutLoading(true);
     setError(null);
+    trackCheckoutStart(triggerSource, FOUNDERS_CLUB_PRICE_ID, "UK Founder's Club", 'annual');
     try {
       const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
@@ -86,26 +95,45 @@ export function AskAIModal({
           priceId: FOUNDERS_CLUB_PRICE_ID,
           tierName: "UK Founder's Club",
           email: user?.email ?? undefined,
+          trigger_source: triggerSource,
+          utm_source: 'pocket_analyst',
+          utm_medium: 'attachment_upsell',
+          utm_campaign: 'intent_trigger',
+          utm_content: triggerSource,
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || `Checkout failed (${res.status})`);
+      if (!res.ok) {
+        trackCheckoutError('session_create', 'session_create_failed', data?.error || `Checkout failed (${res.status})`, triggerSource, FOUNDERS_CLUB_PRICE_ID);
+        throw new Error(data.error || `Checkout failed (${res.status})`);
+      }
+      if (data.sessionId) {
+        trackCheckoutSessionCreated(data.sessionId, FOUNDERS_CLUB_PRICE_ID, "UK Founder's Club", triggerSource);
+      }
       if (data.url) {
-        trackEvent('quota_upgrade_initiated');
+        trackCheckoutRedirected(data.sessionId || 'unknown');
         window.location.href = data.url;
         return;
       }
       if (data.sessionId) {
-        trackEvent('quota_upgrade_initiated');
+        trackCheckoutRedirected(data.sessionId);
         window.location.href = `https://checkout.stripe.com/c/pay/${data.sessionId}`;
         return;
       }
+      trackCheckoutError('redirect', 'missing_checkout_target', 'No checkout URL returned', triggerSource, FOUNDERS_CLUB_PRICE_ID);
       throw new Error('No checkout URL returned');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Checkout failed');
     } finally {
       setCheckoutLoading(false);
     }
+  };
+
+  const handleQuotaUpgradeToStripe = async () => {
+    trackEvent('quota_upgrade_initiated');
+    trackPaywallImpression('ai_file_attachment_attempt');
+    trackPaywallCtaClick('ai_file_attachment_attempt', '/api/create-checkout-session');
+    await launchCheckoutFromTrigger('ai_file_attachment_attempt');
   };
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -440,7 +468,10 @@ export function AskAIModal({
               type="button"
               onClick={() => {
                 if (isPaid) fileInputRef.current?.click();
-                else setShowAttachmentUpsellModal(true);
+                else {
+                  trackPaywallImpression('ai_file_attachment_attempt');
+                  setShowAttachmentUpsellModal(true);
+                }
               }}
               aria-label="Add file"
               style={{
@@ -616,8 +647,16 @@ export function AskAIModal({
                 Upgrade to Founder's Club or Corporate to attach CSV or text files to your questions.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <a
-                  href="/sponsor?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=founders_club"
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackPaywallImpression('ai_file_attachment_attempt');
+                    trackPaywallCtaClick(
+                      'ai_file_attachment_attempt',
+                      '/sponsor?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=intent_trigger&utm_content=ai_file_attachment_attempt&trigger_source=ai_file_attachment_attempt'
+                    );
+                    launchCheckoutFromTrigger('ai_file_attachment_attempt');
+                  }}
                   style={{
                     display: 'block',
                     padding: '12px 20px',
@@ -628,10 +667,13 @@ export function AskAIModal({
                     fontWeight: 600,
                     textDecoration: 'none',
                     textAlign: 'center',
+                    border: 'none',
+                    width: '100%',
+                    cursor: 'pointer',
                   }}
                 >
                   Upgrade to Founder's Club or Corporate
-                </a>
+                </button>
                 <button
                   type="button"
                   onClick={() => setShowAttachmentUpsellModal(false)}

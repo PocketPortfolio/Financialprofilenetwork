@@ -28,17 +28,37 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { priceId, tierName, email, utm_campaign } = body as {
+    const { priceId, tierName, email, utm_campaign, utm_source, utm_medium, utm_content, trigger_source, billing_interval } = body as {
       priceId?: string;
       tierName?: string;
       email?: string;
       utm_campaign?: string;
+      utm_source?: string;
+      utm_medium?: string;
+      utm_content?: string;
+      trigger_source?: string;
+      billing_interval?: 'monthly' | 'annual' | null;
     };
     const utmCampaignMeta =
       typeof utm_campaign === 'string' && utm_campaign.trim().length > 0
         ? utm_campaign.trim().slice(0, 500)
         : 'organic';
-    console.log('🔄 Creating Stripe checkout session:', { priceId, tierName, email, utm_campaign: utmCampaignMeta });
+    const utmSourceMeta = typeof utm_source === 'string' && utm_source.trim() ? utm_source.trim().slice(0, 200) : 'direct';
+    const utmMediumMeta = typeof utm_medium === 'string' && utm_medium.trim() ? utm_medium.trim().slice(0, 200) : 'checkout';
+    const utmContentMeta = typeof utm_content === 'string' && utm_content.trim() ? utm_content.trim().slice(0, 200) : 'none';
+    const triggerSourceMeta = typeof trigger_source === 'string' && trigger_source.trim() ? trigger_source.trim().slice(0, 200) : 'sponsor_page_direct';
+    const billingIntervalMeta = billing_interval === 'monthly' || billing_interval === 'annual' ? billing_interval : 'unknown';
+    console.log('🔄 Creating Stripe checkout session:', {
+      priceId,
+      tierName,
+      email,
+      utm_campaign: utmCampaignMeta,
+      utm_source: utmSourceMeta,
+      utm_medium: utmMediumMeta,
+      utm_content: utmContentMeta,
+      trigger_source: triggerSourceMeta,
+      billing_interval: billingIntervalMeta,
+    });
 
     if (!priceId || priceId.includes('XXXXX')) {
       return NextResponse.json(
@@ -108,6 +128,11 @@ export async function POST(request: NextRequest) {
         tierName: tierName || 'Unknown',
         email: email || '',
         utm_campaign: utmCampaignMeta,
+        utm_source: utmSourceMeta,
+        utm_medium: utmMediumMeta,
+        utm_content: utmContentMeta,
+        trigger_source: triggerSourceMeta,
+        billing_interval: billingIntervalMeta,
       },
     });
 

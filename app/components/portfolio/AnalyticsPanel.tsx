@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { PortfolioAnalytics } from '@/app/lib/portfolio/types';
+import { trackPaywallCtaClick, trackPaywallImpression } from '@/app/lib/analytics/events';
 
 interface AnalyticsPanelProps {
   analytics: PortfolioAnalytics | null;
@@ -18,6 +19,12 @@ export default function AnalyticsPanel({
   loading = false,
   isPremium = false,
 }: AnalyticsPanelProps) {
+  useEffect(() => {
+    if (!isPremium) {
+      trackPaywallImpression('risk_metric_unlock_attempt', '/dashboard', null);
+    }
+  }, [isPremium]);
+
   if (loading) {
     return (
       <div
@@ -121,8 +128,15 @@ export default function AnalyticsPanel({
   ];
 
   const handleUpgradeClick = () => {
+    trackPaywallImpression('risk_metric_unlock_attempt', '/dashboard', isPremium ? 'foundersClub' : null);
+    trackPaywallCtaClick(
+      'risk_metric_unlock_attempt',
+      '/sponsor?utm_source=dashboard&utm_medium=analytics_panel_gate&utm_campaign=intent_trigger&utm_content=risk_metric_unlock_attempt',
+      '/dashboard',
+      isPremium ? 'foundersClub' : null
+    );
     window.location.href =
-      '/sponsor?utm_source=dashboard&utm_medium=analytics_panel_gate&utm_campaign=founders_club';
+      '/sponsor?utm_source=dashboard&utm_medium=analytics_panel_gate&utm_campaign=intent_trigger&utm_content=risk_metric_unlock_attempt&trigger_source=risk_metric_unlock_attempt';
   };
 
   return (

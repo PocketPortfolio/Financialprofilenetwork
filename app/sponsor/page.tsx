@@ -9,6 +9,14 @@ import SponsorModal from '../components/SponsorModal';
 import AlertModal from '../components/modals/AlertModal';
 import SponsorDeck from '../components/sponsor/SponsorDeck';
 import { getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
+import {
+  trackCheckoutError,
+  trackCheckoutRedirected,
+  trackCheckoutSessionCreated,
+  trackCheckoutStart,
+  trackPaywallCtaClick,
+  trackPaywallImpression,
+} from '../lib/analytics/events';
 
 // Get publishable key - REQUIRED (no fallback for security)
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -51,6 +59,11 @@ const PRICE_IDS = {
 function SponsorPageContent() {
   const searchParams = useSearchParams();
   const utmCampaign = searchParams.get('utm_campaign');
+  const triggerSourceParam = (searchParams.get('trigger_source') || 'sponsor_page_direct') as
+    | 'csv_import_success'
+    | 'risk_metric_unlock_attempt'
+    | 'ai_file_attachment_attempt'
+    | 'sponsor_page_direct';
   const [loading, setLoading] = useState<string | null>(null);
   const [stripeStatus, setStripeStatus] = useState<'checking' | 'ready' | 'error'>('checking');
   const [isModalOpen, setModalOpen] = useState(false);
@@ -146,15 +159,25 @@ function SponsorPageContent() {
 
     setModalOpen(false);
     setLoading(finalPriceId);
+    trackPaywallImpression(triggerSourceParam, '/sponsor');
+    trackPaywallCtaClick(triggerSourceParam, '/api/create-checkout-session', '/sponsor');
+    trackCheckoutStart(
+      triggerSourceParam,
+      finalPriceId,
+      selectedTier.tierName,
+      selectedTier.billingInterval || null
+    );
 
     try {
       if (!stripePromise) {
+        trackCheckoutError('stripe_init', 'stripe_not_configured', 'Stripe publishable key not configured', triggerSourceParam, finalPriceId);
         throw new Error('Stripe publishable key not configured');
       }
       
       const stripe = await stripePromise;
       
       if (!stripe) {
+        trackCheckoutError('stripe_init', 'stripe_load_failed', 'Stripe failed to load', triggerSourceParam, finalPriceId);
         throw new Error('Stripe failed to load');
       }
 
@@ -172,28 +195,44 @@ function SponsorPageContent() {
           priceId: finalPriceId,
           tierName: selectedTier.tierName,
           email,
+          billing_interval: selectedTier.billingInterval || null,
+          trigger_source: triggerSourceParam,
+          utm_source: searchParams.get('utm_source') || 'sponsor',
+          utm_medium: searchParams.get('utm_medium') || 'checkout',
           ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
+          ...(searchParams.get('utm_content') ? { utm_content: searchParams.get('utm_content') } : {}),
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
         console.error('❌ API Error:', error);
+        trackCheckoutError(
+          'session_create',
+          'session_create_failed',
+          error.error || `Failed to create checkout session (${response.status})`,
+          triggerSourceParam,
+          finalPriceId
+        );
         throw new Error(error.error || `Failed to create checkout session (${response.status})`);
       }
 
       const { sessionId, url } = await response.json();
       
       if (!sessionId) {
+        trackCheckoutError('session_create', 'missing_session_id', 'No session ID returned from API', triggerSourceParam, finalPriceId);
         throw new Error('No session ID returned from API');
       }
 
       console.log('✅ Checkout session created:', sessionId);
+      trackCheckoutSessionCreated(sessionId, finalPriceId, selectedTier.tierName, triggerSourceParam);
       
       // Redirect to Stripe Checkout
       if (url) {
+        trackCheckoutRedirected(sessionId);
         window.location.href = url;
       } else {
+        trackCheckoutRedirected(sessionId);
         window.location.href = `https://checkout.stripe.com/c/pay/${sessionId}`;
       }
     } catch (error: any) {

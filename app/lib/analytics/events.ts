@@ -171,6 +171,152 @@ export function trackError(error: string, context?: string) {
 
 const CONVERSION_FUNNEL_EVENTS = ['lead_magnet_clicked', 'mobile_setup_requested', 'quota_upgrade_initiated'] as const;
 
+export type MonetizationTriggerSource =
+  | 'csv_import_success'
+  | 'risk_metric_unlock_attempt'
+  | 'ai_file_attachment_attempt'
+  | 'sponsor_page_direct';
+
+const PAYWALL_IMPRESSION_KEY = 'pp_paywall_impressions_v1';
+const MONETIZATION_SESSION_KEY = 'pp_monetization_session_id';
+
+function getMonetizationSessionId(): string {
+  if (typeof window === 'undefined') return 'server';
+  const existing = sessionStorage.getItem(MONETIZATION_SESSION_KEY);
+  if (existing) return existing;
+  const created = `ms_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  sessionStorage.setItem(MONETIZATION_SESSION_KEY, created);
+  return created;
+}
+
+function getCurrentUtm() {
+  if (typeof window === 'undefined') return { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null };
+  const qs = new URLSearchParams(window.location.search);
+  const fromSession = (k: string) => sessionStorage.getItem(k);
+  return {
+    utm_source: qs.get('utm_source') || fromSession('utm_source'),
+    utm_medium: qs.get('utm_medium') || fromSession('utm_medium'),
+    utm_campaign: qs.get('utm_campaign') || fromSession('utm_campaign'),
+    utm_content: qs.get('utm_content') || fromSession('utm_content'),
+  };
+}
+
+export function trackPaywallImpression(triggerSource: MonetizationTriggerSource, pagePath?: string, tier?: string | null) {
+  if (typeof window === 'undefined') return;
+  const key = `${triggerSource}::${window.location.pathname}`;
+  const existingRaw = sessionStorage.getItem(PAYWALL_IMPRESSION_KEY);
+  const existing = existingRaw ? JSON.parse(existingRaw) as string[] : [];
+  if (existing.includes(key)) return;
+  existing.push(key);
+  sessionStorage.setItem(PAYWALL_IMPRESSION_KEY, JSON.stringify(existing));
+
+  const utm = getCurrentUtm();
+  trackEvent('paywall_impression', {
+    session_id: getMonetizationSessionId(),
+    trigger_source: triggerSource,
+    page_path: pagePath || window.location.pathname,
+    tier: tier || 'null',
+    utm_source: utm.utm_source || 'direct',
+    utm_medium: utm.utm_medium || 'paywall',
+    utm_campaign: utm.utm_campaign || 'intent_trigger',
+    utm_content: utm.utm_content || triggerSource,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackPaywallCtaClick(
+  triggerSource: MonetizationTriggerSource,
+  destination: string,
+  pagePath?: string,
+  tier?: string | null,
+  ctaId: string = 'upgrade_founders_primary'
+) {
+  const utm = getCurrentUtm();
+  trackEvent('paywall_cta_click', {
+    session_id: getMonetizationSessionId(),
+    trigger_source: triggerSource,
+    cta_id: ctaId,
+    destination,
+    page_path: pagePath || (typeof window !== 'undefined' ? window.location.pathname : 'server'),
+    tier: tier || 'null',
+    utm_source: utm.utm_source || 'direct',
+    utm_medium: utm.utm_medium || 'paywall',
+    utm_campaign: utm.utm_campaign || 'intent_trigger',
+    utm_content: utm.utm_content || triggerSource,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackCheckoutStart(
+  triggerSource: MonetizationTriggerSource,
+  priceId: string,
+  tierName: string,
+  billingInterval?: 'monthly' | 'annual' | null
+) {
+  const utm = getCurrentUtm();
+  trackEvent('checkout_start', {
+    session_id: getMonetizationSessionId(),
+    trigger_source: triggerSource,
+    price_id: priceId,
+    tier_name: tierName,
+    billing_interval: billingInterval || 'null',
+    page_path: typeof window !== 'undefined' ? window.location.pathname : 'server',
+    utm_source: utm.utm_source || 'direct',
+    utm_medium: utm.utm_medium || 'checkout',
+    utm_campaign: utm.utm_campaign || 'intent_trigger',
+    utm_content: utm.utm_content || triggerSource,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackCheckoutSessionCreated(stripeSessionId: string, priceId: string, tierName: string, triggerSource: MonetizationTriggerSource) {
+  trackEvent('checkout_session_created', {
+    session_id: getMonetizationSessionId(),
+    stripe_session_id: stripeSessionId,
+    price_id: priceId,
+    tier_name: tierName,
+    trigger_source: triggerSource,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackCheckoutRedirected(stripeSessionId: string, redirectTarget: string = 'stripe_checkout_url') {
+  trackEvent('checkout_redirected', {
+    session_id: getMonetizationSessionId(),
+    stripe_session_id: stripeSessionId,
+    redirect_target: redirectTarget,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackCheckoutError(
+  errorStage: 'session_create' | 'stripe_init' | 'redirect',
+  errorCode: string,
+  errorMessage: string,
+  triggerSource?: MonetizationTriggerSource,
+  priceId?: string
+) {
+  trackEvent('checkout_error', {
+    session_id: getMonetizationSessionId(),
+    trigger_source: triggerSource || 'sponsor_page_direct',
+    error_stage: errorStage,
+    error_code: errorCode,
+    error_message: errorMessage.slice(0, 200),
+    price_id: priceId || 'null',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackCheckoutSuccessPageView(stripeSessionId: string, tierName?: string | null, hasApiKey?: boolean | null) {
+  trackEvent('checkout_success_page_view', {
+    session_id: getMonetizationSessionId(),
+    stripe_session_id: stripeSessionId,
+    tier_name: tierName || 'null',
+    has_api_key: String(!!hasApiKey),
+    timestamp: new Date().toISOString(),
+  });
+}
+
 // Conversion funnel events (Lead Magnet, Mobile Setup, Quota Upgrade) — GA4 + /admin/analytics.
 export function trackEvent(
   eventName: string,

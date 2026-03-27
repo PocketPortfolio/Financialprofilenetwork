@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import AlertModal from '../../components/modals/AlertModal';
+import { trackCheckoutSuccessPageView } from '../../lib/analytics/events';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -29,6 +30,11 @@ function SuccessContent() {
     const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, [sessionId]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+    trackCheckoutSuccessPageView(sessionId, tier, !!(apiKey || corporateLicense));
+  }, [sessionId, tier, apiKey, corporateLicense]);
 
   const fetchApiKeys = async (retryCount = 0) => {
     try {

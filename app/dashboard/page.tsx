@@ -45,7 +45,7 @@ import FeatureAnnouncementModal from '../components/modals/FeatureAnnouncementMo
 // import PortfolioSelector from '../components/PortfolioSelector';
 import { getDeviceInfo } from '../lib/utils/device';
 import { initializeMobileAnalytics } from '../lib/analytics/device';
-import { trackEvent } from '../lib/analytics/events';
+import { trackEvent, trackPaywallCtaClick, trackPaywallImpression } from '../lib/analytics/events';
 import MobileHeader from '../components/nav/MobileHeader';
 import OnboardingTour from '../components/OnboardingTour';
 import { SovereignHeader } from '../components/dashboard/SovereignHeader';
@@ -254,6 +254,7 @@ export default function Dashboard() {
   const [showFeatureAnnouncement, setShowFeatureAnnouncement] = useState(false);
   const modalScheduledRef = useRef(false); // Persist across re-renders
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showPostImportUpsell, setShowPostImportUpsell] = useState(false);
   const [importModalFile, setImportModalFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<'performance' | 'insights'>('performance');
   const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty'>('value');
@@ -1702,8 +1703,87 @@ export default function Dashboard() {
                     handleCSVImport(trades);
                     setShowImportModal(false);
                     setImportModalFile(null);
+                    trackPaywallImpression('csv_import_success', '/dashboard', tier);
+                    setShowPostImportUpsell(true);
                   }}
                 />
+              </div>
+            </div>
+          )}
+
+          {showPostImportUpsell && (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.55)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1100,
+                padding: '16px',
+              }}
+              onClick={() => setShowPostImportUpsell(false)}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: '480px',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '12px',
+                  padding: '20px',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 style={{ margin: '0 0 8px', color: 'var(--text)', fontSize: '18px' }}>
+                  Import complete. Unlock advanced risk intelligence.
+                </h3>
+                <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
+                  Your portfolio data is live. Upgrade now to unlock Beta, Volatility, and premium AI analysis.
+                </p>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <a
+                    href="/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success"
+                    onClick={() => {
+                      trackPaywallCtaClick(
+                        'csv_import_success',
+                        '/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success',
+                        '/dashboard',
+                        tier
+                      );
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      background: 'var(--accent-warm)',
+                      color: '#000',
+                      textDecoration: 'none',
+                      fontWeight: 700,
+                      fontSize: '14px',
+                    }}
+                  >
+                    Unlock Founders Features
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setShowPostImportUpsell(false)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      background: 'var(--surface-elevated)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-secondary)',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Continue free
+                  </button>
+                </div>
               </div>
             </div>
           )}
