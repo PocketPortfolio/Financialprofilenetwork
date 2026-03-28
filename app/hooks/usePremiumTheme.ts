@@ -2,9 +2,54 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
+import { isPaidTier, type PaidTier } from '../lib/tier';
 
 type PremiumTheme = 'founder' | 'corporate' | null;
 type Tier = 'codeSupporter' | 'featureVoter' | 'corporateSponsor' | 'foundersClub' | null;
+
+function themeForPaidTier(tier: PaidTier, themeAccess: PremiumTheme | null): PremiumTheme | null {
+  if (themeAccess) return themeAccess;
+  if (tier === 'foundersClub') return 'founder';
+  if (tier === 'corporateSponsor') return 'corporate';
+  return null;
+}
+
+/** Last known paid tier from localStorage (pocket-portfolio-tier or Settings apiKeys_* cache). */
+function readCachedPaidTier(
+  isAuthenticated: boolean,
+  userEmail: string | null | undefined,
+  sponsorEmail: string | null
+): PaidTier | null {
+  const pocket = localStorage.getItem('pocket-portfolio-tier');
+  if (isPaidTier(pocket)) return pocket;
+
+  const email = (isAuthenticated && userEmail) || sponsorEmail;
+  if (!email) return null;
+  try {
+    const raw = localStorage.getItem(`apiKeys_${email}`);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as { tier?: string };
+    if (isPaidTier(data?.tier)) return data.tier;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function applyPaidTierFromBrowserCache(
+  paid: PaidTier,
+  setTier: (t: Tier) => void,
+  setUnlockedTheme: (t: PremiumTheme) => void
+) {
+  setTier(paid);
+  const cachedTheme = localStorage.getItem('pocket-portfolio-premium-theme') as PremiumTheme;
+  const theme = themeForPaidTier(paid, cachedTheme && (cachedTheme === 'founder' || cachedTheme === 'corporate') ? cachedTheme : null);
+  if (theme) {
+    setUnlockedTheme(theme);
+    localStorage.setItem('pocket-portfolio-premium-theme', theme);
+  }
+  localStorage.setItem('pocket-portfolio-tier', paid);
+}
 
 /**
  * Hook to check user's subscription tier and unlock premium themes
@@ -73,14 +118,20 @@ export function usePremiumTheme() {
         }
 
         if (!response.ok) {
-          // 503: only unauthenticated flows may fall back to cache (avoid false premium for signed-in users)
+          // 503: unauthenticated may restore any cached tier + theme from a prior session
           if (response.status === 503 && !isAuthenticated && cachedTier && cachedTheme) {
             setTier(cachedTier);
             setUnlockedTheme(cachedTheme);
           } else if (isAuthenticated && user?.email) {
-            // Any other error: do not keep a stale paid tier in memory
-            setTier(null);
-            setUnlockedTheme(null);
+            // Transient errors (429, 5xx, etc.): keep last known paid tier so upsells (e.g. Founders banner) never target upgraded users
+            const sponsorEmail = localStorage.getItem('sponsor_email');
+            const paid = readCachedPaidTier(true, user.email, sponsorEmail);
+            if (paid) {
+              applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+            } else {
+              setTier(null);
+              setUnlockedTheme(null);
+            }
           }
           setIsLoading(false);
           return;
@@ -125,10 +176,15 @@ export function usePremiumTheme() {
         }
       } catch (error) {
         console.error('Error checking tier:', error);
-        // Unauthenticated only: fall back to cache. Authenticated: prefer no tier over false premium.
         if (!isAuthenticated && cachedTier && cachedTheme) {
           setTier(cachedTier);
           setUnlockedTheme(cachedTheme);
+        } else if (isAuthenticated && user?.email) {
+          const sponsorEmail = localStorage.getItem('sponsor_email');
+          const paid = readCachedPaidTier(true, user.email, sponsorEmail);
+          if (paid) {
+            applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+          }
         }
       } finally {
         setIsLoading(false);
