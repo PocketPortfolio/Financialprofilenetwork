@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -16,6 +16,45 @@ import {
   trackPaywallCtaClick,
   trackPaywallImpression,
 } from '@/app/lib/analytics/events';
+import { LocalProcessingTerminal } from '@/app/components/LocalProcessingTerminal';
+
+const ATTACHMENT_MAX_CHARS = 50000;
+
+type PendingAttachment = { content: string; fileName: string; dataRowCount: number };
+
+function buildAiAttachmentFromCsv(text: string, fileName: string): PendingAttachment {
+  const parsed = Papa.parse<string[]>(text, { skipEmptyLines: true });
+  const rows = parsed.data.filter(
+    (r) => Array.isArray(r) && r.some((c) => String(c).trim() !== '')
+  );
+  if (rows.length === 0) {
+    throw new Error('CSV has no usable rows');
+  }
+  const headerCells = (rows[0] as string[]).map((c) => String(c).trim().toLowerCase());
+  const bodyRows = rows.slice(1).map((row) =>
+    Array.isArray(row) ? row.map((c) => String(c).trim()) : [String(row)]
+  );
+  const normalizedRows = [headerCells, ...bodyRows];
+  const asText = normalizedRows
+    .map((row) => (Array.isArray(row) ? row.join(', ') : String(row)))
+    .join('\n');
+  /** Data rows after treating row 0 as header; 0 if only a header line exists. */
+  const dataRowCount = Math.max(0, rows.length - 1);
+  return {
+    content: asText.slice(0, ATTACHMENT_MAX_CHARS),
+    fileName,
+    dataRowCount,
+  };
+}
+
+function buildAiAttachmentFromPlainText(text: string, fileName: string): PendingAttachment {
+  const lines = text.split('\n').filter((l) => l.trim().length > 0);
+  return {
+    content: text.slice(0, ATTACHMENT_MAX_CHARS),
+    fileName,
+    dataRowCount: lines.length,
+  };
+}
 
 /** Renders assistant message content as Markdown (bold, lists, links). */
 function AssistantMessageContent({ content }: { content: string }) {
@@ -74,6 +113,10 @@ export function AskAIModal({
   const [showQuotaExceededModal, setShowQuotaExceededModal] = useState(false);
   const [showAttachmentUpsellModal, setShowAttachmentUpsellModal] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [attachmentProcessing, setAttachmentProcessing] = useState(false);
+  const [attachmentTerminalActive, setAttachmentTerminalActive] = useState(false);
+  const [attachmentUpsellRowCount, setAttachmentUpsellRowCount] = useState<number | null>(null);
+  const pendingAttachRef = useRef<PendingAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const FOUNDERS_CLUB_PRICE_ID =
@@ -138,23 +181,50 @@ export function AskAIModal({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  const finishAttachmentTheater = useCallback(() => {
+    const pending = pendingAttachRef.current;
+    if (!pending) return;
+    pendingAttachRef.current = null;
+    setAttachmentTerminalActive(false);
+    setAttachmentProcessing(false);
+    if (isPaid) {
+      setAttachedContent(pending.content);
+      setAttachedFileName(pending.fileName);
+    } else {
+      setAttachmentUpsellRowCount(pending.dataRowCount);
+      trackPaywallImpression('ai_file_attachment_attempt');
+      setShowAttachmentUpsellModal(true);
+    }
+  }, [isPaid]);
+
   const handleFileAttach = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
+    setError(null);
+    setAttachmentProcessing(true);
+    setAttachmentTerminalActive(false);
+    pendingAttachRef.current = null;
+
     const reader = new FileReader();
+    reader.onerror = () => {
+      setError('Could not read file.');
+      setAttachmentProcessing(false);
+      setAttachmentTerminalActive(false);
+    };
     reader.onload = () => {
-      const text = reader.result as string;
-      if (isCsv) {
-        const parsed = Papa.parse<string[]>(text, { skipEmptyLines: true });
-        const asText = parsed.data
-          .map((row) => (Array.isArray(row) ? row.join(', ') : String(row)))
-          .join('\n');
-        setAttachedContent(asText.slice(0, 50000));
-      } else {
-        setAttachedContent(text.slice(0, 50000));
+      try {
+        const text = reader.result as string;
+        const pending: PendingAttachment = isCsv
+          ? buildAiAttachmentFromCsv(text, file.name)
+          : buildAiAttachmentFromPlainText(text, file.name);
+        pendingAttachRef.current = pending;
+        setAttachmentTerminalActive(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Could not parse file.');
+        setAttachmentProcessing(false);
+        setAttachmentTerminalActive(false);
       }
-      setAttachedFileName(file.name);
     };
     reader.readAsText(file);
     e.target.value = '';
@@ -165,6 +235,10 @@ export function AskAIModal({
       document.body.style.overflow = 'hidden';
       setShowQuotaExceededModal(false);
       setShowAttachmentUpsellModal(false);
+      setAttachmentProcessing(false);
+      setAttachmentTerminalActive(false);
+      setAttachmentUpsellRowCount(null);
+      pendingAttachRef.current = null;
     }
     return () => {
       document.body.style.overflow = '';
@@ -229,7 +303,7 @@ export function AskAIModal({
         body: JSON.stringify({
           message: text,
           context: portfolioContext,
-          ...(attachedContent ? { attachedContent } : {}),
+          ...(isPaid && attachedContent ? { attachedContent } : {}),
         }),
       });
 
@@ -454,25 +528,23 @@ export function AskAIModal({
               {error}
             </p>
           )}
+          <LocalProcessingTerminal
+            active={attachmentTerminalActive}
+            onSequenceComplete={finishAttachmentTheater}
+            style={{ marginBottom: '10px' }}
+          />
           <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            {isPaid && (
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv,.txt,text/csv,text/plain"
-                onChange={handleFileAttach}
-                style={{ display: 'none' }}
-              />
-            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.txt,text/csv,text/plain"
+              onChange={handleFileAttach}
+              style={{ display: 'none' }}
+            />
             <button
               type="button"
-              onClick={() => {
-                if (isPaid) fileInputRef.current?.click();
-                else {
-                  trackPaywallImpression('ai_file_attachment_attempt');
-                  setShowAttachmentUpsellModal(true);
-                }
-              }}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={attachmentProcessing || isLoading}
               aria-label="Add file"
               style={{
                 padding: '6px 10px',
@@ -480,7 +552,8 @@ export function AskAIModal({
                 borderRadius: '8px',
                 background: 'hsl(var(--muted))',
                 color: 'hsl(var(--foreground))',
-                cursor: 'pointer',
+                cursor: attachmentProcessing || isLoading ? 'not-allowed' : 'pointer',
+                opacity: attachmentProcessing || isLoading ? 0.7 : 1,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
@@ -509,7 +582,7 @@ export function AskAIModal({
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about your portfolio or markets..."
               rows={1}
-              disabled={isLoading}
+              disabled={isLoading || attachmentProcessing}
               style={{
                 flex: 1,
                 padding: '10px 12px',
@@ -525,7 +598,7 @@ export function AskAIModal({
             />
             <button
               type="submit"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || attachmentProcessing || !input.trim()}
               style={{
                 padding: '10px 16px',
                 borderRadius: '8px',
@@ -534,8 +607,8 @@ export function AskAIModal({
                 color: '#000',
                 fontSize: '14px',
                 fontWeight: 600,
-                cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
-                opacity: isLoading || !input.trim() ? 0.7 : 1,
+                cursor: isLoading || attachmentProcessing || !input.trim() ? 'not-allowed' : 'pointer',
+                opacity: isLoading || attachmentProcessing || !input.trim() ? 0.7 : 1,
               }}
             >
               {isLoading ? '...' : 'Send'}
@@ -639,18 +712,19 @@ export function AskAIModal({
               zIndex: 10,
             }}
           >
-            <div style={{ textAlign: 'center', maxWidth: '320px' }}>
+            <div style={{ textAlign: 'center', maxWidth: '340px' }}>
               <p style={{ margin: '0 0 8px', fontSize: '15px', fontWeight: 600 }}>
-                Attach files
+                Local processing complete
               </p>
-              <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
-                Upgrade to Founder's Club or Corporate to attach CSV or text files to your questions.
+              <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))', lineHeight: 1.5 }}>
+                {attachmentUpsellRowCount !== null
+                  ? `${attachmentUpsellRowCount.toLocaleString()} row${attachmentUpsellRowCount === 1 ? '' : 's'} normalized. Upgrade to Founders Club to analyze this anonymous payload with Pocket Analyst.`
+                  : 'Upgrade to Founders Club or Corporate to analyze file attachments with Pocket Analyst.'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => {
-                    trackPaywallImpression('ai_file_attachment_attempt');
                     trackPaywallCtaClick(
                       'ai_file_attachment_attempt',
                       '/sponsor?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=intent_trigger&utm_content=ai_file_attachment_attempt&trigger_source=ai_file_attachment_attempt'
@@ -676,7 +750,10 @@ export function AskAIModal({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAttachmentUpsellModal(false)}
+                  onClick={() => {
+                    setShowAttachmentUpsellModal(false);
+                    setAttachmentUpsellRowCount(null);
+                  }}
                   style={{
                     padding: '10px',
                     background: 'transparent',

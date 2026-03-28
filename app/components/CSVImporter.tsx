@@ -16,6 +16,7 @@ import ColumnMappingModal from './import/ColumnMappingModal';
 import UnknownBrokerInterstitial from './import/UnknownBrokerInterstitial';
 import InfrastructureUpgradeModal from './InfrastructureUpgradeModal';
 import { getFoundersClubSpotsRemaining } from '../lib/utils/foundersClub';
+import { LocalProcessingTerminal } from './LocalProcessingTerminal';
 
 interface Trade {
   id: string;
@@ -2259,13 +2260,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
       
       <label htmlFor="csv-upload" style={{ cursor: processing ? 'not-allowed' : 'pointer' }}>
         {processing ? (
-          <div>
-            <div className="skeleton-loader" style={{
-              height: '40px',
-              borderRadius: '8px',
-              marginBottom: '16px'
-            }}></div>
-            <p style={{ color: 'var(--muted)', fontSize: '16px' }}>Processing CSV file...</p>
+          <div style={{ minHeight: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <LocalProcessingTerminal active={processing} style={{ width: '100%', maxWidth: '420px' }} />
           </div>
         ) : (
           <div>
