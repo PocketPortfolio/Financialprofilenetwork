@@ -1,0 +1,100 @@
+---
+title: 'Service Workers: Caching Assets for Offline Use'
+date: '2026-03-28'
+description: >-
+  Learn how to use service workers to cache assets for offline availability,
+  enhancing the user experience even when network connectivity is compromised.
+tags:
+  - caching
+  - offline
+  - service workers
+  - web development
+author: Pocket Portfolio Team
+image: /images/blog/service-workers-caching-assets-for-offline-use.png
+pillar: Tech Insights
+category: how-to-in-tech
+---
+
+## Problem
+
+In today's web environment, users expect seamless experiences, even when offline or with unstable internet connections. One of the challenges developers face is ensuring that critical assets are available offline to maintain functionality and improve load times.
+
+## Solution with Code
+
+Service workers provide a robust solution for caching assets for offline use. They act as a proxy between your application and the network, enabling you to intercept network requests and serve cached resources when the network is unavailable.
+
+### Step 1: Register a Service Worker
+
+First, ensure your service worker is registered in the main JavaScript file of your application.
+
+```javascript
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(() => console.log('Service Worker Registered'))
+    .catch(err => console.error('Service Worker Registration Failed:', err));
+}
+```
+
+### Step 2: Install and Cache Assets
+
+In the `service-worker.js` file, set up the install event to cache your assets.
+
+```javascript
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('v1').then(cache => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/styles.css',
+        '/script.js',
+        '/image.png'
+      ]);
+    })
+  );
+});
+```
+
+### Step 3: Fetch Cached Assets
+
+Intercept network requests and respond with cached assets if available.
+
+```javascript
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+});
+```
+
+### Step 4: Update Cache
+
+Implement cache versioning to manage updates efficiently.
+
+```javascript
+self.addEventListener('activate', event => {
+  const cacheWhitelist = ['v1'];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+```
+
+## Key Concepts
+
+- **Service Workers**: A script that runs in the background, separate from the web page, allowing for interception and handling of network requests.
+- **Caching**: Storage of assets locally to improve load times and provide offline access.
+- **Offline Access**: Ensures that applications remain functional even when there is no network connectivity.
+- **Cache Versioning**: A method to manage and update cached assets to prevent serving outdated resources.
+
+By implementing service workers, you can significantly enhance the user experience by providing offline capabilities and faster load times, which are crucial for modern web applications.
