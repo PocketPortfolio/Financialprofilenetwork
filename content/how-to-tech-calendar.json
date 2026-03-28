@@ -1373,7 +1373,7 @@
     "scheduledTime": "14:00",
     "title": "Service Workers: Caching Assets for Offline Use",
     "slug": "service-workers-caching-assets-for-offline-use",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1382,7 +1382,8 @@
       "service workers",
       "service",
       "workers"
-    ]
+    ],
+    "publishedAt": "2026-03-28T14:00:48.687Z"
   },
   {
     "id": "how-to-how-to-use-skeleton-screens-to-improve-perceived-performance-mar-29",
