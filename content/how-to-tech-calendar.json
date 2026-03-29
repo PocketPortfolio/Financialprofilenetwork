@@ -1391,7 +1391,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use \"Skeleton Screens\" to Improve Perceived Performance",
     "slug": "how-to-use-skeleton-screens-to-improve-perceived-performance",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1399,7 +1399,8 @@
       "use",
       "skeleton",
       "screens"
-    ]
+    ],
+    "publishedAt": "2026-03-29T14:00:27.653Z"
   },
   {
     "id": "how-to-minimizing-main-thread-work-mar-30",
