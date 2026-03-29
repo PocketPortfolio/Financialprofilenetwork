@@ -1398,14 +1398,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Security Logging Performance - SIEM Overhead",
     "slug": "research-security-logging-performance-siem-overhead-2026-03-29",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "security",
       "logging"
-    ]
+    ],
+    "publishedAt": "2026-03-29T18:00:40.586Z"
   },
   {
     "id": "research-ml-model-inference-performance-cpu-vs-gpu-vs-edge-2026-03-30",
