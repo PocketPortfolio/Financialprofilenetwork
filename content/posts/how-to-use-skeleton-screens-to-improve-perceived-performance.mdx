@@ -1,14 +1,14 @@
 ---
-title: How to Use 'Skeleton Screens' to Improve Perceived Performance
+title: How to Use Skeleton Screens to Improve Perceived Performance
 date: '2026-03-29'
 description: >-
-  Learn how to implement skeleton screens to enhance perceived performance and
-  improve user experience.
+  Learn how to implement skeleton screens to enhance user experience by
+  improving perceived performance.
 tags:
   - performance
   - skeleton screens
   - user experience
-  - frontend development
+  - loading
 author: Pocket Portfolio Team
 image: /images/blog/how-to-use-skeleton-screens-to-improve-perceived-performance.png
 pillar: Technology
@@ -17,82 +17,82 @@ category: how-to-in-tech
 
 ## Problem
 
-In today's digital landscape, user attention spans are shrinking while expectations for fast and seamless interactions are growing. Users often become frustrated when an application takes too long to load, resulting in high bounce rates. Even if the actual load time is reasonable, the perception of waiting can negatively impact user satisfaction.
+In web applications, a common challenge is managing loading times effectively to ensure a seamless user experience. When content takes time to load, users might perceive the application as slow or unresponsive, leading to frustration. Traditional loading indicators, such as spinners, offer limited feedback and can contribute to a negative perception of performance.
 
-## Solution with Code
+## Solution
 
-One effective way to improve perceived performance is by using "skeleton screens." Skeleton screens are lightweight, placeholder UI elements that mimic the layout of content while it's loading. Unlike spinners or progress bars, skeleton screens provide a visual indication of loading, making the wait seem shorter and more engaging.
+Skeleton screens provide a viable solution by showing a placeholder for where content will eventually appear, giving users a sense of progress and structure from the outset. This approach can significantly enhance perceived performance, making the application feel faster and more responsive.
 
-Here's a simple implementation of skeleton screens using React and styled-components:
+### Implementing Skeleton Screens
+
+Here's a basic implementation using React, a popular JavaScript library for building user interfaces. This example demonstrates how to use skeleton screens for a list of items.
 
 ```jsx
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import './Skeleton.css';
 
-// Define styled components for the skeleton
-const SkeletonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
+const SkeletonItem = () => (
+  <div className="skeleton-item">
+    <div className="skeleton-avatar"></div>
+    <div className="skeleton-text"></div>
+  </div>
+);
 
-const SkeletonElement = styled.div`
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  height: ${({ height }) => height || '20px'};
-  width: ${({ width }) => width || '100%'};
-  animation: pulse 1.5s infinite ease-in-out;
-  
-  @keyframes pulse {
-    0% {
-      background-color: #e0e0e0;
-    }
-    50% {
-      background-color: #f0f0f0;
-    }
-    100% {
-      background-color: #e0e0e0;
-    }
-  }
-`;
-
-const ContentComponent = () => {
-  const [isLoading, setIsLoading] = useState(true);
+const ItemList = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000); // Simulate a network request delay
-
-    return () => clearTimeout(timer);
+    // Simulate a network request
+    setTimeout(() => {
+      setItems(['Item 1', 'Item 2', 'Item 3']);
+      setLoading(false);
+    }, 2000);
   }, []);
-
-  if (isLoading) {
-    return (
-      <SkeletonWrapper>
-        <SkeletonElement height="40px" width="60%" />
-        <SkeletonElement height="20px" width="80%" />
-        <SkeletonElement height="20px" />
-        <SkeletonElement height="20px" width="90%" />
-      </SkeletonWrapper>
-    );
-  }
 
   return (
     <div>
-      <h1>Content Loaded</h1>
-      <p>This is the actual content displayed after loading.</p>
+      {loading
+        ? Array.from({ length: 3 }).map((_, index) => <SkeletonItem key={index} />)
+        : items.map((item, index) => <div key={index}>{item}</div>)}
     </div>
   );
 };
 
-export default ContentComponent;
+export default ItemList;
+```
+
+### Skeleton CSS
+
+```css
+.skeleton-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.skeleton-avatar {
+  width: 50px;
+  height: 50px;
+  background-color: #e0e0e0;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.skeleton-text {
+  width: 100%;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}
 ```
 
 ## Key Concepts
 
-- **Perceived Performance**: The user's impression of how fast a website or application feels, irrespective of actual load times.
-- **Skeleton Screens**: Placeholders that replicate the structure of the page, shown while content is loading. This approach helps manage user expectations and reduces the perception of waiting.
-- **User Experience Enhancement**: By displaying a skeleton screen, users are informed that content is loading, providing a more engaging experience than a blank screen or static loading indicator.
+1. **Perceived Performance**: Enhancing the user's perception of speed by reducing the feeling of waiting. Skeleton screens offer visual cues that content is loading, improving user interaction.
 
-Implementing skeleton screens can significantly enhance user experience by making applications feel faster and more responsive, ultimately leading to better user satisfaction and retention.
+2. **Progressive Loading**: By loading the structure first and filling in the content as it becomes available, users receive a quicker feedback loop, leading to a more dynamic experience.
+
+3. **User Experience (UX)**: Improving UX by managing expectations and providing immediate visual feedback, skeleton screens can reduce bounce rates and increase user satisfaction.
+
+By implementing skeleton screens, developers can effectively improve the perceived performance of their applications, leading to a better user experience without necessarily enhancing the actual loading speed.
