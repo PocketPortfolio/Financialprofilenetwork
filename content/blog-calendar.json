@@ -598,7 +598,7 @@
     "date": "2026-03-29",
     "title": "The Developer's Portfolio: Code Your Way to Freedom",
     "slug": "the-developer-s-portfolio-code-your-way-to-freedom",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -608,7 +608,8 @@
       "developer's"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-03-29T09:01:07.940Z"
   },
   {
     "id": "week-13-post-2",
