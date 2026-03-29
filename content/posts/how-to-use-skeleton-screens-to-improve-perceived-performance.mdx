@@ -1,0 +1,98 @@
+---
+title: How to Use 'Skeleton Screens' to Improve Perceived Performance
+date: '2026-03-29'
+description: >-
+  Learn how to implement skeleton screens to enhance perceived performance and
+  improve user experience.
+tags:
+  - performance
+  - skeleton screens
+  - user experience
+  - frontend development
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-skeleton-screens-to-improve-perceived-performance.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+In today's digital landscape, user attention spans are shrinking while expectations for fast and seamless interactions are growing. Users often become frustrated when an application takes too long to load, resulting in high bounce rates. Even if the actual load time is reasonable, the perception of waiting can negatively impact user satisfaction.
+
+## Solution with Code
+
+One effective way to improve perceived performance is by using "skeleton screens." Skeleton screens are lightweight, placeholder UI elements that mimic the layout of content while it's loading. Unlike spinners or progress bars, skeleton screens provide a visual indication of loading, making the wait seem shorter and more engaging.
+
+Here's a simple implementation of skeleton screens using React and styled-components:
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+
+// Define styled components for the skeleton
+const SkeletonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const SkeletonElement = styled.div`
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  height: ${({ height }) => height || '20px'};
+  width: ${({ width }) => width || '100%'};
+  animation: pulse 1.5s infinite ease-in-out;
+  
+  @keyframes pulse {
+    0% {
+      background-color: #e0e0e0;
+    }
+    50% {
+      background-color: #f0f0f0;
+    }
+    100% {
+      background-color: #e0e0e0;
+    }
+  }
+`;
+
+const ContentComponent = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // Simulate a network request delay
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <SkeletonWrapper>
+        <SkeletonElement height="40px" width="60%" />
+        <SkeletonElement height="20px" width="80%" />
+        <SkeletonElement height="20px" />
+        <SkeletonElement height="20px" width="90%" />
+      </SkeletonWrapper>
+    );
+  }
+
+  return (
+    <div>
+      <h1>Content Loaded</h1>
+      <p>This is the actual content displayed after loading.</p>
+    </div>
+  );
+};
+
+export default ContentComponent;
+```
+
+## Key Concepts
+
+- **Perceived Performance**: The user's impression of how fast a website or application feels, irrespective of actual load times.
+- **Skeleton Screens**: Placeholders that replicate the structure of the page, shown while content is loading. This approach helps manage user expectations and reduces the perception of waiting.
+- **User Experience Enhancement**: By displaying a skeleton screen, users are informed that content is loading, providing a more engaging experience than a blank screen or static loading indicator.
+
+Implementing skeleton screens can significantly enhance user experience by making applications feel faster and more responsive, ultimately leading to better user satisfaction and retention.
