@@ -10,9 +10,9 @@ import CommunityContent from '../components/CommunityContent';
 import SocialShare from '../components/viral/SocialShare';
 import SocialProof from '../components/viral/SocialProof';
 import FunnelTracker from '../components/analytics/FunnelTracker';
-import CSVImporter from '../components/CSVImporter';
-import { useTrades } from '../hooks/useTrades';
+import { LocalProcessingTerminal } from '../components/LocalProcessingTerminal';
 import { useAuth } from '../hooks/useAuth';
+import { trackEvent } from '../lib/analytics/events';
 import { WebOneBadge } from '../components/hero/WebOneBadge';
 import NPMStats from '../components/NPMStats';
 import DynamicDownloadCount from '../components/DynamicDownloadCount';
@@ -28,7 +28,6 @@ export default function LandingPage() {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  const { importTrades } = useTrades();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Redirect to dashboard only when user just landed on / after sign-in (not when they clicked logo to visit /)
@@ -42,7 +41,10 @@ export default function LandingPage() {
   }, [user, pathname, router]);
   const [isMobile, setIsMobile] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
-  const [csvUploaded, setCsvUploaded] = useState(false);
+  const [terminalActive, setTerminalActive] = useState(false);
+  const [showFoundersSnare, setShowFoundersSnare] = useState(false);
+  const [terminalMountKey, setTerminalMountKey] = useState(0);
+  const csvDemoInputRef = useRef<HTMLInputElement>(null);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [toolsPanelRect, setToolsPanelRect] = useState<{ top: number; left: number } | null>(null);
   const toolsTriggerRef = useRef<HTMLDivElement>(null);
@@ -101,6 +103,50 @@ export default function LandingPage() {
     return () => {
       if (toolsCloseTimeoutRef.current) clearTimeout(toolsCloseTimeoutRef.current);
     };
+  }, []);
+
+  const isCsvLikeFile = (file: File) => {
+    const name = file.name.toLowerCase();
+    return (
+      name.endsWith('.csv') ||
+      file.type === 'text/csv' ||
+      file.type === 'application/vnd.ms-excel' ||
+      file.type === 'text/plain'
+    );
+  };
+
+  const handleHeroDemoFile = React.useCallback((file: File | undefined) => {
+    if (!file || !isCsvLikeFile(file)) return;
+    setShowFoundersSnare(false);
+    setTerminalActive(false);
+    setTerminalMountKey((k) => k + 1);
+    setTimeout(() => {
+      setTerminalActive(true);
+      trackEvent('landing_hero_demo_csv_drop', { location: 'hero_dropzone' });
+    }, 0);
+  }, []);
+
+  const handleHeroDropZoneDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleHeroDropZoneDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const f = e.dataTransfer.files?.[0];
+    handleHeroDemoFile(f);
+  };
+
+  const handleHeroDemoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    handleHeroDemoFile(f);
+    e.target.value = '';
+  };
+
+  const handleSanitizationSequenceComplete = React.useCallback(() => {
+    setShowFoundersSnare(true);
+    trackEvent('landing_hero_sanitization_complete', { location: 'hero_dropzone' });
   }, []);
 
   return (
@@ -683,28 +729,153 @@ export default function LandingPage() {
             minHeight: '1.2em'
           }}>
             <Typewriter
-              strings={['Stop waiting for API integrations.', 'Import any CSV. Instantly.']}
+              strings={[
+                'Local-First AI Analyst.',
+                'Zero Cloud Uploads.',
+                'Sanitization by Construction.',
+              ]}
               cursorColor="#f59e0b"
             />
-            <noscript>Import any CSV. Instantly.</noscript>
+            <noscript>Local-First AI Analyst.</noscript>
           </h1>
 
-          {/* Subhead - PREMIUM POSITIONING */}
+          {/* Subhead - Sovereign positioning + drop-zone pointer */}
           <p className="brand-text-secondary" style={{ 
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
             lineHeight: '1.6', 
-            marginBottom: '40px',
-            maxWidth: '700px',
+            marginBottom: '24px',
+            maxWidth: '720px',
             color: 'var(--text-secondary)'
           }}>
-            Stop waiting for integrations. Our LLM-powered engine imports trading history from{' '}
-            <strong style={{ color: 'var(--text)' }}>any broker, bank, or spreadsheet</strong>
-            {' '}in seconds.
+            Stop giving Plaid-class aggregators your banking passwords. Drop your broker CSV below and watch our
+            local-first pipeline analyze your portfolio —{' '}
+            <strong style={{ color: 'var(--text)' }}>your raw ledger never leaves your device</strong> for the demo.
             <br />
-            <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)' }}>
-              <strong style={{ color: 'var(--accent-warm)' }}>£12/mo or £100/yr.</strong> Cancel anytime.
+            <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', display: 'block', marginTop: '12px' }}>
+              <strong style={{ color: 'var(--accent-warm)' }}>Founders Club: £12/mo or £100/yr.</strong> Cancel anytime.
+              {' '}Prosumer-grade terminal for serious portfolios.
             </span>
           </p>
+
+          {/* Hero: local sanitization theater (drop zone + terminal) */}
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '560px',
+              marginBottom: '28px',
+            }}
+          >
+            <input
+              ref={csvDemoInputRef}
+              type="file"
+              accept=".csv,text/csv,text/plain"
+              style={{ display: 'none' }}
+              aria-hidden
+              onChange={handleHeroDemoInputChange}
+            />
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Upload or drop a broker CSV to run the local sanitization demo in your browser"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  csvDemoInputRef.current?.click();
+                }
+              }}
+              onDragOver={handleHeroDropZoneDragOver}
+              onDrop={handleHeroDropZoneDrop}
+              onClick={() => csvDemoInputRef.current?.click()}
+              style={{
+                fontFamily:
+                  'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                padding: 'clamp(16px, 3vw, 22px)',
+                borderRadius: '12px',
+                border: '2px dashed var(--border-warm)',
+                background: 'var(--surface)',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                textAlign: 'center',
+                boxSizing: 'border-box',
+              }}
+            >
+              <span style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>&gt; </span>
+              Drop your broker CSV here (or click to upload) — local parser runs in your browser. No upload to our
+              servers for this demo.
+            </div>
+            {terminalActive && (
+              <div style={{ marginTop: '14px', width: '100%' }}>
+                <LocalProcessingTerminal
+                  key={terminalMountKey}
+                  active={terminalActive}
+                  onSequenceComplete={handleSanitizationSequenceComplete}
+                  style={{ maxHeight: 'none', minHeight: '140px' }}
+                />
+              </div>
+            )}
+            {showFoundersSnare && (
+              <div
+                style={{
+                  marginTop: '18px',
+                  padding: '18px 20px',
+                  borderRadius: '12px',
+                  border: '2px solid var(--border-warm)',
+                  background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
+                  textAlign: 'center',
+                }}
+              >
+                <p
+                  className="brand-text"
+                  style={{
+                    margin: '0 0 14px 0',
+                    fontSize: 'clamp(1rem, 2vw, 1.125rem)',
+                    fontWeight: 600,
+                    lineHeight: 1.45,
+                  }}
+                >
+                  Payload Sanitized. Join the Founders Club to unlock the Pocket Analyst.
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
+                  <Link
+                    href="/sponsor?utm_source=landing&utm_medium=hero_dropzone&utm_campaign=founders_club"
+                    className="brand-button brand-button-primary"
+                    style={{
+                      padding: '12px 22px',
+                      background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+                      color: 'white',
+                      textDecoration: 'none',
+                      borderRadius: '10px',
+                      fontSize: '15px',
+                      fontWeight: 600,
+                      border: '2px solid var(--border-warm)',
+                    }}
+                  >
+                    Join Founders Club
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowFoundersSnare(false);
+                      setTerminalActive(false);
+                    }}
+                    style={{
+                      padding: '12px 18px',
+                      background: 'transparent',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '10px',
+                      color: 'var(--text-secondary)',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Try another file
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           
           {/* CTAs - PREMIUM POSITIONING */}
           <div style={{ 
@@ -2350,6 +2521,98 @@ $ npx pocket-init --sovereign
         </section>
       </main>
 
+      {/* US broker SEO hubs — homepage equity to high-intent import pages */}
+      <section
+        aria-label="Supported US brokers"
+        style={{
+          marginTop: 'clamp(32px, 6vw, 64px)',
+          marginBottom: 'clamp(24px, 4vw, 48px)',
+          width: '100%',
+          maxWidth: '100vw',
+          padding: '0 clamp(12px, 3vw, 24px)',
+          boxSizing: 'border-box',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 'min(900px, 95vw)',
+            margin: '0 auto',
+            padding: 'clamp(20px, 4vw, 28px)',
+            borderRadius: '16px',
+            border: '1px solid var(--border-subtle)',
+            background: 'var(--surface)',
+          }}
+        >
+          <h2
+            className="brand-text"
+            style={{
+              fontSize: 'clamp(1.125rem, 2.5vw, 1.35rem)',
+              fontWeight: 700,
+              marginBottom: '6px',
+              textAlign: 'center',
+            }}
+          >
+            Supported brokers (CSV import guides)
+          </h2>
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+              marginBottom: '20px',
+              lineHeight: 1.5,
+            }}
+          >
+            US desktop workflows — export help and local-first import for major brokers.
+          </p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px',
+              justifyItems: 'stretch',
+            }}
+          >
+            {(
+              [
+                { href: '/import/robinhood', label: 'Robinhood' },
+                { href: '/import/schwab', label: 'Charles Schwab' },
+                { href: '/import/fidelity', label: 'Fidelity' },
+                { href: '/import/vanguard', label: 'Vanguard' },
+              ] as const
+            ).map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  display: 'block',
+                  padding: '14px 16px',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-warm)',
+                  background: 'var(--warm-bg)',
+                  transition: 'color 0.15s ease, border-color 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--accent-warm)';
+                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text)';
+                  e.currentTarget.style.borderColor = 'var(--border-warm)';
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Community Content Section */}
       <CommunityContent />
 
@@ -2402,15 +2665,16 @@ $ npx pocket-init --sovereign
             marginBottom: '24px',
             lineHeight: 'var(--line-snug)'
           }}>
-            Help others discover free, open-source portfolio tracking
+            Spread local-first AI portfolio analysis — Founders Club for pros who want Pocket Analyst without shipping
+            raw ledgers to the cloud.
           </p>
           <SocialShare
-            title="Pocket Portfolio - Free, Open-Source Portfolio Tracker"
-            description="Track your investments with a free, privacy-first portfolio tracker. No signup required. Open source."
+            title="Pocket Portfolio — Local-First AI Analyst & Founders Club"
+            description="AI portfolio analysis with zero cloud uploads of your raw CSV. £12/mo Founders Club. Open-source core, prosumer terminal."
             url="https://www.pocketportfolio.app"
             context="landing_page"
             showLabel={true}
-            hashtags={['PocketPortfolio', 'PortfolioTracker', 'OpenSource', 'FreeFinance']}
+            hashtags={['PocketPortfolio', 'LocalFirst', 'FoundersClub', 'PortfolioAI']}
           />
         </div>
       </section>

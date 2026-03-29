@@ -13,6 +13,7 @@ import TabBar from './components/nav/TabBar';
 import LandingPageTracker from './components/LandingPageTracker';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
+import { PremiumTierProvider } from './contexts/PremiumTierContext';
 import GlobalFooter from './components/layout/GlobalFooter';
 import PWAInstallPromptWrapper from './components/PWAInstallPromptWrapper';
 import GlobalFoundersClubBanner from './components/GlobalFoundersClubBanner';
@@ -30,12 +31,14 @@ export const metadata: Metadata = brandEnabled
       path: '/',
     })
   : {
-      title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
-      description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
+      title: 'Pocket Portfolio | Local-First AI Portfolio Analyst',
+      description:
+        'AI portfolio analysis without shipping your raw broker CSV to the cloud. Local-first parsing, Founders Club from £12/mo, optional Google Drive sync you control.',
       robots: 'index,follow,max-image-preview:large',
         openGraph: {
-          title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
-          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
+          title: 'Pocket Portfolio | Local-First AI Portfolio Analyst',
+          description:
+            'AI portfolio analysis without shipping your raw broker CSV to the cloud. Local-first parsing, Founders Club from £12/mo, optional Google Drive sync you control.',
           url: 'https://www.pocketportfolio.app/',
           siteName: 'Pocket Portfolio',
           images: [
@@ -51,8 +54,9 @@ export const metadata: Metadata = brandEnabled
         },
         twitter: {
           card: 'summary_large_image',
-          title: 'Pocket Portfolio | Google Drive Sync & Sovereign Financial Tracking',
-          description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
+          title: 'Pocket Portfolio | Local-First AI Portfolio Analyst',
+          description:
+            'AI portfolio analysis without shipping your raw broker CSV to the cloud. Local-first parsing, Founders Club from £12/mo, optional Google Drive sync you control.',
           images: ['https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3'],
         },
     };
@@ -166,6 +170,7 @@ export default function RootLayout({
           />
         )}
         <BrandProvider>
+          <PremiumTierProvider>
           <ErrorBoundary scope="app-root">
             <PremiumThemeProvider />
             <PocketAnalystProvider>
@@ -194,6 +199,7 @@ export default function RootLayout({
             </div>
             </PocketAnalystProvider>
           </ErrorBoundary>
+          </PremiumTierProvider>
         </BrandProvider>
       </body>
     </html>

@@ -175,7 +175,9 @@ export type MonetizationTriggerSource =
   | 'csv_import_success'
   | 'risk_metric_unlock_attempt'
   | 'ai_file_attachment_attempt'
-  | 'sponsor_page_direct';
+  | 'sponsor_page_direct'
+  | 'global_founders_banner'
+  | 'dashboard_founders_banner';
 
 const PAYWALL_IMPRESSION_KEY = 'pp_paywall_impressions_v1';
 const MONETIZATION_SESSION_KEY = 'pp_monetization_session_id';

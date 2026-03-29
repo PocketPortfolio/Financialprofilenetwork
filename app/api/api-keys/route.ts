@@ -11,7 +11,8 @@ export const fetchCache = 'force-no-store';
 // Rate limiting storage (in-memory, resets on serverless cold start)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute per email
+/** Per-email cap; 10/min was too low for SPA remounts + React Strict Mode (dev) and multi-tab. */
+const MAX_REQUESTS_PER_WINDOW = 60;
 
 // Shared Firebase Admin initialization function
 function initializeFirebaseAdmin() {

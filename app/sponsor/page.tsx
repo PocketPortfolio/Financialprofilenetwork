@@ -202,6 +202,7 @@ function SponsorPageContent() {
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           priceId: finalPriceId,
           tierName: selectedTier.tierName,
@@ -216,20 +217,32 @@ function SponsorPageContent() {
         }),
       });
 
+      const rawBody = await response.text();
+      let payload: { error?: string; sessionId?: string; url?: string } = {};
+      try {
+        if (rawBody) payload = JSON.parse(rawBody) as typeof payload;
+      } catch {
+        throw new Error(
+          !response.ok
+            ? rawBody.slice(0, 200) || `Checkout failed (${response.status})`
+            : 'Invalid response from checkout'
+        );
+      }
+
       if (!response.ok) {
-        const error = await response.json();
-        console.error('❌ API Error:', error);
+        console.error('❌ API Error:', payload);
         trackCheckoutError(
           'session_create',
           'session_create_failed',
-          error.error || `Failed to create checkout session (${response.status})`,
+          payload.error || `Failed to create checkout session (${response.status})`,
           triggerSourceParam,
           finalPriceId
         );
-        throw new Error(error.error || `Failed to create checkout session (${response.status})`);
+        throw new Error(payload.error || `Failed to create checkout session (${response.status})`);
       }
 
-      const { sessionId, url } = await response.json();
+      const sessionId = payload.sessionId;
+      const url = payload.url;
       
       if (!sessionId) {
         trackCheckoutError('session_create', 'missing_session_id', 'No session ID returned from API', triggerSourceParam, finalPriceId);
@@ -238,14 +251,16 @@ function SponsorPageContent() {
 
       console.log('✅ Checkout session created:', sessionId);
       trackCheckoutSessionCreated(sessionId, finalPriceId, selectedTier.tierName, triggerSourceParam);
-      
+
       // Redirect to Stripe Checkout
-      if (url) {
+      const hostedUrl =
+        typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://')) ? url : null;
+      if (hostedUrl) {
         trackCheckoutRedirected(sessionId);
-        window.location.href = url;
+        window.location.assign(hostedUrl);
       } else {
         trackCheckoutRedirected(sessionId);
-        window.location.href = `https://checkout.stripe.com/c/pay/${sessionId}`;
+        window.location.assign(`https://checkout.stripe.com/c/pay/${sessionId}`);
       }
     } catch (error: any) {
       console.error('Checkout error:', error);
@@ -872,12 +887,6 @@ function SponsorPageContent() {
               <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
               <span>
                 <strong>🏢 White Label Portfolio Reports:</strong> Generate professional branded PDF reports with your firm logo - same value as Corporate License
-              </span>
-            </li>
-            <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
-              <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
-              <span>
-                <strong>🇬🇧 UK Concierge Onboarding:</strong> For the first 50 UK Founders, the CTO will personally format and import your messy CSV history from Trading212/Freetrade/Hargreaves Lansdown.
               </span>
             </li>
           </ul>

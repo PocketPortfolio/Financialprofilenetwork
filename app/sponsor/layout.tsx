@@ -36,7 +36,7 @@ export default function SponsorLayout({
         "priceCurrency": "GBP",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/LimitedAvailability",
-        "description": "Paid membership. Includes Concierge Onboarding, unlimited API access, Discord priority, and Founder badge.",
+        "description": "Paid membership. Includes unlimited API access, Discord priority, and Founder badge.",
         "url": "https://www.pocketportfolio.app/sponsor"
       },
       {

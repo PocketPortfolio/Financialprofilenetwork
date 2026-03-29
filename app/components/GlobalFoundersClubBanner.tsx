@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState } from 'react';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useTrades } from '../hooks/useTrades';
+import { useAuth } from '../hooks/useAuth';
+import { startFoundersClubCheckout } from '@/app/lib/checkout/startFoundersClubCheckout';
 
 /**
  * Global Founders Club banner shown on all pages.
@@ -14,6 +15,8 @@ import { useTrades } from '../hooks/useTrades';
 export default function GlobalFoundersClubBanner() {
   const { tier, isLoading } = usePremiumTheme();
   const { trades } = useTrades();
+  const { user } = useAuth();
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
 
   const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
   const hasTrades = trades && trades.length > 0;
@@ -59,8 +62,32 @@ export default function GlobalFoundersClubBanner() {
         <span style={{ fontSize: '14px', fontWeight: '700', letterSpacing: '0.5px' }}>
           🇬🇧 UK FOUNDERS CLUB
         </span>
-        <Link
-          href="/sponsor?utm_source=global_banner&utm_medium=top_cta&utm_campaign=founders_club"
+        <button
+          type="button"
+          disabled={checkoutBusy}
+          aria-busy={checkoutBusy}
+          onClick={() => {
+            setCheckoutBusy(true);
+            void startFoundersClubCheckout({
+              email: user?.email ?? undefined,
+              triggerSource: 'global_founders_banner',
+              utm_source: 'global_banner',
+              utm_medium: 'top_cta',
+              utm_campaign: 'founders_club',
+              utm_content: 'global_founders_banner',
+              missingPriceBehavior: 'redirect_sponsor',
+            })
+              .catch((err) => {
+                console.error('[GlobalFoundersClubBanner] checkout', err);
+                const msg =
+                  err instanceof Error ? err.message : 'Could not open Stripe Checkout.';
+                window.alert(`${msg}\n\nYou will be taken to the sponsor page to try again.`);
+                window.location.assign(
+                  '/sponsor?utm_source=global_banner&utm_medium=top_cta&utm_campaign=founders_club&checkout_fallback=1'
+                );
+              })
+              .finally(() => setCheckoutBusy(false));
+          }}
           style={{
             padding: '8px 20px',
             background: 'hsl(var(--primary))',
@@ -72,8 +99,12 @@ export default function GlobalFoundersClubBanner() {
             whiteSpace: 'nowrap',
             transition: 'all 0.2s ease',
             display: 'inline-block',
+            border: 'none',
+            cursor: checkoutBusy ? 'wait' : 'pointer',
+            opacity: checkoutBusy ? 0.85 : 1,
           }}
           onMouseEnter={(e) => {
+            if (checkoutBusy) return;
             e.currentTarget.style.background = 'hsl(var(--primary) / 0.9)';
             e.currentTarget.style.transform = 'translateY(-1px)';
           }}
@@ -82,8 +113,8 @@ export default function GlobalFoundersClubBanner() {
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
-          Join Founders Club – £12/mo or £100/yr
-        </Link>
+          {checkoutBusy ? 'Opening checkout…' : 'Join Founders Club – £12/mo or £100/yr'}
+        </button>
       </div>
     </div>
   );

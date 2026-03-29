@@ -7,15 +7,8 @@ import remarkGfm from 'remark-gfm';
 import { X, Sparkles, Paperclip } from 'lucide-react';
 import Papa from 'papaparse';
 import type { User } from 'firebase/auth';
-import {
-  trackCheckoutError,
-  trackCheckoutRedirected,
-  trackCheckoutSessionCreated,
-  trackCheckoutStart,
-  trackEvent,
-  trackPaywallCtaClick,
-  trackPaywallImpression,
-} from '@/app/lib/analytics/events';
+import { startFoundersClubCheckout } from '@/app/lib/checkout/startFoundersClubCheckout';
+import { trackEvent, trackPaywallImpression } from '@/app/lib/analytics/events';
 import { LocalProcessingTerminal } from '@/app/components/LocalProcessingTerminal';
 
 const ATTACHMENT_MAX_CHARS = 50000;
@@ -119,52 +112,20 @@ export function AskAIModal({
   const pendingAttachRef = useRef<PendingAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const FOUNDERS_CLUB_PRICE_ID =
-    process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB_ANNUAL || process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDERS_CLUB || 'price_1TAWCxD4sftWa1WtEZtg2Oli';
-
-  const launchCheckoutFromTrigger = async (triggerSource: 'ai_file_attachment_attempt' | 'sponsor_page_direct') => {
-    if (!FOUNDERS_CLUB_PRICE_ID || FOUNDERS_CLUB_PRICE_ID.includes('XXXXX')) {
-      setError('Checkout not configured. Please visit /sponsor to upgrade.');
-      return;
-    }
+  const launchCheckoutFromTrigger = async (
+    triggerSource: 'ai_file_attachment_attempt' | 'sponsor_page_direct'
+  ) => {
     setCheckoutLoading(true);
     setError(null);
-    trackCheckoutStart(triggerSource, FOUNDERS_CLUB_PRICE_ID, "UK Founder's Club", 'annual');
     try {
-      const res = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId: FOUNDERS_CLUB_PRICE_ID,
-          tierName: "UK Founder's Club",
-          email: user?.email ?? undefined,
-          trigger_source: triggerSource,
-          utm_source: 'pocket_analyst',
-          utm_medium: 'attachment_upsell',
-          utm_campaign: 'intent_trigger',
-          utm_content: triggerSource,
-        }),
+      await startFoundersClubCheckout({
+        email: user?.email ?? undefined,
+        triggerSource,
+        utm_source: triggerSource === 'ai_file_attachment_attempt' ? 'pocket_analyst' : 'direct',
+        utm_medium: triggerSource === 'ai_file_attachment_attempt' ? 'attachment_upsell' : 'checkout',
+        utm_campaign: 'intent_trigger',
+        utm_content: triggerSource,
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        trackCheckoutError('session_create', 'session_create_failed', data?.error || `Checkout failed (${res.status})`, triggerSource, FOUNDERS_CLUB_PRICE_ID);
-        throw new Error(data.error || `Checkout failed (${res.status})`);
-      }
-      if (data.sessionId) {
-        trackCheckoutSessionCreated(data.sessionId, FOUNDERS_CLUB_PRICE_ID, "UK Founder's Club", triggerSource);
-      }
-      if (data.url) {
-        trackCheckoutRedirected(data.sessionId || 'unknown');
-        window.location.href = data.url;
-        return;
-      }
-      if (data.sessionId) {
-        trackCheckoutRedirected(data.sessionId);
-        window.location.href = `https://checkout.stripe.com/c/pay/${data.sessionId}`;
-        return;
-      }
-      trackCheckoutError('redirect', 'missing_checkout_target', 'No checkout URL returned', triggerSource, FOUNDERS_CLUB_PRICE_ID);
-      throw new Error('No checkout URL returned');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Checkout failed');
     } finally {
@@ -175,7 +136,6 @@ export function AskAIModal({
   const handleQuotaUpgradeToStripe = async () => {
     trackEvent('quota_upgrade_initiated');
     trackPaywallImpression('ai_file_attachment_attempt');
-    trackPaywallCtaClick('ai_file_attachment_attempt', '/api/create-checkout-session');
     await launchCheckoutFromTrigger('ai_file_attachment_attempt');
   };
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -724,12 +684,9 @@ export function AskAIModal({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <button
                   type="button"
+                  disabled={checkoutLoading}
                   onClick={() => {
-                    trackPaywallCtaClick(
-                      'ai_file_attachment_attempt',
-                      '/sponsor?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=intent_trigger&utm_content=ai_file_attachment_attempt&trigger_source=ai_file_attachment_attempt'
-                    );
-                    launchCheckoutFromTrigger('ai_file_attachment_attempt');
+                    void launchCheckoutFromTrigger('ai_file_attachment_attempt');
                   }}
                   style={{
                     display: 'block',
@@ -743,16 +700,18 @@ export function AskAIModal({
                     textAlign: 'center',
                     border: 'none',
                     width: '100%',
-                    cursor: 'pointer',
+                    cursor: checkoutLoading ? 'wait' : 'pointer',
+                    opacity: checkoutLoading ? 0.85 : 1,
                   }}
                 >
-                  Upgrade to Founder's Club or Corporate
+                  {checkoutLoading ? 'Taking you to checkout…' : "Upgrade to Founder's Club or Corporate"}
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setShowAttachmentUpsellModal(false);
                     setAttachmentUpsellRowCount(null);
+                    setError(null);
                   }}
                   style={{
                     padding: '10px',
@@ -766,6 +725,20 @@ export function AskAIModal({
                   Maybe later
                 </button>
               </div>
+              {error && (
+                <p style={{ margin: '14px 0 0', fontSize: '12px', color: 'hsl(var(--destructive))', lineHeight: 1.45 }}>
+                  {error}
+                </p>
+              )}
+              <p style={{ margin: error ? '8px 0 0' : '14px 0 0', fontSize: '11px', color: 'hsl(var(--muted-foreground))', lineHeight: 1.4 }}>
+                Trouble opening checkout?{' '}
+                <a
+                  href="/sponsor?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=checkout_fallback"
+                  style={{ color: 'var(--warning)', textDecoration: 'underline' }}
+                >
+                  Open the sponsor page
+                </a>
+              </p>
             </div>
           </div>
         )}
