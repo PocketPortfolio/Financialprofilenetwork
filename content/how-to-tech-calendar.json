@@ -1408,14 +1408,15 @@
     "scheduledTime": "14:00",
     "title": "Minimizing Main Thread Work",
     "slug": "minimizing-main-thread-work",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "minimizing",
       "main",
       "thread"
-    ]
+    ],
+    "publishedAt": "2026-03-30T14:01:00.861Z"
   },
   {
     "id": "how-to-march-retro-the-fastest-stack-wins-mar-31",
