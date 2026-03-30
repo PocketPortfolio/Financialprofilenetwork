@@ -1414,14 +1414,15 @@
     "scheduledTime": "18:00",
     "title": "Research: ML Model Inference Performance - CPU vs GPU vs Edge",
     "slug": "research-ml-model-inference-performance-cpu-vs-gpu-vs-edge-2026-03-30",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "inference",
       "model"
-    ]
+    ],
+    "publishedAt": "2026-03-30T18:00:40.001Z"
   },
   {
     "id": "research-model-serving-latency-rest-vs-grpc-vs-websocket-2026-03-31",
