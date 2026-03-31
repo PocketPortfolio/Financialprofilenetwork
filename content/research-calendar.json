@@ -1430,7 +1430,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Model Serving Latency - REST vs gRPC vs WebSocket",
     "slug": "research-model-serving-latency-rest-vs-grpc-vs-websocket-2026-03-31",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1439,7 +1439,8 @@
       "gRPC",
       "model",
       "serving"
-    ]
+    ],
+    "publishedAt": "2026-03-31T18:00:54.960Z"
   },
   {
     "id": "research-training-data-processing-performance-optimization-2026-04-01",
