@@ -1424,14 +1424,15 @@
     "scheduledTime": "14:00",
     "title": "March Retro: The Fastest Stack Wins",
     "slug": "march-retro-the-fastest-stack-wins",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "march",
       "retro",
       "fastest"
-    ]
+    ],
+    "publishedAt": "2026-03-31T14:00:55.078Z"
   },
   {
     "id": "how-to-how-to-build-a-graphql-api-with-typescript-and-node-js-apr-1",
