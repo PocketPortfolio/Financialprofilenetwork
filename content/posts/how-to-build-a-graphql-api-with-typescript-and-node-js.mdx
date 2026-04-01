@@ -1,9 +1,7 @@
 ---
 title: How to Build a GraphQL API with TypeScript and Node.js
 date: '2026-04-01'
-description: >-
-  Learn to build a scalable GraphQL API using TypeScript and Node.js for modern
-  web applications.
+description: Learn how to create a scalable GraphQL API using TypeScript and Node.js.
 tags:
   - api
   - typescript
@@ -12,104 +10,106 @@ tags:
   - build
 author: Pocket Portfolio Team
 image: /images/blog/how-to-build-a-graphql-api-with-typescript-and-node-js.png
-pillar: Technology
+pillar: development
 category: how-to-in-tech
 ---
 
-Building a GraphQL API using TypeScript and Node.js provides a robust framework for creating scalable and type-safe web applications. This guide demonstrates how to set up a basic GraphQL API.
-
 ## Problem
 
-REST APIs can lead to over-fetching or under-fetching data, as each endpoint returns a fixed data structure. GraphQL solves this by allowing clients to specify exactly what data they need, promoting efficiency and flexibility.
+Building a robust API can be challenging, especially when dealing with complex data requirements and real-time updates. REST APIs can sometimes be too rigid or require multiple endpoints for varied data needs. GraphQL, on the other hand, offers a flexible approach to API development, allowing clients to query exactly the data they need. Combining GraphQL with TypeScript and Node.js can enhance type safety and developer productivity.
 
 ## Solution with Code
 
-### Step 1: Set Up Your Project
+To build a GraphQL API using TypeScript and Node.js, we will use the `apollo-server` and `graphql` libraries. Let's go through the steps:
 
-Begin by creating a new Node.js project and installing the necessary dependencies.
+1. **Initialize Your Node.js Project**:
 
-```bash
-mkdir graphql-api
-cd graphql-api
-npm init -y
-npm install express graphql express-graphql @graphql-tools/schema
-npm install typescript ts-node @types/node @types/express --save-dev
-```
+   ```bash
+   mkdir graphql-api
+   cd graphql-api
+   npm init -y
+   ```
 
-### Step 2: Configure TypeScript
+2. **Install Required Packages**:
 
-Create a `tsconfig.json` for TypeScript configuration.
+   ```bash
+   npm install apollo-server graphql
+   npm install typescript @types/node ts-node --save-dev
+   ```
 
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  }
-}
-```
+3. **Setup TypeScript Configuration**:
 
-### Step 3: Define Your GraphQL Schema
+   Create a `tsconfig.json` file:
 
-Create a `schema.ts` file to define your GraphQL schema.
+   ```json
+   {
+     "compilerOptions": {
+       "target": "ES2017",
+       "module": "commonjs",
+       "strict": true,
+       "esModuleInterop": true,
+       "outDir": "./dist"
+     },
+     "include": ["src/**/*"]
+   }
+   ```
 
-```typescript
-import { makeExecutableSchema } from '@graphql-tools/schema';
+4. **Define Your GraphQL Schema**:
 
-const typeDefs = `
-  type Query {
-    hello: String
-  }
-`;
+   In a new directory `src`, create a file `schema.ts`:
 
-const resolvers = {
-  Query: {
-    hello: () => 'Hello world!',
-  },
-};
+   ```typescript
+   import { gql } from 'apollo-server';
 
-export const schema = makeExecutableSchema({ typeDefs, resolvers });
-```
+   export const typeDefs = gql`
+     type Query {
+       hello: String
+     }
+   `;
+   ```
 
-### Step 4: Set Up the Express Server
+5. **Create Resolvers**:
 
-Create an `index.ts` file to set up the Express server.
+   In `src`, create a file `resolvers.ts`:
 
-```typescript
-import express from 'express';
-import { graphqlHTTP } from 'express-graphql';
-import { schema } from './schema';
+   ```typescript
+   export const resolvers = {
+     Query: {
+       hello: () => 'Hello world!',
+     },
+   };
+   ```
 
-const app = express();
+6. **Setup Apollo Server**:
 
-app.use('/graphql', graphqlHTTP({
-  schema,
-  graphiql: true, // Enables the GraphiQL tool for testing
-}));
+   Create `src/index.ts`:
 
-const PORT = 4000;
-app.listen(PORT, () => {
-  console.log(`GraphQL API server running at http://localhost:${PORT}/graphql`);
-});
-```
+   ```typescript
+   import { ApolloServer } from 'apollo-server';
+   import { typeDefs } from './schema';
+   import { resolvers } from './resolvers';
 
-### Step 5: Run Your Server
+   const server = new ApolloServer({ typeDefs, resolvers });
 
-Use the following command to run your server:
+   server.listen().then(({ url }) => {
+     console.log(`🚀 Server ready at ${url}`);
+   });
+   ```
 
-```bash
-npx ts-node index.ts
-```
+7. **Run Your Server**:
 
-### Key Concepts
+   To start the server, run:
 
-- **GraphQL Schema**: Defines the types and structure of data available through the API.
-- **Resolvers**: Functions that resolve queries to return the requested data.
-- **Express-GraphQL**: Middleware that connects GraphQL with an Express server.
-- **TypeScript**: Provides type safety, helping catch errors during development.
+   ```bash
+   npx ts-node src/index.ts
+   ```
 
-By following these steps, you have built a basic GraphQL API with TypeScript and Node.js. This setup allows you to expand the API by adding more types and resolvers as needed, ensuring a flexible and efficient data-fetching solution.
+   You should see the server running and ready to accept queries.
+
+## Key Concepts
+
+- **GraphQL**: A query language for your API that allows clients to request only the data they need.
+- **TypeScript**: A superset of JavaScript that adds static typing, enhancing code quality and maintainability.
+- **Apollo Server**: A popular GraphQL server library for Node.js, which integrates seamlessly with TypeScript, offering tools for building a high-performance GraphQL API.
+
+By following this guide, you set up a basic GraphQL server with a single query. You can expand this by adding more types, queries, and mutations according to your application's requirements.
