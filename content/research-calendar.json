@@ -1448,7 +1448,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Training Data Processing - Performance Optimization",
     "slug": "research-training-data-processing-performance-optimization-2026-04-01",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1457,7 +1457,8 @@
       "training",
       "data",
       "processing"
-    ]
+    ],
+    "publishedAt": "2026-04-01T18:00:56.091Z"
   },
   {
     "id": "research-feature-store-performance-real-time-vs-batch-2026-04-02",
