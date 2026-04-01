@@ -1,0 +1,70 @@
+{
+  "window": {
+    "startDate": "2026-02-27",
+    "endDate": "2026-03-26",
+    "sourceFiles": {
+      "gaSnapshot": "C:/Users/fitne/Downloads/Reports_snapshot (2).csv",
+      "leadsOverview": "C:/Users/fitne/Downloads/Generate_leads_overview.csv",
+      "gscCountries": "C:/Users/fitne/Downloads/pocketportfolio.app-Performance-on-Search-2026-03-27/Countries.csv",
+      "gscQueries": "C:/Users/fitne/Downloads/pocketportfolio.app-Performance-on-Search-2026-03-27/Queries.csv",
+      "gscPages": "C:/Users/fitne/Downloads/pocketportfolio.app-Performance-on-Search-2026-03-27/Pages.csv"
+    }
+  },
+  "ga4": {
+    "activeUsers": 4669,
+    "newUsers": 4712,
+    "sessions": 5090,
+    "avgEngagementSecondsPerActiveUser": 10.58192332405226,
+    "topSessionSources": [
+      { "sourceMedium": "(direct) / (none)", "sessions": 3774 },
+      { "sourceMedium": "google / organic", "sessions": 678 },
+      { "sourceMedium": "chatgpt.com / referral", "sessions": 234 },
+      { "sourceMedium": "landing / hero_cta", "sessions": 80 },
+      { "sourceMedium": "bing / organic", "sessions": 46 },
+      { "sourceMedium": "chatgpt.com / (not set)", "sessions": 46 },
+      { "sourceMedium": "landing / analyst_video", "sessions": 46 },
+      { "sourceMedium": "weekly_snapshot / email", "sessions": 43 },
+      { "sourceMedium": "dividend_page / json_export_cta", "sessions": 20 },
+      { "sourceMedium": "linkedin.com / referral", "sessions": 18 }
+    ],
+    "aiNativeReferralsEvidence": {
+      "chatgptSessions": 234,
+      "perplexitySessions": 4,
+      "claudeSessions": 1,
+      "openaiSessions": 4,
+      "note": "Counts taken from Session source / medium rows; treat as directional, not exhaustive attribution."
+    }
+  },
+  "gsc": {
+    "topCountriesByClicks": [
+      { "country": "India", "clicks": 147, "impressions": 2539, "ctr": "5.79%", "position": 6.31 },
+      { "country": "Cambodia", "clicks": 84, "impressions": 353, "ctr": "23.8%", "position": 3.08 },
+      { "country": "United States", "clicks": 80, "impressions": 19599, "ctr": "0.41%", "position": 9.56 },
+      { "country": "Vietnam", "clicks": 50, "impressions": 1023, "ctr": "4.89%", "position": 4.92 },
+      { "country": "Germany", "clicks": 34, "impressions": 2203, "ctr": "1.54%", "position": 7.38 }
+    ],
+    "selectedHighIntentQueries": [
+      { "query": "pocket portfolio", "clicks": 45, "impressions": 192, "ctr": "23.44%", "position": 4.24 },
+      { "query": "trade republic export csv", "clicks": 5, "impressions": 138, "ctr": "3.62%", "position": 6.45 },
+      { "query": "trade republic csv export", "clicks": 4, "impressions": 258, "ctr": "1.55%", "position": 7.53 },
+      { "query": "ghostfolio import", "clicks": 3, "impressions": 35, "ctr": "8.57%", "position": 5.03 }
+    ],
+    "topPagesByClicks": [
+      { "url": "https://www.pocketportfolio.app/", "clicks": 95, "impressions": 1024, "ctr": "9.28%", "position": 5.6 },
+      { "url": "https://www.pocketportfolio.app/import/trade-republic", "clicks": 64, "impressions": 4168, "ctr": "1.54%", "position": 5.56 },
+      { "url": "https://www.pocketportfolio.app/import/ghostfolio", "clicks": 42, "impressions": 1826, "ctr": "2.3%", "position": 5.01 }
+    ]
+  },
+  "safeClaimsForSlide6": [
+    "Last 28 days: 4,669 active users; 4,712 new users; 5,090 sessions (GA4).",
+    "Organic acquisition present: google / organic delivered 678 sessions (GA4).",
+    "AI-native referrals are already visible in analytics: chatgpt.com delivered 234 sessions (GA4).",
+    "GSC evidence of compliance-adjacent intent: Trade Republic CSV export queries are ranking on page 1 (positions ~6–8) with measurable clicks.",
+    "Global reach: top-click countries include India, US, Germany, Vietnam (GSC)."
+  ],
+  "avoidOverclaiming": [
+    "Do not claim 'top 3 ranking' for Trade Republic CSV terms; current avg positions in export are ~6–8.",
+    "Do not claim revenue from analytics exports; Total revenue is 0 in the GA snapshot table."
+  ]
+}
+

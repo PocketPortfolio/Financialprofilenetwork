@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getArchitectureChallengeLeadsAnalytics } from '@/lib/challenge/challenge-leads-firestore';
+import { getViralMomentBlastMetrics } from '@/lib/marketing/viral-moment-blast-stats';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
@@ -186,6 +187,43 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    let viralMomentEmailBlast: {
+      totalSentAllTime: number;
+      emailsSentInSelectedRange: number;
+      emailsSentLast7Days: number;
+      viralMomentV1ConversionsInRange: number;
+      loopVelocityPer100Emails: number | null;
+      lastCronRunAt: string | null;
+      lastCronRunSent: number;
+      lastCronRunEvaluated: number;
+      lastCronRunSuppressed: number;
+    };
+    try {
+      const db = getDb();
+      const m = await getViralMomentBlastMetrics(db, startDate);
+      const viralConv = referral.byCampaign?.['viral_moment_v1']?.conversions ?? 0;
+      const emails = m.emailsSentInSelectedRange;
+      viralMomentEmailBlast = {
+        ...m,
+        viralMomentV1ConversionsInRange: viralConv,
+        loopVelocityPer100Emails:
+          emails > 0 ? Math.round((viralConv / emails) * 10_000) / 100 : null,
+      };
+    } catch (e: any) {
+      console.error('[Analytics API] 📧 Viral blast metrics failed:', e?.message);
+      viralMomentEmailBlast = {
+        totalSentAllTime: 0,
+        emailsSentInSelectedRange: 0,
+        emailsSentLast7Days: 0,
+        viralMomentV1ConversionsInRange: 0,
+        loopVelocityPer100Emails: null,
+        lastCronRunAt: null,
+        lastCronRunSent: 0,
+        lastCronRunEvaluated: 0,
+        lastCronRunSuppressed: 0,
+      };
+    }
+
     // Fetch conversion funnel (lead_magnet_clicked, mobile_setup_requested, quota_upgrade_initiated)
     let conversionFunnel: Awaited<ReturnType<typeof getConversionFunnelData>>;
     try {
@@ -239,6 +277,7 @@ export async function GET(request: NextRequest) {
       leads: leadsData,
       googleSignups,
       referral,
+      viralMomentEmailBlast,
       conversionFunnel,
       monetizationFunnelBoard,
       architectureChallengeLeads,

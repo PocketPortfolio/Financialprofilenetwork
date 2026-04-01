@@ -151,6 +151,18 @@ interface AnalyticsData {
       }
     >;
   };
+  /** /api/cron/viral-moment-blast aggregates (Firestore adminStats) + referral conversions */
+  viralMomentEmailBlast?: {
+    totalSentAllTime: number;
+    emailsSentInSelectedRange: number;
+    emailsSentLast7Days: number;
+    viralMomentV1ConversionsInRange: number;
+    loopVelocityPer100Emails: number | null;
+    lastCronRunAt: string | null;
+    lastCronRunSent: number;
+    lastCronRunEvaluated: number;
+    lastCronRunSuppressed: number;
+  };
   conversionFunnel?: {
     leadMagnetClicked: { total: number; last7Days: number; byTicker: Record<string, number> };
     mobileSetupRequested: { total: number; last7Days: number };
@@ -1549,6 +1561,107 @@ export default function AdminAnalyticsPage() {
                     </div>
                   </div>
                 )}
+              {analyticsData.viralMomentEmailBlast && (
+                <div
+                  style={{
+                    marginBottom: 'var(--space-4)',
+                    padding: 'var(--space-4)',
+                    background: 'var(--bg)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      marginBottom: 'var(--space-2)',
+                      color: 'var(--text)',
+                    }}
+                  >
+                    Viral email blast (cron)
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: '12px',
+                      color: 'var(--text-secondary)',
+                      marginBottom: 'var(--space-3)',
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    Sends recorded in Firestore when the production cron finishes (not{' '}
+                    <code style={{ fontSize: '11px' }}>?test=1</code> runs). Loop velocity ={' '}
+                    <code style={{ fontSize: '11px' }}>viral_moment_v1</code> signups in the selected
+                    range ÷ emails sent in that range × 100 (directional, not causal).
+                  </p>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                      gap: 'var(--space-3)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text)' }}>
+                        {analyticsData.viralMomentEmailBlast.emailsSentInSelectedRange}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        Emails sent (range)
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text)' }}>
+                        {analyticsData.viralMomentEmailBlast.emailsSentLast7Days}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        Emails sent (7d UTC days)
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text)' }}>
+                        {analyticsData.viralMomentEmailBlast.totalSentAllTime}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        Emails sent (all time)
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--pos)' }}>
+                        {analyticsData.viralMomentEmailBlast.viralMomentV1ConversionsInRange}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        viral_moment_v1 signups (range)
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--accent-warm, #f59e0b)' }}>
+                        {analyticsData.viralMomentEmailBlast.loopVelocityPer100Emails != null
+                          ? analyticsData.viralMomentEmailBlast.loopVelocityPer100Emails
+                          : '—'}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                        Loop velocity (per 100 emails)
+                      </div>
+                    </div>
+                  </div>
+                  {analyticsData.viralMomentEmailBlast.lastCronRunAt && (
+                    <p
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--text-secondary)',
+                        marginTop: 'var(--space-3)',
+                        marginBottom: 0,
+                      }}
+                    >
+                      Last cron:{' '}
+                      {new Date(analyticsData.viralMomentEmailBlast.lastCronRunAt).toLocaleString()} · sent{' '}
+                      {analyticsData.viralMomentEmailBlast.lastCronRunSent} · evaluated{' '}
+                      {analyticsData.viralMomentEmailBlast.lastCronRunEvaluated} · suppressed{' '}
+                      {analyticsData.viralMomentEmailBlast.lastCronRunSuppressed}
+                    </p>
+                  )}
+                </div>
+              )}
               {Object.keys(analyticsData.referral.bySource).length > 0 && (
                 <div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)', color: 'var(--text)' }}>
