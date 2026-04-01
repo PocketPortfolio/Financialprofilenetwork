@@ -1440,7 +1440,7 @@
     "scheduledTime": "14:00",
     "title": "How to Build a GraphQL API with TypeScript and Node.js",
     "slug": "how-to-build-a-graphql-api-with-typescript-and-node-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1449,7 +1449,8 @@
       "node.js",
       "graphql",
       "build"
-    ]
+    ],
+    "publishedAt": "2026-04-01T14:00:32.537Z"
   },
   {
     "id": "how-to-understanding-websockets-real-time-communication-in-2026-apr-2",
