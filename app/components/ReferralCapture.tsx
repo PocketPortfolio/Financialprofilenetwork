@@ -4,6 +4,11 @@ import { useEffect, useRef } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { trackViralReferral } from '@/app/lib/analytics/viral';
 import { VIRAL_REFERRAL_CAMPAIGN_DEFAULT } from '@/app/lib/viral/referralCodeServer';
+import {
+  clearReferralCodeCookie,
+  getReferralCodeCookie,
+  setReferralCodeCookie,
+} from '@/app/lib/viral/referralCookie';
 
 const REFERRAL_CODE_KEY = 'referral_code';
 const REFERRAL_SOURCE_KEY = 'referral_source';
@@ -21,12 +26,25 @@ export default function ReferralCapture() {
     if (typeof window === 'undefined') return;
     try {
       const params = new URLSearchParams(window.location.search);
-      const ref = params.get('ref');
+      const urlRef = params.get('ref');
+      const refFromUrl = !!(urlRef && urlRef.toUpperCase().startsWith('REF-'));
+      let ref = urlRef;
+      if (!ref || !ref.toUpperCase().startsWith('REF-')) {
+        const fromCookie = getReferralCodeCookie();
+        if (fromCookie?.toUpperCase().startsWith('REF-')) {
+          ref = fromCookie;
+        }
+      }
       if (!ref || !ref.toUpperCase().startsWith('REF-')) return;
 
       const normalized = ref.toUpperCase();
       sessionStorage.setItem(REFERRAL_CODE_KEY, normalized);
-      const src = params.get('source') || params.get('utm_source') || 'landing';
+      setReferralCodeCookie(normalized);
+      const src =
+        params.get('source') ||
+        params.get('utm_source') ||
+        sessionStorage.getItem(REFERRAL_SOURCE_KEY) ||
+        (refFromUrl ? 'landing' : 'invite');
       sessionStorage.setItem(REFERRAL_SOURCE_KEY, src);
 
       const logKey = `referral_click_logged_${normalized}`;
@@ -57,6 +75,13 @@ export default function ReferralCapture() {
     let code: string | null = null;
     try {
       code = sessionStorage.getItem(REFERRAL_CODE_KEY);
+      if (!code) {
+        const fromCookie = getReferralCodeCookie();
+        if (fromCookie?.toUpperCase().startsWith('REF-')) {
+          code = fromCookie.toUpperCase();
+          sessionStorage.setItem(REFERRAL_CODE_KEY, code);
+        }
+      }
     } catch {
       return;
     }
@@ -92,6 +117,7 @@ export default function ReferralCapture() {
             sessionStorage.setItem(sessionFlag, '1');
             sessionStorage.removeItem(REFERRAL_CODE_KEY);
             sessionStorage.removeItem(REFERRAL_SOURCE_KEY);
+            clearReferralCodeCookie();
           } catch {
             /* ignore */
           }
@@ -102,6 +128,7 @@ export default function ReferralCapture() {
           try {
             sessionStorage.setItem(sessionFlag, '1');
             sessionStorage.removeItem(REFERRAL_CODE_KEY);
+            clearReferralCodeCookie();
           } catch {
             /* ignore */
           }

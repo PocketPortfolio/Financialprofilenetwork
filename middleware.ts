@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Canonical host: apex → www so referral sessionStorage + cookies stay on one origin (ref survives signup).
+  const host = request.headers.get('host')?.split(':')[0] ?? '';
+  if (host === 'pocketportfolio.app') {
+    const url = request.nextUrl.clone();
+    url.hostname = 'www.pocketportfolio.app';
+    return NextResponse.redirect(url, 307);
+  }
+
   // #region agent log - DISABLED FOR PRODUCTION (causes timeouts during rapid testing)
   // const logData = {pathname:request.nextUrl.pathname,timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug',hypothesisId:'D'};
   // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:5',message:'Middleware invoked',data:logData,...logData})}).catch(()=>{});

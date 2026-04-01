@@ -4,8 +4,8 @@ Use this before making the **Route to Rise / viral_moment_v1** campaign public.
 
 ## 1. Deploy code
 
-- Merge and deploy the branch that includes `POST /api/referral/complete`, `ReferralCapture`, `referralIndex` upsert in `GET /api/api-keys/user`, campaign tagging on `referralEvents`, and admin **Viral campaign (viral_moment_v1)** metrics.
-- Run locally: `npm run lint` and `npx tsc --noEmit` (must pass).
+- Merge and deploy the branch that includes `POST /api/referral/complete`, `ReferralCapture`, `referralIndex` upsert in `GET /api/api-keys/user`, campaign tagging on `referralEvents`, admin **Viral campaign (viral_moment_v1)** metrics, **middleware apex → `www`** (preserves `?ref=`), and **`pp_referral_code` cookie** (`Domain=.pocketportfolio.app`) so referrals survive apex/www hops.
+- Run locally: `npm run lint` and `npm run typecheck` (must pass). If `npm run build` fails on “Cannot find module for page”, delete `.next` and run `npm run build` again.
 
 ## 2. Vercel environment (Production)
 
@@ -39,24 +39,27 @@ No new composite indexes are required for the referral queries in use (single-fi
 
 Do this in **production** URLs (`https://www.pocketportfolio.app`), not only localhost.
 
-1. **Referrer (existing account)**  
+1. **Canonical host (after deploy)**  
+   - Open `http://pocketportfolio.app/?ref=REF-TEST` (no `www`). Expect **307** to `https://www.pocketportfolio.app/?ref=REF-TEST` (query preserved). DevTools → Application → Cookies → confirm `pp_referral_code` on `.pocketportfolio.app` when a valid `REF-*` is present.
+
+2. **Referrer (existing account)**  
    - Sign in → open `/invite` or `/dashboard` (triggers `GET /api/api-keys/user`).  
    - In Firestore: `referralIndex` should contain `REF-` + first 8 chars of that user’s Firebase `uid` (uppercase), with `referrerEmail` lowercased.
 
-2. **Landing + click**  
+3. **Landing + click**  
    - Incognito: open `https://www.pocketportfolio.app/?ref=REF-XXXXXXXX&utm_campaign=viral_moment_v1` (use referrer’s real code).  
    - Confirm `referralEvents` gains a **click** with `campaign` / `metadata` when applicable.
 
-3. **Referee (new account)**  
+4. **Referee (new account)**  
    - New Google account (or account created &lt; 48h per server rule).  
    - After sign-in, `POST /api/referral/complete` should run from `ReferralCapture`.  
    - `referralRewardClaims` doc id: `viral_moment_v1__{refereeUid}`.  
    - `referralEvents` **conversion** row; referrer’s `apiKeysByEmail` gets `tier: foundersClub`, `expiresAt` ~7 days, `referralViralRewardCampaign: viral_moment_v1`.
 
-4. **Admin**  
+5. **Admin**  
    - Signed-in admin (Firebase custom claim `admin: true`) → `/admin/analytics` → **Referrals** → **Viral campaign (viral_moment_v1)** shows non-zero counts after the above.
 
-5. **Paid path**  
+6. **Paid path**  
    - Referrer who already has Founders Club with **no** `expiresAt` (active subscription) should **not** be overwritten by a referral trial (server skips grant; conversion still logged once per new referee).
 
 ## 6. What “no `apiKeysByEmail` doc” means
@@ -67,7 +70,7 @@ Free users often have **no** `apiKeysByEmail` row until checkout, seat grant, or
 
 - [ ] Production deploy complete  
 - [ ] `firestore:rules` deployed  
-- [ ] Smoke test 1–5 passed  
+- [ ] Smoke test 1–6 passed  
 - [ ] `/admin/analytics` viral campaign section verified  
 - [ ] Marketing links use `https://www.pocketportfolio.app/?ref=REF-...` (not `/join` unless you add routing)  
 - [ ] Optional: set calendar reminder to review trial expiry and conversion quality after 7 days  
