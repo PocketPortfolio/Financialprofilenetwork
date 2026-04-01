@@ -10,6 +10,7 @@ import type { User } from 'firebase/auth';
 import { startFoundersClubCheckout } from '@/app/lib/checkout/startFoundersClubCheckout';
 import { trackEvent, trackPaywallImpression } from '@/app/lib/analytics/events';
 import { LocalProcessingTerminal } from '@/app/components/LocalProcessingTerminal';
+import Link from 'next/link';
 
 const ATTACHMENT_MAX_CHARS = 50000;
 
@@ -650,6 +651,22 @@ export function AskAIModal({
                 >
                   Maybe later
                 </button>
+                <Link
+                  href="/invite?utm_source=pocket_analyst&utm_medium=quota_modal&utm_campaign=viral_moment_v1"
+                  onClick={() => { setShowQuotaExceededModal(false); setError(null); }}
+                  style={{
+                    display: 'block',
+                    marginTop: '4px',
+                    padding: '10px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--accent-warm)',
+                    textDecoration: 'underline',
+                    textAlign: 'center',
+                  }}
+                >
+                  Don&apos;t pay yet — invite 1 friend, unlock 7 days Founders Club
+                </Link>
               </div>
               {error && (
                 <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--danger)' }}>{error}</p>
@@ -724,6 +741,26 @@ export function AskAIModal({
                 >
                   Maybe later
                 </button>
+                <Link
+                  href="/invite?utm_source=pocket_analyst&utm_medium=attachment_upsell&utm_campaign=viral_moment_v1"
+                  onClick={() => {
+                    setShowAttachmentUpsellModal(false);
+                    setAttachmentUpsellRowCount(null);
+                    setError(null);
+                  }}
+                  style={{
+                    display: 'block',
+                    marginTop: '4px',
+                    padding: '10px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    color: 'var(--accent-warm)',
+                    textDecoration: 'underline',
+                    textAlign: 'center',
+                  }}
+                >
+                  Invite 1 friend — 7 days Sovereign AI + attachments
+                </Link>
               </div>
               {error && (
                 <p style={{ margin: '14px 0 0', fontSize: '12px', color: 'hsl(var(--destructive))', lineHeight: 1.45 }}>

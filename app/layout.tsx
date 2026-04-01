@@ -11,6 +11,7 @@ import { getHomePageSchema, renderJsonLd } from './lib/seo/schema';
 import { getCleanGAId } from './lib/env-utils';
 import TabBar from './components/nav/TabBar';
 import LandingPageTracker from './components/LandingPageTracker';
+import ReferralCapture from './components/ReferralCapture';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
 import { PremiumTierProvider } from './contexts/PremiumTierContext';
@@ -176,6 +177,7 @@ export default function RootLayout({
             <PocketAnalystProvider>
             <GlobalFoundersClubBanner />
             <LandingPageTracker />
+            <ReferralCapture />
             <div className="safe-area-all" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
               {/* flex-1 + minHeight 0 keeps bottom TabBar/footer in view when pages use full viewport height */}
               <div

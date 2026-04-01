@@ -11,6 +11,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
+import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -180,11 +181,12 @@ export async function POST(request: NextRequest) {
 
   const db = getDb();
 
-  // Resolve tier from apiKeysByEmail
+  // Resolve tier from apiKeysByEmail (time-bound trials respect expiresAt)
   const apiKeyDoc = await db.collection('apiKeysByEmail').doc(email).get();
   const apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
-  const tier = apiKeyData?.tier as string | undefined;
-  const isPaid = tier === 'foundersClub' || tier === 'corporateSponsor';
+  const effective = getEffectivePaidTier(apiKeyData);
+  const tier = effective.tier ?? undefined;
+  const isPaid = effective.isPaid;
 
   if (attachedContent && !isPaid) {
     await logPocketAnalystEvent(db, {

@@ -1591,6 +1591,31 @@ export default function Dashboard() {
 
       {/* 🎨 CONTENT - Layout wrapper handles header/banner/tier injection */}
       <div>
+          {isAuthenticated && !tierLoading && !isPaidTier(tier) && (
+            <div
+              style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 25,
+                padding: '10px 16px',
+                background: 'var(--surface)',
+                borderBottom: '1px solid var(--border-subtle)',
+                textAlign: 'center',
+                fontSize: '14px',
+                color: 'var(--text)',
+              }}
+            >
+              <span style={{ marginRight: '8px' }}>
+                7-day Founders Club unlock: refer one friend who joins—
+              </span>
+              <Link
+                href="/invite?utm_source=dashboard&utm_medium=sticky_banner&utm_campaign=viral_moment_v1"
+                style={{ color: 'var(--accent-warm)', fontWeight: 600, textDecoration: 'underline' }}
+              >
+                Copy your invite link
+              </Link>
+            </div>
+          )}
           {/* 🎨 INTELLIGENCE LAYER - Above everything */}
           {trades.length > 0 && (
             <MorningBrief 

@@ -31,6 +31,8 @@ export function trackViralReferral(data: {
   action: 'click' | 'conversion';
   referralCode: string;
   source?: string;
+  campaign?: string;
+  metadata?: Record<string, string>;
 }): void {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'viral_referral', {
@@ -39,7 +41,8 @@ export function trackViralReferral(data: {
       custom_parameter_source: data.source || 'unknown',
       value: data.action === 'conversion' ? 10 : 1, // Higher value for conversions
       // @ts-ignore - custom parameter not in base type but allowed by GA4
-      custom_parameter_referral_code: data.referralCode
+      custom_parameter_referral_code: data.referralCode,
+      custom_parameter_campaign: data.campaign || 'unknown',
     } as any);
   }
   if (typeof window !== 'undefined') {
@@ -50,6 +53,8 @@ export function trackViralReferral(data: {
         action: data.action,
         referralCode: data.referralCode,
         source: data.source || 'unknown',
+        campaign: data.campaign,
+        metadata: data.metadata,
       }),
     }).catch(() => {});
   }

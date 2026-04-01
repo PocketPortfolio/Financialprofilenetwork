@@ -141,6 +141,15 @@ interface AnalyticsData {
     last7DaysClicks: number;
     last7DaysConversions: number;
     bySource: Record<string, { clicks: number; conversions: number }>;
+    byCampaign?: Record<
+      string,
+      {
+        clicks: number;
+        conversions: number;
+        last7DaysClicks: number;
+        last7DaysConversions: number;
+      }
+    >;
   };
   conversionFunnel?: {
     leadMagnetClicked: { total: number; last7Days: number; byTicker: Record<string, number> };
@@ -1483,6 +1492,63 @@ export default function AdminAnalyticsPage() {
                   <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Conversions (7d)</div>
                 </div>
               </div>
+              {analyticsData.referral.byCampaign &&
+                analyticsData.referral.byCampaign['viral_moment_v1'] && (
+                  <div
+                    style={{
+                      marginBottom: 'var(--space-4)',
+                      padding: 'var(--space-4)',
+                      background: 'var(--bg)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        marginBottom: 'var(--space-3)',
+                        color: 'var(--text)',
+                      }}
+                    >
+                      Viral campaign (viral_moment_v1)
+                    </h3>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                        gap: 'var(--space-3)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text)' }}>
+                          {analyticsData.referral.byCampaign['viral_moment_v1'].clicks}
+                        </div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Clicks</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--pos)' }}>
+                          {analyticsData.referral.byCampaign['viral_moment_v1'].conversions}
+                        </div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Conversions</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text)' }}>
+                          {analyticsData.referral.byCampaign['viral_moment_v1'].last7DaysClicks}
+                        </div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Clicks (7d)</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--pos)' }}>
+                          {analyticsData.referral.byCampaign['viral_moment_v1'].last7DaysConversions}
+                        </div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                          Conversions (7d)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               {Object.keys(analyticsData.referral.bySource).length > 0 && (
                 <div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: 'var(--space-3)', color: 'var(--text)' }}>

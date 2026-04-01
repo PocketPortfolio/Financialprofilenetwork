@@ -75,6 +75,7 @@ npm install
 - [ ] **Production env:** Do **not** set `NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS` or set it to `false` (debug ingest is dev-only)
 - [ ] **Optional:** Leave `ENABLE_LLM_IMPORT` / `NEXT_PUBLIC_ENABLE_LLM_IMPORT` unset or `false` unless you use LLM CSV mapping
 - [ ] **Pocket Analyst (Ask AI):** At least one of `GOOGLE_GENERATIVE_AI_API_KEY` or `OPENAI_API_KEY` set in Production; Firebase Admin vars set; optional `CRON_SECRET` for monthly quota reset; optional `NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL` for landing demo. See `docs/POCKET-ANALYST-PROD.md`.
+- [ ] **Viral referral (Refer 1 / Get 7):** After deploy, run `firebase deploy --only firestore:rules` for `referralIndex` + `referralRewardClaims`, then follow `docs/DEPLOY-VIRAL-REFERRAL-PROD.md` smoke tests before the public campaign.
 - [ ] `public/dashboard-demo-4k.mp4` exists (18.15 MB)
 - [ ] `public/firebase-messaging-sw.js` exists
 - [ ] `public/manifest.webmanifest` updated

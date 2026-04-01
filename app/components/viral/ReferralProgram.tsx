@@ -1,26 +1,35 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { generateReferralCode, getReferralLink, trackReferralClick } from '@/app/lib/viral/referral';
+import { generateReferralCode, getReferralLink } from '@/app/lib/viral/referral';
 import { copyToClipboard } from '@/app/lib/viral/sharing';
 import { trackInviteSent } from '@/app/lib/analytics/viral';
 
 interface ReferralProgramProps {
   userId?: string;
   className?: string;
+  /** Query param `source` on invite links (analytics). */
+  linkSource?: string;
 }
 
-export default function ReferralProgram({ userId, className = '' }: ReferralProgramProps) {
+const SHARE_BLURB =
+  "Pocket Portfolio — local-first portfolio + Sovereign AI. Refer 1 friend, unlock 7 days Founders Club (limited-time offer).";
+
+export default function ReferralProgram({
+  userId,
+  className = '',
+  linkSource = 'dashboard',
+}: ReferralProgramProps) {
   const [referralCode, setReferralCode] = useState<string>('');
   const [referralLink, setReferralLink] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
 
   useEffect(() => {
-    // Generate or retrieve referral code
     const code = generateReferralCode(userId);
     setReferralCode(code);
-    setReferralLink(getReferralLink(code, 'dashboard'));
-  }, [userId]);
+    setReferralLink(getReferralLink(code, linkSource));
+  }, [userId, linkSource]);
 
   const handleCopyLink = async () => {
     const success = await copyToClipboard(referralLink, 'referral');
@@ -31,8 +40,29 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
     }
   };
 
+  const handleNativeShare = async () => {
+    if (typeof navigator === 'undefined' || !referralLink) return;
+    setShareBusy(true);
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Pocket Portfolio',
+          text: `${SHARE_BLURB}`,
+          url: referralLink,
+        });
+        trackInviteSent('social');
+      } else {
+        await handleCopyLink();
+      }
+    } catch {
+      /* user cancelled share sheet */
+    } finally {
+      setShareBusy(false);
+    }
+  };
+
   const handleShare = (platform: 'twitter' | 'linkedin' | 'facebook') => {
-    const shareText = `Check out Pocket Portfolio - Free, open-source portfolio tracker! ${referralLink}`;
+    const shareText = `${SHARE_BLURB} ${referralLink}`;
     const shareUrl = platform === 'twitter'
       ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`
       : platform === 'linkedin'
@@ -57,7 +87,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
         marginBottom: '12px',
         color: 'var(--text)'
       }}>
-        Invite Friends
+        Refer 1, get 7 days
       </h3>
       <p style={{ 
         fontSize: 'var(--font-size-sm)', 
@@ -65,7 +95,9 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
         marginBottom: '20px',
         lineHeight: 'var(--line-snug)'
       }}>
-        Share Pocket Portfolio with your friends and help grow the community. Every referral helps!
+        Copy your REF- link below. When someone joins Pocket Portfolio through it, you unlock 7 days of
+        Founders Club (Sovereign AI + file attachments)—one reward per account for this campaign. No card
+        required. Your ledgers stay on your device.
       </p>
 
       <div style={{ marginBottom: '20px' }}>
@@ -80,7 +112,7 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
         }}>
           Your Referral Link
         </label>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
           <input
             type="text"
             value={referralLink}
@@ -128,7 +160,27 @@ export default function ReferralProgram({ userId, className = '' }: ReferralProg
               }
             }}
           >
-            {copied ? 'Copied!' : 'Copy'}
+            {copied ? 'Copied!' : 'Copy link'}
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleNativeShare()}
+            disabled={shareBusy}
+            className="brand-button brand-button-primary"
+            style={{
+              padding: '10px 20px',
+              background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+              color: 'white',
+              border: '2px solid var(--border-warm)',
+              borderRadius: '8px',
+              cursor: shareBusy ? 'wait' : 'pointer',
+              fontWeight: '600',
+              fontSize: 'var(--font-size-sm)',
+              opacity: shareBusy ? 0.85 : 1,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {shareBusy ? '…' : 'Share invite'}
           </button>
         </div>
       </div>

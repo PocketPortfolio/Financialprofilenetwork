@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -51,8 +52,8 @@ export async function GET(request: NextRequest) {
   const db = getDb();
   const apiKeyDoc = await db.collection('apiKeysByEmail').doc(email).get();
   const apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
-  const tier = apiKeyData?.tier as string | undefined;
-  const isPaid = tier === 'foundersClub' || tier === 'corporateSponsor';
+  const effective = getEffectivePaidTier(apiKeyData);
+  const isPaid = effective.isPaid;
 
   if (isPaid) {
     return NextResponse.json({ used: 0, limit: null, unlimited: true });

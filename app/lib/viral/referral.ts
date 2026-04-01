@@ -5,6 +5,7 @@
 
 import { ReferralData } from './types';
 import { trackViralReferral } from '../analytics/viral';
+import { VIRAL_REFERRAL_CAMPAIGN_DEFAULT } from '@/app/lib/viral/referralCodeServer';
 
 /**
  * Generate a unique referral code for a user
@@ -57,7 +58,11 @@ export function getReferralLinkServer(
 /**
  * Track referral click
  */
-export function trackReferralClick(referralCode: string, source?: string): void {
+export function trackReferralClick(
+  referralCode: string,
+  source?: string,
+  campaign?: string
+): void {
   // Store referral code in session storage
   if (typeof window !== 'undefined') {
     sessionStorage.setItem('referral_code', referralCode);
@@ -65,12 +70,13 @@ export function trackReferralClick(referralCode: string, source?: string): void 
       sessionStorage.setItem('referral_source', source);
     }
   }
-  
-  // Track in analytics
+
   trackViralReferral({
     action: 'click',
     referralCode,
-    source: source || 'unknown'
+    source: source || 'unknown',
+    campaign: campaign || VIRAL_REFERRAL_CAMPAIGN_DEFAULT,
+    metadata: { campaign: campaign || VIRAL_REFERRAL_CAMPAIGN_DEFAULT },
   });
 }
 
@@ -87,16 +93,18 @@ export function getStoredReferralCode(): string | null {
 /**
  * Track referral conversion (signup)
  */
-export function trackReferralConversion(referralCode: string | null): void {
+export function trackReferralConversion(referralCode: string | null, campaign?: string): void {
   if (!referralCode) {
     referralCode = getStoredReferralCode();
   }
-  
+
   if (referralCode) {
     trackViralReferral({
       action: 'conversion',
       referralCode,
-      source: 'signup'
+      source: 'signup',
+      campaign: campaign || VIRAL_REFERRAL_CAMPAIGN_DEFAULT,
+      metadata: { campaign: campaign || VIRAL_REFERRAL_CAMPAIGN_DEFAULT },
     });
   }
 }
@@ -111,7 +119,8 @@ export function parseReferralFromUrl(): string | null {
   const ref = params.get('ref');
   
   if (ref && ref.startsWith('REF-')) {
-    trackReferralClick(ref, params.get('source') || undefined);
+    const utm = params.get('utm_campaign') || undefined;
+    trackReferralClick(ref, params.get('source') || undefined, utm);
     return ref;
   }
   

@@ -176,7 +176,14 @@ export async function GET(request: NextRequest) {
       referral = await getReferralData(startDate);
     } catch (e: any) {
       console.error('[Analytics API] 🔗 Referral data failed:', e?.message);
-      referral = { clicks: 0, conversions: 0, last7DaysClicks: 0, last7DaysConversions: 0, bySource: {} };
+      referral = {
+        clicks: 0,
+        conversions: 0,
+        last7DaysClicks: 0,
+        last7DaysConversions: 0,
+        bySource: {},
+        byCampaign: {},
+      };
     }
 
     // Fetch conversion funnel (lead_magnet_clicked, mobile_setup_requested, quota_upgrade_initiated)
@@ -763,7 +770,6 @@ async function getReferralData(startDate: Date) {
     const ref = db.collection('referralEvents');
     const startTimestamp = Timestamp.fromDate(startDate);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
 
     const snapshot = await ref
       .where('timestamp', '>=', startTimestamp)
@@ -774,24 +780,49 @@ async function getReferralData(startDate: Date) {
     let last7DaysClicks = 0;
     let last7DaysConversions = 0;
     const bySource: Record<string, { clicks: number; conversions: number }> = {};
+    const byCampaign: Record<
+      string,
+      { clicks: number; conversions: number; last7DaysClicks: number; last7DaysConversions: number }
+    > = {};
 
     snapshot.docs.forEach((doc) => {
       const data = doc.data();
       const action = data?.action;
       const source = (data?.source as string) || 'unknown';
+      const campaignRaw = data?.campaign as string | undefined;
+      const campaign =
+        campaignRaw && String(campaignRaw).trim()
+          ? String(campaignRaw).trim()
+          : '_uncampaigned';
       const ts = data?.timestamp as Timestamp;
       const isLast7Days = ts && ts.toMillis ? ts.toMillis() >= sevenDaysAgo.getTime() : false;
 
       if (!bySource[source]) bySource[source] = { clicks: 0, conversions: 0 };
+      if (!byCampaign[campaign]) {
+        byCampaign[campaign] = {
+          clicks: 0,
+          conversions: 0,
+          last7DaysClicks: 0,
+          last7DaysConversions: 0,
+        };
+      }
 
       if (action === 'click') {
         clicks++;
         bySource[source].clicks++;
-        if (isLast7Days) last7DaysClicks++;
+        byCampaign[campaign].clicks++;
+        if (isLast7Days) {
+          last7DaysClicks++;
+          byCampaign[campaign].last7DaysClicks++;
+        }
       } else if (action === 'conversion') {
         conversions++;
         bySource[source].conversions++;
-        if (isLast7Days) last7DaysConversions++;
+        byCampaign[campaign].conversions++;
+        if (isLast7Days) {
+          last7DaysConversions++;
+          byCampaign[campaign].last7DaysConversions++;
+        }
       }
     });
 
@@ -801,6 +832,7 @@ async function getReferralData(startDate: Date) {
       last7DaysClicks,
       last7DaysConversions,
       bySource,
+      byCampaign,
     };
   } catch (error) {
     console.error('Referral data fetch error:', error);
@@ -810,6 +842,7 @@ async function getReferralData(startDate: Date) {
       last7DaysClicks: 0,
       last7DaysConversions: 0,
       bySource: {},
+      byCampaign: {},
     };
   }
 }

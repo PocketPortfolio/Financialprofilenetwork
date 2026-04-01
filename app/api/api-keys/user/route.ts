@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { applySeatGrant, type InheritedTier } from '@/app/lib/seats/applySeatGrant';
+import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
+import { referralCodeFromUid } from '@/app/lib/viral/referralCodeServer';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -133,16 +135,63 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Lazy downgrade: time-bound FC/Corporate (referral trial, one-time, etc.) after expiresAt
+    let effective = getEffectivePaidTier(apiKeyData);
+    const hadStalePaidDoc =
+      !effective.isPaid &&
+      (apiKeyData?.tier === 'foundersClub' || apiKeyData?.tier === 'corporateSponsor');
+    if (hadStalePaidDoc) {
+      await db.collection('apiKeysByEmail').doc(userEmailCanonical).set(
+        {
+          tier: null,
+          expiresAt: null,
+          manuallyGranted: false,
+          themeAccess: null,
+          // Keep referralViralRewardCampaign / referralViralRewardGrantedAt so one trial per campaign stays enforced
+        },
+        { merge: true }
+      );
+      apiKeyDoc = await db.collection('apiKeysByEmail').doc(userEmailCanonical).get();
+      apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
+      effective = getEffectivePaidTier(apiKeyData);
+    }
+
+    // Referral link resolution: map REF-* → this user (for /api/referral/complete)
+    try {
+      const refCode = referralCodeFromUid(decodedToken.uid);
+      await db.collection('referralIndex').doc(refCode).set(
+        {
+          referrerUid: decodedToken.uid,
+          referrerEmail: userEmailCanonical,
+          updatedAt: Timestamp.now(),
+        },
+        { merge: true }
+      );
+    } catch (e) {
+      console.warn('[api-keys/user] referralIndex upsert skipped:', e);
+    }
+
     // Get corporate license
     const licenseDoc = await db.collection('corporateLicenses').doc(userEmailCanonical).get();
     const licenseData = licenseDoc.exists ? licenseDoc.data() : null;
+
+    const responseTier = effective.isPaid ? effective.tier : null;
+    const responseTheme =
+      effective.isPaid && responseTier
+        ? (apiKeyData?.themeAccess as string | null) ||
+          (responseTier === 'foundersClub'
+            ? 'founder'
+            : responseTier === 'corporateSponsor'
+              ? 'corporate'
+              : null)
+        : null;
 
     return NextResponse.json({
       email: userEmail,
       apiKey: apiKeyData?.apiKey || null,
       corporateLicense: licenseData?.licenseKey || null,
-      tier: apiKeyData?.tier || null,
-      themeAccess: apiKeyData?.themeAccess || null, // Premium theme access
+      tier: responseTier,
+      themeAccess: responseTheme,
     });
   } catch (error: any) {
     console.error('Error fetching API keys for user:', error);
