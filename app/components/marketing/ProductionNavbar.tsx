@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import DashboardLaunchLink from '../nav/DashboardLaunchLink';
 import { usePathname } from 'next/navigation';
 import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
@@ -236,7 +237,7 @@ export default function ProductionNavbar() {
                 alignItems: 'center', 
                 gap: '12px'
               }}>
-                <Link href="/dashboard" className="brand-button brand-button-primary" style={{ 
+                <DashboardLaunchLink className="brand-button brand-button-primary" style={{ 
                   padding: '10px 20px', 
                   background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)', 
                   color: 'white', 
@@ -260,7 +261,7 @@ export default function ProductionNavbar() {
                 }}
                 >
                   Launch App
-                </Link>
+                </DashboardLaunchLink>
                 <Link
                   href="/sponsor"
                   style={{
@@ -464,8 +465,7 @@ export default function ProductionNavbar() {
                 margin: '8px 0' 
               }} />
               
-              <Link
-                href="/dashboard"
+              <DashboardLaunchLink
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="brand-button brand-button-primary"
                 style={{
@@ -481,7 +481,7 @@ export default function ProductionNavbar() {
                 }}
               >
                 Launch App
-              </Link>
+              </DashboardLaunchLink>
               
               <Link
                 href="/sponsor"

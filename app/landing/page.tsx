@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import DashboardLaunchLink from '../components/nav/DashboardLaunchLink';
 import { useRouter, usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -348,7 +349,7 @@ export default function LandingPage() {
                 alignItems: 'center', 
                 gap: '12px'
               }}>
-                <Link href="/dashboard" className="brand-button brand-button-primary" style={{ 
+                <DashboardLaunchLink className="brand-button brand-button-primary" style={{ 
                   padding: '10px 20px', 
                   background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)', 
                   color: 'white', 
@@ -372,7 +373,7 @@ export default function LandingPage() {
                 }}
                 >
                   Launch App
-                </Link>
+                </DashboardLaunchLink>
                 <a
                   href="/sponsor"
                   style={{
@@ -634,8 +635,7 @@ export default function LandingPage() {
                 marginBottom: `calc(20px + env(safe-area-inset-bottom, 0px))` // Extra bottom margin for iPhone to ensure Sponsor button is visible
               }}>
                 {/* Launch App Button */}
-                <Link 
-                  href="/dashboard" 
+                <DashboardLaunchLink 
                   onClick={() => setIsMobileMenuOpen(false)}
                   style={{ 
                     width: '100%',
@@ -668,7 +668,7 @@ export default function LandingPage() {
                 >
                   <span style={{ fontSize: '18px' }}>🚀</span>
                   Launch App
-                </Link>
+                </DashboardLaunchLink>
 
                 {/* Theme Switcher */}
                 <div style={{
@@ -1452,8 +1452,7 @@ $ npx pocket-init --sovereign
               }}>
                 Track net worth across 50+ brokers. Autonomous research by Pulitzer AI. 800+ weekly briefs. Human-verified.
               </p>
-              <Link
-                href="/dashboard"
+              <DashboardLaunchLink
                 style={{
                   padding: '12px 24px',
                   background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
@@ -1476,7 +1475,7 @@ $ npx pocket-init --sovereign
                 }}
               >
                 Launch App
-              </Link>
+              </DashboardLaunchLink>
             </div>
 
             {/* CARD 2: SOVEREIGN SYNC */}
@@ -1795,8 +1794,7 @@ $ npx pocket-init --sovereign
             textAlign: 'center', 
             marginTop: '32px' 
           }}>
-            <Link
-              href="/dashboard"
+            <DashboardLaunchLink
               style={{
                 display: 'inline-block',
                 padding: '12px 24px',
@@ -1819,7 +1817,7 @@ $ npx pocket-init --sovereign
               }}
             >
               Track Your Portfolio →
-            </Link>
+            </DashboardLaunchLink>
           </div>
         </section>
 
@@ -2067,8 +2065,7 @@ $ npx pocket-init --sovereign
               gap: '16px', 
               flexWrap: 'wrap'
             }}>
-              <Link 
-                href="/dashboard" 
+              <DashboardLaunchLink 
                 style={{ 
                   padding: '12px 24px', 
                   background: 'white', 
@@ -2082,7 +2079,7 @@ $ npx pocket-init --sovereign
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 Try Beta Version
-              </Link>
+              </DashboardLaunchLink>
               <button 
                 onClick={handleStarGitHub}
                 style={{ 
