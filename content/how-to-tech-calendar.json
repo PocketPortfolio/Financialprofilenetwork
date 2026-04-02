@@ -1458,14 +1458,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding WebSockets: Real-Time Communication in 2026",
     "slug": "understanding-websockets-real-time-communication-in-2026",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "websockets",
       "understanding",
       "real"
-    ]
+    ],
+    "publishedAt": "2026-04-02T14:01:07.835Z"
   },
   {
     "id": "how-to-how-to-implement-jwt-authentication-from-scratch-apr-3",
