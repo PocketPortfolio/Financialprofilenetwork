@@ -1466,14 +1466,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Feature Store Performance - Real-Time vs Batch",
     "slug": "research-feature-store-performance-real-time-vs-batch-2026-04-02",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "product",
     "keywords": [
       "performance",
       "feature",
       "store"
-    ]
+    ],
+    "publishedAt": "2026-04-02T18:00:37.114Z"
   },
   {
     "id": "research-model-versioning-performance-overhead-analysis-2026-04-03",
