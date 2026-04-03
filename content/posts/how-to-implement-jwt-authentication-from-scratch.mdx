@@ -2,106 +2,110 @@
 title: How to Implement JWT Authentication from Scratch
 date: '2026-04-03'
 description: >-
-  Learn how to implement JWT authentication from scratch with a focus on secure
-  user authentication.
+  How to Implement JWT Authentication from Scratch - authentication, jwt,
+  implement
 tags:
   - authentication
   - jwt
   - implement
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-jwt-authentication-from-scratch.png
-pillar: Tech
+pillar: technical
 category: how-to-in-tech
 ---
+```mdx
+---
+title: "How to Implement JWT Authentication from Scratch"
+date: "2026-04-03"
+description: "Learn how to implement JWT authentication from scratch using Node.js and Express."
+tags: ["authentication", "jwt", "implement"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/how-to-implement-jwt-authentication-from-scratch.png"
+pillar: "Development"
+category: "how-to-in-tech"
+---
 
-# Problem
+# How to Implement JWT Authentication from Scratch
 
-In modern web applications, authenticating users securely is paramount. Traditional session-based authentication can become cumbersome and less efficient, especially in distributed systems. JSON Web Tokens (JWT) offer a stateless, scalable solution for authentication by transmitting user information securely between parties.
+JSON Web Tokens (JWT) is a popular method for securely transmitting information between parties as a JSON object. The information can be verified and trusted because it is digitally signed. In this guide, we will implement JWT authentication from scratch using Node.js and Express.
 
-# Solution with Code
+## Problem
 
-To implement JWT authentication from scratch, we'll create a simple Node.js application. We'll use the `jsonwebtoken` package to sign and verify tokens. Here's a step-by-step guide:
+Traditional session-based authentication stores session data on the server, which can scale poorly with large numbers of users. Stateless authentication with JWTs provides a scalable solution by storing user session state on the client-side. The server only needs to verify the JWT's signature and expiration.
+
+## Solution
 
 ### Key Concepts
 
-- **JSON Web Token (JWT):** A compact, URL-safe token used for securely transmitting information.
-- **Payload:** Contains claims, which are statements about an entity (typically, the user) and additional metadata.
-- **Signature:** Ensures the token's integrity and authenticity.
+- **JWT Structure**: JWTs consist of three parts: Header, Payload, and Signature. The Header specifies the algorithm used. The Payload contains claims. The Signature is used to verify the token's authenticity.
+- **Secret Key**: Used to sign the token and verify its signature. Keep it secure.
+- **Expiration**: Tokens should have an expiration time to reduce risk if compromised.
 
-### Step 1: Setup Project
+### Implementation
 
-Initialize a Node.js project and install required packages:
+First, ensure you have Node.js and npm installed. Create a new Node.js project and install the required packages:
 
 ```bash
-mkdir jwt-auth-example
-cd jwt-auth-example
 npm init -y
 npm install express jsonwebtoken dotenv
 ```
 
-### Step 2: Create the Server
+Create a `.env` file for environment variables:
 
-Create a basic Express server in `server.js`:
+```plaintext
+SECRET_KEY=your_secret_key
+```
+
+### Code
+
+Create a file `server.js` and set up Express:
 
 ```javascript
 require('dotenv').config();
 const express = require('express');
 const jwt = require('jsonwebtoken');
-
 const app = express();
+
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key';
+const users = [{ id: 1, username: 'user1', password: 'password' }];
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-```
-
-### Step 3: Implement JWT Authentication
-
-#### Generate Token
-
-Create a route to generate a JWT for a valid user:
-
-```javascript
+// Authenticate user and generate JWT
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
 
-  // Validate user credentials (in a real app, you'd query a database)
-  if (username === 'user' && password === 'password') {
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-    return res.json({ token });
-  }
+  if (!user) return res.status(401).send('Invalid credentials');
 
-  res.status(401).json({ message: 'Invalid credentials' });
+  const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+  res.json({ token });
 });
-```
 
-#### Verify Token
-
-Create a middleware to protect routes:
-
-```javascript
+// Middleware to verify token
 function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) return res.sendStatus(403);
 
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, SECRET_KEY, (err, user) => {
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user;
     next();
   });
 }
 
+// Protected route
 app.get('/protected', authenticateToken, (req, res) => {
-  res.json({ message: 'This is a protected route', user: req.user });
+  res.send('This is a protected route');
 });
+
+app.listen(3000, () => console.log('Server running on port 3000'));
 ```
 
-# Conclusion
+### Explanation
 
-This guide covers the foundational steps for implementing JWT authentication in a Node.js application. JWTs provide a stateless and scalable way to authenticate users, particularly useful in microservices architectures. Ensure your `SECRET_KEY` is kept secure and consider using environment variables for sensitive information. Further enhancements could include integrating a database for user management and implementing a refresh token mechanism.
+- **/login Endpoint**: Authenticates user credentials and generates a JWT.
+- **authenticateToken Middleware**: Verifies the JWT from the request headers.
+- **Protected Route**: Only accessible with a valid JWT.
+
+With this setup, you have a basic JWT authentication mechanism. Remember to secure your `SECRET_KEY` and consider additional security measures like HTTPS in production.
+```
