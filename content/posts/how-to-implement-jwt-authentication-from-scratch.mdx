@@ -1,0 +1,107 @@
+---
+title: How to Implement JWT Authentication from Scratch
+date: '2026-04-03'
+description: >-
+  Learn how to implement JWT authentication from scratch with a focus on secure
+  user authentication.
+tags:
+  - authentication
+  - jwt
+  - implement
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-jwt-authentication-from-scratch.png
+pillar: Tech
+category: how-to-in-tech
+---
+
+# Problem
+
+In modern web applications, authenticating users securely is paramount. Traditional session-based authentication can become cumbersome and less efficient, especially in distributed systems. JSON Web Tokens (JWT) offer a stateless, scalable solution for authentication by transmitting user information securely between parties.
+
+# Solution with Code
+
+To implement JWT authentication from scratch, we'll create a simple Node.js application. We'll use the `jsonwebtoken` package to sign and verify tokens. Here's a step-by-step guide:
+
+### Key Concepts
+
+- **JSON Web Token (JWT):** A compact, URL-safe token used for securely transmitting information.
+- **Payload:** Contains claims, which are statements about an entity (typically, the user) and additional metadata.
+- **Signature:** Ensures the token's integrity and authenticity.
+
+### Step 1: Setup Project
+
+Initialize a Node.js project and install required packages:
+
+```bash
+mkdir jwt-auth-example
+cd jwt-auth-example
+npm init -y
+npm install express jsonwebtoken dotenv
+```
+
+### Step 2: Create the Server
+
+Create a basic Express server in `server.js`:
+
+```javascript
+require('dotenv').config();
+const express = require('express');
+const jwt = require('jsonwebtoken');
+
+const app = express();
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
+const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key';
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+### Step 3: Implement JWT Authentication
+
+#### Generate Token
+
+Create a route to generate a JWT for a valid user:
+
+```javascript
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Validate user credentials (in a real app, you'd query a database)
+  if (username === 'user' && password === 'password') {
+    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+    return res.json({ token });
+  }
+
+  res.status(401).json({ message: 'Invalid credentials' });
+});
+```
+
+#### Verify Token
+
+Create a middleware to protect routes:
+
+```javascript
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+app.get('/protected', authenticateToken, (req, res) => {
+  res.json({ message: 'This is a protected route', user: req.user });
+});
+```
+
+# Conclusion
+
+This guide covers the foundational steps for implementing JWT authentication in a Node.js application. JWTs provide a stateless and scalable way to authenticate users, particularly useful in microservices architectures. Ensure your `SECRET_KEY` is kept secure and consider using environment variables for sensitive information. Further enhancements could include integrating a database for user management and implementing a refresh token mechanism.
