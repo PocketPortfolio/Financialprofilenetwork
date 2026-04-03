@@ -1482,14 +1482,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Model Versioning - Performance Overhead Analysis",
     "slug": "research-model-versioning-performance-overhead-analysis-2026-04-03",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "model",
       "versioning"
-    ]
+    ],
+    "publishedAt": "2026-04-03T18:00:47.911Z"
   },
   {
     "id": "research-a-b-testing-infrastructure-performance-impact-2026-04-04",
