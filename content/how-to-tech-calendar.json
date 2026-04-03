@@ -1474,14 +1474,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement JWT Authentication from Scratch",
     "slug": "how-to-implement-jwt-authentication-from-scratch",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "authentication",
       "jwt",
       "implement"
-    ]
+    ],
+    "publishedAt": "2026-04-03T14:00:37.322Z"
   },
   {
     "id": "how-to-the-complete-guide-to-docker-compose-for-development-apr-4",
