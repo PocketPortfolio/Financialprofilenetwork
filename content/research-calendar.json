@@ -1498,14 +1498,15 @@
     "scheduledTime": "18:00",
     "title": "Research: A/B Testing Infrastructure - Performance Impact",
     "slug": "research-a-b-testing-infrastructure-performance-impact-2026-04-04",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "testing",
       "infrastructure"
-    ]
+    ],
+    "publishedAt": "2026-04-04T18:00:51.707Z"
   },
   {
     "id": "research-recommendation-system-latency-real-time-vs-batch-2026-04-05",
