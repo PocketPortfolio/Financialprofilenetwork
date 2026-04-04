@@ -1,0 +1,27 @@
+---
+title: 'Sanitization by Construction — The Edge Compiler'
+date: '2026-04-24'
+description: >-
+  No regex PII roulette: buildPortfolioContext structurally excludes row dumps. CSV import is a separate pipeline; the AI boundary is totals + top-N only. Part 3 of Sovereign Engineering.
+tags:
+  - privacy
+  - typescript
+  - ai
+author: Pocket Portfolio
+image: /book-assets/sovereign-engineering-covers/se-03.png
+pillar: technical
+series: Sovereign Engineering
+category: sovereign-engineering
+---
+
+**Sovereign Engineering · Part 3**
+
+**Edge Compiler** = **`buildPortfolioContext`** (`app/lib/ai/contextBuilder.ts`) — not a separate npm package. It does **not** parse CSV columns named “Description” or “Account Number”; by the time it runs, data is normalized **`Trade`**. The function **only** emits allowed lines — totals + top **10** tickers — so **structural exclusion**, not redaction.
+
+**Two pipelines:** (1) **Importer** — CSV → `Trade[]`. (2) **Context builder** — `Trade[]` → **~1–2KB** semantic summary for the LLM. Universal column mapping (headers + few rows) is `docs/IP-TECHNICAL-MECHANISMS.md` §3 — full file stays local.
+
+Default Ask AI: **Network tab** shows a short `context` string, not your full export. **Paid attachment** is an explicit second boundary.
+
+---
+
+**Read the [Sovereign Intelligence](/book/sovereign-intelligence) book or [try Pocket Portfolio](/).**

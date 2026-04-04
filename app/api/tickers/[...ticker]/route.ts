@@ -17,6 +17,11 @@ export const dynamicParams = true;
 export const runtime = 'nodejs';
 export const revalidate = 0; // Force no caching to ensure Next.js recognizes the route
 export const fetchCache = 'force-no-store'; // Required for Next.js 15 production routes
+/** GSC/crawl: avoid platform 504s; Yahoo fetches use AbortSignal.timeout below */
+export const maxDuration = 60;
+
+/** Upstream Yahoo chart/quote fetches — fail fast before serverless wall clock kills the invocation */
+const YAHOO_FETCH_TIMEOUT_MS = 14_000;
 
 // Free tier: 50 calls per hour per IP (more generous than price API since this is historical data)
 const FREE_TIER_LIMIT = 50;
@@ -125,7 +130,11 @@ async function fetchNavFromQuoteSummary(ticker: string): Promise<HistoricalDataP
   ];
   for (const url of urls) {
     try {
-      const r = await fetch(url, { headers: YAHOO_QUOTE_HEADERS, next: { revalidate: 3600 } });
+      const r = await fetch(url, {
+        headers: YAHOO_QUOTE_HEADERS,
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(YAHOO_FETCH_TIMEOUT_MS),
+      });
       if (!r.ok) continue;
       const data = await r.json();
       const summary = data?.quoteSummary?.result?.[0]?.summaryDetail;
@@ -184,6 +193,7 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
     const response = await fetch(url, {
       headers: YAHOO_QUOTE_HEADERS,
       next: { revalidate: 3600 }, // Cache for 1 hour
+      signal: AbortSignal.timeout(YAHOO_FETCH_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -682,28 +692,41 @@ export async function GET(
     return NextResponse.json(response, { headers });
   } catch (error: any) {
     console.error(`Error fetching ticker data for ${ticker}:`, error);
+    // 503 (not 500): transient upstream/handler failure — better for crawlers than generic 5xx
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch historical data',
+      {
+        error: 'Data source temporarily unavailable',
         symbol: ticker,
-        message: error.message
+        message: error?.message || 'Retry later',
       },
-      { status: 500 }
+      {
+        status: 503,
+        headers: {
+          'Retry-After': '120',
+          'Cache-Control': 'no-store',
+        },
+      }
     );
   }
   } catch (error: any) {
     // Catch any initialization errors or unexpected errors outside the main try-catch
     console.error('[TICKERS_API] Unexpected error in route handler:', error);
     return NextResponse.json(
-      { 
-        error: 'Internal server error',
+      {
+        error: 'Service temporarily unavailable',
         message: error?.message || 'An unexpected error occurred',
         diagnostic: {
           errorType: error?.constructor?.name || 'Unknown',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       },
-      { status: 500 }
+      {
+        status: 503,
+        headers: {
+          'Retry-After': '120',
+          'Cache-Control': 'no-store',
+        },
+      }
     );
   }
 }

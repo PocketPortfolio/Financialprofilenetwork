@@ -1,0 +1,35 @@
+---
+title: 'Prompt Grounding — Layers in app/api/ai/chat/route.ts'
+date: '2026-05-15'
+description: >-
+  SYSTEM_PROMPT + contextBlock + quoteBlock + attachedBlock; extractSymbolHints for live quotes; Gemini/OpenAI routing. Part 6 of Sovereign Engineering.
+tags:
+  - prompting
+  - ai
+  - gemini
+author: Pocket Portfolio
+image: /book-assets/sovereign-engineering-covers/se-06.png
+pillar: technical
+series: Sovereign Engineering
+category: sovereign-engineering
+---
+
+**Sovereign Engineering · Part 6**
+
+Stacked system string:
+
+```typescript
+const contextBlock = context
+  ? `\n\nPortfolio context:\n${context}`
+  : '\n\n(No portfolio context provided.)';
+const attachedBlock = attachedContent
+  ? `\n\nFile the user included (use this):\n${attachedContent}`
+  : '';
+const systemPrompt = SYSTEM_PROMPT + contextBlock + quoteBlock + attachedBlock;
+```
+
+Quotes: `extractSymbolHints(message)` → internal `/api/quote`. Attachments: **paid** path, **60k** server cap.
+
+---
+
+**Read the [Sovereign Intelligence](/book/sovereign-intelligence) book or [try Pocket Portfolio](/).**

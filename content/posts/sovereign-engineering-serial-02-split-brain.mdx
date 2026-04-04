@@ -1,0 +1,83 @@
+---
+title: 'Split-Brain — Analyst-Grade Reasoning Without Raw Transactions on the Server'
+date: '2026-04-17'
+description: >-
+  buildPortfolioContext: thousands of trades to a ~1–2KB semantic summary; AskAIModal sends only context + message. Part 2 of Sovereign Engineering.
+tags:
+  - rag
+  - architecture
+  - ai
+  - local-first
+author: Pocket Portfolio
+image: /book-assets/sovereign-engineering-covers/se-02.png
+pillar: technical
+series: Sovereign Engineering
+category: sovereign-engineering
+---
+
+**Sovereign Engineering · Part 2**
+
+**Memory on the edge, reasoning in the cloud.** After CSV import, trades live as structured `Trade[]` in the client. **`buildPortfolioContext`** in `app/lib/ai/contextBuilder.ts` is the **compiler**: it turns trades + positions into a **fixed-schema** string — totals, trade count, and up to **10** holdings by value.
+
+## The function (production code)
+
+```typescript
+const TOP_HOLDINGS_COUNT = 10;
+
+export function buildPortfolioContext(
+  trades: Trade[],
+  positions?: Record<string, Position> | Position[]
+): string {
+  const positionMap: Record<string, Position> = (() => {
+    if (positions !== undefined) {
+      if (Array.isArray(positions)) {
+        const map: Record<string, Position> = {};
+        positions.forEach((p) => {
+          map[p.ticker] = p;
+        });
+        return map;
+      }
+      return positions;
+    }
+    const { positions: derived } = calculatePositions(trades);
+    return derived;
+  })();
+
+  const positionList = Object.values(positionMap).filter((p) => p.shares > 0);
+  const totals = calculatePortfolioTotals(positionMap);
+
+  const lines: string[] = [];
+  lines.push('Portfolio summary (for personalization only):');
+  lines.push(`Total positions: ${totals.totalPositions}`);
+  lines.push(`Total trades: ${trades.length}`);
+  if (totals.totalInvested > 0 || totals.totalCurrentValue > 0) {
+    lines.push(`Total invested (USD equiv): ${totals.totalInvested.toFixed(2)}`);
+    lines.push(`Total current value (USD equiv): ${totals.totalCurrentValue.toFixed(2)}`);
+    lines.push(
+      `Total unrealized P/L: ${totals.totalUnrealizedPL.toFixed(2)} (${totals.totalUnrealizedPLPercent.toFixed(1)}%)`
+    );
+  }
+
+  if (positionList.length > 0) {
+    const byValue = [...positionList].sort((a, b) => b.currentValue - a.currentValue);
+    const top = byValue.slice(0, TOP_HOLDINGS_COUNT);
+    lines.push('');
+    lines.push('Top holdings by current value:');
+    top.forEach((p) => {
+      const pct =
+        totals.totalCurrentValue > 0 ? (p.currentValue / totals.totalCurrentValue) * 100 : 0;
+      lines.push(
+        `  ${p.ticker}: ${p.shares.toFixed(2)} shares, ${p.currency} ${p.currentValue.toFixed(2)} (${pct.toFixed(1)}%), P/L ${p.unrealizedPLPercent.toFixed(1)}%`
+      );
+    });
+  }
+
+  return lines.join('\n');
+}
+```
+
+`AskAIModal` sends `context: portfolioContext` — not raw CSV rows — on the default path.
+
+---
+
+**Read the [Sovereign Intelligence](/book/sovereign-intelligence) book or [try Pocket Portfolio](/).**

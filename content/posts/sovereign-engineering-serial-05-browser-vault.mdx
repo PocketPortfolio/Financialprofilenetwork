@@ -1,0 +1,42 @@
+---
+title: 'Browser Storage as the Financial Vault'
+date: '2026-05-08'
+description: >-
+  Three persistence lanes: localStorage (pocket-portfolio-local-trades), Firebase TradeService for auth users, Zustand partialize for prefs only, plus IndexedDB cache clear on logout. Part 5 of Sovereign Engineering.
+tags:
+  - local-first
+  - storage
+  - firebase
+  - engineering
+author: Pocket Portfolio
+image: /book-assets/sovereign-engineering-covers/se-05.png
+pillar: technical
+series: Sovereign Engineering
+category: sovereign-engineering
+---
+
+**Sovereign Engineering · Part 5**
+
+## Guest: `localPortfolioStore.ts`
+
+```typescript
+const STORAGE_KEY_TRADES = 'pocket-portfolio-local-trades';
+```
+
+Trades JSON + metadata; quota estimated vs **5MB** budget — fail closed when over threshold.
+
+## Auth: `useTrades` → `TradeService.getTrades(uid, forceServerFetch)`
+
+Cloud is authoritative for signed-in users; UI still filters **healed** IDs from `localStorage`.
+
+## Prefs: `portfolioStore` `persist` + `partialize`
+
+Only chart view, time range, sectors, benchmarks — **not** full positions blob.
+
+## Logout: `useAuth` → `clearIndexedDbPersistence` + `terminate(db)`
+
+Clears **Firestore client cache** (IndexedDB), not “the vault” for guests.
+
+---
+
+**Read the [Sovereign Intelligence](/book/sovereign-intelligence) book or [try Pocket Portfolio](/).**

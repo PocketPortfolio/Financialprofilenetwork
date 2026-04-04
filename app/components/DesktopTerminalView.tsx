@@ -380,6 +380,7 @@ export default function DesktopTerminalView({
                   </button>
                   <a 
                     href={`/api/tickers/${normalizedSymbol}/csv`}
+                    rel="nofollow noreferrer"
                     style={{
                       fontSize: '14px',
                       color: 'var(--signal)',

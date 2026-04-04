@@ -59,6 +59,27 @@ Use these canonical URLs when updating posts on external platforms to ensure SEO
 | CoderLegion Group | Pocket Portfolio Beta | `https://pocketportfolio.app/blog/pocket-portfolio-beta` |
 | CoderLegion Profile | Pocket Portfolio Beta | `https://pocketportfolio.app/blog/pocket-portfolio-beta` |
 
+## Sovereign Engineering serial (first-party blog)
+
+When cross-posting to CoderLegion or LinkedIn, point canonical at the matching `/blog/` URL (production host: `https://www.pocketportfolio.app`).
+
+| Part | Blog slug | Canonical URL |
+|------|-----------|----------------|
+| 1 | `sovereign-engineering-serial-01-compliance-trap` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-01-compliance-trap` |
+| 2 | `sovereign-engineering-serial-02-split-brain` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-02-split-brain` |
+| 3 | `sovereign-engineering-serial-03-edge-compiler` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-03-edge-compiler` |
+| 4 | `sovereign-engineering-serial-04-viral-scale` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-04-viral-scale` (GA4: 4,669 active / 4,500 new, 2026-03-06–2026-04-02) |
+| 5 | `sovereign-engineering-serial-05-browser-vault` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-05-browser-vault` |
+| 6 | `sovereign-engineering-serial-06-prompt-grounding` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-06-prompt-grounding` |
+| 7 | `sovereign-engineering-serial-07-viral-loop` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-07-viral-loop` |
+| 8 | `sovereign-engineering-serial-08-amber-email` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-08-amber-email` |
+| 9 | `sovereign-engineering-serial-09-admin-analytics` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-09-admin-analytics` |
+| 10 | `sovereign-engineering-serial-10-roadmap-parser` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-10-roadmap-parser` |
+| 11 | `sovereign-engineering-serial-11-vision-b2b` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-11-vision-b2b` |
+| 12 | `sovereign-engineering-serial-12-route-to-rise` | `https://www.pocketportfolio.app/blog/sovereign-engineering-serial-12-route-to-rise` |
+
+Markdown source (CoderLegion-ready): `content/coderlegion-sovereign-engineering-serial/`. Manifest: `content/coderlegion-sovereign-engineering-serial.md`.
+
 ## Notes
 
 - **Dev.to:** Canonical URL field is usually at the bottom of the edit form, under "Advanced Settings" or "SEO Settings"

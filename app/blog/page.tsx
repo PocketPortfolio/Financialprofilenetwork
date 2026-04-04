@@ -29,8 +29,16 @@ type GridItem =
   | { kind: 'external'; article: Article };
 
 function buildVisibleItems(
-  filter: 'all' | 'dev.to' | 'coderlegion' | 'generated' | 'how-to-in-tech' | 'research',
+  filter:
+    | 'all'
+    | 'dev.to'
+    | 'coderlegion'
+    | 'generated'
+    | 'how-to-in-tech'
+    | 'research'
+    | 'sovereign-engineering',
   regularPosts: GeneratedPost[],
+  sovereignEngineeringPosts: GeneratedPost[],
   researchPosts: GeneratedPost[],
   howToPosts: GeneratedPost[],
   filteredArticles: Article[]
@@ -39,6 +47,9 @@ function buildVisibleItems(
 
   if (filter === 'all' || filter === 'generated') {
     regularPosts.forEach((post) => items.push({ kind: 'regular', post }));
+  }
+  if (filter === 'all' || filter === 'sovereign-engineering') {
+    sovereignEngineeringPosts.forEach((post) => items.push({ kind: 'regular', post }));
   }
   if (filter === 'all' || filter === 'research') {
     researchPosts.forEach((post) => items.push({ kind: 'research', post }));
@@ -49,7 +60,10 @@ function buildVisibleItems(
 
   const showExternal =
     filter === 'all' ||
-    (filter !== 'generated' && filter !== 'how-to-in-tech' && filter !== 'research');
+    (filter !== 'generated' &&
+      filter !== 'how-to-in-tech' &&
+      filter !== 'research' &&
+      filter !== 'sovereign-engineering');
   if (showExternal) {
     filteredArticles.forEach((article) => items.push({ kind: 'external', article }));
   }
@@ -62,7 +76,13 @@ function BlogPageInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [filter, setFilter] = useState<
-    'all' | 'dev.to' | 'coderlegion' | 'generated' | 'how-to-in-tech' | 'research'
+    | 'all'
+    | 'dev.to'
+    | 'coderlegion'
+    | 'generated'
+    | 'how-to-in-tech'
+    | 'research'
+    | 'sovereign-engineering'
   >('all');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const prevFilter = useRef(filter);
@@ -83,14 +103,27 @@ function BlogPageInner() {
 
   const howToPosts = generatedPosts.filter((post) => post.category === 'how-to-in-tech');
   const researchPosts = generatedPosts.filter((post) => post.category === 'research');
+  const sovereignEngineeringPosts = generatedPosts.filter(
+    (post) => post.category === 'sovereign-engineering'
+  );
   const regularPosts = generatedPosts.filter(
-    (post) => post.category !== 'how-to-in-tech' && post.category !== 'research'
+    (post) =>
+      post.category !== 'how-to-in-tech' &&
+      post.category !== 'research' &&
+      post.category !== 'sovereign-engineering'
   );
 
   const filteredArticles =
     filter === 'all' ? featuredArticles : featuredArticles.filter((article) => article.platform === filter);
 
-  const visibleItems = buildVisibleItems(filter, regularPosts, researchPosts, howToPosts, filteredArticles);
+  const visibleItems = buildVisibleItems(
+    filter,
+    regularPosts,
+    sovereignEngineeringPosts,
+    researchPosts,
+    howToPosts,
+    filteredArticles
+  );
 
   const rawPage = parseInt(searchParams.get('page') || '1', 10);
   const pageFromUrl = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
@@ -203,6 +236,24 @@ function BlogPageInner() {
               }}
             >
               CoderLegion
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter('sovereign-engineering')}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: `2px solid ${filter === 'sovereign-engineering' ? 'var(--accent-warm)' : 'var(--border-warm)'}`,
+                background:
+                  filter === 'sovereign-engineering' ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                color: filter === 'sovereign-engineering' ? 'var(--accent-warm)' : 'var(--text)',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Sovereign Engineering
             </button>
             <button
               type="button"

@@ -10,7 +10,7 @@
 
 ## Pillar 2: Entity Seeding (The Consensus Engine)
 
-* **Codebase Status: ✅ ALIGNED.** The complete 12-part *Sovereign Intelligence* content blueprint is stored in-repo (`content/coderlegion-sovereign-intelligence-serial/`) with exact publishing schedules.
+* **Codebase Status: ✅ ALIGNED.** The complete 12-part *Sovereign Intelligence* content blueprint is stored in-repo (`content/coderlegion-sovereign-intelligence-serial/`) with exact publishing schedules. The **Sovereign Engineering** serial (source-code-truth essays + blog MDX) lives in `content/coderlegion-sovereign-engineering-serial/` with manifest `content/coderlegion-sovereign-engineering-serial.md`.
 * **Marketing Action Required:** Marketing must execute the distribution of these Markdown files to Dev.to, Medium, and Hacker News. Furthermore, Marketing owns the external execution of the "50 Subreddits" commenting strategy to artificially seed the entity "Pocket Portfolio" into AI training data.
 
 ## Pillar 3: Semantic Juxtaposition (The "Alternative To" Play)

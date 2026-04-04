@@ -1,0 +1,63 @@
+---
+title: 'The End of Data Export — Why the Cloud is a Compliance Trap'
+date: '2026-04-10'
+description: >-
+  Sovereignty is Pocket Portfolio’s architecture philosophy—user-anchored truth, bounded cloud inference, stateless /api/ai/chat (no portfolio payload persistence; quota + toolUsage metadata only). Versus the typical central-DB + full-prompt SaaS path. Part 1 of Sovereign Engineering.
+tags:
+  - local-first
+  - ai
+  - compliance
+  - engineering
+author: Pocket Portfolio
+image: /book-assets/sovereign-engineering-covers/se-01.png
+pillar: technical
+series: Sovereign Engineering
+category: sovereign-engineering
+---
+
+**Sovereign Engineering · Part 1**
+
+Privacy is infrastructure. The high-risk pattern is not “using AI” — it is **centralizing full financial ledgers** in a vendor database or open-ended prompt logs.
+
+**Sovereignty** is our **architecture philosophy**: user-anchored portfolio truth, **cloud for compute** not for hoarding the narrative, and a **stateless** Ask AI boundary — this post is the compliance-shaped case for that bet.
+
+## Typical stack vs Sovereign Ask AI
+
+**Typical stack:** ingest everything into **PostgreSQL**, expose a **central API**, then “add AI” by sending **too much row data** to a model or vector store. **Blast radius** includes breach, subpoena, and data-minimization scrutiny.
+
+**Sovereign Ask AI:** models still run in the cloud (Gemini/OpenAI), but the **default portfolio signal** is a **client-built** bounded string — totals + top-N holdings — and `POST /api/ai/chat` is **stateless** for that payload: **no portfolio row store** on our side for inference. **Residency** (region) is a different axis; it does not replace this philosophy.
+
+## Stateless boundary (`app/api/ai/chat/route.ts`)
+
+```typescript
+/**
+ * Stateless: request payload (message, context, attachedContent) is used only
+ * to build the LLM prompt and stream the response. No database write or cache
+ * of the payload; only analytics/quota metadata are persisted.
+ */
+```
+
+**Operational writes** (telemetry, not your ledger text) — `toolUsage` metadata such as `uid`, `tier`, `hadAttachment`, `provider`:
+
+```typescript
+await db.collection('toolUsage').add({
+  toolType: 'pocket_analyst',
+  action: payload.action,
+  metadata: {
+    uid: payload.uid,
+    tier: payload.tier ?? null,
+    isPaid: payload.isPaid ?? false,
+    hadAttachment: payload.hadAttachment ?? false,
+    provider: payload.provider ?? null,
+    status: payload.status ?? null,
+    errorCode: payload.errorCode ?? null,
+  },
+  timestamp: Timestamp.now(),
+});
+```
+
+**Plain limits:** attachment text is in the prompt for that request. Narrow retention supports the privacy story; sector-specific compliance still needs its own process.
+
+---
+
+**Read the [Sovereign Intelligence](/book/sovereign-intelligence) book or [try Pocket Portfolio](/).**

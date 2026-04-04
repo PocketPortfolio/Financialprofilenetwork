@@ -1,0 +1,33 @@
+---
+title: 'Referral Loop — referralEvents + referral/complete'
+date: '2026-05-22'
+description: >-
+  POST /api/referral-event (click|conversion, bounded metadata); POST /api/referral/complete (auth, REF-* codes, idempotent claims). Middleware apex→www. Part 7.
+tags:
+  - growth
+  - firebase
+  - referrals
+author: Pocket Portfolio
+image: /book-assets/sovereign-engineering-covers/se-07.png
+pillar: technical
+series: Sovereign Engineering
+category: sovereign-engineering
+---
+
+**Sovereign Engineering · Part 7**
+
+```typescript
+await db.collection('referralEvents').add({
+  action,
+  referralCode: String(referralCode).slice(0, 64),
+  source: source || 'unknown',
+  ...(campaignStr ? { campaign: campaignStr } : {}),
+  timestamp: Timestamp.now(),
+});
+```
+
+`/api/referral/complete`: Bearer token, `isValidReferralCode`, `referralIndex`, new-account window, idempotent `(campaign, referee)` claims. Campaign default: `VIRAL_REFERRAL_CAMPAIGN_DEFAULT` — align with **`viral_moment_v1`** in admin.
+
+---
+
+**Read the [Sovereign Intelligence](/book/sovereign-intelligence) book or [try Pocket Portfolio](/).**
