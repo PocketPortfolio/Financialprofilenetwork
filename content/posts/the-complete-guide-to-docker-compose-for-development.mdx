@@ -1,75 +1,90 @@
 ---
 title: The Complete Guide to Docker Compose for Development
 date: '2026-04-04'
-description: Master Docker Compose for seamless development workflows.
+description: >-
+  Learn how to streamline your development process using Docker Compose with
+  this complete guide.
 tags:
   - docker
   - development
-  - guide
   - docker-compose
+  - guide
 author: Pocket Portfolio Team
 image: /images/blog/the-complete-guide-to-docker-compose-for-development.png
-pillar: Development
+pillar: Technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-Developing modern applications often involves multiple services that must interact seamlessly. Managing these services, ensuring they are correctly networked, and keeping environments consistent can be challenging when relying solely on Docker. Developers need a tool that simplifies the orchestration of multi-container Docker applications.
+Managing multiple services for a development environment can be complex and time-consuming. Manually starting each service, managing dependencies, and maintaining consistency across environments can lead to errors and inefficiencies. Developers need a reliable solution to simplify the orchestration of containers, ensuring all services run in harmony.
 
 ## Solution with Code
 
-Docker Compose is a tool that addresses these challenges by allowing developers to define and manage multi-container Docker applications. It uses a YAML file to configure your application's services, networks, and volumes, making it easy to spin up and tear down complete environments.
+Docker Compose is a tool that allows you to define and manage multi-container Docker applications. With a simple YAML configuration, you can specify services, networks, and volumes, and easily spin up your entire development environment with a single command.
 
 ### Step 1: Install Docker Compose
 
-Ensure Docker is installed on your system. Docker Compose is included with Docker Desktop for Windows and Mac. For Linux, execute:
+Ensure Docker is installed on your machine. Docker Compose comes bundled with Docker Desktop for Windows and Mac. For Linux, you can install it separately:
 
 ```bash
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-### Step 2: Define Services in `docker-compose.yml`
+### Step 2: Create a `docker-compose.yml` File
 
-Create a `docker-compose.yml` file in your project root:
+Define your services in a `docker-compose.yml` file. For example, a basic setup with a web application and a database might look like this:
 
 ```yaml
 version: '3.8'
 services:
   web:
     image: node:14
-    ports:
-      - "3000:3000"
     volumes:
       - .:/app
-    working_dir: /app
-    command: npm start
+    ports:
+      - "3000:3000"
+    command: "npm start"
+    depends_on:
+      - db
+
   db:
     image: postgres:13
     environment:
-      POSTGRES_USER: example
-      POSTGRES_PASSWORD: example
-      POSTGRES_DB: example
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
     volumes:
       - db-data:/var/lib/postgresql/data
+
 volumes:
   db-data:
 ```
 
-### Step 3: Start the Services
+### Step 3: Start Your Services
 
-Use the following command to start your services:
+Navigate to the directory containing your `docker-compose.yml` file and run:
 
 ```bash
 docker-compose up
 ```
 
-This command builds, (re)creates, starts, and attaches to containers for a service. Use `docker-compose up -d` to run in detached mode.
+This command will build and start all the services defined in the file. To run it in detached mode, use:
 
-### Step 4: Stop Services
+```bash
+docker-compose up -d
+```
 
-To stop and remove all containers defined in the `docker-compose.yml`, use:
+### Step 4: Manage Your Environment
+
+To view running services, use:
+
+```bash
+docker-compose ps
+```
+
+To stop all services, run:
 
 ```bash
 docker-compose down
@@ -77,12 +92,9 @@ docker-compose down
 
 ## Key Concepts
 
-- **Services**: Defined in the `docker-compose.yml`, these represent the different containers needed for the application. Each service can specify its image, build context, ports, volumes, environment variables, and more.
-  
-- **Networks**: Docker Compose sets up a single network for all services by default, facilitating communication between them. Custom networks can be defined for more complex scenarios.
+- **Services**: Defined in the `docker-compose.yml` file, each service corresponds to a container.
+- **Volumes**: Persistent storage shared between the host and the container, useful for storing data that should survive container restarts.
+- **Networks**: Allow communication between containers, isolating them from other networks.
+- **Dependencies**: Using `depends_on` helps ensure the correct startup order of services.
 
-- **Volumes**: Used to persist data outside the container lifecycle. In the example, `db-data` persists PostgreSQL data.
-
-- **Environment Variables**: These can be defined directly in `docker-compose.yml` or in an accompanying `.env` file for sensitive data.
-
-Docker Compose simplifies the management of multi-container applications, ensuring consistent environments and efficient development workflows. By defining services, networks, and data persistence in a single file, developers can easily share and replicate development setups.
+By using Docker Compose, developers can easily manage complex development environments, reducing setup time and ensuring consistency across different stages of the development process.
