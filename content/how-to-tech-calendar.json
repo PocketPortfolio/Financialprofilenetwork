@@ -1490,14 +1490,15 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to Docker Compose for Development",
     "slug": "the-complete-guide-to-docker-compose-for-development",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "complete",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-04-04T14:00:22.384Z"
   },
   {
     "id": "how-to-how-to-use-zod-for-runtime-type-validation-apr-5",
