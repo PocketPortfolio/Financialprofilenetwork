@@ -1506,14 +1506,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Zod for Runtime Type Validation",
     "slug": "how-to-use-zod-for-runtime-type-validation",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "zod",
       "use",
       "runtime"
-    ]
+    ],
+    "publishedAt": "2026-04-05T14:00:46.991Z"
   },
   {
     "id": "how-to-building-a-restful-api-with-express-and-typescript-apr-6",
