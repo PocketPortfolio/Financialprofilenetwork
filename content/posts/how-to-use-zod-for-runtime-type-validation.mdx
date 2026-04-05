@@ -1,0 +1,82 @@
+---
+title: How to Use Zod for Runtime Type Validation
+date: '2026-04-05'
+description: >-
+  Learn how to use Zod for runtime type validation in JavaScript and TypeScript
+  applications.
+tags:
+  - zod
+  - runtime
+  - type validation
+  - JavaScript
+  - TypeScript
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-zod-for-runtime-type-validation.png
+pillar: Development
+category: how-to-in-tech
+---
+
+# How to Use Zod for Runtime Type Validation
+
+When building applications, ensuring that the data your program receives conforms to expected types is crucial for maintaining robustness and preventing runtime errors. TypeScript provides compile-time type checking, but when dealing with data from external sources like API responses, you need runtime type validation. This is where [Zod](https://github.com/colinhacks/zod), a TypeScript-first schema declaration and validation library, excels.
+
+## Problem
+
+Imagine you are working on a TypeScript application that fetches user data from an API. The API might be unreliable or not fully documented, resulting in data that doesn't match your expectations. Without runtime validation, such discrepancies can lead to application crashes or unexpected behavior.
+
+## Solution with Code
+
+Zod provides a way to define schemas that can validate data at runtime. Here’s how you can leverage Zod to ensure your data matches the expected structure:
+
+1. **Install Zod**:
+
+   ```bash
+   npm install zod
+   ```
+
+2. **Define a Schema**:
+
+   Define a schema for the user data you expect. For example:
+
+   ```typescript
+   import { z } from 'zod';
+
+   const UserSchema = z.object({
+     id: z.string(),
+     name: z.string(),
+     email: z.string().email(),
+     age: z.number().int().nonnegative(),
+   });
+   ```
+
+3. **Validate Incoming Data**:
+
+   Use the schema to validate the data received from the API:
+
+   ```typescript
+   async function fetchUserData(apiUrl: string) {
+     const response = await fetch(apiUrl);
+     const data = await response.json();
+
+     const validationResult = UserSchema.safeParse(data);
+
+     if (!validationResult.success) {
+       console.error("Invalid data:", validationResult.error.errors);
+       throw new Error("Data validation failed");
+     }
+
+     return validationResult.data;
+   }
+   ```
+
+   The `safeParse` method returns an object indicating whether the validation was successful and includes parsed data or errors, depending on the result.
+
+## Key Concepts
+
+- **Schema Definition**: Zod allows you to define schemas that describe the structure of your data. This includes specifying types and constraints like string, number, email format, etc.
+
+- **Type Safety**: While TypeScript checks types at compile-time, Zod ensures that runtime data conforms to expected types, reducing the risk of runtime errors.
+
+- **Error Handling**: Zod provides detailed error messages if validation fails, helping you to diagnose and fix issues quickly.
+
+Using Zod for runtime type validation ensures that your application handles unexpected data gracefully, maintaining stability and reliability. Whether you're handling API responses, form inputs, or any external data, Zod's schemas provide a robust solution for runtime type validation.
