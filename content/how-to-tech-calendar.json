@@ -1522,7 +1522,7 @@
     "scheduledTime": "14:00",
     "title": "Building a RESTful API with Express and TypeScript",
     "slug": "building-a-restful-api-with-express-and-typescript",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1531,7 +1531,8 @@
       "rest",
       "express",
       "building"
-    ]
+    ],
+    "publishedAt": "2026-04-06T14:00:54.276Z"
   },
   {
     "id": "how-to-how-to-set-up-ci-cd-with-github-actions-apr-7",
