@@ -11,6 +11,7 @@ import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
 import { fetchRelevantVideo } from './video-fetcher';
+import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
 
 // Load .env.local if it exists
 const envFiles = ['.env.local', '.env'];
@@ -602,7 +603,7 @@ pillar: "${post.pillar}"
 
     // Validate and fix frontmatter fields
     const frontmatter = parsedContent.data;
-    const bodyContent = parsedContent.content;
+    let bodyContent = sanitizeMdxBodyAfterFrontmatter(parsedContent.content);
 
     // Ensure required fields exist with proper values
     if (!frontmatter.title || typeof frontmatter.title !== 'string' || frontmatter.title.trim() === '') {

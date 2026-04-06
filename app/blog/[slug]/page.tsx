@@ -6,6 +6,7 @@ import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
+import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
 import SEOHead from '../../components/SEOHead';
 import Link from 'next/link';
@@ -210,7 +211,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     
     const parsed = matter(fileContents);
     data = parsed.data;
-    content = parsed.content;
+    content = sanitizeMdxBodyAfterFrontmatter(parsed.content);
     
     // ✅ Validate parsed data
     if (!data || !data.title) {
