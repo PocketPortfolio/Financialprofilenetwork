@@ -1,7 +1,7 @@
 ---
 title: Building a RESTful API with Express and TypeScript
 date: '2026-04-06'
-description: Learn how to build a RESTful API using Express and TypeScript from scratch.
+description: 'Building a RESTful API with Express and TypeScript - api, typescript, rest'
 tags:
   - api
   - typescript
@@ -10,35 +10,46 @@ tags:
   - building
 author: Pocket Portfolio Team
 image: /images/blog/building-a-restful-api-with-express-and-typescript.png
-pillar: Technology
+pillar: technical
 category: how-to-in-tech
 ---
+```mdx
+---
+title: "Building a RESTful API with Express and TypeScript"
+date: "2026-04-06"
+description: "Learn how to build a RESTful API using Express and TypeScript, covering key concepts and code implementations."
+tags: ["api", "typescript", "rest", "express", "building"]
+author: "Pocket Portfolio Team"
+image: "/images/blog/building-a-restful-api-with-express-and-typescript.png"
+pillar: "Development"
+category: "how-to-in-tech"
+---
 
-Building a robust and maintainable RESTful API is a common requirement in modern web development. This guide will walk you through the process of creating a RESTful API using Express and TypeScript, enabling you to leverage both the flexibility of JavaScript and the type safety of TypeScript.
+# Building a RESTful API with Express and TypeScript
 
 ## Problem
 
-Building a RESTful API involves setting up server endpoints that handle HTTP requests, perform operations, and return responses in a structured format. Without a proper framework, managing routes, middleware, and error handling can become complex and error-prone.
+In modern web development, building robust and scalable APIs is essential. RESTful APIs, which conform to REST (Representational State Transfer) principles, are widely used for creating efficient and scalable web services. However, building a RESTful API with strong typing and maintainability can be challenging without the right tools and frameworks. Express, a minimal and flexible Node.js web application framework, combined with TypeScript's static type-checking, offers a powerful solution.
 
 ## Solution with Code
 
-Express, a minimalist web framework for Node.js, paired with TypeScript, provides the tools necessary for developing scalable and maintainable APIs. Follow these steps to build your API:
+To build a RESTful API using Express and TypeScript, follow these steps:
 
-1. **Project Setup**
+1. **Set up the Project:**
 
    First, initialize a new Node.js project and install necessary packages:
 
    ```bash
-   mkdir express-typescript-api
-   cd express-typescript-api
+   mkdir my-rest-api
+   cd my-rest-api
    npm init -y
    npm install express
-   npm install --save-dev typescript @types/node @types/express ts-node nodemon
+   npm install typescript ts-node @types/node @types/express --save-dev
    ```
 
-2. **TypeScript Configuration**
+2. **Configure TypeScript:**
 
-   Create a `tsconfig.json` to configure TypeScript:
+   Create a `tsconfig.json` file for TypeScript configuration:
 
    ```json
    {
@@ -49,14 +60,13 @@ Express, a minimalist web framework for Node.js, paired with TypeScript, provide
        "esModuleInterop": true,
        "outDir": "./dist",
        "rootDir": "./src"
-     },
-     "include": ["src"]
+     }
    }
    ```
 
-3. **Basic Server Setup**
+3. **Create the API:**
 
-   In the `src` directory, create an `index.ts` file and set up a basic Express server:
+   Create a folder `src` and an entry file `index.ts` inside it:
 
    ```typescript
    import express, { Request, Response } from 'express';
@@ -66,8 +76,9 @@ Express, a minimalist web framework for Node.js, paired with TypeScript, provide
 
    app.use(express.json());
 
-   app.get('/', (req: Request, res: Response) => {
-     res.send('Welcome to the Express TypeScript API!');
+   // Sample route
+   app.get('/api/greet', (req: Request, res: Response) => {
+     res.send({ message: 'Hello, World!' });
    });
 
    app.listen(PORT, () => {
@@ -75,54 +86,19 @@ Express, a minimalist web framework for Node.js, paired with TypeScript, provide
    });
    ```
 
-4. **Building Routes**
+4. **Run the API:**
 
-   Create a new file `src/routes.ts` to handle different API routes:
-
-   ```typescript
-   import { Router, Request, Response } from 'express';
-
-   const router = Router();
-
-   // Example route
-   router.get('/api/resource', (req: Request, res: Response) => {
-     res.json({ message: 'List of resources' });
-   });
-
-   export default router;
-   ```
-
-   Update `index.ts` to use the routes:
-
-   ```typescript
-   import routes from './routes';
-   // ...
-
-   app.use(routes);
-   ```
-
-5. **Running the Server**
-
-   Add a script to `package.json` to build and run the server using `nodemon`:
-
-   ```json
-   "scripts": {
-     "start": "ts-node src/index.ts",
-     "dev": "nodemon src/index.ts"
-   }
-   ```
-
-   Run the server:
+   Use `ts-node` to run the TypeScript server:
 
    ```bash
-   npm run dev
+   npx ts-node src/index.ts
    ```
 
 ## Key Concepts
 
-- **Express**: A lightweight web framework for Node.js, ideal for building RESTful APIs.
-- **TypeScript**: Enhances JavaScript with static types, improving code quality and maintainability.
-- **Routes**: Define endpoints in the API to handle specific HTTP requests.
-- **Middleware**: Functions that execute during the lifecycle of a request to the Express server, useful for tasks like parsing request bodies and handling authentication.
+- **Express:** A web application framework for Node.js, simplifies routing and middleware management.
+- **TypeScript:** Offers static typing, which helps in early error detection and enhances code quality.
+- **RESTful API:** Adheres to REST principles, providing a stateless, client-server architecture with standard HTTP methods.
 
-By following these steps, you can establish a strong foundation for building RESTful APIs with Express and TypeScript, benefiting from both Express' simplicity and TypeScript's robust type system.
+Integrating Express with TypeScript ensures that your API is both scalable and maintainable, with the type safety and error-checking capabilities of TypeScript. This setup allows you to build feature-rich APIs efficiently, reducing runtime errors and improving code readability.
+```
