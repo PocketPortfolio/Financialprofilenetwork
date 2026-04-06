@@ -1,0 +1,128 @@
+---
+title: Building a RESTful API with Express and TypeScript
+date: '2026-04-06'
+description: Learn how to build a RESTful API using Express and TypeScript from scratch.
+tags:
+  - api
+  - typescript
+  - rest
+  - express
+  - building
+author: Pocket Portfolio Team
+image: /images/blog/building-a-restful-api-with-express-and-typescript.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+Building a robust and maintainable RESTful API is a common requirement in modern web development. This guide will walk you through the process of creating a RESTful API using Express and TypeScript, enabling you to leverage both the flexibility of JavaScript and the type safety of TypeScript.
+
+## Problem
+
+Building a RESTful API involves setting up server endpoints that handle HTTP requests, perform operations, and return responses in a structured format. Without a proper framework, managing routes, middleware, and error handling can become complex and error-prone.
+
+## Solution with Code
+
+Express, a minimalist web framework for Node.js, paired with TypeScript, provides the tools necessary for developing scalable and maintainable APIs. Follow these steps to build your API:
+
+1. **Project Setup**
+
+   First, initialize a new Node.js project and install necessary packages:
+
+   ```bash
+   mkdir express-typescript-api
+   cd express-typescript-api
+   npm init -y
+   npm install express
+   npm install --save-dev typescript @types/node @types/express ts-node nodemon
+   ```
+
+2. **TypeScript Configuration**
+
+   Create a `tsconfig.json` to configure TypeScript:
+
+   ```json
+   {
+     "compilerOptions": {
+       "target": "ES6",
+       "module": "commonjs",
+       "strict": true,
+       "esModuleInterop": true,
+       "outDir": "./dist",
+       "rootDir": "./src"
+     },
+     "include": ["src"]
+   }
+   ```
+
+3. **Basic Server Setup**
+
+   In the `src` directory, create an `index.ts` file and set up a basic Express server:
+
+   ```typescript
+   import express, { Request, Response } from 'express';
+
+   const app = express();
+   const PORT = process.env.PORT || 3000;
+
+   app.use(express.json());
+
+   app.get('/', (req: Request, res: Response) => {
+     res.send('Welcome to the Express TypeScript API!');
+   });
+
+   app.listen(PORT, () => {
+     console.log(`Server is running on http://localhost:${PORT}`);
+   });
+   ```
+
+4. **Building Routes**
+
+   Create a new file `src/routes.ts` to handle different API routes:
+
+   ```typescript
+   import { Router, Request, Response } from 'express';
+
+   const router = Router();
+
+   // Example route
+   router.get('/api/resource', (req: Request, res: Response) => {
+     res.json({ message: 'List of resources' });
+   });
+
+   export default router;
+   ```
+
+   Update `index.ts` to use the routes:
+
+   ```typescript
+   import routes from './routes';
+   // ...
+
+   app.use(routes);
+   ```
+
+5. **Running the Server**
+
+   Add a script to `package.json` to build and run the server using `nodemon`:
+
+   ```json
+   "scripts": {
+     "start": "ts-node src/index.ts",
+     "dev": "nodemon src/index.ts"
+   }
+   ```
+
+   Run the server:
+
+   ```bash
+   npm run dev
+   ```
+
+## Key Concepts
+
+- **Express**: A lightweight web framework for Node.js, ideal for building RESTful APIs.
+- **TypeScript**: Enhances JavaScript with static types, improving code quality and maintainability.
+- **Routes**: Define endpoints in the API to handle specific HTTP requests.
+- **Middleware**: Functions that execute during the lifecycle of a request to the Express server, useful for tasks like parsing request bodies and handling authentication.
+
+By following these steps, you can establish a strong foundation for building RESTful APIs with Express and TypeScript, benefiting from both Express' simplicity and TypeScript's robust type system.
