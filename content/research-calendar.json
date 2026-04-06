@@ -1530,14 +1530,15 @@
     "scheduledTime": "18:00",
     "title": "Research: NLP Processing Performance - Transformer Models",
     "slug": "research-nlp-processing-performance-transformer-models-2026-04-06",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "nlp",
       "processing"
-    ]
+    ],
+    "publishedAt": "2026-04-06T18:00:37.039Z"
   },
   {
     "id": "research-computer-vision-inference-edge-vs-cloud-2026-04-07",
