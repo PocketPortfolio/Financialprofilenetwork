@@ -2,8 +2,8 @@
 title: How to Set Up CI/CD with GitHub Actions
 date: '2026-04-07'
 description: >-
-  Learn how to set up a CI/CD pipeline using GitHub Actions to automate your
-  development workflow.
+  Learn how to automate your build, test, and deployment processes using GitHub
+  Actions.
 tags:
   - github
   - ci/cd
@@ -16,77 +16,79 @@ pillar: Development
 category: how-to-in-tech
 ---
 
-# Problem
+## Problem
 
-Continuous Integration and Continuous Deployment (CI/CD) are crucial practices in modern software development. They ensure that changes to your codebase are automatically tested and deployed, reducing human error and speeding up the process of getting new features to users. However, setting up a CI/CD pipeline can be daunting if you're unfamiliar with the tools available. One of the most accessible and powerful tools for this purpose is GitHub Actions, which allows you to automate your workflow directly within GitHub.
+Manually building, testing, and deploying applications can be time-consuming and error-prone. Continuous Integration and Continuous Deployment (CI/CD) streamline these processes, ensuring that changes are automatically tested and deployed. GitHub Actions provides a powerful, native solution for implementing CI/CD in your projects. 
 
-# Solution with Code
+## Solution
 
-To set up a CI/CD pipeline with GitHub Actions, you need to create a workflow file in your GitHub repository. This file will define the steps required to build, test, and deploy your application. Here's a basic example of how to set up a CI/CD pipeline for a Node.js application:
+Using GitHub Actions, you can automate your CI/CD pipeline directly within your GitHub repository. Here's a step-by-step guide to setting it up.
 
-1. **Create a new directory in your repository:**
+### Step 1: Create a Workflow File
 
-   Create a `.github/workflows` directory at the root of your repository.
+GitHub Actions workflows are defined in YAML files located in the `.github/workflows` directory of your repository. Create a file named `ci-cd.yml`:
 
-2. **Add a new workflow file:**
+```yaml
+name: CI/CD Pipeline
 
-   Create a new file named `ci-cd.yml` inside the `.github/workflows` directory.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
-3. **Define the workflow:**
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-   Add the following YAML configuration to the `ci-cd.yml` file:
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-   ```yaml
-   name: CI/CD Pipeline
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
 
-   on:
-     push:
-       branches: [ main ]
-     pull_request:
-       branches: [ main ]
+    - name: Install dependencies
+      run: npm install
 
-   jobs:
-     build:
-       runs-on: ubuntu-latest
+    - name: Run tests
+      run: npm test
 
-       steps:
-       - name: Checkout repository
-         uses: actions/checkout@v3
+    - name: Build project
+      run: npm run build
 
-       - name: Set up Node.js
-         uses: actions/setup-node@v3
-         with:
-           node-version: '16'
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Deploy
+      run: echo "Deploying your application"
+```
 
-       - name: Install dependencies
-         run: npm install
+### Step 2: Configure Workflow Triggers
 
-       - name: Run tests
-         run: npm test
+In the workflow above, triggers are set for `push` and `pull_request` events on the `main` branch. This means the workflow will run every time you push changes to `main` or open a pull request targeting `main`.
 
-       - name: Build project
-         run: npm run build
+### Step 3: Define Jobs and Steps
 
-     deploy:
-       runs-on: ubuntu-latest
-       needs: build
+The workflow is split into jobs. Jobs can run sequentially or in parallel. In our example:
+- **Build Job**: Checks out the code, sets up Node.js, installs dependencies, runs tests, and builds the project.
+- **Deploy Job**: Depends on the build job and executes only after the build job succeeds.
 
-       steps:
-       - name: Deploy
-         run: |
-           echo "Deploying the application..."
-           # Add your deployment steps here
-   ```
+### Step 4: Secure Secrets
 
-4. **Commit and push the changes:**
+If your deployment process requires secrets (like API keys), store them in your repository's settings under "Secrets and variables". Use these secrets in your workflow by referencing them with `secrets.MY_SECRET`.
 
-   Once you've added the workflow file, commit and push it to the `main` branch of your repository.
+## Key Concepts
 
-# Key Concepts
+- **GitHub Actions**: Automates workflows based on events in your Git repository.
+- **Workflow**: Defined in YAML, it contains the automation instructions.
+- **Job**: A set of steps executed by a runner.
+- **Runner**: A server that runs your workflows when they're triggered.
+- **Secrets**: Securely store sensitive information like tokens and passwords.
 
-- **GitHub Actions**: A powerful feature of GitHub that allows you to automate tasks within your software development lifecycle.
-- **Workflow**: A configurable automated process made up of one or more jobs.
-- **Job**: A set of steps in a workflow that execute on the same runner.
-- **Runner**: A server that runs your workflows when triggered.
-
-With this setup, every push or pull request to the `main` branch will trigger the CI/CD pipeline, running tests and building the project. This ensures that your application is always in a deployable state, enhancing the reliability and efficiency of your development process.
+By setting up CI/CD with GitHub Actions, you ensure your code quality remains high by automating the testing and deployment processes, allowing you to focus more on writing code and less on manual tasks.
