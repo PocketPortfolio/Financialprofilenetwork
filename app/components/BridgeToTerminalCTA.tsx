@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { trackBridgeToTerminalCtaClick, trackBridgeToTerminalSecondaryClick } from '@/app/lib/analytics/events';
 
 type BridgeToTerminalCTAProps = {
   title: string;
@@ -9,6 +10,10 @@ type BridgeToTerminalCTAProps = {
   primaryLabel?: string;
   secondaryHref?: string;
   secondaryLabel?: string;
+  analytics?: {
+    source: 'json_api' | 'import_page' | 'unknown';
+    contextId?: string;
+  };
 };
 
 export default function BridgeToTerminalCTA({
@@ -18,6 +23,7 @@ export default function BridgeToTerminalCTA({
   primaryLabel = 'Open Terminal',
   secondaryHref,
   secondaryLabel = 'How it works',
+  analytics,
 }: BridgeToTerminalCTAProps) {
   return (
     <section
@@ -48,6 +54,15 @@ export default function BridgeToTerminalCTA({
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           <a
             href={href}
+            onClick={() => {
+              if (!analytics) return;
+              trackBridgeToTerminalCtaClick({
+                source: analytics.source,
+                destination: href,
+                contextId: analytics.contextId,
+                ctaId: 'open_terminal',
+              });
+            }}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -71,6 +86,15 @@ export default function BridgeToTerminalCTA({
           {secondaryHref && (
             <a
               href={secondaryHref}
+              onClick={() => {
+                if (!analytics) return;
+                trackBridgeToTerminalSecondaryClick({
+                  source: analytics.source,
+                  destination: secondaryHref,
+                  contextId: analytics.contextId,
+                  linkId: 'how_local_first_works',
+                });
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',

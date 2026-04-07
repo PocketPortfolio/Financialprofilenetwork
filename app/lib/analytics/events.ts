@@ -133,6 +133,52 @@ export function trackPageView(page: string) {
   }
 }
 
+type BridgeCtaSource = 'json_api' | 'import_page' | 'unknown';
+
+export function trackBridgeToTerminalCtaClick(args: {
+  source: BridgeCtaSource;
+  destination: string;
+  contextId?: string; // ticker symbol, broker slug, etc.
+  ctaId?: string; // e.g. 'open_terminal'
+}) {
+  if (typeof window === 'undefined') return;
+  const utm = getCurrentUtm();
+  trackEvent('bridge_to_terminal_cta_click', {
+    source: args.source,
+    destination: args.destination,
+    context_id: args.contextId || 'null',
+    cta_id: args.ctaId || 'open_terminal',
+    page_path: window.location.pathname,
+    utm_source: utm.utm_source || 'direct',
+    utm_medium: utm.utm_medium || 'bridge_cta',
+    utm_campaign: utm.utm_campaign || 'activation',
+    utm_content: utm.utm_content || (args.contextId || 'null'),
+    timestamp: new Date().toISOString(),
+  });
+}
+
+export function trackBridgeToTerminalSecondaryClick(args: {
+  source: BridgeCtaSource;
+  destination: string;
+  contextId?: string;
+  linkId?: string; // e.g. 'how_local_first_works'
+}) {
+  if (typeof window === 'undefined') return;
+  const utm = getCurrentUtm();
+  trackEvent('bridge_to_terminal_secondary_click', {
+    source: args.source,
+    destination: args.destination,
+    context_id: args.contextId || 'null',
+    link_id: args.linkId || 'how_it_works',
+    page_path: window.location.pathname,
+    utm_source: utm.utm_source || 'direct',
+    utm_medium: utm.utm_medium || 'bridge_cta',
+    utm_campaign: utm.utm_campaign || 'activation',
+    utm_content: utm.utm_content || (args.contextId || 'null'),
+    timestamp: new Date().toISOString(),
+  });
+}
+
 // Blog post tracking
 export function trackBlogPostClick(title: string, platform: string, url: string) {
   if (typeof window !== 'undefined' && window.gtag) {

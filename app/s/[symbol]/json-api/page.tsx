@@ -295,6 +295,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             primaryLabel="Open Terminal"
             secondaryHref="/learn/local-first"
             secondaryLabel="How local-first works"
+            analytics={{ source: 'json_api', contextId: normalizedSymbol.toLowerCase() }}
           />
           
           {/* CROSS-LINK (Internal SEO Juice) */}

@@ -300,6 +300,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
           primaryLabel="Open Terminal"
           secondaryHref="/learn/local-first"
           secondaryLabel="How local-first works"
+          analytics={{ source: 'import_page', contextId: broker }}
         />
 
         {/* NEW: Sovereign Sync CTA Section */}
