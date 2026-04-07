@@ -39,6 +39,8 @@ In a technical stack, different components require different calibration. You do
 
 The moment you miss one, the culture across the board is at risk. A single uncalibrated sensor can crash the entire OS.
 
+In practice, this is why “zero exceptions” has to be real: if a page is live, it cannot be an empty placeholder. If a tool exists, it must work on mobile. Culture is the enforcement layer.
+
 —
 
 3. Operating System vs. Office Politics

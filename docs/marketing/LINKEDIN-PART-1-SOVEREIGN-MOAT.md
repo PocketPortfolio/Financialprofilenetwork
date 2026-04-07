@@ -46,6 +46,8 @@ If your moat is only a wrapper around someone else’s model, you don’t have a
 
 A sovereign moat is built when your architecture handles high-trust requirements—privacy, compliance, zero-trust—by design. While others are cutting staff to fund audits (we have seen plenty of that lately), the sovereign leader scales because compliance isn’t a line-item tax: it’s engineered into the code.
 
+For us, that means a local-first terminal, stateless interfaces for data access (JSON/CSV), and a hard boundary: we don’t need to warehouse your financial ledger to create intelligence.
+
 Your moat is not the intelligence you use. Your moat is the sovereignty you provide.
 
 ---
