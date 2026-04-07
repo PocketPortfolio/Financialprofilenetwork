@@ -69,8 +69,8 @@ function testPricingSchemaFix() {
 // Test 2: Programmatic Risk Pages
 function testRiskPages() {
   try {
-    const pagePath = join(process.cwd(), 'app/tools/track-[ticker]/page.tsx');
-    const componentPath = join(process.cwd(), 'app/tools/track-[ticker]/RiskCalculatorPrefilled.tsx');
+    const pagePath = join(process.cwd(), 'app/tools/track/[ticker]/page.tsx');
+    const componentPath = join(process.cwd(), 'app/tools/track/[ticker]/RiskCalculatorPrefilled.tsx');
     
     const pageExists = existsSync(pagePath);
     const componentExists = existsSync(componentPath);

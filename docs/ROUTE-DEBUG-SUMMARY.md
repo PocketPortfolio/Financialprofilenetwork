@@ -5,7 +5,7 @@
 **Route:** `/tools/track-{ticker}-risk` → `/tools/track/{ticker}` (via middleware rewrite)
 
 **Build Status:** ✅ Route is recognized and built
-- Build output: `├ ƒ /tools/track-[ticker]`
+- Build output: `├ ƒ /tools/track/[ticker]`
 - Route handler invoked during build (with empty params, which is expected)
 
 **Runtime Status:** ❌ Connection closed / 500 error
@@ -21,7 +21,7 @@ This shows the route handler is being called, but params are empty during build 
 
 ## Current Implementation
 
-1. **Route Folder:** `app/tools/track-[ticker]/page.tsx`
+1. **Route Folder:** `app/tools/track/[ticker]/page.tsx`
 2. **Middleware Rewrite:** `/tools/track-{ticker}-risk` → `/tools/track/{ticker}`
 3. **Route Handler:** Expects `ticker` param (without `-risk` suffix)
 
@@ -41,7 +41,7 @@ This shows the route handler is being called, but params are empty during build 
 
 ## Files Modified
 
-- `app/tools/track-[ticker]/page.tsx` - Route handler with instrumentation
+- `app/tools/track/[ticker]/page.tsx` - Route handler with instrumentation
 - `middleware.ts` - URL rewrite logic
 - `next.config.js` - Rewrite rule (backup)
 

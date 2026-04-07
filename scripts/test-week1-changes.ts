@@ -58,8 +58,8 @@ function testPricingSchema() {
 // Test 2: Verify risk pages exist
 function testRiskPages() {
   try {
-    const pagePath = join(process.cwd(), 'app/tools/track-[ticker]/page.tsx');
-    const componentPath = join(process.cwd(), 'app/tools/track-[ticker]/RiskCalculatorPrefilled.tsx');
+    const pagePath = join(process.cwd(), 'app/tools/track/[ticker]/page.tsx');
+    const componentPath = join(process.cwd(), 'app/tools/track/[ticker]/RiskCalculatorPrefilled.tsx');
     
     const pageExists = require('fs').existsSync(pagePath);
     const componentExists = require('fs').existsSync(componentPath);
