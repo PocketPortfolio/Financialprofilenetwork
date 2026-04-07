@@ -410,7 +410,10 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             display: 'grid',
             gridTemplateColumns: '1fr',
             gap: '24px',
-            marginTop: '32px'
+            marginTop: '32px',
+            // Mobile CWV: allow below-the-fold content to skip initial render work.
+            contentVisibility: 'auto',
+            containIntrinsicSize: '1000px'
           }}>
             {/* LEFT COL: Live Preview & NPM Hook */}
             <div>

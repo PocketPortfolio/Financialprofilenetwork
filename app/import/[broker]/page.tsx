@@ -379,7 +379,14 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
         <SovereignSyncCTA brokerName={config.displayName} />
 
         {/* Overview */}
-        <section style={{ marginBottom: '32px' }}>
+        <section
+          style={{
+            marginBottom: '32px',
+            // Mobile CWV: skip rendering deep content until needed.
+            contentVisibility: 'auto',
+            containIntrinsicSize: '800px',
+          }}
+        >
           <div style={{
             background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
             border: '2px solid var(--border-warm)',
@@ -406,7 +413,14 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
         </section>
 
         {/* Required Columns */}
-        <section id="step2" style={{ marginBottom: '32px' }}>
+        <section
+          id="step2"
+          style={{
+            marginBottom: '32px',
+            contentVisibility: 'auto',
+            containIntrinsicSize: '1200px',
+          }}
+        >
           <h2 style={{
             fontSize: '24px',
             fontWeight: '600',
@@ -455,7 +469,13 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
         </section>
 
         {/* Sample Data */}
-        <section style={{ marginBottom: '32px' }}>
+        <section
+          style={{
+            marginBottom: '32px',
+            contentVisibility: 'auto',
+            containIntrinsicSize: '1200px',
+          }}
+        >
           <h2 style={{
             fontSize: '24px',
             fontWeight: '600',
@@ -625,7 +645,13 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
         </section>
 
         {/* Tips and Troubleshooting */}
-        <section style={{ marginBottom: '32px' }}>
+        <section
+          style={{
+            marginBottom: '32px',
+            contentVisibility: 'auto',
+            containIntrinsicSize: '1200px',
+          }}
+        >
           <h2 style={{
             fontSize: '24px',
             fontWeight: '600',
