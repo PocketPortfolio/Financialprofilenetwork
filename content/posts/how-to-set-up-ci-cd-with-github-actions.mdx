@@ -1,0 +1,92 @@
+---
+title: How to Set Up CI/CD with GitHub Actions
+date: '2026-04-07'
+description: >-
+  Learn how to set up a CI/CD pipeline using GitHub Actions to automate your
+  development workflow.
+tags:
+  - github
+  - ci/cd
+  - git
+  - github actions
+  - automation
+author: Pocket Portfolio Team
+image: /images/blog/how-to-set-up-ci-cd-with-github-actions.png
+pillar: Development
+category: how-to-in-tech
+---
+
+# Problem
+
+Continuous Integration and Continuous Deployment (CI/CD) are crucial practices in modern software development. They ensure that changes to your codebase are automatically tested and deployed, reducing human error and speeding up the process of getting new features to users. However, setting up a CI/CD pipeline can be daunting if you're unfamiliar with the tools available. One of the most accessible and powerful tools for this purpose is GitHub Actions, which allows you to automate your workflow directly within GitHub.
+
+# Solution with Code
+
+To set up a CI/CD pipeline with GitHub Actions, you need to create a workflow file in your GitHub repository. This file will define the steps required to build, test, and deploy your application. Here's a basic example of how to set up a CI/CD pipeline for a Node.js application:
+
+1. **Create a new directory in your repository:**
+
+   Create a `.github/workflows` directory at the root of your repository.
+
+2. **Add a new workflow file:**
+
+   Create a new file named `ci-cd.yml` inside the `.github/workflows` directory.
+
+3. **Define the workflow:**
+
+   Add the following YAML configuration to the `ci-cd.yml` file:
+
+   ```yaml
+   name: CI/CD Pipeline
+
+   on:
+     push:
+       branches: [ main ]
+     pull_request:
+       branches: [ main ]
+
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+
+       steps:
+       - name: Checkout repository
+         uses: actions/checkout@v3
+
+       - name: Set up Node.js
+         uses: actions/setup-node@v3
+         with:
+           node-version: '16'
+
+       - name: Install dependencies
+         run: npm install
+
+       - name: Run tests
+         run: npm test
+
+       - name: Build project
+         run: npm run build
+
+     deploy:
+       runs-on: ubuntu-latest
+       needs: build
+
+       steps:
+       - name: Deploy
+         run: |
+           echo "Deploying the application..."
+           # Add your deployment steps here
+   ```
+
+4. **Commit and push the changes:**
+
+   Once you've added the workflow file, commit and push it to the `main` branch of your repository.
+
+# Key Concepts
+
+- **GitHub Actions**: A powerful feature of GitHub that allows you to automate tasks within your software development lifecycle.
+- **Workflow**: A configurable automated process made up of one or more jobs.
+- **Job**: A set of steps in a workflow that execute on the same runner.
+- **Runner**: A server that runs your workflows when triggered.
+
+With this setup, every push or pull request to the `main` branch will trigger the CI/CD pipeline, running tests and building the project. This ensures that your application is always in a deployable state, enhancing the reliability and efficiency of your development process.
