@@ -1546,7 +1546,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Computer Vision Inference - Edge vs Cloud",
     "slug": "research-computer-vision-inference-edge-vs-cloud-2026-04-07",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1554,7 +1554,8 @@
       "inference",
       "computer",
       "vision"
-    ]
+    ],
+    "publishedAt": "2026-04-07T18:00:42.421Z"
   },
   {
     "id": "research-model-compression-techniques-performance-vs-accuracy-2026-04-08",
