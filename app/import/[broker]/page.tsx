@@ -293,15 +293,28 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
           </p>
         </header>
 
-        <BridgeToTerminalCTA
-          title={`Visualize your ${config.displayName} CSV locally — drag & drop into the Terminal.`}
-          subtitle="No uploads. Parsed on-device."
-          href={`/dashboard?utm_source=import_page&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(broker)}`}
-          primaryLabel="Open Terminal"
-          secondaryHref="/learn/local-first"
-          secondaryLabel="How local-first works"
-          analytics={{ source: 'import_page', contextId: broker }}
-        />
+        {(() => {
+          const variant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
+          const title =
+            variant === 'B'
+              ? `Sovereign import — parse your ${config.displayName} CSV in the Terminal.`
+              : `Visualize your ${config.displayName} CSV locally — drag & drop into the Terminal.`;
+          const subtitle =
+            variant === 'B' ? 'On-device parsing. No uploads. Keep your ledger local.' : 'No uploads. Parsed on-device.';
+          const primaryLabel = variant === 'B' ? 'Open Sovereign Terminal' : 'Open Terminal';
+
+          return (
+            <BridgeToTerminalCTA
+              title={title}
+              subtitle={subtitle}
+              href={`/dashboard?utm_source=import_page&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(broker)}`}
+              primaryLabel={primaryLabel}
+              secondaryHref="/learn/local-first"
+              secondaryLabel="How local-first works"
+              analytics={{ source: 'import_page', contextId: broker }}
+            />
+          );
+        })()}
 
         {/* NEW: Sovereign Sync CTA Section */}
         <SovereignSyncCTA brokerName={config.displayName} />

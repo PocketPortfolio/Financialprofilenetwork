@@ -288,15 +288,30 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             {uniqueDescription}
           </p>
 
+          {(() => {
+            const variant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
+            const title =
+              variant === 'B'
+                ? 'Programmable Sovereign Interface — chart this JSON in the Terminal.'
+                : 'Turn this JSON into charts instantly — open the Terminal.';
+            const subtitle =
+              variant === 'B'
+                ? 'Local-first analysis. Stateless data. Your browser is the vault.'
+                : 'Local-first. No uploads required to start.';
+            const primaryLabel = variant === 'B' ? 'Open Sovereign Terminal' : 'Open Terminal';
+
+            return (
           <BridgeToTerminalCTA
-            title="Turn this JSON into charts instantly — open the Terminal."
-            subtitle="Local-first. No uploads required to start."
+            title={title}
+            subtitle={subtitle}
             href={`/dashboard?utm_source=json_api&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
-            primaryLabel="Open Terminal"
+            primaryLabel={primaryLabel}
             secondaryHref="/learn/local-first"
             secondaryLabel="How local-first works"
             analytics={{ source: 'json_api', contextId: normalizedSymbol.toLowerCase() }}
           />
+            );
+          })()}
           
           {/* CROSS-LINK (Internal SEO Juice) */}
           <div style={{ marginBottom: '32px' }}>
