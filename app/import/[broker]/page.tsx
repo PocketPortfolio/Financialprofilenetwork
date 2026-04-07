@@ -6,6 +6,19 @@ import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 
 /** US retail CSV-export intent pages — dedicated title/meta/H1 + export copy */
 const US_RETAIL_SEO_BROKERS = new Set(['robinhood', 'schwab', 'fidelity', 'vanguard']);
+const META_VARIANT = process.env.NEXT_PUBLIC_GSC_META_VARIANT === 'B' ? 'B' : 'A';
+const META_TEST_BROKERS = new Set([
+  // High-impression import landers seen in GSC exports
+  'trade-republic',
+  'ghostfolio',
+  'degiro',
+  'interactive-brokers',
+  'etoro',
+  'trading212',
+  'webull',
+  'saxo',
+  'moomoo',
+]);
 
 function getUsBrokerExportStep1Text(broker: string, displayName: string): string {
   switch (broker) {
@@ -37,6 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
   const resolvedParams = await params;
   const broker = resolvedParams.broker.toLowerCase();
   const config = BROKER_CONFIG[broker as keyof typeof BROKER_CONFIG];
+  const inMetaTest = META_VARIANT === 'B' && META_TEST_BROKERS.has(broker);
   
   if (!config) {
     return {
@@ -46,6 +60,36 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
 
   // CTR-focused SEO template (local-first trust signal)
   if (broker === 'ghostfolio') {
+    if (inMetaTest) {
+      const title = 'Ghostfolio CSV Import | Local-First, No Uploads';
+      const description =
+        'Move from Ghostfolio in minutes. Import your CSV in-browser (no uploads), then analyze positions in a local-first terminal. Keep your ledger off our servers.';
+      return {
+        title,
+        description,
+        openGraph: {
+          title,
+          description,
+          images: [
+            {
+              url: `/og?title=${encodeURIComponent('Ghostfolio CSV Import')}`,
+              width: 1200,
+              height: 630,
+              alt: 'Ghostfolio CSV Import - Pocket Portfolio',
+            },
+          ],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title,
+          description,
+          images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+        },
+        alternates: {
+          canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
+        },
+      };
+    }
     return {
       title: 'Ghostfolio CSV Import | The Local-First Portfolio Alternative',
       description:
@@ -77,8 +121,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
   }
 
   if (US_RETAIL_SEO_BROKERS.has(broker)) {
-    const title = `Free ${config.displayName} CSV Import | Local-First Portfolio — Pocket Portfolio`;
-    const description = `Export your ${config.displayName} transaction history to CSV, then import in seconds. Runs in your browser — data stays on your device. Download historical CSVs instantly.`;
+    const title = inMetaTest
+      ? `Free ${config.displayName} CSV Import | No Uploads, Local-First`
+      : `Free ${config.displayName} CSV Import | Local-First Portfolio — Pocket Portfolio`;
+    const description = inMetaTest
+      ? `Import ${config.displayName} trades in-browser. No uploads. Your data stays on your device. Then chart performance in the Pocket Portfolio terminal.`
+      : `Export your ${config.displayName} transaction history to CSV, then import in seconds. Runs in your browser — data stays on your device. Download historical CSVs instantly.`;
     return {
       title,
       description,
@@ -114,9 +162,16 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     };
   }
 
+  const title = inMetaTest
+    ? `${config.displayName} CSV Import | Local-First, No Uploads`
+    : `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`;
+  const description = inMetaTest
+    ? `Import your ${config.displayName} CSV in-browser and analyze locally. No uploads. Your financial history stays on your device.`
+    : `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads. Your financial history never leaves your device.`;
+
   return {
-    title: `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`,
-    description: `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads. Your financial history never leaves your device.`,
+    title,
+    description,
     keywords: [
       `${config.displayName} CSV export`,
       `${config.displayName} CSV import`,
@@ -129,8 +184,10 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       `${config.displayName} account statement`
     ],
     openGraph: {
-      title: `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`,
-      description: `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
+      title,
+      description: inMetaTest
+        ? `Import your ${config.displayName} CSV in-browser. No uploads. Local-first analysis.`
+        : `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
       images: [
         {
           url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
@@ -142,8 +199,10 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`,
-      description: `Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
+      title,
+      description: inMetaTest
+        ? `Import your ${config.displayName} CSV in-browser. No uploads. Your data stays on your device.`
+        : `Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
       images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
     },
     alternates: {

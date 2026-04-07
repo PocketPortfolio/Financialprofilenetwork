@@ -27,9 +27,28 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
   const symbol = resolvedParams.symbol.toUpperCase();
+  const metaVariant = process.env.NEXT_PUBLIC_GSC_META_VARIANT === 'B' ? 'B' : 'A';
+  const inMetaTest = metaVariant === 'B' && new Set(['xvlxx', 'vhxxx', 'vvlxx', 'xinxx', 'nse']).has(symbol.toLowerCase().replace(/-/g, ''));
   const metadata = await getTickerMetadata(symbol);
 
   if (symbol.replace(/-/g, '') === 'NSE') {
+    if (inMetaTest) {
+      return {
+        title: 'NSE JSON API & Historical CSV Download | Pocket Portfolio',
+        description:
+          'Fetch NSE history as normalized JSON (stateless endpoint) and download clean CSVs. No login. Local-first workflow for National Stock Exchange tickers.',
+        openGraph: {
+          title: 'NSE JSON API & Historical CSV Download | Pocket Portfolio',
+          description:
+            'Fetch NSE history as JSON and download clean CSVs. No login. Local-first workflow.',
+          type: 'website',
+          url: 'https://www.pocketportfolio.app/s/nse/json-api',
+        },
+        alternates: {
+          canonical: 'https://www.pocketportfolio.app/s/nse/json-api',
+        },
+      };
+    }
     return {
       title: 'NSE Historical Data & CSV Export | Pocket Portfolio',
       description:
@@ -49,8 +68,34 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
-      description: `Download ${symbol} historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
+      title: inMetaTest ? `${symbol} JSON API & Historical CSV | Pocket Portfolio` : `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+      description: inMetaTest
+        ? `Fetch ${symbol} history as normalized JSON (stateless endpoint) or download CSV. No login required.`
+        : `Download ${symbol} historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
+    };
+  }
+
+  if (inMetaTest) {
+    return {
+      title: `${symbol} JSON API & Historical CSV | Pocket Portfolio`,
+      description: `Fetch ${metadata.name} (${symbol}) history as normalized JSON (stateless endpoint) or download CSV. No login required.`,
+      keywords: [
+        `${symbol} JSON API`,
+        `${symbol} historical data JSON`,
+        `${symbol} historical data CSV`,
+        `${symbol} price API`,
+        `download ${symbol} JSON`,
+        `download ${symbol} CSV`,
+      ],
+      openGraph: {
+        title: `${symbol} JSON API & Historical CSV | Pocket Portfolio`,
+        description: `Fetch ${metadata.name} (${symbol}) history as JSON or download CSV. No login required.`,
+        type: 'website',
+        url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
+      },
+      alternates: {
+        canonical: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
+      },
     };
   }
 
