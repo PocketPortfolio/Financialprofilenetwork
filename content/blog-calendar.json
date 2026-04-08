@@ -652,7 +652,7 @@
     "date": "2026-04-08",
     "title": "Introducing JSON Portfolio Management: A New Era",
     "slug": "introducing-json-portfolio-management-a-new-era",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -662,7 +662,8 @@
       "introducing"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-08T09:00:33.093Z"
   },
   {
     "id": "week-15-post-1",
