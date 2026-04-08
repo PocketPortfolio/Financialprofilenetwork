@@ -1558,14 +1558,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Microservices Architecture Patterns",
     "slug": "understanding-microservices-architecture-patterns",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "microservices",
       "understanding",
       "architecture"
-    ]
+    ],
+    "publishedAt": "2026-04-08T14:00:40.674Z"
   },
   {
     "id": "how-to-how-to-deploy-a-next-js-app-to-vercel-apr-9",
