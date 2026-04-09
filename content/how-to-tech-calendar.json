@@ -1574,7 +1574,7 @@
     "scheduledTime": "14:00",
     "title": "How to Deploy a Next.js App to Vercel",
     "slug": "how-to-deploy-a-next-js-app-to-vercel",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1583,7 +1583,8 @@
       "deploy",
       "next",
       "app"
-    ]
+    ],
+    "publishedAt": "2026-04-09T14:00:33.864Z"
   },
   {
     "id": "how-to-the-developer-s-guide-to-postgresql-indexes-apr-10",
