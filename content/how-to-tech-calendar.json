@@ -1592,7 +1592,7 @@
     "scheduledTime": "14:00",
     "title": "The Developer's Guide to PostgreSQL Indexes",
     "slug": "the-developer-s-guide-to-postgresql-indexes",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1601,7 +1601,8 @@
       "postgres",
       "developer",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-04-10T14:00:39.178Z"
   },
   {
     "id": "how-to-how-to-use-redis-for-caching-in-node-js-apr-11",
