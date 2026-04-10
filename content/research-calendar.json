@@ -1597,14 +1597,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Server-Side Rendering Overhead - Next.js vs Remix",
     "slug": "research-server-side-rendering-overhead-next-js-vs-remix-2026-04-10",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "server",
       "side",
       "rendering"
-    ]
+    ],
+    "publishedAt": "2026-04-10T18:00:43.157Z"
   },
   {
     "id": "research-static-site-generation-build-time-vs-runtime-2026-04-11",
