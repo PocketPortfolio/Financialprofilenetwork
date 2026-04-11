@@ -13,6 +13,7 @@ import {
   loadLocalTrades,
   saveLocalTrades,
   loadPortfolioNotes,
+  notifyPortfolioNotesChanged,
   savePortfolioNotes,
 } from '../lib/store/localPortfolioStore';
 import { mergePortfolioNotes, parsePortfolioNotes } from '../lib/portfolio/schema';
@@ -1014,6 +1015,8 @@ export function useGoogleDrive() {
         if (driveData.notes !== undefined && driveData.notes !== null) {
           const merged = mergePortfolioNotes(loadPortfolioNotes(), parsePortfolioNotes(driveData.notes));
           savePortfolioNotes(merged);
+          // Refresh notes UI immediately; drive-sync-complete fires much later after Firebase work.
+          notifyPortfolioNotesChanged();
         }
         
         console.log('✅ Synced', driveData.trades.length, 'trades from Drive');

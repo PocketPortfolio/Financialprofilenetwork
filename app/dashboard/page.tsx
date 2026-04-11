@@ -2183,7 +2183,14 @@ export default function Dashboard() {
                 </div>
               </div>
               {portfolioView === 'notes' ? (
-                <div className="dashboard-card" style={{ overflow: 'hidden' }}>
+                <div
+                  className="dashboard-card"
+                  style={{
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
                   <PortfolioNotesPanel
                     tickers={noteTickers}
                     trades={displayTrades}

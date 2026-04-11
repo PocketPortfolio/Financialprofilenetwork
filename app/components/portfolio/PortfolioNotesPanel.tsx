@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import type { PortfolioNotesState } from '@/app/lib/portfolio/schema';
 import type { Trade } from '@/app/services/tradeService';
 
@@ -25,7 +26,12 @@ export function PortfolioNotesPanel({
   onRemoveOrphan,
   variant = 'terminal',
 }: PortfolioNotesPanelProps) {
-  const sortedTickers = [...new Set(tickers.map((t) => t.trim().toUpperCase()))].sort();
+  /** Open positions plus any ticker that already has a saved thesis (e.g. closed lots — notes still on Drive). */
+  const sortedTickers = useMemo(() => {
+    const fromPositions = tickers.map((t) => t.trim().toUpperCase()).filter(Boolean);
+    const fromNotes = Object.keys(notes.byTicker).map((t) => t.trim().toUpperCase()).filter(Boolean);
+    return [...new Set([...fromPositions, ...fromNotes])].sort();
+  }, [tickers, notes.byTicker]);
   const orphanIds = Object.keys(notes.orphanedByTradeId).sort();
 
   const border =
@@ -75,7 +81,9 @@ export function PortfolioNotesPanel({
           Holding thesis (by ticker)
         </h3>
         {sortedTickers.length === 0 ? (
-          <p style={{ margin: 0, color: muted, fontSize: '13px' }}>No open positions to attach a thesis to.</p>
+          <p style={{ margin: 0, color: muted, fontSize: '13px' }}>
+            No ticker-level thesis yet. Open a position to add one, or pull notes from Drive if you wrote them on another device.
+          </p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {sortedTickers.map((ticker) => (
