@@ -8,8 +8,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { driveService } from '../lib/google-drive/driveService';
 import type { DriveSyncState, PortfolioData, DriveFileMetadata } from '../lib/google-drive/types';
-import { exportLocalPortfolio } from '../lib/store/localPortfolioStore';
-import { loadLocalTrades, saveLocalTrades } from '../lib/store/localPortfolioStore';
+import {
+  exportLocalPortfolio,
+  loadLocalTrades,
+  saveLocalTrades,
+  loadPortfolioNotes,
+  savePortfolioNotes,
+} from '../lib/store/localPortfolioStore';
+import { mergePortfolioNotes, parsePortfolioNotes } from '../lib/portfolio/schema';
 import { generateExcelFromPortfolio } from '../lib/google-drive/excelExport';
 import type { Trade } from '../services/tradeService';
 import { useAuth } from './useAuth';
@@ -1003,6 +1009,11 @@ export function useGoogleDrive() {
         const result = saveLocalTrades(driveData.trades);
         if (!result.success) {
           throw new Error(result.error || 'Failed to save trades from Drive');
+        }
+
+        if (driveData.notes !== undefined && driveData.notes !== null) {
+          const merged = mergePortfolioNotes(loadPortfolioNotes(), parsePortfolioNotes(driveData.notes));
+          savePortfolioNotes(merged);
         }
         
         console.log('✅ Synced', driveData.trades.length, 'trades from Drive');

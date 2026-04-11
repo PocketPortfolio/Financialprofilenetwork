@@ -53,6 +53,8 @@ export interface PortfolioData {
     tradeCount: number;
     dataSize: number;
   };
+  /** Decision Journal notes (v1.1+); parsed with portfolio schema helpers on read */
+  notes?: unknown;
 }
 
 export interface DriveSyncConfig {

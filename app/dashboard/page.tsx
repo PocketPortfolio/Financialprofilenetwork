@@ -29,7 +29,7 @@ import CSVImporter from '../components/CSVImporter';
 import AccountManagement from '../components/AccountManagement';
 import ReferralProgram from '../components/viral/ReferralProgram';
 import SyncUpgradeCTA from '../components/SyncUpgradeCTA';
-import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
+import { PortfolioNotesPanel } from '../components/portfolio/PortfolioNotesPanel';
 import PricePipelineHealth from '../components/PricePipelineHealth';
 import CloudStatusIcon from '../components/CloudStatusIcon';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
@@ -38,6 +38,7 @@ import StructuredData, { webAppData } from '../components/StructuredData';
 import { useQuotes, useNews, useMarketData } from '../hooks/useDataFetching';
 import { useAuth } from '../hooks/useAuth';
 import { useTrades } from '../hooks/useTrades';
+import { usePortfolioNotes } from '../hooks/usePortfolioNotes';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import AlertModal from '../components/modals/AlertModal';
@@ -94,6 +95,7 @@ export default function Dashboard() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   // const { selectedPortfolio, selectedPortfolioId } = usePortfolios();
   const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
+  const portfolioNotes = usePortfolioNotes();
   const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
   const { tier, isLoading: tierLoading } = usePremiumTheme();
   const { setPortfolioContext, setTier } = usePocketAnalyst();
@@ -260,7 +262,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<'performance' | 'insights'>('performance');
   const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty'>('value');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [portfolioView, setPortfolioView] = useState<'positions' | 'trades'>('positions');
+  const [portfolioView, setPortfolioView] = useState<'positions' | 'trades' | 'notes'>('positions');
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     symbol: string;
@@ -956,6 +958,11 @@ export default function Dashboard() {
   
   // Memoize positionsArray to prevent new array reference on every render
   const positionsArray = useMemo(() => Object.values(positions), [positions]);
+
+  const noteTickers = useMemo(
+    () => positionsArray.filter((p) => p.shares > 0).map((p) => p.ticker),
+    [positionsArray]
+  );
   
   // Create stable JSON key from positions for comparison (matches original format)
   const positionsKey = useMemo(() => {
@@ -2156,8 +2163,38 @@ export default function Dashboard() {
                   >
                     Trades ({trades.length})
                   </button>
+                  <button
+                    onClick={() => setPortfolioView('notes')}
+                    style={{
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+                      background: portfolioView === 'notes' ? 'hsl(var(--primary))' : 'transparent',
+                      color: portfolioView === 'notes' ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))',
+                      border: `1px solid ${portfolioView === 'notes' ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Notes
+                  </button>
                 </div>
               </div>
+              {portfolioView === 'notes' ? (
+                <div className="dashboard-card" style={{ overflow: 'hidden' }}>
+                  <PortfolioNotesPanel
+                    tickers={noteTickers}
+                    trades={displayTrades}
+                    notes={portfolioNotes.notes}
+                    onHoldingNoteChange={portfolioNotes.setHoldingNote}
+                    onTradeNoteChange={portfolioNotes.setTradeNote}
+                    onRemoveOrphan={portfolioNotes.removeOrphan}
+                    variant="terminal"
+                  />
+                </div>
+              ) : (
               <AssetTerminal
                 view={portfolioView}
                 assets={(() => {
@@ -2273,6 +2310,7 @@ export default function Dashboard() {
                 sortBy={sortBy}
                 sortOrder={sortOrder}
               />
+              )}
             </div>
           </div>
         )}

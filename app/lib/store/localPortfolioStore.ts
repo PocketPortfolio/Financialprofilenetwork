@@ -5,10 +5,18 @@
  */
 
 import type { Trade } from '@/app/services/tradeService';
+import {
+  PORTFOLIO_DB_SCHEMA_VERSION,
+  emptyPortfolioNotes,
+  mergePortfolioNotes,
+  parsePortfolioNotes,
+  type PortfolioNotesState,
+} from '@/app/lib/portfolio/schema';
 
 const STORAGE_KEY_TRADES = 'pocket-portfolio-local-trades';
 const STORAGE_KEY_PORTFOLIO = 'pocket-portfolio-local-portfolio';
 const STORAGE_KEY_METADATA = 'pocket-portfolio-local-metadata';
+export const STORAGE_KEY_NOTES = 'pocket-portfolio-notes-v1';
 
 // localStorage quota is typically 5-10MB, we'll use 80% as warning threshold
 const QUOTA_WARNING_THRESHOLD = 0.8;
@@ -22,10 +30,13 @@ interface LocalPortfolioMetadata {
   dataSize: number; // Approximate size in bytes
 }
 
-interface LocalPortfolioData {
+export interface LocalPortfolioData {
   trades: Trade[];
   metadata: LocalPortfolioMetadata;
+  notes?: PortfolioNotesState;
 }
+
+export type { PortfolioNotesState };
 
 /**
  * Get approximate size of data in bytes
@@ -138,6 +149,49 @@ export function loadLocalTrades(): Trade[] {
   }
 }
 
+export function loadPortfolioNotes(): PortfolioNotesState {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_NOTES);
+    if (!raw) return emptyPortfolioNotes();
+    return parsePortfolioNotes(JSON.parse(raw));
+  } catch (error) {
+    console.error('Error loading portfolio notes:', error);
+    return emptyPortfolioNotes();
+  }
+}
+
+export function savePortfolioNotes(notes: PortfolioNotesState): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
+  } catch (error) {
+    console.error('Error saving portfolio notes:', error);
+  }
+}
+
+/** Move trade-scoped note to orphans when the trade is removed (non-empty body preserved). */
+export function archiveTradeNoteOnDelete(tradeId: string, tickerHint: string): void {
+  const n = loadPortfolioNotes();
+  const entry = n.byTradeId[tradeId];
+  if (!entry) return;
+  if (entry.body.trim()) {
+    n.orphanedByTradeId[tradeId] = { ...entry, tickerHint };
+  }
+  delete n.byTradeId[tradeId];
+  savePortfolioNotes(n);
+}
+
+export function archiveAllTradeNotesFromTrades(trades: Pick<Trade, 'id' | 'ticker'>[]): void {
+  for (const t of trades) {
+    archiveTradeNoteOnDelete(t.id, t.ticker);
+  }
+}
+
+export function notifyPortfolioNotesChanged(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('portfolio-notes-changed'));
+  }
+}
+
 /**
  * Get local portfolio metadata
  */
@@ -161,26 +215,32 @@ export function getLocalPortfolioMetadata(): LocalPortfolioMetadata | null {
 export function exportLocalPortfolio(providedTrades?: Trade[]): { data: LocalPortfolioData; filename: string } {
   // Use provided trades (from Firebase/state) or fall back to localStorage
   const trades = providedTrades || loadLocalTrades();
-  
+  const notes = loadPortfolioNotes();
+
   const metadata = getLocalPortfolioMetadata() || {
     createdAt: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
-    version: '1.0.0',
+    version: PORTFOLIO_DB_SCHEMA_VERSION,
     tradeCount: trades.length,
-    dataSize: getDataSize(trades),
+    dataSize: 0,
   };
 
-  // Update metadata with current trade count if using provided trades
-  if (providedTrades) {
-    metadata.tradeCount = trades.length;
-    metadata.dataSize = getDataSize(trades);
-    metadata.lastUpdated = new Date().toISOString();
-  }
+  metadata.version = PORTFOLIO_DB_SCHEMA_VERSION;
+  metadata.tradeCount = trades.length;
+  metadata.lastUpdated = new Date().toISOString();
 
   const data: LocalPortfolioData = {
     trades,
-    metadata,
+    notes,
+    metadata: {
+      ...metadata,
+      version: PORTFOLIO_DB_SCHEMA_VERSION,
+      tradeCount: trades.length,
+      lastUpdated: new Date().toISOString(),
+      dataSize: 0,
+    },
   };
+  data.metadata.dataSize = getDataSize(data);
 
   const filename = `pocket-portfolio-export-${new Date().toISOString().split('T')[0]}.json`;
 
@@ -226,6 +286,11 @@ export function importLocalPortfolio(jsonData: string): { success: boolean; erro
       return result;
     }
 
+    const remoteNotes = parsePortfolioNotes(data.notes);
+    const merged = mergePortfolioNotes(loadPortfolioNotes(), remoteNotes);
+    savePortfolioNotes(merged);
+    notifyPortfolioNotesChanged();
+
     return {
       success: true,
       tradeCount: validTrades.length,
@@ -246,6 +311,7 @@ export function clearLocalPortfolio(): void {
   localStorage.removeItem(STORAGE_KEY_TRADES);
   localStorage.removeItem(STORAGE_KEY_PORTFOLIO);
   localStorage.removeItem(STORAGE_KEY_METADATA);
+  localStorage.removeItem(STORAGE_KEY_NOTES);
 }
 
 /**

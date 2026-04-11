@@ -8,7 +8,10 @@ import {
   loadLocalTrades, 
   getQuotaStatus,
   exportLocalPortfolio,
-  importLocalPortfolio 
+  importLocalPortfolio,
+  archiveTradeNoteOnDelete,
+  archiveAllTradeNotesFromTrades,
+  notifyPortfolioNotesChanged,
 } from '../lib/store/localPortfolioStore';
 
 export function useTrades() {
@@ -168,6 +171,11 @@ export function useTrades() {
       if (isLocalTrade) {
         // For local trades, just remove from local state and localStorage using localPortfolioStore
         setTrades(prevTrades => {
+          const victim = prevTrades.find(t => t.id === tradeId);
+          if (victim) {
+            archiveTradeNoteOnDelete(tradeId, victim.ticker);
+            notifyPortfolioNotesChanged();
+          }
           const updatedTrades = prevTrades.filter(trade => trade.id !== tradeId);
           const result = saveLocalTrades(updatedTrades);
           if (!result.success) {
@@ -196,13 +204,21 @@ export function useTrades() {
         }
         // Update local state immediately to prevent reload from overriding the deletion
         setTrades(prev => {
-          const updatedTrades = prev.filter(trade => trade.id !== tradeId);
-          
-          return updatedTrades;
+          const victim = prev.find(t => t.id === tradeId);
+          if (victim) {
+            archiveTradeNoteOnDelete(tradeId, victim.ticker);
+            notifyPortfolioNotesChanged();
+          }
+          return prev.filter(trade => trade.id !== tradeId);
         });
       } else {
         // Delete from localStorage for unauthenticated users using localPortfolioStore
         setTrades(prevTrades => {
+          const victim = prevTrades.find(t => t.id === tradeId);
+          if (victim) {
+            archiveTradeNoteOnDelete(tradeId, victim.ticker);
+            notifyPortfolioNotesChanged();
+          }
           const updatedTrades = prevTrades.filter(trade => trade.id !== tradeId);
           const result = saveLocalTrades(updatedTrades);
           if (!result.success) {
@@ -218,7 +234,7 @@ export function useTrades() {
       
       throw err;
     }
-  }, [user, isAuthenticated, trades]);
+  }, [user, isAuthenticated]);
 
   const updateTrade = useCallback(async (tradeId: string, updates: Partial<Trade>) => {
     if (!user) throw new Error('User not authenticated');
@@ -464,6 +480,9 @@ export function useTrades() {
     if (!user) throw new Error('User not authenticated');
     
     try {
+      archiveAllTradeNotesFromTrades(trades);
+      notifyPortfolioNotesChanged();
+
       const deletedCount = await TradeService.deleteAllTrades(user.uid);
       
       
@@ -480,7 +499,7 @@ export function useTrades() {
       setError(error instanceof Error ? error.message : 'Failed to delete all trades');
       throw error;
     }
-  }, [user, isAuthenticated, trades.length]);
+  }, [user, isAuthenticated, trades]);
 
   const cleanupOrphanedTrades = useCallback(async () => {
     if (!user) throw new Error('User not authenticated');

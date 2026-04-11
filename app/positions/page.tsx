@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
 import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
+import { usePortfolioNotes } from '../hooks/usePortfolioNotes';
 import { Trade } from '../services/tradeService';
 import { useQuotes } from '../hooks/useDataFetching';
 import { BrandProvider } from '../lib/brand/theme';
@@ -30,6 +31,7 @@ interface Position {
 export default function PositionsPage() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   const { trades, deleteTrade } = useTrades();
+  const portfolioNotes = usePortfolioNotes();
   const { syncState } = useGoogleDrive();
   const { tier } = usePremiumTheme();
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -262,7 +264,7 @@ export default function PositionsPage() {
           </div>
         </div>
 
-        {positions.length === 0 ? (
+        {positions.length === 0 && trades.length === 0 ? (
           <div style={{
             background: 'var(--surface)',
             border: '1px solid var(--border)',
@@ -297,6 +299,10 @@ export default function PositionsPage() {
             positions={positions}
             onDeleteTrade={handleDeleteTrade}
             onViewTrades={handleViewTrades}
+            notes={portfolioNotes.notes}
+            onHoldingNoteChange={portfolioNotes.setHoldingNote}
+            onTradeNoteChange={portfolioNotes.setTradeNote}
+            onRemoveOrphan={portfolioNotes.removeOrphan}
           />
         )}
       </main>

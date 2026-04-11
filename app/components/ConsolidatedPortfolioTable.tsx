@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { Trade } from '../services/tradeService';
+import type { PortfolioNotesState } from '@/app/lib/portfolio/schema';
+import { PortfolioNotesPanel } from '@/app/components/portfolio/PortfolioNotesPanel';
 
 interface Position {
   ticker: string;
@@ -23,6 +25,10 @@ interface ConsolidatedPortfolioTableProps {
   onDeleteTrade: (tradeId: string) => void;
   onViewTrades: (ticker: string) => void;
   noCard?: boolean; // New prop to remove card styling
+  notes: PortfolioNotesState;
+  onHoldingNoteChange: (ticker: string, body: string) => void;
+  onTradeNoteChange: (tradeId: string, body: string) => void;
+  onRemoveOrphan: (tradeId: string) => void;
 }
 
 export default function ConsolidatedPortfolioTable({ 
@@ -30,9 +36,13 @@ export default function ConsolidatedPortfolioTable({
   positions, 
   onDeleteTrade, 
   onViewTrades,
-  noCard = false
+  noCard = false,
+  notes,
+  onHoldingNoteChange,
+  onTradeNoteChange,
+  onRemoveOrphan,
 }: ConsolidatedPortfolioTableProps) {
-  const [viewMode, setViewMode] = useState<'positions' | 'trades'>('positions');
+  const [viewMode, setViewMode] = useState<'positions' | 'trades' | 'notes'>('positions');
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'ticker' | 'value' | 'pl' | 'plPercent'>('value');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -140,7 +150,9 @@ export default function ConsolidatedPortfolioTable({
             color: 'var(--muted)', 
             margin: '4px 0 0 0' 
           }}>
-            {viewMode === 'positions' 
+            {viewMode === 'notes'
+              ? 'Decision journal — local device & Drive JSON'
+              : viewMode === 'positions' 
               ? `${positions.length} positions • ${trades.length} total trades`
               : selectedTicker 
                 ? `${filteredTrades.length} trades for ${selectedTicker}`
@@ -214,6 +226,37 @@ export default function ConsolidatedPortfolioTable({
             >
               📈 Trades
             </button>
+            <button
+              onClick={() => setViewMode('notes')}
+              style={{
+                padding: '12px 20px',
+                background: viewMode === 'notes' 
+                  ? 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)' 
+                  : 'transparent',
+                color: viewMode === 'notes' ? 'white' : 'var(--text-warm)',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: viewMode === 'notes' ? '0 4px 12px rgba(245, 158, 11, 0.3)' : 'none'
+              }}
+              onMouseEnter={(e) => {
+                if (viewMode !== 'notes') {
+                  e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+                  e.currentTarget.style.color = 'var(--accent-warm)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (viewMode !== 'notes') {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--text-warm)';
+                }
+              }}
+            >
+              Notes
+            </button>
           </div>
 
           {/* Back to Positions Button (when viewing trades) */}
@@ -242,7 +285,17 @@ export default function ConsolidatedPortfolioTable({
       </div>
 
       {/* Table Content */}
-      {viewMode === 'positions' ? (
+      {viewMode === 'notes' ? (
+        <PortfolioNotesPanel
+          tickers={positions.filter((p) => p.shares > 0).map((p) => p.ticker)}
+          trades={trades}
+          notes={notes}
+          onHoldingNoteChange={onHoldingNoteChange}
+          onTradeNoteChange={onTradeNoteChange}
+          onRemoveOrphan={onRemoveOrphan}
+          variant="warm"
+        />
+      ) : viewMode === 'positions' ? (
         // Positions View
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
