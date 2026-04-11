@@ -439,81 +439,116 @@ export function useGoogleDrive() {
     userRef.current = user;
   }, [user]);
 
-  const syncToDrive = useCallback(async (fileId?: string, trades?: Trade[], skipPreUploadCheck?: boolean): Promise<void> => {
-    
-    // Use ref to get latest state to avoid stale closures
-    const state = syncStateRef.current;
-    const targetFileId = fileId || state.fileId;
-    if (!targetFileId || !state.isConnected) {
-      
-      return;
-    }
+  const syncToDrive = useCallback(
+    async (
+      fileId?: string,
+      trades?: Trade[],
+      skipPreUploadCheck?: boolean,
+      options?: { bypassRecentSyncWindow?: boolean }
+    ): Promise<void> => {
+      const bypassRecent = options?.bypassRecentSyncWindow === true;
 
-    // CRITICAL: Set upload time IMMEDIATELY (before any checks) to prevent polling from pulling
-    // This ensures polling sees the ref is set even if we skip the sync or during debounce
-    // We set it here so polling knows we're about to sync, even if we skip due to recent Drive sync
-    const uploadTime = Date.now();
-    lastUploadTimeRef.current = uploadTime;
-    
-
-    // IMPORTANT: Check if we recently synced from Drive (within last 5 seconds)
-    // This prevents immediate overwrite of Drive edits, but allows syncing after a short delay
-    // This makes the sync collaborative - we respect Drive edits but can still sync our changes
-    // EXCEPTION: If skipPreUploadCheck is true, we're intentionally syncing (e.g., after deletion), so proceed
-    const RECENT_SYNC_WINDOW_MS = 5000; // 5 seconds
-    const timeSinceLastDriveSync = Date.now() - lastDriveSyncTimeRef.current;
-    
-    if (!skipPreUploadCheck && timeSinceLastDriveSync < RECENT_SYNC_WINDOW_MS) {
-      console.log('⏸️ Skipping sync to Drive - recently synced from Drive (respecting Drive edits, will retry shortly)');
-      // Note: We keep lastUploadTimeRef set even if we skip, so polling knows we tried to sync
-      return;
-    }
-
-    // Clear existing timeout
-    if (syncTimeoutRef.current) {
-      clearTimeout(syncTimeoutRef.current);
-    }
-
-    // CRITICAL: Capture skipPreUploadCheck in closure for debounced callback
-    // This ensures the flag is preserved even after the debounce delay
-    const capturedSkipPreUploadCheck = skipPreUploadCheck;
-
-    // Debounce sync
-    syncTimeoutRef.current = setTimeout(async () => {
-      try {
-        // Get latest state again inside timeout
-        const currentState = syncStateRef.current;
-        if (!currentState.isConnected || !currentState.fileId) {
-          return;
+      /** Pull notes from Drive into localStorage when we skip full upload (multi-device alignment). */
+      const reconcileNotesOnlyFromDrive = async (fid: string | null | undefined) => {
+        if (!fid) return;
+        try {
+          const raw = await driveService.downloadPortfolioFile(fid);
+          const localNotes = loadPortfolioNotes();
+          const merged = mergePortfolioNotes(localNotes, parsePortfolioNotes(raw.notes));
+          if (JSON.stringify(merged) !== JSON.stringify(localNotes)) {
+            savePortfolioNotes(merged);
+            notifyPortfolioNotesChanged({ source: 'tab-sync' });
+          }
+        } catch (e) {
+          console.warn('[Drive] Notes reconcile (pull-only) failed:', e);
         }
+      };
 
-        // Double-check we didn't just sync from Drive during debounce (reduced to 5 seconds for more collaborative sync)
-        // EXCEPTION: If skipPreUploadCheck is true, we're intentionally syncing, so proceed
-        const timeSinceLastSync = Date.now() - lastDriveSyncTimeRef.current;
-        if (!skipPreUploadCheck && timeSinceLastSync < RECENT_SYNC_WINDOW_MS) {
-          console.log('⏸️ Skipping sync to Drive - Drive was updated during debounce (will retry shortly)');
-          return;
-        }
+      // Use ref to get latest state to avoid stale closures
+      const state = syncStateRef.current;
+      const targetFileId = fileId || state.fileId;
+      if (!targetFileId || !state.isConnected) {
+        return;
+      }
 
-        setSyncState(prev => ({ ...prev, isSyncing: true, error: null, conflictDetected: false, conflictData: null }));
-        
-        // REMOVED: Old conflict check - replaced with optimistic locking in updatePortfolioFile()
-        // Optimistic locking checks revision ID BEFORE upload, preventing overwrites
-        
-        // Use provided trades (from Firebase/state) or fall back to localStorage
-        const portfolioData = exportLocalPortfolio(trades).data;
-        
-        // CRITICAL: If we're syncing a deletion (empty or significantly fewer trades), mark deletion in progress
-        // This prevents polling from pulling stale trades back
-        const driveDataBeforeUpload = await driveService.downloadPortfolioFile(currentState.fileId).catch(() => null);
-        const isDeletion = portfolioData.trades.length === 0 || (driveDataBeforeUpload && portfolioData.trades.length < driveDataBeforeUpload.trades.length);
-        if (isDeletion) {
-          deletionInProgressRef.current = Date.now();
-          
-        }
-        
-        // CRITICAL: Check what's currently in Drive before uploading
-        if (driveDataBeforeUpload) {
+      // CRITICAL: Set upload time IMMEDIATELY (before any checks) to prevent polling from pulling
+      const uploadTime = Date.now();
+      lastUploadTimeRef.current = uploadTime;
+
+      // IMPORTANT: Check if we recently synced from Drive (within last 5 seconds)
+      // EXCEPTION: skipPreUploadCheck OR bypassRecent (notes upload merges before push — safe)
+      const RECENT_SYNC_WINDOW_MS = 5000; // 5 seconds
+      const timeSinceLastDriveSync = Date.now() - lastDriveSyncTimeRef.current;
+
+      if (!skipPreUploadCheck && !bypassRecent && timeSinceLastDriveSync < RECENT_SYNC_WINDOW_MS) {
+        console.log(
+          '⏸️ Skipping sync to Drive - recently synced from Drive (merging remote notes locally only)'
+        );
+        void reconcileNotesOnlyFromDrive(targetFileId);
+        return;
+      }
+
+      // Clear existing timeout
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+
+      const capturedSkipPreUploadCheck = skipPreUploadCheck;
+      const capturedBypassRecent = bypassRecent;
+
+      // Debounce sync
+      syncTimeoutRef.current = setTimeout(async () => {
+        try {
+          const currentState = syncStateRef.current;
+          if (!currentState.isConnected || !currentState.fileId) {
+            return;
+          }
+
+          const timeSinceLastSync = Date.now() - lastDriveSyncTimeRef.current;
+          if (!skipPreUploadCheck && !capturedBypassRecent && timeSinceLastSync < RECENT_SYNC_WINDOW_MS) {
+            console.log(
+              '⏸️ Skipping sync to Drive - Drive was updated during debounce (merging remote notes locally only)'
+            );
+            void reconcileNotesOnlyFromDrive(currentState.fileId);
+            return;
+          }
+
+          setSyncState((prev) => ({
+            ...prev,
+            isSyncing: true,
+            error: null,
+            conflictDetected: false,
+            conflictData: null,
+          }));
+
+          // Use provided trades (from Firebase/state) or fall back to localStorage
+          const portfolioData = exportLocalPortfolio(trades).data;
+
+          const driveDataBeforeUpload = await driveService
+            .downloadPortfolioFile(currentState.fileId)
+            .catch(() => null);
+
+          /** Last-writer-wins per note key vs current Drive file — prevents one device wiping the other's edits. */
+          if (driveDataBeforeUpload) {
+            const localNotes = parsePortfolioNotes(portfolioData.notes);
+            const remoteNotes = parsePortfolioNotes(driveDataBeforeUpload.notes);
+            const mergedNotes = mergePortfolioNotes(localNotes, remoteNotes);
+            if (JSON.stringify(mergedNotes) !== JSON.stringify(localNotes)) {
+              savePortfolioNotes(mergedNotes);
+              notifyPortfolioNotesChanged({ source: 'tab-sync' });
+            }
+            portfolioData.notes = mergedNotes;
+          }
+
+          const isDeletion =
+            portfolioData.trades.length === 0 ||
+            (driveDataBeforeUpload && portfolioData.trades.length < driveDataBeforeUpload.trades.length);
+          if (isDeletion) {
+            deletionInProgressRef.current = Date.now();
+          }
+
+          // CRITICAL: Check what's currently in Drive before uploading
+          if (driveDataBeforeUpload) {
           
           
           // NEW: Content-based conflict detection before upload
@@ -870,8 +905,10 @@ export function useGoogleDrive() {
           error: error instanceof Error ? error.message : 'Sync failed',
         }));
       }
-    }, SYNC_DEBOUNCE_MS);
-  }, []); // Empty deps - use refs for state to avoid stale closures
+      }, SYNC_DEBOUNCE_MS);
+    },
+    []
+  ); // Empty deps - use refs for state to avoid stale closures
 
   /** Notes were never included in trade-based auto-sync; push JSON when notes change locally. */
   useEffect(() => {
@@ -887,15 +924,8 @@ export function useGoogleDrive() {
       timeout = setTimeout(() => {
         const s = syncStateRef.current;
         if (!s.isConnected || !s.fileId || s.isSyncing) return;
-        const timeSinceLastDriveSync = Date.now() - lastDriveSyncTimeRef.current;
-        if (timeSinceLastDriveSync < 5000) {
-          console.log(
-            '⏸️ Notes-triggered Drive sync skipped (within 5s of Drive pull); edit again or wait to upload notes.'
-          );
-          return;
-        }
-        void syncToDrive(undefined, undefined)
-          .then(() => console.log('✅ Portfolio JSON (with notes) synced after note change'))
+        void syncToDrive(undefined, undefined, false, { bypassRecentSyncWindow: true })
+          .then(() => console.log('✅ Portfolio JSON (with merged notes) synced after note change'))
           .catch((err) => console.error('Notes-triggered Drive sync failed:', err));
       }, 1000);
     };
