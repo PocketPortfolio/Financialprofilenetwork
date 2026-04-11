@@ -12,6 +12,7 @@ import {
   parsePortfolioNotes,
   type PortfolioNotesState,
 } from '@/app/lib/portfolio/schema';
+import { mirrorPortfolioNotesJson } from '@/app/lib/store/portfolioNotesMirror';
 
 const STORAGE_KEY_TRADES = 'pocket-portfolio-local-trades';
 const STORAGE_KEY_PORTFOLIO = 'pocket-portfolio-local-portfolio';
@@ -162,7 +163,9 @@ export function loadPortfolioNotes(): PortfolioNotesState {
 
 export function savePortfolioNotes(notes: PortfolioNotesState): void {
   try {
-    localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
+    const json = JSON.stringify(notes);
+    localStorage.setItem(STORAGE_KEY_NOTES, json);
+    mirrorPortfolioNotesJson(json);
   } catch (error) {
     console.error('Error saving portfolio notes:', error);
   }
@@ -186,9 +189,16 @@ export function archiveAllTradeNotesFromTrades(trades: Pick<Trade, 'id' | 'ticke
   }
 }
 
-export function notifyPortfolioNotesChanged(): void {
+/** `drive-pull` / `tab-sync` skip Drive upload handlers; `user` is default. */
+export type PortfolioNotesChangeSource = 'user' | 'drive-pull' | 'tab-sync';
+
+export function notifyPortfolioNotesChanged(detail?: { source?: PortfolioNotesChangeSource }): void {
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('portfolio-notes-changed'));
+    window.dispatchEvent(
+      new CustomEvent('portfolio-notes-changed', {
+        detail: { source: detail?.source ?? 'user' },
+      })
+    );
   }
 }
 

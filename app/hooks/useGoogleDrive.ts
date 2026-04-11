@@ -873,6 +873,40 @@ export function useGoogleDrive() {
     }, SYNC_DEBOUNCE_MS);
   }, []); // Empty deps - use refs for state to avoid stale closures
 
+  /** Notes were never included in trade-based auto-sync; push JSON when notes change locally. */
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    const onNotesChanged = (e: Event) => {
+      const source = (e as CustomEvent<{ source?: string }>).detail?.source ?? 'user';
+      if (source === 'drive-pull' || source === 'tab-sync') return;
+
+      const state = syncStateRef.current;
+      if (!state.isConnected || !state.fileId) return;
+
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const s = syncStateRef.current;
+        if (!s.isConnected || !s.fileId || s.isSyncing) return;
+        const timeSinceLastDriveSync = Date.now() - lastDriveSyncTimeRef.current;
+        if (timeSinceLastDriveSync < 5000) {
+          console.log(
+            '⏸️ Notes-triggered Drive sync skipped (within 5s of Drive pull); edit again or wait to upload notes.'
+          );
+          return;
+        }
+        void syncToDrive(undefined, undefined)
+          .then(() => console.log('✅ Portfolio JSON (with notes) synced after note change'))
+          .catch((err) => console.error('Notes-triggered Drive sync failed:', err));
+      }, 1000);
+    };
+
+    window.addEventListener('portfolio-notes-changed', onNotesChanged);
+    return () => {
+      window.removeEventListener('portfolio-notes-changed', onNotesChanged);
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [syncToDrive]);
+
   /**
    * Sync portfolio data from Drive
    * @param fileId Optional file ID (uses stored ID if not provided)
@@ -1016,7 +1050,7 @@ export function useGoogleDrive() {
           const merged = mergePortfolioNotes(loadPortfolioNotes(), parsePortfolioNotes(driveData.notes));
           savePortfolioNotes(merged);
           // Refresh notes UI immediately; drive-sync-complete fires much later after Firebase work.
-          notifyPortfolioNotesChanged();
+          notifyPortfolioNotesChanged({ source: 'drive-pull' });
         }
         
         console.log('✅ Synced', driveData.trades.length, 'trades from Drive');
