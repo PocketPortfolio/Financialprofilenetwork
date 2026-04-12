@@ -670,7 +670,7 @@
     "date": "2026-04-12",
     "title": "Market Timing is Dead: What 10 Years of Data Shows",
     "slug": "market-timing-is-dead-what-10-years-of-data-shows",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -680,7 +680,8 @@
       "market"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-12T09:00:32.275Z"
   },
   {
     "id": "week-15-post-2",
