@@ -1627,7 +1627,7 @@
     "scheduledTime": "14:00",
     "title": "Building a CLI Tool with Node.js and Commander",
     "slug": "building-a-cli-tool-with-node-js-and-commander",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1635,7 +1635,8 @@
       "building",
       "cli",
       "tool"
-    ]
+    ],
+    "publishedAt": "2026-04-12T14:00:30.203Z"
   },
   {
     "id": "how-to-how-to-implement-oauth-2-0-in-your-application-apr-13",
