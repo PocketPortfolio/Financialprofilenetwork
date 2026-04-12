@@ -1629,7 +1629,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Progressive Web App Performance - Offline Capabilities",
     "slug": "research-progressive-web-app-performance-offline-capabilities-2026-04-12",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1637,7 +1637,8 @@
       "progressive",
       "web",
       "app"
-    ]
+    ],
+    "publishedAt": "2026-04-12T18:00:48.799Z"
   },
   {
     "id": "research-image-optimization-performance-webp-vs-avif-vs-jpeg-xl-2026-04-13",
