@@ -3,46 +3,49 @@ title: Building a CLI Tool with Node.js and Commander
 date: '2026-04-12'
 description: >-
   Learn how to build a Command Line Interface (CLI) tool using Node.js and the
-  Commander package.
+  Commander library.
 tags:
   - node.js
   - cli
-  - commander
   - tool
-  - development
+  - commander
 author: Pocket Portfolio Team
 image: /images/blog/building-a-cli-tool-with-node-js-and-commander.png
-pillar: Development
+pillar: Technology
 category: how-to-in-tech
 ---
 
+Building a Command Line Interface (CLI) tool can significantly enhance productivity by automating tasks and improving workflows. In this guide, we will build a simple CLI tool using Node.js and the Commander library, a popular choice for handling command-line arguments.
+
 ## Problem
 
-Developers often need to automate tasks and manage workflows efficiently. Creating a Command Line Interface (CLI) tool can streamline processes, enhance productivity, and improve user experience for repetitive tasks. However, building a CLI tool from scratch can seem daunting, especially when ensuring it handles arguments, options, and provides a seamless user interface.
+Creating a CLI tool from scratch involves dealing with argument parsing, command execution, and user feedback. This can be cumbersome and error-prone if handled manually. Fortunately, Node.js offers an ecosystem that simplifies these tasks, allowing developers to focus on the core functionality of their CLI applications.
 
-## Solution
+## Solution with Code
 
-Node.js, combined with the Commander package, offers a robust solution for developing CLI tools. Commander simplifies argument parsing and provides a feature-rich platform to build interactive command-line applications.
+To solve this problem, we will use Node.js along with the Commander library to handle command-line arguments efficiently. Follow the steps below to create your own CLI tool:
 
-### Setup
+### Step 1: Set Up Your Node.js Project
 
-To begin building your CLI tool:
+First, create a new directory for your project and initialize a Node.js project.
 
-1. **Initialize a Node.js project**:
-   ```bash
-   mkdir my-cli-tool
-   cd my-cli-tool
-   npm init -y
-   ```
+```bash
+mkdir my-cli-tool
+cd my-cli-tool
+npm init -y
+```
 
-2. **Install Commander**:
-   ```bash
-   npm install commander
-   ```
+### Step 2: Install Commander
 
-### Code Implementation
+Install the Commander package, which is a lightweight library for handling command-line arguments.
 
-Create an `index.js` file to start building your CLI tool:
+```bash
+npm install commander
+```
+
+### Step 3: Create Your CLI Tool
+
+Create an `index.js` file and set it up to use Commander to define commands and options.
 
 ```javascript
 #!/usr/bin/env node
@@ -52,7 +55,7 @@ const program = new Command();
 
 program
   .name('my-cli-tool')
-  .description('A simple CLI tool built with Node.js and Commander')
+  .description('A simple CLI tool example')
   .version('1.0.0');
 
 program
@@ -62,19 +65,12 @@ program
     console.log(`Hello, ${name}!`);
   });
 
-program
-  .option('-d, --debug', 'Output extra debugging');
-
 program.parse(process.argv);
-
-if (program.opts().debug) {
-  console.log('Debugging is enabled');
-}
 ```
 
-### Make the CLI Executable
+### Step 4: Make Your Script Executable
 
-Edit your `package.json` to include the `bin` field:
+Ensure your script can be executed directly from the command line by adding a shebang at the top of your `index.js` file (`#!/usr/bin/env node`) and updating your package.json to include a `bin` field.
 
 ```json
 "bin": {
@@ -82,35 +78,26 @@ Edit your `package.json` to include the `bin` field:
 }
 ```
 
-Change the permissions of `index.js` to make it executable:
+### Step 5: Link Your Tool
 
-```bash
-chmod +x index.js
-```
-
-### Key Concepts
-
-- **Commands**: Define specific actions the CLI tool can perform. Each command can take arguments and options.
-- **Options**: Flags or switches that modify the behavior of commands. Commander handles parsing automatically.
-- **Arguments**: Inputs required for commands to execute properly. Commander allows defining mandatory or optional arguments.
-- **Action Handlers**: Functions that execute when a command is called, allowing you to define the CLI's behavior.
-
-### Testing Your CLI
-
-Link your package globally to test from anywhere:
+Link your tool globally to test it from anywhere on your system.
 
 ```bash
 npm link
 ```
 
-Run your CLI tool:
+### Step 6: Run Your CLI Tool
+
+You can now run your CLI tool using:
 
 ```bash
-my-cli-tool greet John
+my-cli-tool greet World
 ```
 
-Output should be: `Hello, John!`
+## Key Concepts
 
-## Conclusion
+- **Node.js:** A JavaScript runtime built on Chrome's V8 JavaScript engine, ideal for building scalable network applications.
+- **Commander:** A minimalistic library for creating command-line interfaces, handling arguments, and generating help automatically.
+- **Shebang (`#!/usr/bin/env node`)**: A special syntax indicating that the script should be executed by Node.js.
 
-Building a CLI tool with Node.js and Commander is a straightforward process. With Commander, you can rapidly develop robust and user-friendly command-line applications, transforming how you automate and manage tasks.
+By following these steps, you have built a basic CLI tool with Node.js. This serves as a foundation for more complex CLI applications, enabling automation and efficiency in various tasks.
