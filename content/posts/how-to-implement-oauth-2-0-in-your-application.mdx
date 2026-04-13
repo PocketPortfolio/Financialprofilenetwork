@@ -2,84 +2,105 @@
 title: How to Implement OAuth 2.0 in Your Application
 date: '2026-04-13'
 description: >-
-  Learn how to integrate OAuth 2.0 into your application to enhance security and
-  user authentication.
+  Learn step-by-step how to integrate OAuth 2.0 into your application to secure
+  and manage user authentication efficiently.
 tags:
   - oauth
   - authentication
   - implementation
-  - security
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-oauth-2-0-in-your-application.png
 pillar: Technology
 category: how-to-in-tech
 ---
 
-## The Problem
+## Problem
 
-As web applications grow in complexity, the need for secure authentication mechanisms becomes critical. OAuth 2.0 is a robust protocol designed to allow secure delegated access. By implementing OAuth 2.0, you can enhance your application's security by enabling third-party services to interact with your app on behalf of users without sharing their credentials.
+As applications grow, managing user authentication becomes increasingly complex. OAuth 2.0 is a popular open standard for access delegation, commonly used to grant websites or applications limited access to user information without exposing passwords. Implementing OAuth 2.0 can streamline user authentication and improve security by leveraging third-party providers like Google, Facebook, or GitHub.
 
-## The Solution
+## Solution with Code
 
-To implement OAuth 2.0, you'll need to follow these steps:
+Below is a step-by-step guide to implementing OAuth 2.0 in a Node.js application using the `express` framework and `passport` library.
 
-1. **Register Your Application**: Begin by registering your application with the OAuth provider (e.g., Google, Facebook). You will receive a client ID and client secret, which are essential for making API requests.
+### Step 1: Install Required Packages
 
-2. **Redirect Users for Authorization**: Direct your users to the authorization URL of the provider. This URL typically includes the client ID, redirect URI, requested scopes, and a state parameter for CSRF protection.
+First, install the necessary packages:
 
-3. **Handle the Authorization Response**: After the user grants permission, they will be redirected back to your application with an authorization code in the URL.
+```bash
+npm install express passport passport-oauth2 express-session
+```
 
-4. **Exchange Authorization Code for Access Token**: Use the authorization code to request an access token from the OAuth provider's token endpoint.
+### Step 2: Set Up Your Express Server
 
-5. **Access Protected Resources**: With the access token, your application can now access the user's protected resources.
-
-### Sample Code
-
-Below is a basic example in Node.js using the `express` framework and the `axios` library for HTTP requests.
+Create a basic Express server in `server.js`:
 
 ```javascript
 const express = require('express');
-const axios = require('axios');
+const session = require('express-session');
+const passport = require('passport');
+const OAuth2Strategy = require('passport-oauth2');
+
 const app = express();
 
-const clientID = 'YOUR_CLIENT_ID';
-const clientSecret = 'YOUR_CLIENT_SECRET';
-const redirectURI = 'http://localhost:3000/callback';
+app.use(session({ secret: 'SECRET', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get('/login', (req, res) => {
-  const authorizationURI = `https://oauthprovider.com/auth?client_id=${clientID}&redirect_uri=${redirectURI}&response_type=code&scope=read`;
-  res.redirect(authorizationURI);
+passport.serializeUser((user, done) => {
+  done(null, user);
 });
 
-app.get('/callback', async (req, res) => {
-  const { code } = req.query;
-  try {
-    const response = await axios.post('https://oauthprovider.com/token', {
-      client_id: clientID,
-      client_secret: clientSecret,
-      code,
-      redirect_uri: redirectURI,
-      grant_type: 'authorization_code'
-    });
+passport.deserializeUser((obj, done) => {
+  done(null, obj);
+});
+```
 
-    const { access_token } = response.data;
-    // Use access_token to access protected resources
-    res.send('Login successful');
-  } catch (error) {
-    res.status(500).send('Authentication failed');
-  }
+### Step 3: Configure the OAuth 2.0 Strategy
+
+Configure your OAuth 2.0 strategy with your application's credentials:
+
+```javascript
+passport.use(new OAuth2Strategy({
+  authorizationURL: 'https://provider.com/oauth2/authorize',
+  tokenURL: 'https://provider.com/oauth2/token',
+  clientID: 'YOUR_CLIENT_ID',
+  clientSecret: 'YOUR_CLIENT_SECRET',
+  callbackURL: 'http://localhost:3000/auth/provider/callback'
+},
+(accessToken, refreshToken, profile, done) => {
+  User.findOrCreate({ oauthId: profile.id }, (err, user) => {
+    return done(err, user);
+  });
+}
+));
+```
+
+### Step 4: Set Up Routes for Authentication
+
+Define routes to initiate and handle the OAuth authentication process:
+
+```javascript
+app.get('/auth/provider', passport.authenticate('oauth2'));
+
+app.get('/auth/provider/callback', 
+  passport.authenticate('oauth2', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/profile');
+  });
+
+app.get('/profile', (req, res) => {
+  res.send(`Hello, ${req.user.displayName}`);
 });
 
 app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+  console.log('Server is running on http://localhost:3000');
 });
 ```
 
 ## Key Concepts
 
-- **Client ID and Secret**: Unique identifiers for your application.
-- **Authorization Code**: A temporary code provided after user authentication.
-- **Access Token**: A token used to access resources on behalf of the user.
-- **Scopes**: Permissions your application is requesting.
+- **OAuth 2.0**: An industry-standard protocol for authorization, allowing applications to access user data without exposing passwords.
+- **Passport.js**: A middleware for Node.js that simplifies the integration of various authentication strategies.
+- **Express**: A minimal and flexible Node.js web application framework for building web and mobile applications.
 
-By implementing OAuth 2.0, you can ensure a secure and efficient user authentication process, enhancing both security and user experience in your application.
+By following these steps, you can integrate OAuth 2.0 into your application, enhancing security and providing a seamless user authentication experience.
