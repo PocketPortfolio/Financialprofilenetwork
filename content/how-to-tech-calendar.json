@@ -1660,14 +1660,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Event-Driven Architecture",
     "slug": "understanding-event-driven-architecture",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "event",
       "driven"
-    ]
+    ],
+    "publishedAt": "2026-04-14T14:00:35.393Z"
   },
   {
     "id": "how-to-how-to-write-unit-tests-with-jest-apr-15",
