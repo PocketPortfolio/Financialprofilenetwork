@@ -1,0 +1,102 @@
+---
+title: Understanding Event-Driven Architecture
+date: '2026-04-14'
+description: >-
+  Learn the fundamentals of event-driven architecture, its key components, and
+  practical implementation through code examples.
+tags:
+  - event-driven architecture
+  - EDA
+  - software architecture
+  - real-time processing
+author: Pocket Portfolio Team
+image: /images/blog/understanding-event-driven-architecture.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Modern applications require the ability to handle high volumes of data in real-time, scale efficiently, and maintain loose coupling between components. Traditional request/response architectures often fall short in these areas, leading to bottlenecks and increased complexity. Event-Driven Architecture (EDA) provides an effective solution by enabling systems to react to events as they occur, promoting scalability and flexibility.
+
+## Solution with Code
+
+Event-Driven Architecture is centered around the production, detection, and reaction to events. Here’s a basic implementation using a Node.js environment with a message broker like RabbitMQ.
+
+### Setting Up RabbitMQ
+
+First, ensure RabbitMQ is installed and running. You can start RabbitMQ using Docker:
+
+```bash
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+
+### Producer (Event Emitter)
+
+Create a producer that publishes messages (events) to a queue.
+
+```javascript
+const amqp = require('amqplib/callback_api');
+
+amqp.connect('amqp://localhost', (err, connection) => {
+  if (err) throw err;
+
+  connection.createChannel((err, channel) => {
+    if (err) throw err;
+
+    const queue = 'event_queue';
+    const message = JSON.stringify({ eventType: 'USER_SIGNUP', data: { userId: 12345 } });
+
+    channel.assertQueue(queue, { durable: false });
+    channel.sendToQueue(queue, Buffer.from(message));
+
+    console.log(" [x] Sent %s", message);
+
+    setTimeout(() => {
+      connection.close();
+      process.exit(0);
+    }, 500);
+  });
+});
+```
+
+### Consumer (Event Listener)
+
+Create a consumer that listens for messages on the queue and processes them.
+
+```javascript
+const amqp = require('amqplib/callback_api');
+
+amqp.connect('amqp://localhost', (err, connection) => {
+  if (err) throw err;
+
+  connection.createChannel((err, channel) => {
+    if (err) throw err;
+
+    const queue = 'event_queue';
+
+    channel.assertQueue(queue, { durable: false });
+    console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue);
+
+    channel.consume(queue, (msg) => {
+      const event = JSON.parse(msg.content.toString());
+      console.log(" [x] Received %s", event);
+
+      // Handle event
+      if (event.eventType === 'USER_SIGNUP') {
+        // Perform actions related to user sign-up
+        console.log(`Processing signup for userId: ${event.data.userId}`);
+      }
+    }, { noAck: true });
+  });
+});
+```
+
+## Key Concepts
+
+- **Event Producer**: Generates events based on actions or changes in state.
+- **Event Consumer**: Reacts to events and performs necessary operations.
+- **Message Broker**: Facilitates communication between producers and consumers, ensuring decoupling and scalability.
+- **Event Stream**: Continuous flow of events that can be processed in real-time.
+
+Event-Driven Architecture allows applications to be more responsive and scalable by handling events asynchronously. This guide demonstrates a basic setup, but EDA can be expanded to integrate complex systems and workflows.
