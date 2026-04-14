@@ -1662,7 +1662,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Font Loading Strategies - Performance Impact",
     "slug": "research-font-loading-strategies-performance-impact-2026-04-14",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1670,7 +1670,8 @@
       "font",
       "loading",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-04-14T18:00:42.628Z"
   },
   {
     "id": "research-javascript-bundle-size-code-splitting-analysis-2026-04-15",
