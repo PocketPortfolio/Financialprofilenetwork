@@ -1,0 +1,90 @@
+---
+title: How to Write Unit Tests with Jest
+date: '2026-04-15'
+description: >-
+  Learn how to write effective unit tests using Jest to ensure your JavaScript
+  code is reliable and bug-free.
+tags:
+  - jest
+  - unit tests
+  - testing
+  - JavaScript
+author: Pocket Portfolio Team
+image: /images/blog/how-to-write-unit-tests-with-jest.png
+pillar: Tooling
+category: how-to-in-tech
+---
+
+## Problem
+
+In modern software development, ensuring code reliability and bug-free functionality is critical. Without proper testing, code changes can introduce new bugs, breaking existing functionalities. Unit testing is a fundamental practice to verify that individual units of code work as expected. Jest, a popular testing framework for JavaScript, simplifies the process of writing and running unit tests with minimal configuration.
+
+## Solution with Code
+
+Jest allows you to write unit tests that are easy to understand and maintain. Follow these steps to get started with writing unit tests using Jest:
+
+### Step 1: Install Jest
+
+First, ensure you have Node.js installed. Then, install Jest using npm:
+
+```bash
+npm install --save-dev jest
+```
+
+### Step 2: Configure Jest
+
+Add a test script to your `package.json` to run Jest:
+
+```json
+{
+  "scripts": {
+    "test": "jest"
+  }
+}
+```
+
+### Step 3: Write Your First Unit Test
+
+Create a simple JavaScript function to test. For example, a `sum` function:
+
+```javascript
+// sum.js
+function sum(a, b) {
+  return a + b;
+}
+
+module.exports = sum;
+```
+
+Now, write a unit test for the `sum` function:
+
+```javascript
+// sum.test.js
+const sum = require('./sum');
+
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+```
+
+### Step 4: Run Your Tests
+
+Execute the test using the script in your `package.json`:
+
+```bash
+npm test
+```
+
+Jest will automatically find and run the test, providing feedback on whether it passes or fails.
+
+## Key Concepts
+
+- **Test Suites and Test Cases**: A test suite is a collection of test cases. The `test` function is used to define a test case in Jest.
+  
+- **Matchers**: Jest uses matchers like `toBe()` to test the output of your functions. Matchers are used to assert that values meet certain conditions.
+
+- **Setup and Teardown**: Jest provides hooks such as `beforeEach()` and `afterEach()` to run code before and after each test case. This is useful for setting up test environments or cleaning up resources.
+
+- **Mock Functions**: Jest allows you to mock functions to isolate the code being tested from its dependencies, which is essential for unit testing.
+
+By following these steps and understanding these key concepts, you can effectively write unit tests using Jest, ensuring your codebase remains robust and maintainable as it evolves.
