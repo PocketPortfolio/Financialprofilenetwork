@@ -688,7 +688,7 @@
     "date": "2026-04-15",
     "title": "Data Sovereignty: The New Frontier of Financial Independence",
     "slug": "data-sovereignty-the-new-frontier-of-financial-independence",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -698,7 +698,8 @@
       "sovereignty:"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-15T09:00:43.513Z"
   },
   {
     "id": "week-16-post-1",
