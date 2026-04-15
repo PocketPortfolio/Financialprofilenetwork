@@ -1676,7 +1676,7 @@
     "scheduledTime": "14:00",
     "title": "How to Write Unit Tests with Jest",
     "slug": "how-to-write-unit-tests-with-jest",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1685,7 +1685,8 @@
       "write",
       "unit",
       "tests"
-    ]
+    ],
+    "publishedAt": "2026-04-15T14:00:57.092Z"
   },
   {
     "id": "how-to-the-complete-guide-to-error-handling-in-typescript-apr-16",
