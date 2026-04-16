@@ -2,95 +2,88 @@
 title: The Complete Guide to Error Handling in TypeScript
 date: '2026-04-16'
 description: >-
-  Learn how to efficiently handle errors in TypeScript applications by
-  leveraging its type system and best practices.
+  Learn how to effectively handle errors in TypeScript to create robust
+  applications.
 tags:
   - typescript
   - error handling
   - guide
+  - programming
 author: Pocket Portfolio Team
 image: /images/blog/the-complete-guide-to-error-handling-in-typescript.png
 pillar: Engineering
 category: how-to-in-tech
 ---
 
-Handling errors in TypeScript can be challenging, especially when working with asynchronous code and complex data flows. This guide will explore how to effectively manage errors, ensuring your applications are robust and maintainable.
+Error handling in TypeScript is crucial for building resilient applications. Without proper error handling, your application might crash or behave unpredictably. This guide provides a comprehensive approach to managing errors in TypeScript by exploring problem scenarios, solutions, and key concepts.
 
-## Problem
+### Problem
 
-JavaScript's dynamic nature often leads to runtime errors that are hard to predict and catch. TypeScript introduces static typing, which can prevent many errors at compile time. However, runtime errors still occur, and handling these efficiently is crucial for application stability.
+In JavaScript, errors can occur due to various reasons such as unexpected user inputs, failed network requests, or bugs in the code. TypeScript enhances JavaScript by adding static types, which can catch some errors at compile time. However, runtime errors still need to be managed effectively.
 
-## Solution with Code
+### Solution
 
-To handle errors in TypeScript, follow these steps:
+TypeScript offers several strategies for error handling that can be categorized into synchronous and asynchronous methods.
 
-1. **Use try-catch Blocks for Synchronous Code**: Use `try-catch` statements to handle errors in synchronous operations.
+#### Synchronous Error Handling
 
-   ```typescript
-   function parseJson(jsonString: string): object {
-     try {
-       return JSON.parse(jsonString);
-     } catch (error) {
-       console.error('Parsing error:', error);
-       throw new Error('Invalid JSON format');
-     }
-   }
-   ```
+Use `try...catch` blocks to handle errors that occur during the execution of a synchronous block of code. Here is an example:
 
-2. **Handle Asynchronous Errors with async-await**: For async operations, use `try-catch` blocks around `await` keywords.
+```typescript
+function parseJSON(jsonString: string): any {
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+    return null;
+  }
+}
+```
 
-   ```typescript
-   async function fetchData(url: string): Promise<any> {
-     try {
-       const response = await fetch(url);
-       if (!response.ok) {
-         throw new Error(`HTTP error! status: ${response.status}`);
-       }
-       return await response.json();
-     } catch (error) {
-       console.error('Fetch error:', error);
-       throw new Error('Data fetching failed');
-     }
-   }
-   ```
+In this example, if `JSON.parse` throws an error, the catch block handles it gracefully by logging the error and returning `null`.
 
-3. **Utilize TypeScript's Union Types for Error Handling**: Define a result type that encompasses both success and error states.
+#### Asynchronous Error Handling
 
-   ```typescript
-   type Result<T> = { success: true, data: T } | { success: false, error: Error };
+For asynchronous operations, especially those involving Promises, use `.catch()` or `try...catch` within an `async` function.
 
-   function performOperation(): Result<number> {
-     try {
-       // Simulate operation
-       const result = 42;
-       return { success: true, data: result };
-     } catch (error) {
-       return { success: false, error: new Error('Operation failed') };
-     }
-   }
-   ```
+```typescript
+async function fetchData(url: string): Promise<any> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    return null;
+  }
+}
+```
 
-4. **Create Custom Error Classes**: Extend the built-in `Error` class to create domain-specific errors.
+Here, errors from the `fetch` operation and non-OK HTTP responses are handled, ensuring that the function returns `null` instead of propagating the error.
+
+### Key Concepts
+
+1. **Type Safety with Error Types**: TypeScript allows you to define custom error types, which can provide more context and ensure type safety. For example:
 
    ```typescript
-   class ValidationError extends Error {
-     constructor(message: string) {
+   class CustomError extends Error {
+     constructor(public message: string, public code: number) {
        super(message);
-       this.name = 'ValidationError';
-     }
-   }
-
-   function validateInput(input: string) {
-     if (input.length < 5) {
-       throw new ValidationError('Input must be at least 5 characters long');
+       this.name = "CustomError";
      }
    }
    ```
 
-## Key Concepts
+2. **Never Type**: Utilize the `never` type for functions that never return, such as those that always throw an error:
 
-- **Static Typing**: Leverage TypeScript's static typing to catch errors early during development.
-- **Union Types**: Use union types to represent operations that can result in success or failure, improving code clarity.
-- **Custom Errors**: Implement custom error classes to provide more meaningful error information and improve debugging.
+   ```typescript
+   function fail(message: string): never {
+     throw new Error(message);
+   }
+   ```
 
-By adopting these strategies, you can significantly reduce runtime errors and enhance the reliability of your TypeScript applications. Remember, the key to effective error handling is anticipating potential failures and planning for them appropriately.
+3. **Error Propagation**: Always ensure that errors do not fail silently. Handle them or propagate them to a higher-level handler that can make sense of the error context and act appropriately.
+
+By effectively using these techniques, you can manage errors gracefully in your TypeScript applications, leading to more robust and maintainable code. Remember to always test error handling logic thoroughly to ensure your application behaves as expected in all scenarios.
