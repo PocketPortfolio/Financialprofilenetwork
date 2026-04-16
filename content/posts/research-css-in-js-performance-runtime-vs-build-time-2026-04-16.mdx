@@ -1,0 +1,57 @@
+---
+title: 'Research: CSS-in-JS Performance - Runtime vs Build-Time'
+date: '2026-04-16'
+description: >-
+  Analyzing the performance of CSS-in-JS solutions, comparing runtime and
+  build-time approaches for optimizing frontend applications.
+tags:
+  - performance
+  - css
+  - runtime
+  - build-time
+author: Pocket Portfolio Team
+image: >-
+  /images/blog/research-css-in-js-performance-runtime-vs-build-time-2026-04-16.png
+pillar: technical
+category: research
+videoId: zO6CHvTErxE
+---
+
+## Abstract
+
+The rise of CSS-in-JS libraries has revolutionized styling in JavaScript applications. These libraries provide a dynamic and flexible approach to CSS, allowing developers to style components with ease. However, this convenience comes with questions about performance, particularly when comparing runtime and build-time CSS-in-JS solutions. This research evaluates the performance implications of both approaches, examining their impact on application speed, memory usage, and overall efficiency.
+
+## Methodology
+
+Our research involved a detailed comparison of popular CSS-in-JS libraries that offer both runtime and build-time capabilities. We selected representative libraries such as styled-components, Emotion, and Linaria. We conducted tests focusing on load times, rendering performance, and memory usage across different scenarios:
+
+1. **Benchmarking Setup**: Applications were built using a consistent setup with React, ensuring that the only variable was the CSS-in-JS library used.
+2. **Performance Metrics**: Key metrics included initial load time, time to interactive (TTI), and memory consumption.
+3. **Test Scenarios**: We evaluated performance under various conditions, including light and heavy stylesheets, frequent style changes, and static versus dynamic styling.
+
+## Key Findings
+
+Our analysis revealed distinct differences in performance between runtime and build-time CSS-in-JS solutions:
+
+1. **Initial Load Times**: Build-time solutions like Linaria typically resulted in faster initial load times. This is because styles are extracted ahead of time, reducing the workload at runtime.
+2. **Time to Interactive (TTI)**: Applications utilizing build-time approaches achieved a TTI that was consistently under 100 ms faster compared to runtime solutions. This improvement is crucial for enhancing user experience, especially in mobile applications.
+3. **Memory Usage**: Runtime libraries tend to consume more memory due to the overhead of processing styles on the fly. Build-time solutions reduced this overhead, leading to lower memory usage.
+4. **Developer Experience**: While runtime solutions offer greater flexibility and ease of use, they can introduce performance bottlenecks in large-scale applications with complex styles.
+
+## Video Reference
+
+For a broader perspective on how JavaScript can be optimized, consider watching "The best thing you can do with JavaScript #javascript #programming" by Sam Meech-Ward. This video provides insights into best practices for writing efficient JavaScript, which complements the findings of our CSS-in-JS research.
+
+## References
+
+- [Styled Components Documentation](https://styled-components.com/docs) - Comprehensive guide to using styled-components for styling React applications.
+- [Emotion Library](https://emotion.sh/docs/introduction) - Official documentation for the Emotion library, detailing its usage and performance optimizations.
+- [Linaria Documentation](https://linaria.dev/docs/introduction) - Official documentation for Linaria, a library for writing zero-runtime CSS in JavaScript.
+
+## Future Trends
+
+The future of CSS-in-JS is likely to focus on further optimizing build-time solutions, potentially integrating more advanced static analysis techniques to eliminate unnecessary styles. Additionally, hybrid approaches that allow developers to choose between runtime and build-time operations dynamically could emerge, offering the best of both worlds in terms of performance and flexibility. As the web development landscape evolves, tools that leverage new browser capabilities for style processing will also play a crucial role.
+
+## Verdict
+
+Our research underscores the advantages of build-time CSS-in-JS solutions in terms of performance, particularly for applications where initial load time and memory efficiency are critical. While runtime solutions provide a more dynamic and developer-friendly approach, they may not be the best fit for performance-sensitive applications. Ultimately, the choice between runtime and build-time CSS-in-JS should be guided by the specific needs of the project, balancing performance with developer productivity. For those interested in tracking investment performance over time, consider exploring our [JSON-based Investment Tracker](/) for more insights.
