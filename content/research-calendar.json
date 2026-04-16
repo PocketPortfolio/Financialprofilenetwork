@@ -1695,14 +1695,15 @@
     "scheduledTime": "18:00",
     "title": "Research: CSS-in-JS Performance - Runtime vs Build-Time",
     "slug": "research-css-in-js-performance-runtime-vs-build-time-2026-04-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "css",
       "runtime"
-    ]
+    ],
+    "publishedAt": "2026-04-16T18:00:57.331Z"
   },
   {
     "id": "research-state-management-overhead-redux-vs-zustand-vs-jotai-2026-04-17",
