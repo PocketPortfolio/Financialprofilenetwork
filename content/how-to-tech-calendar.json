@@ -1711,7 +1711,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use Prisma ORM with Next.js",
     "slug": "how-to-use-prisma-orm-with-next-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1719,7 +1719,8 @@
       "prisma",
       "use",
       "orm"
-    ]
+    ],
+    "publishedAt": "2026-04-17T14:00:31.920Z"
   },
   {
     "id": "how-to-building-a-real-time-chat-application-apr-18",
