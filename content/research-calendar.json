@@ -1711,7 +1711,7 @@
     "scheduledTime": "18:00",
     "title": "Research: State Management Overhead - Redux vs Zustand vs Jotai",
     "slug": "research-state-management-overhead-redux-vs-zustand-vs-jotai-2026-04-17",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1719,7 +1719,8 @@
       "state",
       "management",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-04-17T18:01:02.524Z"
   },
   {
     "id": "research-virtual-scrolling-performance-large-list-rendering-2026-04-18",
