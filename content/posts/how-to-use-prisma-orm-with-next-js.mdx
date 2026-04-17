@@ -1,0 +1,122 @@
+---
+title: How to Use Prisma ORM with Next.js
+date: '2026-04-17'
+description: >-
+  Learn how to integrate Prisma ORM with Next.js to streamline your database
+  interactions.
+tags:
+  - next.js
+  - prisma
+  - ORM
+  - database
+  - web development
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-prisma-orm-with-next-js.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+## Problem
+
+Building scalable applications with Next.js often requires efficient database management. Traditional ORM solutions can be cumbersome, leading to complex queries and maintenance challenges. As applications grow, maintaining performance and ease of access to database operations becomes critical.
+
+## Solution with Code
+
+Prisma ORM offers a modern solution that integrates seamlessly with Next.js. It provides type-safe database interaction, making it easier to manage complex queries and streamline development.
+
+### Step 1: Set Up the Project
+
+Initialize a new Next.js project and install necessary dependencies:
+
+```bash
+npx create-next-app@latest my-next-prisma-app
+cd my-next-prisma-app
+npm install prisma --save-dev
+npm install @prisma/client
+```
+
+### Step 2: Initialize Prisma
+
+Set up Prisma in your project:
+
+```bash
+npx prisma init
+```
+
+This command creates a `prisma` directory with a `schema.prisma` file. Edit this file to define your data model:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+}
+```
+
+### Step 3: Configure the Database
+
+Ensure your `.env` file includes the `DATABASE_URL`:
+
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
+```
+
+### Step 4: Migrate the Database
+
+Run the following command to create your database schema:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+### Step 5: Generate Prisma Client
+
+Generate the Prisma Client to interact with your database:
+
+```bash
+npx prisma generate
+```
+
+### Step 6: Use Prisma in Next.js
+
+Create `pages/api/posts.js` to use Prisma Client:
+
+```javascript
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export default async function handler(req, res) {
+  if (req.method === 'GET') {
+    const posts = await prisma.post.findMany();
+    res.json(posts);
+  } else if (req.method === 'POST') {
+    const { title, content } = req.body;
+    const newPost = await prisma.post.create({
+      data: {
+        title,
+        content,
+      },
+    });
+    res.json(newPost);
+  }
+}
+```
+
+## Key Concepts
+
+- **Prisma Schema**: Central to defining your database models and their relationships.
+- **Prisma Client**: Auto-generated and provides type-safe database queries.
+- **Migrations**: Prisma's migration system to track and apply schema changes.
+
+By integrating Prisma ORM with Next.js, you simplify database operations, enhance type safety, and improve overall application performance. This setup enables you to focus more on building features and less on managing database interactions.
