@@ -30,3 +30,5 @@ export type { BrokerId, RawFile, NormalizedTrade, ParseResult, BrokerAdapter, } 
 export { detectBroker, ADAPTERS } from './registry';
 export { parseUniversal, genericParse, genericRowToTrade, inferMapping } from './universal';
 export type { UniversalMapping, RequiresMappingResult, StandardField, InferMappingInput, InferMappingOutput, } from './universal';
+/** Column header normalization for client-side fuzzy pre-pass (CSV first row). */
+export { SYNONYMS, normalizeHeader, headerMatchesSynonym } from './universal/synonyms';

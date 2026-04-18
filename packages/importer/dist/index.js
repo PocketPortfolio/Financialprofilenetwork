@@ -13,7 +13,7 @@
  * ```
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.inferMapping = exports.genericRowToTrade = exports.genericParse = exports.parseUniversal = exports.ADAPTERS = exports.detectBroker = void 0;
+exports.headerMatchesSynonym = exports.normalizeHeader = exports.SYNONYMS = exports.inferMapping = exports.genericRowToTrade = exports.genericParse = exports.parseUniversal = exports.ADAPTERS = exports.detectBroker = void 0;
 exports.detectBrokerFromSample = detectBrokerFromSample;
 exports.parseCSV = parseCSV;
 const registry_1 = require("./registry");
@@ -83,3 +83,8 @@ Object.defineProperty(exports, "parseUniversal", { enumerable: true, get: functi
 Object.defineProperty(exports, "genericParse", { enumerable: true, get: function () { return universal_1.genericParse; } });
 Object.defineProperty(exports, "genericRowToTrade", { enumerable: true, get: function () { return universal_1.genericRowToTrade; } });
 Object.defineProperty(exports, "inferMapping", { enumerable: true, get: function () { return universal_1.inferMapping; } });
+/** Column header normalization for client-side fuzzy pre-pass (CSV first row). */
+var synonyms_1 = require("./universal/synonyms");
+Object.defineProperty(exports, "SYNONYMS", { enumerable: true, get: function () { return synonyms_1.SYNONYMS; } });
+Object.defineProperty(exports, "normalizeHeader", { enumerable: true, get: function () { return synonyms_1.normalizeHeader; } });
+Object.defineProperty(exports, "headerMatchesSynonym", { enumerable: true, get: function () { return synonyms_1.headerMatchesSynonym; } });

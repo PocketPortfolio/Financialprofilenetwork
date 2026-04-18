@@ -107,6 +107,9 @@ export type {
   InferMappingOutput,
 } from './universal';
 
+/** Column header normalization for client-side fuzzy pre-pass (CSV first row). */
+export { SYNONYMS, normalizeHeader, headerMatchesSynonym } from './universal/synonyms';
+
 
 
 

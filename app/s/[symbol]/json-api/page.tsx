@@ -12,6 +12,7 @@ import JsonApiNpmSnippet from '@/app/components/JsonApiNpmSnippet';
 import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import TickerCsvDownload from '@/app/components/TickerCsvDownload';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
+import JsonApiStickyPrompt from '@/app/components/JsonApiStickyPrompt';
 import Link from 'next/link';
 
 
@@ -290,11 +291,15 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '32px 16px'
+        padding: '32px 16px 120px',
       }}>
         <div style={{
           maxWidth: '896px',
-          margin: '0 auto'
+          margin: '0 auto',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '16px',
+          padding: '24px 20px 28px',
+          background: 'linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, transparent 48%)',
         }}>
           {/* HEADER: The "Unique" Hook */}
           <div style={{
@@ -307,7 +312,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             <span style={{
               fontSize: '12px',
               fontFamily: 'monospace',
-              color: '#34d399',
+              color: 'var(--accent-warm)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               fontWeight: '600'
@@ -363,7 +368,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             <Link 
               href={`/s/${normalizedSymbol.toLowerCase()}`} 
               style={{
-                color: '#34d399',
+                color: 'var(--accent-warm)',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -433,15 +438,15 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             <div>
               {/* 💰 MONETIZATION: Sovereign Sync Upsell */}
               <div style={{
-                background: 'linear-gradient(135deg, rgba(5, 46, 22, 0.3) 0%, rgba(15, 23, 42, 0.5) 100%)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(15, 23, 42, 0.55) 100%)',
+                border: '1px solid var(--border-warm)',
                 borderRadius: '12px',
                 padding: '32px',
                 textAlign: 'center',
                 marginBottom: '24px'
               }}>
                 <div style={{
-                  background: 'rgba(16, 185, 129, 0.2)',
+                  background: 'rgba(245, 158, 11, 0.15)',
                   width: '48px',
                   height: '48px',
                   borderRadius: '50%',
@@ -476,15 +481,16 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
                     display: 'inline-block',
                     width: '100%',
                     padding: '12px 24px',
-                    background: '#10b981',
-                    color: '#000000',
+                    background: 'var(--accent-warm)',
+                    color: '#0a0a0a',
                     borderRadius: '8px',
                     textDecoration: 'none',
                     fontWeight: '700',
                     fontSize: '15px',
                     transition: 'all 0.2s',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    border: '1px solid rgba(245, 158, 11, 0.55)',
                   }}
                 >
                   Enable Sovereign Sync
@@ -541,6 +547,10 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           </div>
         </div>
       </div>
+      <JsonApiStickyPrompt
+        dashboardHref={`/dashboard?utm_source=json_api&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
+        contextId={normalizedSymbol.toLowerCase()}
+      />
       </div>
     </>
   );

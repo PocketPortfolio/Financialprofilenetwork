@@ -66,13 +66,17 @@ export default function JsonApiLivePreview({
   };
 
   return (
-    <div style={{
-      background: 'var(--surface)',
-      border: '2px solid var(--border-warm)',
-      borderRadius: '12px',
-      overflow: 'hidden',
-      marginBottom: '24px'
-    }}>
+    <div
+      id="json-api-live-preview-root"
+      style={{
+        background: 'var(--surface)',
+        border: '2px solid var(--border-warm)',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        marginBottom: '24px',
+        boxShadow: '0 0 0 1px rgba(245, 158, 11, 0.12)',
+      }}
+    >
       <div style={{
         background: 'var(--surface-elevated)',
         padding: '12px 16px',

@@ -5,9 +5,11 @@ import {
   trackCSVImportSuccess,
   trackCSVImportStart,
   trackCSVImportError,
+  trackCSVImportHeaderAutofix,
   trackPaywallCtaClick,
   trackPaywallImpression,
 } from '../lib/analytics/events';
+import { prepareCsvForImport } from '../lib/csv/headerAliases';
 import { parseCSV as parseCSVAdapter, detectBrokerFromSample, genericParse, parseUniversal } from '@pocket-portfolio/importer';
 import { detectBroker } from '@pocket-portfolio/importer';
 import type { BrokerId, NormalizedTrade, RequiresMappingResult } from '@pocket-portfolio/importer';
@@ -1334,12 +1336,22 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
     debugLog('STEP_START', { fileName: file.name, size: file.size });
 
     try {
-      const csvContent = await file.text();
+      const csvContentRaw = await file.text();
+      const prepared = prepareCsvForImport(csvContentRaw, file.name);
+      if (prepared.fixesApplied.length > 0) {
+        try {
+          trackCSVImportHeaderAutofix({
+            count: prepared.fixesApplied.length,
+            preview: prepared.fixesApplied.slice(0, 8).join(' | '),
+          });
+        } catch {
+          /* non-fatal */
+        }
+      }
+      const csvContent = prepared.csvText;
+      const rawFile = prepared.rawFile;
       debugLog('STEP_FILE_READ', { contentLength: csvContent.length, firstLine: csvContent.split('\n')[0]?.slice(0, 80) });
       console.log('CSV content read successfully');
-
-      // Convert File to RawFile format for adapter system
-      const rawFile = fileToRawFile(file);
 
       // Auto-detect broker from CSV sample
       const sample = csvContent.slice(0, 2048);
@@ -2020,8 +2032,12 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         errorMessage: errMsg
       });
       showAlert(
-        'Import Error',
-        `Error processing CSV file. Please check the format and try again.\n\nError: ${errMsg}`,
+        'Sovereign alignment guide',
+        `We could not parse this CSV. Check the following, then try again:\n\n` +
+          `• Export is a trade history CSV (not PDF).\n` +
+          `• The first row lists column headers (Date, Ticker/Symbol, Quantity, Price, etc.).\n` +
+          `• For broker-specific steps, open the import guide from your broker on pocketportfolio.app/import.\n\n` +
+          `Technical detail: ${errMsg}`,
         'error'
       );
     } finally {

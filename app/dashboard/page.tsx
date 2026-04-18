@@ -91,6 +91,20 @@ interface Position {
   totalInvested: number;
 }
 
+const DASHBOARD_DEMO_SEED_DATE = '2025-01-15';
+
+/** Deterministic mock rows for cold-start / “Play with demo” (importTrades shape). */
+function buildDashboardDemoSeedTrades(): Omit<
+  Trade,
+  'id' | 'uid' | 'createdAt' | 'updatedAt'
+>[] {
+  return [
+    { ticker: 'AAPL', qty: 10, price: 175, date: DASHBOARD_DEMO_SEED_DATE, type: 'BUY', currency: 'USD', mock: true },
+    { ticker: 'MSFT', qty: 6, price: 380, date: DASHBOARD_DEMO_SEED_DATE, type: 'BUY', currency: 'USD', mock: true },
+    { ticker: 'VOO', qty: 4, price: 495, date: DASHBOARD_DEMO_SEED_DATE, type: 'BUY', currency: 'USD', mock: true },
+  ];
+}
+
 export default function Dashboard() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   // const { selectedPortfolio, selectedPortfolioId } = usePortfolios();
@@ -128,7 +142,52 @@ export default function Dashboard() {
     fees: ''
   });
   const [isMockTrade, setIsMockTrade] = useState(false);
-  
+  const [showDemoTerminalBanner, setShowDemoTerminalBanner] = useState(false);
+  const autoDemoColdStartRef = React.useRef(false);
+
+  // One-shot cold-start demo: after hydration, if still empty and user has not dismissed demo before.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (autoDemoColdStartRef.current) return;
+    if (sessionStorage.getItem('pp_dashboard_demo_dismissed')) return;
+    if (sessionStorage.getItem('pp_dashboard_demo_auto_v1')) return;
+
+    const timer = window.setTimeout(async () => {
+      if (autoDemoColdStartRef.current) return;
+      if (sessionStorage.getItem('pp_dashboard_demo_dismissed')) return;
+      if (sessionStorage.getItem('pp_dashboard_demo_auto_v1')) return;
+      if (tradesRef.current.length > 0) return;
+
+      autoDemoColdStartRef.current = true;
+      try {
+        await importTrades(buildDashboardDemoSeedTrades());
+        sessionStorage.setItem('pp_dashboard_demo_auto_v1', '1');
+        setShowDemoTerminalBanner(true);
+        trackEvent('dashboard_demo_shown', { source: 'auto_cold_start' });
+      } catch {
+        autoDemoColdStartRef.current = false;
+      }
+    }, 1100);
+
+    return () => clearTimeout(timer);
+  }, [importTrades]);
+
+  const dismissDemoPortfolio = React.useCallback(async () => {
+    const mockIds = trades.filter((t) => t.mock).map((t) => t.id);
+    for (const id of mockIds) {
+      try {
+        await deleteTrade(id);
+      } catch {
+        /* continue */
+      }
+    }
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('pp_dashboard_demo_dismissed', '1');
+    }
+    setShowDemoTerminalBanner(false);
+    trackEvent('dashboard_demo_dismissed', { source: 'banner' });
+  }, [trades, deleteTrade]);
+
   // Debug authentication state (reduced logging)
   // console.log('🔐 Auth state:', { isAuthenticated, user: user?.email, loading: false });
   
@@ -1623,6 +1682,45 @@ export default function Dashboard() {
               </Link>
             </div>
           )}
+          {showDemoTerminalBanner &&
+            realTrades.length === 0 &&
+            trades.length > 0 &&
+            trades.every((t) => t.mock) && (
+              <div
+                style={{
+                  margin: '0 16px 12px',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border-warm)',
+                  background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, transparent 100%)',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                }}
+              >
+                <div style={{ fontSize: '13px', color: 'var(--text)', fontWeight: 600 }}>
+                  Projected Sovereign Terminal — demo portfolio (local only until you import CSV).
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void dismissDemoPortfolio()}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-subtle)',
+                    background: 'var(--surface)',
+                    color: 'var(--text)',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Use my real portfolio
+                </button>
+              </div>
+            )}
           {/* 🎨 INTELLIGENCE LAYER - Above everything */}
           {trades.length > 0 && (
             <MorningBrief 
@@ -2505,12 +2603,13 @@ export default function Dashboard() {
 
             <button
               onClick={() => {
-                const demoTrades = [
-                  { ticker: 'AAPL', qty: 10, price: 150, date: new Date().toISOString().split('T')[0], type: 'BUY' as const, currency: 'USD', mock: true },
-                  { ticker: 'TSLA', qty: 5, price: 200, date: new Date().toISOString().split('T')[0], type: 'BUY' as const, currency: 'USD', mock: true },
-                  { ticker: 'NVDA', qty: 8, price: 400, date: new Date().toISOString().split('T')[0], type: 'BUY' as const, currency: 'USD', mock: true },
-                ];
-                importTrades(demoTrades);
+                void importTrades(buildDashboardDemoSeedTrades()).then(() => {
+                  if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('pp_dashboard_demo_auto_v1', 'manual');
+                  }
+                  setShowDemoTerminalBanner(true);
+                  trackEvent('dashboard_demo_shown', { source: 'manual_button' });
+                });
               }}
               style={{
                 marginTop: '8px',

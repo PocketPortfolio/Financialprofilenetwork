@@ -504,7 +504,10 @@ export function AskAIModal({
             />
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => {
+                trackEvent('ai_attachment_button_click', { is_paid: Boolean(isPaid) });
+                fileInputRef.current?.click();
+              }}
               disabled={attachmentProcessing || isLoading}
               aria-label="Add file"
               style={{
@@ -691,12 +694,12 @@ export function AskAIModal({
           >
             <div style={{ textAlign: 'center', maxWidth: '340px' }}>
               <p style={{ margin: '0 0 8px', fontSize: '15px', fontWeight: 600 }}>
-                Local processing complete
+                Deep document reasoning (Pro)
               </p>
               <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))', lineHeight: 1.5 }}>
                 {attachmentUpsellRowCount !== null
-                  ? `${attachmentUpsellRowCount.toLocaleString()} row${attachmentUpsellRowCount === 1 ? '' : 's'} normalized. Upgrade to Founders Club to analyze this anonymous payload with Pocket Analyst.`
-                  : 'Upgrade to Founders Club or Corporate to analyze file attachments with Pocket Analyst.'}
+                  ? `${attachmentUpsellRowCount.toLocaleString()} row${attachmentUpsellRowCount === 1 ? '' : 's'} normalized locally. Your data stays at the edge; Founders Club unlocks Pocket Analyst on this payload.`
+                  : 'Your data stays at the edge; Founders Club or Corporate unlocks Pocket Analyst on file attachments.'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <button
@@ -709,7 +712,7 @@ export function AskAIModal({
                     display: 'block',
                     padding: '12px 20px',
                     borderRadius: '8px',
-                    background: 'var(--warning)',
+                    background: 'var(--accent-warm)',
                     color: '#000',
                     fontSize: '14px',
                     fontWeight: 600,
@@ -721,7 +724,7 @@ export function AskAIModal({
                     opacity: checkoutLoading ? 0.85 : 1,
                   }}
                 >
-                  {checkoutLoading ? 'Taking you to checkout…' : "Upgrade to Founder's Club or Corporate"}
+                  {checkoutLoading ? 'Taking you to checkout…' : "Unlock Founder's Club or Corporate"}
                 </button>
                 <button
                   type="button"

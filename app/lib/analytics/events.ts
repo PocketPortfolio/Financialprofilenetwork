@@ -89,6 +89,18 @@ export function trackCSVImportError(error?: string | { errorType?: string; error
   }
 }
 
+/** Header row was auto-corrected via synonym/fuzzy pass (low-cardinality summary). */
+export function trackCSVImportHeaderAutofix(params: { count: number; preview?: string }) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'csv_import_header_autofix', {
+      event_category: 'CSV Import',
+      event_label: 'header_normalize',
+      value: params.count,
+      ...(params.preview ? { custom_parameter_preview: params.preview.slice(0, 120) } : {}),
+    });
+  }
+}
+
 // Portfolio tracking events
 export function trackPortfolioView() {
   if (typeof window !== 'undefined' && window.gtag) {
