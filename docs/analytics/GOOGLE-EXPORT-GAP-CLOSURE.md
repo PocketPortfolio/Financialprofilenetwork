@@ -41,7 +41,7 @@ Toggle **on** for events that already fire from the app (verify spelling in DevT
 | `ai_attachment_button_click` | Paperclip attempts |
 | `csv_import_header_autofix` | Header normalization (optional diagnostic) |
 
-**Ecommerce:** If revenue is tracked only in Stripe, either implement GA4 **`purchase`** with `value` + `currency` on success, or document that **revenue KPI lives in Stripe** and GA4 tracks **intent** only.
+**Ecommerce:** The app fires GA4 **`purchase`** (`transaction_id`, `value`, `currency`, `items`) from [`/sponsor/success`](../../app/sponsor/success/page.tsx) after [`GET /api/stripe/checkout-session/[sessionId]`](../../app/api/stripe/checkout-session/[sessionId]/route.ts) confirms `payment_status === 'paid'`. Mark **`purchase`** as a **Key event** in GA4 Admin. **Stripe** remains the financial source of truth.
 
 ### 1.2 Custom dimensions (Admin → Custom definitions)
 
@@ -129,13 +129,18 @@ Build a **single-page** dashboard (or two tabs):
 
 **Tab B — Monetization**
 
-- `paywall_impression` → `paywall_cta_click` → `checkout_start` → `checkout_success_page_view`
+- `paywall_impression` → `paywall_cta_click` → `checkout_start` → **`purchase`** (and optional `checkout_success_page_view`)
 - Breakdown: **event-scoped** `trigger_source`, `cta_id`
 
 **Tab C — Bridge**
 
 - Sessions with landing page containing `json-api` (exploration)
 - Event: `bridge_to_terminal_cta_click` with `cta_id`
+
+### Internal `/admin/analytics` (Firestore + Stripe)
+
+- The page calls [`GET /api/admin/analytics`](../../app/api/admin/analytics/route.ts) with **`cache: 'no-store'`**, a **cache-busting query**, and **`Cache-Control: no-store`** on the JSON response.
+- **Auto-refresh every 45 seconds** plus a **Refresh now** control for near–real-time operations review (still bounded by Stripe/Firestore API latency).
 
 ---
 

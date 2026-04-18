@@ -408,6 +408,63 @@ export function trackCheckoutError(
   });
 }
 
+const STRIPE_CHECKOUT_ANALYTICS_KEY = 'pp_stripe_checkout_analytics_';
+
+export type StripeCheckoutAnalyticsItem = {
+  item_id: string;
+  item_name: string;
+  price: number;
+  quantity: number;
+};
+
+/**
+ * GA4 recommended ecommerce `purchase` + existing `checkout_success_page_view`.
+ * Deduplicated per Stripe Checkout session id (browser sessionStorage).
+ */
+export function trackStripeCheckoutCompleteAnalytics(args: {
+  transaction_id: string;
+  value: number;
+  currency: string;
+  items: StripeCheckoutAnalyticsItem[];
+  tier_name?: string | null;
+  has_api_key_hint?: boolean | null;
+}) {
+  if (typeof window === 'undefined') return;
+  const key = STRIPE_CHECKOUT_ANALYTICS_KEY + args.transaction_id;
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
+
+  const itemsPayload = args.items.map((i) => ({
+    item_id: i.item_id,
+    item_name: i.item_name,
+    price: i.price,
+    quantity: i.quantity,
+  }));
+
+  if (window.gtag) {
+    window.gtag('event', 'purchase', {
+      transaction_id: args.transaction_id,
+      value: args.value,
+      currency: args.currency,
+      tax: 0,
+      shipping: 0,
+      items: itemsPayload,
+      event_category: 'Ecommerce',
+    });
+  }
+
+  trackEvent('checkout_success_page_view', {
+    session_id: getMonetizationSessionId(),
+    stripe_session_id: args.transaction_id,
+    tier_name: args.tier_name || 'null',
+    has_api_key: String(!!args.has_api_key_hint),
+    value: args.value,
+    currency: args.currency,
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/** Prefer `trackStripeCheckoutCompleteAnalytics` on `/sponsor/success` so GA4 receives `purchase`. */
 export function trackCheckoutSuccessPageView(stripeSessionId: string, tierName?: string | null, hasApiKey?: boolean | null) {
   trackEvent('checkout_success_page_view', {
     session_id: getMonetizationSessionId(),

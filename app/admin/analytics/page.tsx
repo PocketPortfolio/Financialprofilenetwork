@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -190,6 +190,7 @@ export default function AdminAnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
+  const [manualRefresh, setManualRefresh] = useState(0);
 
   // Check admin status
   useEffect(() => {
@@ -224,39 +225,47 @@ export default function AdminAnalyticsPage() {
     }
   }, [user, loading]);
 
-  // Fetch analytics data
+  const fetchAnalyticsData = useCallback(async () => {
+    if (!isAdmin || checkingAdmin) {
+      return;
+    }
+    try {
+      setLoadingData(true);
+      setError(null);
+
+      const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch analytics data' }));
+        throw new Error(errorData.error || 'Failed to fetch analytics data');
+      }
+
+      const data = await response.json();
+      setAnalyticsData(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load analytics');
+      console.error('Analytics fetch error:', err);
+    } finally {
+      setLoadingData(false);
+    }
+  }, [isAdmin, checkingAdmin, timeRange]);
+
+  // Fetch analytics data — near–real-time poll + manual refresh
   useEffect(() => {
     if (!isAdmin || checkingAdmin) {
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        setLoadingData(true);
-        setError(null);
+    void fetchAnalyticsData();
 
-        const response = await fetch(`/api/admin/analytics?range=${timeRange}`);
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Failed to fetch analytics data' }));
-          throw new Error(errorData.error || 'Failed to fetch analytics data');
-        }
-
-        const data = await response.json();
-        setAnalyticsData(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load analytics');
-        console.error('Analytics fetch error:', err);
-      } finally {
-        setLoadingData(false);
-      }
-    };
-
-    fetchData();
-    
-    // Refresh every 5 minutes
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    const intervalMs = 45 * 1000;
+    const interval = setInterval(() => {
+      void fetchAnalyticsData();
+    }, intervalMs);
     return () => clearInterval(interval);
-  }, [isAdmin, checkingAdmin, timeRange]);
+  }, [isAdmin, checkingAdmin, timeRange, manualRefresh, fetchAnalyticsData]);
 
   // Show loading while checking auth
   if (loading || checkingAdmin) {
@@ -374,15 +383,15 @@ export default function AdminAnalyticsPage() {
                     color: 'var(--text-tertiary)',
                     marginLeft: '4px'
                   }}>
-                    (Auto-refreshes every 5 minutes)
+                    (Auto-refreshes every 45 seconds)
                   </span>
                 )}
               </p>
             )}
           </div>
           
-          {/* Time Range Selector */}
-          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+          {/* Time Range Selector + manual refresh */}
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
             {(['7d', '30d', '90d', 'all'] as const).map((range) => (
               <button
                 key={range}
@@ -402,6 +411,23 @@ export default function AdminAnalyticsPage() {
                 {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : 'All Time'}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setManualRefresh((n) => n + 1)}
+              disabled={loadingData}
+              style={{
+                padding: '8px 16px',
+                border: '1px solid var(--border-warm)',
+                borderRadius: '6px',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                cursor: loadingData ? 'wait' : 'pointer',
+                fontSize: '14px',
+                fontWeight: 600,
+              }}
+            >
+              Refresh now
+            </button>
           </div>
         </div>
       </div>

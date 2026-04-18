@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import AlertModal from '../../components/modals/AlertModal';
-import { trackCheckoutSuccessPageView } from '../../lib/analytics/events';
+import { trackStripeCheckoutCompleteAnalytics } from '../../lib/analytics/events';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -31,10 +31,48 @@ function SuccessContent() {
     return () => clearTimeout(timer);
   }, [sessionId]);
 
+  /** GA4 `purchase` + `checkout_success_page_view` once Stripe marks session paid (deduped per session id). */
   useEffect(() => {
     if (!sessionId) return;
-    trackCheckoutSuccessPageView(sessionId, tier, !!(apiKey || corporateLicense));
-  }, [sessionId, tier, apiKey, corporateLicense]);
+    let cancelled = false;
+    (async () => {
+      for (let attempt = 0; attempt < 15; attempt++) {
+        if (cancelled) return;
+        try {
+          const res = await fetch(
+            `/api/stripe/checkout-session/${encodeURIComponent(sessionId)}`,
+            { cache: 'no-store' }
+          );
+          if (res.ok) {
+            const d = (await res.json()) as {
+              transaction_id: string;
+              value: number;
+              currency: string;
+              items: Array<{ item_id: string; item_name: string; price: number; quantity: number }>;
+            };
+            if (!cancelled) {
+              trackStripeCheckoutCompleteAnalytics({
+                transaction_id: d.transaction_id,
+                value: d.value,
+                currency: d.currency,
+                items: d.items,
+                tier_name: d.items[0]?.item_name ?? null,
+                has_api_key_hint: false,
+              });
+            }
+            return;
+          }
+          if (res.status !== 402) return;
+        } catch {
+          /* retry */
+        }
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId]);
 
   const fetchApiKeys = async (retryCount = 0) => {
     try {

@@ -268,7 +268,7 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    return NextResponse.json({
+    const body = {
       monetization,
       toolUsage,
       seoPages,
@@ -282,7 +282,14 @@ export async function GET(request: NextRequest) {
       monetizationFunnelBoard,
       architectureChallengeLeads,
       timeRange: range,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
+    };
+
+    return NextResponse.json(body, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        Pragma: 'no-cache',
+      },
     });
   } catch (error: any) {
     console.error('[Analytics API] ❌ ERROR:', error);
