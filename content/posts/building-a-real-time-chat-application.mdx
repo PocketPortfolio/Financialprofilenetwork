@@ -1,34 +1,42 @@
 ---
 title: Building a Real-Time Chat Application
 date: '2026-04-18'
-description: Learn how to build a real-time chat application using modern web technologies.
+description: >-
+  A step-by-step guide to building a real-time chat application using modern web
+  technologies.
 tags:
   - real-time
-  - chat application
+  - chat
+  - application
   - web development
-  - socket.io
-  - node.js
-  - react
 author: Pocket Portfolio Team
 image: /images/blog/building-a-real-time-chat-application.png
-pillar: Engineering
+pillar: Innovation
 category: how-to-in-tech
 ---
 
+Building a real-time chat application is a common requirement in modern web development. This guide will walk you through building a basic real-time chat application using Node.js and Socket.io, a library that enables real-time, bidirectional communication between web clients and servers.
+
 ## Problem
 
-Creating a real-time chat application involves several challenges, including handling multiple user connections, maintaining low latency, and ensuring data consistency. Traditional HTTP requests are not designed for persistent connections, making real-time communication difficult. This guide will help you build a chat application that overcomes these challenges using WebSockets.
+Traditional HTTP request/response cycles are not efficient for real-time communication. In a chat application, you need to push messages to users in real-time without them having to refresh the page or send repeated requests to the server.
 
 ## Solution with Code
 
-We will build a simple real-time chat application using Node.js for the server and React for the client, leveraging WebSockets via the `socket.io` library.
+To solve this problem, we will use WebSockets, which allow persistent connections between the client and server. Socket.io, a popular library, abstracts WebSockets and provides a simple API.
 
-### Server Setup with Node.js and Socket.io
+### Step 1: Set Up the Server
 
-First, set up a Node.js server with `socket.io`:
+First, initialize a Node.js application and install the necessary dependencies:
+
+```bash
+npm init -y
+npm install express socket.io
+```
+
+Create a file named `server.js`:
 
 ```javascript
-// server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -36,6 +44,10 @@ const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
 
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -54,61 +66,60 @@ server.listen(3000, () => {
 });
 ```
 
-### Client Setup with React and Socket.io-client
+### Step 2: Create the Client
 
-Next, create a React client to connect to the server:
+Create an `index.html` file in the same directory:
 
-```jsx
-// App.js
-import React, { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      var form = document.getElementById('form');
+      var input = document.getElementById('input');
 
-const socket = io('http://localhost:3000');
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (input.value) {
+          socket.emit('chat message', input.value);
+          input.value = '';
+        }
+      });
 
-function App() {
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    socket.on('chat message', (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
-    });
-
-    return () => {
-      socket.off('chat message');
-    };
-  }, []);
-
-  const sendMessage = () => {
-    socket.emit('chat message', message);
-    setMessage('');
-  };
-
-  return (
-    <div>
-      <ul>
-        {messages.map((msg, index) => (
-          <li key={index}>{msg}</li>
-        ))}
-      </ul>
-      <input
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-      />
-      <button onClick={sendMessage}>Send</button>
-    </div>
-  );
-}
-
-export default App;
+      socket.on('chat message', function(msg) {
+        var item = document.createElement('li');
+        item.textContent = msg;
+        document.getElementById('messages').appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+    </script>
+  </body>
+</html>
 ```
+
+### Step 3: Run Your Application
+
+Start the server:
+
+```bash
+node server.js
+```
+
+Open `http://localhost:3000` in multiple browser windows and test the chat by sending messages.
 
 ## Key Concepts
 
-- **WebSockets**: Enables real-time, bidirectional communication between server and client.
-- **Socket.io**: A library that abstracts WebSockets for easier implementation, providing fallbacks for environments that do not support WebSockets.
-- **Node.js**: A JavaScript runtime for building scalable network applications.
-- **React**: A JavaScript library for building user interfaces, particularly useful for creating dynamic, real-time applications.
+- **WebSockets**: These provide full-duplex communication channels over a single TCP connection, enabling real-time data exchange.
+- **Socket.io**: A library that simplifies the use of WebSockets by providing fallbacks for environments where WebSockets are not supported.
+- **Node.js**: A JavaScript runtime built on Chrome's V8 engine, suitable for building scalable network applications.
 
-By following this guide, you will have a foundational real-time chat application. Expand it by adding features like user authentication, message history, and more robust client-server communication protocols.
+This simple chat application demonstrates the power of real-time web technologies and can be expanded with additional features such as user authentication, chat rooms, and message persistence.
