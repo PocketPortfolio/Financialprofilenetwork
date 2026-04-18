@@ -835,11 +835,24 @@ export default function AdminAnalyticsPage() {
             <h2 style={{
               fontSize: '20px',
               fontWeight: 'bold',
-              marginBottom: 'var(--space-4)',
+              marginBottom: 'var(--space-2)',
               color: 'var(--text)'
             }}>
               📥 CSV Downloads
             </h2>
+            <p style={{
+              fontSize: '13px',
+              color: 'var(--text-secondary)',
+              marginBottom: 'var(--space-4)',
+              lineHeight: 1.5
+            }}>
+              Ticker CSV totals use the same time range as the dashboard selector above (default 30 days), not wall-clock “all time,” unless you choose All.
+              Events are written when the json-api download button completes a successful fetch and posts to{' '}
+              <code style={{ fontSize: '12px' }}>/api/tool-usage</code>
+              {' '}(blocked clients and direct browser/API links to{' '}
+              <code style={{ fontSize: '12px' }}>/api/tickers/…/csv</code>
+              {' '}without that flow are omitted).
+            </p>
             
             <div style={{
               display: 'grid',
@@ -850,17 +863,17 @@ export default function AdminAnalyticsPage() {
               <MetricCard
                 label="Total Downloads"
                 value={analyticsData.toolUsage.csvDownloads.total.toLocaleString()}
-                subtitle="All time"
+                subtitle={timeRange === 'all' ? 'Since logging began' : `Within ${timeRange} window`}
               />
               <MetricCard
                 label="Last 7 Days"
                 value={analyticsData.toolUsage.csvDownloads.last7Days.toLocaleString()}
-                subtitle="Recent activity"
+                subtitle="Rolling 7 days (from event time)"
               />
               <MetricCard
                 label="Last 24 Hours"
                 value={analyticsData.toolUsage.csvDownloads.last24Hours.toLocaleString()}
-                subtitle="Real-time"
+                subtitle="Rolling 24 hours (from event time)"
               />
             </div>
 

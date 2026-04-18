@@ -477,6 +477,8 @@ async function getToolUsageData(startDate: Date) {
     const db = getDb();
     
     // Fetch tool usage events from Firestore
+    // Same startDate as dashboard range (7d / 30d / 90d / epoch for "all").
+    // Admin UI must not label aggregates as "all time" unless range=all — otherwise totals are period-scoped.
     const toolEventsRef = db.collection('toolUsage');
     const startTimestamp = Timestamp.fromDate(startDate);
     
