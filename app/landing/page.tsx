@@ -375,7 +375,7 @@ export default function LandingPage() {
                   Launch App
                 </DashboardLaunchLink>
                 <a
-                  href="/sponsor"
+                  href="/sponsor?utm_source=landing&utm_medium=hero_secondary&utm_campaign=founders_club"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1639,7 +1639,7 @@ $ npx pocket-init --sovereign
                 Back the protocol. Direct access to the Command Team. Shape the roadmap.
               </p>
               <Link
-                href="/sponsor"
+                href="/sponsor?utm_source=landing&utm_medium=founders_section&utm_campaign=founders_club"
                 style={{
                   padding: '12px 24px',
                   background: 'transparent',

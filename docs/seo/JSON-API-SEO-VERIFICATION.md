@@ -9,7 +9,8 @@ Run these checks on a **Vercel Preview** URL before promoting to production afte
 3. Confirm:
    - Primary **textual** content (title, description, internal links) is present in HTML.
    - Structured data `<script type="application/ld+json">` is present when configured for that route.
-   - The live JSON **sample** may be hydrated by a client component; confirm the page still returns **200** and meaningful static HTML for crawlers. If policy requires a static JSON excerpt in HTML, add a server-rendered `<pre>` snippet in a follow-up.
+   - A **`<noscript><pre>`** block in [`app/s/[symbol]/json-api/page.tsx`](../../app/s/[symbol]/json-api/page.tsx) exposes a **static JSON sample** when ticker API data is available at render time (supplements the client `JsonApiLivePreview` which still receives `initialHistorySample` from the server when data exists).
+   - The page returns **200** and meaningful static HTML for crawlers.
 
 ## 2. Google Search Console — URL Inspection
 

@@ -48,7 +48,9 @@ const FeatureAnnouncementModal: React.FC<FeatureAnnouncementModalProps> = ({
   const handleUpgrade = () => {
     trackFeatureUpgradeClick();
     onClose();
-    router.push('/sponsor?utm_source=feature_announcement_modal&utm_medium=system_alert');
+    router.push(
+      '/sponsor?utm_source=feature_announcement_modal&utm_medium=system_alert&utm_campaign=founders_club'
+    );
   };
 
   // Debug logging (client-side only)

@@ -117,7 +117,7 @@ export default function JsonApiLivePreview({
           Tired of exporting to Excel? Track {symbol.toUpperCase()} and analyze your portfolio locally with Pocket Portfolio.
         </p>
         <a
-          href="/dashboard"
+          href={`/dashboard?utm_source=json_api&utm_medium=live_preview_lead&utm_campaign=activation&utm_content=${encodeURIComponent(symbol.toLowerCase())}`}
           onClick={() => trackEvent('lead_magnet_clicked', { ticker: symbol })}
           style={{
             display: 'inline-block',

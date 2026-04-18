@@ -226,7 +226,22 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
     metadata?.name,
     metadata?.exchange
   );
-  
+
+  /** Crawlers and no-JS clients still see a factual JSON excerpt in View Source. */
+  const indexableJsonSample = JSON.stringify(
+    {
+      symbol: normalizedSymbol,
+      note: 'Static sample for indexers without JavaScript',
+      sample_rows: tickerData?.data?.slice(0, 2) ?? [],
+      quote: quoteData
+        ? { price: quoteData.price, changePct: quoteData.changePct }
+        : null,
+      data_points: stats?.count ?? null,
+    },
+    null,
+    2
+  );
+
   // Prepare initial data for client-side component
   // Client component will fetch live data if server data is unavailable
 
@@ -422,6 +437,24 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           }}>
             {/* LEFT COL: Live Preview & NPM Hook */}
             <div>
+              <noscript>
+                <pre
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: '12px',
+                    padding: '16px',
+                    overflow: 'auto',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    lineHeight: 1.6,
+                    color: 'var(--text)',
+                  }}
+                >
+                  {indexableJsonSample}
+                </pre>
+              </noscript>
               {/* 💻 LIVE PREVIEW (The Trust Signal) - Client-side component fetches live data */}
               <JsonApiLivePreview
                 symbol={normalizedSymbol}
