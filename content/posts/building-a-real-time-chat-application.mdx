@@ -1,0 +1,114 @@
+---
+title: Building a Real-Time Chat Application
+date: '2026-04-18'
+description: Learn how to build a real-time chat application using modern web technologies.
+tags:
+  - real-time
+  - chat application
+  - web development
+  - socket.io
+  - node.js
+  - react
+author: Pocket Portfolio Team
+image: /images/blog/building-a-real-time-chat-application.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+## Problem
+
+Creating a real-time chat application involves several challenges, including handling multiple user connections, maintaining low latency, and ensuring data consistency. Traditional HTTP requests are not designed for persistent connections, making real-time communication difficult. This guide will help you build a chat application that overcomes these challenges using WebSockets.
+
+## Solution with Code
+
+We will build a simple real-time chat application using Node.js for the server and React for the client, leveraging WebSockets via the `socket.io` library.
+
+### Server Setup with Node.js and Socket.io
+
+First, set up a Node.js server with `socket.io`:
+
+```javascript
+// server.js
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+server.listen(3000, () => {
+  console.log('listening on *:3000');
+});
+```
+
+### Client Setup with React and Socket.io-client
+
+Next, create a React client to connect to the server:
+
+```jsx
+// App.js
+import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:3000');
+
+function App() {
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    socket.on('chat message', (msg) => {
+      setMessages((prevMessages) => [...prevMessages, msg]);
+    });
+
+    return () => {
+      socket.off('chat message');
+    };
+  }, []);
+
+  const sendMessage = () => {
+    socket.emit('chat message', message);
+    setMessage('');
+  };
+
+  return (
+    <div>
+      <ul>
+        {messages.map((msg, index) => (
+          <li key={index}>{msg}</li>
+        ))}
+      </ul>
+      <input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+      />
+      <button onClick={sendMessage}>Send</button>
+    </div>
+  );
+}
+
+export default App;
+```
+
+## Key Concepts
+
+- **WebSockets**: Enables real-time, bidirectional communication between server and client.
+- **Socket.io**: A library that abstracts WebSockets for easier implementation, providing fallbacks for environments that do not support WebSockets.
+- **Node.js**: A JavaScript runtime for building scalable network applications.
+- **React**: A JavaScript library for building user interfaces, particularly useful for creating dynamic, real-time applications.
+
+By following this guide, you will have a foundational real-time chat application. Expand it by adding features like user authentication, message history, and more robust client-server communication protocols.
