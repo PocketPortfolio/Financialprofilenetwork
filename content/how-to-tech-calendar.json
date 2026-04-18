@@ -1728,14 +1728,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Real-Time Chat Application",
     "slug": "building-a-real-time-chat-application",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "real",
       "time"
-    ]
+    ],
+    "publishedAt": "2026-04-18T14:00:34.886Z"
   },
   {
     "id": "how-to-how-to-optimize-database-queries-apr-19",
