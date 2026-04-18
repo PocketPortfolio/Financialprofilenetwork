@@ -1728,14 +1728,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Virtual Scrolling Performance - Large List Rendering",
     "slug": "research-virtual-scrolling-performance-large-list-rendering-2026-04-18",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "virtual",
       "scrolling"
-    ]
+    ],
+    "publishedAt": "2026-04-18T18:00:33.894Z"
   },
   {
     "id": "research-http-2-vs-http-3-performance-real-world-benchmarks-2026-04-19",
