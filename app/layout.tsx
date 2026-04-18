@@ -6,7 +6,7 @@ import './styles/tokens.css';
 import './styles/brand.css';
 import './styles/animations.css';
 import { BrandProvider } from './lib/brand/theme';
-import { generateMetadata as genMeta } from './lib/seo/meta';
+import { generateMetadata as genMeta, siteConfig } from './lib/seo/meta';
 import { getHomePageSchema, renderJsonLd } from './lib/seo/schema';
 import { getCleanGAId } from './lib/env-utils';
 import TabBar from './components/nav/TabBar';
@@ -29,38 +29,38 @@ const brandEnabled = process.env.NEXT_PUBLIC_BRAND_V2 === 'true';
 export const metadata: Metadata = brandEnabled
   ? genMeta({
       title: '',
-      description: 'Track positions with clean, reliable data pipelines. Built in public, evidence first.',
+      description: siteConfig.description,
       path: '/',
     })
   : {
-      title: 'Pocket Portfolio | Local-First AI Portfolio Analyst',
-      description:
-        'AI portfolio analysis without shipping your raw broker CSV to the cloud. Local-first parsing, Founders Club from £12/mo, optional Google Drive sync you control.',
+      title: {
+        default: siteConfig.title,
+        template: '%s | Pocket Portfolio',
+      },
+      description: siteConfig.description,
       robots: 'index,follow,max-image-preview:large',
-        openGraph: {
-          title: 'Pocket Portfolio | Local-First AI Portfolio Analyst',
-          description:
-            'AI portfolio analysis without shipping your raw broker CSV to the cloud. Local-first parsing, Founders Club from £12/mo, optional Google Drive sync you control.',
-          url: 'https://www.pocketportfolio.app/',
-          siteName: 'Pocket Portfolio',
-          images: [
-            {
-              url: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3',
-              width: 1200,
-              height: 630,
-              alt: 'Pocket Portfolio app preview',
-            },
-          ],
-          locale: 'en_GB',
-          type: 'website',
-        },
-        twitter: {
-          card: 'summary_large_image',
-          title: 'Pocket Portfolio | Local-First AI Portfolio Analyst',
-          description:
-            'AI portfolio analysis without shipping your raw broker CSV to the cloud. Local-first parsing, Founders Club from £12/mo, optional Google Drive sync you control.',
-          images: ['https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3'],
-        },
+      openGraph: {
+        title: siteConfig.title,
+        description: siteConfig.description,
+        url: 'https://www.pocketportfolio.app/',
+        siteName: siteConfig.name,
+        images: [
+          {
+            url: siteConfig.ogImage,
+            width: 1200,
+            height: 630,
+            alt: 'Pocket Portfolio app preview',
+          },
+        ],
+        locale: 'en_GB',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: siteConfig.title,
+        description: siteConfig.description,
+        images: [siteConfig.ogImage],
+      },
     };
 
 export const viewport: Viewport = {

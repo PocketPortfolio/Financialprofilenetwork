@@ -152,6 +152,10 @@ export function trackBridgeToTerminalCtaClick(args: {
   destination: string;
   contextId?: string; // ticker symbol, broker slug, etc.
   ctaId?: string; // e.g. 'open_terminal'
+  /** A/B arm from NEXT_PUBLIC_BRIDGE_CTA_VARIANT — unchanged experiment split. */
+  bridgeVariant?: 'A' | 'B';
+  /** Semantic hook bucket for json-api title rotation (GA4 custom dimension). */
+  bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
 }) {
   if (typeof window === 'undefined') return;
   const utm = getCurrentUtm();
@@ -160,6 +164,8 @@ export function trackBridgeToTerminalCtaClick(args: {
     destination: args.destination,
     context_id: args.contextId || 'null',
     cta_id: args.ctaId || 'open_terminal',
+    bridge_variant: args.bridgeVariant ?? 'null',
+    bridge_hook: args.bridgeHook ?? 'null',
     page_path: window.location.pathname,
     utm_source: utm.utm_source || 'direct',
     utm_medium: utm.utm_medium || 'bridge_cta',

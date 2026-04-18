@@ -13,6 +13,7 @@ import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import TickerCsvDownload from '@/app/components/TickerCsvDownload';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 import JsonApiStickyPrompt from '@/app/components/JsonApiStickyPrompt';
+import { jsonApiBridgeCopy, jsonApiDashboardFooterLink } from '@/app/lib/seo/jsonApiInternalLinks';
 import Link from 'next/link';
 
 
@@ -208,6 +209,8 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const bridgeVariant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
+  const jsonApiBridge = jsonApiBridgeCopy(normalizedSymbol, bridgeVariant);
   const metadata = await getTickerMetadata(normalizedSymbol);
   
   // Fetch historical data and quote for unique content
@@ -353,30 +356,20 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             {uniqueDescription}
           </p>
 
-          {(() => {
-            const variant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
-            const title =
-              variant === 'B'
-                ? 'Programmable Sovereign Interface — chart this JSON in the Terminal.'
-                : 'Turn this JSON into charts instantly — open the Terminal.';
-            const subtitle =
-              variant === 'B'
-                ? 'Local-first analysis. Stateless data. Your browser is the vault.'
-                : 'Local-first. No uploads required to start.';
-            const primaryLabel = variant === 'B' ? 'Open Sovereign Terminal' : 'Open Terminal';
-
-            return (
           <BridgeToTerminalCTA
-            title={title}
-            subtitle={subtitle}
+            title={jsonApiBridge.title}
+            subtitle={jsonApiBridge.subtitle}
             href={`/dashboard?utm_source=json_api&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
-            primaryLabel={primaryLabel}
+            primaryLabel={jsonApiBridge.primaryLabel}
             secondaryHref="/learn/local-first"
             secondaryLabel="How local-first works"
-            analytics={{ source: 'json_api', contextId: normalizedSymbol.toLowerCase() }}
+            analytics={{
+              source: 'json_api',
+              contextId: normalizedSymbol.toLowerCase(),
+              bridgeVariant,
+              bridgeHook: jsonApiBridge.hook,
+            }}
           />
-            );
-          })()}
           
           {/* CROSS-LINK (Internal SEO Juice) */}
           <div style={{ marginBottom: '32px' }}>
@@ -578,11 +571,49 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
               </div>
             </div>
           </div>
+
+          {(() => {
+            const foot = jsonApiDashboardFooterLink(normalizedSymbol);
+            return (
+              <div
+                style={{
+                  marginTop: '28px',
+                  paddingTop: '20px',
+                  borderTop: '1px solid var(--border-subtle)',
+                  textAlign: 'center',
+                }}
+              >
+                <Link
+                  href={foot.href}
+                  title={foot.title}
+                  style={{
+                    color: 'var(--accent-warm)',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                  }}
+                >
+                  {foot.label}
+                </Link>
+                <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <Link
+                    href="/architecture?utm_source=json_api&utm_medium=footer&utm_campaign=geo"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    How local-first, privacy-first architecture works →
+                  </Link>
+                </p>
+              </div>
+            );
+          })()}
         </div>
       </div>
       <JsonApiStickyPrompt
         dashboardHref={`/dashboard?utm_source=json_api&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
         contextId={normalizedSymbol.toLowerCase()}
+        bridgeVariant={bridgeVariant}
+        bridgeHook={jsonApiBridge.hook}
       />
       </div>
     </>

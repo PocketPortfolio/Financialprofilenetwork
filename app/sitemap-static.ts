@@ -191,6 +191,12 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/architecture`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
     // ✅ Waitlist Page (Priority Queue)
     {
       url: `${baseUrl}/waitlist`,

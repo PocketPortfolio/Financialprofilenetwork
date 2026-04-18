@@ -6,12 +6,19 @@ import { trackBridgeToTerminalCtaClick } from '@/app/lib/analytics/events';
 type JsonApiStickyPromptProps = {
   dashboardHref: string;
   contextId: string;
+  bridgeVariant?: 'A' | 'B';
+  bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
 };
 
 /**
  * SEO-safe: does not hide JSON. Persistent bottom command line linking to Terminal (Y) or scroll to live preview (N).
  */
-export default function JsonApiStickyPrompt({ dashboardHref, contextId }: JsonApiStickyPromptProps) {
+export default function JsonApiStickyPrompt({
+  dashboardHref,
+  contextId,
+  bridgeVariant,
+  bridgeHook,
+}: JsonApiStickyPromptProps) {
   return (
     <div
       style={{
@@ -59,6 +66,8 @@ export default function JsonApiStickyPrompt({ dashboardHref, contextId }: JsonAp
                 destination: dashboardHref,
                 contextId,
                 ctaId: 'sticky_terminal_prompt_y',
+                bridgeVariant,
+                bridgeHook,
               })
             }
             style={{
