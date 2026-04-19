@@ -18,13 +18,13 @@ export async function generateTickerContent(
   const exchange = metadata.exchange || 'NYSE';
   const sector = metadata.sector || 'General';
 
-  // Generate title and description
-  const title = `${symbol} Stock Analysis & Portfolio Tracking | Pocket Portfolio`;
+  // Generate title and description (sovereign / infrastructure framing for SERP + hub)
+  const title = `${symbol} Sovereign Infrastructure & Portfolio Analysis | Pocket Portfolio`;
   const description = metadata.description || 
-    `Track ${symbol} (${name}) stock price, performance, and portfolio analysis. Import ${symbol} positions from broker CSVs or export ${symbol} historical data to JSON or CSV. Free, open-source portfolio tracking.`;
+    `Local-first ${symbol} (${name}) analysis: import broker CSVs in the browser, export JSON/CSV, and keep your ledger off vendor warehouses. Privacy-first portfolio infrastructure.`;
 
   // Generate H1
-  const h1 = `${symbol} Stock Analysis & Portfolio Tracker`;
+  const h1 = `${symbol} Sovereign Infrastructure & Portfolio Tracker`;
 
   // Generate H2 sections based on template
   const h2Sections: string[] = [];

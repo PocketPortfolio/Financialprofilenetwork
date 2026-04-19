@@ -8,6 +8,10 @@ type JsonApiStickyPromptProps = {
   contextId: string;
   bridgeVariant?: 'A' | 'B';
   bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
+  /** json-api: legacy sticky. symbol_hub: main /s/[symbol] asset pages. */
+  pageSource?: 'json_api' | 'symbol_hub';
+  /** Element id for [N] scroll target (defaults by pageSource). */
+  scrollTargetId?: string;
 };
 
 /**
@@ -18,7 +22,14 @@ export default function JsonApiStickyPrompt({
   contextId,
   bridgeVariant,
   bridgeHook,
+  pageSource = 'json_api',
+  scrollTargetId,
 }: JsonApiStickyPromptProps) {
+  const resolvedScrollId =
+    scrollTargetId ?? (pageSource === 'symbol_hub' ? 'symbol-hub-main' : 'json-api-live-preview-root');
+  const analyticsSource = pageSource === 'symbol_hub' ? 'symbol_hub' : 'json_api';
+  const dismissLabel =
+    pageSource === 'symbol_hub' ? '[N] — jump to asset view' : '[N] — view raw JSON block';
   return (
     <div
       style={{
@@ -62,7 +73,7 @@ export default function JsonApiStickyPrompt({
             href={dashboardHref}
             onClick={() =>
               trackBridgeToTerminalCtaClick({
-                source: 'json_api',
+                source: analyticsSource,
                 destination: dashboardHref,
                 contextId,
                 ctaId: 'sticky_terminal_prompt_y',
@@ -83,7 +94,7 @@ export default function JsonApiStickyPrompt({
           <button
             type="button"
             onClick={() =>
-              document.getElementById('json-api-live-preview-root')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              document.getElementById(resolvedScrollId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
             }
             style={{
               background: 'transparent',
@@ -96,7 +107,7 @@ export default function JsonApiStickyPrompt({
               padding: '4px 10px',
             }}
           >
-            [N] — view raw JSON block
+            {dismissLabel}
           </button>
         </div>
       </div>

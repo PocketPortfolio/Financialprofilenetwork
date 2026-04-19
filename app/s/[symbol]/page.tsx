@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import Link from 'next/link';
 import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 import { generateTickerContent } from '@/app/lib/pseo/content';
 import { generateFAQStructuredData } from '@/app/lib/pseo/content';
 import StructuredData from '@/app/components/StructuredData';
 import TickerPageContent from '@/app/components/TickerPageContent';
+import JsonApiStickyPrompt from '@/app/components/JsonApiStickyPrompt';
+import { jsonApiBridgeCopy, jsonApiDashboardFooterLink } from '@/app/lib/seo/jsonApiInternalLinks';
 
 
 // Server-side quote fetching for SEO (runs during ISR revalidation)
@@ -67,8 +68,8 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: `${symbol} Price & Dividends (No Login Required) - Pocket Portfolio`,
-      description: `Analyze ${symbol} stock without signing up. Import your CSV from Robinhood, eToro, or Fidelity directly in the browser. Privacy-first.`,
+      title: `${symbol} Sovereign Infrastructure Analysis (No Login) | Pocket Portfolio`,
+      description: `Local-first ${symbol} analysis: import broker CSVs in-browser, export JSON, keep your ledger private. Sovereign portfolio infrastructure — no signup wall.`,
     };
   }
   
@@ -101,6 +102,9 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
   const resolvedParams = await params;
   // Normalize symbol (remove dashes, handle crypto pairs)
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const bridgeVariant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
+  const jsonApiBridge = jsonApiBridgeCopy(normalizedSymbol, bridgeVariant);
+  const authorityFoot = jsonApiDashboardFooterLink(normalizedSymbol);
   const metadata = await getTickerMetadata(normalizedSymbol);
   
   // Fetch quote data server-side for SEO (only during ISR revalidation, not during build)
@@ -139,10 +143,16 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
         />
-        <div style={{
-          background: 'var(--bg)',
-          minHeight: '100vh'
-        }}>
+        <div
+          id="symbol-hub-main"
+          style={{
+            background: 'var(--bg)',
+            minHeight: '100vh',
+            borderTop: '2px solid var(--border-warm)',
+            boxShadow: 'inset 0 1px 0 rgba(245, 158, 11, 0.1)',
+            paddingBottom: '100px',
+          }}
+        >
           <div style={{
             maxWidth: '1200px',
             margin: '0 auto',
@@ -198,7 +208,45 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
               </a>
             </div>
           </div>
+          <div
+            style={{
+              maxWidth: '1200px',
+              margin: '0 auto',
+              padding: '8px 16px 28px',
+              textAlign: 'center',
+              borderTop: '1px solid var(--border-subtle)',
+            }}
+          >
+            <Link
+              href={authorityFoot.href}
+              title={authorityFoot.title}
+              style={{
+                color: 'var(--accent-warm)',
+                fontWeight: 600,
+                fontSize: '14px',
+                textDecoration: 'underline',
+                textUnderlineOffset: '3px',
+              }}
+            >
+              {authorityFoot.label}
+            </Link>
+            <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
+              <Link
+                href="/architecture?utm_source=symbol_hub&utm_medium=footer&utm_campaign=geo"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                Local-first architecture & hybrid sovereignty →
+              </Link>
+            </p>
+          </div>
         </div>
+        <JsonApiStickyPrompt
+          dashboardHref={`/dashboard?utm_source=symbol_hub&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
+          contextId={normalizedSymbol.toLowerCase()}
+          bridgeVariant={bridgeVariant}
+          bridgeHook={jsonApiBridge.hook}
+          pageSource="symbol_hub"
+        />
       </>
     );
   }
@@ -208,13 +256,64 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
   const faqStructuredData = generateFAQStructuredData(metadata.faqs);
   
   return (
-    <TickerPageContent
-      normalizedSymbol={normalizedSymbol}
-      metadata={metadata}
-      content={content}
-      faqStructuredData={faqStructuredData}
-      initialQuoteData={initialQuoteData}
-    />
+    <>
+      <div
+        id="symbol-hub-main"
+        style={{
+          background: 'var(--bg)',
+          minHeight: '100vh',
+          borderTop: '2px solid var(--border-warm)',
+          boxShadow: 'inset 0 1px 0 rgba(245, 158, 11, 0.1)',
+          paddingBottom: '100px',
+        }}
+      >
+        <TickerPageContent
+          normalizedSymbol={normalizedSymbol}
+          metadata={metadata}
+          content={content}
+          faqStructuredData={faqStructuredData}
+          initialQuoteData={initialQuoteData}
+        />
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '8px 16px 28px',
+            textAlign: 'center',
+            borderTop: '1px solid var(--border-subtle)',
+          }}
+        >
+          <Link
+            href={authorityFoot.href}
+            title={authorityFoot.title}
+            style={{
+              color: 'var(--accent-warm)',
+              fontWeight: 600,
+              fontSize: '14px',
+              textDecoration: 'underline',
+              textUnderlineOffset: '3px',
+            }}
+          >
+            {authorityFoot.label}
+          </Link>
+          <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <Link
+              href="/architecture?utm_source=symbol_hub&utm_medium=footer&utm_campaign=geo"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              Local-first architecture & hybrid sovereignty →
+            </Link>
+          </p>
+        </div>
+      </div>
+      <JsonApiStickyPrompt
+        dashboardHref={`/dashboard?utm_source=symbol_hub&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
+        contextId={normalizedSymbol.toLowerCase()}
+        bridgeVariant={bridgeVariant}
+        bridgeHook={jsonApiBridge.hook}
+        pageSource="symbol_hub"
+      />
+    </>
   );
 }
 

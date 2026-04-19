@@ -145,7 +145,7 @@ export function trackPageView(page: string) {
   }
 }
 
-type BridgeCtaSource = 'json_api' | 'import_page' | 'unknown';
+type BridgeCtaSource = 'json_api' | 'import_page' | 'symbol_hub' | 'unknown';
 
 export function trackBridgeToTerminalCtaClick(args: {
   source: BridgeCtaSource;

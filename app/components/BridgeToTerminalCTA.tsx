@@ -11,7 +11,7 @@ type BridgeToTerminalCTAProps = {
   secondaryHref?: string;
   secondaryLabel?: string;
   analytics?: {
-    source: 'json_api' | 'import_page' | 'unknown';
+    source: 'json_api' | 'import_page' | 'symbol_hub' | 'unknown';
     contextId?: string;
     bridgeVariant?: 'A' | 'B';
     bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
