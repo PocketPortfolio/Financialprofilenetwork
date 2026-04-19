@@ -706,7 +706,7 @@
     "date": "2026-04-19",
     "title": "Sovereign Sync vs. Cloud Portfolios: A Feature Comparison",
     "slug": "sovereign-sync-vs-cloud-portfolios-a-feature-comparison",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -716,7 +716,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-19T09:01:14.375Z"
   },
   {
     "id": "week-16-post-2",
