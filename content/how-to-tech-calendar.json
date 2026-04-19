@@ -1744,14 +1744,15 @@
     "scheduledTime": "14:00",
     "title": "How to Optimize Database Queries",
     "slug": "how-to-optimize-database-queries",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "database",
       "optimize",
       "queries"
-    ]
+    ],
+    "publishedAt": "2026-04-19T14:00:55.725Z"
   },
   {
     "id": "how-to-understanding-serverless-functions-apr-20",
