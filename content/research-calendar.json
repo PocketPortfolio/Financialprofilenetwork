@@ -1744,14 +1744,15 @@
     "scheduledTime": "18:00",
     "title": "Research: HTTP/2 vs HTTP/3 Performance - Real-World Benchmarks",
     "slug": "research-http-2-vs-http-3-performance-real-world-benchmarks-2026-04-19",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "benchmarks",
       "performance",
       "http"
-    ]
+    ],
+    "publishedAt": "2026-04-19T18:01:00.865Z"
   },
   {
     "id": "research-quic-protocol-performance-connection-establishment-2026-04-20",
