@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { trackBridgeToTerminalCtaClick } from '@/app/lib/analytics/events';
+import type { BridgeSurface } from '@/app/lib/seo/symbolRouteSurface';
 
 type JsonApiStickyPromptProps = {
   dashboardHref: string;
   contextId: string;
   bridgeVariant?: 'A' | 'B';
   bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
+  bridgeSurface?: BridgeSurface;
   /** json-api: legacy sticky. symbol_hub: main /s/[symbol] asset pages. */
   pageSource?: 'json_api' | 'symbol_hub';
   /** Element id for [N] scroll target (defaults by pageSource). */
@@ -22,11 +24,12 @@ export default function JsonApiStickyPrompt({
   contextId,
   bridgeVariant,
   bridgeHook,
+  bridgeSurface,
   pageSource = 'json_api',
   scrollTargetId,
 }: JsonApiStickyPromptProps) {
   const resolvedScrollId =
-    scrollTargetId ?? (pageSource === 'symbol_hub' ? 'symbol-hub-main' : 'json-api-live-preview-root');
+    scrollTargetId ?? (pageSource === 'symbol_hub' ? 'symbol-route-main' : 'json-api-live-preview-root');
   const analyticsSource = pageSource === 'symbol_hub' ? 'symbol_hub' : 'json_api';
   const dismissLabel =
     pageSource === 'symbol_hub' ? '[N] — jump to asset view' : '[N] — view raw JSON block';
@@ -79,6 +82,7 @@ export default function JsonApiStickyPrompt({
                 ctaId: 'sticky_terminal_prompt_y',
                 bridgeVariant,
                 bridgeHook,
+                bridgeSurface: bridgeSurface ?? (pageSource === 'json_api' ? 'json_api' : 'hub'),
               })
             }
             style={{

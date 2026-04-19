@@ -156,6 +156,8 @@ export function trackBridgeToTerminalCtaClick(args: {
   bridgeVariant?: 'A' | 'B';
   /** Semantic hook bucket for json-api title rotation (GA4 custom dimension). */
   bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
+  /** Path segment under /s/[symbol] (hub, json_api, dividend_history, …). */
+  bridgeSurface?: string;
 }) {
   if (typeof window === 'undefined') return;
   const utm = getCurrentUtm();
@@ -166,6 +168,7 @@ export function trackBridgeToTerminalCtaClick(args: {
     cta_id: args.ctaId || 'open_terminal',
     bridge_variant: args.bridgeVariant ?? 'null',
     bridge_hook: args.bridgeHook ?? 'null',
+    bridge_surface: args.bridgeSurface ?? 'null',
     page_path: window.location.pathname,
     utm_source: utm.utm_source || 'direct',
     utm_medium: utm.utm_medium || 'bridge_cta',

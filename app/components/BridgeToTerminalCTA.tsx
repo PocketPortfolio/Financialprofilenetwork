@@ -15,6 +15,7 @@ type BridgeToTerminalCTAProps = {
     contextId?: string;
     bridgeVariant?: 'A' | 'B';
     bridgeHook?: 'sovereign' | 'local_first' | 'private_ledger';
+    bridgeSurface?: string;
   };
 };
 
@@ -65,6 +66,7 @@ export default function BridgeToTerminalCTA({
                 ctaId: 'open_terminal',
                 bridgeVariant: analytics.bridgeVariant,
                 bridgeHook: analytics.bridgeHook,
+                bridgeSurface: analytics.bridgeSurface,
               });
             }}
             style={{

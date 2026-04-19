@@ -1126,3 +1126,18 @@ select option:checked {
     display: block;
   }
 }
+
+/* Sovereign Totality: scoped terminal coercion for legacy tables under /s/[symbol] layout */
+.terminal-content-scope table {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.terminal-content-scope th,
+.terminal-content-scope td {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+.terminal-content-scope thead th {
+  color: var(--accent-warm);
+  font-weight: 600;
+}

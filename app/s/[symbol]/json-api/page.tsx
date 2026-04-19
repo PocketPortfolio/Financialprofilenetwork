@@ -12,8 +12,7 @@ import JsonApiNpmSnippet from '@/app/components/JsonApiNpmSnippet';
 import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import TickerCsvDownload from '@/app/components/TickerCsvDownload';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
-import JsonApiStickyPrompt from '@/app/components/JsonApiStickyPrompt';
-import { jsonApiBridgeCopy, jsonApiDashboardFooterLink } from '@/app/lib/seo/jsonApiInternalLinks';
+import { jsonApiBridgeCopy } from '@/app/lib/seo/jsonApiInternalLinks';
 import Link from 'next/link';
 
 
@@ -258,35 +257,30 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           }}
         />
         <div style={{
-          minHeight: '100vh',
-          background: 'var(--bg)',
-          color: 'var(--text)'
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '32px 16px',
+          color: 'var(--text)',
         }}>
           <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '32px 16px'
+            maxWidth: '896px',
+            margin: '0 auto'
           }}>
-            <div style={{
-              maxWidth: '896px',
-              margin: '0 auto'
+            <h1 style={{
+              fontSize: '30px',
+              fontWeight: '700',
+              color: 'var(--text)',
+              marginBottom: '16px'
             }}>
-              <h1 style={{
-                fontSize: '30px',
-                fontWeight: '700',
-                color: 'var(--text)',
-                marginBottom: '16px'
-              }}>
-                {normalizedSymbol} Historical Data & JSON API
-              </h1>
-              <p style={{
-                color: 'var(--text-secondary)',
-                marginBottom: '32px',
-                lineHeight: '1.6'
-              }}>
-                Download {normalizedSymbol} historical stock data in JSON format. Free API for developers. No login required.
-              </p>
-            </div>
+              {normalizedSymbol} Historical Data & JSON API
+            </h1>
+            <p style={{
+              color: 'var(--text-secondary)',
+              marginBottom: '32px',
+              lineHeight: '1.6'
+            }}>
+              Download {normalizedSymbol} historical stock data in JSON format. Free API for developers. No login required.
+            </p>
           </div>
         </div>
       </>
@@ -302,14 +296,10 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
         }}
       />
       <div style={{
-        minHeight: '100vh',
-        background: 'var(--bg)',
-        color: 'var(--text)'
-      }}>
-      <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '32px 16px 120px',
+        padding: '32px 16px 48px',
+        color: 'var(--text)',
       }}>
         <div style={{
           maxWidth: '896px',
@@ -368,6 +358,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
               contextId: normalizedSymbol.toLowerCase(),
               bridgeVariant,
               bridgeHook: jsonApiBridge.hook,
+              bridgeSurface: 'json_api',
             }}
           />
           
@@ -572,49 +563,7 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
             </div>
           </div>
 
-          {(() => {
-            const foot = jsonApiDashboardFooterLink(normalizedSymbol);
-            return (
-              <div
-                style={{
-                  marginTop: '28px',
-                  paddingTop: '20px',
-                  borderTop: '1px solid var(--border-subtle)',
-                  textAlign: 'center',
-                }}
-              >
-                <Link
-                  href={foot.href}
-                  title={foot.title}
-                  style={{
-                    color: 'var(--accent-warm)',
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '3px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                  }}
-                >
-                  {foot.label}
-                </Link>
-                <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                  <Link
-                    href="/architecture?utm_source=json_api&utm_medium=footer&utm_campaign=geo"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    How local-first, privacy-first architecture works →
-                  </Link>
-                </p>
-              </div>
-            );
-          })()}
         </div>
-      </div>
-      <JsonApiStickyPrompt
-        dashboardHref={`/dashboard?utm_source=json_api&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
-        contextId={normalizedSymbol.toLowerCase()}
-        bridgeVariant={bridgeVariant}
-        bridgeHook={jsonApiBridge.hook}
-      />
       </div>
     </>
   );

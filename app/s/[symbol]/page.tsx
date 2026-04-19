@@ -1,12 +1,9 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 import { generateTickerContent } from '@/app/lib/pseo/content';
 import { generateFAQStructuredData } from '@/app/lib/pseo/content';
 import StructuredData from '@/app/components/StructuredData';
 import TickerPageContent from '@/app/components/TickerPageContent';
-import JsonApiStickyPrompt from '@/app/components/JsonApiStickyPrompt';
-import { jsonApiBridgeCopy, jsonApiDashboardFooterLink } from '@/app/lib/seo/jsonApiInternalLinks';
 
 
 // Server-side quote fetching for SEO (runs during ISR revalidation)
@@ -102,9 +99,6 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
   const resolvedParams = await params;
   // Normalize symbol (remove dashes, handle crypto pairs)
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
-  const bridgeVariant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
-  const jsonApiBridge = jsonApiBridgeCopy(normalizedSymbol, bridgeVariant);
-  const authorityFoot = jsonApiDashboardFooterLink(normalizedSymbol);
   const metadata = await getTickerMetadata(normalizedSymbol);
   
   // Fetch quote data server-side for SEO (only during ISR revalidation, not during build)
@@ -143,110 +137,61 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
         />
-        <div
-          id="symbol-hub-main"
-          style={{
-            background: 'var(--bg)',
-            minHeight: '100vh',
-            borderTop: '2px solid var(--border-warm)',
-            boxShadow: 'inset 0 1px 0 rgba(245, 158, 11, 0.1)',
-            paddingBottom: '100px',
-          }}
-        >
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '32px 16px'
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '32px 16px'
+        }}>
+          <h1 style={{
+            fontSize: '30px',
+            fontWeight: '700',
+            color: 'var(--text)',
+            marginBottom: '8px'
           }}>
-            <h1 style={{
-              fontSize: '30px',
-              fontWeight: '700',
+            {content.h1}
+          </h1>
+          <p style={{
+            color: 'var(--text-secondary)',
+            marginBottom: '32px',
+            lineHeight: '1.6'
+          }}>
+            {content.description}
+          </p>
+          <div style={{
+            background: 'var(--card)',
+            border: '2px solid var(--border-warm)',
+            borderRadius: '12px',
+            padding: '24px',
+            marginBottom: '32px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
               color: 'var(--text)',
-              marginBottom: '8px'
+              marginBottom: '16px'
             }}>
-              {content.h1}
-            </h1>
-            <p style={{
-              color: 'var(--text-secondary)',
-              marginBottom: '32px',
-              lineHeight: '1.6'
-            }}>
-              {content.description}
-            </p>
-            <div style={{
-              background: 'var(--card)',
-              border: '2px solid var(--border-warm)',
-              borderRadius: '12px',
-              padding: '24px',
-              marginBottom: '32px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}>
-              <h2 style={{
-                fontSize: '20px',
-                fontWeight: '600',
-                color: 'var(--text)',
-                marginBottom: '16px'
-              }}>
-                Track {normalizedSymbol} in Your Portfolio
-              </h2>
-              <a
-                href={content.cta.url}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  padding: '12px 24px',
-                  background: 'var(--accent-warm)',
-                  color: '#ffffff',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                  transition: 'background-color 0.2s',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                }}
-              >
-                {content.cta.text}
-              </a>
-            </div>
-          </div>
-          <div
-            style={{
-              maxWidth: '1200px',
-              margin: '0 auto',
-              padding: '8px 16px 28px',
-              textAlign: 'center',
-              borderTop: '1px solid var(--border-subtle)',
-            }}
-          >
-            <Link
-              href={authorityFoot.href}
-              title={authorityFoot.title}
+              Track {normalizedSymbol} in Your Portfolio
+            </h2>
+            <a
+              href={content.cta.url}
               style={{
-                color: 'var(--accent-warm)',
-                fontWeight: 600,
-                fontSize: '14px',
-                textDecoration: 'underline',
-                textUnderlineOffset: '3px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '12px 24px',
+                background: 'var(--accent-warm)',
+                color: '#ffffff',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: '500',
+                transition: 'background-color 0.2s',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
               }}
             >
-              {authorityFoot.label}
-            </Link>
-            <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
-              <Link
-                href="/architecture?utm_source=symbol_hub&utm_medium=footer&utm_campaign=geo"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                Local-first architecture & hybrid sovereignty →
-              </Link>
-            </p>
+              {content.cta.text}
+            </a>
           </div>
         </div>
-        <JsonApiStickyPrompt
-          dashboardHref={`/dashboard?utm_source=symbol_hub&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
-          contextId={normalizedSymbol.toLowerCase()}
-          bridgeVariant={bridgeVariant}
-          bridgeHook={jsonApiBridge.hook}
-          pageSource="symbol_hub"
-        />
       </>
     );
   }
@@ -256,64 +201,13 @@ export default async function SymbolPage({ params }: { params: Promise<{ symbol:
   const faqStructuredData = generateFAQStructuredData(metadata.faqs);
   
   return (
-    <>
-      <div
-        id="symbol-hub-main"
-        style={{
-          background: 'var(--bg)',
-          minHeight: '100vh',
-          borderTop: '2px solid var(--border-warm)',
-          boxShadow: 'inset 0 1px 0 rgba(245, 158, 11, 0.1)',
-          paddingBottom: '100px',
-        }}
-      >
-        <TickerPageContent
-          normalizedSymbol={normalizedSymbol}
-          metadata={metadata}
-          content={content}
-          faqStructuredData={faqStructuredData}
-          initialQuoteData={initialQuoteData}
-        />
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '8px 16px 28px',
-            textAlign: 'center',
-            borderTop: '1px solid var(--border-subtle)',
-          }}
-        >
-          <Link
-            href={authorityFoot.href}
-            title={authorityFoot.title}
-            style={{
-              color: 'var(--accent-warm)',
-              fontWeight: 600,
-              fontSize: '14px',
-              textDecoration: 'underline',
-              textUnderlineOffset: '3px',
-            }}
-          >
-            {authorityFoot.label}
-          </Link>
-          <p style={{ margin: '10px 0 0', fontSize: '12px', color: 'var(--text-secondary)' }}>
-            <Link
-              href="/architecture?utm_source=symbol_hub&utm_medium=footer&utm_campaign=geo"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              Local-first architecture & hybrid sovereignty →
-            </Link>
-          </p>
-        </div>
-      </div>
-      <JsonApiStickyPrompt
-        dashboardHref={`/dashboard?utm_source=symbol_hub&utm_medium=sticky_prompt&utm_campaign=activation&utm_content=${encodeURIComponent(normalizedSymbol.toLowerCase())}`}
-        contextId={normalizedSymbol.toLowerCase()}
-        bridgeVariant={bridgeVariant}
-        bridgeHook={jsonApiBridge.hook}
-        pageSource="symbol_hub"
-      />
-    </>
+    <TickerPageContent
+      normalizedSymbol={normalizedSymbol}
+      metadata={metadata}
+      content={content}
+      faqStructuredData={faqStructuredData}
+      initialQuoteData={initialQuoteData}
+    />
   );
 }
 
