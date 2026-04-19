@@ -22,12 +22,20 @@ import TickerSearch from '../components/TickerSearch';
 import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import LivingPipeline from '../components/landing/LivingPipeline';
 import { AnalystVideo } from '../components/landing/AnalystVideo';
-import Typewriter from '../components/ui/Typewriter';
 import ScrollReveal from '../components/ui/ScrollReveal';
+import {
+  sovereignPrimaryNav,
+  sovereignToolsDropdown,
+  isHashOnlyHref,
+} from '@/app/lib/nav/sovereignMarketingNav';
 
 export default function LandingPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const primaryNav = sovereignPrimaryNav(pathname, 'landing');
+  const faqNavItem = primaryNav[primaryNav.length - 1]!;
+  const beforeFaqNav = primaryNav.slice(0, -1);
+  const toolsNavLinks = sovereignToolsDropdown(pathname);
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -206,141 +214,184 @@ export default function LandingPage() {
               <nav className="desktop-nav mobile-hidden" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '24px'
+                gap: '16px',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
               }}>
-                <a href="#mission" className="brand-link" style={{ 
-                  fontSize: '15px',
-                  padding: '8px 0',
-                  borderBottom: '2px solid transparent'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--signal)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--text)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                }}
-                >Mission</a>
-                <a href="#features" className="brand-link" style={{ 
-                  fontSize: '15px',
-                  padding: '8px 0',
-                  borderBottom: '2px solid transparent'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--signal)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--text)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                }}
-                >Features</a>
-                <Link href="#popular-stocks" className="brand-link" style={{ 
-                  fontSize: '15px',
-                  padding: '8px 0',
-                  borderBottom: '2px solid transparent',
-                  textDecoration: 'none',
-                  color: 'var(--text)'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--signal)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--text)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                }}
-                >Stocks</Link>
-                <a href="#fin-pillars" className="brand-link" style={{ 
-                  fontSize: '15px',
-                  padding: '8px 0',
-                  borderBottom: '2px solid transparent'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--signal)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--text)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                }}
-                >FIN Pillars</a>
-                <div
-                  ref={toolsTriggerRef}
-                  style={{ position: 'relative', display: 'inline-block' }}
-                  onMouseEnter={() => {
-                    if (toolsCloseTimeoutRef.current) {
-                      clearTimeout(toolsCloseTimeoutRef.current);
-                      toolsCloseTimeoutRef.current = null;
-                    }
-                    setToolsOpen(true);
-                  }}
-                  onMouseLeave={() => {
-                    toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
-                  }}
-                >
-                  <span
+                {beforeFaqNav.map((link) => {
+                  const linkStyle = {
+                    fontSize: '15px',
+                    padding: '8px 0',
+                    borderBottom: '2px solid transparent',
+                    textDecoration: 'none',
+                    color: 'var(--text)' as const,
+                  };
+                  const linkEl = isHashOnlyHref(link.href) ? (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="brand-link"
+                      style={linkStyle}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--signal)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--text)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                      }}
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="brand-link"
+                      style={linkStyle}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--signal)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--text)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                      }}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                  if (link.label === 'FIN Pillars') {
+                    return (
+                      <React.Fragment key={link.label}>
+                        {linkEl}
+                        <div
+                          ref={toolsTriggerRef}
+                          style={{ position: 'relative', display: 'inline-block' }}
+                          onMouseEnter={() => {
+                            if (toolsCloseTimeoutRef.current) {
+                              clearTimeout(toolsCloseTimeoutRef.current);
+                              toolsCloseTimeoutRef.current = null;
+                            }
+                            setToolsOpen(true);
+                          }}
+                          onMouseLeave={() => {
+                            toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
+                          }}
+                        >
+                          <span
+                            className="brand-link"
+                            style={{
+                              fontSize: '15px',
+                              padding: '8px 0',
+                              borderBottom: '2px solid transparent',
+                              cursor: 'pointer',
+                              color: toolsOpen ? 'var(--signal)' : 'var(--text)',
+                              borderBottomColor: toolsOpen ? 'var(--signal)' : 'transparent',
+                            }}
+                            onClick={() => setToolsOpen(!toolsOpen)}
+                          >
+                            Tools ▾
+                          </span>
+                          {toolsOpen && toolsPanelRect && typeof document !== 'undefined' && createPortal(
+                            <div
+                              role="menu"
+                              onMouseEnter={() => {
+                                if (toolsCloseTimeoutRef.current) {
+                                  clearTimeout(toolsCloseTimeoutRef.current);
+                                  toolsCloseTimeoutRef.current = null;
+                                }
+                                setToolsOpen(true);
+                              }}
+                              onMouseLeave={() => {
+                                toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
+                              }}
+                              style={{
+                                position: 'fixed',
+                                top: toolsPanelRect.top,
+                                left: toolsPanelRect.left,
+                                minWidth: '180px',
+                                background: 'var(--surface-elevated)',
+                                border: '2px solid var(--border-warm)',
+                                borderRadius: '8px',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                padding: '8px 0',
+                                zIndex: 10050,
+                              }}
+                            >
+                              {toolsNavLinks.map((t) => (
+                                <Link
+                                  key={t.label}
+                                  href={t.href}
+                                  style={{
+                                    display: 'block',
+                                    padding: '10px 16px',
+                                    fontSize: '14px',
+                                    color: 'var(--text)',
+                                    textDecoration: 'none',
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'var(--muted)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'transparent';
+                                  }}
+                                >
+                                  {t.label}
+                                </Link>
+                              ))}
+                            </div>,
+                            document.body
+                          )}
+                        </div>
+                      </React.Fragment>
+                    );
+                  }
+                  return linkEl;
+                })}
+                {isHashOnlyHref(faqNavItem.href) ? (
+                  <a
+                    href={faqNavItem.href}
                     className="brand-link"
                     style={{
                       fontSize: '15px',
                       padding: '8px 0',
                       borderBottom: '2px solid transparent',
-                      cursor: 'pointer',
-                      color: toolsOpen ? 'var(--signal)' : 'var(--text)',
-                      borderBottomColor: toolsOpen ? 'var(--signal)' : 'transparent'
                     }}
-                    onClick={() => setToolsOpen(!toolsOpen)}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.color = 'var(--signal)';
+                      (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.color = 'var(--text)';
+                      (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                    }}
                   >
-                    Tools ▾
-                  </span>
-                  {toolsOpen && toolsPanelRect && typeof document !== 'undefined' && createPortal(
-                    <div
-                      role="menu"
-                      onMouseEnter={() => {
-                        if (toolsCloseTimeoutRef.current) {
-                          clearTimeout(toolsCloseTimeoutRef.current);
-                          toolsCloseTimeoutRef.current = null;
-                        }
-                        setToolsOpen(true);
-                      }}
-                      onMouseLeave={() => {
-                        toolsCloseTimeoutRef.current = setTimeout(() => setToolsOpen(false), 200);
-                      }}
-                      style={{
-                        position: 'fixed',
-                        top: toolsPanelRect.top,
-                        left: toolsPanelRect.left,
-                        minWidth: '180px',
-                        background: 'var(--surface-elevated)',
-                        border: '2px solid var(--border-warm)',
-                        borderRadius: '8px',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                        padding: '8px 0',
-                        zIndex: 10050
-                      }}
-                    >
-                      <Link href="/live" style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: 'var(--text)', textDecoration: 'none' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Live Market Data</Link>
-                      <Link href="/tools" style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: 'var(--text)', textDecoration: 'none' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Tax Converters</Link>
-                      <Link href="/s/directory" style={{ display: 'block', padding: '10px 16px', fontSize: '14px', color: 'var(--text)', textDecoration: 'none' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>JSON API Directory</Link>
-                    </div>,
-                    document.body
-                  )}
-                </div>
-                <a href="#faq" className="brand-link" style={{ 
-                  fontSize: '15px',
-                  padding: '8px 0',
-                  borderBottom: '2px solid transparent'
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--signal)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.color = 'var(--text)';
-                  (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                }}
-                >FAQ</a>
+                    {faqNavItem.label}
+                  </a>
+                ) : (
+                  <Link
+                    href={faqNavItem.href}
+                    className="brand-link"
+                    style={{
+                      fontSize: '15px',
+                      padding: '8px 0',
+                      borderBottom: '2px solid transparent',
+                      textDecoration: 'none',
+                      color: 'var(--text)',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.color = 'var(--signal)';
+                      (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.color = 'var(--text)';
+                      (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                    }}
+                  >
+                    {faqNavItem.label}
+                  </Link>
+                )}
               </nav>
 
               {/* Action Buttons */}
@@ -467,32 +518,32 @@ export default function LandingPage() {
                   <span style={{
                     width: '36px',
                     height: '8px',
-                    background: '#ff6b35',
+                    background: 'var(--accent-warm)',
                     borderRadius: '4px',
                     transition: 'all 0.3s ease',
                     transform: isMobileMenuOpen ? 'rotate(45deg) translate(9px, 9px)' : 'none',
-                    boxShadow: '0 4px 12px rgba(255, 107, 53, 0.6), 0 0 0 1px rgba(255, 107, 53, 0.3)',
-                    border: '1px solid #ff6b35'
+                    boxShadow: '0 2px 8px color-mix(in srgb, var(--accent-warm) 45%, transparent)',
+                    border: '1px solid var(--border-warm)'
                   }}></span>
                   <span style={{
                     width: '36px',
                     height: '8px',
-                    background: '#ff6b35',
+                    background: 'var(--accent-warm)',
                     borderRadius: '4px',
                     transition: 'all 0.3s ease',
                     opacity: isMobileMenuOpen ? 0 : 1,
-                    boxShadow: '0 4px 12px rgba(255, 107, 53, 0.6), 0 0 0 1px rgba(255, 107, 53, 0.3)',
-                    border: '1px solid #ff6b35'
+                    boxShadow: '0 2px 8px color-mix(in srgb, var(--accent-warm) 45%, transparent)',
+                    border: '1px solid var(--border-warm)'
                   }}></span>
                   <span style={{
                     width: '36px',
                     height: '8px',
-                    background: '#ff6b35',
+                    background: 'var(--accent-warm)',
                     borderRadius: '4px',
                     transition: 'all 0.3s ease',
                     transform: isMobileMenuOpen ? 'rotate(-45deg) translate(9px, -9px)' : 'none',
-                    boxShadow: '0 4px 12px rgba(255, 107, 53, 0.6), 0 0 0 1px rgba(255, 107, 53, 0.3)',
-                    border: '1px solid #ff6b35'
+                    boxShadow: '0 2px 8px color-mix(in srgb, var(--accent-warm) 45%, transparent)',
+                    border: '1px solid var(--border-warm)'
                   }}></span>
                 </div>
               </button>
@@ -560,70 +611,127 @@ export default function LandingPage() {
             borderRadius: '12px',
             margin: '80px 20px 32px 20px'
           }}>
-            <a 
-              href="#mission" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '18px', 
+            {beforeFaqNav.map((link) => {
+              const row = {
+                color: 'var(--text)',
+                textDecoration: 'none',
+                fontSize: '18px',
                 fontWeight: '500',
                 padding: '12px 0',
-                borderBottom: '1px solid var(--card-border)'
-              }}
-            >
-              Mission
-            </a>
-            <a 
-              href="#features" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '18px', 
-                fontWeight: '500',
-                padding: '12px 0',
-                borderBottom: '1px solid var(--card-border)'
-              }}
-            >
-              Features
-            </a>
-            <a 
-              href="#fin-pillars" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '18px', 
-                fontWeight: '500',
-                padding: '12px 0',
-                borderBottom: '1px solid var(--card-border)'
-              }}
-            >
-              FIN Pillars
-            </a>
-            <details style={{ margin: 0 }}>
-              <summary style={{ color: 'var(--text)', fontSize: '18px', fontWeight: '500', padding: '12px 0', borderBottom: '1px solid var(--card-border)', cursor: 'pointer', listStyle: 'none' }}>Tools</summary>
-              <div style={{ paddingLeft: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <Link href="/live" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '16px', padding: '10px 0' }}>Live Market Data</Link>
-                <Link href="/tools" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '16px', padding: '10px 0' }}>Tax Converters</Link>
-                <Link href="/s/directory" onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--text)', textDecoration: 'none', fontSize: '16px', padding: '10px 0' }}>JSON API Directory</Link>
-              </div>
-            </details>
-            <a 
-              href="#faq" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              style={{ 
-                color: 'var(--text)', 
-                textDecoration: 'none', 
-                fontSize: '18px', 
-                fontWeight: '500',
-                padding: '12px 0',
-                borderBottom: '1px solid var(--card-border)'
-              }}
-            >
-              FAQ
-            </a>
+                borderBottom: '1px solid var(--card-border)',
+              } as const;
+              const close = () => setIsMobileMenuOpen(false);
+              const linkEl = isHashOnlyHref(link.href) ? (
+                <a key={link.label} href={link.href} onClick={close} style={row}>
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={close}
+                  style={{ ...row, display: 'block' }}
+                >
+                  {link.label}
+                </Link>
+              );
+              if (link.label === 'FIN Pillars') {
+                return (
+                  <React.Fragment key={link.label}>
+                    {linkEl}
+                    <details style={{ margin: 0 }}>
+                      <summary
+                        style={{
+                          color: 'var(--text)',
+                          fontSize: '18px',
+                          fontWeight: '500',
+                          padding: '12px 0',
+                          borderBottom: '1px solid var(--card-border)',
+                          cursor: 'pointer',
+                          listStyle: 'none',
+                        }}
+                      >
+                        Tools
+                      </summary>
+                      <div
+                        style={{
+                          paddingLeft: '16px',
+                          marginTop: '8px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                        }}
+                      >
+                        {toolsNavLinks.map((t) =>
+                          isHashOnlyHref(t.href) ? (
+                            <a
+                              key={t.label}
+                              href={t.href}
+                              onClick={close}
+                              style={{
+                                color: 'var(--text)',
+                                textDecoration: 'none',
+                                fontSize: '16px',
+                                padding: '10px 0',
+                              }}
+                            >
+                              {t.label}
+                            </a>
+                          ) : (
+                            <Link
+                              key={t.label}
+                              href={t.href}
+                              onClick={close}
+                              style={{
+                                color: 'var(--text)',
+                                textDecoration: 'none',
+                                fontSize: '16px',
+                                padding: '10px 0',
+                              }}
+                            >
+                              {t.label}
+                            </Link>
+                          )
+                        )}
+                      </div>
+                    </details>
+                  </React.Fragment>
+                );
+              }
+              return linkEl;
+            })}
+            {isHashOnlyHref(faqNavItem.href) ? (
+              <a
+                href={faqNavItem.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{
+                  color: 'var(--text)',
+                  textDecoration: 'none',
+                  fontSize: '18px',
+                  fontWeight: '500',
+                  padding: '12px 0',
+                  borderBottom: '1px solid var(--card-border)',
+                }}
+              >
+                {faqNavItem.label}
+              </a>
+            ) : (
+              <Link
+                href={faqNavItem.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{
+                  color: 'var(--text)',
+                  textDecoration: 'none',
+                  fontSize: '18px',
+                  fontWeight: '500',
+                  padding: '12px 0',
+                  borderBottom: '1px solid var(--card-border)',
+                  display: 'block',
+                }}
+              >
+                {faqNavItem.label}
+              </Link>
+            )}
           </nav>
 
               {/* Mobile Action Buttons */}
@@ -690,7 +798,7 @@ export default function LandingPage() {
       )}
 
       {/* Hero Section - PREMIUM POSITIONING (High-Tech Low-Drag: Living Pipeline + Typewriter + grid pulse) */}
-      <main className="brand-surface brand-grid brand-grid-pulse mobile-container" style={{ 
+      <main className="brand-surface brand-grid brand-grid-pulse mobile-container terminal-content-scope" style={{ 
         width: '100%',
         maxWidth: '100vw',
         padding: 'clamp(24px, 6vw, 60px) clamp(12px, 3vw, 24px)',
@@ -718,7 +826,41 @@ export default function LandingPage() {
         }}>
           {/* Living Pipeline: CSV -> Processor -> JSON (motion as meaning) */}
           <LivingPipeline />
-          {/* Headline - Terminal Typer */}
+          {/* Static protocol strip — factual labels; flex-centered for optical alignment */}
+          <div
+            aria-hidden
+            style={{
+              width: '100%',
+              maxWidth: '720px',
+              minHeight: '44px',
+              marginBottom: '18px',
+              padding: '0 clamp(12px, 3vw, 20px)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border)',
+              background: 'var(--surface-elevated)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              columnGap: '10px',
+              rowGap: '6px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--font-size-xs)',
+              letterSpacing: '0.06em',
+              color: 'var(--text-secondary)',
+              lineHeight: 'var(--line-tight)',
+              boxSizing: 'border-box',
+            }}
+          >
+            <span style={{ color: 'var(--accent-warm)', fontWeight: 700 }}>PROTOCOL</span>
+            <span aria-hidden style={{ color: 'var(--muted)' }}>
+              ·
+            </span>
+            <span>
+              LEDGER_LOCAL_FIRST · SYNC_OPTIONAL_USER_OWNED · AI_CONTEXT_BOUNDED_STATELESS
+            </span>
+          </div>
+          {/* Headline - system-led category */}
           <h1 className="brand-text" style={{ 
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', 
             fontWeight: 'bold', 
@@ -728,18 +870,11 @@ export default function LandingPage() {
             maxWidth: '800px',
             minHeight: '1.2em'
           }}>
-            <Typewriter
-              strings={[
-                'Local-First AI Analyst.',
-                'Zero Cloud Uploads.',
-                'Sanitization by Construction.',
-              ]}
-              cursorColor="#f59e0b"
-            />
-            <noscript>Local-First AI Analyst.</noscript>
+            The Local-First Portfolio Terminal.
+            <noscript>The Local-First Portfolio Terminal.</noscript>
           </h1>
 
-          {/* Subhead - Sovereign positioning + drop-zone pointer */}
+          {/* Subhead - Pocket Analyst + sovereignty + drop-zone pointer */}
           <p className="brand-text-secondary" style={{ 
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
             lineHeight: '1.6', 
@@ -747,9 +882,10 @@ export default function LandingPage() {
             maxWidth: '720px',
             color: 'var(--text-secondary)'
           }}>
-            Stop giving Plaid-class aggregators your banking passwords. Drop your broker CSV below and watch our
-            local-first pipeline analyze your portfolio —{' '}
-            <strong style={{ color: 'var(--text)' }}>your raw ledger never leaves your device</strong> for the demo.
+            Analyze broker CSVs with <strong style={{ color: 'var(--text)' }}>Pocket Analyst</strong> and a
+            local-first pipeline built for serious portfolios. Your raw financial ledger is processed in your
+            browser and is not warehoused on our servers —{' '}
+            <strong style={{ color: 'var(--text)' }}>for the hero demo below, your file never leaves your device.</strong>
             <br />
             <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', display: 'block', marginTop: '12px' }}>
               <strong style={{ color: 'var(--accent-warm)' }}>Founders Club: £12/mo or £100/yr.</strong> Cancel anytime.
@@ -942,6 +1078,23 @@ export default function LandingPage() {
             </Link>
           </div>
 
+          <div style={{ width: '100%', maxWidth: '720px', marginBottom: '24px', textAlign: 'center' }}>
+            <Link
+              href="/architecture?utm_source=landing&utm_medium=hero_bridge&utm_campaign=architecture"
+              className="brand-link"
+              style={{
+                fontSize: 'clamp(15px, 2vw, 17px)',
+                fontWeight: 600,
+                color: 'var(--accent-warm)',
+                textDecoration: 'none',
+                borderBottom: '2px solid var(--accent-warm)',
+                paddingBottom: '2px',
+              }}
+            >
+              Read how our hybrid-sync architecture works →
+            </Link>
+          </div>
+
           {/* Quick Command Search Bar - Sitemap Bridge */}
           <div style={{
             width: '100%',
@@ -952,11 +1105,11 @@ export default function LandingPage() {
             zIndex: 10000
           }}>
             <div style={{
-              background: '#1a1a1a',
-              border: '2px solid var(--border-warm)',
-              borderRadius: '12px',
+              background: 'var(--surface-elevated)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)',
               padding: '4px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+              boxShadow: 'var(--shadow-md)',
             }}>
               <TickerSearch
                 placeholder="> Search 58,070 assets (e.g. NVDA, BTC)..."
@@ -1008,15 +1161,15 @@ export default function LandingPage() {
               position: 'absolute',
               bottom: '12px',
               right: '12px',
-              background: 'rgba(0, 0, 0, 0.8)',
-              color: '#00ff00',
+              background: 'color-mix(in srgb, var(--surface-elevated) 92%, transparent)',
+              color: 'var(--accent-warm)',
               padding: '8px 16px',
-              borderRadius: '8px',
+              borderRadius: 'var(--radius-md)',
               fontSize: '12px',
-              fontFamily: 'monospace',
+              fontFamily: 'var(--font-mono)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(0, 255, 0, 0.3)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)'
+              border: '1px solid var(--border-warm)',
+              boxShadow: 'var(--shadow-sm)',
             }}>
               Actual footage of Pocket Portfolio running on localhost
             </div>
@@ -1025,7 +1178,9 @@ export default function LandingPage() {
       </main>
 
       {/* Pocket Analyst: Your Personal Quantitative Analyst (video + CTAs) */}
-      <AnalystVideo />
+      <div className="terminal-content-scope">
+        <AnalystVideo />
+      </div>
 
       {/* SECTION 2: THE BRIDGE - TRUST ANCHOR */}
       <section style={{
@@ -1048,7 +1203,11 @@ export default function LandingPage() {
             color: 'var(--text-warm)',
             letterSpacing: '-0.02em'
           }}>
-            TRUSTED BY <span style={{ color: '#10b981' }}><DynamicDownloadCount /></span> ENGINEERS & BUILDERS
+            TRUSTED BY{' '}
+            <span style={{ color: 'var(--accent-warm)' }}>
+              <DynamicDownloadCount />
+            </span>{' '}
+            ENGINEERS & BUILDERS
           </h2>
           
           {/* Trust Logos Row */}
@@ -1147,21 +1306,23 @@ export default function LandingPage() {
               <span>NPM</span>
             </a>
 
-            {/* Verified Audit Badge */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 24px',
-              background: 'rgba(66, 133, 244, 0.1)',
-              border: '2px solid rgba(66, 133, 244, 0.3)',
-              borderRadius: '12px',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#4285F4'
-            }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#4285F4">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            {/* Verified Audit Badge — brand chrome (no third-party blue as our accent) */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 24px',
+                background: 'var(--surface)',
+                border: '2px solid var(--border-warm)',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'var(--text-warm)',
+              }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent-warm)">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
               <span>Verified Audit</span>
             </div>
@@ -1226,10 +1387,10 @@ export default function LandingPage() {
       <section id="developer" style={{
         width: '100%',
         padding: 'clamp(60px, 10vw, 120px) clamp(12px, 3vw, 24px)',
-        background: '#0a0a0a',
+        background: 'linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%)',
         marginBottom: 'clamp(60px, 10vw, 120px)',
-        borderTop: '1px solid var(--border-warm)',
-        borderBottom: '1px solid var(--border-warm)'
+        borderTop: '1px solid var(--border)',
+        borderBottom: '1px solid var(--border)',
       }}>
         <div style={{
           maxWidth: '1000px',
@@ -1240,16 +1401,16 @@ export default function LandingPage() {
             fontSize: 'clamp(2rem, 4vw, 3rem)',
             fontWeight: 'bold',
             marginBottom: '24px',
-            color: '#ffffff',
+            color: 'var(--text)',
             letterSpacing: '-0.02em',
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontFamily: 'var(--font-sans)',
           }}>
             Or... Build Your Own Stack.
           </h2>
 
           <p style={{
             fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-            color: '#a0a0a0',
+            color: 'var(--text-secondary)',
             marginBottom: '48px',
             maxWidth: '700px',
             marginLeft: 'auto',
@@ -1261,13 +1422,13 @@ export default function LandingPage() {
 
           {/* Terminal Block */}
           <div style={{
-            background: '#1a1a1a',
-            border: '2px solid #333',
-            borderRadius: '12px',
+            background: 'var(--surface-elevated)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-md)',
             padding: 'clamp(24px, 5vw, 40px)',
             marginBottom: '32px',
             textAlign: 'left',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
+            boxShadow: 'var(--shadow-lg)',
           }}>
             {/* Terminal Header */}
             <div style={{
@@ -1276,7 +1437,7 @@ export default function LandingPage() {
               gap: '8px',
               marginBottom: '24px',
               paddingBottom: '16px',
-              borderBottom: '1px solid #333'
+              borderBottom: '1px solid var(--border)',
             }}>
               <div style={{
                 width: '12px',
@@ -1298,9 +1459,9 @@ export default function LandingPage() {
               }}></div>
               <span style={{
                 marginLeft: '16px',
-                color: '#666',
+                color: 'var(--muted)',
                 fontSize: '14px',
-                fontFamily: 'monospace'
+                fontFamily: 'var(--font-mono)',
               }}>terminal</span>
             </div>
 
@@ -1308,8 +1469,8 @@ export default function LandingPage() {
             <pre style={{
               margin: 0,
               fontSize: 'clamp(14px, 2vw, 16px)',
-              fontFamily: '"Fira Code", "Monaco", "Consolas", monospace',
-              color: '#00ff00',
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--accent-warm)',
               lineHeight: '1.8',
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-word',
@@ -1334,21 +1495,21 @@ $ npx pocket-init --sovereign
               display: 'inline-block',
               padding: '16px 32px',
               background: 'transparent',
-              border: '2px solid #333',
-              color: '#ffffff',
-              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              color: 'var(--text)',
+              borderRadius: 'var(--radius-md)',
               fontSize: '16px',
               fontWeight: '600',
               textDecoration: 'none',
               transition: 'all 0.2s ease',
-              fontFamily: 'monospace'
+              fontFamily: 'var(--font-mono)',
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'var(--accent-warm)';
-              e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+              e.currentTarget.style.background = 'color-mix(in srgb, var(--accent-warm) 12%, transparent)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#333';
+              e.currentTarget.style.borderColor = 'var(--border)';
               e.currentTarget.style.background = 'transparent';
             }}
           >
@@ -1563,11 +1724,11 @@ $ npx pocket-init --sovereign
 
             {/* CARD 3: THE VANGUARD */}
             <div style={{
-              background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
-              border: '2px solid #333',
+              background: 'linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface) 100%)',
+              border: '1px solid var(--border)',
               borderRadius: '16px',
               padding: 'clamp(32px, 5vw, 40px)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+              boxShadow: 'var(--shadow-md)',
               display: 'flex',
               flexDirection: 'column',
               transition: 'transform 0.2s, box-shadow 0.2s',
@@ -1576,13 +1737,13 @@ $ npx pocket-init --sovereign
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-4px)';
-              e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.7)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
               e.currentTarget.style.borderColor = 'var(--accent-warm)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.5)';
-              e.currentTarget.style.borderColor = '#333';
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.borderColor = 'var(--border)';
             }}
             >
               {/* Premium Badge Effect */}
@@ -1621,14 +1782,14 @@ $ npx pocket-init --sovereign
                 fontSize: 'clamp(1.5rem, 3vw, 1.75rem)',
                 fontWeight: 'bold',
                 marginBottom: '12px',
-                color: '#ffffff',
+                color: 'var(--text)',
                 position: 'relative',
                 zIndex: 1
               }}>
                 Founders & Sponsors
               </h3>
               <p style={{
-                color: '#a0a0a0',
+                color: 'var(--text-secondary)',
                 lineHeight: '1.6',
                 fontSize: '15px',
                 marginBottom: '24px',
@@ -1644,7 +1805,7 @@ $ npx pocket-init --sovereign
                   padding: '12px 24px',
                   background: 'transparent',
                   border: '2px solid rgba(245, 158, 11, 0.4)',
-                  color: '#f59e0b',
+                  color: 'var(--accent-warm)',
                   textDecoration: 'none',
                   borderRadius: '8px',
                   fontSize: '15px',
@@ -1947,88 +2108,139 @@ $ npx pocket-init --sovereign
           <p style={{ 
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
             color: 'var(--muted)', 
-            marginBottom: '48px' 
+            marginBottom: '32px' 
           }}>
-            Future • Investment • Now
+            Future • Investment • Now — one engine: open core, human-centered execution, shipped insight.
           </p>
-          
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: '32px' 
-          }}>
-            <div style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              padding: '32px', 
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <h3 style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                marginBottom: '16px', 
-                color: 'var(--signal)' 
-              }}>
-                Future
-              </h3>
-              <p style={{ color: 'var(--muted)', lineHeight: '1.6', marginBottom: '16px' }}>
-                We design in the open and evolve with our community. We challenge the status quo in investment education and accessibility, and we focus relentlessly on clarity of insight.
-              </p>
-              <ul style={{ textAlign: 'left', color: 'var(--muted)', lineHeight: '1.6', paddingLeft: '0', listStyle: 'none' }}>
-                <li style={{ marginBottom: '8px' }}>• Open-source core</li>
-                <li style={{ marginBottom: '8px' }}>• Capability building with the community</li>
-                <li style={{ marginBottom: '8px' }}>• Insight-first design</li>
-              </ul>
+
+          {/* FIN engine: conceptual flow (not live telemetry) */}
+          <div
+            style={{
+              maxWidth: '1000px',
+              margin: '0 auto 40px',
+              padding: 'clamp(20px, 4vw, 28px)',
+              borderRadius: '16px',
+              border: '2px solid var(--border-warm)',
+              background: 'linear-gradient(165deg, var(--surface) 0%, var(--warm-bg) 100%)',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                alignItems: 'stretch',
+                justifyContent: 'center',
+                gap: 'clamp(8px, 2vw, 16px)',
+              }}
+            >
+              {[
+                {
+                  title: 'Future',
+                  subtitle: 'Open-source core',
+                  body: 'Community-owned primitives and transparent evolution — capability you can fork, audit, and extend.',
+                  bullets: ['Open-source core', 'Insight-first design', 'Public roadmap'],
+                },
+                {
+                  title: 'Investment',
+                  subtitle: 'Human-centered UX + data engineering',
+                  body: 'Design and pipelines that respect attention: evidence in, noise out, serious portfolios in focus.',
+                  bullets: ['Human-centered UX', 'Robust data engineering', 'Evidence-based decisions'],
+                },
+                {
+                  title: 'Now',
+                  subtitle: 'Real-time insight + delivery',
+                  body: 'Shipped learning loops: fast iteration, honest telemetry on the product (not your ledger), transparent delivery.',
+                  bullets: ['Real-time insights', 'Fast iterative delivery', 'Transparent roadmap'],
+                },
+              ].map((node, i) => (
+                <React.Fragment key={node.title}>
+                  {i > 0 && (
+                    <div
+                      aria-hidden
+                      style={{
+                        alignSelf: 'center',
+                        fontFamily: 'ui-monospace, Menlo, monospace',
+                        fontSize: 'clamp(18px, 3vw, 24px)',
+                        color: 'var(--accent-warm)',
+                        fontWeight: 700,
+                        padding: '4px 0',
+                      }}
+                    >
+                      →
+                    </div>
+                  )}
+                  <div
+                    style={{
+                      flex: '1 1 240px',
+                      maxWidth: '320px',
+                      textAlign: 'left',
+                      padding: '20px 18px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface-elevated)',
+                      boxShadow: 'var(--shadow-xs)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        fontFamily: 'ui-monospace, Menlo, monospace',
+                        letterSpacing: '0.08em',
+                        color: 'var(--accent-warm)',
+                        fontWeight: 700,
+                        marginBottom: '6px',
+                      }}
+                    >
+                      {node.title.toUpperCase()}
+                    </div>
+                    <h3
+                      style={{
+                        fontSize: 'clamp(18px, 2.5vw, 22px)',
+                        fontWeight: 800,
+                        margin: '0 0 10px',
+                        color: 'var(--text-warm)',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {node.subtitle}
+                    </h3>
+                    <p style={{ color: 'var(--muted)', lineHeight: 1.55, fontSize: '14px', margin: '0 0 12px' }}>
+                      {node.body}
+                    </p>
+                    <ul
+                      style={{
+                        margin: 0,
+                        paddingLeft: '0',
+                        listStyle: 'none',
+                        color: 'var(--muted)',
+                        fontSize: '13px',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {node.bullets.map((b) => (
+                        <li key={b} style={{ marginBottom: '6px' }}>
+                          <span style={{ color: 'var(--accent-warm)' }}>›</span> {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </React.Fragment>
+              ))}
             </div>
-            <div style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              padding: '32px', 
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <h3 style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                marginBottom: '16px', 
-                color: 'var(--signal)' 
-              }}>
-                Investment
-              </h3>
-              <p style={{ color: 'var(--muted)', lineHeight: '1.6', marginBottom: '16px' }}>
-                We promote investment mindsets through thoughtful design, technical excellence, and ambidextrous methods—tools that are simple to use and powerful under the hood.
-              </p>
-              <ul style={{ textAlign: 'left', color: 'var(--muted)', lineHeight: '1.6', paddingLeft: '0', listStyle: 'none' }}>
-                <li style={{ marginBottom: '8px' }}>• Human-centered UX</li>
-                <li style={{ marginBottom: '8px' }}>• Robust data engineering</li>
-                <li style={{ marginBottom: '8px' }}>• Evidence-based decisions</li>
-              </ul>
-            </div>
-            <div style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              padding: '32px', 
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <h3 style={{ 
-                fontSize: '24px', 
-                fontWeight: 'bold', 
-                marginBottom: '16px', 
-                color: 'var(--signal)' 
-              }}>
-                Now
-              </h3>
-              <p style={{ color: 'var(--muted)', lineHeight: '1.6', marginBottom: '16px' }}>
-                We stay present and adaptable to evolving markets. Community comes first—we learn out loud and ship improvements quickly with honesty and transparency.
-              </p>
-              <ul style={{ textAlign: 'left', color: 'var(--muted)', lineHeight: '1.6', paddingLeft: '0', listStyle: 'none' }}>
-                <li style={{ marginBottom: '8px' }}>• Real-time insights</li>
-                <li style={{ marginBottom: '8px' }}>• Fast, iterative delivery</li>
-                <li style={{ marginBottom: '8px' }}>• Transparent roadmap</li>
-              </ul>
-            </div>
+            <p
+              style={{
+                margin: '20px 0 0',
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                fontFamily: 'var(--font-mono)',
+                textAlign: 'center',
+                lineHeight: 1.5,
+              }}
+            >
+              FLOW: OPEN_CORE → UX_AND_PIPELINES → SHIPPED_INSIGHT
+            </p>
           </div>
         </section>
         </ScrollReveal>
@@ -2036,11 +2248,11 @@ $ npx pocket-init --sovereign
         {/* Early Access Section */}
         <section style={{ marginBottom: '120px', textAlign: 'center' }}>
           <div style={{ 
-            background: 'linear-gradient(135deg, var(--signal), #8b5cf6)', 
+            background: 'linear-gradient(135deg, var(--signal) 0%, var(--accent-warm) 100%)',
             borderRadius: '12px', 
             padding: '48px 32px',
             marginBottom: '48px',
-            color: 'white'
+            color: '#ffffff',
           }}>
             <h2 style={{ 
               fontSize: 'clamp(1.5rem, 3vw, 2rem)', 
@@ -2227,7 +2439,13 @@ $ npx pocket-init --sovereign
               marginRight: 'auto',
               lineHeight: '1.6'
             }}>
-              Your financial data never leaves your device. Zero tracking pixels. Zero cloud latency. 100% Client-Side Encryption.
+              We use standard web analytics to measure traffic and improve the product. Your portfolio ledgers, broker
+              CSVs, and import pipeline run in your browser and are not warehoused on our servers. Optional sync and
+              AI flows are bounded and described on{' '}
+              <Link href="/architecture?utm_source=landing&utm_medium=sovereign_section&utm_campaign=architecture" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+                Architecture
+              </Link>
+              . Encryption for Sovereign Sync is handled client-side before data reaches your personal cloud.
             </p>
             <div style={{
               display: 'grid',
@@ -2248,14 +2466,20 @@ $ npx pocket-init --sovereign
                   marginBottom: '12px',
                   color: 'var(--text-warm)'
                 }}>
-                  Zero Tracking
+                  Analytics and privacy
                 </h3>
                 <p style={{
                   color: 'var(--text-secondary)',
                   lineHeight: '1.6',
                   fontSize: '15px'
                 }}>
-                  No analytics pixels. No data collection. Your portfolio data stays on your device.
+                  We use standard web analytics to measure site traffic and improve the application. Your financial
+                  data, portfolio ledgers, and broker CSVs are processed locally in your browser and are not
+                  warehoused on our servers.{' '}
+                  <Link href="/privacy" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+                    View Privacy Policy
+                  </Link>
+                  .
                 </p>
               </div>
               <div style={{
@@ -2307,7 +2531,8 @@ $ npx pocket-init --sovereign
                   lineHeight: '1.6',
                   fontSize: '15px'
                 }}>
-                  Everything runs locally. Instant load times. Works offline. Your data, your control.
+                  Core portfolio views and imports run locally for fast feedback. Many workflows work offline; live
+                  prices and optional cloud-backed features use the network on your terms.
                 </p>
               </div>
             </div>
@@ -2390,7 +2615,15 @@ $ npx pocket-init --sovereign
               </summary>
               <div style={{ padding: '24px', paddingTop: '0' }}>
                 <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  You control your data. We store the minimum needed and make export easy. See our privacy note in the repository.
+                  You control your data. We store the minimum needed and make export easy. Read the{' '}
+                  <Link href="/privacy" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+                    Privacy Policy
+                  </Link>{' '}
+                  and technical overview on{' '}
+                  <Link href="/architecture" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+                    Architecture
+                  </Link>
+                  .
                 </p>
               </div>
             </details>

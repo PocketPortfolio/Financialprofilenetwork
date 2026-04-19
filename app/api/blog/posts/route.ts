@@ -52,6 +52,7 @@ export async function GET() {
           image: data.image,
           pillar: data.pillar,
           category: data.category || 'deep-dive',
+          excludeFromLanding: data.excludeFromLanding === true,
         };
       });
 

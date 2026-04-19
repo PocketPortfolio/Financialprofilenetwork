@@ -90,3 +90,15 @@ These rules are in `lib/blog-generator-cron.ts` and `docs/BLOG-POST-GOLD-STANDAR
 - **API route:** `app/api/cron/generate-blog/route.ts`
 - **Lib:** `lib/blog-generator-cron.ts`
 - **Cron config:** `vercel.json` (crons array)
+
+## Git and `vercel --prod` (stay aligned with cron commits)
+
+Cron pushes new commits to **GitHub `main`** (MDX, images, calendars). If you deploy with **`vercel --prod` from a laptop** that has **not** pulled `main`, production can briefly (or until the next Git deploy) serve a **different** tree than GitHub: you will see Ready builds in Vercel but missing posts or stale admin calendar.
+
+**Before any CLI production deploy:**
+
+1. `git fetch origin && git pull --ff-only origin main` (or `git pull --rebase origin main` if you have local commits on top).
+2. Prefer **push to `main` and let Vercel build from Git** so production always matches the repo the cron updates.
+3. Use a deploy hook only when GitHub → Vercel integration is broken; still **pull `main` first** so the hook builds the same commit as GitHub.
+
+Calendar fetches in `lib/blog-generator-cron.ts` use **cache-busting** so the next cron run does not read a stale `raw.githubusercontent.com` copy and regenerate the same post.

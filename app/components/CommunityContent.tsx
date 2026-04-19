@@ -15,6 +15,9 @@ interface PocketPortfolioPost {
   tags: string[];
   image?: string;
   pillar?: string;
+  category?: string;
+  /** When true, post stays published but is omitted from landing “Building in Public” (any category). */
+  excludeFromLanding?: boolean;
 }
 
 interface CombinedArticle {
@@ -46,9 +49,17 @@ export default function CommunityContent() {
       const coderLegionPosts = (externalData as any)?.coderlegion || [];
       
       setPocketPortfolioPosts(ppPosts);
+
+      // Landing grid: omit Sovereign Engineering pillar (promo surface only); respect opt-out
+      const ppForLandingGrid = ppPosts
+        .filter(
+          (post) =>
+            post.category !== 'sovereign-engineering' && !post.excludeFromLanding
+        )
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       
       // Convert Pocket Portfolio posts to CombinedArticle format
-      const ppArticles: CombinedArticle[] = ppPosts.slice(0, 3).map((post: PocketPortfolioPost) => ({
+      const ppArticles: CombinedArticle[] = ppForLandingGrid.slice(0, 3).map((post: PocketPortfolioPost) => ({
         title: post.title,
         description: post.description,
         url: `/blog/${post.slug}`,

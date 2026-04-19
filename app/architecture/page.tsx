@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { generateMetadata as genMeta } from '@/app/lib/seo/meta';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 
 export const metadata: Metadata = genMeta({
   title: 'Sovereign Intelligence Architecture',
@@ -31,6 +32,7 @@ const section = (children: ReactNode) => (
 export default function ArchitecturePage() {
   return (
     <>
+      <ProductionNavbar />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermLd) }} />
       <div
         style={{

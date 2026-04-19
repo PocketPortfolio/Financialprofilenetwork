@@ -7,7 +7,7 @@ export const siteConfig = {
   name: 'Pocket Portfolio',
   title: 'Pocket Portfolio | Sovereign Local-First Wealth Tracker',
   description:
-    'Private investment analysis and portfolio tracking. A sovereign terminal with no central warehousing of your raw ledger: local-first parsing, bounded AI, optional Google Drive sync you control.',
+    'Private investment analysis and portfolio tracking. Local-first portfolio terminal: hybrid-sync architecture, no central warehousing of your raw ledger, bounded AI, optional Google Drive sync you control.',
   url: 'https://www.pocketportfolio.app',
   ogImage: 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3',
   twitter: '@PocketPortApp',

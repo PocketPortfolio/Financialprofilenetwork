@@ -8,6 +8,11 @@ import { usePathname } from 'next/navigation';
 import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
 import { useStickyHeader } from '../../hooks/useStickyHeader';
+import {
+  sovereignPrimaryNav,
+  sovereignToolsDropdown,
+  isHashOnlyHref,
+} from '@/app/lib/nav/sovereignMarketingNav';
 
 export default function ProductionNavbar() {
   const pathname = usePathname();
@@ -65,22 +70,58 @@ export default function ProductionNavbar() {
   // Ensure header stays visible when scrolling
   useStickyHeader('header.brand-header');
 
-  // Determine if we're on the landing page to use anchor links vs full paths
-  const isLandingPage = pathname === '/landing' || pathname === '/';
-  
-  const navLinks = [
-    { label: 'Mission', href: isLandingPage ? '#mission' : '/landing#mission' },
-    { label: 'Features', href: isLandingPage ? '#features' : '/landing#features' },
-    { label: 'Stocks', href: isLandingPage ? '#popular-stocks' : '/landing#popular-stocks' },
-    { label: 'FIN Pillars', href: isLandingPage ? '#fin-pillars' : '/landing#fin-pillars' },
-    { label: 'FAQ', href: isLandingPage ? '#faq' : '/landing#faq' },
-  ];
+  const primaryNav = sovereignPrimaryNav(pathname, 'site');
+  const faqItem = primaryNav[primaryNav.length - 1]!;
+  const beforeFaq = primaryNav.slice(0, -1);
+  const toolsLinks = sovereignToolsDropdown(pathname);
 
-  const toolsLinks = [
-    { label: 'Live Market Data', href: '/live' },
-    { label: 'Tax Converters', href: '/tools' },
-    { label: 'JSON API Directory', href: '/s/directory' },
-  ];
+  const renderNavLink = (link: { label: string; href: string }) => {
+    const linkStyle = {
+      fontSize: '15px',
+      padding: '8px 0',
+      borderBottom: '2px solid transparent',
+      textDecoration: 'none',
+      color: 'var(--text)' as const,
+    };
+    if (isHashOnlyHref(link.href)) {
+      return (
+        <a
+          key={link.label}
+          href={link.href}
+          className="brand-link"
+          style={linkStyle}
+          onMouseEnter={(e) => {
+            (e.target as HTMLElement).style.color = 'var(--signal)';
+            (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+          }}
+          onMouseLeave={(e) => {
+            (e.target as HTMLElement).style.color = 'var(--text)';
+            (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+          }}
+        >
+          {link.label}
+        </a>
+      );
+    }
+    return (
+      <Link
+        key={link.label}
+        href={link.href}
+        className="brand-link"
+        style={linkStyle}
+        onMouseEnter={(e) => {
+          (e.target as HTMLElement).style.color = 'var(--signal)';
+          (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+        }}
+        onMouseLeave={(e) => {
+          (e.target as HTMLElement).style.color = 'var(--text)';
+          (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+        }}
+      >
+        {link.label}
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -119,34 +160,17 @@ export default function ProductionNavbar() {
               <nav className="desktop-nav mobile-hidden" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '24px'
+                gap: '16px',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
               }}>
-                {navLinks.map((link) => {
-                  const isAnchor = link.href.startsWith('#');
-                  const linkStyle = {
-                    fontSize: '15px',
-                    padding: '8px 0',
-                    borderBottom: '2px solid transparent',
-                    textDecoration: 'none',
-                    color: 'var(--text)' as const
-                  };
-                  const linkEl = isAnchor ? (
-                    <a key={link.label} href={link.href} className="brand-link" style={linkStyle}
-                      onMouseEnter={(e) => { (e.target as HTMLElement).style.color = 'var(--signal)'; (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)'; }}
-                      onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'var(--text)'; (e.target as HTMLElement).style.borderBottomColor = 'transparent'; }}
-                    >{link.label}</a>
-                  ) : (
-                    <Link key={link.label} href={link.href} className="brand-link" style={linkStyle}
-                      onMouseEnter={(e) => { (e.target as HTMLElement).style.color = 'var(--signal)'; (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)'; }}
-                      onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'var(--text)'; (e.target as HTMLElement).style.borderBottomColor = 'transparent'; }}
-                    >{link.label}</Link>
-                  );
+                {beforeFaq.map((link) => {
+                  const linkEl = renderNavLink(link);
                   if (link.label === 'FIN Pillars') {
                     return (
                       <React.Fragment key={link.label}>
                         {linkEl}
                         <div
-                          key="tools"
                           ref={toolsTriggerRef}
                           style={{ position: 'relative', display: 'inline-block' }}
                           onMouseEnter={() => {
@@ -163,7 +187,9 @@ export default function ProductionNavbar() {
                           <span
                             className="brand-link"
                             style={{
-                              ...linkStyle,
+                              fontSize: '15px',
+                              padding: '8px 0',
+                              borderBottom: '2px solid transparent',
                               cursor: 'pointer',
                               borderBottomColor: toolsOpen ? 'var(--signal)' : 'transparent',
                               color: toolsOpen ? 'var(--signal)' : 'var(--text)'
@@ -229,6 +255,7 @@ export default function ProductionNavbar() {
                   }
                   return linkEl;
                 })}
+                {renderNavLink(faqItem)}
               </nav>
 
               {/* Action Buttons */}
@@ -417,8 +444,7 @@ export default function ProductionNavbar() {
           onClick={(e) => e.stopPropagation()}
           >
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {navLinks.flatMap((link) => {
-                const isAnchor = link.href.startsWith('#');
+              {beforeFaq.map((link) => {
                 const handleClick = () => setIsMobileMenuOpen(false);
                 const linkStyle = {
                   fontSize: '16px',
@@ -428,36 +454,127 @@ export default function ProductionNavbar() {
                   color: 'var(--text)',
                   background: 'var(--surface)',
                   border: '1px solid var(--border)',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
                 };
-                const linkEl = isAnchor ? (
-                  <a key={link.label} href={link.href} onClick={handleClick} className="brand-link" style={linkStyle}
-                    onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'var(--signal)'; (e.target as HTMLElement).style.color = 'white'; }}
-                    onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'var(--surface)'; (e.target as HTMLElement).style.color = 'var(--text)'; }}
-                  >{link.label}</a>
+                const linkEl = isHashOnlyHref(link.href) ? (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={handleClick}
+                    className="brand-link"
+                    style={linkStyle}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--signal)';
+                      (e.target as HTMLElement).style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--surface)';
+                      (e.target as HTMLElement).style.color = 'var(--text)';
+                    }}
+                  >
+                    {link.label}
+                  </a>
                 ) : (
-                  <Link key={link.label} href={link.href} onClick={handleClick} className="brand-link" style={linkStyle}
-                    onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'var(--signal)'; (e.target as HTMLElement).style.color = 'white'; }}
-                    onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'var(--surface)'; (e.target as HTMLElement).style.color = 'var(--text)'; }}
-                  >{link.label}</Link>
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={handleClick}
+                    className="brand-link"
+                    style={linkStyle}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--signal)';
+                      (e.target as HTMLElement).style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--surface)';
+                      (e.target as HTMLElement).style.color = 'var(--text)';
+                    }}
+                  >
+                    {link.label}
+                  </Link>
                 );
-                if (link.label === 'FAQ') {
-                  return [
-                    <details key="tools" style={{ margin: 0 }}>
-                      <summary style={{ ...linkStyle, cursor: 'pointer', listStyle: 'none' }}>Tools</summary>
-                      <div style={{ paddingLeft: '16px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {toolsLinks.map((t) => (
-                          <Link key={t.label} href={t.href} onClick={handleClick} style={{ ...linkStyle, padding: '10px 16px' }}>
-                            {t.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </details>,
-                    linkEl
-                  ];
+                if (link.label === 'FIN Pillars') {
+                  return (
+                    <React.Fragment key={link.label}>
+                      {linkEl}
+                      <details style={{ margin: 0 }}>
+                        <summary style={{ ...linkStyle, cursor: 'pointer', listStyle: 'none' }}>Tools</summary>
+                        <div
+                          style={{
+                            paddingLeft: '16px',
+                            marginTop: '8px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                          }}
+                        >
+                          {toolsLinks.map((t) => (
+                            <Link
+                              key={t.label}
+                              href={t.href}
+                              onClick={handleClick}
+                              style={{ ...linkStyle, padding: '10px 16px' }}
+                            >
+                              {t.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </details>
+                    </React.Fragment>
+                  );
                 }
-                return [linkEl];
+                return linkEl;
               })}
+              {(() => {
+                const handleClick = () => setIsMobileMenuOpen(false);
+                const linkStyle = {
+                  fontSize: '16px',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  textDecoration: 'none' as const,
+                  color: 'var(--text)',
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  transition: 'all 0.2s ease',
+                };
+                return isHashOnlyHref(faqItem.href) ? (
+                  <a
+                    key={faqItem.label}
+                    href={faqItem.href}
+                    onClick={handleClick}
+                    className="brand-link"
+                    style={linkStyle}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--signal)';
+                      (e.target as HTMLElement).style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--surface)';
+                      (e.target as HTMLElement).style.color = 'var(--text)';
+                    }}
+                  >
+                    {faqItem.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={faqItem.label}
+                    href={faqItem.href}
+                    onClick={handleClick}
+                    className="brand-link"
+                    style={linkStyle}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--signal)';
+                      (e.target as HTMLElement).style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLElement).style.background = 'var(--surface)';
+                      (e.target as HTMLElement).style.color = 'var(--text)';
+                    }}
+                  >
+                    {faqItem.label}
+                  </Link>
+                );
+              })()}
               
               <div style={{ 
                 height: '1px', 

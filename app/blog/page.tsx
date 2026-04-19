@@ -20,6 +20,7 @@ interface GeneratedPost {
   image?: string;
   pillar?: string;
   category?: string;
+  excludeFromLanding?: boolean;
 }
 
 type GridItem =
@@ -103,6 +104,7 @@ function BlogPageInner() {
 
   const howToPosts = generatedPosts.filter((post) => post.category === 'how-to-in-tech');
   const researchPosts = generatedPosts.filter((post) => post.category === 'research');
+  // excludeFromLanding is for the homepage “Building in Public” grid only — /blog lists every published post
   const sovereignEngineeringPosts = generatedPosts.filter(
     (post) => post.category === 'sovereign-engineering'
   );

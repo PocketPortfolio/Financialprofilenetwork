@@ -84,10 +84,14 @@ function sanitizeMDXContent(content: string): string {
 }
 
 export async function fetchCalendarsFromGitHub(): Promise<BlogPost[]> {
+  // raw.githubusercontent.com is CDN-cached; without bust, the next cron run can still see
+  // status "pending" after a publish and regenerate the same post (duplicate commits + cost).
+  const bust = Date.now();
+  const fetchOpts: RequestInit = { cache: 'no-store' };
   const [blogRes, howToRes, researchRes] = await Promise.all([
-    fetch(`${GITHUB_RAW_BASE}/content/blog-calendar.json`),
-    fetch(`${GITHUB_RAW_BASE}/content/how-to-tech-calendar.json`),
-    fetch(`${GITHUB_RAW_BASE}/content/research-calendar.json`),
+    fetch(`${GITHUB_RAW_BASE}/content/blog-calendar.json?cb=${bust}`, fetchOpts),
+    fetch(`${GITHUB_RAW_BASE}/content/how-to-tech-calendar.json?cb=${bust}`, fetchOpts),
+    fetch(`${GITHUB_RAW_BASE}/content/research-calendar.json?cb=${bust}`, fetchOpts),
   ]);
 
   const blog: BlogPost[] = blogRes.ok ? await blogRes.json() : [];
