@@ -1760,7 +1760,7 @@
     "scheduledTime": "14:00",
     "title": "Understanding Serverless Functions",
     "slug": "understanding-serverless-functions",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1768,7 +1768,8 @@
       "serverless",
       "understanding",
       "functions"
-    ]
+    ],
+    "publishedAt": "2026-04-20T14:00:49.923Z"
   },
   {
     "id": "how-to-how-to-implement-rate-limiting-with-redis-apr-21",
