@@ -1776,14 +1776,15 @@
     "scheduledTime": "18:00",
     "title": "Research: WebRTC Latency - Peer-to-Peer Communication",
     "slug": "research-webrtc-latency-peer-to-peer-communication-2026-04-21",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "latency",
       "webrtc",
       "peer"
-    ]
+    ],
+    "publishedAt": "2026-04-21T18:00:38.014Z"
   },
   {
     "id": "research-grpc-vs-rest-performance-serialization-overhead-2026-04-22",
