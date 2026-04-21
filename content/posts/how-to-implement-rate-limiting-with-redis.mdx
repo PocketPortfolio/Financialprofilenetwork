@@ -1,0 +1,86 @@
+---
+title: How to Implement Rate Limiting with Redis
+date: '2026-04-21'
+description: >-
+  Learn how to implement rate limiting using Redis to manage API requests
+  effectively.
+tags:
+  - redis
+  - rate limiting
+  - API
+  - throttling
+  - backend
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-rate-limiting-with-redis.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+In high-traffic applications, managing the number of requests a user can make to an API is crucial. Without rate limiting, a single user can overwhelm your server, leading to degraded performance or downtime. Rate limiting helps control the flow of incoming requests, ensuring fair usage and maintaining server integrity.
+
+## Solution
+
+Redis, an in-memory data structure store, is an excellent choice for implementing rate limiting due to its speed and capability to handle high-throughput operations. Below is a step-by-step guide to implement rate limiting using Redis.
+
+## Key Concepts
+
+1. **Token Bucket Algorithm**: This algorithm is often used for rate limiting. It allows a fixed number of tokens to be added to a bucket at a regular interval. For each request, a token is removed. If tokens are unavailable, the request is denied, enforcing the rate limit.
+
+2. **Redis Commands**:
+   - `INCR`: Increments a key's value. Useful for counting requests.
+   - `EXPIRE`: Sets a timeout on keys, automatically removing them after expiration.
+
+3. **Atomic Operations**: Redis operations like `INCR` are atomic, which means they can safely handle concurrent requests without race conditions.
+
+## Implementation
+
+Here is a basic implementation of rate limiting using Node.js and Redis:
+
+```javascript
+const redis = require('redis');
+const client = redis.createClient();
+
+const RATE_LIMIT_WINDOW = 60; // Time window in seconds
+const MAX_REQUESTS = 100; // Max number of requests per window
+
+async function isRateLimited(userId) {
+  const currentTime = Math.floor(Date.now() / 1000);
+  const key = `rate_limit:${userId}:${Math.floor(currentTime / RATE_LIMIT_WINDOW)}`;
+  
+  return new Promise((resolve, reject) => {
+    client.multi()
+      .incr(key)
+      .expire(key, RATE_LIMIT_WINDOW)
+      .exec((err, replies) => {
+        if (err) {
+          return reject(err);
+        }
+        const requestCount = replies[0];
+        resolve(requestCount > MAX_REQUESTS);
+      });
+  });
+}
+
+// Usage
+async function handleRequest(req, res) {
+  const userId = req.user.id; // Assume user ID is available in request
+  if (await isRateLimited(userId)) {
+    res.status(429).send('Too Many Requests');
+  } else {
+    // Process the request
+    res.send('Request processed');
+  }
+}
+```
+
+### Explanation
+
+- **Key Generation**: The key `rate_limit:${userId}:${Math.floor(currentTime / RATE_LIMIT_WINDOW)}` is generated to store request count. It combines the user ID and the current time window.
+  
+- **Increment and Expiration**: The `INCR` command increases the count, and `EXPIRE` sets the time limit for each key. This ensures that counts reset after each time window.
+
+- **Check and Enforce Limit**: After incrementing the count, the script checks if the count exceeds `MAX_REQUESTS`. If so, the request is denied.
+
+This setup leverages Redis's speed and atomic operations to efficiently manage rate limiting, ensuring your server remains available and responsive. By adjusting `RATE_LIMIT_WINDOW` and `MAX_REQUESTS`, you can tailor the rate limit to your application's needs.
