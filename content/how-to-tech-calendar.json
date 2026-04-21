@@ -1777,7 +1777,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Rate Limiting with Redis",
     "slug": "how-to-implement-rate-limiting-with-redis",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1785,7 +1785,8 @@
       "implement",
       "rate",
       "limiting"
-    ]
+    ],
+    "publishedAt": "2026-04-21T14:00:46.025Z"
   },
   {
     "id": "how-to-the-guide-to-api-versioning-best-practices-apr-22",
