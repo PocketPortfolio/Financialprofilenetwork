@@ -1792,7 +1792,7 @@
     "scheduledTime": "18:00",
     "title": "Research: gRPC vs REST Performance - Serialization Overhead",
     "slug": "research-grpc-vs-rest-performance-serialization-overhead-2026-04-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1801,7 +1801,8 @@
       "gRPC",
       "grpc",
       "rest"
-    ]
+    ],
+    "publishedAt": "2026-04-22T18:00:43.397Z"
   },
   {
     "id": "research-graphql-query-performance-n-1-problem-analysis-2026-04-23",
