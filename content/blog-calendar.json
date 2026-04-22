@@ -724,7 +724,7 @@
     "date": "2026-04-22",
     "title": "JSON Schema Validation: Ensuring Data Integrity",
     "slug": "json-schema-validation-ensuring-data-integrity",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -734,7 +734,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-22T09:00:51.468Z"
   },
   {
     "id": "week-17-post-1",
