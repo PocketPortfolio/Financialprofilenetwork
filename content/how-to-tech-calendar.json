@@ -1794,14 +1794,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Versioning Best Practices",
     "slug": "the-guide-to-api-versioning-best-practices",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "versioning"
-    ]
+    ],
+    "publishedAt": "2026-04-22T14:00:40.061Z"
   },
   {
     "id": "how-to-how-to-use-webhooks-for-event-notifications-apr-23",
