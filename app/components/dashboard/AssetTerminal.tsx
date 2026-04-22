@@ -21,6 +21,7 @@ interface Asset {
 interface AssetTerminalProps {
   assets: Asset[];
   view?: 'positions' | 'trades';
+  loading?: boolean;
   onEdit?: (asset: Asset) => void;
   onDelete?: (symbol: string) => void;
   onSort?: (column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => void;
@@ -29,11 +30,32 @@ interface AssetTerminalProps {
   setShowImportModal?: (show: boolean) => void;
 }
 
+const SKELETON_ROW_COUNT = 5;
+
+function SkeletonCell({ width = '60%', align = 'left' }: { width?: string; align?: 'left' | 'right' | 'center' }) {
+  return (
+    <td style={{ padding: '12px 16px', textAlign: align }}>
+      <div
+        style={{
+          height: '14px',
+          width,
+          borderRadius: '4px',
+          background: 'hsl(var(--muted) / 0.6)',
+          animation: 'pulse 1.5s ease-in-out infinite',
+          marginLeft: align === 'right' ? 'auto' : align === 'center' ? 'auto' : undefined,
+          marginRight: align === 'center' ? 'auto' : undefined,
+        }}
+      />
+    </td>
+  );
+}
+
 const MONO_FONT = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace';
 
 export function AssetTerminal({ 
   assets, 
   view = 'positions',
+  loading = false,
   onEdit, 
   onDelete, 
   onSort,
@@ -258,7 +280,34 @@ export function AssetTerminal({
             </tr>
           </thead>
           <tbody style={{ borderTop: `1px solid hsl(var(--border) / 0.5)` }}>
-            {assets.length === 0 ? (
+            {loading ? (
+              Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
+                <tr key={`skeleton-${i}`} aria-hidden="true">
+                  {view === 'trades' ? (
+                    <>
+                      <SkeletonCell width={i % 2 === 0 ? '70%' : '55%'} />
+                      <SkeletonCell width={i % 3 === 0 ? '40%' : '50%'} />
+                      <SkeletonCell width="35%" align="right" />
+                      <SkeletonCell width="40%" align="right" />
+                      <SkeletonCell width="55%" align="right" />
+                      <SkeletonCell width="60%" align="right" />
+                      <SkeletonCell width="45%" align="center" />
+                      <SkeletonCell width="48px" align="center" />
+                    </>
+                  ) : (
+                    <>
+                      <SkeletonCell width={i % 2 === 0 ? '55%' : '45%'} />
+                      <SkeletonCell width={i % 3 === 0 ? '50%' : '60%'} align="right" />
+                      <SkeletonCell width="45%" align="right" />
+                      <SkeletonCell width="55%" align="right" />
+                      <SkeletonCell width="60%" align="right" />
+                      <SkeletonCell width="70%" align="center" />
+                      <SkeletonCell width="48px" align="center" />
+                    </>
+                  )}
+                </tr>
+              ))
+            ) : assets.length === 0 ? (
               <tr>
                 <td colSpan={view === 'trades' ? 8 : 7} style={{ padding: 0 }}>
                   <div style={{
@@ -357,8 +406,7 @@ export function AssetTerminal({
                   </div>
                 </td>
               </tr>
-            ) : (
-              assets.map((asset, index) => {
+            ) : assets.map((asset, index) => {
                 const isPos = asset.change >= 0;
                 const rowKey = view === 'trades' && asset.tradeId ? asset.tradeId : `${asset.symbol}-${index}`;
                 const isHovered = hoveredRow === rowKey;
@@ -624,7 +672,7 @@ export function AssetTerminal({
                   </tr>
                 );
               })
-            )}
+            }
           </tbody>
         </table>
       </div>

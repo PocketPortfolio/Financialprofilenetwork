@@ -108,7 +108,7 @@ function buildDashboardDemoSeedTrades(): Omit<
 export default function Dashboard() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
   // const { selectedPortfolio, selectedPortfolioId } = usePortfolios();
-  const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
+  const { trades, loading: tradesLoading, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
   const portfolioNotes = usePortfolioNotes();
   const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
   const { tier, isLoading: tierLoading } = usePremiumTheme();
@@ -2302,6 +2302,7 @@ export default function Dashboard() {
               ) : (
               <AssetTerminal
                 view={portfolioView}
+                loading={portfolioView === 'trades' ? tradesLoading : (tradesLoading || quotesLoading)}
                 assets={(() => {
                   if (portfolioView === 'trades') {
                     // Transform trades to Asset format - use all trades (not displayTrades) to match positions page
