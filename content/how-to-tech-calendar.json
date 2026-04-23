@@ -1810,14 +1810,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Webhooks for Event Notifications",
     "slug": "how-to-use-webhooks-for-event-notifications",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "webhooks",
       "event"
-    ]
+    ],
+    "publishedAt": "2026-04-23T14:00:44.897Z"
   },
   {
     "id": "how-to-building-a-file-upload-system-with-multer-apr-24",
