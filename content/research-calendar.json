@@ -1810,7 +1810,7 @@
     "scheduledTime": "18:00",
     "title": "Research: GraphQL Query Performance - N+1 Problem Analysis",
     "slug": "research-graphql-query-performance-n-1-problem-analysis-2026-04-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1818,7 +1818,8 @@
       "GraphQL",
       "graphql",
       "query"
-    ]
+    ],
+    "publishedAt": "2026-04-23T18:01:10.734Z"
   },
   {
     "id": "research-websocket-reconnection-strategies-performance-impact-2026-04-24",
