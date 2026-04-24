@@ -1827,7 +1827,7 @@
     "scheduledTime": "18:00",
     "title": "Research: WebSocket Reconnection Strategies - Performance Impact",
     "slug": "research-websocket-reconnection-strategies-performance-impact-2026-04-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1835,7 +1835,8 @@
       "websocket",
       "reconnection",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-04-24T18:00:47.429Z"
   },
   {
     "id": "research-dns-resolution-performance-caching-strategies-2026-04-25",
