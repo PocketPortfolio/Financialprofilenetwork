@@ -1826,14 +1826,15 @@
     "scheduledTime": "14:00",
     "title": "Building a File Upload System with Multer",
     "slug": "building-a-file-upload-system-with-multer",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "file",
       "upload"
-    ]
+    ],
+    "publishedAt": "2026-04-24T14:00:35.721Z"
   },
   {
     "id": "how-to-how-to-implement-search-functionality-with-elasticsearch-apr-25",
