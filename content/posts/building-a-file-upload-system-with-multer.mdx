@@ -1,0 +1,104 @@
+---
+title: Building a File Upload System with Multer
+date: '2026-04-24'
+description: Learn how to build a robust file upload system using Multer in Node.js.
+tags:
+  - file upload
+  - Multer
+  - Node.js
+  - Express
+author: Pocket Portfolio Team
+image: /images/blog/building-a-file-upload-system-with-multer.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Handling file uploads in web applications can be a challenging task due to various considerations, such as file storage, validation, and processing. Developers need a robust solution that simplifies these tasks while ensuring security and efficiency.
+
+## Solution with Code
+
+Multer is a Node.js middleware for handling `multipart/form-data`, which is primarily used for uploading files. It makes file uploading a breeze by providing an easy-to-use interface and several configuration options. Below is a step-by-step guide to building a file upload system using Multer.
+
+First, set up a basic Node.js and Express application:
+
+```javascript
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+```
+
+Next, configure Multer to specify the destination and filename for uploaded files:
+
+```javascript
+// Set storage engine
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: function(req, file, cb){
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+// Initialize upload
+const upload = multer({
+  storage: storage,
+  limits: {fileSize: 1000000}, // Limit file size to 1MB
+  fileFilter: function(req, file, cb){
+    checkFileType(file, cb);
+  }
+}).single('myFile');
+```
+
+Here, we specify a `diskStorage` option that tells Multer to save files to the `./uploads/` directory. The `filename` function ensures each file has a unique name by appending the current timestamp. We also set a file size limit (1MB in this case) and a custom file filter function to restrict file types.
+
+Implement the `checkFileType` function to allow only certain file types:
+
+```javascript
+function checkFileType(file, cb){
+  // Allowed extensions
+  const filetypes = /jpeg|jpg|png|gif/;
+  // Check extension
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // Check mime
+  const mimetype = filetypes.test(file.mimetype);
+
+  if(mimetype && extname){
+    return cb(null, true);
+  } else {
+    cb('Error: Images Only!');
+  }
+}
+```
+
+Finally, create a route to handle file upload requests:
+
+```javascript
+app.post('/upload', (req, res) => {
+  upload(req, res, (err) => {
+    if(err){
+      res.status(400).send(err);
+    } else {
+      if(req.file == undefined){
+        res.status(400).send('Error: No File Selected!');
+      } else {
+        res.send(`File uploaded successfully: ${req.file.filename}`);
+      }
+    }
+  });
+});
+
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+```
+
+## Key Concepts
+
+- **Multer Middleware**: Simplifies handling `multipart/form-data` in Express.
+- **Storage Configuration**: Allows customization of file storage paths and naming conventions.
+- **File Filtering**: Ensures that only files of specified types are uploaded.
+- **Error Handling**: Provides feedback in case of errors, such as incorrect file types or sizes.
+
+By utilizing Multer, developers can efficiently manage file uploads with minimal configuration, ensuring files are stored securely and only valid files are accepted.
