@@ -1844,14 +1844,15 @@
     "scheduledTime": "18:00",
     "title": "Research: DNS Resolution Performance - Caching Strategies",
     "slug": "research-dns-resolution-performance-caching-strategies-2026-04-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "dns",
       "resolution"
-    ]
+    ],
+    "publishedAt": "2026-04-25T18:00:58.542Z"
   },
   {
     "id": "research-tcp-vs-udp-application-performance-comparison-2026-04-26",
