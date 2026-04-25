@@ -1842,7 +1842,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Search Functionality with Elasticsearch",
     "slug": "how-to-implement-search-functionality-with-elasticsearch",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1851,7 +1851,8 @@
       "implement",
       "search",
       "functionality"
-    ]
+    ],
+    "publishedAt": "2026-04-25T14:00:27.939Z"
   },
   {
     "id": "how-to-understanding-message-queues-rabbitmq-vs-kafka-apr-26",
