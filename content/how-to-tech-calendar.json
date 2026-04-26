@@ -1860,7 +1860,7 @@
     "scheduledTime": "14:00",
     "title": "Understanding Message Queues: RabbitMQ vs Kafka",
     "slug": "understanding-message-queues-rabbitmq-vs-kafka",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1869,7 +1869,8 @@
       "understanding",
       "message",
       "queues"
-    ]
+    ],
+    "publishedAt": "2026-04-26T14:00:44.061Z"
   },
   {
     "id": "how-to-how-to-set-up-monitoring-with-prometheus-apr-27",
