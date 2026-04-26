@@ -228,7 +228,12 @@ export default async function PressPage() {
             }}
           >
             <p style={{ margin: '0 0 6px', fontSize: '17px', fontWeight: 700 }}>
-              {PERSON_ABBA.name}
+              <Link
+                href="/press/abba-lawal"
+                style={{ color: 'var(--text)', textDecoration: 'none' }}
+              >
+                {PERSON_ABBA.name}
+              </Link>
             </p>
             <p style={{ margin: '0 0 12px', fontSize: '14px', color: 'var(--text-secondary)' }}>
               {PERSON_ABBA.jobTitle}
@@ -243,6 +248,14 @@ export default async function PressPage() {
                 </li>
               ))}
             </ul>
+            <p style={{ margin: '14px 0 0', fontSize: '14px' }}>
+              <Link
+                href="/press/abba-lawal"
+                style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600 }}
+              >
+                Read full founder profile →
+              </Link>
+            </p>
           </div>
         </section>
 
@@ -370,6 +383,12 @@ export default async function PressPage() {
             Canonical references
           </h2>
           <ul style={{ paddingLeft: '18px', margin: 0, fontSize: '15px', lineHeight: 1.8 }}>
+            <li>
+              Founder profile:{' '}
+              <Link href="/press/abba-lawal" style={{ color: 'var(--accent-warm)' }}>
+                /press/abba-lawal
+              </Link>
+            </li>
             <li>
               Architecture (long-form):{' '}
               <Link href="/architecture" style={{ color: 'var(--accent-warm)' }}>

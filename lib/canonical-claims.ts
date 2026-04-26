@@ -29,6 +29,68 @@ export const TAGLINE_LONG =
   'Pocket Portfolio is the Sovereign Ingestion & Inference Layer for wealth-tech: a local-first import SDK plus stateless AI reasoning that lets platforms and operators reason over broker data without warehousing PII.';
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Moat Claims — technical defensibility phrases (evidence-backed, audit-ready)
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// Each entry is a phrase authorised for verbatim use on high-authority off-platform
+// surfaces (GitHub, npm, LinkedIn, press) where technical claim density matters
+// for AEO/GEO entity disambiguation. Phrases must be backed by in-repo evidence
+// so a third-party engineer can verify the claim within ~5 minutes of clone-and-grep.
+//
+// Authorised by Unified Command 2026-04-26 (Phase 2 charter ratification).
+// Drift discipline: any change to a phrase or its evidenceRefs requires a
+// corresponding bump of MoatClaim.asOf; tests/unit/moat-claims.spec.ts enforces
+// evidenceRefs file-existence in CI.
+
+export interface MoatClaim {
+  /** Short canonical phrase — used verbatim on profile bios, package descriptions, headlines. */
+  phrase: string;
+  /** One-sentence longer form for About sections / OG descriptions. */
+  longForm: string;
+  /** In-repo file references whose existence/behaviour validates the claim. */
+  evidenceRefs: ReadonlyArray<string>;
+  /** External regulatory or standards references (optional, citation-grade). */
+  externalRefs?: ReadonlyArray<string>;
+  /** Date the phrase was last reviewed against the evidence. */
+  asOf: string;
+  /** Surfaces authorised for verbatim use of the phrase. */
+  authorisedSurfaces: ReadonlyArray<
+    'github' | 'npm' | 'linkedin' | 'coderlegion' | 'devto' | 'press' | 'llms.txt'
+  >;
+}
+
+export const MOAT_CLAIMS: Readonly<Record<string, MoatClaim>> = {
+  /**
+   * Asserts Pocket Portfolio's stateless, minimum-data architecture:
+   *   - Broker CSV/Excel parsing happens entirely in-browser (no upload).
+   *   - AI inference is stateless via /api/ai/chat (no per-user persistence).
+   *   - Client-side persistence (Zustand persist) is deliberately partialized
+   *     to UI preferences only — broker positions and historical data are
+   *     NOT persisted on disk and clear on tab close.
+   * This matches GDPR Art. 4(8) "processor" positioning where scope is
+   * technically limited by architecture rather than policy alone, and supports
+   * the Art. 5(1)(c) data-minimisation principle.
+   */
+  limitedScopeProcessor: {
+    phrase: 'Limited-Scope Processor',
+    longForm:
+      'A limited-scope processor architecture: broker data parses in-browser, never warehouses server-side, and AI inference runs stateless — minimising the per-user data footprint by design.',
+    evidenceRefs: [
+      'app/api/ai/chat/route.ts',
+      'app/lib/store/portfolioStore.ts',
+      'packages/importer/',
+      'app/architecture/page.tsx',
+    ],
+    externalRefs: [
+      'GDPR Art. 4(8) — definition of processor',
+      'GDPR Art. 5(1)(c) — data-minimisation principle',
+    ],
+    asOf: LAST_HUMAN_VERIFIED,
+    authorisedSurfaces: ['github', 'npm', 'linkedin', 'coderlegion', 'devto', 'press', 'llms.txt'],
+  },
+} as const;
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Organization
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -286,6 +348,7 @@ export const URLS = {
   home: 'https://www.pocketportfolio.app',
   architecture: 'https://www.pocketportfolio.app/architecture',
   press: 'https://www.pocketportfolio.app/press',
+  personAbba: 'https://www.pocketportfolio.app/press/abba-lawal',
   privacy: 'https://www.pocketportfolio.app/privacy',
   blog: 'https://www.pocketportfolio.app/blog',
   npmAggregateApi: 'https://www.pocketportfolio.app/api/npm-stats',

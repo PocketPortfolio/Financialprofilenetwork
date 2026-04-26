@@ -72,6 +72,8 @@ export function buildPersonLd() {
     '@context': 'https://schema.org',
     '@type': 'Person',
     '@id': `${ORG.url}/press#abba-lawal`,
+    mainEntityOfPage: URLS.personAbba,
+    url: URLS.personAbba,
     name: PERSON_ABBA.name,
     jobTitle: PERSON_ABBA.jobTitle,
     description: PERSON_ABBA.description,
