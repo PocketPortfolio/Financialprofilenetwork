@@ -1860,7 +1860,7 @@
     "scheduledTime": "18:00",
     "title": "Research: TCP vs UDP - Application Performance Comparison",
     "slug": "research-tcp-vs-udp-application-performance-comparison-2026-04-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1868,7 +1868,8 @@
       "tcp",
       "udp",
       "application"
-    ]
+    ],
+    "publishedAt": "2026-04-26T18:01:10.071Z"
   },
   {
     "id": "research-network-partitioning-cap-theorem-in-practice-2026-04-27",
