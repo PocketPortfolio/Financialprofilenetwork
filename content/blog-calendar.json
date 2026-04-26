@@ -742,7 +742,7 @@
     "date": "2026-04-26",
     "title": "From SaaS to Sovereignty: The Evolution of Personal Finance Tools",
     "slug": "from-saas-to-sovereignty-the-evolution-of-personal-finance-t",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -752,7 +752,8 @@
       "sovereignty:"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-26T09:00:46.449Z"
   },
   {
     "id": "week-17-post-2",
