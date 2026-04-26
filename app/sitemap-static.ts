@@ -197,6 +197,13 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.85,
     },
+    // Press / AEO substrate (canonical machine-readable identity page)
+    {
+      url: `${baseUrl}/press`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
     // ✅ Waitlist Page (Priority Queue)
     {
       url: `${baseUrl}/waitlist`,

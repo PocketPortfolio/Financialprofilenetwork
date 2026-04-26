@@ -534,6 +534,21 @@ export default function GlobalFooter() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <Link
+                  href="/press"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Press Kit
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/book"
                   style={{
                     color: 'var(--text-secondary)',
