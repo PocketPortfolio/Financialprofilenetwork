@@ -1,0 +1,99 @@
+---
+title: 'Understanding Message Queues: RabbitMQ vs Kafka'
+date: '2026-04-26'
+description: >-
+  A comprehensive guide to understanding message queues, focusing on RabbitMQ
+  and Kafka, their use-cases, and implementation examples.
+tags:
+  - kafka
+  - rabbitmq
+  - message queues
+  - understanding
+author: Pocket Portfolio Team
+image: /images/blog/understanding-message-queues-rabbitmq-vs-kafka.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Modern applications often require reliable communication between different services, especially in distributed systems. Message queues solve this by allowing asynchronous communication between services, ensuring messages are delivered even if a service is temporarily unavailable. Two popular message queue systems are RabbitMQ and Kafka, each with unique strengths and suitable for different use-cases.
+
+## Solution with Code
+
+### RabbitMQ
+
+RabbitMQ is a lightweight, versatile message broker that supports multiple messaging protocols. It is ideal for complex routing and scenarios where message durability and acknowledgment are important.
+
+**RabbitMQ Setup:**
+
+1. **Install RabbitMQ**:
+   ```bash
+   sudo apt-get update
+   sudo apt-get install rabbitmq-server
+   ```
+   
+2. **Send a Message**:
+   ```python
+   import pika
+
+   connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+   channel = connection.channel()
+
+   channel.queue_declare(queue='hello')
+
+   channel.basic_publish(exchange='',
+                         routing_key='hello',
+                         body='Hello RabbitMQ!')
+   print(" [x] Sent 'Hello RabbitMQ!'")
+   connection.close()
+   ```
+
+### Kafka
+
+Kafka is a distributed event streaming platform ideal for high-throughput and real-time data processing. It is well-suited for use-cases requiring high availability and scalability.
+
+**Kafka Setup:**
+
+1. **Install Kafka**:
+   ```bash
+   # Download Kafka
+   wget https://archive.apache.org/dist/kafka/3.0.0/kafka_2.13-3.0.0.tgz
+   tar -xzf kafka_2.13-3.0.0.tgz
+   cd kafka_2.13-3.0.0
+
+   # Start Zookeeper and Kafka
+   bin/zookeeper-server-start.sh config/zookeeper.properties &
+   bin/kafka-server-start.sh config/server.properties &
+   ```
+
+2. **Send a Message**:
+   ```java
+   import org.apache.kafka.clients.producer.KafkaProducer;
+   import org.apache.kafka.clients.producer.ProducerRecord;
+
+   import java.util.Properties;
+
+   public class SimpleProducer {
+       public static void main(String[] args) {
+           Properties props = new Properties();
+           props.put("bootstrap.servers", "localhost:9092");
+           props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+           props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+           KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+           producer.send(new ProducerRecord<>("test-topic", "key", "Hello Kafka"));
+           producer.close();
+       }
+   }
+   ```
+
+## Key Concepts
+
+- **Durability and Acknowledgments**: RabbitMQ excels in scenarios requiring message acknowledgment and durability, making it ideal for tasks that require guaranteed processing.
+  
+- **Scalability and Throughput**: Kafka is designed for high throughput and can process millions of messages per second, making it suitable for processing large streams of data.
+
+- **Use Cases**: RabbitMQ is preferred for tasks like request/reply and complex routing, while Kafka is optimal for log aggregation, real-time analytics, and stream processing.
+
+Choosing between RabbitMQ and Kafka depends on the specific requirements of your application, such as message throughput, complexity of message routing, and need for real-time processing.
