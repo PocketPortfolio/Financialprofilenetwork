@@ -1,0 +1,85 @@
+---
+title: How to Set Up Monitoring with Prometheus
+date: '2026-04-27'
+description: >-
+  Learn how to set up monitoring with Prometheus to effectively monitor your
+  systems and applications.
+tags:
+  - monitoring
+  - prometheus
+  - setup
+  - how-to
+author: Pocket Portfolio Team
+image: /images/blog/how-to-set-up-monitoring-with-prometheus.png
+pillar: Infrastructure
+category: how-to-in-tech
+---
+
+Setting up effective monitoring is crucial for maintaining the health and performance of your systems and applications. Prometheus, an open-source monitoring and alerting toolkit, is widely adopted due to its powerful querying capabilities and easy integration with various systems.
+
+## Problem
+
+Managing a growing infrastructure requires a robust monitoring solution that can handle diverse data sources, provide real-time insights, and scale with your needs. Without an effective monitoring setup, diagnosing issues can be time-consuming and error-prone.
+
+## Solution with Code
+
+To set up Prometheus, follow these steps:
+
+1. **Install Prometheus:**
+
+   First, download Prometheus from the [official website](https://prometheus.io/download/) and extract it.
+
+   ```bash
+   wget https://github.com/prometheus/prometheus/releases/download/v2.41.0/prometheus-2.41.0.linux-amd64.tar.gz
+   tar xvfz prometheus-2.41.0.linux-amd64.tar.gz
+   cd prometheus-2.41.0.linux-amd64
+   ```
+
+2. **Configure Prometheus:**
+
+   Create a configuration file named `prometheus.yml` with the following content:
+
+   ```yaml
+   global:
+     scrape_interval: 15s
+     evaluation_interval: 15s
+
+   scrape_configs:
+     - job_name: 'node'
+       static_configs:
+         - targets: ['localhost:9100']
+   ```
+
+   This configuration tells Prometheus to scrape metrics from a node exporter running on `localhost:9100`.
+
+3. **Run Prometheus:**
+
+   Start Prometheus using the following command:
+
+   ```bash
+   ./prometheus --config.file=prometheus.yml
+   ```
+
+   Prometheus will be accessible at `http://localhost:9090`.
+
+4. **Set Up Node Exporter:**
+
+   Install and run Node Exporter to collect system metrics:
+
+   ```bash
+   wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
+   tar xvfz node_exporter-1.5.0.linux-amd64.tar.gz
+   cd node_exporter-1.5.0.linux-amd64
+   ./node_exporter
+   ```
+
+   Node Exporter will run on port `9100`, as configured in `prometheus.yml`.
+
+## Key Concepts
+
+- **Prometheus Server:** The core component that retrieves and stores time-series data.
+- **Scrape Targets:** Endpoints from which Prometheus collects metrics.
+- **PromQL:** A powerful query language used for aggregating and displaying metrics.
+- **Node Exporter:** A Prometheus exporter that provides hardware and OS metrics exposed by *nix kernels.
+
+By following these steps, you'll set up a basic monitoring environment with Prometheus, allowing you to monitor system metrics and gain valuable insights into your infrastructure's performance.
