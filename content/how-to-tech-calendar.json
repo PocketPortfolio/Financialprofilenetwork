@@ -1878,7 +1878,7 @@
     "scheduledTime": "14:00",
     "title": "How to Set Up Monitoring with Prometheus",
     "slug": "how-to-set-up-monitoring-with-prometheus",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1886,7 +1886,8 @@
       "rome",
       "prometheus",
       "set"
-    ]
+    ],
+    "publishedAt": "2026-04-27T14:00:33.601Z"
   },
   {
     "id": "how-to-the-complete-guide-to-environment-variables-apr-28",
