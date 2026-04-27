@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './useAuth';
 import { TradeService, Trade } from '../services/tradeService';
 import { 
@@ -19,6 +19,9 @@ export function useTrades() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Avoid getDocsFromServer on every refresh — that billed 1 read per trade per call and drove multi‑million Firestore reads/day. */
+  const tradesServerHydratedUidRef = useRef<string | null>(null);
+  const forceServerTradeFetchRef = useRef(false);
 
   // Debug: Log trades state changes (disabled)
   // useEffect(() => {
@@ -36,9 +39,15 @@ export function useTrades() {
     try {
       if (isAuthenticated && user) {
         // Load from Firebase for authenticated users
-        // 🔥 CRITICAL: Force server fetch to prevent stale cache from causing trades to reappear
-        // This ensures we always get fresh data, not cached data from previous sessions
-        const userTrades = await TradeService.getTrades(user.uid, true); // forceServerFetch = true
+        const uid = user.uid;
+        const firstHydrateThisUid = tradesServerHydratedUidRef.current !== uid;
+        const forceServer =
+          forceServerTradeFetchRef.current || firstHydrateThisUid;
+        forceServerTradeFetchRef.current = false;
+        if (firstHydrateThisUid) {
+          tradesServerHydratedUidRef.current = uid;
+        }
+        const userTrades = await TradeService.getTrades(uid, forceServer);
         
         // 🛡️ TOMBSTONE FILTER: Exclude locally "healed" (deleted) trades
         // This is a UI-layer safeguard - even if getTrades() filters them,
@@ -113,6 +122,12 @@ export function useTrades() {
   useEffect(() => {
     loadTrades();
   }, [user?.uid, isAuthenticated]); // Only reload when user ID or auth status changes
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      tradesServerHydratedUidRef.current = null;
+    }
+  }, [isAuthenticated, user]);
 
   const addTrade = useCallback(async (tradeData: Omit<Trade, 'id' | 'uid' | 'createdAt' | 'updatedAt'>) => {
     try {
@@ -361,6 +376,7 @@ export function useTrades() {
     
     try {
       await TradeService.migrateTrades(user.uid, tradeIds);
+      forceServerTradeFetchRef.current = true;
       // Refresh the trades list to reflect the migration
       await loadTrades();
     } catch (error) {
@@ -506,6 +522,7 @@ export function useTrades() {
     
     try {
       const cleanedCount = await TradeService.cleanupOrphanedTrades(user.uid);
+      forceServerTradeFetchRef.current = true;
       // Refresh trades after cleanup
       await loadTrades();
       return cleanedCount;

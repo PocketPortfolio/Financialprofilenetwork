@@ -3,24 +3,33 @@
 import Link from 'next/link';
 
 export default function SovereignFinancePage() {
-  const definedTermSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    "name": "Sovereign Finance",
-    "description": "The philosophy of owning and controlling your financial data completely. No vendor lock-in, no data sales, no cloud dependency for core functionality.",
-    "inDefinedTermSet": {
-      "@type": "DefinedTermSet",
-      "name": "Financial Sovereignty Glossary",
-      "url": "https://www.pocketportfolio.app/learn"
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Sovereign Finance (Pocket Portfolio)',
+    description:
+      'Engineering stub: Sovereign Finance is the philosophy of owning and controlling your financial data completely. Founder will supply full prose + citations.',
+    url: 'https://www.pocketportfolio.app/learn/sovereign-finance',
+    mainEntityOfPage: 'https://www.pocketportfolio.app/learn/sovereign-finance',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
     },
-    "url": "https://www.pocketportfolio.app/learn/sovereign-finance"
-  };
+    author: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
+    },
+    datePublished: '2026-04-27',
+    dateModified: '2026-04-27',
+  } as const;
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <div style={{
         maxWidth: '800px',

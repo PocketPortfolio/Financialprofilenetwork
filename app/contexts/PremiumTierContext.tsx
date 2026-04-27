@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -92,13 +93,35 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
   const [tier, setTier] = useState<Tier>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { user, isAuthenticated } = useAuth();
+  /** Survives transient degraded+null API responses (Firestore quota) without locking premium UI. */
+  const lastKnownPaidRef = useRef<{ tier: PaidTier; theme: PremiumTheme } | null>(null);
 
   useEffect(() => {
     const cachedTier = localStorage.getItem('pocket-portfolio-tier') as Tier;
     const cachedTheme = localStorage.getItem(
       'pocket-portfolio-premium-theme'
     ) as PremiumTheme;
+    const cachedTierTsRaw = localStorage.getItem('pocket-portfolio-tier-timestamp');
+    const cachedTierTs = cachedTierTsRaw ? Number(cachedTierTsRaw) : NaN;
 
+    // Hydrate immediately from browser cache to prevent UI "downgrade flash"
+    // while network/auth tier checks are pending or Firestore is degraded.
+    if (cachedTier) {
+      setTier(cachedTier);
+    }
+    if (cachedTheme) {
+      setUnlockedTheme(cachedTheme);
+    }
+    if (isPaidTier(cachedTier)) {
+      const th =
+        cachedTheme === 'founder' || cachedTheme === 'corporate'
+          ? cachedTheme
+          : cachedTier === 'foundersClub'
+            ? 'founder'
+            : 'corporate';
+      lastKnownPaidRef.current = { tier: cachedTier, theme: th };
+    }
+    
     let emailToCheck: string | null = null;
     let useAuthenticatedEndpoint = false;
 
@@ -123,6 +146,18 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
 
     const checkTier = async () => {
       try {
+        // If we have a recent cached tier, don't hammer Firestore during quota incidents.
+        // This does not change business logic: it avoids a known-bad dependency while degraded.
+        const cacheTtlMs = 10 * 60 * 1000;
+        if (
+          cachedTier &&
+          Number.isFinite(cachedTierTs) &&
+          Date.now() - cachedTierTs < cacheTtlMs
+        ) {
+                    setIsLoading(false);
+          return;
+        }
+
         let response: Response;
 
         if (useAuthenticatedEndpoint && user) {
@@ -156,6 +191,8 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
         }
 
         if (!response.ok) {
+                    const throttleOrUnavailable =
+            response.status === 429 || response.status === 503;
           if (
             response.status === 503 &&
             !isAuthenticated &&
@@ -165,13 +202,30 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
             setTier(cachedTier);
             setUnlockedTheme(cachedTheme);
           } else if (isAuthenticated && user?.email) {
-            const sponsorEmail = localStorage.getItem('sponsor_email');
-            const paid = readCachedPaidTier(true, user.email, sponsorEmail);
-            if (paid) {
-              applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+            if (throttleOrUnavailable) {
+              const lk = lastKnownPaidRef.current;
+              if (lk) {
+                setTier(lk.tier);
+                setUnlockedTheme(lk.theme);
+              } else {
+                const sponsorEmail = localStorage.getItem('sponsor_email');
+                const paid = readCachedPaidTier(true, user.email, sponsorEmail);
+                if (paid) {
+                  applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+                } else if (cachedTier || cachedTheme) {
+                  if (cachedTier) setTier(cachedTier);
+                  if (cachedTheme) setUnlockedTheme(cachedTheme);
+                }
+              }
             } else {
-              setTier(null);
-              setUnlockedTheme(null);
+              const sponsorEmail = localStorage.getItem('sponsor_email');
+              const paid = readCachedPaidTier(true, user.email, sponsorEmail);
+              if (paid) {
+                applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+              } else {
+                setTier(null);
+                setUnlockedTheme(null);
+              }
             }
           }
           setIsLoading(false);
@@ -179,8 +233,57 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
         }
 
         const data = await response.json();
+        const isDegraded =
+          Boolean((data as any)?.degraded) ||
+          typeof (data as any)?.degradedReason === 'string';
         const userTier = data.tier as Tier;
         const userThemeAccess = data.themeAccess as PremiumTheme;
+
+        
+        // If Firestore is throttling or unavailable, do NOT wipe premium status.
+        // Keep last-known tier/theme from browser cache when available.
+        if (!userTier && isDegraded) {
+          if (user) {
+            try {
+              const tr = await user.getIdTokenResult();
+              if (tr.claims.admin === true) {
+                const th: PremiumTheme = 'founder';
+                setTier('foundersClub');
+                setUnlockedTheme(th);
+                lastKnownPaidRef.current = { tier: 'foundersClub', theme: th };
+                localStorage.setItem('pocket-portfolio-tier', 'foundersClub');
+                localStorage.setItem('pocket-portfolio-premium-theme', th);
+                localStorage.setItem('pocket-portfolio-tier-timestamp', Date.now().toString());
+                setIsLoading(false);
+                return;
+              }
+            } catch {
+              /* ignore */
+            }
+          }
+          const lk = lastKnownPaidRef.current;
+          if (lk) {
+                        setTier(lk.tier);
+            setUnlockedTheme(lk.theme);
+            setIsLoading(false);
+            return;
+          }
+          const sponsorEmail = localStorage.getItem('sponsor_email');
+          const paid = readCachedPaidTier(isAuthenticated, user?.email, sponsorEmail);
+          if (paid) {
+                        applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+          } else {
+            // Fall back to raw cached tier/theme even if it's not a paid tier (eg supporter tiers),
+            // and if none exist, preserve current in-memory values rather than downgrading.
+            if (cachedTier || cachedTheme) {
+                            if (cachedTier) setTier(cachedTier);
+              if (cachedTheme) setUnlockedTheme(cachedTheme);
+            } else {
+                          }
+          }
+          setIsLoading(false);
+          return;
+        }
 
         if (userTier) {
           setTier(userTier);
@@ -203,7 +306,11 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
             setUnlockedTheme(theme);
             localStorage.setItem('pocket-portfolio-premium-theme', theme);
           }
+          if (isPaidTier(userTier) && theme) {
+            lastKnownPaidRef.current = { tier: userTier, theme };
+          }
         } else {
+          lastKnownPaidRef.current = null;
           setTier(null);
           setUnlockedTheme(null);
           localStorage.removeItem('pocket-portfolio-tier');

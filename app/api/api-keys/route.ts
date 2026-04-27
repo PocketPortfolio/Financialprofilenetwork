@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import {
+  isFirestoreResourceExhausted,
+  markFirestoreReadsDegraded,
+  shouldDegradeFirestoreReads,
+} from '@/app/lib/server/firestore-quota-circuit';
+import { resolvePaidTierFromStripeEmail } from '@/app/lib/server/stripe-paid-tier';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -45,28 +51,63 @@ function getDb() {
  * This route is more reliable as it avoids Next.js routing issues with @ in path segments
  */
 export async function GET(request: NextRequest) {
+  let emailForDegraded: string | null = null;
   try {
-    // Initialize Firebase Admin first
     initializeFirebaseAdmin();
-    
-    // Get email from query parameter
+
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
-    
+
     if (!email) {
-      return NextResponse.json(
-        { error: 'Email parameter required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email parameter required' }, { status: 400 });
     }
-    
-    // Decode and validate email format
+
     const decodedEmail = decodeURIComponent(email);
+    emailForDegraded = decodedEmail || null;
     if (!decodedEmail || !decodedEmail.includes('@')) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
+    // In local dev, do not hit production Firestore for tiers by default.
+    const useFirestoreInDev = process.env.NEXT_PUBLIC_DEV_USE_FIRESTORE_TIERS === 'true';
+    if (process.env.NODE_ENV === 'development' && !useFirestoreInDev) {
+      let stripeTier = { tier: null as string | null, themeAccess: null as string | null };
+      try {
+        const s = await resolvePaidTierFromStripeEmail(decodedEmail);
+        stripeTier = { tier: s.tier, themeAccess: s.themeAccess };
+      } catch {
+        /* ignore */
+      }
+      return NextResponse.json({
+        email: decodedEmail,
+        apiKey: null,
+        corporateLicense: null,
+        tier: stripeTier.tier,
+        themeAccess: stripeTier.themeAccess,
+        degraded: true,
+        degradedReason: 'dev_no_firestore',
+        degradedFallback: stripeTier.tier ? 'stripe_subscription' : null,
+      });
+    }
+
+    if (shouldDegradeFirestoreReads()) {
+      let stripeTier = { tier: null as string | null, themeAccess: null as string | null };
+      try {
+        const s = await resolvePaidTierFromStripeEmail(decodedEmail);
+        stripeTier = { tier: s.tier, themeAccess: s.themeAccess };
+      } catch {
+        /* ignore */
+      }
+      return NextResponse.json({
+        email: decodedEmail,
+        apiKey: null,
+        corporateLicense: null,
+        tier: stripeTier.tier,
+        themeAccess: stripeTier.themeAccess,
+        degraded: true,
+        degradedReason: 'firestore_circuit_open',
+        degradedFallback: stripeTier.tier ? 'stripe_subscription' : null,
+      });
     }
     
     // Rate limiting check
@@ -122,14 +163,29 @@ export async function GET(request: NextRequest) {
     });
     
     // Handle quota exceeded errors specifically
-    if (error?.code === 8 || error?.message?.includes('RESOURCE_EXHAUSTED') || error?.message?.includes('Quota exceeded')) {
+    if (isFirestoreResourceExhausted(error)) {
+      markFirestoreReadsDegraded();
+      let stripeTier = { tier: null as string | null, themeAccess: null as string | null };
+      if (emailForDegraded) {
+        try {
+          const s = await resolvePaidTierFromStripeEmail(emailForDegraded);
+          stripeTier = { tier: s.tier, themeAccess: s.themeAccess };
+        } catch {
+          /* ignore */
+        }
+      }
       return NextResponse.json(
-        { 
-          error: 'Service temporarily unavailable due to high demand',
-          code: 'QUOTA_EXCEEDED',
-          retryAfter: 60 // Suggest retrying after 60 seconds
+        {
+          email: emailForDegraded,
+          apiKey: null,
+          corporateLicense: null,
+          tier: stripeTier.tier,
+          themeAccess: stripeTier.themeAccess,
+          degraded: true,
+          degradedReason: 'firestore_quota_exceeded',
+          degradedFallback: stripeTier.tier ? 'stripe_subscription' : null,
         },
-        { status: 503 } // Service Unavailable
+        { status: 200 }
       );
     }
     

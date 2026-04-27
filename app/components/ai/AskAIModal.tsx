@@ -255,12 +255,15 @@ export function AskAIModal({
 
     try {
       const token = await user.getIdToken();
+
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        // Prevent infinite "thinking..." when network hangs; surfaces a concrete error instead.
+        signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? (AbortSignal as any).timeout(20000) : undefined,
         body: JSON.stringify({
           message: text,
           context: portfolioContext,

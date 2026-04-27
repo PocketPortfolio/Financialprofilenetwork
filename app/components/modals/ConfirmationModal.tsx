@@ -31,7 +31,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
 
-  // #region agent log
   useEffect(() => {
     renderCountRef.current += 1;
     const wasOpen = prevIsOpenRef.current;
@@ -60,7 +59,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       }
     };
   }, [isOpen, type, isLoading, shouldAnimate]);
-  // #endregion
 
   // Memoize overlay styles to prevent re-renders
   // Reduced blur to improve performance and prevent glitching
@@ -107,27 +105,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     isolation: 'isolate' as const, // Create new stacking context
     contain: 'layout style paint' as const // Isolate modal from parent layout recalculations
   }), [shouldAnimate, animationStartedRef.current]);
-
-  // #region agent log
-  // Track overlay repaints using ResizeObserver
-  useEffect(() => {
-    if (!isOpen || !overlayRef.current) return;
-    
-    const overlay = overlayRef.current;
-    let repaintCount = 0;
-    
-    // Use ResizeObserver to detect layout changes (repaints)
-    const resizeObserver = new ResizeObserver(() => {
-      repaintCount++;
-    });
-    
-    resizeObserver.observe(overlay);
-    
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [isOpen, isLoading]);
-  // #endregion
 
   if (!isOpen) return null;
 

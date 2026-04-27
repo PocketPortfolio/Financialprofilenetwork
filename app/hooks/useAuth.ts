@@ -40,12 +40,19 @@ export function useAuth() {
       // Trigger Welcome Email (Week 0) at most once per session (sync guard so double onAuthStateChange doesn't double-send)
       if (!welcomeEmailTriggeredRef.current) {
         welcomeEmailTriggeredRef.current = true;
-        user.getIdToken().then((token) => {
-          fetch('/api/welcome-email', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-          }).catch((err) => console.error('Welcome email trigger failed:', err));
-        }).catch((err) => console.error('Welcome email: getIdToken failed:', err));
+        // In development, avoid spamming Resend/Firestore and triggering Fast Refresh reload loops.
+        // Important: do NOT return early here; it would prevent `setUser` / `setLoading(false)` below.
+        if (process.env.NODE_ENV !== 'development') {
+          user
+            .getIdToken()
+            .then((token) => {
+              fetch('/api/welcome-email', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
+              }).catch((err) => console.error('Welcome email trigger failed:', err));
+            })
+            .catch((err) => console.error('Welcome email: getIdToken failed:', err));
+        }
       }
     }
 
@@ -167,7 +174,7 @@ export function useAuth() {
           await signInWithRedirect(auth, provider);
           // Note: User will be redirected, so we don't return here
           return null;
-        } catch (redirectError) {
+        } catch (redirectError: any) {
           console.error('Error with redirect authentication:', redirectError);
           throw redirectError;
         }

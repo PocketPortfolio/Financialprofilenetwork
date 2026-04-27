@@ -59,6 +59,9 @@ https://www.pocketportfolio.app/api/npm-stats
 
 ## Canonical Articles
 - The architecture of sovereign intelligence — https://www.pocketportfolio.app/architecture (2026-03-15)
+- Sovereign Finance — https://www.pocketportfolio.app/learn/sovereign-finance (2026-04-27)
+- Sovereign Stack — https://www.pocketportfolio.app/learn/sovereign-stack (2026-04-27)
+- Local-First — https://www.pocketportfolio.app/learn/local-first (2026-04-27)
 
 ## Where to Find Us
 - https://github.com/PocketPortfolio

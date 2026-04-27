@@ -3,24 +3,33 @@
 import Link from 'next/link';
 
 export default function LocalFirstPage() {
-  const definedTermSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    "name": "Local-First Architecture",
-    "description": "A software design pattern where data is stored and processed on the user's device first, with optional cloud sync. This ensures privacy, offline functionality, and user data sovereignty.",
-    "inDefinedTermSet": {
-      "@type": "DefinedTermSet",
-      "name": "Financial Sovereignty Glossary",
-      "url": "https://www.pocketportfolio.app/learn"
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Local-First (Pocket Portfolio)',
+    description:
+      "Engineering stub: Local-first architecture stores and processes data on the user's device first, with optional sync. Founder will supply full prose + citations.",
+    url: 'https://www.pocketportfolio.app/learn/local-first',
+    mainEntityOfPage: 'https://www.pocketportfolio.app/learn/local-first',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
     },
-    "url": "https://www.pocketportfolio.app/learn/local-first"
-  };
+    author: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
+    },
+    datePublished: '2026-04-27',
+    dateModified: '2026-04-27',
+  } as const;
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <div style={{
         maxWidth: '800px',

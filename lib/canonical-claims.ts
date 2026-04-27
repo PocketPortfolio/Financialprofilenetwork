@@ -338,6 +338,27 @@ export const CANONICAL_ARTICLES: ReadonlyArray<CanonicalArticle> = [
       'Plain-language map of how Pocket Portfolio combines local-first storage, optional sync, and bounded AI so search engines and answer engines can quote us accurately.',
     datePublished: '2026-03-15',
   },
+  {
+    headline: 'Sovereign Finance',
+    url: 'https://www.pocketportfolio.app/learn/sovereign-finance',
+    description:
+      'Engineering stub for Article JSON-LD. Founder will supply full prose + citations.',
+    datePublished: '2026-04-27',
+  },
+  {
+    headline: 'Sovereign Stack',
+    url: 'https://www.pocketportfolio.app/learn/sovereign-stack',
+    description:
+      'Engineering stub for Article JSON-LD. Founder will supply full prose + citations.',
+    datePublished: '2026-04-27',
+  },
+  {
+    headline: 'Local-First',
+    url: 'https://www.pocketportfolio.app/learn/local-first',
+    description:
+      'Engineering stub for Article JSON-LD. Founder will supply full prose + citations.',
+    datePublished: '2026-04-27',
+  },
 ];
 
 // ──────────────────────────────────────────────────────────────────────────────

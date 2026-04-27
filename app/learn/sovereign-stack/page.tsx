@@ -3,24 +3,33 @@
 import Link from 'next/link';
 
 export default function SovereignStackPage() {
-  const definedTermSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    "name": "The Sovereign Stack",
-    "description": "A financial software architecture where sensitive banking data (Transactions, Holdings) is fetched via API but analyzed entirely on the client-side (Browser/Local), ensuring the platform provider never sees the user's Net Worth.",
-    "inDefinedTermSet": {
-      "@type": "DefinedTermSet",
-      "name": "Financial Sovereignty Glossary",
-      "url": "https://www.pocketportfolio.app/learn"
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Sovereign Stack (Pocket Portfolio)',
+    description:
+      "Engineering stub: The Sovereign Stack is a financial software architecture where sensitive banking data is analyzed client-side so the platform never sees the user's net worth. Founder will supply full prose + citations.",
+    url: 'https://www.pocketportfolio.app/learn/sovereign-stack',
+    mainEntityOfPage: 'https://www.pocketportfolio.app/learn/sovereign-stack',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
     },
-    "url": "https://www.pocketportfolio.app/learn/sovereign-stack"
-  };
+    author: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
+    },
+    datePublished: '2026-04-27',
+    dateModified: '2026-04-27',
+  } as const;
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <div style={{
         maxWidth: '800px',

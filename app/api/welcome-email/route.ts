@@ -15,11 +15,20 @@ import {
   WELCOME_SUBJECT,
 } from '@/lib/stack-reveal/email-templates';
 import { sendStackRevealEmail } from '@/lib/stack-reveal/resend';
+import { markFirestoreReadsDegraded } from '@/app/lib/server/firestore-quota-circuit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-function getDb() {
+function isResourceExhausted(error: any) {
+  return (
+    error?.code === 8 ||
+    (typeof error?.message === 'string' &&
+      (error.message.includes('RESOURCE_EXHAUSTED') || error.message.includes('Quota exceeded')))
+  );
+}
+
+function initializeFirebaseAdmin() {
   if (!getApps().length) {
     initializeApp({
       credential: cert({
@@ -29,6 +38,10 @@ function getDb() {
       }),
     });
   }
+}
+
+function getDb() {
+  initializeFirebaseAdmin();
   return getFirestore();
 }
 
@@ -43,6 +56,7 @@ export async function POST(request: NextRequest) {
   let email: string;
   let displayName: string | null;
   try {
+    initializeFirebaseAdmin();
     const auth = getAuth();
     const decoded = await auth.verifyIdToken(token);
     uid = decoded.uid;
@@ -85,6 +99,14 @@ export async function POST(request: NextRequest) {
   } catch (e: unknown) {
     if (e instanceof Error && e.message === ALREADY_SENT) {
       return NextResponse.json({ sent: false, alreadySent: true });
+    }
+    if (isResourceExhausted(e)) {
+      markFirestoreReadsDegraded();
+      // Do not block the app when Firestore is throttling.
+      return NextResponse.json(
+        { sent: false, degraded: true, degradedReason: 'firestore_quota_exceeded' },
+        { status: 202 }
+      );
     }
     throw e;
   }

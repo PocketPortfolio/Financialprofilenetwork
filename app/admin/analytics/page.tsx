@@ -168,7 +168,7 @@ interface AnalyticsData {
     mobileSetupRequested: { total: number; last7Days: number };
     quotaUpgradeInitiated: { total: number; last7Days: number };
   };
-  /** Traffic → intent → checkout → Founders (Firestore monetizationFunnelEvents + apiKeysByEmail) */
+  /** Traffic → intent → checkout → Founders */
   monetizationFunnelBoard?: {
     organicTraffic: number;
     paywallImpressions: number;
@@ -198,14 +198,14 @@ export default function AdminAnalyticsPage() {
       if (!user) {
         setIsAdmin(false);
         setCheckingAdmin(false);
-        return;
+                return;
       }
 
       try {
         const token = await user.getIdTokenResult();
         const hasAdminClaim = token.claims.admin === true;
         setIsAdmin(hasAdminClaim);
-        
+                
         if (!hasAdminClaim) {
           // Don't redirect immediately, let user see the access denied message
           console.log('User does not have admin privileges');
@@ -213,7 +213,7 @@ export default function AdminAnalyticsPage() {
       } catch (err) {
         console.error('Error checking admin status:', err);
         setIsAdmin(false);
-      } finally {
+              } finally {
         setCheckingAdmin(false);
       }
     };
@@ -227,27 +227,27 @@ export default function AdminAnalyticsPage() {
 
   const fetchAnalyticsData = useCallback(async () => {
     if (!isAdmin || checkingAdmin) {
-      return;
+            return;
     }
     try {
       setLoadingData(true);
       setError(null);
 
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
+            const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
       });
-      if (!response.ok) {
+            if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Failed to fetch analytics data' }));
-        throw new Error(errorData.error || 'Failed to fetch analytics data');
+                throw new Error(errorData.error || 'Failed to fetch analytics data');
       }
 
       const data = await response.json();
       setAnalyticsData(data);
-    } catch (err: any) {
+          } catch (err: any) {
       setError(err.message || 'Failed to load analytics');
       console.error('Analytics fetch error:', err);
-    } finally {
+          } finally {
       setLoadingData(false);
     }
   }, [isAdmin, checkingAdmin, timeRange]);
@@ -260,7 +260,8 @@ export default function AdminAnalyticsPage() {
 
     void fetchAnalyticsData();
 
-    const intervalMs = 45 * 1000;
+    // Long interval: admin dashboard previously polled every 45s and contributed to Firestore read spikes.
+    const intervalMs = 10 * 60 * 1000;
     const interval = setInterval(() => {
       void fetchAnalyticsData();
     }, intervalMs);
@@ -383,7 +384,7 @@ export default function AdminAnalyticsPage() {
                     color: 'var(--text-tertiary)',
                     marginLeft: '4px'
                   }}>
-                    (Auto-refreshes every 45 seconds)
+                    (Auto-refreshes every 10 minutes)
                   </span>
                 )}
               </p>
@@ -502,7 +503,7 @@ export default function AdminAnalyticsPage() {
                 <MetricCard
                   label="Paywall impressions"
                   value={analyticsData.monetizationFunnelBoard.paywallImpressions.toLocaleString()}
-                  subtitle="Firestore monetizationFunnelEvents (period)"
+                  subtitle="Paywall views in selected range"
                 />
                 <MetricCard
                   label="Checkout starts"
@@ -512,7 +513,7 @@ export default function AdminAnalyticsPage() {
                 <MetricCard
                   label="Founders (active)"
                   value={analyticsData.monetizationFunnelBoard.paidFoundersActive.toLocaleString()}
-                  subtitle="apiKeysByEmail tier = foundersClub"
+                  subtitle="Active founder memberships"
                 />
               </div>
               <div
@@ -580,12 +581,12 @@ export default function AdminAnalyticsPage() {
               <MetricCard
                 label="Founders Club MRR"
                 value={`£${analyticsData.monetization.foundersClub.revenue.toFixed(2)}`}
-                subtitle={`${analyticsData.monetization.foundersClub.count} members (valuation / run rate)`}
+                subtitle={`${analyticsData.monetization.foundersClub.count} active members`}
               />
               <MetricCard
                 label="Founders Club Cash Collected"
                 value={`£${(analyticsData.monetization.foundersClub.cashCollected ?? 0).toFixed(2)}`}
-                subtitle="Total cash in period (runway)"
+                subtitle="Cash collected in selected period"
               />
             </div>
 

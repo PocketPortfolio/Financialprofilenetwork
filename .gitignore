@@ -1,6 +1,8 @@
 # Claude Code CLI: .claudesignore is intentionally tracked (repo guardrails)
 node_modules/
 dist/
+# Package build output (commit source only; CI builds dist)
+packages/importer/dist/
 .vite/
 .vercel/
 .next/
@@ -29,3 +31,5 @@ Thumbs.db
 # Avoid committing secrets (use env vars / Vercel)
 temp_api_key.txt
 *.key
+.vercel
+.env*.local

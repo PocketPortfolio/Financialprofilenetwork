@@ -12,6 +12,8 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
+import { markFirestoreReadsDegraded, shouldDegradeFirestoreReads } from '@/app/lib/server/firestore-quota-circuit';
+import { resolvePaidTierFromStripeEmail } from '@/app/lib/server/stripe-paid-tier';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -23,6 +25,34 @@ const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const FREE_TIER_MONTHLY_LIMIT = 20; // Free: quota enforced; paid (foundersClub/corporateSponsor): no quota, unlimited.
 const PERIOD_DAYS = 30;
 const MAX_ATTACHED_CONTENT_LENGTH = 60_000; // Server-side cap for prod (frontend caps at 50k)
+
+const KV_REST_API_URL = process.env.KV_REST_API_URL;
+const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
+
+async function kvGetJson<T>(key: string): Promise<T | null> {
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) return null;
+  const res = await fetch(`${KV_REST_API_URL}/get/${encodeURIComponent(key)}`, {
+    headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  const body = (await res.json()) as { result?: string | null };
+  if (!body || typeof body.result !== 'string' || !body.result) return null;
+  try {
+    return JSON.parse(body.result) as T;
+  } catch {
+    return null;
+  }
+}
+
+async function kvSetJson(key: string, value: unknown, exSeconds: number) {
+  if (!KV_REST_API_URL || !KV_REST_API_TOKEN) return;
+  const payload = encodeURIComponent(JSON.stringify(value));
+  await fetch(`${KV_REST_API_URL}/set/${encodeURIComponent(key)}/${payload}?EX=${exSeconds}`, {
+    headers: { Authorization: `Bearer ${KV_REST_API_TOKEN}` },
+    cache: 'no-store',
+  }).catch(() => {});
+}
 
 function initializeFirebaseAdmin() {
   if (!getApps().length) {
@@ -39,6 +69,14 @@ function initializeFirebaseAdmin() {
 function getDb() {
   initializeFirebaseAdmin();
   return getFirestore();
+}
+
+function isResourceExhausted(error: any) {
+  return (
+    error?.code === 8 ||
+    (typeof error?.message === 'string' &&
+      (error.message.includes('RESOURCE_EXHAUSTED') || error.message.includes('Quota exceeded')))
+  );
 }
 
 /** Log Pocket Analyst event to Firestore toolUsage for /admin/analytics. Fire-and-forget for success; await for errors so log is persisted. */
@@ -179,74 +217,157 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const db = getDb();
+  let db: ReturnType<typeof getFirestore> | null = null;
+  let tier: string | undefined;
+  let isPaid = false;
+  if (!shouldDegradeFirestoreReads()) {
+    try {
+      db = getDb();
 
-  // Resolve tier from apiKeysByEmail (time-bound trials respect expiresAt)
-  const apiKeyDoc = await db.collection('apiKeysByEmail').doc(email).get();
-  const apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
-  const effective = getEffectivePaidTier(apiKeyData);
-  const tier = effective.tier ?? undefined;
-  const isPaid = effective.isPaid;
+      // Resolve tier from apiKeysByEmail (time-bound trials respect expiresAt)
+      const apiKeyDoc = await db.collection('apiKeysByEmail').doc(email).get();
+      const apiKeyData = apiKeyDoc.exists ? apiKeyDoc.data() : null;
+      const effective = getEffectivePaidTier(apiKeyData);
+      tier = effective.tier ?? undefined;
+      isPaid = effective.isPaid;
+    } catch (e: any) {
+      if (isResourceExhausted(e)) {
+        markFirestoreReadsDegraded();
+        db = null;
+        tier = undefined;
+        isPaid = false;
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  if ((!isPaid || !tier) && email) {
+    try {
+      const s = await resolvePaidTierFromStripeEmail(email);
+      if (s.tier) {
+        tier = s.tier;
+        isPaid = true;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const adminAllow = (process.env.ADMIN_EMAIL_OVERRIDE ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const emailLc = email?.trim().toLowerCase() ?? '';
+  if (adminAllow.length && emailLc && adminAllow.includes(emailLc) && !isPaid) {
+    tier = 'foundersClub';
+    isPaid = true;
+  }
+
+  const ttlSeconds = PERIOD_DAYS * 24 * 60 * 60;
 
   if (attachedContent && !isPaid) {
-    await logPocketAnalystEvent(db, {
-      action: 'error',
-      uid,
-      tier,
-      isPaid: false,
-      hadAttachment: true,
-      status: 403,
-      errorCode: 'attachment_forbidden',
-    });
+    if (db) {
+      await logPocketAnalystEvent(db, {
+        action: 'error',
+        uid,
+        tier,
+        isPaid: false,
+        hadAttachment: true,
+        status: 403,
+        errorCode: 'attachment_forbidden',
+      });
+    }
     return NextResponse.json(
       { error: 'File attachments are available on Founder\'s Club or Corporate tier' },
       { status: 403 }
     );
   }
 
+  // Enforce + increment quota. Prefer Firestore, fallback to KV when Firestore unavailable/throttled.
   if (!isPaid) {
-    const usageRef = db.collection('aiUsage').doc(uid);
-    const usageSnap = await usageRef.get();
     const now = new Date();
-    const data = usageSnap.exists ? usageSnap.data() : null;
-    let usageCount = typeof data?.usageCount === 'number' ? data.usageCount : 0;
-    let periodStart = data?.periodStart;
+    let firestoreQuotaBlocked = db === null;
+    // 1) Try Firestore quota enforcement if available
+    if (db) {
+      const usageRef = db.collection('aiUsage').doc(uid);
+      let usageSnap: Awaited<ReturnType<typeof usageRef.get>>;
+      try {
+        usageSnap = await usageRef.get();
+      } catch (e: any) {
+        if (isResourceExhausted(e)) {
+          usageSnap = { exists: false, data: () => null } as any;
+          firestoreQuotaBlocked = true;
+        } else {
+          throw e;
+        }
+      }
+      const data = usageSnap.exists ? usageSnap.data() : null;
+      let usageCount = typeof data?.usageCount === 'number' ? data.usageCount : 0;
+      let periodStart = data?.periodStart;
 
-    if (periodStart && periodStart.toDate) {
-      const start = periodStart.toDate();
-      const daysSince = (now.getTime() - start.getTime()) / (24 * 60 * 60 * 1000);
-      if (daysSince >= PERIOD_DAYS) {
-        usageCount = 0;
+      if (periodStart && periodStart.toDate) {
+        const start = periodStart.toDate();
+        const daysSince = (now.getTime() - start.getTime()) / (24 * 60 * 60 * 1000);
+        if (daysSince >= PERIOD_DAYS) {
+          usageCount = 0;
+          periodStart = Timestamp.now();
+        }
+      } else {
         periodStart = Timestamp.now();
       }
-    } else {
-      periodStart = Timestamp.now();
+
+      if (usageCount >= FREE_TIER_MONTHLY_LIMIT) {
+        await logPocketAnalystEvent(db, {
+          action: 'error',
+          uid,
+          tier,
+          isPaid: false,
+          hadAttachment: !!attachedContent,
+          status: 429,
+          errorCode: 'quota_exceeded',
+        });
+        return NextResponse.json(
+          { error: `You've used ${FREE_TIER_MONTHLY_LIMIT} questions this month. Upgrade to Founder's Club for unlimited questions.` },
+          { status: 429 }
+        );
+      }
+
+      try {
+        await usageRef.set(
+          {
+            usageCount: usageCount + 1,
+            periodStart,
+            updatedAt: Timestamp.now(),
+          },
+          { merge: true }
+        );
+      } catch (e: any) {
+        if (!isResourceExhausted(e)) throw e;
+        // If Firestore throttles on write, fall through to KV so UI can still count down.
+        firestoreQuotaBlocked = true;
+      }
     }
 
-    if (usageCount >= FREE_TIER_MONTHLY_LIMIT) {
-      await logPocketAnalystEvent(db, {
-        action: 'error',
-        uid,
-        tier,
-        isPaid: false,
-        hadAttachment: !!attachedContent,
-        status: 429,
-        errorCode: 'quota_exceeded',
-      });
-      return NextResponse.json(
-        { error: `You've used ${FREE_TIER_MONTHLY_LIMIT} questions this month. Upgrade to Founder's Club for unlimited questions.` },
-        { status: 429 }
-      );
+    // 2) KV fallback quota enforcement (when Firestore is down/throttled)
+    if (firestoreQuotaBlocked && KV_REST_API_URL && KV_REST_API_TOKEN) {
+      const kvKey = `aiUsage:${uid}`;
+      const kv = await kvGetJson<{ usageCount?: number; periodStartMs?: number }>(kvKey);
+      let usageCount = typeof kv?.usageCount === 'number' ? kv!.usageCount : 0;
+      let periodStartMs = typeof kv?.periodStartMs === 'number' ? kv!.periodStartMs : Date.now();
+      const daysSince = (Date.now() - periodStartMs) / (24 * 60 * 60 * 1000);
+      if (daysSince >= PERIOD_DAYS) {
+        usageCount = 0;
+        periodStartMs = Date.now();
+      }
+      if (usageCount >= FREE_TIER_MONTHLY_LIMIT) {
+        return NextResponse.json(
+          { error: `You've used ${FREE_TIER_MONTHLY_LIMIT} questions this month. Upgrade to Founder's Club for unlimited questions.` },
+          { status: 429 }
+        );
+      }
+      await kvSetJson(kvKey, { usageCount: usageCount + 1, periodStartMs }, ttlSeconds);
     }
-
-    await usageRef.set(
-      {
-        usageCount: usageCount + 1,
-        periodStart,
-        updatedAt: Timestamp.now(),
-      },
-      { merge: true }
-    );
   }
 
   const contextBlock = context
@@ -277,14 +398,16 @@ export async function POST(request: NextRequest) {
     if (geminiRes.ok) {
       const reader = geminiRes.body?.getReader();
       if (reader) {
-        logPocketAnalystEvent(db, {
-          action: 'question',
-          uid,
-          tier,
-          isPaid,
-          hadAttachment: !!attachedContent,
-          provider: 'gemini',
-        }).catch(() => {});
+        if (db) {
+          logPocketAnalystEvent(db, {
+            action: 'question',
+            uid,
+            tier,
+            isPaid,
+            hadAttachment: !!attachedContent,
+            provider: 'gemini',
+          }).catch(() => {});
+        }
         const decoder = new TextDecoder();
         let buffer = '';
         const stream = new ReadableStream({
@@ -333,14 +456,16 @@ export async function POST(request: NextRequest) {
   // Fallback to OpenAI if key is set
   if (openaiKey) {
     try {
-      logPocketAnalystEvent(db, {
-        action: 'question',
-        uid,
-        tier,
-        isPaid,
-        hadAttachment: !!attachedContent,
-        provider: 'openai',
-      }).catch(() => {});
+      if (db) {
+        logPocketAnalystEvent(db, {
+          action: 'question',
+          uid,
+          tier,
+          isPaid,
+          hadAttachment: !!attachedContent,
+          provider: 'openai',
+        }).catch(() => {});
+      }
       const openai = createOpenAI({ apiKey: openaiKey });
       const model = openai(isPaid ? 'gpt-4o' : 'gpt-4o-mini');
       const result = streamText({
@@ -354,15 +479,17 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await logPocketAnalystEvent(db, {
-    action: 'error',
-    uid,
-    tier,
-    isPaid,
-    hadAttachment: !!attachedContent,
-    status: 502,
-    errorCode: 'ai_error',
-  });
+  if (db) {
+    await logPocketAnalystEvent(db, {
+      action: 'error',
+      uid,
+      tier,
+      isPaid,
+      hadAttachment: !!attachedContent,
+      status: 502,
+      errorCode: 'ai_error',
+    });
+  }
   return NextResponse.json(
     { error: 'AI service error. Please try again.' },
     { status: 502 }
