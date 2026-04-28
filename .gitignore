@@ -33,3 +33,6 @@ temp_api_key.txt
 *.key
 .vercel
 .env*.local
+
+# Seed decks / binaries (keep repo text-first)
+docs/seed/*.pptx

@@ -98,6 +98,19 @@ export async function GET(request: NextRequest) {
   let idTokenAdminClaim = false;
 
   try {
+    // Dev-only Manchester proof: force a quota-like failure to verify client fallbacks.
+    if (process.env.NODE_ENV === 'development') {
+      const simulate = request.headers.get('x-simulate-quota');
+      if (simulate && simulate.toLowerCase() === 'true') {
+        const statusHeader = request.headers.get('x-simulate-quota-status');
+        const status = statusHeader === '429' ? 429 : 503;
+        return NextResponse.json(
+          { error: 'Simulated quota exhaustion (dev only)' },
+          { status }
+        );
+      }
+    }
+
     // In local dev, do not hit production Firestore for tiers by default.
     const useFirestoreInDev = process.env.NEXT_PUBLIC_DEV_USE_FIRESTORE_TIERS === 'true';
     if (process.env.NODE_ENV === 'development' && !useFirestoreInDev) {
