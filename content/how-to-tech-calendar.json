@@ -1895,7 +1895,7 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to Environment Variables",
     "slug": "the-complete-guide-to-environment-variables",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1903,7 +1903,8 @@
       "complete",
       "guide",
       "environment"
-    ]
+    ],
+    "publishedAt": "2026-04-28T14:00:47.290Z"
   },
   {
     "id": "how-to-how-to-build-a-graphql-subscription-server-apr-29",
