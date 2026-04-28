@@ -232,7 +232,7 @@ export default function AdminAnalyticsPage() {
     try {
       setLoadingData(true);
       setError(null);
-
+      
             const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },

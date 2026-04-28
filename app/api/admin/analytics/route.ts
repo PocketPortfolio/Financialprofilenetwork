@@ -467,17 +467,23 @@ async function getMonetizationData(startDate: Date) {
     let foundersClubMRR = 0;
     const foundersClubSubscriberIds = new Set<string>();
     let foundersClubCashCollected = 0;
+    let scannedItems = 0;
+    let matchedItems = 0;
+    const unmatchedPriceIds = new Map<string, number>();
 
     for (const sub of subscriptions.data) {
       if (!SUBSCRIPTION_OK_FOR_MRR.has(sub.status)) continue;
       for (const item of sub.items.data) {
         const price = item.price;
         const priceId = price.id;
+        scannedItems += 1;
         
         // Only track subscriptions from /sponsor page (filter by Price ID)
         if (!VALID_PRICE_IDS.has(priceId)) {
+          unmatchedPriceIds.set(priceId, (unmatchedPriceIds.get(priceId) || 0) + 1);
           continue;
         }
+        matchedItems += 1;
         
         // Handle both monthly and annual subscriptions
         if (price.recurring && price.unit_amount) {
