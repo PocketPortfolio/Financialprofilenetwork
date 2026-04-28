@@ -1893,7 +1893,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Content Delivery Optimization - Multi-CDN Strategies",
     "slug": "research-content-delivery-optimization-multi-cdn-strategies-2026-04-28",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1901,7 +1901,8 @@
       "content",
       "delivery",
       "optimization"
-    ]
+    ],
+    "publishedAt": "2026-04-28T18:01:13.821Z"
   },
   {
     "id": "research-apm-tool-overhead-new-relic-vs-datadog-vs-dynatrace-2026-04-29",
