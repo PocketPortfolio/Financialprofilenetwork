@@ -1,0 +1,84 @@
+---
+title: The Complete Guide to Environment Variables
+date: '2026-04-28'
+description: >-
+  Learn how to manage environment variables effectively for application
+  configuration and security.
+tags:
+  - environment variables
+  - configuration
+  - security
+  - guide
+author: Pocket Portfolio Team
+image: /images/blog/the-complete-guide-to-environment-variables.png
+pillar: Tech Foundations
+category: how-to-in-tech
+---
+
+## Problem
+
+In modern software development, managing configurations and sensitive data like API keys or database credentials is crucial. Hardcoding these values into your codebase can lead to security vulnerabilities and inflexibility across different environments.
+
+## Solution with Code
+
+Environment variables provide a secure and flexible way to manage configuration data. Here's how you can use them effectively in a Node.js application.
+
+### Step 1: Setting Environment Variables
+
+Environment variables can be set in a terminal session or within configuration files like `.env`. Here's how to set them in a terminal:
+
+```bash
+export DATABASE_URL="mongodb://localhost:27017/mydatabase"
+export API_KEY="your_api_key_here"
+```
+
+Alternatively, using a `.env` file:
+
+```plaintext
+DATABASE_URL=mongodb://localhost:27017/mydatabase
+API_KEY=your_api_key_here
+```
+
+### Step 2: Accessing Environment Variables in Node.js
+
+Use the `dotenv` package to load environment variables from a `.env` file:
+
+1. Install `dotenv`:
+
+   ```bash
+   npm install dotenv
+   ```
+
+2. Create a `.env` file in your project root and add your variables.
+
+3. Load the variables at the top of your `index.js` or `app.js` file:
+
+   ```javascript
+   require('dotenv').config();
+
+   const databaseUrl = process.env.DATABASE_URL;
+   const apiKey = process.env.API_KEY;
+
+   console.log(`Database URL: ${databaseUrl}`);
+   console.log(`API Key: ${apiKey}`);
+   ```
+
+### Step 3: Best Practices
+
+- **Avoid Version Control:** Never commit your `.env` file to version control. Use `.gitignore` to exclude it.
+- **Use Default Values:** Provide default values in your code to ensure it runs even if some variables are missing.
+- **Environment-specific Configurations:** Use different `.env` files for development, testing, and production.
+
+Example of using default values:
+
+```javascript
+const port = process.env.PORT || 3000;
+```
+
+## Key Concepts
+
+- **Security:** Environment variables help keep sensitive information out of your codebase, reducing the risk of exposure.
+- **Flexibility:** Easily switch configurations by changing environment variables without modifying the codebase.
+- **Portability:** Code can run in different environments (development, testing, production) with minimal changes, simply by altering environment variables.
+
+By adopting these practices, you can enhance the security and flexibility of your applications, making them easier to manage and deploy across different environments.
