@@ -1,6 +1,6 @@
 {
   "name": "@pocket-portfolio/coinbase-transaction-parser",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Parse Coinbase transaction history from CSV. Free & open-source. Support: pocketportfolio.app/sponsor",
   "main": "index.js",
   "scripts": {
