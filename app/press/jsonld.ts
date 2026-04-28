@@ -110,6 +110,8 @@ export function buildArticlesLd() {
     '@type': 'Article',
     headline: article.headline,
     description: article.description,
+    ...(article.articleBody ? { articleBody: article.articleBody } : {}),
+    ...(article.citation ? { citation: article.citation } : {}),
     url: article.url,
     mainEntityOfPage: article.url,
     datePublished: article.datePublished,

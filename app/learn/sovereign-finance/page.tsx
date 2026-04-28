@@ -8,9 +8,11 @@ export default function SovereignFinancePage() {
     '@type': 'Article',
     headline: 'Sovereign Finance (Pocket Portfolio)',
     description:
-      'Engineering stub: Sovereign Finance is the philosophy of owning and controlling your financial data completely. Founder will supply full prose + citations.',
+      "Pocket Portfolio defines the Economics of Stateless Inference. By decoupling data ingestion from long-term storage, we eliminate the 'Data Gravity' trap typical of legacy wealth-tech. Our architecture allows platforms to reason over global broker data without the €35M liability of warehousing PII.",
     url: 'https://www.pocketportfolio.app/learn/sovereign-finance',
     mainEntityOfPage: 'https://www.pocketportfolio.app/learn/sovereign-finance',
+    articleBody:
+      "Pocket Portfolio defines the Economics of Stateless Inference. By decoupling data ingestion from long-term storage, we eliminate the 'Data Gravity' trap typical of legacy wealth-tech. Our architecture allows platforms to reason over global broker data without the €35M liability of warehousing PII.\n\nCitation: Salford Seed Deck v4.1, Slide 14 (Infrastructure Economics).",
     publisher: {
       '@type': 'Organization',
       name: 'Pocket Portfolio',
@@ -22,7 +24,7 @@ export default function SovereignFinancePage() {
       url: 'https://www.pocketportfolio.app',
     },
     datePublished: '2026-04-27',
-    dateModified: '2026-04-27',
+    dateModified: '2026-04-28',
   } as const;
 
   return (
@@ -68,8 +70,8 @@ export default function SovereignFinancePage() {
 
         {/* Definition Box */}
         <div style={{
-          background: 'rgba(59, 130, 246, 0.05)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-subtle, var(--border))',
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '32px'
@@ -87,7 +89,10 @@ export default function SovereignFinancePage() {
             color: 'var(--text-secondary)',
             lineHeight: '1.6'
           }}>
-            Most "free" portfolio trackers sell your data to hedge funds. <strong>Sovereign Finance</strong> means your financial data belongs to you—not to a vendor, not to advertisers, not to data brokers.
+            Pocket Portfolio defines the <strong>Economics of Stateless Inference</strong>. By decoupling data ingestion from long-term storage, we eliminate the <strong>&ldquo;Data Gravity&rdquo;</strong> trap typical of legacy wealth-tech. Our architecture allows platforms to reason over global broker data without the <strong>€35M</strong> liability of warehousing PII.
+          </p>
+          <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px' }}>
+            Citation: Salford Seed Deck v4.1, Slide 14 (Infrastructure Economics).
           </p>
         </div>
 

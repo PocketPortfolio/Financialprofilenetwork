@@ -8,9 +8,11 @@ export default function SovereignStackPage() {
     '@type': 'Article',
     headline: 'Sovereign Stack (Pocket Portfolio)',
     description:
-      "Engineering stub: The Sovereign Stack is a financial software architecture where sensitive banking data is analyzed client-side so the platform never sees the user's net worth. Founder will supply full prose + citations.",
+      "The Sovereign Stack is built on a 'Local-First' foundation. We utilize a deterministic adapter floor to standardize messy broker CSVs at the edge. This ensures 99.9% ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by 80%.",
     url: 'https://www.pocketportfolio.app/learn/sovereign-stack',
     mainEntityOfPage: 'https://www.pocketportfolio.app/learn/sovereign-stack',
+    articleBody:
+      "The Sovereign Stack is built on a 'Local-First' foundation. We utilize a deterministic adapter floor to standardize messy broker CSVs at the edge. This ensures 99.9% ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by 80%.\n\nCitation: Salford Seed Deck v4.1, Slide 08 (The Technical Wedge).",
     publisher: {
       '@type': 'Organization',
       name: 'Pocket Portfolio',
@@ -22,7 +24,7 @@ export default function SovereignStackPage() {
       url: 'https://www.pocketportfolio.app',
     },
     datePublished: '2026-04-27',
-    dateModified: '2026-04-27',
+    dateModified: '2026-04-28',
   } as const;
 
   return (
@@ -68,8 +70,8 @@ export default function SovereignStackPage() {
 
         {/* Definition Box */}
         <div style={{
-          background: 'rgba(59, 130, 246, 0.05)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-subtle, var(--border))',
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '32px'
@@ -87,7 +89,10 @@ export default function SovereignStackPage() {
             color: 'var(--text-secondary)',
             lineHeight: '1.6'
           }}>
-            Here is how we calculate your Beta without ever seeing your stocks. The math happens in <strong>your browser</strong>, not on our servers.
+            The Sovereign Stack is built on a <strong>Local-First</strong> foundation. We utilize a <strong>deterministic adapter floor</strong> to standardize messy broker CSVs at the edge. This ensures <strong>99.9%</strong> ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by <strong>80%</strong>.
+          </p>
+          <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px' }}>
+            Citation: Salford Seed Deck v4.1, Slide 08 (The Technical Wedge).
           </p>
         </div>
 

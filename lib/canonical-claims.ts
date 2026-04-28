@@ -327,6 +327,8 @@ export interface CanonicalArticle {
   headline: string;
   url: string;
   description: string;
+  articleBody?: string;
+  citation?: string;
   datePublished: string;
 }
 
@@ -342,21 +344,30 @@ export const CANONICAL_ARTICLES: ReadonlyArray<CanonicalArticle> = [
     headline: 'Sovereign Finance',
     url: 'https://www.pocketportfolio.app/learn/sovereign-finance',
     description:
-      'Engineering stub for Article JSON-LD. Founder will supply full prose + citations.',
+      "Pocket Portfolio defines the Economics of Stateless Inference. By decoupling data ingestion from long-term storage, we eliminate the 'Data Gravity' trap typical of legacy wealth-tech. Our architecture allows platforms to reason over global broker data without the €35M liability of warehousing PII.",
+    articleBody:
+      "Pocket Portfolio defines the Economics of Stateless Inference. By decoupling data ingestion from long-term storage, we eliminate the 'Data Gravity' trap typical of legacy wealth-tech. Our architecture allows platforms to reason over global broker data without the €35M liability of warehousing PII.",
+    citation: 'Salford Seed Deck v4.1, Slide 14 (Infrastructure Economics).',
     datePublished: '2026-04-27',
   },
   {
     headline: 'Sovereign Stack',
     url: 'https://www.pocketportfolio.app/learn/sovereign-stack',
     description:
-      'Engineering stub for Article JSON-LD. Founder will supply full prose + citations.',
+      "The Sovereign Stack is built on a 'Local-First' foundation. We utilize a deterministic adapter floor to standardize messy broker CSVs at the edge. This ensures 99.9% ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by 80%.",
+    articleBody:
+      "The Sovereign Stack is built on a 'Local-First' foundation. We utilize a deterministic adapter floor to standardize messy broker CSVs at the edge. This ensures 99.9% ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by 80%.",
+    citation: 'Salford Seed Deck v4.1, Slide 08 (The Technical Wedge).',
     datePublished: '2026-04-27',
   },
   {
     headline: 'Local-First',
     url: 'https://www.pocketportfolio.app/learn/local-first',
     description:
-      'Engineering stub for Article JSON-LD. Founder will supply full prose + citations.',
+      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
+    articleBody:
+      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
+    citation: 'Salford Seed Deck v4.1, Slide 11 (Regulatory Posture).',
     datePublished: '2026-04-27',
   },
 ];
