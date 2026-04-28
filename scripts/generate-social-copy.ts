@@ -1,7 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { MOAT_CLAIMS, ORG, PERSON_ABBA, POSITIONING, TAGLINE_LONG } from '../lib/canonical-claims';
+import {
+  FOUNDER_CREDENTIALS_ABBA,
+  MOAT_CLAIMS,
+  ORG,
+  PERSON_ABBA,
+  POSITIONING,
+  TAGLINE_LONG,
+} from '../lib/canonical-claims';
 
 type Section = {
   title: string;
@@ -34,9 +41,15 @@ function main() {
   const coderlegion = ORG.sameAs.find((u) => u.includes('coderlegion.com')) ?? 'https://coderlegion.com/user/Pocket+Portfolio';
 
   const limitedScope = MOAT_CLAIMS.limitedScopeProcessor;
+  const founderHeadline = FOUNDER_CREDENTIALS_ABBA.headline;
+  const founderHighlights = FOUNDER_CREDENTIALS_ABBA.highlights.map((h) => `- ${h}`).join('\n');
+  const founderLead = clamp(
+    `I specialise in architecting scalable AI and data platforms that bridge complex enterprise requirements with user-centric digital products.\n\nRecognition:\n${founderHighlights}`,
+    1200,
+  );
 
   const header = trimLines(`
-# SOCIAL POST PACK — Phase 3 (SSOT-generated)
+# SOCIAL POST PACK — Phase 3 (SSOT-generated, expert-led)
 **Canonical Anchor:** ${anchor}  
 **Tagline (verbatim):** ${POSITIONING.primary}
 
@@ -46,13 +59,16 @@ Do not manually rewrite claims; paste as-is.
 
   const sections: Section[] = [
     {
-      title: 'LinkedIn Personal — About / Featured',
+      title: 'LinkedIn Personal — Headline / About / Featured',
       body: `
 **Featured link:** ${anchor}
 
+**Headline (paste-ready):**
+${founderHeadline}
+
 **About (paste-ready):**
 ${clamp(
-  `${TAGLINE_LONG}\n\n${limitedScope.longForm}\n\nCanonical anchor: ${anchor}`,
+  `${founderLead}\n\nCurrently, I’m building Pocket Portfolio — ${POSITIONING.primary}\n\n${limitedScope.longForm}\n\nCanonical anchor: ${anchor}`,
   2600,
 )}
 
@@ -67,11 +83,11 @@ ${clamp(
 **Company page:** ${linkedinCompany}
 
 **Tagline (paste-ready):**
-${POSITIONING.primary}
+${POSITIONING.primary} Architected by award-recognised expertise.
 
 **About (paste-ready):**
 ${clamp(
-  `${TAGLINE_LONG}\n\nSovereign substrate: 11 public npm packages for broker ingestion, plus a press-grade canonical claim set for automated due diligence.\n\nCanonical anchor: ${anchor}`,
+  `${TAGLINE_LONG}\n\nFounded by ${PERSON_ABBA.name} — ${founderHeadline}.\n\n${limitedScope.longForm}\n\nSovereign substrate: 11 public npm packages for broker ingestion, plus a press-grade canonical claim set for automated due diligence.\n\nCanonical anchor: ${anchor}`,
   2000,
 )}
 `,
@@ -81,19 +97,19 @@ ${clamp(
       body: `
 **Post 1/3**
 ${clamp(
-  `${POSITIONING.primary}\n\nWe’re building local-first wealth-tech ingestion: import broker data without warehousing PII.\n\n${anchor}`,
+  `From enterprise-scale AI & data platforms to ${POSITIONING.primary}\n\nI’m ${PERSON_ABBA.name}. We’re redefining wealth-tech ingestion with a privacy-first, local-first mandate.\n\n${anchor}`,
   280,
 )}
 
 **Post 2/3**
 ${clamp(
-  `Moat claim (verbatim): ${limitedScope.phrase}.\n\n${limitedScope.longForm}`,
+  `${FOUNDER_CREDENTIALS_ABBA.highlights[1]}\n\nNow applying that same data-scale rigor to fintech ingestion.\n\n${anchor}`,
   280,
 )}
 
 **Post 3/3**
 ${clamp(
-  `Receipts > vibes: canonical claims + JSON-LD live on /press, and 11 npm packages now point to the same anchor.\n\n${anchor}`,
+  `Why “Sovereign”? ${limitedScope.phrase} by design: parses in-browser, stateless inference, no PII warehousing.\n\n${anchor}`,
   280,
 )}
 `,
@@ -107,7 +123,7 @@ ${clamp(
 
 **Bio (paste-ready):**
 ${clamp(
-  `${POSITIONING.primary} ${POSITIONING.secondary}\n\n${limitedScope.longForm}\n\n${anchor}`,
+  `${FOUNDER_CREDENTIALS_ABBA.highlights[3]}\n\nArchitect of ${POSITIONING.primary} ${POSITIONING.secondary}\n\n${limitedScope.longForm}\n\n${anchor}`,
   600,
 )}
 `,
@@ -120,7 +136,7 @@ ${clamp(
 **Website:** ${anchor}
 
 **Bio (paste-ready):**
-${clamp(`${POSITIONING.primary} ${limitedScope.longForm} ${anchor}`, 600)}
+${clamp(`${FOUNDER_CREDENTIALS_ABBA.highlights[0]} Building Pocket Portfolio: ${POSITIONING.primary} ${limitedScope.longForm} ${anchor}`, 600)}
 `,
     },
   ];
