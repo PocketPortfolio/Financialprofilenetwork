@@ -2,11 +2,13 @@
 
 > **⚠️ Disclaimer:** Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
 
-**A privacy-first, production-ready investment tracking platform**
+**The Sovereign Ingestion & Inference Layer**
 
 Pocket Portfolio is a modern web application for tracking investments across stocks, crypto, and FX. Import trades from any broker, visualize your portfolio in real-time, and gain insights—all while keeping your data secure and private.
 
 🌐 **Live App:** [https://www.pocketportfolio.app/](https://www.pocketportfolio.app/)
+
+📰 **Press / Canonical Articles:** [https://www.pocketportfolio.app/press](https://www.pocketportfolio.app/press)
 
 [![CI Pipeline](https://github.com/PocketPortfolio/Financialprofilenetwork/actions/workflows/ci.yml/badge.svg)](https://github.com/PocketPortfolio/Financialprofilenetwork/actions)
 [![Lighthouse Score](https://img.shields.io/badge/Lighthouse-95%2B-success)](https://developers.google.com/web/tools/lighthouse)
@@ -55,7 +57,7 @@ cp env.example.md .env.local
 npm run dev
 ```
 
-Visit `http://localhost:5173` to see the app.
+Visit `http://localhost:3001` to see the app.
 
 ## 📋 OpenBrokerCSV Schema
 
@@ -81,9 +83,9 @@ See `env.example.md` for full list. Key variables:
 
 ```bash
 # Client-side (exposed)
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
 
 # Server-side (Vercel only)
 UPSTASH_REDIS_REST_URL=https://...
@@ -94,7 +96,7 @@ UPSTASH_REDIS_REST_TOKEN=...
 
 ```bash
 # Development
-npm run dev              # Start dev server (port 5173)
+npm run dev              # Start dev server (port 3001)
 npm run build            # Production build
 npm run preview          # Preview production build
 
