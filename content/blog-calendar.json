@@ -760,7 +760,7 @@
     "date": "2026-04-29",
     "title": "The Hidden Costs of Active Trading: A Data Analysis",
     "slug": "the-hidden-costs-of-active-trading-a-data-analysis",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -770,7 +770,8 @@
       "hidden"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-29T09:00:54.613Z"
   },
   {
     "id": "week-18-post-1",
