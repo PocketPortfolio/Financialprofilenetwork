@@ -1912,14 +1912,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a GraphQL Subscription Server",
     "slug": "how-to-build-a-graphql-subscription-server",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "graphql",
       "build",
       "subscription"
-    ]
+    ],
+    "publishedAt": "2026-04-29T14:01:01.215Z"
   },
   {
     "id": "how-to-april-retro-api-design-patterns-we-learned-apr-30",
