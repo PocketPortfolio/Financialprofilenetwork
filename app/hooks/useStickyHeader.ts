@@ -38,6 +38,8 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
       document.body.style.paddingTop = `${totalHeaderHeight}px`;
       document.body.style.setProperty('--header-offset', `${totalHeaderHeight}px`);
       document.body.style.setProperty('--header-top', `${bannerHeight}px`);
+      document.documentElement.style.setProperty('--header-height', `${totalHeaderHeight}px`);
+      document.documentElement.style.setProperty('--banner-height', `${bannerHeight}px`);
     };
 
     // Apply immediately, after a short delay (banner may not be in DOM yet), and on resize
@@ -57,7 +59,10 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
       }
     };
     observeBanner();
-    const t4 = setTimeout(() => { observeBanner(); applyFixedPositioning(); }, 600);
+    const t4 = setTimeout(() => {
+      observeBanner();
+      applyFixedPositioning();
+    }, 600);
 
     return () => {
       window.removeEventListener('resize', applyFixedPositioning);
@@ -73,25 +78,9 @@ export function useStickyHeader(headerSelector: string = 'header.brand-header, h
         document.body.style.paddingTop = '';
         document.body.style.removeProperty('--header-offset');
         document.body.style.removeProperty('--header-top');
+        document.documentElement.style.removeProperty('--header-height');
+        document.documentElement.style.removeProperty('--banner-height');
       }
     };
   }, [headerSelector]);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

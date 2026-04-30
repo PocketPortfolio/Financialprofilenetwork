@@ -660,8 +660,13 @@ textarea:focus-visible {
   
   /* Mobile-specific optimizations */
   body {
-    padding: 0 !important;
     margin: 0 !important;
+    /* useStickyHeader sets --header-offset on body; !important here beats legacy inline padding fights */
+    padding-top: calc(var(--header-offset, 0px) + 4px) !important;
+    padding-bottom: 0 !important;
+    /* horizontal padding comes from .mobile-container (do not zero with shorthand) */
+    padding-left: 0;
+    padding-right: 0;
   }
   
   /* Remove horizontal padding on mobile */

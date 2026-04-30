@@ -58,12 +58,20 @@ export function MorningBrief({ netWorthChange, topMover }: BriefProps) {
             background: sentimentBg,
             border: `1px solid ${sentimentBorder}`
           }}>
-            <div style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: sentimentColor
-            }} />
+            <div
+              aria-hidden
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: sentimentColor,
+                boxShadow:
+                  netWorthChange >= 0
+                    ? '0 0 10px hsl(var(--accent) / 0.5)'
+                    : '0 0 10px hsl(var(--danger) / 0.5)',
+                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              }}
+            />
             <span style={{
               fontSize: '12px',
               fontWeight: '600',
