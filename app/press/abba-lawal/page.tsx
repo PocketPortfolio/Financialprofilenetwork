@@ -14,6 +14,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Github, Linkedin } from 'lucide-react';
 
 import { generateMetadata as genMeta } from '@/app/lib/seo/meta';
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
@@ -56,6 +57,43 @@ function LdBlock({ data, id }: { data: unknown; id: string }) {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />
   );
+}
+
+/** CoderLegion has no bundled brand SVG; this mark reads as a dev-community glyph (not the GitHub octocat). */
+function CoderLegionGlyph({ size = 22 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="1.75" />
+      <path
+        d="M8.5 9.5 6 12l2.5 2.5M15.5 9.5 18 12l-2.5 2.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function profileLinkMeta(url: string): {
+  label: string;
+  icon: 'linkedin' | 'github' | 'coderlegion';
+} {
+  const u = url.toLowerCase();
+  if (u.includes('linkedin.com')) {
+    return { label: `${PERSON_ABBA.name} on LinkedIn`, icon: 'linkedin' };
+  }
+  if (u.includes('github.com')) {
+    return { label: 'Pocket Portfolio on GitHub', icon: 'github' };
+  }
+  return { label: 'Pocket Portfolio on CoderLegion', icon: 'coderlegion' };
 }
 
 export default function AbbaLawalPersonPage() {
@@ -164,7 +202,7 @@ export default function AbbaLawalPersonPage() {
           style={{
             margin: '0 0 24px',
             maxWidth: '340px',
-            border: '1px solid var(--border-subtle)',
+            border: '1px solid var(--accent-warm)',
             borderRadius: '10px',
             overflow: 'hidden',
             background: 'var(--surface)',
@@ -198,7 +236,7 @@ export default function AbbaLawalPersonPage() {
               padding: '10px 12px',
               fontSize: '12px',
               color: 'var(--text-secondary)',
-              borderTop: '1px solid var(--border-subtle)',
+              borderTop: '1px solid var(--accent-warm)',
               fontFamily: 'var(--font-mono, ui-monospace, SFMono-Regular, monospace)',
               lineHeight: 1.45,
             }}
@@ -318,24 +356,37 @@ export default function AbbaLawalPersonPage() {
           </h2>
           <ul
             style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '12px',
+              alignItems: 'center',
+              listStyle: 'none',
               margin: 0,
-              paddingLeft: '18px',
-              fontSize: '14px',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.7,
+              padding: 0,
             }}
           >
-            {PERSON_ABBA.sameAs.map((url) => (
-              <li key={url}>
-                <a
-                  href={url}
-                  rel="me noopener noreferrer"
-                  style={{ color: 'var(--text-secondary)' }}
-                >
-                  {url}
-                </a>
-              </li>
-            ))}
+            {PERSON_ABBA.sameAs.map((url) => {
+              const { label, icon } = profileLinkMeta(url);
+              return (
+                <li key={url}>
+                  <a
+                    href={url}
+                    rel="me noopener noreferrer"
+                    aria-label={label}
+                    title={label}
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[var(--accent-warm)] bg-[var(--surface)] text-[var(--text-primary)] no-underline transition-[box-shadow] hover:shadow-[0_4px_14px_-4px_color-mix(in_srgb,var(--accent-warm)_45%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-warm)]"
+                  >
+                    {icon === 'linkedin' ? (
+                      <Linkedin size={22} strokeWidth={1.75} aria-hidden />
+                    ) : icon === 'github' ? (
+                      <Github size={22} strokeWidth={1.75} aria-hidden />
+                    ) : (
+                      <CoderLegionGlyph size={22} />
+                    )}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </section>
 
@@ -343,7 +394,7 @@ export default function AbbaLawalPersonPage() {
           style={{
             marginTop: '40px',
             paddingTop: '20px',
-            borderTop: '1px solid var(--border-subtle)',
+            borderTop: '1px solid var(--accent-warm)',
             fontSize: '13px',
             color: 'var(--text-secondary)',
             lineHeight: 1.6,

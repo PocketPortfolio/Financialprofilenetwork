@@ -192,7 +192,7 @@ export default async function PressPage() {
           </h2>
           <div
             style={{
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--accent-warm)',
               borderRadius: '10px',
               padding: '20px',
               background: 'var(--surface)',
@@ -221,7 +221,7 @@ export default async function PressPage() {
           <h2 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 14px' }}>Founder</h2>
           <div
             style={{
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--accent-warm)',
               borderRadius: '10px',
               padding: '20px',
               background: 'var(--surface)',
@@ -265,7 +265,7 @@ export default async function PressPage() {
           </h2>
           <div
             style={{
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--accent-warm)',
               borderRadius: '10px',
               overflow: 'hidden',
               background: 'var(--surface)',
@@ -285,14 +285,14 @@ export default async function PressPage() {
                 ingestion substrate.
               </caption>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--background)' }}>
+                <tr style={{ borderBottom: '1px solid var(--accent-warm)', background: 'var(--background)' }}>
                   <th scope="col" style={{ textAlign: 'left', padding: '10px 14px', fontWeight: 700 }}>Package</th>
                   <th scope="col" style={{ textAlign: 'left', padding: '10px 14px', fontWeight: 700 }}>Role</th>
                 </tr>
               </thead>
               <tbody>
                 {PACKAGES.map((pkg) => (
-                  <tr key={pkg.name} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <tr key={pkg.name} style={{ borderBottom: '1px solid var(--accent-warm)' }}>
                     <td style={{ padding: '10px 14px' }}>
                       <a
                         href={`https://www.npmjs.com/package/${pkg.name}`}
@@ -323,7 +323,7 @@ export default async function PressPage() {
           </p>
           <div
             style={{
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--accent-warm)',
               borderRadius: '10px',
               overflow: 'hidden',
               background: 'var(--surface)',
@@ -341,7 +341,7 @@ export default async function PressPage() {
                 Frozen numeric receipts. Each row tags the artifact it resolves to.
               </caption>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--background)' }}>
+                <tr style={{ borderBottom: '1px solid var(--accent-warm)', background: 'var(--background)' }}>
                   <th scope="col" style={{ textAlign: 'left', padding: '10px 14px', fontWeight: 700 }}>Claim</th>
                   <th scope="col" style={{ textAlign: 'left', padding: '10px 14px', fontWeight: 700 }}>Value</th>
                   <th scope="col" style={{ textAlign: 'left', padding: '10px 14px', fontWeight: 700 }}>Evidence ID</th>
@@ -350,7 +350,7 @@ export default async function PressPage() {
               </thead>
               <tbody>
                 {NUMBERS_SNAPSHOT.map((row) => (
-                  <tr key={row.numbersPackRowId} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <tr key={row.numbersPackRowId} style={{ borderBottom: '1px solid var(--accent-warm)' }}>
                     <td style={{ padding: '10px 14px' }}>{row.label}</td>
                     <td
                       style={{
@@ -430,7 +430,7 @@ export default async function PressPage() {
           style={{
             marginTop: '40px',
             paddingTop: '20px',
-            borderTop: '1px solid var(--border-subtle)',
+            borderTop: '1px solid var(--accent-warm)',
             fontSize: '12px',
             color: 'var(--text-secondary)',
             fontFamily: 'var(--font-mono, ui-monospace, SFMono-Regular, monospace)',
