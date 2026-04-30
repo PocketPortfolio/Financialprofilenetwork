@@ -1,96 +1,79 @@
 ---
 title: 'April Retro: API Design Patterns We Learned'
 date: '2026-04-30'
-description: Explore the API design patterns that improved our product in April.
+description: >-
+  Exploring API design patterns and their applications in enhancing system
+  interoperability and scalability.
 tags:
   - api
   - design patterns
-  - tech retrospective
+  - development
   - best practices
 author: Pocket Portfolio Team
 image: /images/blog/april-retro-api-design-patterns-we-learned.png
-pillar: Product Development
+pillar: technology
 category: how-to-in-tech
 ---
 
-# Problem
+# April Retro: API Design Patterns We Learned
 
-In April, our team faced several challenges with the existing API architecture. These included issues with scalability, maintainability, and inconsistent responses, which resulted in increased latency and difficulty in implementing new features. Our main goal was to establish a more robust and consistent API design pattern that could scale and support new functionalities seamlessly.
+In April, our team revisited our API design patterns to improve system interoperability and scalability. This retrospective highlights the problems we faced, the solutions we implemented, and the key concepts that guided our decisions.
 
-# Solution with Code
+## Problem
 
-To address these issues, we adopted several API design patterns. Below are some patterns and a simple code implementation to demonstrate their use:
+As our system architecture evolved, we encountered issues with API scalability and maintainability. Multiple teams working on different services led to inconsistencies in API design, resulting in increased technical debt and integration challenges.
 
-## RESTful Design
+## Solution
 
-We ensured our API endpoints were designed according to REST principles, which emphasize statelessness and resource-based interactions.
+To address these issues, we adopted several API design patterns that promote consistency, scalability, and ease of integration. Below, we detail one of the primary patterns we implemented: **The Gateway Pattern**.
+
+### The Gateway Pattern
+
+The Gateway Pattern acts as a single entry point for all client requests to the underlying microservices. It provides a unified API and handles cross-cutting concerns such as authentication, logging, and load balancing.
+
+#### Implementation
+
+We utilized [Express.js](https://expressjs.com/) to implement the API Gateway. Here's a simplified version of the code we used:
 
 ```javascript
-// Express.js example for a RESTful endpoint
 const express = require('express');
 const app = express();
 const port = 3000;
 
-app.use(express.json());
+// Middleware for authentication
+app.use((req, res, next) => {
+  // Simulated authentication logic
+  const token = req.headers['authorization'];
+  if (token !== 'valid-token') {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  next();
+});
 
-// RESTful route for user resource
-app.get('/api/users/:id', (req, res) => {
-  const userId = req.params.id;
-  // Fetch user data from database
-  res.json({ id: userId, name: "John Doe" });
+// Route forwarding to microservices
+app.use('/service1', (req, res) => {
+  // Logic to forward request to Service 1
+  res.send('Service 1 response');
+});
+
+app.use('/service2', (req, res) => {
+  // Logic to forward request to Service 2
+  res.send('Service 2 response');
 });
 
 app.listen(port, () => {
-  console.log(`API server running at http://localhost:${port}`);
+  console.log(`API Gateway running at http://localhost:${port}`);
 });
 ```
 
-## Versioning
+## Key Concepts
 
-Implementing versioning allowed us to introduce changes without breaking existing clients.
+- **Centralized Access Control**: By handling authentication at the gateway level, we streamlined security management across all microservices.
+  
+- **Consistent API Structure**: The Gateway Pattern ensures a uniform API structure, reducing discrepancies and simplifying client integration.
 
-```javascript
-// API versioning approach
-app.get('/api/v1/users/:id', (req, res) => {
-  // Code for v1
-});
+- **Scalability**: The pattern allows seamless scaling of individual microservices without affecting the client-facing API.
 
-app.get('/api/v2/users/:id', (req, res) => {
-  // Code for v2 with additional fields
-});
-```
+By adopting the Gateway Pattern, we enhanced our system's robustness and maintainability, ensuring a smoother development process and improved client interactions. This pattern, among others, has become a cornerstone of our API strategy moving forward.
 
-## Error Handling
-
-Consistent error handling helped in debugging and improved client-side error management.
-
-```javascript
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
-```
-
-## Rate Limiting
-
-To enhance security and prevent abuse, we added rate limiting using middleware.
-
-```javascript
-const rateLimit = require('express-rate-limit');
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-
-app.use(limiter);
-```
-
-# Key Concepts
-
-- **REST Principles**: Emphasize simplicity and the separation of client and server concerns.
-- **Versioning**: Allows APIs to evolve without disrupting the client systems.
-- **Error Handling**: Provides clear, consistent error responses, facilitating better client-side management.
-- **Rate Limiting**: Protects APIs from being overwhelmed by too many requests from a single client.
-
-By incorporating these patterns, our API became more scalable, easier to maintain, and adaptable to future requirements. The structured approach also enhanced developer productivity and user satisfaction.
+Explore these patterns and consider how they might apply to your architecture for improved API design and system efficiency.
