@@ -1,0 +1,96 @@
+---
+title: 'April Retro: API Design Patterns We Learned'
+date: '2026-04-30'
+description: Explore the API design patterns that improved our product in April.
+tags:
+  - api
+  - design patterns
+  - tech retrospective
+  - best practices
+author: Pocket Portfolio Team
+image: /images/blog/april-retro-api-design-patterns-we-learned.png
+pillar: Product Development
+category: how-to-in-tech
+---
+
+# Problem
+
+In April, our team faced several challenges with the existing API architecture. These included issues with scalability, maintainability, and inconsistent responses, which resulted in increased latency and difficulty in implementing new features. Our main goal was to establish a more robust and consistent API design pattern that could scale and support new functionalities seamlessly.
+
+# Solution with Code
+
+To address these issues, we adopted several API design patterns. Below are some patterns and a simple code implementation to demonstrate their use:
+
+## RESTful Design
+
+We ensured our API endpoints were designed according to REST principles, which emphasize statelessness and resource-based interactions.
+
+```javascript
+// Express.js example for a RESTful endpoint
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+// RESTful route for user resource
+app.get('/api/users/:id', (req, res) => {
+  const userId = req.params.id;
+  // Fetch user data from database
+  res.json({ id: userId, name: "John Doe" });
+});
+
+app.listen(port, () => {
+  console.log(`API server running at http://localhost:${port}`);
+});
+```
+
+## Versioning
+
+Implementing versioning allowed us to introduce changes without breaking existing clients.
+
+```javascript
+// API versioning approach
+app.get('/api/v1/users/:id', (req, res) => {
+  // Code for v1
+});
+
+app.get('/api/v2/users/:id', (req, res) => {
+  // Code for v2 with additional fields
+});
+```
+
+## Error Handling
+
+Consistent error handling helped in debugging and improved client-side error management.
+
+```javascript
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+```
+
+## Rate Limiting
+
+To enhance security and prevent abuse, we added rate limiting using middleware.
+
+```javascript
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+app.use(limiter);
+```
+
+# Key Concepts
+
+- **REST Principles**: Emphasize simplicity and the separation of client and server concerns.
+- **Versioning**: Allows APIs to evolve without disrupting the client systems.
+- **Error Handling**: Provides clear, consistent error responses, facilitating better client-side management.
+- **Rate Limiting**: Protects APIs from being overwhelmed by too many requests from a single client.
+
+By incorporating these patterns, our API became more scalable, easier to maintain, and adaptable to future requirements. The structured approach also enhanced developer productivity and user satisfaction.
