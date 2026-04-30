@@ -49,8 +49,8 @@ grep -r "127.0.0.1:7242" app/
 
 ## Recommendations
 
-1. **For Production:** All debug calls should be disabled or gated behind `NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS` flag
-2. **For Development:** Use the `debugAnalytics.ts` utility function for conditional logging
+1. **For Production:** All debug calls should be disabled or gated behind an explicit env flag
+2. **For Development:** Prefer `console.debug` / structured logs behind `NODE_ENV === 'development'` (or a dedicated `NEXT_PUBLIC_*` flag) instead of hard-coded ingest URLs
 3. **Browser Extensions:** Inform users that extension errors are not from our app
 
 ## Files Modified
@@ -59,11 +59,6 @@ grep -r "127.0.0.1:7242" app/
 - ✅ `app/components/modals/AlertModal.tsx`
 - ✅ `app/components/modals/ConfirmationModal.tsx`
 - ✅ `app/not-found.tsx`
-- ✅ `app/lib/utils/debugAnalytics.ts` (created utility for future use)
-
-
-
-
 
 
 

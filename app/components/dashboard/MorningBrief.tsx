@@ -11,9 +11,12 @@ interface BriefProps {
 export function MorningBrief({ netWorthChange, topMover }: BriefProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const sentiment = netWorthChange >= 0 ? 'Bullish' : 'Bearish';
-  const sentimentColor = netWorthChange >= 0 ? 'hsl(var(--accent))' : 'hsl(var(--danger))';
-  const sentimentBg = netWorthChange >= 0 ? 'hsla(var(--accent), 0.1)' : 'hsla(var(--danger), 0.1)';
-  const sentimentBorder = netWorthChange >= 0 ? 'hsla(var(--accent), 0.2)' : 'hsla(var(--danger), 0.2)';
+  // Use --destructive for bearish: tokens.css overwrites --danger with a hex (#ef4444), which breaks hsl(var(--danger)).
+  const sentimentColor = netWorthChange >= 0 ? 'hsl(var(--accent))' : 'hsl(var(--destructive))';
+  const sentimentBg =
+    netWorthChange >= 0 ? 'hsl(var(--accent) / 0.1)' : 'hsl(var(--destructive) / 0.1)';
+  const sentimentBorder =
+    netWorthChange >= 0 ? 'hsl(var(--accent) / 0.2)' : 'hsl(var(--destructive) / 0.2)';
   
   const analysisText = `Your portfolio is ${netWorthChange >= 0 ? 'outperforming' : 'lagging'} the market today. Performance is primarily driven by ${topMover.symbol} moving ${topMover.change > 0 ? '+' : ''}${topMover.change.toFixed(2)}% intraday. Sector exposure remains balanced.`;
   const truncatedText = analysisText.length > 120 ? analysisText.substring(0, 120) + '...' : analysisText;
@@ -68,7 +71,7 @@ export function MorningBrief({ netWorthChange, topMover }: BriefProps) {
                 boxShadow:
                   netWorthChange >= 0
                     ? '0 0 10px hsl(var(--accent) / 0.5)'
-                    : '0 0 10px hsl(var(--danger) / 0.5)',
+                    : '0 0 10px hsl(var(--destructive) / 0.5)',
                 animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               }}
             />
@@ -129,14 +132,14 @@ export function MorningBrief({ netWorthChange, topMover }: BriefProps) {
               <span style={{
                 fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                 fontSize: '14px',
-                color: topMover.change >= 0 ? 'hsl(var(--accent))' : 'hsl(var(--danger))'
+                color: topMover.change >= 0 ? 'hsl(var(--accent))' : 'hsl(var(--destructive))'
               }}>
                 {topMover.change > 0 ? '+' : ''}{topMover.change.toFixed(2)}%
               </span>
               {topMover.change >= 0 ? (
                 <TrendingUp style={{ width: '16px', height: '16px', color: 'hsl(var(--accent))' }} />
               ) : (
-                <TrendingDown style={{ width: '16px', height: '16px', color: 'hsl(var(--danger))' }} />
+                <TrendingDown style={{ width: '16px', height: '16px', color: 'hsl(var(--destructive))' }} />
               )}
             </div>
           </div>
