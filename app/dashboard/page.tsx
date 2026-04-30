@@ -2000,19 +2000,9 @@ export default function Dashboard() {
                 {activeTab === 'performance' ? (
                   <div>
                     {/* Main Dashboard Grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth < 768 ? '1fr' : '1fr 300px',
-                  gap: 'var(--space-4)',
-                  marginBottom: 'var(--space-4)',
-                  width: '100%',
-                  maxWidth: '100%',
-                  boxSizing: 'border-box',
-                }}
-              >
+              <div className="grid w-full max-w-full grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_320px] md:gap-6">
                 {/* Charts Section */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                <div className="flex min-w-0 flex-col gap-4 md:gap-6">
                   {/* Allocation Chart with Drill-Down */}
                   <DrillDownChart
                     positions={filteredPositions}
@@ -2043,7 +2033,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Sidebar */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                <div className="flex min-w-0 flex-col gap-4 md:gap-6">
                   {/* Sector Filter */}
                   <SectorFilter
                     positions={Object.values(positions)}

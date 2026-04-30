@@ -35,13 +35,9 @@ export default function DashboardClientLayout({ children }: { children: React.Re
       />
 
       <main
-        className="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6"
+        className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-[calc(96px+env(safe-area-inset-bottom,0px))] pt-[calc(var(--header-height,64px)+4px)] md:px-6 md:pb-8"
         data-dashboard-content
         style={{
-          maxWidth: '1600px',
-          margin: '0 auto',
-          padding: '16px',
-          paddingTop: 'calc(var(--header-height, 64px) + 4px)',
           minHeight: 'calc(100vh - 80px)'
         }}
       >

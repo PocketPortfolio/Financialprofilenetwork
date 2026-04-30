@@ -19,6 +19,11 @@ public/sw.js
 # Test / tooling output
 coverage/
 *.tsbuildinfo
+test-results/
+ui-audit/
+
+# Local npm auth at repo root (use NPM_TOKEN in env; packages/*/ may ship a tokenless stub)
+/.npmrc
 
 # OS / editor
 .DS_Store
