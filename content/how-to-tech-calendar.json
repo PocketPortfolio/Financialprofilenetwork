@@ -1928,14 +1928,15 @@
     "scheduledTime": "14:00",
     "title": "April Retro: API Design Patterns We Learned",
     "slug": "april-retro-api-design-patterns-we-learned",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "april",
       "retro"
-    ]
+    ],
+    "publishedAt": "2026-04-30T14:00:46.742Z"
   },
   {
     "id": "how-to-how-to-implement-pagination-in-rest-apis-may-1",
