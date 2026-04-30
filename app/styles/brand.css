@@ -100,14 +100,15 @@ main, section, div {
   color: var(--text);
 }
 
-/* Reserve space and fix header from first paint; default 83px/0 so no 52px gap when banner is hidden */
+/* Reserve space for sticky/fixed marketing header.
+   `useStickyHeader` sets `--header-offset` on <body> (banner + header height). */
 body:has(header.brand-header) {
-  padding-top: 83px; /* header only; hook updates to 135px when banner is visible */
+  padding-top: var(--header-offset, 83px);
 }
-/* Mobile: globals.css sets body { padding: 0 !important } — override so header reserve space is kept */
 @media (max-width: 768px) {
   body:has(header.brand-header) {
-    padding-top: 83px !important;
+    /* Keep a tiny breathing gap under chrome (matches globals.css) */
+    padding-top: calc(var(--header-offset, 83px) + 4px) !important;
   }
 }
 .brand-header {
