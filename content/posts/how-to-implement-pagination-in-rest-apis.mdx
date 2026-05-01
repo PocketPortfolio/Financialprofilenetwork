@@ -1,0 +1,80 @@
+---
+title: How to Implement Pagination in REST APIs
+date: '2026-05-01'
+description: >-
+  Learn how to efficiently implement pagination in RESTful APIs to manage large
+  datasets and improve performance.
+tags:
+  - api
+  - rest
+  - implement
+  - pagination
+  - guide
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-pagination-in-rest-apis.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Introduction
+
+In RESTful APIs, handling large datasets can be challenging, especially when trying to deliver data efficiently and responsively. Pagination is a common solution that divides data into "pages" to reduce load time and enhance user experience. This guide will walk you through implementing pagination in REST APIs using a practical example.
+
+## Problem
+
+When an API endpoint returns a large dataset, it can lead to performance issues such as long response times and increased server load. Without pagination, clients may receive thousands of records in a single response, making it difficult to process and display data effectively.
+
+## Solution
+
+Pagination can be implemented in various ways, with two popular methods being **offset-based** and **cursor-based** pagination. Here, we'll focus on offset-based pagination due to its simplicity and wide adoption.
+
+### Offset-Based Pagination
+
+Offset-based pagination uses two query parameters: `limit` and `offset`. The `limit` parameter specifies the maximum number of records to return, while the `offset` parameter determines the starting point in the dataset.
+
+### Example Code
+
+Let's implement offset-based pagination in a Node.js application using Express and a hypothetical database.
+
+```javascript
+const express = require('express');
+const app = express();
+
+// Mock data - typically this would be your database query
+const data = [...Array(100).keys()].map(i => ({ id: i + 1, name: `Item ${i + 1}` }));
+
+app.get('/items', (req, res) => {
+  // Parse limit and offset from query parameters, defaulting to 10 and 0 respectively
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const offset = parseInt(req.query.offset, 10) || 0;
+
+  // Calculate total number of items
+  const totalItems = data.length;
+
+  // Slice the data array to create a paginated response
+  const paginatedData = data.slice(offset, offset + limit);
+
+  // Send the paginated response, along with total count for client-side calculations
+  res.json({
+    totalItems,
+    pageCount: Math.ceil(totalItems / limit),
+    currentPage: Math.floor(offset / limit) + 1,
+    data: paginatedData
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+```
+
+## Key Concepts
+
+- **Limit**: The maximum number of records returned in a single response.
+- **Offset**: The starting index in the dataset for the records to be returned.
+- **Page Count**: Total number of pages available, calculated as `totalItems / limit`.
+- **Current Page**: The page number currently being viewed, derived from `offset / limit + 1`.
+
+## Conclusion
+
+Implementing pagination in REST APIs helps manage large datasets more efficiently by breaking them into smaller, more manageable chunks. With offset-based pagination, users can navigate through data seamlessly, improving both performance and user experience.
