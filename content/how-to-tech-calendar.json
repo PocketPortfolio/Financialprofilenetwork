@@ -1961,14 +1961,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Database Transactions",
     "slug": "understanding-database-transactions",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "database",
       "understanding",
       "transactions"
-    ]
+    ],
+    "publishedAt": "2026-05-02T14:01:07.848Z"
   },
   {
     "id": "how-to-how-to-use-docker-for-local-development-may-3",
