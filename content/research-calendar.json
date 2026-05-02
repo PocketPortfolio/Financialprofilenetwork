@@ -1958,14 +1958,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Metrics Collection Overhead - Prometheus vs StatsD",
     "slug": "research-metrics-collection-overhead-prometheus-vs-statsd-2026-05-02",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "metrics",
       "collection",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-05-02T18:01:05.513Z"
   },
   {
     "id": "research-alert-fatigue-threshold-optimization-2026-05-03",
