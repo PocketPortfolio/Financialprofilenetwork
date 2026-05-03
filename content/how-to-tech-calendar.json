@@ -1977,14 +1977,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Docker for Local Development",
     "slug": "how-to-use-docker-for-local-development",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "use",
       "local"
-    ]
+    ],
+    "publishedAt": "2026-05-03T14:01:11.936Z"
   },
   {
     "id": "how-to-building-a-microservices-gateway-with-kong-may-4",
