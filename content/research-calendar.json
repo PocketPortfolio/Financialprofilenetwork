@@ -1974,14 +1974,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Alert Fatigue - Threshold Optimization",
     "slug": "research-alert-fatigue-threshold-optimization-2026-05-03",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "alert",
       "fatigue",
       "threshold"
-    ]
+    ],
+    "publishedAt": "2026-05-03T18:00:36.959Z"
   },
   {
     "id": "research-dashboard-rendering-performance-real-time-updates-2026-05-04",
