@@ -156,7 +156,8 @@ export const PERSON_ABBA = {
 } as const;
 
 /**
- * Founder credentials SSOT (evidence-backed, paste-ready).
+ * Founder credentials SSOT (public / partner-ready copy).
+ * Evidence traceability (award PDFs, speaking proof, CV) stays in filing artifacts — not inline in strings.
  * Source artifacts:
  * - Global Talent Draft: Document A1 — Tech award evidence.pdf
  * - Global Talent Draft: Document A2 — Speaking engagement.pdf
@@ -167,12 +168,12 @@ export const FOUNDER_CREDENTIALS_ABBA = {
     'Lead Product Manager | Fintech Architect | DataIQ 2024 ESG Award Contributor | Speaker at UK Black Business Show 2024',
   highlights: [
     'Contributor to the Whale Watch platform recognised with the 2024 DataIQ ESG Data Award (National Grid Ventures).',
-    'Whale Watch processed 4.7B data points and 775M kilometres of vessel activity (award evidence).',
-    'Invited speaker at UK Black Business Show 2024 (UK Black Business Week), with major sponsors/participants including HSBC, JP Morgan, and Moody’s (speaking evidence).',
-    'Led delivery of OceanBrain at National Grid Ventures, reducing manual subsea investigations by 60% (CV).',
-    'Built a digital portfolio platform supporting decision-making across £7B in energy assets (CV).',
-    'Software Engineer (Messaging Team) at IBM: contributed to MQTT messaging systems for connected infrastructure (CV).',
-    'Product Manager (Learning Technologies) at NHS: scaled digital learning platforms during COVID-19 (CV).',
+    'Whale Watch processed 4.7B data points and 775M kilometres of vessel activity.',
+    'Invited speaker at UK Black Business Show 2024 (UK Black Business Week), with major sponsors/participants including HSBC, JP Morgan, and Moody’s.',
+    'Led delivery of OceanBrain at National Grid Ventures, reducing manual subsea investigations by 60%.',
+    'Built a digital portfolio platform supporting decision-making across £7B in energy assets.',
+    'Software Engineer (Messaging Team) at IBM: contributed to MQTT messaging systems for connected infrastructure.',
+    'Product Manager (Learning Technologies) at NHS: scaled digital learning platforms during COVID-19.',
   ] as const,
 } as const;
 

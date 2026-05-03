@@ -8,6 +8,8 @@
     "build:sitemaps": "ts-node --project scripts/tsconfig.json scripts/build-static-sitemaps.ts",
     "build:inject-firebase": "node scripts/inject-firebase-config.js",
     "build:llms": "ts-node --project scripts/tsconfig.build.json scripts/build-llms-txt.ts",
+    "build:plaid-deck": "ts-node --project scripts/tsconfig.json -r tsconfig-paths/register scripts/generate-plaid-design-partnership-deck.ts",
+    "build:partner-deck": "ts-node --project scripts/tsconfig.json -r tsconfig-paths/register scripts/generate-partner-deck.ts",
     "build": "npm run build:importer && npm run build:sitemaps && npm run build:inject-firebase && npm run build:book-assets && npm run build:llms && next build",
     "build:book-assets": "node scripts/copy-book-assets.js && node scripts/verify-book-assets-for-deploy.js",
     "build:importer": "npm run build --prefix packages/importer",

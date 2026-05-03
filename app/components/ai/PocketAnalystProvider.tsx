@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '../../hooks/useAuth';
 import { isPaidTier } from '@/app/lib/tier';
 import { AskAIFab } from './AskAIFab';
@@ -24,7 +25,12 @@ export function PocketAnalystProvider({ children }: { children: React.ReactNode 
   const [portfolioContext, setPortfolioContext] = useState('');
   const [tier, setTier] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const pathname = usePathname();
   const { user } = useAuth();
+
+  const isDashboardRoute =
+    pathname === '/dashboard' || (pathname?.startsWith('/dashboard/') ?? false);
+  const showAskAI = Boolean(user) || isDashboardRoute;
 
   const value = React.useMemo(
     () => ({
@@ -41,7 +47,7 @@ export function PocketAnalystProvider({ children }: { children: React.ReactNode 
   return (
     <PocketAnalystContext.Provider value={value}>
       {children}
-      {user && (
+      {showAskAI && (
         <>
           <AskAIFab onClick={() => setModalOpen(true)} />
           <AskAIModal
