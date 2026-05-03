@@ -1,0 +1,83 @@
+---
+title: How to Use Docker for Local Development
+date: '2026-05-03'
+description: >-
+  Learn how to streamline your local development process using Docker
+  containers.
+tags:
+  - docker
+  - local development
+  - containers
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-docker-for-local-development.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Developers often face challenges in maintaining consistent development environments. Different operating systems, dependencies, and configurations can lead to the classic "works on my machine" problem. This inconsistency can slow down development and complicate testing and deployment.
+
+## Solution with Code
+
+Docker provides a solution by encapsulating applications and their dependencies into containers, ensuring uniformity across development, testing, and production environments. Here's a step-by-step guide to using Docker for local development.
+
+### Step 1: Install Docker
+
+First, ensure Docker is installed on your system. You can download Docker Desktop from the [official Docker website](https://www.docker.com/products/docker-desktop).
+
+### Step 2: Create a Dockerfile
+
+A `Dockerfile` describes the environment and instructions needed to build your application into a container image. Below is a simple example for a Node.js application:
+
+```dockerfile
+# Use official Node.js image as base
+FROM node:14
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the application port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "start"]
+```
+
+### Step 3: Build the Docker Image
+
+Navigate to your project directory in the terminal and build your Docker image using the following command:
+
+```bash
+docker build -t my-node-app .
+```
+
+The `-t` flag names the image `my-node-app`.
+
+### Step 4: Run the Docker Container
+
+Once the image is built, run a container using:
+
+```bash
+docker run -d -p 3000:3000 my-node-app
+```
+
+The `-d` flag runs the container in detached mode, while `-p` maps the host port 3000 to the container port 3000.
+
+## Key Concepts
+
+- **Dockerfile**: A script containing a series of instructions on how to build a specific Docker image.
+- **Image**: A lightweight, standalone, executable package that includes everything needed to run a piece of software.
+- **Container**: A running instance of a Docker image.
+- **Port Mapping**: Exposes container ports to your local machine, allowing you to access your application as if it were running locally.
+
+By using Docker, developers can ensure consistent environments across all stages of the software development lifecycle, reducing bugs related to environment discrepancies and speeding up the development process.
