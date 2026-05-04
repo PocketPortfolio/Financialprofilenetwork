@@ -1990,14 +1990,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Dashboard Rendering Performance - Real-Time Updates",
     "slug": "research-dashboard-rendering-performance-real-time-updates-2026-05-04",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "dashboard",
       "rendering"
-    ]
+    ],
+    "publishedAt": "2026-05-04T18:01:09.447Z"
   },
   {
     "id": "research-synthetic-monitoring-performance-impact-2026-05-05",
