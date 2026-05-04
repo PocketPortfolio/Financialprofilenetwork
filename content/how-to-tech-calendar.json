@@ -1993,14 +1993,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Microservices Gateway with Kong",
     "slug": "building-a-microservices-gateway-with-kong",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "microservices",
       "building",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-05-04T14:00:47.504Z"
   },
   {
     "id": "how-to-how-to-implement-file-compression-in-node-js-may-5",
