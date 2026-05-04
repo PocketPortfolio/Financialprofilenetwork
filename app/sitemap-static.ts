@@ -225,6 +225,13 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.92,
     },
+    // Design Partnership Challenge — regulated-vertical recruitment hub (CoderLegion + GitHub funnel)
+    {
+      url: `${baseUrl}/designchallenge`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.92,
+    },
     {
       url: `${baseUrl}/book/universal-llm-import`,
       lastModified: now,

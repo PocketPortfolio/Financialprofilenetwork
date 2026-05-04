@@ -15,6 +15,7 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  DESIGN_CHALLENGE,
   LAST_HUMAN_VERIFIED,
   NUMBERS_SNAPSHOT,
   PACKAGES,
@@ -22,7 +23,9 @@ import {
   SDK,
   SOVEREIGN_THRESHOLDS,
   TAGLINE_LONG,
+  URLS,
 } from '../../lib/canonical-claims';
+import { ADAPTERS } from '@/src/import/registry';
 
 describe('Sovereign Threshold #1 — one-liner discipline', () => {
   test('primary positioning is non-empty and exposed', () => {
@@ -114,5 +117,51 @@ describe('Sovereign Threshold #4 — recency rule (the discipline trigger)', () 
     const verified = new Date(LAST_HUMAN_VERIFIED);
     const now = new Date();
     expect(verified.getTime()).toBeLessThanOrEqual(now.getTime() + 24 * 60 * 60 * 1000);
+  });
+});
+
+describe('Design Partnership Challenge SSOT', () => {
+  test('SDK.brokerAdapterCount stays pinned to ADAPTERS.length (drift guard)', () => {
+    expect(
+      SDK.brokerAdapterCount,
+      `SDK.brokerAdapterCount (${SDK.brokerAdapterCount}) must equal ADAPTERS.length (${ADAPTERS.length}). Update lib/canonical-claims.ts when registry changes.`,
+    ).toBe(ADAPTERS.length);
+  });
+
+  test('DESIGN_CHALLENGE.url matches URLS.designChallenge', () => {
+    expect(DESIGN_CHALLENGE.url).toBe(URLS.designChallenge);
+  });
+
+  test('DESIGN_CHALLENGE.path is /designchallenge and url ends with it', () => {
+    expect(DESIGN_CHALLENGE.path).toBe('/designchallenge');
+    expect(DESIGN_CHALLENGE.url.endsWith('/designchallenge')).toBe(true);
+  });
+
+  test('DESIGN_CHALLENGE.footerCommunityLabel is set for GlobalFooter / marketing footers', () => {
+    expect(typeof DESIGN_CHALLENGE.footerCommunityLabel).toBe('string');
+    expect(DESIGN_CHALLENGE.footerCommunityLabel.length).toBeGreaterThan(0);
+  });
+
+  test('GitHub submission thread is a discussion URL', () => {
+    expect(DESIGN_CHALLENGE.github.submissionThread).toMatch(
+      /^https:\/\/github\.com\/PocketPortfolio\/Financialprofilenetwork\/discussions\/\d+$/,
+    );
+  });
+
+  test('CoderLegion link points at the openfi-builders group', () => {
+    expect(DESIGN_CHALLENGE.coderLegionGroup).toBe(
+      'https://coderlegion.com/groups/openfi-builders',
+    );
+  });
+
+  test('exactly four v1 verticals are surfaced (Healthcare, Defense, Finance, Energy)', () => {
+    const ids = DESIGN_CHALLENGE.verticals.map((v) => v.id);
+    expect(ids).toEqual(['healthcare', 'defense', 'finance', 'energy']);
+  });
+
+  test('OG image is the static sovereign-green hero card mirrored into /public/og', () => {
+    expect(DESIGN_CHALLENGE.ogImage).toBe('/og/designchallenge.png');
+    expect(DESIGN_CHALLENGE.ogImageWidth).toBe(1200);
+    expect(DESIGN_CHALLENGE.ogImageHeight).toBe(627);
   });
 });

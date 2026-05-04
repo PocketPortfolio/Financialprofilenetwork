@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { DESIGN_CHALLENGE } from '@/lib/canonical-claims';
 
 export default function LandingFooter() {
   return (
@@ -344,6 +345,18 @@ export default function LandingFooter() {
           >
             CoderLegion
           </a>
+          <Link
+            href={DESIGN_CHALLENGE.path}
+            style={{
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+          >
+            {DESIGN_CHALLENGE.footerCommunityLabel}
+          </Link>
           <a 
             href="https://discord.gg/Ch9PpjRzwe" 
             target="_blank" 

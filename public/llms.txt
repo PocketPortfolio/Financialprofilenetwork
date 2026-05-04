@@ -63,6 +63,16 @@ https://www.pocketportfolio.app/api/npm-stats
 - Sovereign Stack — https://www.pocketportfolio.app/learn/sovereign-stack (2026-04-27)
 - Local-First — https://www.pocketportfolio.app/learn/local-first (2026-04-27)
 
+## Design Partnership Challenge (open recruitment for regulated-vertical architects)
+- Public hub: https://www.pocketportfolio.app/designchallenge
+- Hero: The Sovereign AI Design Challenge: Build for Regulated Verticals.
+- Eyebrow: The Future of Regulated AI is Sovereign.
+- Summary: Extend the Pocket Portfolio substrate into Healthcare, Defense, and Finance. Deploy frontier AI without the Sovereignty Lockout.
+- Verticals (v1 cohort): Healthcare, Defense, Finance, Energy
+- GitHub fork (boilerplate): https://github.com/PocketPortfolio/Financialprofilenetwork
+- GitHub submission thread: https://github.com/PocketPortfolio/Financialprofilenetwork/discussions/49
+- CoderLegion cohort (Open-Fi Builders): https://coderlegion.com/groups/openfi-builders
+
 ## Where to Find Us
 - https://github.com/PocketPortfolio
 - https://www.npmjs.com/org/pocket-portfolio

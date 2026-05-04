@@ -23,6 +23,7 @@ import {
   NUMBERS_SNAPSHOT,
   CANONICAL_ARTICLES,
   URLS,
+  DESIGN_CHALLENGE,
 } from '../lib/canonical-claims';
 
 /**
@@ -86,6 +87,16 @@ ${numbersSection}
 
 ## Canonical Articles
 ${articlesSection}
+
+## Design Partnership Challenge (open recruitment for regulated-vertical architects)
+- Public hub: ${DESIGN_CHALLENGE.url}
+- Hero: ${DESIGN_CHALLENGE.headline}
+- Eyebrow: ${DESIGN_CHALLENGE.eyebrow}
+- Summary: ${DESIGN_CHALLENGE.subheadline}
+- Verticals (v1 cohort): ${DESIGN_CHALLENGE.verticals.map((v) => v.label).join(', ')}
+- GitHub fork (boilerplate): ${DESIGN_CHALLENGE.github.fork}
+- GitHub submission thread: ${DESIGN_CHALLENGE.github.submissionThread}
+- CoderLegion cohort (Open-Fi Builders): ${DESIGN_CHALLENGE.coderLegionGroup}
 
 ## Where to Find Us
 ${sameAsSection}

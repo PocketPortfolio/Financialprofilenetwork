@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-05-04T15:42:42.789Z",
+  "platform": "multi",
+  "markdown": "docs/challenges/v1-regulated-verticals.md",
+  "assets": [
+    {
+      "file": "docs/challenges/v1-assets/CL_Challenge_Hero.png",
+      "width": 1200,
+      "height": 400
+    },
+    {
+      "file": "docs/challenges/v1-assets/GitHub_Banner.png",
+      "width": 1280,
+      "height": 640
+    },
+    {
+      "file": "docs/challenges/v1-assets/Challenge_Badge_Sovereign_Substrate_Architect_2026.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "docs/challenges/v1-assets/Challenge_Badge_Early_Design_Partner_2026.png",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "file": "docs/challenges/v1-assets/Platform_Banner_1500x500.png",
+      "width": 1500,
+      "height": 500
+    },
+    {
+      "file": "docs/challenges/v1-assets/Hero_Card_Design_Partnership_1200x627.png",
+      "width": 1200,
+      "height": 627
+    },
+    {
+      "file": "public/og/designchallenge.png",
+      "width": 1200,
+      "height": 627
+    }
+  ],
+  "wordCounts": {
+    "coderLegion": 222,
+    "githubDiscussionBody": 147,
+    "totalWords": 369,
+    "coderLegionCharsNoSpaces": 1546,
+    "githubCharsNoSpaces": 1099
+  },
+  "urls": {
+    "landing": "https://www.pocketportfolio.app/designchallenge",
+    "coderLegionGroup": "https://coderlegion.com/groups/openfi-builders",
+    "githubSubmissionThread": "https://github.com/PocketPortfolio/Financialprofilenetwork/discussions/49",
+    "githubDiscussions": "https://github.com/PocketPortfolio/Financialprofilenetwork/discussions",
+    "importerTree": "https://github.com/PocketPortfolio/Financialprofilenetwork/tree/main/packages/importer"
+  }
+}

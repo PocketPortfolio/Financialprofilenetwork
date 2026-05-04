@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { DESIGN_CHALLENGE } from '@/lib/canonical-claims';
 
 interface TrendingAsset {
   symbol: string;
@@ -260,6 +261,21 @@ export default function GlobalFooter() {
                 >
                   CoderLegion
                 </a>
+              </li>
+              <li>
+                <Link
+                  href={DESIGN_CHALLENGE.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  {DESIGN_CHALLENGE.footerCommunityLabel}
+                </Link>
               </li>
               <li>
                 <a

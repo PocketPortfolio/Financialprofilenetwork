@@ -1,6 +1,8 @@
 # Claude Code CLI: .claudesignore is intentionally tracked (repo guardrails)
 node_modules/
-dist/
+dist/*
+!dist/campaigns/
+!dist/campaigns/**
 # Package build output (commit source only; CI builds dist)
 packages/importer/dist/
 .vite/

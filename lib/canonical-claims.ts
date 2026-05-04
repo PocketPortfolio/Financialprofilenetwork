@@ -405,9 +405,91 @@ export const URLS = {
   personAbba: 'https://www.pocketportfolio.app/press/abba-lawal',
   privacy: 'https://www.pocketportfolio.app/privacy',
   blog: 'https://www.pocketportfolio.app/blog',
+  designChallenge: 'https://www.pocketportfolio.app/designchallenge',
   npmAggregateApi: 'https://www.pocketportfolio.app/api/npm-stats',
   npmOrg: 'https://www.npmjs.com/org/pocket-portfolio',
   github: 'https://github.com/PocketPortfolio/Financialprofilenetwork',
+} as const;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Design Partnership Challenge — public landing SSOT
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// Consumed by:
+//   - app/designchallenge/page.tsx  (hero, vertical cards, CTAs, JSON-LD)
+//   - scripts/build-llms-txt.ts     (cites the route + 1-line summary)
+//   - scripts/lib/challenges/design-partnership-v1.ts (URL realignment)
+//
+// Hero copy is a CT1 + CT2 merge (eyebrow from CT2; H1 from CT1 vertical
+// inflection). See docs/challenges/DESIGNCHALLENGE-LANDING-ALIGNMENT.md.
+
+export interface ChallengeVertical {
+  id: 'healthcare' | 'defense' | 'finance' | 'energy';
+  label: string;
+  blurb: string;
+}
+
+export const DESIGN_CHALLENGE = {
+  path: '/designchallenge',
+  /** Footer / compact nav (GlobalFooter, marketing footers). */
+  footerCommunityLabel: 'Design challenge',
+  url: URLS.designChallenge,
+  eyebrow: 'The Future of Regulated AI is Sovereign.',
+  headline: 'The Sovereign AI Design Challenge: Build for Regulated Verticals.',
+  subheadline:
+    'Extend the Pocket Portfolio substrate into Healthcare, Defense, and Finance. Deploy frontier AI without the Sovereignty Lockout.',
+  ogImage: '/og/designchallenge.png',
+  /** Static OG image dimensions — kept in sync with scripts/lib/design-challenge-assets.ts hero card. */
+  ogImageWidth: 1200,
+  ogImageHeight: 627,
+  github: {
+    fork: 'https://github.com/PocketPortfolio/Financialprofilenetwork',
+    submissionThread: 'https://github.com/PocketPortfolio/Financialprofilenetwork/discussions/49',
+    discussionsIndex: 'https://github.com/PocketPortfolio/Financialprofilenetwork/discussions',
+    importerTree: 'https://github.com/PocketPortfolio/Financialprofilenetwork/tree/main/packages/importer',
+  },
+  coderLegionGroup: 'https://coderlegion.com/groups/openfi-builders',
+  /** Coordinated CoderLegion cohort push (operations, not contractual). */
+  coderLegionLaunch: '2026-05-11T08:45:00Z',
+  /** SSOT copy block in repo (regenerated from build:challenge). */
+  ssotCopyPath: 'docs/challenges/v1-regulated-verticals.md',
+  verticals: [
+    {
+      id: 'healthcare',
+      label: 'Healthcare',
+      blurb:
+        'Local-first ingestion of patient-controlled records; stateless inference for clinical reasoning aids.',
+    },
+    {
+      id: 'defense',
+      label: 'Defense',
+      blurb:
+        'Sovereign substrate boundaries for classified-adjacent workflows; on-device inference patterns.',
+    },
+    {
+      id: 'finance',
+      label: 'Finance',
+      blurb:
+        'Limited-scope processor posture for broker, banking, and wealth data — no central PII warehouse.',
+    },
+    {
+      id: 'energy',
+      label: 'Energy',
+      blurb:
+        'Asset-portfolio decision support patterns extending the £7B energy-assets reference architecture.',
+    },
+  ] as ReadonlyArray<ChallengeVertical>,
+  rewards: [
+    'Early Design Partner status — your name or logo on flagship pages.',
+    'Early access to sovereign innovation from Pocket Portfolio.',
+    'Optional path to lead a vertical business area when submissions reach revenue modelling (terms to be discussed).',
+  ] as const,
+  artefacts: [
+    'Business AI strategy document.',
+    'Wireframe or prototype (screenshots or hosted URL).',
+    'Full-stack application forked from the Pocket Portfolio boilerplate.',
+    'Honest, adversarial feedback to harden the substrate.',
+  ] as const,
 } as const;
 
 // ──────────────────────────────────────────────────────────────────────────────

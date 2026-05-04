@@ -73,7 +73,7 @@ const RASTER_CALLOUTS_PX = 2400;
 const RASTER_BADGE_PX = 900;
 
 /**
- * UK Black Business Show portrait for deck slide 5. Prefers committed press variants,
+ * UK Black Business Show portrait for the executive (final) slide. Prefers committed press variants,
  * then deck-specific PNG (e.g. copied from press pipeline output).
  */
 function resolveUkBbsPortraitPath(): string | null {
@@ -864,6 +864,103 @@ function dualExchangePdf(doc: jsPDF, y0: number, assets: DeckAssets) {
   doc.line(xR, ay, xR - tip, ay + halfW);
 }
 
+/** Consultant-aligned monetisation copy — partner-specific emphasis (dual-deck SSOT). */
+interface RevenueSlideModel {
+  title: string;
+  subtitle: string;
+  bullets: readonly string[];
+}
+
+function getRevenueSlideModel(partner: PartnerDeckId): RevenueSlideModel {
+  if (partner === 'plaid') {
+    return {
+      title: 'Revenue model & path to monetisation',
+      subtitle:
+        'Consumer subscription (access-gating) monetises premium data connectivity while keeping core packaging simple.',
+      bullets: [
+        'Founders Club: GBP 12/month or GBP 100/year (published prosumer tier on pocketportfolio.app).',
+        'Premium bundle: Plaid-powered US Investments (Holdings + Transactions) where offered, with Pocket Analyst and local-first privacy as tier justification.',
+        'Commercial pattern: access-gating — a clean upsell without per-call metering on the base subscription.',
+        'Heavy-user balance: optional usage-based add-ons (e.g. higher refresh limits, deeper analytics) to capture marginal value.',
+        'Iteration: sharpen what is uniquely in-tier beyond connectivity so price tracks perceived ROI.',
+      ],
+    };
+  }
+  return {
+    title: 'Revenue model & path to monetisation',
+    subtitle:
+      'B2B hybrid pricing monetises sovereign ingestion and stateless inference as infrastructure, not a discretionary widget.',
+    bullets: [
+      'Mechanism: add-on module — Freetrade deploys AI features adjacent to core flows without a full platform rewrite.',
+      'Hybrid structure: base platform licence plus usage-aligned fees so partner scale tracks inference and import volumes.',
+      'ROI framing (regime context, not penalty prediction): GDPR ceilings up to EUR 20m or 4% turnover; EU AI Act up to EUR 35m or 7%; sovereign edge + stateless boundary shrinks export surface and audit perimeter.',
+      'Positioning: integral substrate for safer regulated AI on retail ledger data under EU / UK rules.',
+      'IG Group context: enterprise procurement, SLAs, security review gates, and scoped customisation in commercial design.',
+    ],
+  };
+}
+
+function addPdfRevenueSlide(doc: jsPDF, assets: DeckAssets, fy: number): void {
+  doc.addPage([SLIDE_W, SLIDE_H], 'landscape');
+  slideBg(doc);
+  const m = getRevenueSlideModel(deckCtx.partner);
+  let y = addPartnershipHeaderPdf(doc, assets, m.title, 40);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...MUTED);
+  const sub = doc.splitTextToSize(ascii(m.subtitle), SLIDE_W - 96);
+  doc.text(sub, PDF_TITLE_COL_X, y);
+  y += sub.length * 12 + 8;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(...WHITE);
+  for (const b of m.bullets) {
+    const block = doc.splitTextToSize(ascii(`\u2022 ${b}`), SLIDE_W - 96);
+    doc.text(block, 48, y);
+    y += block.length * 11.5 + 4;
+  }
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  const disc = doc.splitTextToSize(
+    ascii(
+      'Illustrative commercial patterns — not an offer; final economics subject to contract, volume forecasts, and legal review.'
+    ),
+    SLIDE_W - 96
+  );
+  doc.text(disc, 48, fy - 58);
+  const slideLabel =
+    deckCtx.partner === 'freetrade' ? 'Slide 6 — Revenue model' : 'Slide 5 — Revenue model';
+  drawFooterPdf(doc, slideLabel, fy);
+}
+
+function addRevenueSlidePptx(pptx: PptxGenJS, assets: DeckAssets, partner: PartnerDeckId): void {
+  const m = getRevenueSlideModel(partner);
+  const s = pptx.addSlide();
+  addSlideHeaderPptxFixed(s, assets, ascii(m.title), ascii(m.subtitle));
+  const bullets = m.bullets.map((text) => ({
+    text: ascii(text),
+    options: { bullet: true, fontSize: 12, color: COL.text },
+  }));
+  s.addText(bullets, { x: 0.58, y: 1.78, w: 12.12, h: 4.85, fontFace: 'Calibri' });
+  s.addText(
+    ascii(
+      'Illustrative commercial patterns — not an offer; final economics subject to contract, volume forecasts, and legal review.'
+    ),
+    {
+      x: 0.58,
+      y: 6.68,
+      w: 12.12,
+      h: 0.42,
+      fontFace: 'Calibri',
+      fontSize: 9,
+      italic: true,
+      color: COL.muted,
+    }
+  );
+  footerPptxFixed(s, partner === 'freetrade' ? 'Slide 6 — Revenue model' : 'Slide 5 — Revenue model');
+}
+
 function buildPdf(assets: DeckAssets) {
   const doc = new jsPDF({
     orientation: 'landscape',
@@ -1223,6 +1320,7 @@ function buildPdf(assets: DeckAssets) {
       y + roadmapCapH - 30
     );
     drawFooterPdf(doc, 'Slide 4 — Roadmap', fy);
+    addPdfRevenueSlide(doc, assets, fy);
   }
 
   // 5 — Freetrade: inference economics | Plaid: authority
@@ -1293,6 +1391,7 @@ function buildPdf(assets: DeckAssets) {
       cy
     );
     drawFooterPdf(doc, 'Slide 5 — Inference economics', fy);
+    addPdfRevenueSlide(doc, assets, fy);
   }
 
   doc.addPage([SLIDE_W, SLIDE_H], 'landscape');
@@ -1362,7 +1461,7 @@ function buildPdf(assets: DeckAssets) {
   doc.text(ascii('UK Black Business Show 2024 — on-stage panel.'), imgBoxX, photoFit.y + photoFit.h + 12);
   drawFooterPdf(
     doc,
-    deckCtx.partner === 'freetrade' ? 'Slide 6 — Executive authority' : 'Slide 5 — Executive authority',
+    deckCtx.partner === 'freetrade' ? 'Slide 7 — Executive authority' : 'Slide 6 — Executive authority',
     fy
   );
 
@@ -1955,6 +2054,7 @@ export async function runDesignPartnershipDeck(partner: PartnerDeckId): Promise<
       { x: 8.15, y: 4.88, w: 4.6, h: 1.45, fontFace: 'Calibri' }
     );
     footerPptxFixed(s, 'Slide 5 — Inference economics');
+    addRevenueSlidePptx(pptx, assets, 'freetrade');
   } else {
     const s = pptx.addSlide();
     addSlideHeaderPptxFixed(s, assets, 'North American Deployment: Q3–Q4 2026 (180-day window).');
@@ -1973,6 +2073,7 @@ export async function runDesignPartnershipDeck(partner: PartnerDeckId): Promise<
       { x: 0.58, y: 6.58, w: 12.12, h: 0.45, fontFace: 'Calibri', fontSize: 11, italic: true, color: COL.muted }
     );
     footerPptxFixed(s, 'Slide 4 — Roadmap');
+    addRevenueSlidePptx(pptx, assets, 'plaid');
   }
 
   {
@@ -2065,7 +2166,7 @@ export async function runDesignPartnershipDeck(partner: PartnerDeckId): Promise<
       italic: true,
       color: COL.muted,
     });
-    footerPptxFixed(s, partner === 'freetrade' ? 'Slide 6 — Executive authority' : 'Slide 5 — Executive authority');
+    footerPptxFixed(s, partner === 'freetrade' ? 'Slide 7 — Executive authority' : 'Slide 6 — Executive authority');
   }
 
   await pptx.writeFile({ fileName: deckCtx.outPptx });

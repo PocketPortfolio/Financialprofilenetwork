@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/app/hooks/useAuth';
+import { DESIGN_CHALLENGE } from '@/lib/canonical-claims';
 
 export default function ToolFooter() {
   const { isAuthenticated } = useAuth();
@@ -332,6 +333,18 @@ export default function ToolFooter() {
             >
               CoderLegion
             </a>
+            <Link
+              href={DESIGN_CHALLENGE.path}
+              style={{
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            >
+              {DESIGN_CHALLENGE.footerCommunityLabel}
+            </Link>
             <a
               href="https://discord.gg/Ch9PpjRzwe"
               target="_blank"
