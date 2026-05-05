@@ -1,0 +1,57 @@
+---
+title: How to Implement File Compression in Node.js
+date: '2026-05-05'
+description: >-
+  Learn how to efficiently implement file compression in Node.js to save space
+  and improve performance.
+tags:
+  - node.js
+  - file compression
+  - guide
+  - gzip
+  - zlib
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-file-compression-in-node-js.png
+pillar: Tech
+category: how-to-in-tech
+---
+
+### Problem
+
+When dealing with large files in a Node.js application, file size can become a bottleneck for performance, both in terms of storage and network transfer. Compression is a key technique to mitigate these issues by reducing file size. This guide covers how to implement file compression in Node.js using the `zlib` module, which provides compression functionality in a straightforward manner.
+
+### Solution with Code
+
+Node.js includes a built-in module called `zlib` that supports file compression using algorithms like Gzip and Deflate. Below is a step-by-step guide on how to compress a file using Gzip.
+
+First, ensure you have Node.js installed. Create a new JavaScript file, `compress.js`, and include the following code:
+
+```javascript
+const fs = require('fs');
+const zlib = require('zlib');
+
+function compressFile(inputPath, outputPath) {
+  const gzip = zlib.createGzip();
+  const source = fs.createReadStream(inputPath);
+  const destination = fs.createWriteStream(outputPath);
+  
+  source.pipe(gzip).pipe(destination);
+}
+
+const inputFile = 'example.txt';
+const outputFile = 'example.txt.gz';
+
+compressFile(inputFile, outputFile);
+```
+
+### Key Concepts
+
+1. **Streams**: Node.js uses streams to handle reading from and writing to files, which allows for efficient data processing without loading the entire file into memory. In the code above, `fs.createReadStream()` reads the file in chunks, and `fs.createWriteStream()` writes compressed data to a new file.
+
+2. **Piping**: The `.pipe()` method connects the read stream and the write stream with the transformation stream (Gzip in this case). This setup allows data to flow from the source file through the Gzip compression and into the destination file seamlessly.
+
+3. **Gzip Compression**: The `zlib.createGzip()` function creates a Gzip transform stream. Gzip is a widely used compression algorithm that reduces file size effectively, making it a good choice for web applications due to its balance between compression ratio and speed.
+
+### Conclusion
+
+Implementing file compression in Node.js is straightforward with the `zlib` module. By leveraging Node.js streams and piping, you can efficiently compress files, which can lead to significant improvements in application performance, especially in environments where network bandwidth and storage are constrained. This approach is particularly useful for preparing files for transfer over HTTP, as many web servers and clients support Gzip compression natively.
