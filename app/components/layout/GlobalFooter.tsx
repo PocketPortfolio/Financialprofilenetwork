@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { DESIGN_CHALLENGE } from '@/lib/canonical-claims';
 
 interface TrendingAsset {
@@ -15,6 +15,7 @@ interface TrendingAsset {
 export default function GlobalFooter() {
   const pathname = usePathname();
   const [trendingAssets, setTrendingAssets] = useState<TrendingAsset[]>([]);
+  const footerRef = useRef<HTMLElement | null>(null);
 
   // Determine footer variant based on pathname
   const isLiteFooter = pathname?.startsWith('/login') || 
@@ -22,23 +23,57 @@ export default function GlobalFooter() {
                        pathname?.startsWith('/checkout') ||
                        pathname?.startsWith('/join');
 
-  // Fetch trending assets for the dynamic bar
+  // Fetch trending assets only when the footer is near-viewport + idle (keeps main thread free early).
   useEffect(() => {
-    if (isLiteFooter) return; // Skip fetch for lite footer
-    
+    if (isLiteFooter) return;
+
+    let cancelled = false;
+
     const fetchTrending = async () => {
       try {
         const response = await fetch('/api/most-traded?count=5&region=US');
-        if (response.ok) {
-          const data = await response.json();
-          setTrendingAssets(data.slice(0, 5));
-        }
+        if (!response.ok || cancelled) return;
+        const data = await response.json();
+        if (!cancelled) setTrendingAssets(data.slice(0, 5));
       } catch (error) {
-        console.error('Failed to fetch trending assets:', error);
+        if (!cancelled) console.error('Failed to fetch trending assets:', error);
       }
     };
 
-    fetchTrending();
+    const schedule = () => {
+      const w = typeof window !== 'undefined' ? window : undefined;
+      if (!w) return;
+      const ric = (w as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void })
+        .requestIdleCallback;
+      if (typeof ric === 'function') {
+        ric(() => void fetchTrending(), { timeout: 4000 });
+      } else {
+        w.setTimeout(() => void fetchTrending(), 2000);
+      }
+    };
+
+    const el = footerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      schedule();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        schedule();
+      },
+      { root: null, rootMargin: '280px 0px 0px 0px', threshold: 0 }
+    );
+    io.observe(el);
+
+    return () => {
+      cancelled = true;
+      io.disconnect();
+    };
   }, [isLiteFooter]);
 
   // Lite Footer (Login, Sign-up, Checkout)
@@ -73,6 +108,7 @@ export default function GlobalFooter() {
   // Full Footer (4-Column Structure)
   return (
     <footer
+      ref={footerRef}
       style={{
         marginTop: 'clamp(40px, 8vw, 80px)',
         paddingTop: 'clamp(20px, 4vw, 32px)',

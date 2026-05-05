@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
@@ -16,12 +17,26 @@ import ReferralPendingNotice from './components/ReferralPendingNotice';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
 import { PremiumTierProvider } from './contexts/PremiumTierContext';
-import GlobalFooter from './components/layout/GlobalFooter';
 import PWAInstallPromptWrapper from './components/PWAInstallPromptWrapper';
 import GlobalFoundersClubBanner from './components/GlobalFoundersClubBanner';
 import { PocketAnalystProvider } from './components/ai/PocketAnalystProvider';
 
 const inter = Inter({ subsets: ['latin'] });
+
+/** Code-split footer so first interaction isn’t blocked parsing a large client chunk. */
+const GlobalFooter = dynamic(() => import('./components/layout/GlobalFooter'), {
+  loading: () => (
+    <footer
+      style={{
+        marginTop: 'auto',
+        minHeight: '100px',
+        borderTop: '1px solid var(--border-warm)',
+        background: 'var(--bg)',
+      }}
+      aria-label="Site footer"
+    />
+  ),
+});
 
 // Use brand V2 metadata if enabled, fallback to legacy
 const brandEnabled = process.env.NEXT_PUBLIC_BRAND_V2 === 'true';

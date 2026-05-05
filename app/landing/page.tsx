@@ -894,6 +894,120 @@ export default function LandingPage() {
             </span>
           </p>
 
+          {/* Directive B — 3s affordance: explicit next actions before scroll */}
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '720px',
+              marginBottom: '16px',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--text-secondary)',
+                marginBottom: '10px',
+              }}
+            >
+              Start here — pick one
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '10px',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('landing-hero-ticker');
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  window.setTimeout(() => {
+                    (el?.querySelector('input') as HTMLInputElement | null)?.focus();
+                  }, 320);
+                }}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '2px solid var(--border-warm)',
+                  background: 'var(--surface-elevated)',
+                  color: 'var(--text)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                1 · Search a ticker
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  document.getElementById('landing-hero-dropzone')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '2px solid var(--border-warm)',
+                  background: 'var(--surface-elevated)',
+                  color: 'var(--text)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                2 · Parse CSV locally
+              </button>
+              <Link
+                href="/dashboard?utm_source=landing&utm_medium=hero_affordance&utm_campaign=direct_entry"
+                style={{
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '2px solid var(--border-warm)',
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, var(--surface) 100%)',
+                  color: 'var(--accent-warm)',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                }}
+              >
+                3 · Open terminal
+              </Link>
+            </div>
+          </div>
+
+          <div
+            id="landing-hero-ticker"
+            style={{
+              width: '100%',
+              maxWidth: '600px',
+              marginBottom: '22px',
+              position: 'relative',
+              zIndex: 10000,
+            }}
+          >
+            <div
+              style={{
+                background: 'var(--surface-elevated)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '4px',
+                boxShadow: 'var(--shadow-md)',
+              }}
+            >
+              <TickerSearch
+                placeholder="> Search tickers (e.g. NVDA, BTC) — opens market page"
+                linkToTickerPage={true}
+              />
+            </div>
+          </div>
+
           {/* Hero: local sanitization theater (drop zone + terminal) */}
           <div
             style={{
@@ -911,6 +1025,7 @@ export default function LandingPage() {
               onChange={handleHeroDemoInputChange}
             />
             <div
+              id="landing-hero-dropzone"
               role="button"
               tabIndex={0}
               aria-label="Upload or drop a broker CSV to run the local sanitization demo in your browser"
@@ -1096,29 +1211,6 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Quick Command Search Bar - Sitemap Bridge */}
-          <div style={{
-            width: '100%',
-            maxWidth: '600px',
-            marginTop: '32px',
-            marginBottom: '0',
-            position: 'relative',
-            zIndex: 10000
-          }}>
-            <div style={{
-              background: 'var(--surface-elevated)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-md)',
-              padding: '4px',
-              boxShadow: 'var(--shadow-md)',
-            }}>
-              <TickerSearch
-                placeholder="> Search 58,070 assets (e.g. NVDA, BTC)..."
-                linkToTickerPage={true}
-              />
-            </div>
-          </div>
-
           {/* Dashboard Screenshot - High Fidelity Visual */}
           <div style={{
             width: '100%',
@@ -1137,7 +1229,7 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
               crossOrigin="anonymous"
               style={{
                 width: '100%',

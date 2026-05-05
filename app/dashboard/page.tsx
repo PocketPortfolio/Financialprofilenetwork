@@ -1721,6 +1721,65 @@ export default function Dashboard() {
                 </button>
               </div>
             )}
+          {/* Directive B — direct-entry affordance: search + import before deep terminal chrome */}
+          <div
+            id="dashboard-quick-search"
+            className="dashboard-card"
+            style={{
+              margin: '0 16px 16px',
+              padding: '14px 16px',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              background: 'var(--surface)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--text-secondary)',
+                marginBottom: '8px',
+              }}
+            >
+              Next action
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 12px', lineHeight: 1.5 }}>
+              Search a symbol for context, or import trades — everything stays local-first until you opt into sync.
+            </p>
+            <div
+              style={{
+                maxWidth: '520px',
+                borderRadius: '10px',
+                border: '1px solid var(--border-subtle)',
+                padding: '4px',
+                background: 'var(--surface-elevated)',
+              }}
+            >
+              <TickerSearch placeholder="> Ticker lookup (e.g. AAPL, BTC)…" linkToTickerPage />
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '12px', alignItems: 'center' }}>
+              <a
+                href="#add-trade"
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--accent-warm)',
+                  textDecoration: 'none',
+                  borderBottom: '1px solid var(--accent-warm)',
+                }}
+              >
+                Add trade / Import CSV ↓
+              </a>
+              <Link
+                href="/s/api?utm_source=dashboard&utm_medium=quick_strip&utm_campaign=developer_hub"
+                style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}
+              >
+                JSON API hub →
+              </Link>
+            </div>
+          </div>
           {/* 🎨 INTELLIGENCE LAYER - Above everything */}
           {trades.length > 0 && (
             <MorningBrief 
