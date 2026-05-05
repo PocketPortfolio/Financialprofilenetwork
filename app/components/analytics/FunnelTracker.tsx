@@ -56,7 +56,7 @@ export default function FunnelTracker({
 
       if (autoTrackScroll && scrollPercent > scrollDepth) {
         scrollDepth = scrollPercent;
-        trackScrollDepth(scrollPercent, pathname);
+        trackScrollDepth(scrollPercent, pathname ?? undefined);
       }
     };
 
@@ -68,7 +68,7 @@ export default function FunnelTracker({
       milestones.forEach(milestone => {
         if (autoTrackTime && seconds >= milestone && !timeTracked.has(milestone)) {
           timeTracked.add(milestone);
-          trackTimeOnPage(milestone, pathname);
+          trackTimeOnPage(milestone, pathname ?? undefined);
         }
       });
     };
@@ -90,7 +90,7 @@ export default function FunnelTracker({
           // Track final time on page
           const finalSeconds = Math.floor((Date.now() - timeStart) / 1000);
           if (finalSeconds > 0) {
-            trackTimeOnPage(finalSeconds, pathname);
+            trackTimeOnPage(finalSeconds, pathname ?? undefined);
           }
         }
       };

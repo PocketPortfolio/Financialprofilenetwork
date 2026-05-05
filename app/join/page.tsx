@@ -13,7 +13,7 @@ function JoinWaitlistContent() {
   const [source, setSource] = useState<'web:join' | 'web:footer' | 'web:header'>('web:join');
   
   useEffect(() => {
-    const sourceParam = searchParams.get('source') as 'web:footer' | 'web:header' | null;
+    const sourceParam = (searchParams?.get('source') ?? null) as 'web:footer' | 'web:header' | null;
     if (sourceParam && ['web:footer', 'web:header'].includes(sourceParam)) {
       setSource(sourceParam);
     }

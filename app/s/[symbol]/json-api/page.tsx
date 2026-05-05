@@ -29,19 +29,20 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   const resolvedParams = await params;
   const symbol = resolvedParams.symbol.toUpperCase();
   const metaVariant = process.env.NEXT_PUBLIC_GSC_META_VARIANT === 'B' ? 'B' : 'A';
-  const inMetaTest = metaVariant === 'B' && new Set(['xvlxx', 'vhxxx', 'vvlxx', 'xinxx', 'nse']).has(symbol.toLowerCase().replace(/-/g, ''));
+  const metaTestSet = new Set(['xvlxx', 'vhxxx', 'vvlxx', 'xinxx', 'nse', 'spy', 'qqq', 'aapl']);
+  const inMetaTest = metaVariant === 'B' && metaTestSet.has(symbol.toLowerCase().replace(/-/g, ''));
   const metadata = await getTickerMetadata(symbol);
 
   if (symbol.replace(/-/g, '') === 'NSE') {
     if (inMetaTest) {
       return {
-        title: 'NSE JSON API & Historical CSV Download | Pocket Portfolio',
+        title: 'NSE JSON Endpoint (REST API) + CSV Export | Pocket Portfolio',
         description:
-          'Fetch NSE history as normalized JSON (stateless endpoint) and download clean CSVs. No login. Local-first workflow for National Stock Exchange tickers.',
+          'Free NSE JSON endpoint (REST API) + CSV export for historical data. Copy‑paste examples. No API key. No login. Stateless + local-first workflow.',
         openGraph: {
-          title: 'NSE JSON API & Historical CSV Download | Pocket Portfolio',
+          title: 'NSE JSON Endpoint (REST API) + CSV Export | Pocket Portfolio',
           description:
-            'Fetch NSE history as JSON and download clean CSVs. No login. Local-first workflow.',
+            'Free NSE JSON endpoint (REST API) + CSV export. No API key. No login. Stateless + local-first workflow.',
           type: 'website',
           url: 'https://www.pocketportfolio.app/s/nse/json-api',
         },
@@ -69,28 +70,33 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: inMetaTest ? `${symbol} JSON API & Historical CSV | Pocket Portfolio` : `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+      title: inMetaTest
+        ? `${symbol} JSON Endpoint (REST API) + CSV Export | Pocket Portfolio`
+        : `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
       description: inMetaTest
-        ? `Fetch ${symbol} history as normalized JSON (stateless endpoint) or download CSV. No login required.`
+        ? `Free ${symbol} JSON endpoint (REST API) + CSV export for historical data. No API key. No login. Copy‑paste examples.`
         : `Download ${symbol} historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
     };
   }
 
   if (inMetaTest) {
     return {
-      title: `${symbol} JSON API & Historical CSV | Pocket Portfolio`,
-      description: `Fetch ${metadata.name} (${symbol}) history as normalized JSON (stateless endpoint) or download CSV. No login required.`,
+      title: `${symbol} JSON Endpoint (REST API) + CSV Export | Pocket Portfolio`,
+      description: `Free ${symbol} JSON endpoint (REST API) + CSV export for historical data. No API key. No login. Examples for ${metadata.name} (${symbol}).`,
       keywords: [
-        `${symbol} JSON API`,
+        `${symbol} JSON endpoint`,
+        `${symbol} REST API`,
         `${symbol} historical data JSON`,
         `${symbol} historical data CSV`,
         `${symbol} price API`,
+        `${symbol} csv export endpoint`,
+        `${symbol} json api example`,
         `download ${symbol} JSON`,
         `download ${symbol} CSV`,
       ],
       openGraph: {
-        title: `${symbol} JSON API & Historical CSV | Pocket Portfolio`,
-        description: `Fetch ${metadata.name} (${symbol}) history as JSON or download CSV. No login required.`,
+        title: `${symbol} JSON Endpoint (REST API) + CSV Export | Pocket Portfolio`,
+        description: `Free ${symbol} JSON endpoint (REST API) + CSV export. No API key. No login. Copy‑paste examples.`,
         type: 'website',
         url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
       },

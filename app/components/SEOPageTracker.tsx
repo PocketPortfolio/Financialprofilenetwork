@@ -16,7 +16,7 @@ import { trackSEOPageView, getSEOPageAttribution, trackSEOSignupConversion } fro
  * Also tracks conversions when users sign up from these pages
  */
 export default function SEOPageTracker() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '';
   const { isAuthenticated, user, loading } = useAuth();
   const wasAuthenticatedRef = useRef(false);
   const hasTrackedConversionRef = useRef(false);

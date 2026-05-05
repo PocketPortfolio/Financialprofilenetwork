@@ -58,6 +58,7 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
+    ".next",
     "node_modules",
     "src_backup",
     "scripts_backup",

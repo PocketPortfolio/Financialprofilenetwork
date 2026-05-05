@@ -1,8 +1,6 @@
 # Claude Code CLI: .claudesignore is intentionally tracked (repo guardrails)
 node_modules/
-dist/*
-!dist/campaigns/
-!dist/campaigns/**
+dist/
 # Package build output (commit source only; CI builds dist)
 packages/importer/dist/
 .vite/
@@ -43,3 +41,10 @@ temp_api_key.txt
 
 # Seed decks / binaries (keep repo text-first)
 docs/seed/*.pptx
+
+# Marketing binaries + caches (keep repo text-first)
+docs/marketing/*.pptx
+docs/marketing/*.pdf
+docs/marketing/~$*
+docs/marketing/_freetrade-deck-cache/
+docs/marketing/_plaid-deck-cache/

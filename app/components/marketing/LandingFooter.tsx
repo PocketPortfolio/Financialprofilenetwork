@@ -113,6 +113,27 @@ export default function LandingFooter() {
             gap: '16px', 
             flexWrap: 'wrap' 
           }}>
+            <Link href="/s/api" style={{ 
+              padding: '10px 20px', 
+              border: '2px solid var(--border-warm)', 
+              borderRadius: '8px', 
+              color: 'var(--text)', 
+              textDecoration: 'none', 
+              fontSize: '13px', 
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#D97706';
+              e.currentTarget.style.color = '#D97706';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
+              e.currentTarget.style.color = 'var(--text)';
+            }}
+            >
+              JSON API Hub
+            </Link>
             <Link href="/tools/risk-calculator" style={{ 
               padding: '10px 20px', 
               border: '2px solid var(--border-warm)', 

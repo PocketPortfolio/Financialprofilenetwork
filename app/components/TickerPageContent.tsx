@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import StructuredData from './StructuredData';
 import MobileTickerView from './MobileTickerView';
 import DesktopTerminalView from './DesktopTerminalView';
@@ -83,6 +84,98 @@ export default function TickerPageContent({
           .ticker-desktop-view { display: block !important; }
         }
       ` }} />
+
+      {/* Developer wedge: pass authority to JSON API surfaces */}
+      <div
+        style={{
+          maxWidth: '1200px',
+          margin: '12px auto 0',
+          padding: '0 16px',
+        }}
+      >
+        <div
+          style={{
+            border: '1px solid var(--border-subtle)',
+            background: 'linear-gradient(180deg, rgba(245, 158, 11, 0.07) 0%, transparent 60%)',
+            borderRadius: '14px',
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ minWidth: 220 }}>
+            <div
+              style={{
+                fontSize: '12px',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                color: 'var(--accent-warm)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                fontWeight: 800,
+                marginBottom: '4px',
+              }}
+            >
+              Developer API
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              JSON endpoint + CSV export for {normalizedSymbol}. No API key.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Link
+              href={`/s/${normalizedSymbol.toLowerCase()}/json-api`}
+              style={{
+                padding: '8px 10px',
+                borderRadius: '10px',
+                border: '1px solid var(--border-warm)',
+                background: 'rgba(245, 158, 11, 0.12)',
+                color: 'var(--accent-warm)',
+                textDecoration: 'none',
+                fontSize: '12px',
+                fontWeight: 800,
+              }}
+            >
+              View JSON API page →
+            </Link>
+            <a
+              href={`/api/tickers/${encodeURIComponent(normalizedSymbol)}/json?range=max`}
+              style={{
+                padding: '8px 10px',
+                borderRadius: '10px',
+                border: '1px solid var(--border-subtle)',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                textDecoration: 'none',
+                fontSize: '12px',
+                fontWeight: 700,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+              }}
+            >
+              Open JSON
+            </a>
+            <a
+              href={`/api/tickers/${encodeURIComponent(normalizedSymbol)}/csv?range=max`}
+              style={{
+                padding: '8px 10px',
+                borderRadius: '10px',
+                border: '1px solid var(--border-subtle)',
+                background: 'var(--surface)',
+                color: 'var(--text)',
+                textDecoration: 'none',
+                fontSize: '12px',
+                fontWeight: 700,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+              }}
+            >
+              CSV
+            </a>
+          </div>
+        </div>
+      </div>
       
       {/* Mobile: Visible < 1024px */}
       <div className="ticker-mobile-view">

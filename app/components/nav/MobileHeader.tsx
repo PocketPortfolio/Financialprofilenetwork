@@ -92,8 +92,8 @@ const HomeIcon = () => (
 );
 
 // Get page title from pathname
-function getPageTitle(pathname: string): string {
-  switch (pathname) {
+function getPageTitle(pathname: string | null): string {
+  switch (pathname ?? '') {
     case '/dashboard':
       return 'Dashboard';
     case '/live':

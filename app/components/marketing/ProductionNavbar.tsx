@@ -70,10 +70,11 @@ export default function ProductionNavbar() {
   // Ensure header stays visible when scrolling
   useStickyHeader('header.brand-header');
 
-  const primaryNav = sovereignPrimaryNav(pathname, 'site');
+  const safePathname = pathname ?? '/';
+  const primaryNav = sovereignPrimaryNav(safePathname, 'site');
   const faqItem = primaryNav[primaryNav.length - 1]!;
   const beforeFaq = primaryNav.slice(0, -1);
-  const toolsLinks = sovereignToolsDropdown(pathname);
+  const toolsLinks = sovereignToolsDropdown(safePathname);
 
   const renderNavLink = (link: { label: string; href: string }) => {
     const linkStyle = {

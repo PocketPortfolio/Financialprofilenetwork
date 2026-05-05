@@ -455,6 +455,21 @@ export default function GlobalFooter() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <Link
+                  href="/s/api"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  JSON API Hub
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/tools/risk-calculator"
                   style={{
                     color: 'var(--text-secondary)',

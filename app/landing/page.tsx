@@ -32,10 +32,11 @@ import {
 export default function LandingPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const primaryNav = sovereignPrimaryNav(pathname, 'landing');
+  const safePathname = pathname ?? '/';
+  const primaryNav = sovereignPrimaryNav(safePathname, 'landing');
   const faqNavItem = primaryNav[primaryNav.length - 1]!;
   const beforeFaqNav = primaryNav.slice(0, -1);
-  const toolsNavLinks = sovereignToolsDropdown(pathname);
+  const toolsNavLinks = sovereignToolsDropdown(safePathname);
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

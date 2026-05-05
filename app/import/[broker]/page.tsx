@@ -120,6 +120,50 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     };
   }
 
+  // High-impression developer/ops intent: Interactive Brokers (Flex Queries, exports, schema)
+  if (broker === 'interactive-brokers') {
+    const title = inMetaTest
+      ? 'Interactive Brokers CSV Import (Flex Query) | Verified Schema, Local-First'
+      : 'Interactive Brokers CSV Export → Local-First Import | Verified Ingestion Schema';
+    const description = inMetaTest
+      ? 'Parse Interactive Brokers CSV/Flex Query exports in-browser (no uploads). Verified ingestion schema + local-first parsing for portfolio tracking.'
+      : 'Export Interactive Brokers activity (Flex Query / statements) to CSV, then import locally. Verified ingestion schema, no uploads, your ledger stays on-device.';
+    return {
+      title,
+      description,
+      keywords: [
+        'Interactive Brokers CSV export',
+        'Interactive Brokers Flex Query CSV',
+        'IBKR CSV import',
+        'Interactive Brokers trade history CSV',
+        'Interactive Brokers activity statement CSV',
+        'local-first CSV parser',
+        'verified ingestion schema',
+      ],
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: `/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}`,
+            width: 1200,
+            height: 630,
+            alt: 'Interactive Brokers CSV Import - Pocket Portfolio',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: ['/og?title=' + encodeURIComponent('Interactive Brokers CSV Import')],
+      },
+      alternates: {
+        canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
+      },
+    };
+  }
+
   if (US_RETAIL_SEO_BROKERS.has(broker)) {
     const title = inMetaTest
       ? `Free ${config.displayName} CSV Import | No Uploads, Local-First`
@@ -225,6 +269,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
   const exportStep1Text = isUsRetailSeo
     ? getUsBrokerExportStep1Text(broker, config.displayName)
     : `Log into your ${config.displayName} account and export your trading history or account statement as a CSV file.`;
+  const isIbkr = broker === 'interactive-brokers';
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -346,7 +391,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             margin: '0 auto',
             lineHeight: '1.6'
           }}>
-            {isUsRetailSeo
+            {isIbkr
+              ? 'Export an Interactive Brokers Flex Query or activity statement as CSV, then parse locally. Verified ingestion schema, local-first parsing, and zero uploads.'
+              : isUsRetailSeo
               ? `Export your ${config.displayName} transaction history to CSV, then import in seconds. Everything runs in your browser — your data stays on your device.`
               : `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.`}
           </p>
@@ -407,7 +454,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
               color: 'var(--text-secondary)',
               margin: '0'
             }}>
-              {config.description}
+              {isIbkr
+                ? 'Interactive Brokers exports are powerful but inconsistent across report types. Pocket Portfolio treats IBKR as a verified ingestion route: parse CSV locally, normalize trades, and keep your ledger off servers.'
+                : config.description}
             </p>
           </div>
         </section>

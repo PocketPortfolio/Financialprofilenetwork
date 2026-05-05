@@ -26,7 +26,7 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
     setIsMobile(deviceInfo.isMobile);
   }, []);
 
-  const getPageTitle = (path: string) => {
+  const getPageTitle = (path: string | null) => {
     const titles: { [key: string]: string } = {
       '/dashboard': 'Dashboard',
       '/positions': 'Positions',
@@ -36,6 +36,7 @@ export default function Header({ activeTab = 'dashboard' }: HeaderProps) {
       '/news': 'News',
       '/live': 'Live'
     };
+    if (!path) return 'Dashboard';
     return titles[path] || 'Dashboard';
   };
 

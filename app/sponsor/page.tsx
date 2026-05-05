@@ -68,9 +68,9 @@ function getInitialSponsorAbVariant(): 'A' | 'B' {
 
 function SponsorPageContent() {
   const searchParams = useSearchParams();
-  const utmCampaign = searchParams.get('utm_campaign');
+  const utmCampaign = searchParams?.get('utm_campaign') ?? null;
   const [abVariant] = useState<'A' | 'B'>(getInitialSponsorAbVariant);
-  const triggerSourceParam = (searchParams.get('trigger_source') || 'sponsor_page_direct') as
+  const triggerSourceParam = ((searchParams?.get('trigger_source') ?? null) || 'sponsor_page_direct') as
     | 'csv_import_success'
     | 'risk_metric_unlock_attempt'
     | 'ai_file_attachment_attempt'
@@ -210,10 +210,10 @@ function SponsorPageContent() {
           billing_interval: selectedTier.billingInterval || null,
           trigger_source: triggerSourceParam,
           ab_test_variant: abVariant,
-          utm_source: searchParams.get('utm_source') || 'sponsor',
-          utm_medium: searchParams.get('utm_medium') || 'checkout',
+          utm_source: searchParams?.get('utm_source') || 'sponsor',
+          utm_medium: searchParams?.get('utm_medium') || 'checkout',
           ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
-          ...(searchParams.get('utm_content') ? { utm_content: searchParams.get('utm_content') } : {}),
+          ...(searchParams?.get('utm_content') ? { utm_content: searchParams?.get('utm_content') } : {}),
         }),
       });
 

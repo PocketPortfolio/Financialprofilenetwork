@@ -127,7 +127,7 @@ function BlogPageInner() {
     filteredArticles
   );
 
-  const rawPage = parseInt(searchParams.get('page') || '1', 10);
+  const rawPage = parseInt(searchParams?.get('page') ?? '1', 10);
   const pageFromUrl = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
   const totalPages = Math.max(1, Math.ceil(visibleItems.length / POSTS_PER_PAGE));
   const currentPage = Math.min(pageFromUrl, totalPages);
