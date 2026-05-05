@@ -163,6 +163,37 @@ export function normalizeCsvHeadersFirstRow(csvText: string): NormalizeCsvHeader
   return { csvText: newText, fixesApplied };
 }
 
+function stripCsvPreamble(csvText: string): { csvText: string; fixesApplied: string[] } {
+  const fixesApplied: string[] = [];
+  if (!csvText) return { csvText, fixesApplied };
+
+  const eol = csvText.includes('\r\n') ? '\r\n' : '\n';
+  const lines = csvText.split(/\n/);
+
+  // Remove leading blank lines (often appear as a lone '\r' first line on Windows exports).
+  while (lines.length && !lines[0].replace(/\r/g, '').trim()) {
+    lines.shift();
+    fixesApplied.push('drop:leading_blank');
+  }
+
+  // Coinbase "Transactions" export prelude:
+  // Transactions
+  // User,<name>,<id>
+  // ID,Timestamp,Transaction Type,...
+  if (lines.length >= 2) {
+    const l0 = (lines[0] ?? '').replace(/\r/g, '').trim();
+    const l1 = (lines[1] ?? '').replace(/\r/g, '').trim();
+    if (/^Transactions$/i.test(l0) && /^User,/i.test(l1)) {
+      lines.shift();
+      lines.shift();
+      fixesApplied.push('drop:coinbase_transactions_prelude');
+    }
+  }
+
+  const next = lines.join('\n');
+  return { csvText: next, fixesApplied };
+}
+
 export function rawFileFromCsvText(csvText: string, filename: string): RawFile {
   const enc = new TextEncoder().encode(csvText);
   const copy = new Uint8Array(enc.byteLength);
@@ -191,10 +222,12 @@ export function prepareCsvForImport(csvText: string, filename: string): {
       rawFile: rawFileFromCsvText(csvText, filename),
     };
   }
-  const { csvText: normalized, fixesApplied } = normalizeCsvHeadersFirstRow(csvText);
+  const stripped = stripCsvPreamble(csvText);
+  const normalized = normalizeCsvHeadersFirstRow(stripped.csvText);
+  const fixesApplied = [...stripped.fixesApplied, ...normalized.fixesApplied];
   return {
-    csvText: normalized,
+    csvText: normalized.csvText,
     fixesApplied,
-    rawFile: rawFileFromCsvText(normalized, filename),
+    rawFile: rawFileFromCsvText(normalized.csvText, filename),
   };
 }

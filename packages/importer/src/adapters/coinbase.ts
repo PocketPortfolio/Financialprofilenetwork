@@ -8,9 +8,10 @@ export const coinbase: BrokerAdapter = {
     // More specific: require "Transaction Type" AND "Spot Price at Transaction" (Coinbase-specific columns)
     const hasTransactionType = /(^|\n)(Transaction Type)/i.test(sample);
     const hasSpotPriceAtTransaction = /(^|\n)(Spot Price at Transaction)/i.test(sample);
+    const hasPriceAtTransaction = /(^|\n)(Price at Transaction)/i.test(sample);
     const hasAsset = /(^|\n)(Asset)/i.test(sample);
     // Coinbase has these three specific columns together
-    return hasTransactionType && hasSpotPriceAtTransaction && hasAsset;
+    return hasTransactionType && (hasSpotPriceAtTransaction || hasPriceAtTransaction) && hasAsset;
   },
   parse: async (file, locale='en-US') => {
     const t0 = performance.now();
@@ -27,12 +28,17 @@ export const coinbase: BrokerAdapter = {
         }
         
         const type = /SELL/i.test(action) ? 'SELL' : 'BUY';
+        const qtyRaw = r['Quantity Transacted'] ?? r['Quantity'] ?? r['Qty'] ?? '0';
+        const priceRaw = r['Spot Price at Transaction'] ?? r['Price at Transaction'] ?? r['Price'] ?? r['Trade Price'] ?? '0';
+        const qty = toNumber(qtyRaw, locale);
+        const price = toNumber(priceRaw, locale);
+
         const out: NormalizedTrade = {
           date: toISO(r['Timestamp'] ?? r['Date'] ?? r['Time'] ?? '', locale),
           ticker: toTicker(r['Asset'] ?? r['Symbol'] ?? r['Ticker'] ?? ''),
           type,
-          qty: toNumber(r['Quantity Transacted'] ?? r['Quantity'] ?? r['Qty'] ?? '0', locale),
-          price: toNumber(r['Spot Price at Transaction'] ?? r['Price'] ?? r['Trade Price'] ?? '0', locale),
+          qty,
+          price,
           currency: r['Spot Price Currency'] ?? r['Currency'] ?? inferCurrency(r, 'USD'),
           fees: r['Fees'] ? toNumber(r['Fees'], locale) : 0,
           source: 'coinbase',
