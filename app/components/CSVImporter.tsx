@@ -54,6 +54,11 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
   const [showIntentUpsellModal, setShowIntentUpsellModal] = useState(false);
   const [pendingUniversal, setPendingUniversal] = useState<RequiresMappingResult | null>(null);
   const [unknownFile, setUnknownFile] = useState<{ file: File; rawFile: import('@pocket-portfolio/importer').RawFile; csvContent: string; reason?: 'unknown' | 'zero_trades' } | null>(null);
+  const [smartImportCompile, setSmartImportCompile] = useState<{
+    status: 'idle' | 'running' | 'success' | 'error';
+    summary?: string;
+    details?: string[];
+  }>({ status: 'idle' });
 
   // Helper function to show alerts
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
@@ -2136,7 +2141,11 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
           <UnknownBrokerInterstitial
             fileName={unknownFile.file.name}
             reason={unknownFile.reason}
-            onCancel={() => setUnknownFile(null)}
+            smartImportState={smartImportCompile}
+            onCancel={() => {
+              setSmartImportCompile({ status: 'idle' });
+              setUnknownFile(null);
+            }}
             onSelectBroker={async (brokerId) => {
               try {
                 const result = await parseCSVAdapter(unknownFile.rawFile, 'en-US', brokerId);
@@ -2149,6 +2158,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'}.`, 'success');
                 trackPaywallImpression('csv_import_success', '/dashboard');
                 setShowIntentUpsellModal(true);
+                setSmartImportCompile({ status: 'idle' });
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -2156,19 +2166,58 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
               }
             }}
             onSmartImport={async () => {
+              setSmartImportCompile({ status: 'running', summary: 'Initializing local parse…' });
               try {
                 const result = await parseUniversal(unknownFile.rawFile, 'en-US');
                 if ('type' in result && result.type === 'REQUIRES_MAPPING') {
+                  const headers = result.headers ?? [];
+                  const proposed = result.proposedMapping ?? {};
+                  const hasAnyDateHeader = headers.some((h) => /date|time|timestamp/i.test(String(h)));
+                  const missingDate = !proposed.date;
+                  if (missingDate && !hasAnyDateHeader) {
+                    setSmartImportCompile({
+                      status: 'error',
+                      summary: 'Missing required column: Date/Time',
+                      details: [
+                        'Smart Import can map columns, but it can’t invent missing data. This file does not include trade timestamps.',
+                        'Export an eToro “account statement / history” (trade history) CSV that includes a Date/Time column, then re-import.',
+                        `File: ${unknownFile.file?.name ?? 'unknown'}`,
+                        `Headers found: ${headers.slice(0, 12).join(', ')}`,
+                      ],
+                    });
+                    return;
+                  }
+                  setSmartImportCompile({
+                    status: 'success',
+                    summary: 'Mapping required — open the mapping editor to confirm columns.',
+                    details: [
+                      `Headers: ${result.headers.length}`,
+                      `Sample rows: ${result.sampleRows.length}`,
+                      `Confidence: ${(result.confidence * 100).toFixed(0)}%`,
+                    ],
+                  });
                   setPendingUniversal(result);
                   setUnknownFile(null);
                   return;
                 }
                 const trades = convertToAppTrades(result as import('@pocket-portfolio/importer').ParseResult);
                 if (trades.length === 0) {
-                  showAlert('No Trades Found', 'No valid trades found. Try adjusting column mapping.', 'warning');
-                  setUnknownFile(null);
+                  const warnings =
+                    (result as import('@pocket-portfolio/importer').ParseResult)?.warnings?.slice(0, 3) ?? [];
+                  setSmartImportCompile({
+                    status: 'error',
+                    summary: 'Compiled, but no valid trades were produced from this CSV.',
+                    details: warnings.length ? warnings : ['Try selecting a broker format, or use a different CSV export.'],
+                  });
                   return;
                 }
+                const warnings =
+                  (result as import('@pocket-portfolio/importer').ParseResult)?.warnings?.slice(0, 3) ?? [];
+                setSmartImportCompile({
+                  status: 'success',
+                  summary: `Compiled successfully — found ${trades.length} trade${trades.length === 1 ? '' : 's'}.`,
+                  details: warnings.length ? warnings : ['No warnings.'],
+                });
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} with Smart Import.`, 'success');
                 trackPaywallImpression('csv_import_success', '/dashboard');
@@ -2176,6 +2225,11 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
+                setSmartImportCompile({
+                  status: 'error',
+                  summary: 'Smart Import compile failed.',
+                  details: [msg],
+                });
                 showAlert(
                   'Smart Import failed',
                   'Smart Import couldn\'t read this file. Try choosing a broker from the list above, or use a different CSV.',

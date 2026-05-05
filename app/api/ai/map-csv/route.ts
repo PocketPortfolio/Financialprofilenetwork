@@ -20,8 +20,17 @@ const HEADER_SYNONYMS: Record<string, string[]> = {
   ticker: ['symbol', 'ticker', 'instrument', 'product', 'stock', 'asset', 'instrument code', 'security', 'epic', 'details'],
   action: ['action', 'type', 'transaction type', 'operation', 'buy/sell', 'label', 'transaction', 'transaction kind', 'order type'],
   quantity: ['quantity', 'qty', 'shares', 'amount', 'units', 'volume', 'no. of shares', 'number of shares'],
-  price: ['price', 'trade price', 'execution price', 'rate', 'open rate', 'price per share', 'cost basis', 'spot price at transaction'],
+  price: ['price', 'trade price', 'execution price', 'rate', 'open rate', 'price per share', 'cost basis', 'spot price at transaction', 'price at transaction'],
 };
+
+function sanitizeForMapping(input: string, maxLen = 120): string {
+  const s = (input || '')
+    .replace(/^\uFEFF/, '')
+    .replace(/[\u0000-\u001F\u007F]/g, '')
+    .replace(/[\u200B-\u200F\u2060\uFEFF]/g, '')
+    .trim();
+  return s.length > maxLen ? s.slice(0, maxLen) : s;
+}
 
 function heuristicMapping(headers: string[]): Record<string, string> {
   const mapping: Record<string, string> = {};
@@ -53,10 +62,12 @@ export async function POST(req: Request) {
   if (!Array.isArray(headers) || headers.length === 0) {
     return NextResponse.json({ error: 'headers array required' }, { status: 400 });
   }
+  // Sanitize to reduce prompt-injection surface (even though we do heuristic-only today).
+  const safeHeaders = headers.map((h) => sanitizeForMapping(String(h)));
 
   // Optional: call OpenAI when OPENAI_API_KEY is set for improved mapping
   // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   // const completion = await openai.chat.completions.create({ ... });
-  const mapping = heuristicMapping(headers);
+  const mapping = heuristicMapping(safeHeaders);
   return NextResponse.json({ mapping });
 }

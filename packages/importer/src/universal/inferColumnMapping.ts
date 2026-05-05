@@ -5,7 +5,7 @@
 import type { UniversalMapping, StandardField } from './types';
 import { REQUIRED_FIELDS } from './types';
 import { SYNONYMS, normalizeHeader, headerMatchesSynonym } from './synonyms';
-import { toNumber } from '../normalize';
+import { toISO, toNumber } from '../normalize';
 
 export interface InferResult {
   mapping: UniversalMapping;
@@ -24,68 +24,88 @@ export function inferColumnMapping(
   _options?: { validateNumeric?: boolean }
 ): InferResult {
   const mapping: UniversalMapping = {};
+  const usedNorm = new Set<string>();
 
-  for (const field of Object.keys(SYNONYMS) as StandardField[]) {
-    const synonyms = SYNONYMS[field];
-    for (const syn of synonyms) {
-      const match = headers.find((h) => headerMatchesSynonym(h, syn));
-      if (match) {
-        // Avoid mapping the same header to multiple fields (first wins)
-        const alreadyUsed = Object.values(mapping).some(
-          (v) => normalizeHeader(v) === normalizeHeader(match)
-        );
-        if (!alreadyUsed) {
-          mapping[field] = match;
-          break;
+  const rows = sampleRows.slice(0, 5);
+
+  const headerNorm = new Map<string, string>();
+  for (const h of headers) headerNorm.set(h, normalizeHeader(h));
+
+  function scoreCandidate(field: StandardField, header: string): number {
+    let score = 0;
+
+    // Base: synonym hit (already filtered by caller) – small positive
+    score += 10;
+
+    // Shape checks from sample values
+    if (rows.length > 0) {
+      let ok = 0;
+      let seen = 0;
+      for (const r of rows) {
+        const v = r[header];
+        if (v == null || String(v).trim() === '') continue;
+        seen += 1;
+        try {
+          if (field === 'date') toISO(String(v), LOCALE_FOR_VALIDATION);
+          else if (field === 'quantity' || field === 'price' || field === 'fees')
+            toNumber(String(v), LOCALE_FOR_VALIDATION);
+          else if (field === 'action') {
+            const a = String(v).toUpperCase();
+            if (/BUY|SELL|DEPOSIT|WITHDRAW|TRANSFER|DIVIDEND|INTEREST/.test(a)) ok += 1;
+            continue;
+          }
+          ok += 1;
+        } catch {
+          // ignore
         }
       }
+      if (seen > 0) score += Math.round((ok / seen) * 20); // up to +20
     }
+
+    // Prefer shorter, earlier headers (deterministic tie-break helpers)
+    score += Math.max(0, 8 - Math.floor(header.length / 10));
+
+    return score;
   }
 
-  // Optional: prefer numeric-looking columns for quantity/price when ambiguous
-  if (sampleRows.length > 0) {
-    for (const field of ['quantity', 'price'] as const) {
-      const col = mapping[field];
-      if (!col) continue;
-      let allNumeric = true;
-      for (const row of sampleRows.slice(0, 5)) {
-        const val = row[col];
-        if (val == null || String(val).trim() === '') continue;
-        try {
-          toNumber(String(val), LOCALE_FOR_VALIDATION);
-        } catch {
-          allNumeric = false;
-          break;
-        }
+  function pickBest(field: StandardField): string | null {
+    const synonyms = SYNONYMS[field];
+    const candidates = headers.filter((h) => synonyms.some((s) => headerMatchesSynonym(h, s)));
+    if (candidates.length === 0) return null;
+
+    let best: string | null = null;
+    let bestScore = -1;
+    for (const c of candidates) {
+      const norm = headerNorm.get(c) ?? normalizeHeader(c);
+      if (usedNorm.has(norm)) continue;
+      const s = scoreCandidate(field, c);
+      if (s > bestScore) {
+        bestScore = s;
+        best = c;
+        continue;
       }
-      if (!allNumeric) {
-        // Try to find another header that matches synonym and has numeric samples
-        const synonyms = SYNONYMS[field];
-        for (const syn of synonyms) {
-          const candidate = headers.find((h) => headerMatchesSynonym(h, syn));
-          if (!candidate || candidate === col) continue;
-          const used = Object.values(mapping).some(
-            (v) => normalizeHeader(v) === normalizeHeader(candidate)
-          );
-          if (used) continue;
-          let ok = true;
-          for (const row of sampleRows.slice(0, 5)) {
-            const val = row[candidate];
-            if (val == null || String(val).trim() === '') continue;
-            try {
-              toNumber(String(val), LOCALE_FOR_VALIDATION);
-            } catch {
-              ok = false;
-              break;
-            }
-          }
-          if (ok) {
-            mapping[field] = candidate;
-            break;
-          }
+      if (s === bestScore && best) {
+        // Deterministic tie-break: shorter header, then earlier occurrence
+        if (c.length < best.length) best = c;
+        else if (c.length === best.length) {
+          if (headers.indexOf(c) < headers.indexOf(best)) best = c;
         }
       }
     }
+    return best;
+  }
+
+  // Assign in a stable order (required fields first) to reduce collisions.
+  const fieldOrder: StandardField[] = [
+    ...REQUIRED_FIELDS,
+    ...(['currency', 'fees'] as StandardField[]),
+  ];
+
+  for (const field of fieldOrder) {
+    const chosen = pickBest(field);
+    if (!chosen) continue;
+    mapping[field] = chosen;
+    usedNorm.add(normalizeHeader(chosen));
   }
 
   const requiredMapped = REQUIRED_FIELDS.filter((f) => mapping[f]).length;
