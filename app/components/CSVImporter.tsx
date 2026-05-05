@@ -1345,6 +1345,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
 
       // Auto-detect broker from CSV sample
       const sample = csvContent.slice(0, 2048);
+
+      
       
       
       
@@ -1406,9 +1408,12 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         // Manual Coinbase detection (has unique "Transaction Type" + "Spot Price at Transaction" + "Asset")
         const hasTransactionType = /Transaction Type/i.test(firstLine);
         const hasSpotPriceAtTransaction = /Spot Price at Transaction/i.test(firstLine);
+        const hasPriceAtTransaction = /Price at Transaction/i.test(firstLine);
         const hasAsset = /Asset/i.test(firstLine);
         // Coinbase has Transaction Type + Spot Price at Transaction + Asset, but NOT Action or Product (which Degiro has)
-        const manualCoinbaseDetect = hasTransactionType && hasSpotPriceAtTransaction && hasAsset && !hasAction && !hasProduct;
+        const manualCoinbaseDetect = hasTransactionType && (hasSpotPriceAtTransaction || hasPriceAtTransaction) && hasAsset && !hasAction && !hasProduct;
+
+        
         
         
         
@@ -1555,6 +1560,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
 
       debugLog('STEP_DETECTION_DONE', { detectedBroker });
       console.log('🔍 Detected broker:', detectedBroker);
+
+      
       
       
       
@@ -1572,12 +1579,16 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         try {
           result = await parseCSVAdapter(rawFile, 'en-US', detectedBroker);
           debugLog('STEP_ADAPTER_RESULT', { broker: result?.broker, tradesCount: result?.trades?.length, warningsCount: result?.warnings?.length });
+
+          
         
         console.log('Parsing complete:', result.trades.length, 'trades found');
         console.log('Broker:', result.broker);
         console.log('Warnings:', result.warnings);
       } catch (parseError: any) {
         console.error('[CSVImporter] parseCSVAdapter error', parseError);
+
+        
         
         
         // If adapter not found, implement parser directly for specific brokers
