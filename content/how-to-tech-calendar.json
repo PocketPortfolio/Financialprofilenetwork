@@ -2009,7 +2009,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement File Compression in Node.js",
     "slug": "how-to-implement-file-compression-in-node-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2017,7 +2017,8 @@
       "implement",
       "file",
       "compression"
-    ]
+    ],
+    "publishedAt": "2026-05-05T14:00:47.300Z"
   },
   {
     "id": "how-to-the-guide-to-api-documentation-with-openapi-may-6",
