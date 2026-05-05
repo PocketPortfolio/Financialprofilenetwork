@@ -4,11 +4,30 @@ import { leads, auditLogs } from '@/db/sales/schema';
 import { eq } from 'drizzle-orm';
 import { validateEmail } from '@/lib/sales/email-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
+
+function getAdminDb() {
+  if (!getApps().length) {
+    try {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+      });
+    } catch (e) {
+      console.error('[waitlist/submit] Firebase init error:', e);
+    }
+  }
+  return getFirestore();
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,69 +58,93 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for duplicates
-    const existing = await db
-      .select()
-      .from(leads)
-      .where(eq(leads.email, body.email.toLowerCase().trim()))
-      .limit(1);
+    const email = body.email.toLowerCase().trim();
+    const source = typeof body.source === 'string' ? body.source.trim().slice(0, 120) : 'unknown';
+    const firstNameRaw = typeof body.firstName === 'string' ? body.firstName.trim().slice(0, 100) : '';
+    const companyName = String(body.companyName).trim().slice(0, 140);
 
-    if (existing.length > 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'You are already on the priority queue!',
-        leadId: existing[0].id,
-        duplicate: true,
+    // Always record to /admin/analytics sink (Firestore), even if sales DB is unreachable.
+    try {
+      const adb = getAdminDb();
+      await adb.collection('waitlistLeads').add({
+        email,
+        first_name: firstNameRaw || null,
+        company_name: companyName,
+        source,
+        timestamp: Timestamp.now(),
       });
+    } catch (fireErr) {
+      console.error('[waitlist/submit] Firestore record failed:', fireErr);
     }
 
-    // Parse name into firstName/lastName if provided
-    const nameParts = body.firstName?.trim().split(/\s+/) || [];
-    const firstName = nameParts[0] || null;
-    const lastName = nameParts.slice(1).join(' ') || null;
+    // Best-effort: also write to sales DB (used by /admin/sales). Do not block UX on DB failures.
+    try {
+      const existing = await db.select().from(leads).where(eq(leads.email, email)).limit(1);
+      if (existing.length > 0) {
+        return NextResponse.json({
+          success: true,
+          message: 'You are already on the priority queue!',
+          leadId: existing[0].id,
+          duplicate: true,
+        });
+      }
 
-    // Insert new lead
-    const [newLead] = await db.insert(leads).values({
-      email: body.email.toLowerCase().trim(),
-      firstName: firstName,
-      lastName: lastName,
-      companyName: body.companyName.trim(),
-      jobTitle: null,
-      location: null,
-      dataSource: `waitlist_${body.source || 'unknown'}`,
-      status: 'NEW',
-      score: 0,
-      researchData: {
-        submittedVia: 'waitlist_page',
-        submittedAt: new Date().toISOString(),
-        source: body.source || 'unknown',
-      },
-    }).returning({ id: leads.id });
+      const nameParts = firstNameRaw ? firstNameRaw.split(/\s+/) : [];
+      const firstName = nameParts[0] || null;
+      const lastName = nameParts.slice(1).join(' ') || null;
 
-    // Log submission
-    await db.insert(auditLogs).values({
-      leadId: newLead.id,
-      action: 'LEAD_SUBMITTED',
-      aiReasoning: `Lead submitted via Waitlist Page from source: ${body.source || 'unknown'}`,
-      metadata: {
-        source: body.source || 'unknown',
-        submittedAt: new Date().toISOString(),
-      },
-    });
+      const [newLead] = await db
+        .insert(leads)
+        .values({
+          email,
+          firstName,
+          lastName,
+          companyName,
+          jobTitle: null,
+          location: null,
+          dataSource: `waitlist_${source}`,
+          status: 'NEW',
+          score: 0,
+          researchData: {
+            submittedVia: 'waitlist_page',
+            submittedAt: new Date().toISOString(),
+            source,
+          },
+        })
+        .returning({ id: leads.id });
 
-    console.log(`✅ Waitlist lead submitted: ${body.email} at ${body.companyName}`);
+      await db.insert(auditLogs).values({
+        leadId: newLead.id,
+        action: 'LEAD_SUBMITTED',
+        aiReasoning: `Lead submitted via Waitlist Page from source: ${source}`,
+        metadata: {
+          source,
+          submittedAt: new Date().toISOString(),
+        },
+      });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Successfully joined the priority queue!',
-      leadId: newLead.id,
-    });
+      console.log(`✅ Waitlist lead submitted: ${email} at ${companyName}`);
+
+      return NextResponse.json({
+        success: true,
+        message: 'Successfully joined the priority queue!',
+        leadId: newLead.id,
+      });
+    } catch (dbErr) {
+      console.error('❌ Waitlist sales DB error (non-blocking):', dbErr);
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Successfully joined the priority queue!',
+          queued: true,
+        },
+        { status: 202 }
+      );
+    }
   } catch (error: any) {
     console.error('❌ Waitlist submission error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to submit lead' },
-      { status: 500 }
-    );
+    // Never leak internal errors to the client.
+    return NextResponse.json({ error: 'Failed to submit lead' }, { status: 500 });
   }
 }
 

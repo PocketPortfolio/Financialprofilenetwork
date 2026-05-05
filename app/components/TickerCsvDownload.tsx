@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { trackToolDownload } from '@/app/lib/analytics/tools';
+import IdentityGate from '@/app/components/auth/IdentityGate';
 
 interface TickerCsvDownloadProps {
   symbol: string;
@@ -29,8 +30,7 @@ export default function TickerCsvDownload({ symbol, name }: TickerCsvDownloadPro
   const handleDownloadClick = () => {
     setShowUpsellModal(true);
     setUpsellPhase('preparing');
-    const t = setTimeout(() => setUpsellPhase('upsell'), 1500);
-    return () => clearTimeout(t);
+    setTimeout(() => setUpsellPhase('upsell'), 1500);
   };
 
   const closeModal = () => {
@@ -107,42 +107,56 @@ export default function TickerCsvDownload({ symbol, name }: TickerCsvDownloadPro
 
   return (
     <>
-      <button
-        onClick={handleDownloadClick}
-        disabled={downloading}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '12px 24px',
-          background: downloading ? 'var(--text-secondary)' : 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-          color: '#ffffff',
-          border: '2px solid var(--border-warm)',
-          borderRadius: '8px',
-          fontSize: '14px',
-          fontWeight: '600',
-          cursor: downloading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s ease',
-          boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
-          opacity: downloading ? 0.7 : 1
-        }}
-        onMouseEnter={(e) => { 
-          if (!downloading) {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #d97706 0%, #fbbf24 100%)';
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
-          }
-        }}
-        onMouseLeave={(e) => { 
-          if (!downloading) {
-            e.currentTarget.style.background = 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
-          }
-        }}
-      >
-        {downloading ? (<><span>⏳</span> Downloading...</>) : (<><span>📥</span> Download {symbol} Historical Data (CSV)</>)}
-      </button>
+      <IdentityGate action="export_csv" contextId={symbol} onContinue={handleDownloadClick}>
+        {({ request }) => (
+          <button
+            onClick={request}
+            disabled={downloading}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              background: downloading
+                ? 'var(--text-secondary)'
+                : 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
+              color: '#ffffff',
+              border: '2px solid var(--border-warm)',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: downloading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)',
+              opacity: downloading ? 0.7 : 1,
+            }}
+            onMouseEnter={(e) => {
+              if (!downloading) {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #d97706 0%, #fbbf24 100%)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(245, 158, 11, 0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!downloading) {
+                e.currentTarget.style.background = 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+              }
+            }}
+          >
+            {downloading ? (
+              <>
+                <span>⏳</span> Downloading...
+              </>
+            ) : (
+              <>
+                <span>📥</span> Download {symbol} Historical Data (CSV)
+              </>
+            )}
+          </button>
+        )}
+      </IdentityGate>
 
       {showUpsellModal && (
         <div

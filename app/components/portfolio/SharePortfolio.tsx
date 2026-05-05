@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Position } from '@/app/lib/utils/portfolioCalculations';
 import { exportToCSV, exportChartAsPNG, exportChartAsSVG } from '@/app/lib/portfolio/export';
+import IdentityGate from '@/app/components/auth/IdentityGate';
 
 interface SharePortfolioProps {
   positions: Position[];
@@ -109,30 +110,34 @@ export default function SharePortfolio({
           gap: 'var(--space-2)',
         }}
       >
-        <button
-          onClick={handleExportCSV}
-          style={{
-            padding: 'var(--space-3)',
-            background: 'var(--surface-elevated)',
-            color: 'var(--text)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-medium)',
-            cursor: 'pointer',
-            transition: 'var(--transition-base)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--surface)';
-            e.currentTarget.style.borderColor = 'var(--signal)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--surface-elevated)';
-            e.currentTarget.style.borderColor = 'var(--border)';
-          }}
-        >
-          📥 Export to CSV
-        </button>
+        <IdentityGate action="export_csv" contextId="portfolio" onContinue={handleExportCSV}>
+          {({ request }) => (
+            <button
+              onClick={request}
+              style={{
+                padding: 'var(--space-3)',
+                background: 'var(--surface-elevated)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-medium)',
+                cursor: 'pointer',
+                transition: 'var(--transition-base)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--surface)';
+                e.currentTarget.style.borderColor = 'var(--signal)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--surface-elevated)';
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
+            >
+              📥 Export to CSV
+            </button>
+          )}
+        </IdentityGate>
 
         {chartElementRef && (
           <>
@@ -196,30 +201,34 @@ export default function SharePortfolio({
           borderTop: '1px solid var(--border)',
         }}
       >
-        <button
-          onClick={handleGenerateShareLink}
-          style={{
-            padding: 'var(--space-3)',
-            background: 'var(--signal)',
-            color: 'var(--bg)',
-            border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-semibold)',
-            cursor: 'pointer',
-            transition: 'var(--transition-base)',
-            width: '100%',
-            marginBottom: shareLink ? 'var(--space-2)' : 0,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.9';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '1';
-          }}
-        >
-          🔗 Generate Share Link
-        </button>
+        <IdentityGate action="share_portfolio" contextId="portfolio" onContinue={handleGenerateShareLink}>
+          {({ request }) => (
+            <button
+              onClick={request}
+              style={{
+                padding: 'var(--space-3)',
+                background: 'var(--signal)',
+                color: 'var(--bg)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-semibold)',
+                cursor: 'pointer',
+                transition: 'var(--transition-base)',
+                width: '100%',
+                marginBottom: shareLink ? 'var(--space-2)' : 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              🔗 Generate Share Link
+            </button>
+          )}
+        </IdentityGate>
 
         {shareLink && (
           <div

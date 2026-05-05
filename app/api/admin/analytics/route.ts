@@ -1775,53 +1775,141 @@ async function getBlogPostsData() {
 
 async function getLeadsData(startDate: Date) {
   try {
-    const { db } = await import('@/db/sales/client');
-    const { leads } = await import('@/db/sales/schema');
-    const { gte, desc, like, and } = await import('drizzle-orm');
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
+    const db = getDb();
+    const startTimestamp = Timestamp.fromDate(startDate);
 
-    // ✅ FILTER: Only get leads from waitlist (exclude autonomous sales engine)
-    const leadsList = await db
-      .select({
-        id: leads.id,
-        email: leads.email,
-        firstName: leads.firstName,
-        lastName: leads.lastName,
-        companyName: leads.companyName,
-        status: leads.status,
-        createdAt: leads.createdAt,
-        dataSource: leads.dataSource,
-      })
-      .from(leads)
-      .where(and(
-        gte(leads.createdAt, startDate),
-        like(leads.dataSource, 'waitlist_%')  // ✅ Only waitlist leads
-      ))
-      .orderBy(desc(leads.createdAt));
+    // 1) Firestore: identity gate leads (this is what /admin/analytics must reflect)
+    let identityDocs: Array<{
+      id: string;
+      email: string;
+      firstName: null;
+      lastName: null;
+      companyName: string;
+      status: string;
+      createdAt: string;
+      dataSource: string | null;
+    }> = [];
 
-    const total = leadsList.length;
-    const byStatus = leadsList.reduce((acc, lead) => {
+    try {
+      const snapshot = await db
+        .collection('identityGateLeads')
+        .where('timestamp', '>=', startTimestamp)
+        .orderBy('timestamp', 'desc')
+        .limit(scanLimit)
+        .get();
+
+      identityDocs = snapshot.docs.map((d) => {
+        const data = d.data() as any;
+        const ts = data?.timestamp as Timestamp | undefined;
+        const createdAt = ts?.toDate ? ts.toDate().toISOString() : new Date().toISOString();
+        const action = typeof data?.action === 'string' ? data.action : 'unknown';
+        return {
+          id: d.id,
+          email: typeof data?.email === 'string' ? data.email : '',
+          firstName: null,
+          lastName: null,
+          companyName: 'Individual',
+          status: 'NEW',
+          createdAt,
+          dataSource: `identity_gate:${action}`,
+        };
+      });
+    } catch (e) {
+      console.error('[admin/analytics] identityGateLeads fetch failed:', e);
+    }
+
+    // 1b) Firestore: waitlist leads (Broker Sync /waitlist)
+    let waitlistDocs: Array<{
+      id: string;
+      email: string;
+      firstName: string | null;
+      lastName: string | null;
+      companyName: string;
+      status: string;
+      createdAt: string;
+      dataSource: string | null;
+    }> = [];
+
+    try {
+      const snapshot = await db
+        .collection('waitlistLeads')
+        .where('timestamp', '>=', startTimestamp)
+        .orderBy('timestamp', 'desc')
+        .limit(scanLimit)
+        .get();
+
+      waitlistDocs = snapshot.docs.map((d) => {
+        const data = d.data() as any;
+        const ts = data?.timestamp as Timestamp | undefined;
+        const createdAt = ts?.toDate ? ts.toDate().toISOString() : new Date().toISOString();
+        const source = typeof data?.source === 'string' ? data.source : 'unknown';
+        return {
+          id: d.id,
+          email: typeof data?.email === 'string' ? data.email : '',
+          firstName: typeof data?.first_name === 'string' ? data.first_name : null,
+          lastName: null,
+          companyName: typeof data?.company_name === 'string' ? data.company_name : 'Individual',
+          status: 'NEW',
+          createdAt,
+          dataSource: `waitlist_${source}`,
+        };
+      });
+    } catch (e) {
+      console.error('[admin/analytics] waitlistLeads fetch failed:', e);
+    }
+
+    // 2) Sales DB: waitlist leads (best effort)
+    let waitlistLeads: Array<any> = [];
+    try {
+      const { db: salesDb } = await import('@/db/sales/client');
+      const { leads } = await import('@/db/sales/schema');
+      const { gte, desc, like, and } = await import('drizzle-orm');
+
+      waitlistLeads = await salesDb
+        .select({
+          id: leads.id,
+          email: leads.email,
+          firstName: leads.firstName,
+          lastName: leads.lastName,
+          companyName: leads.companyName,
+          status: leads.status,
+          createdAt: leads.createdAt,
+          dataSource: leads.dataSource,
+        })
+        .from(leads)
+        .where(and(gte(leads.createdAt, startDate), like(leads.dataSource, 'waitlist_%')))
+        .orderBy(desc(leads.createdAt));
+    } catch (e) {
+      console.error('[admin/analytics] Sales leads fetch failed:', e);
+    }
+
+    const combined = [...identityDocs, ...waitlistDocs, ...waitlistLeads].filter((l) => l?.email);
+    combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const total = combined.length;
+    const byStatus = combined.reduce((acc, lead) => {
       const status = lead.status || 'NEW';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    // ✅ Simplified: All leads are from waitlist now
-    const bySource = {
-      waitlist: total
-    };
+    const bySource: Record<string, number> = {};
+    for (const lead of combined) {
+      const ds = typeof lead.dataSource === 'string' ? lead.dataSource : '';
+      const key = ds.startsWith('identity_gate:') ? 'identity_gate' : ds.startsWith('waitlist_') ? 'waitlist' : 'other';
+      bySource[key] = (bySource[key] || 0) + 1;
+    }
 
-    // Last 7 days count
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const last7Days = leadsList.filter(lead => 
-      lead.createdAt && new Date(lead.createdAt) >= sevenDaysAgo
-    ).length;
+    const last7Days = combined.filter((lead) => lead.createdAt && new Date(lead.createdAt) >= sevenDaysAgo).length;
 
     return {
       total,
       last7Days,
       byStatus,
       bySource,
-      recent: leadsList.slice(0, 10), // First 10 leads (already sorted desc, so most recent)
+      recent: combined.slice(0, 10),
     };
   } catch (error) {
     console.error('Leads data fetch error:', error);
