@@ -4,30 +4,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const REPO_OWNER = 'PocketPortfolio';
-const REPO_NAME = 'Financialprofilenetwork';
-const WORKFLOW_FILE = 'publish-importer.yml';
-const REF = 'main';
-
-async function githubRequest(path: string, options: RequestInit = {}) {
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) throw new Error('GITHUB_TOKEN not set');
-  const res = await fetch(`https://api.github.com${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...options.headers,
-    },
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub API ${res.status}: ${text}`);
-  }
-  return res;
-}
-
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   const vercelCronHeader = request.headers.get('x-vercel-cron');
@@ -47,24 +23,43 @@ export async function GET(request: Request) {
   }
 
   try {
-    if (!process.env.GITHUB_TOKEN) {
-      return NextResponse.json({ error: 'GITHUB_TOKEN not set' }, { status: 500 });
+    const runnerUrl = process.env.NPM_PUBLISH_RUNNER_URL;
+    const runnerSecret = process.env.NPM_PUBLISH_RUNNER_SECRET;
+    if (!runnerUrl || !runnerSecret) {
+      return NextResponse.json(
+        { error: 'NPM_PUBLISH_RUNNER_URL / NPM_PUBLISH_RUNNER_SECRET not configured' },
+        { status: 500 }
+      );
     }
 
-    // Triggers the GitHub Actions workflow. This keeps publishing in CI (npm is available there),
-    // while Vercel cron just orchestrates.
-    await githubRequest(
-      `/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ref: REF }),
-      }
-    );
+    // Orchestrate publish on an external runner (no GitHub Actions).
+    // Runner is expected to authenticate this request and execute publish logic server-side.
+    const res = await fetch(runnerUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Runner-Secret': runnerSecret,
+      },
+      body: JSON.stringify({
+        package: 'importer',
+        version: '1.1.2',
+        source: 'vercel-cron',
+        timestamp: new Date().toISOString(),
+      }),
+    });
+    const text = await res.text().catch(() => '');
+    if (!res.ok) {
+      return NextResponse.json(
+        { success: false, error: `Runner ${res.status}: ${text}` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      message: `Dispatched ${WORKFLOW_FILE} on ${REF}`,
+      message: `Publish request dispatched to runner`,
+      runnerStatus: res.status,
+      runnerResponse: text ? text.slice(0, 500) : '',
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
