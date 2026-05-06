@@ -1,0 +1,86 @@
+---
+title: The Guide to API Documentation with OpenAPI
+date: '2026-05-06'
+description: >-
+  Learn how to effectively document your API using OpenAPI standards to enhance
+  usability and maintainability.
+tags:
+  - api
+  - documentation
+  - OpenAPI
+  - guide
+author: Pocket Portfolio Team
+image: /images/blog/the-guide-to-api-documentation-with-openapi.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+APIs are the backbone of modern web applications, enabling different software components to communicate. However, without proper documentation, APIs can be difficult to use and maintain. Developers often face challenges in understanding the capabilities, limitations, and usage of APIs, leading to increased development time and potential integration issues.
+
+## Solution with Code
+
+OpenAPI is a specification that provides a standard way to document RESTful APIs. Using OpenAPI, you can create a comprehensive and interactive API documentation that is easy to understand and use.
+
+### Step 1: Define the OpenAPI Specification
+
+Begin by defining your API using the OpenAPI Specification (OAS). You can write this in either JSON or YAML format. Below is a simple example using YAML:
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+  description: This is a sample API for demonstration purposes.
+paths:
+  /users:
+    get:
+      summary: Get list of users
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+```
+
+### Step 2: Implement the API
+
+Implement your API endpoints based on the specifications you defined. In this example, create a simple endpoint in a Node.js application:
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/users', (req, res) => {
+  res.json(['Alice', 'Bob', 'Charlie']);
+});
+
+app.listen(3000, () => {
+  console.log('API is running on http://localhost:3000');
+});
+```
+
+### Step 3: Generate Documentation
+
+Use tools like Swagger UI or Redoc to generate interactive documentation from your OpenAPI definition. These tools can parse the OpenAPI YAML or JSON file and create a user-friendly interface.
+
+For Swagger UI, you can run it using Docker:
+
+```bash
+docker run -p 8080:8080 -e SWAGGER_JSON=/foo/swagger.yaml -v /path-to-your-spec:/foo swaggerapi/swagger-ui
+```
+
+Replace `/path-to-your-spec` with the path to your OpenAPI specification file.
+
+## Key Concepts
+
+- **OpenAPI Specification**: A standardized format for describing RESTful APIs, allowing automatic generation of documentation, code stubs, and client libraries.
+- **Swagger UI**: A popular tool for visualizing and interacting with APIs based on OpenAPI specifications. It provides a web-based UI for exploring API endpoints.
+- **YAML vs. JSON**: OpenAPI specifications can be written in either YAML or JSON. YAML is often preferred for its readability.
+
+By adhering to OpenAPI standards, your API documentation becomes a living part of the development process, ensuring that it remains up-to-date with the API itself. This approach not only improves the developer experience but also reduces the potential for errors during integration.
