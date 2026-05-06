@@ -137,6 +137,60 @@ export default function GlobalFooter() {
           }}
           className="footer-columns"
         >
+          {/* Verified Importers (Authority Injection) */}
+          <div>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
+              Verified Importers
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>
+                <Link
+                  href="/import/trade-republic"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Trade Republic CSV Importer
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/import/interactive-brokers"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Interactive Brokers (IBKR) Importer
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/import"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  All broker importers →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Column 1: Product (Sovereign Pitch) */}
           <div>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
@@ -786,11 +840,12 @@ export default function GlobalFooter() {
             grid-template-columns: 1fr !important;
             gap: 24px !important;
           }
-          /* Mobile stacking order: Product -> Market Data -> Community -> Resources */
+          /* Mobile stacking order: Verified Importers -> Product -> Market Data -> Community -> Resources */
           .footer-columns > div:nth-child(1) { order: 1; }
-          .footer-columns > div:nth-child(2) { order: 3; }
-          .footer-columns > div:nth-child(3) { order: 2; }
-          .footer-columns > div:nth-child(4) { order: 4; }
+          .footer-columns > div:nth-child(2) { order: 2; }
+          .footer-columns > div:nth-child(3) { order: 4; }
+          .footer-columns > div:nth-child(4) { order: 3; }
+          .footer-columns > div:nth-child(5) { order: 5; }
         }
       `}</style>
     </footer>

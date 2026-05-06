@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 export default function ApiHubPage() {
   const inkBorder = 'rgba(15, 23, 42, 0.16)';
   const inkBorderSoft = 'rgba(15, 23, 42, 0.10)';
+  const ABS_BASE = 'https://www.pocketportfolio.app';
 
   const hubSchema = {
     '@context': 'https://schema.org',
@@ -189,6 +190,31 @@ export default function ApiHubPage() {
               background: 'var(--surface)',
             }}
           >
+            {/* Directive 3: indexable absolute URL strings for URL-as-query searches */}
+            <div style={{ marginBottom: '14px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 900, marginBottom: '6px' }}>Absolute endpoint strings</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+                Google is seeing literal URL searches. These are the human-bridge pages that should rank for them.
+              </div>
+              <div style={{ marginTop: '10px', display: 'grid', gap: '8px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <code style={{ display: 'block', wordBreak: 'break-all' }}>
+                    {ABS_BASE}/api/tickers/spy/json
+                  </code>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <code style={{ display: 'block', wordBreak: 'break-all' }}>
+                    {ABS_BASE}/api/tickers/spy/json?range=max
+                  </code>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <code style={{ display: 'block', wordBreak: 'break-all' }}>
+                    {ABS_BASE}/s/spy/json-api
+                  </code>
+                </div>
+              </div>
+            </div>
+
             <div
               style={{
                 display: 'flex',
