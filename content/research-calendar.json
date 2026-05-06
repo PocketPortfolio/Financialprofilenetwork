@@ -2022,14 +2022,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Error Tracking Overhead - Sentry vs Rollbar",
     "slug": "research-error-tracking-overhead-sentry-vs-rollbar-2026-05-06",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "error",
       "tracking",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-05-06T18:00:42.944Z"
   },
   {
     "id": "research-performance-budget-enforcement-ci-cd-integration-2026-05-07",
