@@ -2026,14 +2026,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Documentation with OpenAPI",
     "slug": "the-guide-to-api-documentation-with-openapi",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "documentation"
-    ]
+    ],
+    "publishedAt": "2026-05-06T14:00:54.035Z"
   },
   {
     "id": "how-to-how-to-use-message-brokers-for-async-processing-may-7",
