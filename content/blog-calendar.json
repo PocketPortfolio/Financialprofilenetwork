@@ -796,7 +796,7 @@
     "date": "2026-05-06",
     "title": "The Evolution of Pocket Portfolio: From Cloud to Sovereign",
     "slug": "the-evolution-of-pocket-portfolio-from-cloud-to-sovereign",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -806,7 +806,8 @@
       "evolution"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-06T09:00:49.486Z"
   },
   {
     "id": "week-19-post-1",
