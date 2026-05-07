@@ -2042,14 +2042,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Message Brokers for Async Processing",
     "slug": "how-to-use-message-brokers-for-async-processing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "message",
       "brokers"
-    ]
+    ],
+    "publishedAt": "2026-05-07T14:01:11.234Z"
   },
   {
     "id": "how-to-understanding-cqrs-pattern-may-8",
