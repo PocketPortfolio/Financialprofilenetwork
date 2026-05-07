@@ -1,0 +1,93 @@
+---
+title: How to Use Message Brokers for Async Processing
+date: '2026-05-07'
+description: >-
+  Learn how to utilize message brokers for efficient asynchronous processing in
+  distributed systems.
+tags:
+  - message brokers
+  - async processing
+  - distributed systems
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-message-brokers-for-async-processing.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+In modern distributed systems, processing tasks asynchronously is crucial for maintaining performance and responsiveness. Without asynchronous processing, systems can become bottlenecked, leading to slow response times and degraded user experience. Message brokers are essential components that facilitate asynchronous communication between services, enabling scalable and resilient architectures.
+
+## Solution
+
+Message brokers allow different parts of a system to communicate by sending and receiving messages. Here, we’ll demonstrate how to use RabbitMQ, a popular message broker, to implement an asynchronous processing system.
+
+First, ensure RabbitMQ is installed and running. You can use Docker for quick setup:
+
+```bash
+docker run -d --hostname my-rabbit --name some-rabbit -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+
+### Key Concepts
+
+- **Producer**: A service that sends messages to the broker.
+- **Queue**: A buffer that stores messages until they can be processed.
+- **Consumer**: A service that processes messages from the queue.
+
+### Implementing the Producer
+
+```python
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='task_queue', durable=True)
+
+def send_message(message: str):
+    channel.basic_publish(
+        exchange='',
+        routing_key='task_queue',
+        body=message,
+        properties=pika.BasicProperties(
+            delivery_mode=2,  # make message persistent
+        ))
+    print(f" [x] Sent {message}")
+
+send_message("Task 1")
+connection.close()
+```
+
+### Implementing the Consumer
+
+```python
+import pika
+import time
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='task_queue', durable=True)
+
+def callback(ch, method, properties, body):
+    print(f" [x] Received {body}")
+    time.sleep(body.count(b'.'))
+    print(" [x] Done")
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
+channel.basic_qos(prefetch_count=1)
+channel.basic_consume(queue='task_queue', on_message_callback=callback)
+
+print(' [*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
+```
+
+In the above example, the producer sends messages to a `task_queue`, and the consumer processes these messages. The messages are persistent, ensuring they are not lost if RabbitMQ crashes.
+
+## Benefits of Message Brokers
+
+1. **Decoupling**: Producers and consumers are independent, allowing for scalable and maintainable systems.
+2. **Load Balancing**: Multiple consumers can process messages concurrently, improving throughput.
+3. **Reliability**: Persistent messages ensure no data loss.
+
+By correctly implementing message brokers, you can significantly enhance the efficiency and reliability of your distributed systems.
