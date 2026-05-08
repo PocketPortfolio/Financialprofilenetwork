@@ -2058,14 +2058,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding CQRS Pattern",
     "slug": "understanding-cqrs-pattern",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "cqrs",
       "pattern"
-    ]
+    ],
+    "publishedAt": "2026-05-08T14:00:43.964Z"
   },
   {
     "id": "how-to-how-to-implement-background-jobs-with-bull-may-9",
