@@ -1,78 +1,130 @@
 ---
 title: Understanding CQRS Pattern
 date: '2026-05-08'
-description: Learn how to implement the CQRS pattern to optimize your application design.
+description: >-
+  A comprehensive guide to understanding and implementing the CQRS pattern in
+  software architecture.
 tags:
-  - understanding
-  - cqrs
-  - pattern
+  - CQRS
+  - Software Architecture
+  - Design Patterns
 author: Pocket Portfolio Team
 image: /images/blog/understanding-cqrs-pattern.png
-pillar: Technology
+pillar: Tech Guides
 category: how-to-in-tech
 ---
 
 ## Problem
 
-In traditional CRUD (Create, Read, Update, Delete) operations, applications often face challenges such as scalability issues, complex business logic handling, and performance bottlenecks. This is primarily because the same model is used for both reading and writing data, which can lead to inefficiencies and increased complexity in maintaining the system. 
+In traditional software architecture, the same data model is often used to handle both commands (updates) and queries (reads). This approach can lead to complex models that are difficult to scale and maintain, particularly in high-performance applications. As applications grow, the demand for optimizing read and write operations separately increases, which is where the Command Query Responsibility Segregation (CQRS) pattern becomes beneficial.
 
 ## Solution with Code
 
-The CQRS (Command Query Responsibility Segregation) pattern addresses these problems by separating the read and write operations into distinct models, allowing for better scalability and simplified codebases.
+CQRS separates the models for reading and writing data, allowing each to be optimized independently. Below is a simplified example of implementing the CQRS pattern in a Node.js application using an Express server.
 
-### Basic Implementation of CQRS
+### Step 1: Define Command and Query Models
 
-Here is a basic implementation in a Node.js environment using Express:
+Create separate modules for command and query operations.
 
-1. **Command Side** (Write Model): Handles operations that modify state.
-
+**Command Model (commands/userCommands.js)**
 ```javascript
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
-app.use(bodyParser.json());
-
-let database = {};
-
-app.post('/commands', (req, res) => {
-  const { id, data } = req.body;
-  database[id] = data;
-  res.status(200).send({ message: 'Data saved successfully' });
-});
-
-app.listen(3000, () => {
-  console.log('Command service running on port 3000');
-});
-```
-
-2. **Query Side** (Read Model): Handles operations that retrieve state.
-
-```javascript
-const express = require('express');
-const app = express();
-
-let database = {};
-
-app.get('/queries/:id', (req, res) => {
-  const id = req.params.id;
-  const data = database[id];
-  if (data) {
-    res.status(200).send(data);
-  } else {
-    res.status(404).send({ message: 'Data not found' });
+export class UserCommands {
+  constructor(userRepository) {
+    this.userRepository = userRepository;
   }
-});
 
-app.listen(3001, () => {
-  console.log('Query service running on port 3001');
-});
+  createUser(userData) {
+    // Logic to validate and transform input
+    return this.userRepository.save(userData);
+  }
+
+  updateUser(userId, userData) {
+    // Logic to validate and transform input
+    return this.userRepository.update(userId, userData);
+  }
+}
 ```
 
-### Key Concepts
+**Query Model (queries/userQueries.js)**
+```javascript
+export class UserQueries {
+  constructor(userRepository) {
+    this.userRepository = userRepository;
+  }
 
-- **Separation of Concerns**: CQRS divides the system into read and write responsibilities, reducing complexity and improving maintainability.
-- **Scalability**: By separating the read and write models, each can scale independently. Read-intensive operations can use caching mechanisms for better performance.
-- **Optimized Data Models**: The read model can be optimized for query operations which might involve denormalizing data or using different storage systems than the write model.
-- **Simplified Business Logic**: Handling commands and queries separately can simplify complex business logic by focusing on specific concerns.
+  getUserById(userId) {
+    // Logic to fetch user data
+    return this.userRepository.findById(userId);
+  }
 
-By implementing the CQRS pattern, systems can achieve improved scalability, performance, and a cleaner architecture, making them more maintainable and adaptable to changing requirements. Understanding and applying CQRS effectively requires a shift in how we design systems, focusing on the distinct responsibilities of handling commands and queries.
+  listUsers() {
+    // Logic to list all users
+    return this.userRepository.findAll();
+  }
+}
+```
+
+### Step 2: Implement Repository
+
+Create a repository that handles the actual data storage operations.
+
+**Repository (repository/userRepository.js)**
+```javascript
+export class UserRepository {
+  constructor(db) {
+    this.db = db; // Assume `db` is an instance of a database connection
+  }
+
+  save(userData) {
+    // Logic to save user data to database
+  }
+
+  update(userId, userData) {
+    // Logic to update user data in database
+  }
+
+  findById(userId) {
+    // Logic to retrieve a user by ID from database
+  }
+
+  findAll() {
+    // Logic to retrieve all users from database
+  }
+}
+```
+
+### Step 3: Setup Express Routes
+
+Create routes to handle incoming requests and delegate to either command or query models.
+
+**Server Setup (server.js)**
+```javascript
+import express from 'express';
+import { UserCommands } from './commands/userCommands';
+import { UserQueries } from './queries/userQueries';
+import { UserRepository } from './repository/userRepository';
+
+const app = express();
+const db = {}; // Placeholder for database instance
+const userRepository = new UserRepository(db);
+const userCommands = new UserCommands(userRepository);
+const userQueries = new UserQueries(userRepository);
+
+app.post('/user', (req, res) => {
+  userCommands.createUser(req.body).then(result => res.send(result));
+});
+
+app.get('/user/:id', (req, res) => {
+  userQueries.getUserById(req.params.id).then(user => res.send(user));
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+```
+
+## Key Concepts
+
+- **Separation of Concerns**: CQRS separates the read and write operations, allowing each to be scaled independently.
+- **Optimized Performance**: By using different models for reading and writing, you can optimize each for its specific use case.
+- **Improved Scalability**: Scale read and write operations separately, reducing load and improving performance.
+
+By following the CQRS pattern, you can create a more scalable and maintainable architecture, especially for applications with complex business logic or high transaction volumes.
