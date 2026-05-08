@@ -2054,14 +2054,15 @@
     "scheduledTime": "18:00",
     "title": "Research: User Experience Monitoring - RUM vs Synthetic",
     "slug": "research-user-experience-monitoring-rum-vs-synthetic-2026-05-08",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "monitoring",
       "user",
       "experience"
-    ]
+    ],
+    "publishedAt": "2026-05-08T18:01:10.720Z"
   },
   {
     "id": "research-cloud-cost-optimization-reserved-vs-on-demand-2026-05-09",
