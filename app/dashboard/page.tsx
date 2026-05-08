@@ -23,6 +23,7 @@ import { usePortfolioNews } from '../hooks/useDataFetching';
 import { getSectorSync } from '../lib/portfolio/sectorService';
 import { GICSSector, GICS_SECTOR_INFO, normalizeSector } from '../lib/portfolio/sectorClassification';
 import Logo from '../components/Logo';
+import CompanyLogo from '../components/CompanyLogo';
 import TickerSearch from '../components/TickerSearch';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import CSVImporter from '../components/CSVImporter';
@@ -2866,16 +2867,10 @@ export default function Dashboard() {
                       color: 'hsl(var(--foreground))',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '10px'
                     }}>
-                  <div style={{ 
-                    width: '6px', 
-                    height: '6px', 
-                    borderRadius: '50%', 
-                        background: 'var(--signal)',
-                        animation: 'pulse 2s infinite'
-                      }} />
-                      {symbol}
+                      <CompanyLogo symbol={symbol} size={26} />
+                      <span>{symbol}</span>
                     </div>
                     <div style={{ 
                       fontSize: '12px', 
@@ -2981,16 +2976,10 @@ export default function Dashboard() {
                       color: 'hsl(var(--foreground))',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '10px'
                     }}>
-                      <div style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: 'var(--warning)',
-                        animation: 'pulse 2s infinite'
-                      }} />
-                        {stock.symbol}
+                      <CompanyLogo symbol={stock.symbol} size={26} />
+                      <span>{stock.symbol}</span>
           </div>
                     <div style={{ 
                       fontSize: '12px', 

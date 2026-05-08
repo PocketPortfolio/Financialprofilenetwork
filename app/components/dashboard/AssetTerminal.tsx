@@ -2,6 +2,7 @@
 
 import { TrendingUp, TrendingDown, Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import CompanyLogo from '@/app/components/CompanyLogo';
 
 interface Asset {
   symbol: string;
@@ -42,6 +43,7 @@ export function AssetTerminal({
   setShowImportModal
 }: AssetTerminalProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const LOGO_SIZE = 18;
 
   const handleSort = (column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => {
     if (onSort) {
@@ -394,7 +396,10 @@ export function AssetTerminal({
                           fontSize: '14px',
                           whiteSpace: 'nowrap'
                         }}>
-                          {asset.symbol}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <CompanyLogo symbol={asset.symbol} name={asset.name} size={LOGO_SIZE} />
+                            <span>{asset.symbol}</span>
+                          </div>
                         </td>
                         <td style={{ 
                           padding: '12px 16px', 
@@ -481,17 +486,20 @@ export function AssetTerminal({
                           fontWeight: '500',
                           fontSize: '14px'
                         }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span>{asset.symbol}</span>
-                            {asset.name && asset.name !== asset.symbol && (
-                              <span style={{ 
-                                fontSize: '11px', 
-                                color: 'hsl(var(--muted-foreground))',
-                                fontWeight: '400'
-                              }}>
-                                {asset.name}
-                              </span>
-                            )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <CompanyLogo symbol={asset.symbol} name={asset.name} size={LOGO_SIZE} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <span>{asset.symbol}</span>
+                              {asset.name && asset.name !== asset.symbol && (
+                                <span style={{ 
+                                  fontSize: '11px', 
+                                  color: 'hsl(var(--muted-foreground))',
+                                  fontWeight: '400'
+                                }}>
+                                  {asset.name}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td style={{ 
