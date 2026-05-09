@@ -30,6 +30,67 @@ import {
   isHashOnlyHref,
 } from '@/app/lib/nav/sovereignMarketingNav';
 
+const LANDING_FAQ_ENTRIES: { question: string; answer: React.ReactNode }[] = [
+  {
+    question: 'Is Pocket Portfolio free?',
+    answer: (
+      <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
+        Yes. It&apos;s open source. If the community later wants premium data sources, we&apos;ll decide together.
+      </p>
+    ),
+  },
+  {
+    question: 'How do you handle my data?',
+    answer: (
+      <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
+        You control your data. We store the minimum needed and make export easy. Read the{' '}
+        <Link href="/privacy" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+          Privacy Policy
+        </Link>{' '}
+        and technical overview on{' '}
+        <Link href="/architecture" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+          Architecture
+        </Link>
+        .
+      </p>
+    ),
+  },
+  {
+    question: 'Can I contribute?',
+    answer: (
+      <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
+        Please! Check the GitHub repo for issues, roadmap, and contribution guidelines.
+      </p>
+    ),
+  },
+  {
+    question: 'What data sources do you use for live prices?',
+    answer: (
+      <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
+        We use multiple data providers including Yahoo Finance, Alpha Vantage, and others with fallback support to
+        ensure reliability.
+      </p>
+    ),
+  },
+  {
+    question: 'Is my portfolio data secure?',
+    answer: (
+      <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
+        Yes, we use industry-standard encryption and follow privacy-first principles. Your data is stored securely and
+        you can export it anytime.
+      </p>
+    ),
+  },
+  {
+    question: 'Can I import data from other platforms?',
+    answer: (
+      <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
+        Yes, we support CSV import from most major brokers with smart normalization to handle different formats.
+      </p>
+    ),
+  },
+];
+
 export default function LandingPage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -184,7 +245,7 @@ export default function LandingPage() {
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%)',
-          borderBottom: '1px solid var(--border)',
+          borderBottom: '1px solid var(--border-warm)',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
           width: '100%',
           margin: 0
@@ -623,7 +684,7 @@ export default function LandingPage() {
                 fontSize: '18px',
                 fontWeight: '500',
                 padding: '12px 0',
-                borderBottom: '1px solid var(--card-border)',
+                borderBottom: '1px solid var(--border-warm)',
               } as const;
               const close = () => setIsMobileMenuOpen(false);
               const linkEl = isHashOnlyHref(link.href) ? (
@@ -651,7 +712,7 @@ export default function LandingPage() {
                           fontSize: '18px',
                           fontWeight: '500',
                           padding: '12px 0',
-                          borderBottom: '1px solid var(--card-border)',
+                          borderBottom: '1px solid var(--border-warm)',
                           cursor: 'pointer',
                           listStyle: 'none',
                         }}
@@ -715,7 +776,7 @@ export default function LandingPage() {
                   fontSize: '18px',
                   fontWeight: '500',
                   padding: '12px 0',
-                  borderBottom: '1px solid var(--card-border)',
+                  borderBottom: '1px solid var(--border-warm)',
                 }}
               >
                 {faqNavItem.label}
@@ -730,7 +791,7 @@ export default function LandingPage() {
                   fontSize: '18px',
                   fontWeight: '500',
                   padding: '12px 0',
-                  borderBottom: '1px solid var(--card-border)',
+                  borderBottom: '1px solid var(--border-warm)',
                   display: 'block',
                 }}
               >
@@ -833,6 +894,7 @@ export default function LandingPage() {
           <LivingPipeline />
           {/* Static protocol strip — factual labels; flex-centered for optical alignment */}
           <div
+            id="landing-hero-protocol"
             aria-hidden
             style={{
               width: '100%',
@@ -841,7 +903,7 @@ export default function LandingPage() {
               marginBottom: '18px',
               padding: '0 clamp(12px, 3vw, 20px)',
               borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--border-warm)',
               background: 'var(--surface-elevated)',
               display: 'flex',
               alignItems: 'center',
@@ -997,9 +1059,10 @@ export default function LandingPage() {
             }}
           >
             <div
+              id="landing-hero-search-wrap"
               style={{
                 background: 'var(--surface-elevated)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--border-warm)',
                 borderRadius: 'var(--radius-md)',
                 padding: '4px',
                 boxShadow: 'var(--shadow-md)',
@@ -1008,6 +1071,7 @@ export default function LandingPage() {
               <TickerSearch
                 placeholder="> Search tickers (e.g. NVDA, BTC) — opens market page"
                 linkToTickerPage={true}
+                marketingChrome
               />
             </div>
           </div>
@@ -1119,7 +1183,7 @@ export default function LandingPage() {
                     style={{
                       padding: '12px 18px',
                       background: 'transparent',
-                      border: '1px solid var(--border-subtle)',
+                      border: '1px solid rgba(245, 158, 11, 0.38)',
                       borderRadius: '10px',
                       color: 'var(--text-secondary)',
                       fontSize: '14px',
@@ -1486,17 +1550,19 @@ export default function LandingPage() {
         padding: 'clamp(60px, 10vw, 120px) clamp(12px, 3vw, 24px)',
         background: 'linear-gradient(180deg, var(--surface) 0%, var(--surface-elevated) 100%)',
         marginBottom: 'clamp(60px, 10vw, 120px)',
-        borderTop: '1px solid var(--border)',
-        borderBottom: '1px solid var(--border)',
+        borderTop: '1px solid var(--border-warm)',
+        borderBottom: '1px solid var(--border-warm)',
       }}>
         <div style={{
           maxWidth: '1000px',
           margin: '0 auto',
-          textAlign: 'center'
+          textAlign: 'center',
+          paddingBottom: 'clamp(8px, 2vw, 16px)',
         }}>
           <h2 style={{
             fontSize: 'clamp(2rem, 4vw, 3rem)',
             fontWeight: 'bold',
+            marginTop: 0,
             marginBottom: '24px',
             color: 'var(--text)',
             letterSpacing: '-0.02em',
@@ -1520,7 +1586,7 @@ export default function LandingPage() {
           {/* Terminal Block */}
           <div style={{
             background: 'var(--surface-elevated)',
-            border: '1px solid var(--border)',
+            border: '1px solid var(--border-warm)',
             borderRadius: 'var(--radius-md)',
             padding: 'clamp(24px, 5vw, 40px)',
             marginBottom: '32px',
@@ -1534,7 +1600,7 @@ export default function LandingPage() {
               gap: '8px',
               marginBottom: '24px',
               paddingBottom: '16px',
-              borderBottom: '1px solid var(--border)',
+              borderBottom: '1px solid var(--border-warm)',
             }}>
               <div style={{
                 width: '12px',
@@ -1592,7 +1658,7 @@ $ npx pocket-init --sovereign
               display: 'inline-block',
               padding: '16px 32px',
               background: 'transparent',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--border-warm)',
               color: 'var(--text)',
               borderRadius: 'var(--radius-md)',
               fontSize: '16px',
@@ -1606,7 +1672,7 @@ $ npx pocket-init --sovereign
               e.currentTarget.style.background = 'color-mix(in srgb, var(--accent-warm) 12%, transparent)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
               e.currentTarget.style.background = 'transparent';
             }}
           >
@@ -1822,7 +1888,7 @@ $ npx pocket-init --sovereign
             {/* CARD 3: THE VANGUARD */}
             <div style={{
               background: 'linear-gradient(135deg, var(--surface-elevated) 0%, var(--surface) 100%)',
-              border: '1px solid var(--border)',
+              border: '2px solid var(--border-warm)',
               borderRadius: '16px',
               padding: 'clamp(32px, 5vw, 40px)',
               boxShadow: 'var(--shadow-md)',
@@ -1840,7 +1906,7 @@ $ npx pocket-init --sovereign
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--border-warm)';
             }}
             >
               {/* Premium Badge Effect */}
@@ -2082,8 +2148,8 @@ $ npx pocket-init --sovereign
         {/* Why Choose Pocket Portfolio Section */}
         <section style={{ marginBottom: '120px', textAlign: 'center' }}>
           <div style={{ 
-            background: 'var(--card)', 
-            border: '1px solid var(--card-border)', 
+            background: 'hsl(var(--card))', 
+            border: '1px solid var(--border-warm)', 
             borderRadius: '12px', 
             padding: '48px 32px',
             marginBottom: '48px'
@@ -2275,7 +2341,7 @@ $ npx pocket-init --sovereign
                       textAlign: 'left',
                       padding: '20px 18px',
                       borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border)',
+                      border: '1px solid var(--border-warm)',
                       background: 'var(--surface-elevated)',
                       boxShadow: 'var(--shadow-xs)',
                     }}
@@ -2636,8 +2702,11 @@ $ npx pocket-init --sovereign
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section id="faq" style={{ marginBottom: '120px' }}>
+        {/* FAQ — single shell: log-backed fix (pre-fix widthSpread/rightSpread were 0; stagger was visual vs brand-grid) */}
+        <section
+          id="faq"
+          style={{ marginBottom: '120px', padding: '0 clamp(12px, 3vw, 24px)', boxSizing: 'border-box' }}
+        >
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
             <h2 style={{ 
               fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
@@ -2656,194 +2725,55 @@ $ npx pocket-init --sovereign
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <details style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
+          <div
+            id="faq-shell"
+            className="pp-landing-faq-shell"
+            style={{
+              border: '1px solid var(--border-warm)',
+              borderRadius: '12px',
               overflow: 'hidden',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <summary style={{ 
-                padding: '24px', 
-                cursor: 'pointer', 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                borderBottom: '1px solid var(--card-border)', 
-                listStyle: 'none', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-                Is Pocket Portfolio free?
-              </summary>
-              <div style={{ padding: '24px', paddingTop: '0' }}>
-                <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  Yes. It's open source. If the community later wants premium data sources, we'll decide together.
-                </p>
-              </div>
-            </details>
-
-            <details style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              overflow: 'hidden',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <summary style={{ 
-                padding: '24px', 
-                cursor: 'pointer', 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                borderBottom: '1px solid var(--card-border)', 
-                listStyle: 'none', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-                How do you handle my data?
-              </summary>
-              <div style={{ padding: '24px', paddingTop: '0' }}>
-                <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  You control your data. We store the minimum needed and make export easy. Read the{' '}
-                  <Link href="/privacy" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
-                    Privacy Policy
-                  </Link>{' '}
-                  and technical overview on{' '}
-                  <Link href="/architecture" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
-                    Architecture
-                  </Link>
-                  .
-                </p>
-              </div>
-            </details>
-
-            <details style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              overflow: 'hidden',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <summary style={{ 
-                padding: '24px', 
-                cursor: 'pointer', 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                borderBottom: '1px solid var(--card-border)', 
-                listStyle: 'none', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-                Can I contribute?
-              </summary>
-              <div style={{ padding: '24px', paddingTop: '0' }}>
-                <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  Please! Check the GitHub repo for issues, roadmap, and contribution guidelines.
-                </p>
-              </div>
-            </details>
-
-            <details style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              overflow: 'hidden',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <summary style={{ 
-                padding: '24px', 
-                cursor: 'pointer', 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                borderBottom: '1px solid var(--card-border)', 
-                listStyle: 'none', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-                What data sources do you use for live prices?
-              </summary>
-              <div style={{ padding: '24px', paddingTop: '0' }}>
-                <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  We use multiple data providers including Yahoo Finance, Alpha Vantage, and others with fallback support to ensure reliability.
-                </p>
-              </div>
-            </details>
-
-            <details style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              overflow: 'hidden',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <summary style={{ 
-                padding: '24px', 
-                cursor: 'pointer', 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                borderBottom: '1px solid var(--card-border)', 
-                listStyle: 'none', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-                Is my portfolio data secure?
-              </summary>
-              <div style={{ padding: '24px', paddingTop: '0' }}>
-                <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  Yes, we use industry-standard encryption and follow privacy-first principles. Your data is stored securely and you can export it anytime.
-                </p>
-              </div>
-            </details>
-
-            <details style={{ 
-              background: 'var(--card)', 
-              border: '1px solid var(--card-border)', 
-              borderRadius: '12px', 
-              overflow: 'hidden',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-            }}>
-              <summary style={{ 
-                padding: '24px', 
-                cursor: 'pointer', 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                borderBottom: '1px solid var(--card-border)', 
-                listStyle: 'none', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '12px'
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="6,9 12,15 18,9"></polyline>
-                </svg>
-                Can I import data from other platforms?
-              </summary>
-              <div style={{ padding: '24px', paddingTop: '0' }}>
-                <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-                  Yes, we support CSV import from most major brokers with smart normalization to handle different formats.
-                </p>
-              </div>
-            </details>
+              background: 'hsl(var(--card))',
+              boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+            }}
+          >
+            <div id="faq-accordion-column" style={{ display: 'flex', flexDirection: 'column' }}>
+              {LANDING_FAQ_ENTRIES.map((item, index) => (
+                <details
+                  key={item.question}
+                  style={{
+                    margin: 0,
+                    width: '100%',
+                    minWidth: 0,
+                    boxSizing: 'border-box',
+                    background: 'hsl(var(--card))',
+                    border: 'none',
+                    borderRadius: 0,
+                    boxShadow: 'none',
+                    overflow: 'hidden',
+                    borderTop: index === 0 ? 'none' : '1px solid rgba(245, 158, 11, 0.35)',
+                  }}
+                >
+                  <summary
+                    style={{
+                      padding: '24px',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      fontWeight: 600,
+                      listStyle: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                      <polyline points="6,9 12,15 18,9" />
+                    </svg>
+                    {item.question}
+                  </summary>
+                  <div style={{ padding: '0 24px 24px', boxSizing: 'border-box' }}>{item.answer}</div>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
       </main>
@@ -2861,13 +2791,15 @@ $ npx pocket-init --sovereign
         }}
       >
         <div
+          id="broker-csv-guides"
+          className="pp-landing-card-900"
           style={{
-            maxWidth: 'min(900px, 95vw)',
-            margin: '0 auto',
+            width: '100%',
             padding: 'clamp(20px, 4vw, 28px)',
             borderRadius: '16px',
-            border: '1px solid var(--border-subtle)',
+            border: '1px solid var(--border-warm)',
             background: 'var(--surface)',
+            boxSizing: 'border-box',
           }}
         >
           <h2
@@ -2894,10 +2826,12 @@ $ npx pocket-init --sovereign
           </p>
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignContent: 'center',
               gap: '12px',
-              justifyItems: 'stretch',
             }}
           >
             {(
@@ -2912,7 +2846,12 @@ $ npx pocket-init --sovereign
                 key={href}
                 href={href}
                 style={{
-                  display: 'block',
+                  flex: '1 1 200px',
+                  maxWidth: '260px',
+                  minHeight: '52px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   padding: '14px 16px',
                   textAlign: 'center',
                   textDecoration: 'none',
@@ -2923,6 +2862,7 @@ $ npx pocket-init --sovereign
                   border: '1px solid var(--border-warm)',
                   background: 'var(--warm-bg)',
                   transition: 'color 0.15s ease, border-color 0.15s ease',
+                  boxSizing: 'border-box',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = 'var(--accent-warm)';

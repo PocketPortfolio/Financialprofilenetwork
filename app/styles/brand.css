@@ -57,6 +57,79 @@ main, section, div {
   box-sizing: border-box !important;
 }
 
+/* Landing FAQ: global rule above defeats inline max-width; cap width for readability */
+.pp-landing-faq-shell {
+  max-width: min(720px, 100%) !important;
+  width: 100%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.pp-landing-card-900 {
+  max-width: min(900px, 100%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Social share row: avoid nesting .brand-card + .brand-button (pseudo/layers caused zig-zag) */
+.social-share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.social-share--start {
+  justify-content: flex-start;
+}
+
+.social-share__label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-right: 8px;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.social-share__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid var(--border-warm);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  line-height: 1.2;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: background var(--transition-base), border-color var(--transition-base), color var(--transition-base), transform var(--transition-base);
+}
+
+.social-share__btn svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.social-share__btn:hover {
+  background: var(--surface-elevated);
+  border-color: var(--signal);
+  color: var(--signal);
+  transform: translateY(-1px);
+}
+
 
 /* === Surface & Layout === */
 

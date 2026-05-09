@@ -186,7 +186,7 @@ export function AnalystVideo() {
               borderRadius: '16px',
               overflow: 'hidden',
               boxShadow: '0 24px 48px rgba(0,0,0,0.15)',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--border-warm)',
               background: '#000',
             }}
             className="group"

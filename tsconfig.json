@@ -24,8 +24,14 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
+      "@/app/*": [
+        "./app/*"
+      ],
+      "@/db/*": [
+        "./db/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
       ],
       "@/components/*": [
         "./src/components/*"
@@ -36,17 +42,11 @@
       "@/services/*": [
         "./src/services/*"
       ],
-      "@/lib/*": [
-        "./lib/*"
-      ],
       "@/types/*": [
         "./src/types/*"
       ],
-      "@/app/*": [
-        "./app/*"
-      ],
-      "@/db/*": [
-        "./db/*"
+      "@/*": [
+        "./src/*"
       ]
     }
   },

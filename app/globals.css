@@ -386,7 +386,7 @@ a {
   --text: var(--text-inverse);
   --muted: var(--muted-inverse);
   --card: var(--card-on-dark);
-  --card-border: var(--card-border-on-dark);
+  --card-border: var(--border);
 }
 
 /* ============================================

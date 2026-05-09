@@ -7,6 +7,8 @@ interface TickerSearchProps {
   onTickerSelect?: (ticker: string) => void;
   placeholder?: string;
   linkToTickerPage?: boolean; // New prop to enable linking to /s/[symbol] pages
+  /** Hero / marketing: amber stroke instead of tier-primary grey-adjacent idle border */
+  marketingChrome?: boolean;
 }
 
 interface TickerResult {
@@ -32,7 +34,14 @@ const popularTickers = [
   { symbol: 'SPY', name: 'SPDR S&P 500 ETF Trust' },
 ];
 
-export default function TickerSearch({ onTickerSelect, placeholder = "Search stocks or crypto...", linkToTickerPage = false }: TickerSearchProps) {
+const MARKETING_DIVIDER = '1px solid rgba(245, 158, 11, 0.28)';
+
+export default function TickerSearch({
+  onTickerSelect,
+  placeholder = 'Search stocks or crypto...',
+  linkToTickerPage = false,
+  marketingChrome = false,
+}: TickerSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TickerResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -154,10 +163,13 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
   };
 
   // Tier-aware: `--primary` is derived from `[data-tier]` in globals.css
-  const borderIdle = 'hsl(var(--primary) / 0.28)';
-  const borderHover = 'hsl(var(--primary) / 0.40)';
-  const borderFocus = 'hsl(var(--primary))';
-  const ringFocus = 'hsl(var(--primary) / 0.20)';
+  const borderIdle = marketingChrome
+    ? 'rgba(245, 158, 11, 0.38)'
+    : 'hsl(var(--primary) / 0.28)';
+  const borderHover = marketingChrome ? 'rgba(245, 158, 11, 0.52)' : 'hsl(var(--primary) / 0.40)';
+  const borderFocus = marketingChrome ? 'var(--accent-warm)' : 'hsl(var(--primary))';
+  const ringFocus = marketingChrome ? 'rgba(245, 158, 11, 0.22)' : 'hsl(var(--primary) / 0.20)';
+  const dropdownDivider = marketingChrome ? MARKETING_DIVIDER : '1px solid var(--border-subtle)';
 
   return (
     <div ref={searchRef} style={{ position: 'relative', width: '100%', zIndex: 1 }}>
@@ -260,7 +272,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
               fontSize: '12px', 
               color: 'var(--muted)', 
               background: 'var(--surface)',
-              borderBottom: '1px solid var(--border-subtle)'
+              borderBottom: dropdownDivider
             }}>
               Found {results.length} result{results.length !== 1 ? 's' : ''}
             </div>
@@ -297,7 +309,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                   color: 'var(--text)',
                   textAlign: 'left' as const,
                   cursor: 'pointer',
-                  borderBottom: index < results.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                  borderBottom: index < results.length - 1 ? dropdownDivider : 'none',
                   transition: 'all 0.2s ease',
                   fontSize: '14px',
                   display: 'flex',
@@ -428,7 +440,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                         required
                         style={{
                           padding: '8px 12px',
-                          border: '1px solid var(--border)',
+                          border: marketingChrome ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid var(--border)',
                           borderRadius: '6px',
                           background: 'var(--surface)',
                           color: 'var(--text)',

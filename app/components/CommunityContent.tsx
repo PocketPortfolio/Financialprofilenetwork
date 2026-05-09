@@ -6,6 +6,11 @@ import StructuredData from './StructuredData';
 import { trackBlogPostClick, trackBlogPlatformView } from '../lib/analytics/events';
 import { featuredArticles, type Article } from '../lib/blog/articles';
 
+/** Match /blog marketing cards — explicit amber stroke (CommunityContent is the homepage “Building in Public” grid) */
+const BIP_CARD_BORDER = '1px solid rgba(245, 158, 11, 0.42)';
+const BIP_CARD_BORDER_COLOR = 'rgba(245, 158, 11, 0.42)';
+const BIP_CARD_SHADOW = '0 4px 18px rgba(245, 158, 11, 0.07)';
+
 interface PocketPortfolioPost {
   slug: string;
   title: string;
@@ -177,12 +182,13 @@ export default function CommunityContent() {
         />
       ))}
     <section 
+      id="building-in-public"
       className="brand-surface" 
       style={{ 
         padding: '48px 24px',
         background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(255, 107, 53, 0.02) 100%)',
-        borderTop: '1px solid var(--border)',
-        borderBottom: '1px solid var(--border)'
+        borderTop: '1px solid var(--border-warm)',
+        borderBottom: '1px solid var(--border-warm)',
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -221,6 +227,7 @@ export default function CommunityContent() {
             featuredArticles.map((article, index) => (
               <a
                 key={index}
+                className="bip-article-card"
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -228,13 +235,14 @@ export default function CommunityContent() {
                 style={{
                   display: 'block',
                   padding: '24px',
-                  background: 'var(--card)',
-                  border: '1px solid var(--card-border)',
+                  background: 'hsl(var(--card))',
+                  border: BIP_CARD_BORDER,
                   borderRadius: '12px',
                   transition: 'all 0.2s ease',
                   textDecoration: 'none',
                   color: 'inherit',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: BIP_CARD_SHADOW,
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)';
@@ -245,8 +253,8 @@ export default function CommunityContent() {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = 'var(--card-border)';
+                  e.currentTarget.style.boxShadow = BIP_CARD_SHADOW;
+                  e.currentTarget.style.borderColor = BIP_CARD_BORDER_COLOR;
                 }}
               >
                 <div style={{ marginBottom: '12px' }}>
@@ -345,18 +353,20 @@ export default function CommunityContent() {
               return (
                 <CardComponent
                   key={index}
+                  className="bip-article-card"
                   {...cardProps}
                   onClick={() => trackBlogPostClick(article.title, article.platform, article.url)}
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: BIP_CARD_BORDER,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: BIP_CARD_SHADOW,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
@@ -365,8 +375,8 @@ export default function CommunityContent() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
+                    e.currentTarget.style.boxShadow = BIP_CARD_SHADOW;
+                    e.currentTarget.style.borderColor = BIP_CARD_BORDER_COLOR;
                   }}
                 >
                   {/* Platform Badge */}

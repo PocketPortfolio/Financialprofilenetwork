@@ -10,6 +10,10 @@ import SEOPageTracker from '../components/SEOPageTracker';
 
 const POSTS_PER_PAGE = 20;
 
+/** Amber-tinted stroke (not slate); rgba reads warm on peach backgrounds where color-mix can look grey */
+const BLOG_CARD_BORDER = '1px solid rgba(245, 158, 11, 0.42)';
+const BLOG_CARD_BORDER_COLOR = 'rgba(245, 158, 11, 0.42)';
+
 interface GeneratedPost {
   slug: string;
   title: string;
@@ -345,13 +349,14 @@ function BlogPageInner() {
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: BLOG_CARD_BORDER,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
                     cursor: 'pointer',
+                    boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
@@ -360,8 +365,8 @@ function BlogPageInner() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
+                    e.currentTarget.style.boxShadow = '0 4px 18px rgba(245, 158, 11, 0.06)';
+                    e.currentTarget.style.borderColor = BLOG_CARD_BORDER_COLOR;
                   }}
                 >
                   <div style={{ marginBottom: '12px' }}>
@@ -438,13 +443,14 @@ function BlogPageInner() {
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: BLOG_CARD_BORDER,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
                     cursor: 'pointer',
+                    boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
@@ -453,8 +459,8 @@ function BlogPageInner() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
+                    e.currentTarget.style.boxShadow = '0 4px 18px rgba(245, 158, 11, 0.06)';
+                    e.currentTarget.style.borderColor = BLOG_CARD_BORDER_COLOR;
                   }}
                 >
                   <div style={{ marginBottom: '12px' }}>
@@ -531,13 +537,14 @@ function BlogPageInner() {
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: BLOG_CARD_BORDER,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
                     cursor: 'pointer',
+                    boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
@@ -546,8 +553,8 @@ function BlogPageInner() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
+                    e.currentTarget.style.boxShadow = '0 4px 18px rgba(245, 158, 11, 0.06)';
+                    e.currentTarget.style.borderColor = BLOG_CARD_BORDER_COLOR;
                   }}
                 >
                   <div style={{ marginBottom: '12px' }}>
@@ -625,13 +632,14 @@ function BlogPageInner() {
                 style={{
                   display: 'block',
                   padding: '24px',
-                  background: 'var(--card)',
-                  border: '1px solid var(--card-border)',
+                  background: 'hsl(var(--card))',
+                  border: BLOG_CARD_BORDER,
                   borderRadius: '12px',
                   transition: 'all 0.2s ease',
                   textDecoration: 'none',
                   color: 'inherit',
                   cursor: 'pointer',
+                  boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)';
@@ -641,8 +649,8 @@ function BlogPageInner() {
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = 'var(--card-border)';
+                  e.currentTarget.style.boxShadow = '0 4px 18px rgba(245, 158, 11, 0.06)';
+                  e.currentTarget.style.borderColor = BLOG_CARD_BORDER_COLOR;
                 }}
               >
                 <div style={{ marginBottom: '12px' }}>
@@ -765,9 +773,10 @@ function BlogPageInner() {
           style={{
             textAlign: 'center',
             padding: '48px 24px',
-            background: 'var(--card)',
+            background: 'hsl(var(--card))',
             borderRadius: '12px',
-            border: '1px solid var(--card-border)',
+            border: BLOG_CARD_BORDER,
+            boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
           }}
         >
           <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>Want More Content?</h2>
