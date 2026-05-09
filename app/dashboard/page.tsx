@@ -1664,7 +1664,7 @@ export default function Dashboard() {
                 zIndex: 25,
                 padding: '10px 16px',
                 background: 'var(--surface)',
-                borderBottom: '1px solid var(--border-subtle)',
+                borderBottom: '1px solid var(--dashboard-chrome-border-subtle)',
                 textAlign: 'center',
                 fontSize: '14px',
                 color: 'var(--text)',
@@ -1708,7 +1708,7 @@ export default function Dashboard() {
                   style={{
                     padding: '8px 14px',
                     borderRadius: '8px',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--dashboard-chrome-border-subtle)',
                     background: 'var(--surface)',
                     color: 'var(--text)',
                     fontSize: '13px',
@@ -1727,7 +1727,7 @@ export default function Dashboard() {
             style={{
               margin: '0 16px 16px',
               padding: '14px 16px',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--dashboard-chrome-border-subtle)',
               borderRadius: '12px',
               background: 'var(--surface)',
             }}
@@ -1751,7 +1751,7 @@ export default function Dashboard() {
               style={{
                 maxWidth: '520px',
                 borderRadius: '10px',
-                border: '1px solid var(--border-subtle)',
+                border: '1px solid var(--dashboard-chrome-border-subtle)',
                 padding: '4px',
                 background: 'var(--surface-elevated)',
               }}
@@ -1863,7 +1863,7 @@ export default function Dashboard() {
                   maxHeight: '90vh',
                   overflowY: 'auto',
                   background: 'hsl(var(--card))',
-                  border: `1px solid hsl(var(--border))`
+                  border: `1px solid var(--dashboard-chrome-border)`
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -1874,14 +1874,14 @@ export default function Dashboard() {
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: 'hsl(var(--muted-foreground))',
+                      color: 'var(--dashboard-muted-foreground)',
                       cursor: 'pointer',
                       fontSize: '24px',
                       padding: '4px 8px',
                       lineHeight: 1
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(var(--foreground))'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     ×
                   </button>
@@ -1919,7 +1919,7 @@ export default function Dashboard() {
                   width: '100%',
                   maxWidth: '480px',
                   background: 'var(--surface)',
-                  border: '1px solid var(--border-subtle)',
+                  border: '1px solid var(--dashboard-chrome-border-subtle)',
                   borderRadius: '12px',
                   padding: '20px',
                 }}
@@ -1964,7 +1964,7 @@ export default function Dashboard() {
                       padding: '10px 14px',
                       borderRadius: '8px',
                       background: 'var(--surface-elevated)',
-                      border: '1px solid var(--border-subtle)',
+                      border: '1px solid var(--dashboard-chrome-border-subtle)',
                       color: 'var(--text-secondary)',
                       fontSize: '14px',
                       cursor: 'pointer',
@@ -1998,7 +1998,7 @@ export default function Dashboard() {
                   display: 'flex', 
                   gap: '8px', 
                   marginBottom: '16px', 
-                  borderBottom: `1px solid hsl(var(--border))` 
+                  borderBottom: `1px solid var(--dashboard-chrome-border)` 
                 }}>
                   <button
                     onClick={() => setActiveTab('performance')}
@@ -2009,7 +2009,7 @@ export default function Dashboard() {
                       background: 'transparent',
                       border: 'none',
                       borderBottom: activeTab === 'performance' ? '2px solid hsl(var(--accent))' : '2px solid transparent',
-                      color: activeTab === 'performance' ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))',
+                      color: activeTab === 'performance' ? 'hsl(var(--accent))' : 'var(--dashboard-muted-foreground)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
                     }}
@@ -2020,7 +2020,7 @@ export default function Dashboard() {
                     }}
                     onMouseLeave={(e) => {
                       if (activeTab !== 'performance') {
-                        e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                        e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
                       }
                     }}
                   >
@@ -2035,7 +2035,7 @@ export default function Dashboard() {
                       background: 'transparent',
                       border: 'none',
                       borderBottom: activeTab === 'insights' ? '2px solid hsl(var(--accent))' : '2px solid transparent',
-                      color: activeTab === 'insights' ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))',
+                      color: activeTab === 'insights' ? 'hsl(var(--accent))' : 'var(--dashboard-muted-foreground)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
                     }}
@@ -2046,7 +2046,7 @@ export default function Dashboard() {
                     }}
                     onMouseLeave={(e) => {
                       if (activeTab !== 'insights') {
-                        e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                        e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
                       }
                     }}
                   >
@@ -2148,7 +2148,7 @@ export default function Dashboard() {
                       padding: '6px 12px',
                       background: chartType === 'pie' ? 'hsl(var(--accent))' : 'transparent',
                       color: chartType === 'pie' ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
-                      border: chartType === 'pie' ? 'none' : `1px solid hsl(var(--border))`,
+                      border: chartType === 'pie' ? 'none' : `1px solid var(--dashboard-chrome-border)`,
                       borderRadius: '8px',
                       fontSize: '12px',
                       fontWeight: '600',
@@ -2165,7 +2165,7 @@ export default function Dashboard() {
                       padding: '6px 12px',
                       background: chartType === 'line' ? `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)` : 'transparent',
                       color: chartType === 'line' ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
-                      border: chartType === 'line' ? `2px solid hsl(var(--accent))` : `1px solid hsl(var(--border))`,
+                      border: chartType === 'line' ? `2px solid hsl(var(--accent))` : `1px solid var(--dashboard-chrome-border)`,
                       borderRadius: '8px',
                       fontSize: '12px',
                       fontWeight: '600',
@@ -2227,7 +2227,7 @@ export default function Dashboard() {
                       Portfolio Holdings
                     </h1>
                     <p style={{ 
-                      color: 'hsl(var(--muted-foreground))', 
+                      color: 'var(--dashboard-muted-foreground)', 
                       fontSize: '16px',
                       margin: 0
                     }}>
@@ -2243,8 +2243,8 @@ export default function Dashboard() {
                     style={{
                       padding: '6px 12px',
                       background: 'transparent',
-                      color: 'hsl(var(--muted-foreground))',
-                      border: `1px solid hsl(var(--border))`,
+                      color: 'var(--dashboard-muted-foreground)',
+                      border: `1px solid var(--dashboard-chrome-border)`,
                       borderRadius: '6px',
                       fontSize: '12px',
                       cursor: 'pointer',
@@ -2259,8 +2259,8 @@ export default function Dashboard() {
                       e.currentTarget.style.background = 'hsla(var(--danger), 0.1)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
-                      e.currentTarget.style.borderColor = 'hsl(var(--border))';
+                      e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
+                      e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
                       e.currentTarget.style.background = 'transparent';
                     }}
                     title="Permanently delete all trades from Firebase"
@@ -2283,8 +2283,8 @@ export default function Dashboard() {
                       fontWeight: '600',
                       fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                       background: portfolioView === 'positions' ? 'hsl(var(--primary))' : 'transparent',
-                      color: portfolioView === 'positions' ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))',
-                      border: `1px solid ${portfolioView === 'positions' ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
+                      color: portfolioView === 'positions' ? 'hsl(var(--primary-foreground))' : 'var(--dashboard-muted-foreground)',
+                      border: `1px solid ${portfolioView === 'positions' ? 'hsl(var(--primary))' : 'var(--dashboard-chrome-border)'}`,
                       borderRadius: '2px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
@@ -2300,8 +2300,8 @@ export default function Dashboard() {
                       fontWeight: '600',
                       fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                       background: portfolioView === 'trades' ? 'hsl(var(--primary))' : 'transparent',
-                      color: portfolioView === 'trades' ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))',
-                      border: `1px solid ${portfolioView === 'trades' ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
+                      color: portfolioView === 'trades' ? 'hsl(var(--primary-foreground))' : 'var(--dashboard-muted-foreground)',
+                      border: `1px solid ${portfolioView === 'trades' ? 'hsl(var(--primary))' : 'var(--dashboard-chrome-border)'}`,
                       borderRadius: '2px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
@@ -2317,8 +2317,8 @@ export default function Dashboard() {
                       fontWeight: '600',
                       fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                       background: portfolioView === 'notes' ? 'hsl(var(--primary))' : 'transparent',
-                      color: portfolioView === 'notes' ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))',
-                      border: `1px solid ${portfolioView === 'notes' ? 'hsl(var(--primary))' : 'hsl(var(--border))'}`,
+                      color: portfolioView === 'notes' ? 'hsl(var(--primary-foreground))' : 'var(--dashboard-muted-foreground)',
+                      border: `1px solid ${portfolioView === 'notes' ? 'hsl(var(--primary))' : 'var(--dashboard-chrome-border)'}`,
                       borderRadius: '2px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
@@ -2474,7 +2474,7 @@ export default function Dashboard() {
             style={{
               padding: '32px 24px',
               background: 'var(--surface-hover, hsl(var(--muted) / 0.3))',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--dashboard-chrome-border-subtle)',
               borderRadius: '12px',
               marginBottom: '12px',
             }}
@@ -2500,7 +2500,7 @@ export default function Dashboard() {
                     padding: '12px 16px',
                     marginBottom: '12px',
                     fontSize: '16px',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--dashboard-chrome-border-subtle)',
                     borderRadius: '8px',
                     background: 'hsl(var(--background))',
                     color: 'hsl(var(--foreground))',
@@ -2567,10 +2567,10 @@ export default function Dashboard() {
           <div style={{ 
             textAlign: 'center', 
             padding: '48px 24px',
-            color: 'hsl(var(--muted-foreground))',
+            color: 'var(--dashboard-muted-foreground)',
             background: 'hsl(var(--card))',
             borderRadius: '12px',
-            border: '1px solid hsl(var(--border))',
+            border: '1px solid var(--dashboard-chrome-border)',
             marginBottom: '12px'
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: '600', margin: '0 0 24px 0', color: 'hsl(var(--foreground))' }}>
@@ -2582,7 +2582,7 @@ export default function Dashboard() {
               <span style={{ display: 'inline-block', width: '28px', height: '28px', borderRadius: '50%', background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', fontWeight: '700', lineHeight: '28px', marginRight: '12px', fontSize: '14px' }}>1</span>
               <strong style={{ color: 'hsl(var(--foreground))' }}>Export.</strong>{' '}
               Download your transaction history (.csv) from your broker.
-              <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', marginLeft: '40px', display: 'block' }}>e.g. IBKR, Fidelity, Robinhood, Degiro</span>
+              <span style={{ fontSize: '12px', color: 'var(--dashboard-muted-foreground)', marginLeft: '40px', display: 'block' }}>e.g. IBKR, Fidelity, Robinhood, Degiro</span>
             </div>
 
             {/* Step 2: Drop zone */}
@@ -2610,7 +2610,7 @@ export default function Dashboard() {
                 }
               }}
               style={{
-                border: '2px dashed hsl(var(--border))',
+                border: '2px dashed var(--dashboard-chrome-border)',
                 borderRadius: '12px',
                 padding: '48px 24px',
                 margin: '0 auto 24px',
@@ -2620,7 +2620,7 @@ export default function Dashboard() {
                 transition: 'background 0.2s, border-color 0.2s'
               }}
             >
-              <span style={{ fontSize: '15px', color: 'hsl(var(--muted-foreground))' }}>Drop your CSV here or click to browse</span>
+              <span style={{ fontSize: '15px', color: 'var(--dashboard-muted-foreground)' }}>Drop your CSV here or click to browse</span>
             </div>
 
             {/* Step 3: Analyze */}
@@ -2674,7 +2674,7 @@ export default function Dashboard() {
             >
               🎮 Play with Demo Data
             </button>
-            <p style={{ marginTop: '20px', fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
+            <p style={{ marginTop: '20px', fontSize: '14px', color: 'var(--dashboard-muted-foreground)' }}>
               <Link href="/invite" style={{ color: 'hsl(var(--primary))', textDecoration: 'underline', fontWeight: '500' }}>
                 Invite a friend to try Pocket Portfolio
               </Link>
@@ -2702,10 +2702,10 @@ export default function Dashboard() {
                   style={{ 
                   padding: '4px 8px',
                   background: 'hsl(var(--muted))',
-                  border: `1px solid hsl(var(--border))`,
+                  border: `1px solid var(--dashboard-chrome-border)`,
                   borderRadius: '4px',
                   fontSize: '10px',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   cursor: 'pointer'
                 }}
               >
@@ -2713,7 +2713,7 @@ export default function Dashboard() {
               </button>
             </div>
             {newsLoading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--muted-foreground))' }}>Loading news...</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--dashboard-muted-foreground)' }}>Loading news...</div>
             ) : newsError ? (
               <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--danger))' }}>
                 Failed to load news: {newsError}
@@ -2726,7 +2726,7 @@ export default function Dashboard() {
                       padding: '12px', 
                       background: 'hsl(var(--card))', 
                       borderRadius: '6px', 
-                      border: `1px solid hsl(var(--border))`,
+                      border: `1px solid var(--dashboard-chrome-border)`,
                       transition: 'all 0.2s ease',
                       cursor: 'pointer'
                     }}
@@ -2736,7 +2736,7 @@ export default function Dashboard() {
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'hsl(var(--muted))';
-                      e.currentTarget.style.borderColor = 'hsl(var(--border))';
+                      e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
                     }}
                     onClick={() => {
                       if (article.url) {
@@ -2754,7 +2754,7 @@ export default function Dashboard() {
                       </div>
                       <div style={{ 
                         fontSize: '11px', 
-                        color: 'hsl(var(--muted-foreground))',
+                        color: 'var(--dashboard-muted-foreground)',
                         marginBottom: '6px',
                         lineHeight: '1.3'
                       }}>
@@ -2765,7 +2765,7 @@ export default function Dashboard() {
                         justifyContent: 'space-between', 
                         alignItems: 'center',
                         fontSize: '10px',
-                        color: 'hsl(var(--muted-foreground))'
+                        color: 'var(--dashboard-muted-foreground)'
                       }}>
                         <span>
                           {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('en-US', {
@@ -2806,7 +2806,7 @@ export default function Dashboard() {
                 )}
               </>
             ) : (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--muted-foreground))' }}>No news available</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--dashboard-muted-foreground)' }}>No news available</div>
             )}
           </div>
 
@@ -2816,7 +2816,7 @@ export default function Dashboard() {
               Live Prices
             </div>
             {quotesLoading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--muted-foreground))' }}>Loading prices...</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--dashboard-muted-foreground)' }}>Loading prices...</div>
             ) : quotesError ? (
               <div style={{ textAlign: 'center', padding: '20px', color: 'hsl(var(--danger))' }}>
                 Failed to load prices: {quotesError}
@@ -2831,10 +2831,10 @@ export default function Dashboard() {
                   padding: '8px',
                   background: 'var(--surface-elevated)',
                 borderRadius: '4px', 
-                  border: '1px solid var(--border-subtle)',
+                  border: '1px solid var(--dashboard-chrome-border-subtle)',
                   fontSize: '11px',
                   fontWeight: '600',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -2852,7 +2852,7 @@ export default function Dashboard() {
                   padding: '8px',
                   background: 'var(--bg)',
                     borderRadius: '4px',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--dashboard-chrome-border-subtle)',
                     transition: 'all 0.2s ease',
                     position: 'relative'
                   }}
@@ -2901,7 +2901,7 @@ export default function Dashboard() {
                   justifyContent: 'center', 
                   gap: '4px',
                   fontSize: '10px',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   marginTop: '4px'
                 }}>
                   <div style={{
@@ -2940,10 +2940,10 @@ export default function Dashboard() {
                   padding: '8px',
                   background: 'var(--surface-elevated)',
                   borderRadius: '4px',
-                  border: '1px solid var(--border-subtle)',
+                  border: '1px solid var(--dashboard-chrome-border-subtle)',
                   fontSize: '11px',
                   fontWeight: '600',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
@@ -2961,7 +2961,7 @@ export default function Dashboard() {
                     padding: '8px',
                     background: 'var(--bg)',
                     borderRadius: '4px',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--dashboard-chrome-border-subtle)',
                     transition: 'all 0.2s ease',
                     position: 'relative'
                   }}
@@ -3010,7 +3010,7 @@ export default function Dashboard() {
                   justifyContent: 'center', 
                   gap: '4px',
                   fontSize: '10px',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   marginTop: '4px'
                 }}>
                   <div style={{
@@ -3034,7 +3034,7 @@ export default function Dashboard() {
             padding: '12px',
             background: 'hsl(var(--card))',
             borderRadius: '8px',
-            border: `1px solid hsl(var(--border))`,
+            border: `1px solid var(--dashboard-chrome-border)`,
             scrollMarginTop: '80px'
           }}>
             {isAuthenticated && user ? (
@@ -3055,7 +3055,7 @@ export default function Dashboard() {
                 padding: '20px',
                 background: 'var(--bg)',
                 borderRadius: '8px',
-                border: '1px solid var(--border-subtle)'
+                border: '1px solid var(--dashboard-chrome-border-subtle)'
               }}>
                 <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚙️</div>
                 <h3 style={{ 
@@ -3067,7 +3067,7 @@ export default function Dashboard() {
                   Sign In Required
                 </h3>
                 <p style={{ 
-                  color: 'hsl(var(--muted-foreground))', 
+                  color: 'var(--dashboard-muted-foreground)', 
                   fontSize: '14px',
                   margin: '0'
                 }}>
@@ -3084,7 +3084,7 @@ export default function Dashboard() {
               padding: '0',
               background: 'var(--surface)',
               borderRadius: '8px',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--dashboard-chrome-border)',
               overflow: 'hidden'
             }}>
               <ReferralProgram userId={user.uid} />

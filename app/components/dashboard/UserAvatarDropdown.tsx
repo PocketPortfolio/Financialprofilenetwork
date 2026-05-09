@@ -36,18 +36,18 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
           gap: '8px',
           padding: '6px 12px',
           borderRadius: '6px',
-          border: `1px solid hsl(var(--border))`,
+          border: `1px solid var(--dashboard-chrome-border)`,
           background: 'transparent',
           cursor: 'pointer',
           transition: 'all 0.2s ease'
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'hsl(var(--muted))';
-          e.currentTarget.style.borderColor = 'hsl(var(--border))';
+          e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
+          e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.borderColor = 'hsl(var(--border))';
+          e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
         }}
       >
         {user?.photoURL ? (
@@ -87,7 +87,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
           style={{ 
             width: '16px', 
             height: '16px',
-            color: 'hsl(var(--muted-foreground))',
+            color: 'var(--dashboard-muted-foreground)',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             transition: 'transform 0.2s ease'
           }}
@@ -106,7 +106,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
           top: 'calc(100% + 8px)',
           width: '224px',
           background: 'hsl(var(--card))',
-          border: `1px solid hsl(var(--border))`,
+          border: `1px solid var(--dashboard-chrome-border)`,
           borderRadius: '8px',
           boxShadow: '0 10px 25px -5px hsl(var(--foreground) / 0.5)',
           zIndex: 50,
@@ -116,8 +116,8 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
             <div style={{ 
               padding: '8px 12px', 
               fontSize: '12px', 
-              color: 'hsl(var(--muted-foreground))', 
-              borderBottom: `1px solid hsl(var(--border))`,
+              color: 'var(--dashboard-muted-foreground)', 
+              borderBottom: `1px solid var(--dashboard-chrome-border)`,
               marginBottom: '4px'
             }}>
               {user?.email}
@@ -138,7 +138,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
                 transition: 'background 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'hsl(var(--muted))';
+                e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
@@ -163,7 +163,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
                 transition: 'background 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'hsl(var(--muted))';
+                e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
@@ -188,7 +188,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
                 transition: 'background 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'hsl(var(--muted))';
+                e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
@@ -199,7 +199,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
             </Link>
             
             <div style={{ 
-              borderTop: `1px solid hsl(var(--border))`, 
+              borderTop: `1px solid var(--dashboard-chrome-border)`, 
               margin: '4px 0'
             }} />
             
@@ -223,7 +223,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
                 transition: 'background 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'hsl(var(--muted))';
+                e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';

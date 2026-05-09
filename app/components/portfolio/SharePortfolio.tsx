@@ -89,7 +89,7 @@ export default function SharePortfolio({
         padding: 'var(--space-4)',
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border)',
+        border: '1px solid var(--dashboard-chrome-border)',
       }}
     >
       <h3
@@ -118,7 +118,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 fontWeight: 'var(--font-medium)',
@@ -131,7 +131,7 @@ export default function SharePortfolio({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               📥 Export to CSV
@@ -147,7 +147,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 fontWeight: 'var(--font-medium)',
@@ -160,7 +160,7 @@ export default function SharePortfolio({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               🖼️ Export Chart as PNG
@@ -172,7 +172,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 fontWeight: 'var(--font-medium)',
@@ -185,7 +185,7 @@ export default function SharePortfolio({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               🎨 Export Chart as SVG
@@ -198,7 +198,7 @@ export default function SharePortfolio({
       <div
         style={{
           paddingTop: 'var(--space-4)',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--dashboard-chrome-border-subtle)',
         }}
       >
         <IdentityGate action="share_portfolio" contextId="portfolio" onContinue={handleGenerateShareLink}>
@@ -247,7 +247,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-2)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
               }}
@@ -258,7 +258,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-2) var(--space-3)',
                 background: copied ? 'var(--signal)' : 'var(--surface-elevated)',
                 color: copied ? 'var(--bg)' : 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',

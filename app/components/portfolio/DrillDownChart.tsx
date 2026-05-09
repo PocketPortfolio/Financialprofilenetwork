@@ -147,7 +147,7 @@ export default function DrillDownChart({
               padding: '4px 12px',
               fontSize: '12px',
               background: 'var(--surface-elevated)',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--dashboard-chrome-border)',
               borderRadius: '6px',
               cursor: 'pointer',
               transition: 'var(--transition-base)',
@@ -158,7 +158,7 @@ export default function DrillDownChart({
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'var(--surface-elevated)';
-              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
             }}
           >
             Reset
@@ -189,7 +189,7 @@ export default function DrillDownChart({
                 padding: 'var(--space-2) var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',
@@ -201,7 +201,7 @@ export default function DrillDownChart({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               Portfolio
@@ -231,7 +231,7 @@ export default function DrillDownChart({
                     border: `1px solid ${
                       index === drillDownPath.length - 1
                         ? 'var(--signal)'
-                        : 'var(--border)'
+                        : 'var(--dashboard-chrome-border)'
                     }`,
                     borderRadius: 'var(--radius-sm)',
                     fontSize: 'var(--font-size-sm)',
@@ -247,7 +247,7 @@ export default function DrillDownChart({
                   onMouseLeave={(e) => {
                     if (index !== drillDownPath.length - 1) {
                       e.currentTarget.style.background = 'var(--surface-elevated)';
-                      e.currentTarget.style.borderColor = 'var(--border)';
+                      e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
                     }
                   }}
                 >
@@ -266,7 +266,7 @@ export default function DrillDownChart({
                 padding: 'var(--space-2) var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',
@@ -278,7 +278,7 @@ export default function DrillDownChart({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               ← Back
@@ -303,8 +303,8 @@ export default function DrillDownChart({
               height: '400px',
               background: 'var(--surface)',
               borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              color: 'var(--muted)',
+              border: '1px solid var(--dashboard-chrome-border)',
+              color: 'var(--dashboard-muted-foreground)',
               fontSize: 'var(--font-size-base)',
             }}
           >

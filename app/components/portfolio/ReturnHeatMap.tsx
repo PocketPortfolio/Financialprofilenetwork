@@ -163,8 +163,8 @@ export default function ReturnHeatMap({
           height: '400px',
           background: 'var(--surface)',
           borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border)',
-          color: 'var(--muted)',
+          border: '1px solid var(--dashboard-chrome-border)',
+          color: 'var(--dashboard-muted-foreground)',
           fontSize: 'var(--font-size-base)',
         }}
       >
@@ -178,7 +178,7 @@ export default function ReturnHeatMap({
       style={{
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border)',
+        border: '1px solid var(--dashboard-chrome-border)',
         padding: 'var(--space-4)',
         overflowX: 'auto',
       }}
@@ -211,7 +211,7 @@ export default function ReturnHeatMap({
                   fontSize: 'var(--font-size-sm)',
                   fontWeight: 'var(--font-semibold)',
                   color: 'var(--text-secondary)',
-                  borderBottom: '1px solid var(--border)',
+                  borderBottom: '1px solid var(--dashboard-chrome-border)',
                 }}
               >
                 Ticker
@@ -225,7 +225,7 @@ export default function ReturnHeatMap({
                     fontSize: 'var(--font-size-sm)',
                     fontWeight: 'var(--font-semibold)',
                     color: 'var(--text-secondary)',
-                    borderBottom: '1px solid var(--border)',
+                    borderBottom: '1px solid var(--dashboard-chrome-border)',
                   }}
                 >
                   {period.label}
@@ -238,7 +238,7 @@ export default function ReturnHeatMap({
               <tr
                 key={row.ticker}
                 style={{
-                  borderBottom: '1px solid var(--border)',
+                  borderBottom: '1px solid var(--dashboard-chrome-border)',
                 }}
               >
                 <td
@@ -296,7 +296,7 @@ export default function ReturnHeatMap({
           gap: 'var(--space-4)',
           marginTop: 'var(--space-4)',
           paddingTop: 'var(--space-4)',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--dashboard-chrome-border)',
           flexWrap: 'wrap',
         }}
       >
