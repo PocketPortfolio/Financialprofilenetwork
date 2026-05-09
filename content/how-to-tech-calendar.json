@@ -2074,14 +2074,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Background Jobs with Bull",
     "slug": "how-to-implement-background-jobs-with-bull",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "implement",
       "background",
       "jobs"
-    ]
+    ],
+    "publishedAt": "2026-05-09T14:00:49.577Z"
   },
   {
     "id": "how-to-building-a-multi-tenant-application-may-10",
