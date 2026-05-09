@@ -23,6 +23,7 @@ import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '.
 import LivingPipeline from '../components/landing/LivingPipeline';
 import { AnalystVideo } from '../components/landing/AnalystVideo';
 import ScrollReveal from '../components/ui/ScrollReveal';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import {
   sovereignPrimaryNav,
   sovereignToolsDropdown,
@@ -167,8 +168,10 @@ export default function LandingPage() {
         autoTrackScroll={true}
         autoTrackTime={true}
       />
+      <ProductionNavbar />
       
       {/* Header - Positioned below banner (handled globally by useStickyHeader) */}
+      {false && (
       <header 
         className="brand-header brand-spine" 
         style={{
@@ -553,9 +556,10 @@ export default function LandingPage() {
           </div>
         </div>
       </header>
+      )}
 
       {/* Mobile Menu Overlay */}
-      {showHamburger && isMobileMenuOpen && (
+      {false && showHamburger && isMobileMenuOpen && (
         <div className="mobile-menu-overlay mobile-only brand-surface brand-grid" style={{
               display: isMobileMenuOpen ? 'block' : 'none',
               position: 'fixed',

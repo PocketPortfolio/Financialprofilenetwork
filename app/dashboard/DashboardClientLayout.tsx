@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 
 export default function DashboardClientLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -30,11 +30,7 @@ export default function DashboardClientLayout({ children }: { children: React.Re
         fontFamily: 'system-ui, -apple-system, sans-serif',
       }}
     >
-      <SovereignHeader
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
-        lastSyncTime={syncState.lastSyncTime}
-        user={user}
-      />
+      <ProductionNavbar />
 
       <main
         className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-[calc(96px+env(safe-area-inset-bottom,0px))] md:px-6 md:pb-8"

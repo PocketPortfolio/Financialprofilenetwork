@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MobileHeader from '@/app/components/nav/MobileHeader';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 
 interface AnalyticsData {
   monetization: {
@@ -326,8 +326,7 @@ export default function AdminAnalyticsPage() {
 
   return (
     <>
-      {/* Mobile Header - matches dashboard */}
-      <MobileHeader title="Analytics Dashboard" />
+      <ProductionNavbar />
       
       <div style={{
         minHeight: '100vh',

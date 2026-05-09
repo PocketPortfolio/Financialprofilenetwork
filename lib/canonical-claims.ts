@@ -406,6 +406,8 @@ export const URLS = {
   privacy: 'https://www.pocketportfolio.app/privacy',
   blog: 'https://www.pocketportfolio.app/blog',
   designChallenge: 'https://www.pocketportfolio.app/designchallenge',
+  tier1DesignPartner: 'https://www.pocketportfolio.app/tier1designpartner',
+  boardOfInvestors: 'https://www.pocketportfolio.app/board-of-investors',
   npmAggregateApi: 'https://www.pocketportfolio.app/api/npm-stats',
   npmOrg: 'https://www.npmjs.com/org/pocket-portfolio',
   github: 'https://github.com/PocketPortfolio/Financialprofilenetwork',
@@ -489,6 +491,55 @@ export const DESIGN_CHALLENGE = {
     'Wireframe or prototype (screenshots or hosted URL).',
     'Full-stack application forked from the Pocket Portfolio boilerplate.',
     'Honest, adversarial feedback to harden the substrate.',
+  ] as const,
+} as const;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Tier 1 Design Partnership + Board of Investors — high-intent institutional surfaces
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// Consumed by:
+//   - app/tier1designpartner/page.tsx
+//   - app/board-of-investors/page.tsx
+//   - scripts/build-llms-txt.ts
+//
+// These pages are not “marketing.” They are the public Source of Truth for
+// institutional stakeholders (CTO, Security, Compliance) and seed-round investors.
+
+export const TIER1_DESIGN_PARTNER = {
+  path: '/tier1designpartner',
+  url: URLS.tier1DesignPartner,
+  eyebrow: 'Tier 1 Design Partnership Program',
+  headline: 'The Sovereign Design Partnership Program (Tier 1).',
+  subheadline:
+    'A clean-room design partnership for Finance, Defense, and Healthcare — reduce audit perimeter by keeping customer data local, and prove value via stateless metering.',
+  ogImage: '/og/tier1designpartner.png',
+  ogImageWidth: 1200,
+  ogImageHeight: 627,
+  focusVerticals: ['Finance', 'Defense', 'Healthcare'] as const,
+  /** Technical narrative anchors (used verbatim across the surface). */
+  pillars: [
+    'Audit perimeter reduction (GDPR / DORA posture via architecture)',
+    'Limited-Scope Processor — we do not warehouse partner/customer PII',
+    'Stateless metering (PPI-METER/1): usage counts without data custody',
+  ] as const,
+} as const;
+
+export const BOARD_OF_INVESTORS = {
+  path: '/board-of-investors',
+  url: URLS.boardOfInvestors,
+  eyebrow: 'Board of Investors Program (BIP)',
+  headline: 'Board of Investors Program (Seed Round).',
+  subheadline:
+    'A five-seat governance board for aligned seed investors backing an open-source core, human-centered UX, and real-time distributed data engineering.',
+  ogImage: '/og/board-of-investors.png',
+  ogImageWidth: 1200,
+  ogImageHeight: 627,
+  maxSeats: 5,
+  finPillars: [
+    'Open-source core (verifiable substrate, forkable by design)',
+    'Human-centered UX (operator-grade, high-density surfaces)',
+    'Distributed data engineering (real-time insights, stateless inference)',
   ] as const,
 } as const;
 

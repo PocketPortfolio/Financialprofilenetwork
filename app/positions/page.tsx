@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useTrades } from '../hooks/useTrades';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
 import { usePortfolioNotes } from '../hooks/usePortfolioNotes';
 import { Trade } from '../services/tradeService';
@@ -162,10 +162,7 @@ export default function PositionsPage() {
           title="Positions - Pocket Portfolio"
           description="View your portfolio positions and holdings"
         />
-        <SovereignHeader 
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-          user={user}
-        />
+        <ProductionNavbar />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -213,10 +210,7 @@ export default function PositionsPage() {
         title="Positions - Pocket Portfolio"
         description="View your portfolio positions and holdings"
       />
-      <SovereignHeader 
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-        user={user}
-      />
+      <ProductionNavbar />
       
       <main style={{ 
         flex: 1, 

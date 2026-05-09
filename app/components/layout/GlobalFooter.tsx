@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { DESIGN_CHALLENGE } from '@/lib/canonical-claims';
+import { BOARD_OF_INVESTORS, DESIGN_CHALLENGE, TIER1_DESIGN_PARTNER } from '@/lib/canonical-claims';
 
 interface TrendingAsset {
   symbol: string;
@@ -353,21 +353,6 @@ export default function GlobalFooter() {
                 </a>
               </li>
               <li>
-                <Link
-                  href={DESIGN_CHALLENGE.path}
-                  style={{
-                    color: 'var(--text-secondary)',
-                    textDecoration: 'none',
-                    fontSize: '14px',
-                    transition: 'color 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-                >
-                  {DESIGN_CHALLENGE.footerCommunityLabel}
-                </Link>
-              </li>
-              <li>
                 <a
                   href="https://dev.to/pocketportfolioapp"
                   target="_blank"
@@ -434,6 +419,60 @@ export default function GlobalFooter() {
                 >
                   1EO Certified
                 </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Partners (Institutional funnel) */}
+          <div>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
+              Partners
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>
+                <Link
+                  href={DESIGN_CHALLENGE.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  {DESIGN_CHALLENGE.footerCommunityLabel}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={TIER1_DESIGN_PARTNER.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Tier 1 design partner
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={BOARD_OF_INVESTORS.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Board of investors (BIP)
+                </Link>
               </li>
             </ul>
           </div>
@@ -840,12 +879,13 @@ export default function GlobalFooter() {
             grid-template-columns: 1fr !important;
             gap: 24px !important;
           }
-          /* Mobile stacking order: Verified Importers -> Product -> Market Data -> Community -> Resources */
-          .footer-columns > div:nth-child(1) { order: 1; }
-          .footer-columns > div:nth-child(2) { order: 2; }
-          .footer-columns > div:nth-child(3) { order: 4; }
-          .footer-columns > div:nth-child(4) { order: 3; }
-          .footer-columns > div:nth-child(5) { order: 5; }
+          /* Mobile stacking order: Verified Importers -> Product -> Partners -> Community -> Market Data -> Resources */
+          .footer-columns > div:nth-child(1) { order: 1; } /* Verified Importers */
+          .footer-columns > div:nth-child(2) { order: 2; } /* Product */
+          .footer-columns > div:nth-child(3) { order: 4; } /* Community */
+          .footer-columns > div:nth-child(4) { order: 3; } /* Partners */
+          .footer-columns > div:nth-child(5) { order: 5; } /* Market Data */
+          .footer-columns > div:nth-child(6) { order: 6; } /* Resources */
         }
       `}</style>
     </footer>

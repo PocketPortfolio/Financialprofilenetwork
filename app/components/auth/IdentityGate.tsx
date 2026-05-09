@@ -9,7 +9,9 @@ type GateAction =
   | 'export_json'
   | 'save_view'
   | 'share_reasoning'
-  | 'share_portfolio';
+  | 'share_portfolio'
+  | 'tier1_brief'
+  | 'bip_apply';
 
 type IdentityGateProps = {
   action: GateAction;
@@ -22,6 +24,29 @@ type IdentityGateProps = {
 
 const IDENTIFIED_KEY = 'pp_identified_v1';
 const IDENTIFIED_EMAIL_KEY = 'pp_identified_email_v1';
+
+function gateCopy(action: GateAction): { title: string; body: string; cta: string } {
+  switch (action) {
+    case 'tier1_brief':
+      return {
+        title: 'Tier 1 brief access',
+        body: 'Enter an email routing key to verify institutional intent. We store attribution metadata only (no portfolio/trade payloads).',
+        cta: 'Unlock brief →',
+      };
+    case 'bip_apply':
+      return {
+        title: 'Board of Investors application',
+        body: 'Enter an email routing key to verify governance intent. We store attribution metadata only (no portfolio/trade payloads).',
+        cta: 'Unlock application →',
+      };
+    default:
+      return {
+        title: 'Your sovereign export is ready',
+        body: 'Where should we send your session recovery key and export summary?',
+        cta: 'Continue →',
+      };
+  }
+}
 
 function isUnlocked(): boolean {
   if (typeof window === 'undefined') return false;
@@ -44,6 +69,7 @@ export default function IdentityGate({ action, contextId, onContinue, children }
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const copy = useMemo(() => gateCopy(action), [action]);
 
   const request = () => {
     if (typeof window === 'undefined') return;
@@ -131,26 +157,60 @@ export default function IdentityGate({ action, contextId, onContinue, children }
               width: '100%',
               maxWidth: 520,
               background: 'var(--surface)',
-              border: '1px solid var(--border-subtle)',
+              border: '1px solid var(--border-warm)',
               borderRadius: 14,
               padding: 18,
               boxShadow: '0 18px 60px rgba(0,0,0,0.35)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              id="pp-identity-gate-title"
-              style={{
-                fontSize: 14,
-                fontWeight: 900,
-                letterSpacing: '-0.01em',
-                color: 'var(--text)',
-              }}
-            >
-              Your sovereign export is ready
-            </div>
-            <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              Where should we send your session recovery key and export summary?
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 900,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--accent-warm)',
+                    fontFamily: 'var(--font-mono, ui-monospace, SFMono-Regular, monospace)',
+                  }}
+                >
+                  Identity gate
+                </div>
+                <div
+                  id="pp-identity-gate-title"
+                  style={{
+                    marginTop: 6,
+                    fontSize: 15,
+                    fontWeight: 900,
+                    letterSpacing: '-0.01em',
+                    color: 'var(--text)',
+                  }}
+                >
+                  {copy.title}
+                </div>
+                <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                  {copy.body}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={close}
+                aria-label="Close"
+                style={{
+                  border: '1px solid var(--border-warm)',
+                  background: 'var(--background)',
+                  color: 'var(--text-secondary)',
+                  borderRadius: 10,
+                  padding: '8px 10px',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 900,
+                }}
+              >
+                Esc
+              </button>
             </div>
 
             <div style={{ marginTop: 12 }}>
@@ -176,8 +236,8 @@ export default function IdentityGate({ action, contextId, onContinue, children }
                   width: '100%',
                   padding: '10px 12px',
                   borderRadius: 12,
-                  border: '1px solid var(--border-subtle)',
-                  background: 'var(--background)',
+                  border: '1px solid var(--border-warm)',
+                  background: 'var(--surface-elevated)',
                   color: 'var(--text)',
                   outline: 'none',
                   boxSizing: 'border-box',
@@ -187,8 +247,7 @@ export default function IdentityGate({ action, contextId, onContinue, children }
                 <div style={{ marginTop: 8, fontSize: 12, color: 'rgba(239, 68, 68, 0.95)' }}>{error}</div>
               )}
               <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Local-first: we only capture an email as a routing key, plus first-touch attribution metadata (no
-                portfolio/trade data).
+                Local-first: we capture an email routing key + first-touch attribution metadata only (no portfolio/trade payloads).
               </div>
             </div>
 
@@ -199,8 +258,8 @@ export default function IdentityGate({ action, contextId, onContinue, children }
                 style={{
                   padding: '10px 12px',
                   borderRadius: 12,
-                  border: '1px solid var(--border-subtle)',
-                  background: 'var(--background)',
+                  border: '1px solid var(--border-warm)',
+                  background: 'var(--surface-elevated)',
                   color: 'var(--text)',
                   fontSize: 12,
                   fontWeight: 800,
@@ -224,7 +283,7 @@ export default function IdentityGate({ action, contextId, onContinue, children }
                   cursor: submitting ? 'not-allowed' : 'pointer',
                 }}
               >
-                Continue →
+                {copy.cta}
               </button>
             </div>
           </div>

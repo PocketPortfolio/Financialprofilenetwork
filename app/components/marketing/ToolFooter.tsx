@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/app/hooks/useAuth';
 import { DESIGN_CHALLENGE } from '@/lib/canonical-claims';
+import { BOARD_OF_INVESTORS, TIER1_DESIGN_PARTNER } from '@/lib/canonical-claims';
 
 export default function ToolFooter() {
   const { isAuthenticated } = useAuth();
@@ -333,18 +334,6 @@ export default function ToolFooter() {
             >
               CoderLegion
             </a>
-            <Link
-              href={DESIGN_CHALLENGE.path}
-              style={{
-                color: 'var(--text-secondary)',
-                textDecoration: 'none',
-                transition: 'color 0.2s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-            >
-              {DESIGN_CHALLENGE.footerCommunityLabel}
-            </Link>
             <a
               href="https://discord.gg/Ch9PpjRzwe"
               target="_blank"
@@ -398,6 +387,56 @@ export default function ToolFooter() {
               onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
               Launch App
+            </Link>
+          </div>
+
+          {/* Partners Links */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '24px',
+              flexWrap: 'wrap',
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              marginTop: '16px',
+            }}
+          >
+            <Link
+              href={DESIGN_CHALLENGE.path}
+              style={{
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            >
+              {DESIGN_CHALLENGE.footerCommunityLabel}
+            </Link>
+            <Link
+              href={TIER1_DESIGN_PARTNER.path}
+              style={{
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            >
+              Tier 1 design partner
+            </Link>
+            <Link
+              href={BOARD_OF_INVESTORS.path}
+              style={{
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            >
+              Board of investors
             </Link>
           </div>
 

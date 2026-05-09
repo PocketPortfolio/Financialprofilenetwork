@@ -49,9 +49,7 @@ import FeatureAnnouncementModal from '../components/modals/FeatureAnnouncementMo
 import { getDeviceInfo } from '../lib/utils/device';
 import { initializeMobileAnalytics } from '../lib/analytics/device';
 import { trackEvent, trackPaywallCtaClick, trackPaywallImpression } from '../lib/analytics/events';
-import MobileHeader from '../components/nav/MobileHeader';
 import OnboardingTour from '../components/OnboardingTour';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import { MorningBrief } from '../components/dashboard/MorningBrief';
 import { useWeeklySnapshotToast } from '../hooks/useWeeklySnapshotToast';
 import { WeeklySnapshotToast } from '../components/WeeklySnapshotToast';

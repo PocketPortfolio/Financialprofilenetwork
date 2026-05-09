@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useWatchlist } from '../hooks/useWatchlist';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import AlertModal from '../components/modals/AlertModal';
 import { getDeviceInfo } from '../lib/utils/device';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
@@ -169,10 +169,7 @@ export default function WatchlistPage() {
           title="Watchlist - Pocket Portfolio"
           description="Track your favorite stocks and investments"
         />
-        <SovereignHeader 
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-          user={user}
-        />
+        <ProductionNavbar />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -220,10 +217,7 @@ export default function WatchlistPage() {
         title="Watchlist - Pocket Portfolio"
         description="Track your favorite stocks and investments"
       />
-      <SovereignHeader 
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-        user={user}
-      />
+      <ProductionNavbar />
       
       <main style={{ 
         flex: 1, 

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MobileHeader from '@/app/components/nav/MobileHeader';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import { RevenueWidget } from '@/app/components/sales/RevenueWidget';
 import { ActionFeed } from '@/app/components/sales/ActionFeed';
 import { LeadDetailsDrawer } from '@/app/components/sales/LeadDetailsDrawer';
@@ -353,7 +353,7 @@ export default function AdminSalesPage() {
   if (!isAuthenticated || !isAdmin) {
     return (
       <>
-        <MobileHeader title="Sales Pilot" />
+        <ProductionNavbar />
         <div style={{ 
           minHeight: '100vh', 
           display: 'flex', 
@@ -393,7 +393,7 @@ export default function AdminSalesPage() {
   if (loading && !metrics) {
     return (
       <>
-        <MobileHeader title="Sales Pilot" />
+        <ProductionNavbar />
         <div className="brand-surface" style={{ padding: 'var(--space-6)', minHeight: '100vh' }}>
           <div style={{ color: 'var(--text-secondary)', textAlign: 'center' }}>Loading...</div>
         </div>
@@ -403,7 +403,7 @@ export default function AdminSalesPage() {
 
   return (
     <>
-      <MobileHeader title="Sales Pilot" />
+      <ProductionNavbar />
       <div className="brand-surface" style={{ minHeight: '100vh', padding: 'var(--space-6)' }}>
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         {/* WAR MODE: Quota limits removed (Directive 011) */}

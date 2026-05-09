@@ -232,6 +232,19 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.92,
     },
+    // Institutional funnel — Tier 1 partners + seed governance
+    {
+      url: `${baseUrl}/tier1designpartner`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/board-of-investors`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
     {
       url: `${baseUrl}/book/universal-llm-import`,
       lastModified: now,

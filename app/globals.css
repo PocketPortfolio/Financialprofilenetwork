@@ -940,20 +940,21 @@ select option:checked {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    background: transparent !important;
-    border: none !important;
+    background: var(--accent-warm) !important;
+    border: 2px solid var(--border-warm) !important;
     cursor: pointer !important;
     padding: 8px !important;
     border-radius: 6px !important;
-    transition: background-color 0.2s ease !important;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
     min-height: 40px !important;
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.28) !important;
   }
   
   .hamburger-btn:hover {
-    background: var(--chrome) !important;
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
   }
   
   .hamburger-btn:focus {
@@ -966,8 +967,8 @@ select option:checked {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    background: transparent !important;
-    border: none !important;
+    background: var(--accent-warm) !important;
+    border: 2px solid var(--border-warm) !important;
     position: relative !important;
     z-index: 1000 !important;
   }

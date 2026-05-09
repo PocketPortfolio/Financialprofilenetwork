@@ -1,5 +1,5 @@
 /**
- * Ratified marketing IA: Terminal | Architecture | Developers | Founders | Mission | FIN Pillars | Tools | FAQ.
+ * Ratified marketing IA: Terminal | Architecture | Developers | Partners | Mission | FIN Pillars | Tools | FAQ.
  * Used by landing (`/`, `/landing`) and ProductionNavbar (`/s/*`, tools, learn, etc.) so hrefs resolve correctly.
  */
 
@@ -27,13 +27,7 @@ function architectureHref(utmContext: 'landing' | 'site'): string {
   return `/architecture?${q}`;
 }
 
-function foundersHref(utmContext: 'landing' | 'site'): string {
-  const q =
-    utmContext === 'landing'
-      ? 'utm_source=landing&utm_medium=nav&utm_campaign=founders_club'
-      : 'utm_source=navbar&utm_medium=global&utm_campaign=founders_club';
-  return `/sponsor?${q}`;
-}
+// Partners dropdown is handled in ProductionNavbar (portal dropdown) because it is not a single href.
 
 export function sovereignPrimaryNav(
   pathname: string,
@@ -44,7 +38,7 @@ export function sovereignPrimaryNav(
     { label: 'Terminal', href: L('#features') },
     { label: 'Architecture', href: architectureHref(utmContext) },
     { label: 'Developers', href: L('#developer') },
-    { label: 'Founders', href: foundersHref(utmContext) },
+    { label: 'Partners', href: '/designchallenge' },
     { label: 'Mission', href: L('#mission') },
     { label: 'FIN Pillars', href: L('#fin-pillars') },
     { label: 'FAQ', href: L('#faq') },

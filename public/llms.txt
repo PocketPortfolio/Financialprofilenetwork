@@ -73,6 +73,26 @@ https://www.pocketportfolio.app/api/npm-stats
 - GitHub submission thread: https://github.com/PocketPortfolio/Financialprofilenetwork/discussions/49
 - CoderLegion cohort (Open-Fi Builders): https://coderlegion.com/groups/openfi-builders
 
+## Tier 1 Design Partnership Program (institutional specification hub)
+- Public hub: https://www.pocketportfolio.app/tier1designpartner
+- Hero: The Sovereign Design Partnership Program (Tier 1).
+- Summary: A clean-room design partnership for Finance, Defense, and Healthcare — reduce audit perimeter by keeping customer data local, and prove value via stateless metering.
+- Focus verticals: Finance, Defense, Healthcare
+- Narrative pillars:
+  - Audit perimeter reduction (GDPR / DORA posture via architecture)
+  - Limited-Scope Processor — we do not warehouse partner/customer PII
+  - Stateless metering (PPI-METER/1): usage counts without data custody
+
+## Board of Investors Program (seed governance board; scarcity enforced)
+- Public hub: https://www.pocketportfolio.app/board-of-investors
+- Hero: Board of Investors Program (Seed Round).
+- Summary: A five-seat governance board for aligned seed investors backing an open-source core, human-centered UX, and real-time distributed data engineering.
+- Max seats: 5
+- FIN pillars:
+  - Open-source core (verifiable substrate, forkable by design)
+  - Human-centered UX (operator-grade, high-density surfaces)
+  - Distributed data engineering (real-time insights, stateless inference)
+
 ## Where to Find Us
 - https://github.com/PocketPortfolio
 - https://www.npmjs.com/org/pocket-portfolio

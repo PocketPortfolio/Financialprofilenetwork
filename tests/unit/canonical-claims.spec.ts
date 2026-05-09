@@ -15,6 +15,7 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  BOARD_OF_INVESTORS,
   DESIGN_CHALLENGE,
   LAST_HUMAN_VERIFIED,
   NUMBERS_SNAPSHOT,
@@ -23,6 +24,7 @@ import {
   SDK,
   SOVEREIGN_THRESHOLDS,
   TAGLINE_LONG,
+  TIER1_DESIGN_PARTNER,
   URLS,
 } from '../../lib/canonical-claims';
 import { ADAPTERS } from '@/src/import/registry';
@@ -163,5 +165,23 @@ describe('Design Partnership Challenge SSOT', () => {
     expect(DESIGN_CHALLENGE.ogImage).toBe('/og/designchallenge.png');
     expect(DESIGN_CHALLENGE.ogImageWidth).toBe(1200);
     expect(DESIGN_CHALLENGE.ogImageHeight).toBe(627);
+  });
+});
+
+describe('Institutional Funnel SSOT (Tier 1 + BIP)', () => {
+  test('TIER1_DESIGN_PARTNER url matches URLS.tier1DesignPartner and path is stable', () => {
+    expect(TIER1_DESIGN_PARTNER.path).toBe('/tier1designpartner');
+    expect(TIER1_DESIGN_PARTNER.url).toBe(URLS.tier1DesignPartner);
+    expect(TIER1_DESIGN_PARTNER.url.endsWith(TIER1_DESIGN_PARTNER.path)).toBe(true);
+  });
+
+  test('BOARD_OF_INVESTORS url matches URLS.boardOfInvestors and path is stable', () => {
+    expect(BOARD_OF_INVESTORS.path).toBe('/board-of-investors');
+    expect(BOARD_OF_INVESTORS.url).toBe(URLS.boardOfInvestors);
+    expect(BOARD_OF_INVESTORS.url.endsWith(BOARD_OF_INVESTORS.path)).toBe(true);
+  });
+
+  test('BIP scarcity rule: maxSeats is pinned to 5', () => {
+    expect(BOARD_OF_INVESTORS.maxSeats).toBe(5);
   });
 });

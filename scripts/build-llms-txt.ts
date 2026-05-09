@@ -24,6 +24,8 @@ import {
   CANONICAL_ARTICLES,
   URLS,
   DESIGN_CHALLENGE,
+  TIER1_DESIGN_PARTNER,
+  BOARD_OF_INVESTORS,
 } from '../lib/canonical-claims';
 
 /**
@@ -97,6 +99,22 @@ ${articlesSection}
 - GitHub fork (boilerplate): ${DESIGN_CHALLENGE.github.fork}
 - GitHub submission thread: ${DESIGN_CHALLENGE.github.submissionThread}
 - CoderLegion cohort (Open-Fi Builders): ${DESIGN_CHALLENGE.coderLegionGroup}
+
+## Tier 1 Design Partnership Program (institutional specification hub)
+- Public hub: ${TIER1_DESIGN_PARTNER.url}
+- Hero: ${TIER1_DESIGN_PARTNER.headline}
+- Summary: ${TIER1_DESIGN_PARTNER.subheadline}
+- Focus verticals: ${TIER1_DESIGN_PARTNER.focusVerticals.join(', ')}
+- Narrative pillars:
+${TIER1_DESIGN_PARTNER.pillars.map((p) => `  - ${p}`).join('\n')}
+
+## Board of Investors Program (seed governance board; scarcity enforced)
+- Public hub: ${BOARD_OF_INVESTORS.url}
+- Hero: ${BOARD_OF_INVESTORS.headline}
+- Summary: ${BOARD_OF_INVESTORS.subheadline}
+- Max seats: ${BOARD_OF_INVESTORS.maxSeats}
+- FIN pillars:
+${BOARD_OF_INVESTORS.finPillars.map((p) => `  - ${p}`).join('\n')}
 
 ## Where to Find Us
 ${sameAsSection}

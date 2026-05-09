@@ -21,6 +21,7 @@ import { generateMetadata as genMeta } from '@/app/lib/seo/meta';
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import type { LiveSignal } from '@/app/press/jsonld';
 import {
+  BOARD_OF_INVESTORS,
   DESIGN_CHALLENGE,
   FOUNDER_CREDENTIALS_ABBA,
   MOAT_CLAIMS,
@@ -29,6 +30,7 @@ import {
   PACKAGES,
   PERSON_ABBA,
   SDK,
+  TIER1_DESIGN_PARTNER,
   URLS,
 } from '@/lib/canonical-claims';
 
@@ -683,6 +685,38 @@ export default async function DesignChallengePage() {
                 Join the cohort →
               </a>
             </article>
+          </div>
+        </section>
+
+        {/* ───────────── Tier 1 escalation ───────────── */}
+        <section style={{ marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+          <h2 style={{ fontSize: 'clamp(22px, 2.5vw, 28px)', fontWeight: 800, margin: '0 0 14px' }}>
+            Tier 1 escalation
+          </h2>
+          <p style={{ margin: '0 0 14px', fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+            If you are already operating inside a regulated institution, these are the high-intent surfaces: the Tier 1 technical brief and the seed governance board.
+          </p>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <Link
+              href={TIER1_DESIGN_PARTNER.path}
+              style={{
+                background: 'var(--accent-warm)',
+                color: '#1a1208',
+                fontWeight: 800,
+                padding: '12px 18px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                fontSize: '14px',
+              }}
+            >
+              {TIER1_DESIGN_PARTNER.eyebrow} →
+            </Link>
+            <Link
+              href={BOARD_OF_INVESTORS.path}
+              style={{ ...ctaOutlineCommunity('12px 18px', '14px'), display: 'inline-block' }}
+            >
+              {BOARD_OF_INVESTORS.eyebrow} (max {BOARD_OF_INVESTORS.maxSeats}) →
+            </Link>
           </div>
         </section>
 

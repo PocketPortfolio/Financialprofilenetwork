@@ -1,4 +1,4 @@
-import MobileHeader from '@/app/components/nav/MobileHeader';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
 
 export default function ImportLayout({
@@ -19,7 +19,7 @@ export default function ImportLayout({
         overflowX: 'hidden'
       }}
     >
-      <MobileHeader title="Import Trades" />
+      <ProductionNavbar />
       <SEOPageTracker />
       <main
         style={{

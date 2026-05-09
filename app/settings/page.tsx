@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import { auth } from '../lib/firebase';
 import { AccountService } from '../services/accountService';
 import { useTrades } from '../hooks/useTrades';
@@ -449,11 +449,7 @@ export default function SettingsPage() {
           title="Settings - Pocket Portfolio"
           description="Manage your account settings and preferences"
         />
-        <SovereignHeader 
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-          lastSyncTime={syncState.lastSyncTime}
-          user={user}
-        />
+        <ProductionNavbar />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -501,11 +497,7 @@ export default function SettingsPage() {
         title="Settings - Pocket Portfolio"
         description="Manage your account settings and preferences"
       />
-      <SovereignHeader 
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-        lastSyncTime={syncState.lastSyncTime}
-        user={user}
-      />
+      <ProductionNavbar />
       
       <main style={{ 
         flex: 1, 
