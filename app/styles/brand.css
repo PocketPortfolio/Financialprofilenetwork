@@ -947,12 +947,7 @@ body:has(header.brand-header) {
   }
 }
 
-/* Hide tab bar on desktop */
-@media (min-width: 769px) {
-  .mobile-tab-bar {
-    display: none !important;
-  }
-}
+/* Tab bar visibility: mobile = always (JS); desktop = only when authenticated (JS). No CSS hide on desktop. */
 
 /* Force hide hamburger button on desktop - Final override */
 @media screen and (min-width: 769px) {
@@ -1033,8 +1028,8 @@ body:has(header.brand-header) {
   }
 }
 
-/* Enhanced TabBar with Pocket Portfolio branding */
-.mobile-tab-bar {
+/* Mobile bottom TabBar — terminal / pro reference manual (token-driven, no SaaS orange slab) */
+.mobile-tab-bar.pp-tab-bar {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
@@ -1043,99 +1038,112 @@ body:has(header.brand-header) {
   left: 0 !important;
   right: 0 !important;
   z-index: 1000 !important;
-  background: linear-gradient(135deg, rgba(255, 107, 53, 0.95) 0%, rgba(245, 158, 11, 0.95) 100%) !important;
-  border-top: 2px solid rgba(255, 107, 53, 0.3) !important;
-  padding-top: 12px !important;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-  min-height: 72px !important;
-  backdrop-filter: blur(20px) saturate(1.2) !important;
-  box-shadow: 0 -8px 32px rgba(255, 107, 53, 0.3), 0 -4px 16px rgba(0, 0, 0, 0.1) !important;
+  justify-content: space-around !important;
+  align-items: stretch !important;
+  gap: 4px !important;
+  background: color-mix(in srgb, var(--surface-elevated) 94%, var(--background) 6%) !important;
+  border-top: 1px solid var(--border-subtle) !important;
+  padding-top: 10px !important;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  min-height: 64px !important;
+  backdrop-filter: blur(16px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.15) !important;
+  box-shadow:
+    0 -1px 0 color-mix(in srgb, var(--border-warm) 35%, transparent),
+    0 -12px 40px rgba(0, 0, 0, 0.14) !important;
   width: 100% !important;
   box-sizing: border-box !important;
 }
 
-@media (min-width: 769px) {
-  .mobile-tab-bar {
-    display: none !important;
-  }
-}
-
-
-/* Enhanced TabBar item styling */
-.mobile-tab-bar .mobile-tab-item {
+.mobile-tab-bar .mobile-tab-item.pp-tab-item {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 8px 12px !important;
+  padding: 6px 4px 4px !important;
   border-radius: 12px !important;
   background: transparent !important;
-  border: 2px solid transparent !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid transparent !important;
+  color: var(--text-secondary) !important;
+  text-decoration: none !important;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease !important;
   min-height: 52px !important;
-  min-width: 52px !important;
+  min-width: 0 !important;
   cursor: pointer !important;
-  flex: 1 !important;
-  max-width: 80px !important;
+  flex: 1 1 0 !important;
+  max-width: 88px !important;
   transform: scale(1) !important;
   box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-.mobile-tab-bar .mobile-tab-item[data-active="true"] {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
-  color: #ffffff !important;
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+.mobile-tab-bar .mobile-tab-item.pp-tab-item[data-active="true"] {
+  background: color-mix(in srgb, var(--accent-warm) 18%, var(--surface)) !important;
+  border: 1px solid var(--border-warm) !important;
+  color: var(--text) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent-warm) 25%, transparent) !important;
 }
 
-.mobile-tab-bar .mobile-tab-item span {
-  font-size: 11px !important;
-  font-weight: 500 !important;
+.mobile-tab-bar .pp-tab-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 2px !important;
+}
+
+.mobile-tab-bar .pp-tab-icon-svg {
+  width: 22px !important;
+  height: 22px !important;
+  flex-shrink: 0 !important;
+}
+
+.mobile-tab-bar .mobile-tab-item .pp-tab-label {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums !important;
   text-align: center !important;
-  line-height: 1.2 !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-  text-shadow: none !important;
-  letter-spacing: 0.025em !important;
-  margin-top: 2px !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0.02em !important;
+  margin-top: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: inherit !important;
 }
 
-/* Hide text labels on mobile - icon only */
-@media (max-width: 768px) {
-  .mobile-tab-bar .mobile-tab-item .mobile-tab-label {
-    display: none !important;
-  }
-  
-  .mobile-tab-bar .mobile-tab-item > div {
-    margin-bottom: 0 !important;
-  }
-}
-
-/* Show text labels on desktop/tablet */
-@media (min-width: 769px) {
-  .mobile-tab-bar .mobile-tab-item .mobile-tab-label {
-    display: block !important;
-  }
-}
-
-.mobile-tab-bar .mobile-tab-item[data-active="true"] span {
+.mobile-tab-bar .mobile-tab-item[data-active="true"] .pp-tab-label {
+  color: var(--text) !important;
   font-weight: 700 !important;
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Enhanced SVG styling with gradients */
-.mobile-tab-bar svg {
-  stroke: rgba(255, 255, 255, 0.8) !important;
+/* Lucide: stroke follows text color; no forced white fills */
+.mobile-tab-bar .mobile-tab-item .pp-tab-icon-svg {
+  stroke: currentColor !important;
   fill: none !important;
 }
 
-.mobile-tab-bar .mobile-tab-item[data-active="true"] svg {
-  stroke: #ffffff !important;
-  fill: #ffffff !important;
+.mobile-tab-bar .mobile-tab-item[data-active="true"] .pp-tab-icon-svg {
+  color: var(--accent-warm) !important;
+  stroke: var(--accent-warm) !important;
+}
+
+.mobile-tab-bar .mobile-tab-item:not([data-active="true"]):hover {
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent-warm) 12%) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text) !important;
+}
+
+@media (max-width: 380px) {
+  .mobile-tab-bar .mobile-tab-item .pp-tab-label {
+    font-size: 9px !important;
+  }
 }
 
 

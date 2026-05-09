@@ -97,6 +97,14 @@ export default function ProductionNavbar() {
   useStickyHeader('header.brand-header');
 
   const safePathname = pathname ?? '/';
+  const isMarketingHome = safePathname === '/' || safePathname === '/landing';
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isMarketingHome) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const primaryNav = sovereignPrimaryNav(safePathname, 'site');
   const faqItem = primaryNav[primaryNav.length - 1]!;
   const beforeFaq = primaryNav.slice(0, -1);
@@ -177,7 +185,13 @@ export default function ProductionNavbar() {
           }}>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Link href="/" style={{ textDecoration: 'none' }}>
+              <Link
+                href="/"
+                scroll={!isMarketingHome}
+                onClick={handleLogoClick}
+                style={{ textDecoration: 'none' }}
+                aria-label={isMarketingHome ? 'Back to top' : 'Pocket Portfolio home'}
+              >
                 <Logo size="medium" showWordmark={!isMobile} />
               </Link>
             </div>

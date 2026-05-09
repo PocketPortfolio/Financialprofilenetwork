@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
+import { SovereignHeader } from '@/app/components/dashboard/SovereignHeader';
+import { useGoogleDrive } from '@/app/hooks/useGoogleDrive';
 
 interface AnalyticsData {
   monetization: {
@@ -183,6 +184,7 @@ interface AnalyticsData {
 
 export default function AdminAnalyticsPage() {
   const { user, isAuthenticated, loading } = useAuth();
+  const { syncState } = useGoogleDrive();
   const router = useRouter();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loadingData, setLoadingData] = useState(true);
@@ -271,16 +273,28 @@ export default function AdminAnalyticsPage() {
   // Show loading while checking auth
   if (loading || checkingAdmin) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'var(--bg)',
-        color: 'var(--text)'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <p>Loading...</p>
+      <div
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans"
+        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      >
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
+        <div
+          style={{
+            minHeight: 'calc(100vh - 80px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <p>Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -289,36 +303,48 @@ export default function AdminAnalyticsPage() {
   // Show access denied if not authenticated or not admin
   if (!isAuthenticated || !isAdmin) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'var(--bg)',
-        color: 'var(--text)',
-        padding: '20px'
-      }}>
-        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-          <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Access Denied</h1>
-          <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>
-            {!isAuthenticated 
-              ? 'You must be logged in to access this page.'
-              : 'You need admin privileges to access this page.'}
-          </p>
-          <Link 
-            href="/dashboard"
-            style={{
-              padding: '12px 24px',
-              background: 'var(--signal)',
-              color: 'white',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              display: 'inline-block',
-              fontWeight: '500'
-            }}
-          >
-            Go to Dashboard
-          </Link>
+      <div
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans"
+        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      >
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
+        <div
+          style={{
+            minHeight: 'calc(100vh - 80px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+            padding: '20px',
+          }}
+        >
+          <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+            <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Access Denied</h1>
+            <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>
+              {!isAuthenticated
+                ? 'You must be logged in to access this page.'
+                : 'You need admin privileges to access this page.'}
+            </p>
+            <Link
+              href="/dashboard"
+              style={{
+                padding: '12px 24px',
+                background: 'var(--signal)',
+                color: 'white',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                display: 'inline-block',
+                fontWeight: '500',
+              }}
+            >
+              Go to Dashboard
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -326,10 +352,17 @@ export default function AdminAnalyticsPage() {
 
   return (
     <>
-      <ProductionNavbar />
-      
+      <div
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans"
+        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      >
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
       <div style={{
-        minHeight: '100vh',
+        minHeight: 'calc(100vh - 80px)',
         background: 'var(--bg)',
         color: 'var(--text)',
         padding: 'var(--space-6)',
@@ -2043,6 +2076,7 @@ export default function AdminAnalyticsPage() {
          </Link>
        </div>
      </div>
+      </div>
     </>
   );
 }
