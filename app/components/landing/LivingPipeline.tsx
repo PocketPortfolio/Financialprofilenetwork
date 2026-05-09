@@ -15,14 +15,12 @@ const JSON_OBJECTS = [
   '{"symbol":"GOOGL","qty":3,"date":"2024-03-10"}',
 ];
 
-/** Matches landing hero “signature” chrome (warm 2px + soft glow); processor node stays stronger. */
 const CARD_STYLE: React.CSSProperties = {
   fontFamily: 'ui-monospace, monospace',
   fontSize: '11px',
   padding: '10px 14px',
   borderRadius: '8px',
-  border: '2px solid var(--border-warm)',
-  boxShadow: '0 0 12px rgba(245, 158, 11, 0.22), 0 0 24px rgba(245, 158, 11, 0.08)',
+  border: '1px solid var(--border-subtle, rgba(255,255,255,0.1))',
   background: 'var(--surface-elevated, rgba(26,30,36,0.9))',
   color: 'var(--text-secondary, #9aa3ae)',
   whiteSpace: 'nowrap',

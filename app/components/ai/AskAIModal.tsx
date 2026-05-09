@@ -550,15 +550,7 @@ export function AskAIModal({
                   </span>
                 )}
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '8px',
-                  alignItems: 'stretch',
-                  width: '100%',
-                  boxSizing: 'border-box',
-                }}
-              >
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -567,7 +559,6 @@ export function AskAIModal({
                   disabled={isLoading || attachmentProcessing}
                   style={{
                     flex: 1,
-                    minWidth: 0,
                     padding: '10px 12px',
                     borderRadius: '8px',
                     border: '1px solid hsl(var(--border))',
@@ -577,15 +568,12 @@ export function AskAIModal({
                     resize: 'none',
                     minHeight: '44px',
                     maxHeight: '120px',
-                    alignSelf: 'stretch',
-                    boxSizing: 'border-box',
                   }}
                 />
                 <button
                   type="submit"
                   disabled={isLoading || attachmentProcessing || !input.trim()}
                   style={{
-                    flexShrink: 0,
                     padding: '10px 16px',
                     borderRadius: '8px',
                     border: 'none',
@@ -595,12 +583,6 @@ export function AskAIModal({
                     fontWeight: 600,
                     cursor: isLoading || attachmentProcessing || !input.trim() ? 'not-allowed' : 'pointer',
                     opacity: isLoading || attachmentProcessing || !input.trim() ? 0.7 : 1,
-                    minHeight: '44px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    alignSelf: 'stretch',
-                    boxSizing: 'border-box',
                   }}
                 >
                   {isLoading ? '...' : 'Send'}
