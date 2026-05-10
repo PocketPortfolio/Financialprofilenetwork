@@ -2087,14 +2087,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Resource Right-Sizing - CPU vs Memory Analysis",
     "slug": "research-resource-right-sizing-cpu-vs-memory-analysis-2026-05-10",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "resource",
       "right",
       "sizing"
-    ]
+    ],
+    "publishedAt": "2026-05-10T18:00:43.934Z"
   },
   {
     "id": "research-auto-scaling-policies-cost-vs-performance-2026-05-11",
