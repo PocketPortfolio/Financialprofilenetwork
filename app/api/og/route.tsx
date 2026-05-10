@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
 import { ImageResponse } from 'next/og';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 /**
  * OG Image — brand-correct, thumbnail-resilient.
@@ -15,6 +17,9 @@ import { ImageResponse } from 'next/og';
  *
  * We buffer to a Node Buffer and set Content-Length explicitly — some social
  * scrapers (notably WhatsApp) reject chunked-encoded OG images.
+ *
+ * The brand mark is loaded from public/icon-192.png at cold start and embedded
+ * as a base64 data URI so Satori (next/og) renders it without a network fetch.
  */
 
 const BG = '#0b0d10';
@@ -28,6 +33,27 @@ const TEXT_WARM = '#fbbf24';
 
 const SITE_HOST = 'pocketportfolio.app';
 const TAGLINE = 'Sovereign · Local-First · Evidence-First';
+
+/**
+ * Load the brand monogram from disk once at cold start and inline it as a
+ * base64 SVG data URI. Satori's <img> renderer accepts SVG data URIs reliably
+ * (no network, no CORS, no Vercel function egress). We use the email-safe
+ * variant which is solid-color (no filters, no gradients) so Satori renders
+ * it pixel-perfect. If the file is missing we fall back to a typographic
+ * "PP" tile rather than failing the render.
+ *
+ * Note: public/icon-192.png is a 710-byte stub and not safe to use as the
+ * brand mark here (separate issue worth fixing for the PWA manifest).
+ */
+let LOGO_DATA_URI: string | null = null;
+try {
+  const logoPath = join(process.cwd(), 'public', 'brand', 'pp-monogram-email.svg');
+  const logoBuf = readFileSync(logoPath);
+  LOGO_DATA_URI = `data:image/svg+xml;base64,${logoBuf.toString('base64')}`;
+} catch (e) {
+  console.error('[og] failed to load brand monogram, using text fallback:', e);
+  LOGO_DATA_URI = null;
+}
 
 function clamp(text: string, max: number): string {
   if (!text) return '';
@@ -65,28 +91,44 @@ function renderCard(title: string, description: string) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
+          gap: '18px',
           zIndex: 1,
         }}
       >
-        <div
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '10px',
-            background: ACCENT_WARM,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: BG,
-            fontWeight: 800,
-            fontSize: '24px',
-            letterSpacing: '-0.02em',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          }}
-        >
-          PP
-        </div>
+        {LOGO_DATA_URI ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={LOGO_DATA_URI}
+            alt="Pocket Portfolio"
+            width={64}
+            height={64}
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '14px',
+              border: `1px solid ${BORDER_SUBTLE}`,
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '14px',
+              background: ACCENT_WARM,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: BG,
+              fontWeight: 800,
+              fontSize: '32px',
+              letterSpacing: '-0.02em',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            }}
+          >
+            PP
+          </div>
+        )}
         <div
           style={{
             display: 'flex',
@@ -223,7 +265,7 @@ function renderCard(title: string, description: string) {
             display: 'flex',
           }}
         >
-          ↳ Ready to import trades
+          → Ready to import trades
         </div>
       </div>
     </div>
