@@ -814,7 +814,7 @@
     "date": "2026-05-10",
     "title": "Sector Rotation Strategies: What the Data Reveals",
     "slug": "sector-rotation-strategies-what-the-data-reveals",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -824,7 +824,8 @@
       "sector"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-10T09:00:36.579Z"
   },
   {
     "id": "week-19-post-2",
