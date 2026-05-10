@@ -72,10 +72,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
           description,
           images: [
             {
-              url: `/og?title=${encodeURIComponent('Ghostfolio CSV Import')}`,
+              url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First, No Uploads')}&v=5`,
+              secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First, No Uploads')}&v=5`,
               width: 1200,
               height: 630,
               alt: 'Ghostfolio CSV Import - Pocket Portfolio',
+              type: 'image/png',
             },
           ],
         },
@@ -83,7 +85,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
           card: 'summary_large_image',
           title,
           description,
-          images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+          images: [
+            `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First, No Uploads')}&v=5`,
+          ],
         },
         alternates: {
           canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -100,10 +104,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
           'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
         images: [
           {
-            url: `/og?title=${encodeURIComponent('Ghostfolio CSV Import')}`,
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First Portfolio Alternative')}&v=5`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First Portfolio Alternative')}&v=5`,
             width: 1200,
             height: 630,
             alt: 'Ghostfolio CSV Import - Pocket Portfolio',
+            type: 'image/png',
           },
         ],
       },
@@ -112,7 +118,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         title: 'Ghostfolio CSV Import | The Local-First Portfolio Alternative',
         description:
           'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
-        images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+        images: [
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First Portfolio Alternative')}&v=5`,
+        ],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -145,10 +153,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         description,
         images: [
           {
-            url: `/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}`,
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=5`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=5`,
             width: 1200,
             height: 630,
             alt: 'Interactive Brokers CSV Import - Pocket Portfolio',
+            type: 'image/png',
           },
         ],
       },
@@ -156,7 +166,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         card: 'summary_large_image',
         title,
         description,
-        images: ['/og?title=' + encodeURIComponent('Interactive Brokers CSV Import')],
+        images: [
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=5`,
+        ],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -187,10 +199,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         description,
         images: [
           {
-            url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Local-First, No Uploads')}&v=5`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Local-First, No Uploads')}&v=5`,
             width: 1200,
             height: 630,
             alt: `${config.displayName} CSV Import - Pocket Portfolio`,
+            type: 'image/png',
           },
         ],
       },
@@ -198,7 +212,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         card: 'summary_large_image',
         title,
         description,
-        images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
+        images: [
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Local-First, No Uploads')}&v=5`,
+        ],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -234,10 +250,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         : `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
       images: [
         {
-          url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
+          url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=5`,
+          secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=5`,
           width: 1200,
           height: 630,
           alt: `${config.displayName} CSV Import - Pocket Portfolio`,
+          type: 'image/png',
         },
       ],
     },
@@ -247,7 +265,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       description: inMetaTest
         ? `Import your ${config.displayName} CSV in-browser. No uploads. Your data stays on your device.`
         : `Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
-      images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
+      images: [
+        `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=5`,
+      ],
     },
     alternates: {
       canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,

@@ -135,6 +135,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const fileContents = fs.readFileSync(postPath, 'utf-8');
     const { data } = matter(fileContents);
 
+    const fallbackOgImage = `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=5`;
     return {
       title: `${data.title} | Pocket Portfolio Blog`,
       description: data.description,
@@ -142,7 +143,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       openGraph: {
         title: data.title,
         description: data.description,
-        images: [data.image || 'https://www.pocketportfolio.app/brand/og-base.svg'],
+        images: [data.image || fallbackOgImage],
         type: 'article',
         publishedTime: data.date, // Will be updated below if publishedAt exists
         authors: [data.author || 'Pocket Portfolio Team'],
@@ -308,7 +309,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     '@type': 'Article',
     headline: data.title,
     description: data.description,
-    image: data.image ? `https://www.pocketportfolio.app${data.image}` : 'https://www.pocketportfolio.app/brand/og-base.svg',
+    image: data.image
+      ? `https://www.pocketportfolio.app${data.image}`
+      : `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=5`,
     datePublished: publishedAt || data.date,
     dateModified: data.dateModified || publishedAt || data.date,
     author: {

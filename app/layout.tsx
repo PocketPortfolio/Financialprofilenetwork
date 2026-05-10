@@ -62,9 +62,11 @@ export const metadata: Metadata = brandEnabled
         images: [
           {
             url: siteConfig.ogImage,
+            secureUrl: siteConfig.ogImage,
             width: 1200,
             height: 630,
-            alt: 'Pocket Portfolio app preview',
+            alt: 'Pocket Portfolio — Sovereign Local-First Wealth Tracker',
+            type: 'image/png',
           },
         ],
         locale: 'en_GB',
@@ -99,8 +101,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/brand/pp-maskable.svg" />
-        <link rel="apple-touch-icon" href="/brand/pp-maskable.svg" />
+        {/* PNG favicon variants for crawlers + iOS Safari rich link previews.
+            iOS does not render SVG for apple-touch-icon — using SVG here was
+            causing iMessage / Safari Share Sheet to show a generic preview. */}
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+        <link rel="icon" type="image/svg+xml" href="/brand/pp-maskable.svg" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="preconnect" href="https://www.gstatic.com" crossOrigin="anonymous" />
