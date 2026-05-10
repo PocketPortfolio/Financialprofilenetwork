@@ -2090,14 +2090,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Multi-Tenant Application",
     "slug": "building-a-multi-tenant-application",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "multi",
       "tenant"
-    ]
+    ],
+    "publishedAt": "2026-05-10T14:00:34.630Z"
   },
   {
     "id": "how-to-how-to-use-typescript-generics-effectively-may-11",
