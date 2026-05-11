@@ -33,7 +33,7 @@ export function getHomePageSchema(): HomePageSchema {
     url: 'https://www.pocketportfolio.app',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
+      url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png'
     },
     sameAs: [
       'https://github.com/PocketPortfolio/Financialprofilenetwork',

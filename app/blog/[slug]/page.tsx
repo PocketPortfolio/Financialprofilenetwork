@@ -135,7 +135,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const fileContents = fs.readFileSync(postPath, 'utf-8');
     const { data } = matter(fileContents);
 
-    const fallbackOgImage = `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=5`;
+    const fallbackOgImage = `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
     return {
       title: `${data.title} | Pocket Portfolio Blog`,
       description: data.description,
@@ -311,7 +311,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     description: data.description,
     image: data.image
       ? `https://www.pocketportfolio.app${data.image}`
-      : `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=5`,
+      : `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`,
     datePublished: publishedAt || data.date,
     dateModified: data.dateModified || publishedAt || data.date,
     author: {
@@ -323,7 +323,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       name: 'Pocket Portfolio',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
+        url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
       },
     },
     mainEntityOfPage: {

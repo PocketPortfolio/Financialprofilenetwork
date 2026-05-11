@@ -175,7 +175,7 @@ export default function CommunityContent() {
               name: 'Pocket Portfolio',
               logo: {
                 '@type': 'ImageObject',
-                url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
+                url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png'
               }
             }
           }}

@@ -40,7 +40,7 @@ function JoinWaitlistContent() {
           'financial technology'
         ]}
         canonical="https://www.pocketportfolio.app/join"
-        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=5"
+        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=6"
         ogType="website"
       />
       

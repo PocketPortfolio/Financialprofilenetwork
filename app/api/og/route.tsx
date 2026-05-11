@@ -37,17 +37,15 @@ const TAGLINE = 'Sovereign · Local-First · Evidence-First';
 /**
  * Load the brand monogram from disk once at cold start and inline it as a
  * base64 SVG data URI. Satori's <img> renderer accepts SVG data URIs reliably
- * (no network, no CORS, no Vercel function egress). We use the email-safe
- * variant which is solid-color (no filters, no gradients) so Satori renders
- * it pixel-perfect. If the file is missing we fall back to a typographic
- * "PP" tile rather than failing the render.
- *
- * Note: public/icon-192.png is a 710-byte stub and not safe to use as the
- * brand mark here (separate issue worth fixing for the PWA manifest).
+ * (no network, no CORS, no Vercel function egress). We use the amber
+ * monogram (solid #0b0d10 surface + #f59e0b mark, no gradients/filters) so
+ * Satori renders it pixel-perfect AND the OG card matches the SERP thumbnail
+ * served by JSON-LD Organization.logo. If the file is missing we fall back
+ * to a typographic "PP" tile rather than failing the render.
  */
 let LOGO_DATA_URI: string | null = null;
 try {
-  const logoPath = join(process.cwd(), 'public', 'brand', 'pp-monogram-email.svg');
+  const logoPath = join(process.cwd(), 'public', 'brand', 'pp-monogram-amber.svg');
   const logoBuf = readFileSync(logoPath);
   LOGO_DATA_URI = `data:image/svg+xml;base64,${logoBuf.toString('base64')}`;
 } catch (e) {

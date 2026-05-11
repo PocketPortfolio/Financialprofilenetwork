@@ -20,7 +20,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@type': 'Organization',
           name: 'Pocket Portfolio',
           url: 'https://www.pocketportfolio.app',
-          logo: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
+          logo: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
           description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
           sameAs: [
             'https://github.com/PocketPortfolio/Financialprofilenetwork',
@@ -109,7 +109,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             name: 'Pocket Portfolio',
             logo: {
               '@type': 'ImageObject',
-              url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
+              url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png'
             }
           },
           datePublished: data.datePublished || new Date().toISOString(),
@@ -164,7 +164,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
 export const organizationData = {
   name: 'Pocket Portfolio',
   url: 'https://www.pocketportfolio.app',
-  logo: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg',
+  logo: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
   description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
   sameAs: [
     'https://github.com/PocketPortfolio/Financialprofilenetwork',

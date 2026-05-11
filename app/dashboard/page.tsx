@@ -1648,7 +1648,7 @@ export default function Dashboard() {
           'investment tools'
         ]}
         canonical="https://www.pocketportfolio.app/dashboard"
-        ogImage="https://www.pocketportfolio.app/api/og?title=Dashboard&description=Your%20Portfolio%2C%20Local-First&v=5"
+        ogImage="https://www.pocketportfolio.app/api/og?title=Dashboard&description=Your%20Portfolio%2C%20Local-First&v=6"
         ogType="website"
       />
       

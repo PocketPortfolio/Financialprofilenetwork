@@ -9,7 +9,7 @@ const BOOK_PATH = path.join(process.cwd(), 'docs', 'book', 'SOVEREIGN-INTELLIGEN
 
 const baseUrl = 'https://www.pocketportfolio.app';
 const bookUrl = `${baseUrl}/book/sovereign-intelligence`;
-const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Sovereign Intelligence')}&description=${encodeURIComponent('Building Local-First RAG for Finance')}&v=5`;
+const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Sovereign Intelligence')}&description=${encodeURIComponent('Building Local-First RAG for Finance')}&v=6`;
 
 export const metadata: Metadata = {
   title: 'Sovereign Intelligence: Building Local-First RAG for Finance | Pocket Portfolio',
@@ -66,7 +66,7 @@ const sovereignIntelligenceArticleSchema = {
   publisher: {
     '@type': 'Organization' as const,
     name: 'Pocket Portfolio',
-    logo: { '@type': 'ImageObject' as const, url: `${baseUrl}/brand/pp-wordmark.svg` },
+    logo: { '@type': 'ImageObject' as const, url: `${baseUrl}/brand/pp-monogram-amber.png` },
   },
   mainEntityOfPage: { '@type': 'WebPage' as const, '@id': bookUrl },
 };

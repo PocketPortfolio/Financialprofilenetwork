@@ -10,7 +10,7 @@ export const siteConfig = {
     'Private investment analysis and portfolio tracking. Local-first portfolio terminal: hybrid-sync architecture, no central warehousing of your raw ledger, bounded AI, optional Google Drive sync you control.',
   url: 'https://www.pocketportfolio.app',
   ogImage:
-    'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=5',
+    'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=6',
   twitter: '@PocketPortApp',
   keywords: [
     'local-first portfolio tracker',
