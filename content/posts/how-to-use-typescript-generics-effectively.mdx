@@ -2,83 +2,103 @@
 title: How to Use TypeScript Generics Effectively
 date: '2026-05-11'
 description: >-
-  Learn how to leverage TypeScript generics to create reusable and flexible
-  code.
+  Learn how to effectively use TypeScript generics to create more flexible and
+  reusable code.
 tags:
   - typescript
   - generics
   - programming
-  - coding
+  - typescript-tutorial
 author: Pocket Portfolio Team
 image: /images/blog/how-to-use-typescript-generics-effectively.png
-pillar: Develop
+pillar: Technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-In TypeScript, writing functions or classes that are reusable and scalable can be challenging when dealing with multiple types. Without a flexible solution, developers may end up duplicating code to handle various data types, leading to maintenance difficulties and increased potential for bugs. Generics provide a way to create components that work with any data type while maintaining type safety.
+When developing with TypeScript, you often encounter situations where you want to create reusable components or functions that can work with a variety of data types. Without generics, you'd have to either sacrifice type safety by using the `any` type or create multiple versions of the same function or component for each type you want to support. This approach is both inefficient and error-prone.
 
 ## Solution with Code
 
-Generics in TypeScript allow you to define a placeholder type, which can be replaced with a specific type when the function or class is used. This makes your code more flexible and reusable.
+Generics allow you to define placeholder types, enabling functions or components to operate with both type safety and flexibility. Let's dive into how you can implement generics effectively in TypeScript.
 
-### Example: Generic Function
+### Generic Functions
 
-Consider a simple function `identity` that returns whatever is passed to it. Using generics, you can ensure that the type of the argument and the return type are the same:
+A generic function can handle different types without losing type information. Here's a simple example:
 
 ```typescript
 function identity<T>(arg: T): T {
   return arg;
 }
 
-const numberIdentity = identity<number>(42);
-const stringIdentity = identity<string>("Hello, TypeScript");
+const numberIdentity = identity<number>(42); // returns 42
+const stringIdentity = identity<string>("Hello, TypeScript!"); // returns "Hello, TypeScript!"
 ```
 
-### Example: Generic Interface
+The function `identity` uses a type variable `T` to capture the type passed in, allowing it to be used throughout the function.
 
-Interfaces can also use generics to define a contract for data types. Here's an example:
+### Generic Interfaces
+
+Generics can also be used with interfaces to define a contract for a variety of types:
 
 ```typescript
-interface Pair<T, U> {
-  first: T;
-  second: U;
+interface GenericContainer<T> {
+  value: T;
+  getValue: () => T;
 }
 
-const numberStringPair: Pair<number, string> = { first: 1, second: "one" };
+const numberContainer: GenericContainer<number> = {
+  value: 42,
+  getValue: function () {
+    return this.value;
+  },
+};
+
+const stringContainer: GenericContainer<string> = {
+  value: "TypeScript",
+  getValue: function () {
+    return this.value;
+  },
+};
 ```
 
-### Example: Generic Class
+Here, `GenericContainer<T>` allows for a consistent structure while being flexible with the type of `value`.
 
-Classes can also be made generic in TypeScript. Here's an example of a generic class for a queue:
+### Generic Classes
+
+Classes can also benefit from generics, allowing you to create flexible data structures:
 
 ```typescript
-class Queue<T> {
-  private items: T[] = [];
+class DataStorage<T> {
+  private data: T[] = [];
 
-  enqueue(item: T): void {
-    this.items.push(item);
+  addItem(item: T): void {
+    this.data.push(item);
   }
 
-  dequeue(): T | undefined {
-    return this.items.shift();
+  removeItem(item: T): void {
+    this.data = this.data.filter(i => i !== item);
+  }
+
+  getItems(): T[] {
+    return [...this.data];
   }
 }
 
-const numberQueue = new Queue<number>();
-numberQueue.enqueue(10);
-const dequeuedNumber = numberQueue.dequeue();
+const textStorage = new DataStorage<string>();
+textStorage.addItem("Hello");
+textStorage.addItem("World");
+
+const numberStorage = new DataStorage<number>();
+numberStorage.addItem(1);
+numberStorage.addItem(2);
 ```
 
 ## Key Concepts
 
-1. **Type Parameter**: Generics use a type parameter, often denoted by `T`, as a placeholder for the actual data type. This parameter can be used in functions, interfaces, and classes.
+1. **Type Variables**: Use type variables (like `T`) to capture and reuse type information.
+2. **Type Constraints**: Apply constraints (`extends`) to ensure that generic types adhere to specific contracts or interfaces.
+3. **Reusability**: Generics promote code reusability by allowing you to write functions, interfaces, and classes that can operate with any set of types.
 
-2. **Type Safety**: By using generics, you maintain strong type safety. The TypeScript compiler will catch type mismatches at compile time rather than at runtime.
-
-3. **Reusability**: Generics make it easy to write reusable code components that can work with any data type, reducing code duplication.
-
-4. **Flexibility**: With generics, you can create flexible APIs that can work with a wide range of types, making it easier to extend functionality in the future.
-
-By effectively using TypeScript generics, you can create more maintainable and scalable code. They help in promoting DRY (Don't Repeat Yourself) principles and ensure that your code is both robust and versatile.
+By leveraging generics, you can create more robust and reusable components, leading to cleaner and more maintainable TypeScript code.
