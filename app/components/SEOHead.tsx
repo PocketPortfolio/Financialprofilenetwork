@@ -24,7 +24,7 @@ export default function SEOHead({
   structuredData
 }: SEOHeadProps) {
   const fullTitle = title.includes('Pocket Portfolio') ? title : `${title} | Pocket Portfolio`;
-  const fullDescription = description || 'Pocket Portfolio is an open-source, community-led investing dashboard with live prices, profit/loss, mock trades, news, and simple trade import. Invest smarter, together.';
+  const fullDescription = description || 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.';
   
   const defaultKeywords = [
     'portfolio tracker',

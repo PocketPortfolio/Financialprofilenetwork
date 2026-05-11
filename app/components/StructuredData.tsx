@@ -21,7 +21,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           name: 'Pocket Portfolio',
           url: 'https://www.pocketportfolio.app',
           logo: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
-          description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
+          description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
           sameAs: [
             'https://github.com/PocketPortfolio/Financialprofilenetwork',
             'https://discord.gg/Ch9PpjRzwe',
@@ -41,7 +41,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           '@type': 'WebSite',
           name: 'Pocket Portfolio',
           url: 'https://www.pocketportfolio.app',
-          description: 'Open-source, community-led investing dashboard',
+          description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
           potentialAction: {
             '@type': 'SearchAction',
             target: 'https://www.pocketportfolio.app/search?q={search_term_string}',
@@ -81,7 +81,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           ...baseData,
           '@type': 'Product',
           name: 'Pocket Portfolio',
-          description: 'Open-source, community-led investing dashboard',
+          description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
           brand: {
             '@type': 'Brand',
             name: 'Pocket Portfolio'
@@ -165,7 +165,7 @@ export const organizationData = {
   name: 'Pocket Portfolio',
   url: 'https://www.pocketportfolio.app',
   logo: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
-  description: 'Open-source, community-led investing dashboard with live P/L, mock trades, prices, and insights.',
+  description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
   sameAs: [
     'https://github.com/PocketPortfolio/Financialprofilenetwork',
     'https://discord.gg/Ch9PpjRzwe',
@@ -177,7 +177,7 @@ export const organizationData = {
 export const websiteData = {
   name: 'Pocket Portfolio',
   url: 'https://www.pocketportfolio.app',
-  description: 'Open-source, community-led investing dashboard',
+  description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
   potentialAction: {
     '@type': 'SearchAction',
     target: 'https://www.pocketportfolio.app/search?q={search_term_string}',

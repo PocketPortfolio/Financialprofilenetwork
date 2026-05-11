@@ -2252,7 +2252,7 @@ $ npx pocket-init --sovereign
             maxWidth: '800px', 
             margin: '0 auto 48px' 
           }}>
-            Pocket Portfolio exists to help people make better investment decisions, together. We are building a community-led, open-source platform that turns market noise into clear, actionable insight—so anyone can learn, evaluate, and act with confidence.
+            Pocket Portfolio exists to give individual investors <strong>sovereignty over their financial data</strong>. We bring the compute to the data: your full trade history, positions, and balances stay on your device—only a sanitized snapshot ever crosses the wire. No raw ledger upload. No central warehouse. No model training on your portfolio. Just evidence-first analysis, optional Google Drive sync you control, and a terminal that respects the boundary between you and the cloud.
           </p>
         </section>
         </ScrollReveal>
