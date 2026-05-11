@@ -60,9 +60,9 @@ const tabs: TabItem[] = [
   },
   {
     id: 'sponsor',
-    label: 'Support',
+    label: 'Utility',
     href: '/sponsor',
-    ariaLabel: 'Support Pocket Portfolio',
+    ariaLabel: 'Developer Utility — support Pocket Portfolio',
     icon: HeartHandshake,
   },
 ];
