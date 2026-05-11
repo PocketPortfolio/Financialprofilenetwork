@@ -2106,14 +2106,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use TypeScript Generics Effectively",
     "slug": "how-to-use-typescript-generics-effectively",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "typescript",
       "use",
       "generics"
-    ]
+    ],
+    "publishedAt": "2026-05-11T14:01:18.455Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-security-may-12",
