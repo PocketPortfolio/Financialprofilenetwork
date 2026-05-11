@@ -2103,7 +2103,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Auto-Scaling Policies - Cost vs Performance",
     "slug": "research-auto-scaling-policies-cost-vs-performance-2026-05-11",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2111,7 +2111,8 @@
       "auto",
       "scaling",
       "policies"
-    ]
+    ],
+    "publishedAt": "2026-05-11T18:00:34.311Z"
   },
   {
     "id": "research-spot-instance-performance-interruption-analysis-2026-05-12",
