@@ -1051,8 +1051,21 @@ select option:checked {
 
 .blog-content h2 {
   font-size: 2em;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-warm) 55%, transparent);
   padding-bottom: 0.5em;
+}
+
+.blog-content hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-warm) 50%,
+    transparent 100%
+  );
+  opacity: 0.7;
+  margin: 2.5em 0;
 }
 
 .blog-content h3 {
@@ -1089,7 +1102,7 @@ select option:checked {
   border-radius: 8px;
   overflow-x: auto;
   margin-bottom: 1.5em;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border-warm) 35%, transparent);
 }
 
 .blog-content pre code {

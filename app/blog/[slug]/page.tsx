@@ -79,7 +79,7 @@ async function MDXContent({ content, slug }: { content: string; slug: string }) 
             Technical Details
           </summary>
           <pre style={{
-            background: '#f5f5f5',
+            background: 'var(--surface)',
             padding: '1em',
             borderRadius: '4px',
             overflow: 'auto',
@@ -87,6 +87,8 @@ async function MDXContent({ content, slug }: { content: string; slug: string }) 
             marginTop: '0.5em',
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            border: '1px solid color-mix(in srgb, var(--border-warm) 35%, transparent)',
+            color: 'var(--text)',
           }}>
             Error: {error.message || 'Unknown error'}
             {error.stack && (
@@ -527,7 +529,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             fontSize: '14px', 
             color: 'var(--text-secondary)',
             fontStyle: 'italic',
-            borderTop: '1px solid var(--border)',
+            borderTop: '1px solid color-mix(in srgb, var(--border-warm) 45%, transparent)',
             textAlign: 'center',
             background: 'var(--surface-elevated)',
             borderRadius: '8px',
