@@ -2122,7 +2122,7 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to API Security",
     "slug": "the-complete-guide-to-api-security",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2130,7 +2130,8 @@
       "security",
       "complete",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-05-12T14:00:32.416Z"
   },
   {
     "id": "how-to-how-to-implement-caching-strategies-may-13",
