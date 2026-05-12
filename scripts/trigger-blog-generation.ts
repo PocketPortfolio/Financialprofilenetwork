@@ -65,7 +65,7 @@ async function triggerBlogWorkflow() {
     console.log(`   https://github.com/${GITHUB_REPO}/actions/workflows/${WORKFLOW_FILE}`);
     console.log(`\n⏱️  The workflow will:`);
     console.log(`   1. Generate the blog post using OpenAI`);
-    console.log(`   2. Create and save the image using DALL-E`);
+    console.log(`   2. Create and save the image using OpenAI GPT Image (gpt-image-1-mini by default)`);
     console.log(`   3. Commit changes to main branch`);
     console.log(`   4. Trigger automatic deployment to Vercel`);
   } else {

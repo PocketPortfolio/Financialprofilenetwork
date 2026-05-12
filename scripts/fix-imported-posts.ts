@@ -233,44 +233,43 @@ Learn how to set up [Google Drive Sync](/features/google-drive-sync) and turn yo
 }
 
 /**
- * Generate image using DALL-E
+ * Generate image using OpenAI GPT Image model.
+ * Defaults to gpt-image-1-mini; override via OPENAI_IMAGE_MODEL env var.
  */
 async function generateImage(title: string, slug: string, pillar: string): Promise<string | null> {
   if (!openai) {
     console.warn(`   ⚠️  OPENAI_API_KEY not set, skipping image generation`);
     return null;
   }
-  
+
   try {
     const imagePrompt = `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. No text. Theme: ${title}. Professional, modern, technical aesthetic. Pillar: ${pillar}.`;
-    
-    console.log(`🎨 Generating image for: ${slug}`);
+
+    const imageModel = (process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini') as
+      | 'gpt-image-2'
+      | 'gpt-image-1.5'
+      | 'gpt-image-1'
+      | 'gpt-image-1-mini';
+
+    console.log(`🎨 Generating image for: ${slug} (model: ${imageModel})`);
     const imageResponse = await openai.images.generate({
-      model: 'dall-e-3',
+      model: imageModel,
       prompt: imagePrompt,
       size: '1024x1024',
-      quality: 'standard',
+      quality: 'medium',
     });
 
-    const imageUrl = imageResponse.data?.[0]?.url;
-    if (!imageUrl) {
-      console.warn(`⚠️  No image URL returned for ${slug}`);
+    const b64 = imageResponse.data?.[0]?.b64_json;
+    if (!b64) {
+      console.warn(`⚠️  No image returned for ${slug}`);
       return null;
     }
 
-    // Download and save image
-    console.log(`📥 Downloading image: ${imageUrl}`);
-    const imageRes = await fetch(imageUrl);
-    if (!imageRes.ok) {
-      throw new Error(`Failed to download image: ${imageRes.statusText}`);
-    }
-    
-    const imageBuffer = await imageRes.arrayBuffer();
     const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${slug}.png`);
     fs.mkdirSync(path.dirname(imagePath), { recursive: true });
-    fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
+    fs.writeFileSync(imagePath, Buffer.from(b64, 'base64'));
     console.log(`💾 Image saved: ${imagePath}`);
-    
+
     return `/images/blog/${slug}.png`;
   } catch (error) {
     console.error(`❌ Failed to generate image for ${slug}:`, error);

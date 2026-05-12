@@ -9,7 +9,7 @@ import {
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // 5 min for OpenAI + DALL-E
+export const maxDuration = 300; // 5 min for OpenAI text + GPT image generation
 
 const REPO_OWNER = 'PocketPortfolio';
 const REPO_NAME = 'Financialprofilenetwork';
