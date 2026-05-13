@@ -832,7 +832,7 @@
     "date": "2026-05-13",
     "title": "The Decentralized Portfolio: Beyond the Cloud",
     "slug": "the-decentralized-portfolio-beyond-the-cloud",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -842,7 +842,8 @@
       "decentralized"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-13T09:00:37.731Z"
   },
   {
     "id": "week-20-post-1",
