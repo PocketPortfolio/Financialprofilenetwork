@@ -2139,14 +2139,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Caching Strategies",
     "slug": "how-to-implement-caching-strategies",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "caching",
       "implement",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-05-13T14:00:44.442Z"
   },
   {
     "id": "how-to-understanding-domain-driven-design-may-14",
