@@ -2136,7 +2136,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Data Transfer Costs - CDN vs Direct",
     "slug": "research-data-transfer-costs-cdn-vs-direct-2026-05-13",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2144,7 +2144,8 @@
       "data",
       "transfer",
       "costs"
-    ]
+    ],
+    "publishedAt": "2026-05-13T18:00:55.141Z"
   },
   {
     "id": "research-storage-tier-optimization-hot-vs-cold-vs-archive-2026-05-14",
