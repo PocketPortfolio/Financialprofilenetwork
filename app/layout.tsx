@@ -101,14 +101,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* PNG favicon variants for crawlers + iOS Safari rich link previews.
-            iOS does not render SVG for apple-touch-icon — using SVG here was
-            causing iMessage / Safari Share Sheet to show a generic preview. */}
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-        <link rel="icon" type="image/svg+xml" href="/brand/pp-maskable.svg" />
-        <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
-        <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
+        {/* Brand SSOT: amber-on-dark monogram across every channel.
+            - SVG: scalable favicon for Chrome/Firefox/Edge (preferred over PNG).
+            - PNG 192/512: crawlers + iOS Safari rich link previews
+              (iOS does NOT render SVG for apple-touch-icon).
+            ?v=2 query busts cached legacy blue/emerald favicon on returning visitors. */}
+        <link rel="icon" type="image/svg+xml" href="/brand/pp-monogram-amber.svg?v=2" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=2" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=2" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png?v=2" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png?v=2" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="preconnect" href="https://www.gstatic.com" crossOrigin="anonymous" />
