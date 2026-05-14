@@ -2155,14 +2155,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Domain-Driven Design",
     "slug": "understanding-domain-driven-design",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "domain",
       "driven"
-    ]
+    ],
+    "publishedAt": "2026-05-14T14:00:57.218Z"
   },
   {
     "id": "how-to-how-to-build-a-graphql-resolver-may-15",
