@@ -1,0 +1,94 @@
+---
+title: How to Build a GraphQL Resolver
+date: '2026-05-15'
+description: >-
+  Learn how to build a GraphQL resolver to fetch and transform data for your
+  applications.
+tags:
+  - graphql
+  - resolver
+  - backend
+  - api
+author: Pocket Portfolio Team
+image: /images/blog/how-to-build-a-graphql-resolver.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+GraphQL is an increasingly popular choice for building APIs due to its efficiency in data fetching. However, implementing GraphQL resolvers can be challenging for developers new to this paradigm. A resolver is a crucial part of a GraphQL server, responsible for fetching the necessary data for a specific field in a query. Understanding how to build effective resolvers is essential for leveraging GraphQL's full potential.
+
+## Solution with Code
+
+Here's a step-by-step approach to building a simple GraphQL resolver using Node.js and Apollo Server.
+
+First, set up your project and install the required packages:
+
+```bash
+npm init -y
+npm install apollo-server graphql
+```
+
+Next, define your GraphQL schema. In this example, we'll create a simple schema to fetch user details:
+
+```javascript
+const { gql } = require('apollo-server');
+
+const typeDefs = gql`
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
+  type Query {
+    user(id: ID!): User
+  }
+`;
+```
+
+Now, implement the resolver. A resolver is a function that corresponds to a field in your schema. In this case, we'll create a resolver for the `user` query:
+
+```javascript
+const users = [
+  { id: '1', name: 'Alice', email: 'alice@example.com' },
+  { id: '2', name: 'Bob', email: 'bob@example.com' },
+];
+
+const resolvers = {
+  Query: {
+    user: (_, { id }) => {
+      return users.find(user => user.id === id);
+    },
+  },
+};
+```
+
+Finally, set up the Apollo Server and pass the schema and resolvers:
+
+```javascript
+const { ApolloServer } = require('apollo-server');
+
+const server = new ApolloServer({ typeDefs, resolvers });
+
+server.listen().then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`);
+});
+```
+
+Run your server with:
+
+```bash
+node index.js
+```
+
+You can now test your GraphQL API by querying user data using a GraphQL client or Apollo's built-in playground.
+
+## Key Concepts
+
+- **Resolvers:** Functions that fetch the data for a specific field in a query. Each field in a GraphQL query can have a corresponding resolver.
+- **Schema:** Defines the structure of your data and the operations that can be performed on it. It includes types, queries, and mutations.
+- **Apollo Server:** A community-driven, open-source GraphQL server that works with any GraphQL schema.
+
+By understanding and implementing these concepts, you can build powerful and efficient GraphQL APIs that make data fetching both flexible and optimized.
