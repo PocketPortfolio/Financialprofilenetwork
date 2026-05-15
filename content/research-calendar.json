@@ -2169,7 +2169,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Compute Optimization - ARM vs x86 Performance",
     "slug": "research-compute-optimization-arm-vs-x86-performance-2026-05-15",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2177,7 +2177,8 @@
       "compute",
       "optimization",
       "arm"
-    ]
+    ],
+    "publishedAt": "2026-05-15T18:00:50.965Z"
   },
   {
     "id": "research-energy-efficiency-performance-per-watt-2026-05-16",
