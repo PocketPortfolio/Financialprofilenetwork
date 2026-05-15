@@ -2171,14 +2171,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a GraphQL Resolver",
     "slug": "how-to-build-a-graphql-resolver",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "graphql",
       "build",
       "resolver"
-    ]
+    ],
+    "publishedAt": "2026-05-15T14:00:36.553Z"
   },
   {
     "id": "how-to-the-developer-s-guide-to-api-testing-may-16",
