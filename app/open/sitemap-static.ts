@@ -5,14 +5,23 @@
  * middleware rewrite). Wealth-manager routes remain on the Pocket sitemap at
  * app/sitemap-static.ts.
  *
+ * Blog: hub plus every MDX post whose category is OPEN_BLOG_CATEGORIES (canonical
+ * on Open per app/blog/[slug]/page.tsx). Pocket-only posts stay on app/sitemap-blog.ts.
+ *
  * Routes mirror OPEN_ALIAS_ROUTES in lib/canonical-claims.ts.
  */
 
 import { MetadataRoute } from 'next';
+import {
+  loadBlogPostSitemapEntries,
+  partitionBlogPostsForSitemap,
+} from '../../lib/blog-sitemap-entries';
 import { OPEN_ALIAS_ROUTES, OPEN_URLS } from '../../lib/canonical-claims';
 
 export default async function openSitemapStatic(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const entries = loadBlogPostSitemapEntries();
+  const { open: openBlogPosts } = partitionBlogPostsForSitemap(entries);
 
   return [
     {
@@ -33,6 +42,12 @@ export default async function openSitemapStatic(): Promise<MetadataRoute.Sitemap
       changeFrequency: 'daily',
       priority: 0.88,
     },
+    ...openBlogPosts.map((e) => ({
+      url: `${OPEN_URLS.home}/blog/${e.slug}`,
+      lastModified: e.lastModified,
+      changeFrequency: 'weekly' as const,
+      priority: 0.82,
+    })),
   ];
 }
 
