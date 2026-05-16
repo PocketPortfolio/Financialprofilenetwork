@@ -7,7 +7,7 @@ import openSitemapStatic from '../sitemap-static';
 export const dynamic = 'force-dynamic';
 
 /**
- * Dynamic B2B sitemap — SSOT is OPEN_ALIAS_ROUTES via openSitemapStatic().
+ * Dynamic B2B sitemap — OPEN_ALIAS_ROUTES + Open-category blog posts via openSitemapStatic().
  * Served at /open/sitemap.xml; Open-host requests rewrite /sitemap.xml here (middleware).
  */
 export async function GET() {
