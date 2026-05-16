@@ -75,6 +75,8 @@ export const OPEN_STATIC_ASSET_PREFIXES = [
   '/icon-',
   '/og/',
   '/open/og/',
+  /** Landing PNG/SVG lives under public/open/landing — must not hit /open/* → strip-/open redirect in middleware. */
+  '/open/landing/',
   '/fonts/',
   '/favicon',
 ] as const;

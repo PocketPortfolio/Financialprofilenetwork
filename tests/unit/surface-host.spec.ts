@@ -6,6 +6,11 @@ describe('isOpenStaticAssetPath', () => {
     expect(isOpenStaticAssetPath('/press/abba/abba-uk-black-business-show-820.webp')).toBe(true);
     expect(isOpenStaticAssetPath('/press/abba-lawal')).toBe(false);
   });
+
+  it('includes B2B landing art under /open/landing/ (public/open/landing)', () => {
+    expect(isOpenStaticAssetPath('/open/landing/hero-sovereign-layer.png')).toBe(true);
+    expect(isOpenStaticAssetPath('/open/landing/svg/privacy-architecture.svg')).toBe(true);
+  });
 });
 
 describe('isOpenSurfaceRoute', () => {
