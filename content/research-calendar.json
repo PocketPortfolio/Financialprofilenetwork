@@ -2186,14 +2186,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Energy Efficiency - Performance per Watt",
     "slug": "research-energy-efficiency-performance-per-watt-2026-05-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "efficiency",
       "energy"
-    ]
+    ],
+    "publishedAt": "2026-05-16T18:00:56.915Z"
   },
   {
     "id": "research-carbon-footprint-cloud-vs-on-premise-2026-05-17",
