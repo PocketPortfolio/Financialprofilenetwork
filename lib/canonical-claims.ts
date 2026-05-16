@@ -558,3 +558,353 @@ export const SOVEREIGN_THRESHOLDS = {
   /** #4 — Recency rule: LAST_HUMAN_VERIFIED must be within this window before a production build. */
   maxAgeDays: 30,
 } as const;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Dual-Surface Bifurcation (CEO mandate 2026-05-15) — Pocket (P.) vs Open (O.)
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// Pocket Portfolio (P.) serves wealth managers and high-value investors on
+// www.pocketportfolio.app. Open Portfolio (O.) serves developers, CTOs, and
+// enterprise bank procurement teams on www.openportfolio.co.uk. Both surfaces
+// share this monorepo; host-aware middleware forks the route group at request
+// time. Per CEO directive: B2C paywall structures are unchanged.
+//
+// Existing POSITIONING / ORG / URLS exports are preserved for back-compat —
+// the surface map below is purely additive.
+
+export type Surface = 'pocket' | 'open';
+
+/** Surface-aware positioning. P. talks to wealth managers; O. talks to infrastructure buyers. */
+export const SURFACE_POSITIONING: Readonly<Record<Surface, { primary: string; secondary: string }>> = {
+  pocket: {
+    primary: 'The local-first wealth terminal for advisors and high-value investors.',
+    secondary: 'Private portfolio analytics. Your ledger never leaves your device.',
+  },
+  open: {
+    primary: POSITIONING.primary,
+    secondary: POSITIONING.secondary,
+  },
+} as const;
+
+/** Surface-aware organization metadata for JSON-LD, OG, and llms.txt rendering. */
+export const SURFACE_ORG: Readonly<Record<Surface, {
+  name: string;
+  legalName: string;
+  alternateName: string;
+  url: string;
+  logo: string;
+  description: string;
+}>> = {
+  pocket: {
+    name: ORG.name,
+    legalName: ORG.legalName,
+    alternateName: SURFACE_POSITIONING.pocket.secondary,
+    url: ORG.url,
+    logo: ORG.logo,
+    description:
+      'Pocket Portfolio is the local-first wealth terminal for advisors and high-value investors. Broker data parses in-browser and never leaves the device.',
+  },
+  open: {
+    name: 'Open Portfolio',
+    legalName: 'Open Portfolio',
+    alternateName: SURFACE_POSITIONING.open.secondary,
+    url: 'https://www.openportfolio.co.uk',
+    logo: 'https://www.openportfolio.co.uk/brand/op-monogram-amber.png',
+    description: TAGLINE_LONG,
+  },
+} as const;
+
+/** Open Portfolio canonical URL constants. Mirrors the pocket-facing URLS where appropriate. */
+export const OPEN_URLS = {
+  home: 'https://www.openportfolio.co.uk',
+  architecture: 'https://www.openportfolio.co.uk/architecture',
+  designChallenge: 'https://www.openportfolio.co.uk/designchallenge',
+  tier1DesignPartner: 'https://www.openportfolio.co.uk/tier1designpartner',
+  boardOfInvestors: 'https://www.openportfolio.co.uk/board-of-investors',
+  sovereignAiGrant: 'https://www.openportfolio.co.uk/sovereign-ai-grant',
+  sovereignStack: 'https://www.openportfolio.co.uk/learn/sovereign-stack',
+  sovereignFinance: 'https://www.openportfolio.co.uk/learn/sovereign-finance',
+  localFirst: 'https://www.openportfolio.co.uk/learn/local-first',
+  vendorLockIn: 'https://www.openportfolio.co.uk/learn/vendor-lock-in',
+  sovereignStrike: 'https://www.openportfolio.co.uk/playbooks/sovereign-strike',
+  openBrokerCsv: 'https://www.openportfolio.co.uk/openbrokercsv',
+  etoroToOpenBrokerCsv: 'https://www.openportfolio.co.uk/static/csv-etoro-to-openbrokercsv',
+  portfolioTracker: 'https://www.openportfolio.co.uk/static/portfolio-tracker',
+  whyWeAreFast: 'https://www.openportfolio.co.uk/static/why-we-are-fast',
+  stackReveal: 'https://www.openportfolio.co.uk/stack-reveal',
+  press: 'https://www.openportfolio.co.uk/press',
+  personAbba: 'https://www.openportfolio.co.uk/press/abba-lawal',
+  sponsor: 'https://www.openportfolio.co.uk/sponsor',
+  learnHub: 'https://www.openportfolio.co.uk/learn',
+  privacy: 'https://www.openportfolio.co.uk/privacy',
+  terms: 'https://www.openportfolio.co.uk/terms',
+  llmsTxt: 'https://www.openportfolio.co.uk/llms.txt',
+  sitemap: 'https://www.openportfolio.co.uk/sitemap.xml',
+} as const;
+
+/**
+ * Developer + institutional routes with thin-wrapper aliases on the O. surface.
+ * Pocket→Open 301 matrix: `next.config.js` (`OPEN_ALIAS_POCKET_TO_OPEN_PATHS`) — same paths except `/press`
+ * remains on Pocket for consumer media hub (growth audit Item 5).
+ */
+export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; openUrl: string }> = [
+  { path: '/architecture', title: 'Architecture', openUrl: OPEN_URLS.architecture },
+  { path: '/designchallenge', title: 'Design Challenge', openUrl: OPEN_URLS.designChallenge },
+  { path: '/tier1designpartner', title: 'Tier 1 Design Partnership', openUrl: OPEN_URLS.tier1DesignPartner },
+  { path: '/board-of-investors', title: 'Board of Investors (BIP)', openUrl: OPEN_URLS.boardOfInvestors },
+  { path: '/sovereign-ai-grant', title: 'Sovereign AI Grant', openUrl: OPEN_URLS.sovereignAiGrant },
+  { path: '/learn/sovereign-stack', title: 'Sovereign Stack', openUrl: OPEN_URLS.sovereignStack },
+  { path: '/learn/sovereign-finance', title: 'Sovereign Finance', openUrl: OPEN_URLS.sovereignFinance },
+  { path: '/learn/local-first', title: 'Local-First', openUrl: OPEN_URLS.localFirst },
+  { path: '/learn/vendor-lock-in', title: 'Vendor Lock-In', openUrl: OPEN_URLS.vendorLockIn },
+  { path: '/playbooks/sovereign-strike', title: 'Sovereign Strike Playbook', openUrl: OPEN_URLS.sovereignStrike },
+  { path: '/openbrokercsv', title: 'OpenBrokerCSV', openUrl: OPEN_URLS.openBrokerCsv },
+  {
+    path: '/static/csv-etoro-to-openbrokercsv',
+    title: 'eToro → OpenBrokerCSV',
+    openUrl: OPEN_URLS.etoroToOpenBrokerCsv,
+  },
+  {
+    path: '/static/portfolio-tracker',
+    title: 'Portfolio Tracker',
+    openUrl: OPEN_URLS.portfolioTracker,
+  },
+  {
+    path: '/static/why-we-are-fast',
+    title: 'Why We Are Fast',
+    openUrl: OPEN_URLS.whyWeAreFast,
+  },
+  { path: '/stack-reveal', title: 'Stack Reveal', openUrl: OPEN_URLS.stackReveal },
+  { path: '/press', title: 'Press Kit', openUrl: OPEN_URLS.press },
+  { path: '/press/abba-lawal', title: 'Founder Profile', openUrl: OPEN_URLS.personAbba },
+  { path: '/sponsor', title: 'Founders Club', openUrl: OPEN_URLS.sponsor },
+  { path: '/learn', title: 'Learn', openUrl: OPEN_URLS.learnHub },
+  { path: '/privacy', title: 'Privacy', openUrl: OPEN_URLS.privacy },
+  { path: '/terms', title: 'Terms', openUrl: OPEN_URLS.terms },
+] as const;
+
+/** Host strings recognised as the O. surface (Stage 1 middleware uses this list). */
+export const OPEN_HOSTS = [
+  'openportfolio.co.uk',
+  'www.openportfolio.co.uk',
+  'openportfolio.uk',
+  'www.openportfolio.uk',
+] as const;
+
+/** Canonical apex for the O. surface (all other OPEN_HOSTS 307-redirect here). */
+export const OPEN_CANONICAL_HOST = 'www.openportfolio.co.uk' as const;
+
+/** Resolve the right org/positioning block for a given surface. */
+export function getSurfaceOrg(surface: Surface) {
+  return SURFACE_ORG[surface];
+}
+
+export function getSurfacePositioning(surface: Surface) {
+  return SURFACE_POSITIONING[surface];
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Surface navigation — own SSOT for Open Portfolio (B2B)
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// The Pocket Portfolio nav lives in app/lib/nav/sovereignMarketingNav.ts and
+// targets wealth managers. The B2B surface needs its own compact navigation
+// pointing at developer/institutional intent only. Defining it here keeps
+// canonical-claims.ts as the single SSOT for both surfaces.
+
+export interface SurfaceNavItem {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+export const OPEN_NAV: ReadonlyArray<SurfaceNavItem> = [
+  { label: 'Architecture', href: '/architecture' },
+  { label: 'Design Challenge', href: '/designchallenge' },
+  { label: 'Tier 1', href: '/tier1designpartner' },
+  { label: 'BIP', href: '/board-of-investors' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'Sovereign Stack', href: '/learn/sovereign-stack' },
+] as const;
+
+/** Cross-surface footer / switcher copy (CEO mandate 2026-05-15). */
+export const SURFACE_CROSS_LINKS = {
+  pocket: {
+    label: 'For developers & infrastructure →',
+    href: 'https://www.openportfolio.co.uk',
+  },
+  open: {
+    label: 'For advisors & wealth managers →',
+    href: 'https://www.pocketportfolio.app',
+  },
+} as const;
+
+/**
+ * Blog categories shown on Open Portfolio (B2B). Cron still writes all posts to
+ * content/posts — filtering is presentation-only so autonomous generation is unchanged.
+ */
+export const OPEN_BLOG_CATEGORIES = [
+  'research',
+  'sovereign-engineering',
+  'how-to-in-tech',
+] as const;
+
+export type OpenBlogCategory = (typeof OPEN_BLOG_CATEGORIES)[number];
+
+export function isOpenBlogCategory(category: string | undefined): boolean {
+  return (OPEN_BLOG_CATEGORIES as readonly string[]).includes(category ?? '');
+}
+
+/** First-party MDX on Pocket (B2C) — excludes Open-only categories. */
+export function isPocketBlogCategory(category: string | undefined): boolean {
+  const c = category ?? 'deep-dive';
+  return !isOpenBlogCategory(c);
+}
+
+/** Blog hub filter chips — www.openportfolio.co.uk/blog (B2B substrate content). */
+export const OPEN_BLOG_FILTER_CHIPS = [
+  { id: 'all' as const, label: 'All technical posts' },
+  { id: 'sovereign-engineering' as const, label: 'Sovereign Engineering' },
+  { id: 'how-to-in-tech' as const, label: 'How to in Tech' },
+  { id: 'research' as const, label: 'Research' },
+] as const;
+
+export type OpenBlogFilterId = (typeof OPEN_BLOG_FILTER_CHIPS)[number]['id'];
+
+/**
+ * Blog hub filter chips — www.pocketportfolio.app/blog (B2C building in public).
+ * No Sovereign Engineering / research / how-to pillars here — those live on Open.
+ */
+export const POCKET_BLOG_FILTER_CHIPS = [
+  {
+    id: 'all' as const,
+    label: 'All Posts',
+    accent: 'var(--accent-warm)',
+    activeBg: 'rgba(245, 158, 11, 0.12)',
+  },
+  {
+    id: 'dev.to' as const,
+    label: 'Dev.to',
+    accent: 'rgb(59, 73, 223)',
+    activeBg: 'rgba(59, 73, 223, 0.12)',
+  },
+  {
+    id: 'coderlegion' as const,
+    label: 'CoderLegion',
+    accent: 'rgb(139, 92, 246)',
+    activeBg: 'rgba(139, 92, 246, 0.12)',
+  },
+  {
+    id: 'generated' as const,
+    label: 'Pocket Portfolio Posts',
+    accent: 'var(--accent-warm)',
+    activeBg: 'rgba(245, 158, 11, 0.12)',
+  },
+] as const;
+
+export type PocketBlogFilterId = (typeof POCKET_BLOG_FILTER_CHIPS)[number]['id'];
+
+/** Github CTA shown in the trailing slot of the O. navbar. */
+export const OPEN_PRIMARY_CTA = {
+  label: 'GitHub',
+  href: 'https://github.com/PocketPortfolio/Financialprofilenetwork',
+  external: true,
+} as const;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Surface landing copy — narrative SSOT for app/open/page.tsx
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// The O. landing runs a "scare-then-savior" arc:
+//   1. Eyebrow + hero — the substrate positioning.
+//   2. AI + privacy sub-hero — the architectural commitment.
+//   3. Threat surface — regulatory fines + breach cost, sourced from
+//      NUMBERS_SNAPSHOT rows REG-01 / REG-03 / CODB-01.
+//   4. Pocket Portfolio as live proof — the adversarial test harness.
+//   5. Substrate pillars + tracks + SDK packages.
+//
+// Numbers are NEVER hardcoded here — every figure shown on the page is
+// pulled from NUMBERS_SNAPSHOT at render time so Sovereign Threshold #3
+// catches drift before deploy.
+
+export const OPEN_LANDING_COPY = {
+  eyebrow: 'Open Portfolio — wealth-tech proven · regulated verticals forward',
+  heroTitle: 'Your data stays yours. Your story stays clear.',
+  heroBody:
+    'Open Portfolio is the privacy layer for deploying AI in regulated environments: import broker data on the device, reason with AI that forgets every session, and prove the model in production before procurement asks the hard questions.',
+  subHero: {
+    eyebrow: 'Trust by design',
+    title: 'Privacy is built in — not bolted on in a policy PDF.',
+    body: 'We designed AI that does not hoard conversations, embeddings, or training files. Reasoning happens where the citizen already holds their records; regulators get architectural answers, not marketing promises.',
+    tags: [
+      'No chat-history warehouse',
+      'No embedding store',
+      'Session-forgetful AI',
+      'Data stays on device',
+    ],
+  },
+  threat: {
+    eyebrow: 'Why boards are paying attention',
+    title: 'Three numbers that changed the conversation.',
+    body: 'Legacy vendors treated personal finance data like oil in a tank. Regulators and insurers now price that risk in the open — fines, breach costs, and reputational drag show up on every quarterly review.',
+    bridgeEyebrow: 'Proof, not promises',
+    bridgeTitle: 'Pocket Portfolio: the live demonstration.',
+    bridgeBody:
+      'Thousands of people already run their wealth on our consumer terminal — real statements, messy CSVs, everyday edge cases — with nothing sensitive parked on our servers. What breaks in the open makes the enterprise substrate stronger before your audit.',
+  },
+  pillarsTitle: 'Three guarantees your board can name.',
+  pillarsIntro:
+    'We proved the stack in wealth tech and finance — the same substrate is built for regulated verticals where trust and perimeter matter most.',
+  tracksTitle: 'Pick the door that matches your mandate.',
+  tracksIntro:
+    'Engineers, institutions, investors, and grant teams each get a clear path — without wading through a technical library.',
+  pillars: [
+    {
+      title: 'Sovereign ingestion',
+      body: 'Broker statements are read on the device — 19+ formats, no raw rows through your servers, no surprise data lake for the DPO to discover.',
+      href: '/openbrokercsv',
+    },
+    {
+      title: 'Stateless inference',
+      body: 'AI answers questions and moves on. No memory warehouse, no shadow training set — the scope of processing is visible in the architecture.',
+      href: '/architecture',
+    },
+    {
+      title: 'A smaller audit perimeter',
+      body: 'Partnership programmes and metering designed so commercial proof does not require shipping identifiers back to a vendor cloud.',
+      href: '/tier1designpartner',
+    },
+  ],
+  tracks: [
+    {
+      eyebrow: 'For engineers',
+      title: 'Design Challenge',
+      body: 'Extend the substrate into Healthcare, Defense, Finance, or Energy. Fork the boilerplate, ship a prototype, earn Design Partner status.',
+      href: '/designchallenge',
+    },
+    {
+      eyebrow: 'For institutions',
+      title: 'Tier 1 Design Partnership',
+      body: 'A clean-room partnership for Finance, Defense, and Healthcare. Reduce audit perimeter; prove value via stateless metering.',
+      href: '/tier1designpartner',
+    },
+    {
+      eyebrow: 'For investors',
+      title: 'Board of Investors (BIP)',
+      body: 'A five-seat governance board for aligned seed investors backing an open-source core, human-centered UX, and real-time distributed data engineering.',
+      href: '/board-of-investors',
+    },
+    {
+      eyebrow: 'For grant teams',
+      title: 'Sovereign AI Grant',
+      body: 'A grant programme for research teams building sovereign AI in regulated environments.',
+      href: '/sovereign-ai-grant',
+    },
+  ],
+  contact: {
+    eyebrow: 'Start a conversation',
+    title: 'Bring your mandate. We will meet it with architecture.',
+    body: 'Policy, procurement, or engineering — tell us what success looks like. We reply within one working day and route serious institutional conversations to the right track.',
+    submitLabel: 'Request a briefing',
+  },
+} as const;

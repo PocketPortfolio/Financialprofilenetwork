@@ -38,17 +38,7 @@ export const revolut: BrokerAdapter = {
         let priceValue = r['Price'] ?? r['Price per share'] ?? r['Trade Price'] ?? r['Execution Price'] ?? '0';
         // Strip currency prefix (e.g., "USD 111.97" -> "111.97")
         priceValue = priceValue.replace(/^[A-Z]{3}\s+/i, '').trim();
-        
-        // #region agent log
-        const rowDebug = {
-          action: r['Action'] || r['Type'] || '',
-          tickerValue,
-          priceValue,
-          quantity: r['Quantity'] ?? r['Qty'] ?? r['Shares'] ?? '',
-          date: r['Date'] ?? r['Trade Date'] ?? r['Transaction Date'] ?? '',
-        };
-        // #endregion
-        
+
         const out: NormalizedTrade = {
           date: toISO(r['Date'] ?? r['Trade Date'] ?? r['Transaction Date'] ?? '', locale),
           ticker: toTicker(tickerValue),
@@ -62,11 +52,8 @@ export const revolut: BrokerAdapter = {
         };
         if (!(out.qty > 0) || !(out.price > 0)) throw new Error('Non-positive qty/price');
         trades.push(out);
-      } catch (e:any) {
-        warnings.push(`row ${JSON.stringify(r).slice(0,120)}… → ${e.message}`);
-        // #region agent log
-        console.error('[REVOLUT ADAPTER] Row parse error', { row: JSON.stringify(r).slice(0,200), error: e.message });
-        // #endregion
+      } catch (e: any) {
+        warnings.push(`row ${JSON.stringify(r).slice(0, 120)}… → ${e.message}`);
       }
     }
 

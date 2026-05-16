@@ -1,28 +1,12 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import http from 'http';
 
 puppeteer.use(StealthPlugin());
 
 const TARGET_CITY = "London";
 
-function sendLog(data: any) {
-  const payload = JSON.stringify(data);
-  const options = {
-    hostname: '127.0.0.1',
-    port: 43110,
-    path: '/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(payload)
-    }
-  };
-  
-  const req = http.request(options, () => {});
-  req.on('error', () => {});
-  req.write(payload);
-  req.end();
+function sendLog(data: unknown) {
+  console.log('[predator-probe-simple]', JSON.stringify(data));
 }
 
 async function runProbe() {

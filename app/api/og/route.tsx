@@ -31,26 +31,56 @@ const BORDER_SUBTLE = '#1f242c';
 const ACCENT_WARM = '#f59e0b';
 const TEXT_WARM = '#fbbf24';
 
-const SITE_HOST = 'pocketportfolio.app';
-const TAGLINE = 'Sovereign · Local-First · Evidence-First';
+type OgSurface = 'pocket' | 'open';
+
+const SURFACE_CONFIG: Record<OgSurface, {
+  siteHost: string;
+  brandName: string;
+  brandFallback: string;
+  tagline: string;
+  cta: string;
+}> = {
+  pocket: {
+    siteHost: 'pocketportfolio.app',
+    brandName: 'Pocket Portfolio',
+    brandFallback: 'PP',
+    tagline: 'Sovereign · Local-First · Evidence-First',
+    cta: '→ Ready to import trades',
+  },
+  open: {
+    siteHost: 'openportfolio.co.uk',
+    brandName: 'Open Portfolio',
+    brandFallback: 'OP',
+    tagline: 'Sovereign Ingestion · Stateless Inference · Audit-Ready',
+    cta: '→ Build on the substrate',
+  },
+};
 
 /**
- * Load the brand monogram from disk once at cold start and inline it as a
- * base64 SVG data URI. Satori's <img> renderer accepts SVG data URIs reliably
- * (no network, no CORS, no Vercel function egress). We use the amber
- * monogram (solid #0b0d10 surface + #f59e0b mark, no gradients/filters) so
- * Satori renders it pixel-perfect AND the OG card matches the SERP thumbnail
- * served by JSON-LD Organization.logo. If the file is missing we fall back
- * to a typographic "PP" tile rather than failing the render.
+ * Load the surface-specific brand monogram from disk once at cold start and
+ * inline as base64 SVG data URI. Satori renders SVG data URIs reliably
+ * (no network, no CORS, no Vercel function egress). Falls back to a
+ * typographic tile if the asset is missing.
  */
-let LOGO_DATA_URI: string | null = null;
-try {
-  const logoPath = join(process.cwd(), 'public', 'brand', 'pp-monogram-amber.svg');
-  const logoBuf = readFileSync(logoPath);
-  LOGO_DATA_URI = `data:image/svg+xml;base64,${logoBuf.toString('base64')}`;
-} catch (e) {
-  console.error('[og] failed to load brand monogram, using text fallback:', e);
-  LOGO_DATA_URI = null;
+const LOGO_PATH_BY_SURFACE: Record<OgSurface, string> = {
+  pocket: 'public/brand/pp-monogram-amber.svg',
+  open: 'public/brand/op-monogram-amber.svg',
+};
+
+const LOGO_DATA_URI_BY_SURFACE: Record<OgSurface, string | null> = {
+  pocket: null,
+  open: null,
+};
+
+for (const surface of ['pocket', 'open'] as const) {
+  try {
+    const logoPath = join(process.cwd(), LOGO_PATH_BY_SURFACE[surface]);
+    const logoBuf = readFileSync(logoPath);
+    LOGO_DATA_URI_BY_SURFACE[surface] = `data:image/svg+xml;base64,${logoBuf.toString('base64')}`;
+  } catch (e) {
+    console.error(`[og] failed to load ${surface} brand monogram, using text fallback:`, e);
+    LOGO_DATA_URI_BY_SURFACE[surface] = null;
+  }
 }
 
 function clamp(text: string, max: number): string {
@@ -58,7 +88,9 @@ function clamp(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
 
-function renderCard(title: string, description: string) {
+function renderCard(title: string, description: string, surface: OgSurface) {
+  const cfg = SURFACE_CONFIG[surface];
+  const logoDataUri = LOGO_DATA_URI_BY_SURFACE[surface];
   return (
     <div
       style={{
@@ -93,11 +125,11 @@ function renderCard(title: string, description: string) {
           zIndex: 1,
         }}
       >
-        {LOGO_DATA_URI ? (
+        {logoDataUri ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={LOGO_DATA_URI}
-            alt="Pocket Portfolio"
+            src={logoDataUri}
+            alt={cfg.brandName}
             width={64}
             height={64}
             style={{
@@ -124,7 +156,7 @@ function renderCard(title: string, description: string) {
               fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
             }}
           >
-            PP
+            {cfg.brandFallback}
           </div>
         )}
         <div
@@ -145,7 +177,7 @@ function renderCard(title: string, description: string) {
               display: 'flex',
             }}
           >
-            Pocket Portfolio
+            {cfg.brandName}
           </div>
           <div
             style={{
@@ -157,7 +189,7 @@ function renderCard(title: string, description: string) {
               display: 'flex',
             }}
           >
-            {TAGLINE}
+            {cfg.tagline}
           </div>
         </div>
       </div>
@@ -250,7 +282,7 @@ function renderCard(title: string, description: string) {
               display: 'flex',
             }}
           >
-            {SITE_HOST}
+            {cfg.siteHost}
           </div>
         </div>
         <div
@@ -263,15 +295,19 @@ function renderCard(title: string, description: string) {
             display: 'flex',
           }}
         >
-          → Ready to import trades
+          {cfg.cta}
         </div>
       </div>
     </div>
   );
 }
 
-async function renderImage(title: string, description: string): Promise<Buffer> {
-  const ir = new ImageResponse(renderCard(title, description), {
+async function renderImage(
+  title: string,
+  description: string,
+  surface: OgSurface,
+): Promise<Buffer> {
+  const ir = new ImageResponse(renderCard(title, description, surface), {
     width: 1200,
     height: 630,
   });
@@ -289,17 +325,32 @@ function imageHeaders(byteLength: number): HeadersInit {
   };
 }
 
+function resolveSurface(request: NextRequest, override: string | null): OgSurface {
+  if (override === 'open' || override === 'pocket') return override;
+  // Fall back to detecting the request host when no explicit param is given.
+  // Lets <meta property="og:image" content="/api/og?title=..."> on the O. surface
+  // render the O.-branded card without every wrapper needing ?surface=open.
+  const host = request.headers.get('host')?.split(':')[0]?.toLowerCase() ?? '';
+  if (host.endsWith('openportfolio.co.uk') || host.endsWith('openportfolio.uk')) return 'open';
+  return 'pocket';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const rawTitle = searchParams.get('title') || 'Pocket Portfolio';
+    const surface = resolveSurface(request, searchParams.get('surface'));
+    const surfaceDefaults = SURFACE_CONFIG[surface];
+    const rawTitle = searchParams.get('title') || surfaceDefaults.brandName;
     const rawDescription =
-      searchParams.get('description') || 'Sovereign Local-First Wealth Tracker';
+      searchParams.get('description') ||
+      (surface === 'open'
+        ? 'The Sovereign Ingestion & Inference Layer'
+        : 'Sovereign Local-First Wealth Tracker');
 
     const title = clamp(rawTitle, 80);
     const description = clamp(rawDescription, 140);
 
-    const png = await renderImage(title, description);
+    const png = await renderImage(title, description, surface);
 
     return new Response(new Uint8Array(png), {
       status: 200,
@@ -311,6 +362,7 @@ export async function GET(request: NextRequest) {
       const png = await renderImage(
         'Pocket Portfolio',
         'Sovereign Local-First Wealth Tracker',
+        'pocket',
       );
       return new Response(new Uint8Array(png), {
         status: 200,

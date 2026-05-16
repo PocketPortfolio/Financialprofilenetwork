@@ -19,13 +19,21 @@ import {
   DESIGN_CHALLENGE,
   LAST_HUMAN_VERIFIED,
   NUMBERS_SNAPSHOT,
+  OPEN_ALIAS_ROUTES,
+  OPEN_CANONICAL_HOST,
+  OPEN_HOSTS,
+  OPEN_URLS,
   PACKAGES,
   POSITIONING,
   SDK,
   SOVEREIGN_THRESHOLDS,
+  SURFACE_ORG,
+  SURFACE_POSITIONING,
   TAGLINE_LONG,
   TIER1_DESIGN_PARTNER,
   URLS,
+  getSurfaceOrg,
+  getSurfacePositioning,
 } from '../../lib/canonical-claims';
 import { ADAPTERS } from '@/src/import/registry';
 
@@ -183,5 +191,79 @@ describe('Institutional Funnel SSOT (Tier 1 + BIP)', () => {
 
   test('BIP scarcity rule: maxSeats is pinned to 5', () => {
     expect(BOARD_OF_INVESTORS.maxSeats).toBe(5);
+  });
+});
+
+describe('Dual-Surface Bifurcation SSOT (CEO mandate 2026-05-15)', () => {
+  test('SURFACE_POSITIONING covers both pocket and open surfaces with distinct primaries', () => {
+    expect(SURFACE_POSITIONING.pocket.primary.length).toBeGreaterThan(8);
+    expect(SURFACE_POSITIONING.open.primary.length).toBeGreaterThan(8);
+    expect(SURFACE_POSITIONING.pocket.primary).not.toBe(SURFACE_POSITIONING.open.primary);
+  });
+
+  test('SURFACE_POSITIONING.open.primary echoes the canonical POSITIONING.primary', () => {
+    expect(SURFACE_POSITIONING.open.primary).toBe(POSITIONING.primary);
+  });
+
+  test('SURFACE_ORG carries distinct names and URLs per surface', () => {
+    expect(SURFACE_ORG.pocket.name).toBe('Pocket Portfolio');
+    expect(SURFACE_ORG.open.name).toBe('Open Portfolio');
+    expect(SURFACE_ORG.pocket.url).toMatch(/pocketportfolio\.app$/);
+    expect(SURFACE_ORG.open.url).toMatch(/openportfolio\.co\.uk$/);
+  });
+
+  test('SURFACE_ORG.pocket.url is identical to URLS.home (back-compat invariant)', () => {
+    expect(SURFACE_ORG.pocket.url).toBe(URLS.home);
+  });
+
+  test('OPEN_CANONICAL_HOST is the apex www.openportfolio.co.uk', () => {
+    expect(OPEN_CANONICAL_HOST).toBe('www.openportfolio.co.uk');
+  });
+
+  test('OPEN_HOSTS includes both .co.uk and the parked .uk variants', () => {
+    expect(OPEN_HOSTS).toContain('openportfolio.co.uk');
+    expect(OPEN_HOSTS).toContain('www.openportfolio.co.uk');
+    expect(OPEN_HOSTS).toContain('openportfolio.uk');
+    expect(OPEN_HOSTS).toContain('www.openportfolio.uk');
+  });
+
+  test('OPEN_HOSTS contains the canonical host', () => {
+    expect((OPEN_HOSTS as readonly string[]).includes(OPEN_CANONICAL_HOST)).toBe(true);
+  });
+
+  test('every OPEN_URLS entry points at the openportfolio.co.uk canonical host', () => {
+    for (const [key, value] of Object.entries(OPEN_URLS)) {
+      expect(value, `OPEN_URLS.${key} must point at openportfolio.co.uk`).toMatch(
+        /^https:\/\/www\.openportfolio\.co\.uk(\/|$)/,
+      );
+    }
+  });
+
+  test('OPEN_ALIAS_ROUTES lists exactly the 21 B2B surfaces (CEO mandate + performance dossier)', () => {
+    expect(OPEN_ALIAS_ROUTES).toHaveLength(21);
+    const paths = OPEN_ALIAS_ROUTES.map((r) => r.path);
+    expect(new Set(paths).size).toBe(paths.length);
+  });
+
+  test('every OPEN_ALIAS_ROUTES openUrl ends with the route path', () => {
+    for (const route of OPEN_ALIAS_ROUTES) {
+      expect(route.openUrl.endsWith(route.path)).toBe(true);
+      expect(route.openUrl.startsWith('https://www.openportfolio.co.uk')).toBe(true);
+    }
+  });
+
+  test('OPEN_ALIAS_ROUTES include the architectural anchors (architecture, designchallenge, BIP)', () => {
+    const paths = OPEN_ALIAS_ROUTES.map((r) => r.path);
+    expect(paths).toContain('/architecture');
+    expect(paths).toContain('/designchallenge');
+    expect(paths).toContain('/tier1designpartner');
+    expect(paths).toContain('/board-of-investors');
+  });
+
+  test('helpers return the correct surface block', () => {
+    expect(getSurfaceOrg('pocket').name).toBe('Pocket Portfolio');
+    expect(getSurfaceOrg('open').name).toBe('Open Portfolio');
+    expect(getSurfacePositioning('pocket').primary).toBe(SURFACE_POSITIONING.pocket.primary);
+    expect(getSurfacePositioning('open').primary).toBe(POSITIONING.primary);
   });
 });

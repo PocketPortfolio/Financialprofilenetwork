@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import MarketingLink from '@/app/components/MarketingLink';
 import { useRouter } from 'next/navigation';
 
 export function PlaybookGate() {
@@ -52,7 +53,7 @@ export function PlaybookGate() {
       }}
     >
       <div style={{ width: '100%', marginBottom: '1.25rem' }}>
-        <Link
+        <MarketingLink
           href="/dashboard"
           style={{
             display: 'inline-flex',
@@ -65,7 +66,7 @@ export function PlaybookGate() {
           }}
         >
           ← Main app (Dashboard)
-        </Link>
+        </MarketingLink>
         <p style={{ marginTop: '0.35rem', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#64748b' }}>
           Full navigation: bar fixed at bottom of screen
         </p>

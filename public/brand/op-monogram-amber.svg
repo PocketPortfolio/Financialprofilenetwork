@@ -1,0 +1,8 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <title>Open Portfolio O. monogram (amber)</title>
+  <rect width="256" height="256" rx="56" fill="#0b0d10"/>
+  <g fill="#f59e0b">
+    <path d="M62 138a40 40 0 1 1 80 0 40 40 0 0 1-80 0zm20 0a20 20 0 1 0 40 0 20 20 0 0 0-40 0z"/>
+    <rect x="160" y="138" width="36" height="36" rx="8" opacity=".9"/>
+  </g>
+</svg>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import MarketingLink from '@/app/components/MarketingLink';
 
 export default function SovereignStackPage() {
   const articleSchema = {
@@ -202,7 +203,7 @@ export default function SovereignStackPage() {
           }}>
             Our <strong>Sovereign Sync</strong> feature turns your Google Drive into your personal database. All calculations happen in your browser. We never see your portfolio value, your holdings, or your trades.
           </p>
-          <Link
+          <MarketingLink
             href="/features/google-drive-sync"
             style={{
               display: 'inline-block',
@@ -225,7 +226,7 @@ export default function SovereignStackPage() {
             }}
           >
             Learn About Sovereign Sync →
-          </Link>
+          </MarketingLink>
         </section>
 
         {/* Key Takeaways */}

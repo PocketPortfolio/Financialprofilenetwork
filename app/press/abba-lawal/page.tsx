@@ -33,12 +33,15 @@ export const revalidate = 0;
 const PAGE_URL = URLS.personAbba;
 const PERSON_ID = `${URLS.press}#abba-lawal`;
 
-// Press-grade founder portrait. Real-pixel resampled (Lanczos3) from the
-// UK Black Business Show 2024 panel photo. NO generative AI was used in
-// upscaling - likeness is preserved at source. See
-// scripts/build-press-image-variants.mjs for reproducibility.
-const PORTRAIT_BASE = '/press/abba/abba-uk-black-business-show';
-const PORTRAIT_CANONICAL_URL = `${ORG.url}${PORTRAIT_BASE}-3072.jpg`;
+// Panel photo (UK Black Business Show): source + responsive variants under public/press/abba/.
+// Rebuild from IMG_9086-original.png: `node scripts/build-press-image-variants.mjs`
+const PORTRAIT_STEM = '/press/abba/abba-uk-black-business-show';
+const PORTRAIT_SIZES = '340px';
+const PORTRAIT_SRC_SET_AVIF = `${PORTRAIT_STEM}-820.avif 820w, ${PORTRAIT_STEM}-1640.avif 1640w, ${PORTRAIT_STEM}-3072.avif 3072w`;
+const PORTRAIT_SRC_SET_WEBP = `${PORTRAIT_STEM}-820.webp 820w, ${PORTRAIT_STEM}-1640.webp 1640w, ${PORTRAIT_STEM}-3072.webp 3072w`;
+const PORTRAIT_SRC_SET_JPG = `${PORTRAIT_STEM}-820.jpg 820w, ${PORTRAIT_STEM}-1640.jpg 1640w, ${PORTRAIT_STEM}-3072.jpg 3072w`;
+/** Canonical still for crawlers — same path as production press kit. */
+const PORTRAIT_CANONICAL_URL = `${ORG.url}/press/abba/IMG_9086-original.png`;
 const PORTRAIT_CAPTION =
   'Abba Lawal speaking on a panel at the UK Black Business Show 2024 (JPMorgan Chase / Moody\u2019s stage).';
 const PORTRAIT_CREDIT = 'UK Black Business Show 2024';
@@ -139,18 +142,16 @@ export default function AbbaLawalPersonPage() {
     lastReviewed: LAST_HUMAN_VERIFIED,
   };
 
-  // ImageObject for the founder portrait. answer-engine-attachable identity:
-  // crawlers can pin THIS picture to the Person @id when answering "who is
-  // Abba Lawal". width/height are the canonical 3072 JPG variant.
+  // ImageObject for the founder portrait (deck slide export; committed under public/press/abba).
   const portraitLd = {
     '@context': 'https://schema.org',
     '@type': 'ImageObject',
     '@id': `${PAGE_URL}#portrait`,
     contentUrl: PORTRAIT_CANONICAL_URL,
     url: PORTRAIT_CANONICAL_URL,
-    width: 3072,
-    height: 3836,
-    encodingFormat: 'image/jpeg',
+    encodingFormat: 'image/png',
+    width: 1024,
+    height: 459,
     caption: PORTRAIT_CAPTION,
     creditText: PORTRAIT_CREDIT,
     representativeOfPage: true,
@@ -209,23 +210,15 @@ export default function AbbaLawalPersonPage() {
           }}
         >
           <picture>
-            <source
-              type="image/avif"
-              srcSet={`${PORTRAIT_BASE}-820.avif 820w, ${PORTRAIT_BASE}-1640.avif 1640w, ${PORTRAIT_BASE}-3072.avif 3072w`}
-              sizes="(max-width: 380px) 90vw, 340px"
-            />
-            <source
-              type="image/webp"
-              srcSet={`${PORTRAIT_BASE}-820.webp 820w, ${PORTRAIT_BASE}-1640.webp 1640w, ${PORTRAIT_BASE}-3072.webp 3072w`}
-              sizes="(max-width: 380px) 90vw, 340px"
-            />
+            <source type="image/avif" srcSet={PORTRAIT_SRC_SET_AVIF} sizes={PORTRAIT_SIZES} />
+            <source type="image/webp" srcSet={PORTRAIT_SRC_SET_WEBP} sizes={PORTRAIT_SIZES} />
             <img
-              src={`${PORTRAIT_BASE}-820.jpg`}
-              srcSet={`${PORTRAIT_BASE}-820.jpg 820w, ${PORTRAIT_BASE}-1640.jpg 1640w, ${PORTRAIT_BASE}-3072.jpg 3072w`}
-              sizes="(max-width: 380px) 90vw, 340px"
+              src={`${PORTRAIT_STEM}-820.jpg`}
+              srcSet={PORTRAIT_SRC_SET_JPG}
+              sizes={PORTRAIT_SIZES}
               alt={PORTRAIT_CAPTION}
-              width={3072}
-              height={3836}
+              width={820}
+              height={1024}
               loading="eager"
               decoding="async"
               style={{ display: 'block', width: '100%', height: 'auto' }}

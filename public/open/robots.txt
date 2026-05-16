@@ -1,0 +1,15 @@
+# Open Portfolio (B2B) — robots policy
+# Served at https://www.openportfolio.co.uk/robots.txt via middleware rewrite.
+
+User-agent: *
+Allow: /
+
+# B2B developer surface: crawl `/` and allow-listed routes; unknown paths 404 on Open chrome.
+# All other paths fall through to /open/* and 404 cleanly (no leakage to the
+# Pocket consumer surface).
+
+Sitemap: https://www.openportfolio.co.uk/sitemap.xml
+
+# AI-context file for answer engines (Perplexity, ChatGPT search, etc.)
+# Surfaces SDK package list, NUMBERS_SNAPSHOT receipts, and architecture URL.
+# See https://www.openportfolio.co.uk/llms.txt

@@ -4,7 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { BOARD_OF_INVESTORS, DESIGN_CHALLENGE, TIER1_DESIGN_PARTNER } from '@/lib/canonical-claims';
+import {
+  BOARD_OF_INVESTORS,
+  DESIGN_CHALLENGE,
+  SURFACE_CROSS_LINKS,
+  TIER1_DESIGN_PARTNER,
+} from '@/lib/canonical-claims';
+import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
 
 interface TrendingAsset {
   symbol: string;
@@ -16,6 +22,17 @@ export default function GlobalFooter() {
   const pathname = usePathname();
   const [trendingAssets, setTrendingAssets] = useState<TrendingAsset[]>([]);
   const footerRef = useRef<HTMLElement | null>(null);
+  const [onOpenSurface, setOnOpenSurface] = useState(false);
+  const [crossLinkHref, setCrossLinkHref] = useState<string>(SURFACE_CROSS_LINKS.pocket.href);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    const open = isOpenPortfolioHost(host);
+    setOnOpenSurface(open);
+    setCrossLinkHref(
+      open ? pocketSurfaceBaseUrl(host) : openSurfaceBaseUrl(host),
+    );
+  }, []);
 
   // Determine footer variant based on pathname
   const isLiteFooter = pathname?.startsWith('/login') || 
@@ -25,7 +42,7 @@ export default function GlobalFooter() {
 
   // Fetch trending assets only when the footer is near-viewport + idle (keeps main thread free early).
   useEffect(() => {
-    if (isLiteFooter) return;
+    if (isLiteFooter || onOpenSurface) return;
 
     let cancelled = false;
 
@@ -74,7 +91,12 @@ export default function GlobalFooter() {
       cancelled = true;
       io.disconnect();
     };
-  }, [isLiteFooter]);
+  }, [isLiteFooter, onOpenSurface]);
+
+  // Pocket footer is not shown on the B2B surface (OpenNavbar + page footers only).
+  if (onOpenSurface) {
+    return null;
+  }
 
   // Lite Footer (Login, Sign-up, Checkout)
   if (isLiteFooter) {
@@ -473,6 +495,24 @@ export default function GlobalFooter() {
                 >
                   Board of investors (BIP)
                 </Link>
+              </li>
+              <li>
+                <a
+                  href={crossLinkHref}
+                  {...(onOpenSurface ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  {onOpenSurface
+                    ? SURFACE_CROSS_LINKS.open.label
+                    : SURFACE_CROSS_LINKS.pocket.label}
+                </a>
               </li>
             </ul>
           </div>

@@ -1,8 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { useSurface } from '@/app/components/SurfaceProvider';
+import { pocketSurfaceBaseUrl } from '@/lib/surface-host';
 
 export default function SovereignFinancePage() {
+  const surface = useSurface();
+  const fallbackHostForSsr =
+    process.env.NODE_ENV === 'development' ? 'open.localhost' : 'www.openportfolio.co.uk';
+  const pocketMarketingHome = `${pocketSurfaceBaseUrl(
+    typeof window !== 'undefined' ? window.location.host : fallbackHostForSsr,
+  )}/`;
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -205,7 +213,7 @@ export default function SovereignFinancePage() {
             Pocket Portfolio is built on the principles of Sovereign Finance. Your data, your storage, your control. No subscriptions, no data sales, no vendor lock-in.
           </p>
           <Link
-            href="/"
+            href={surface === 'open' ? pocketMarketingHome : '/'}
             style={{
               display: 'inline-block',
               background: 'var(--accent-warm)',

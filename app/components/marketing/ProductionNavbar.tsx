@@ -8,6 +8,8 @@ import { usePathname } from 'next/navigation';
 import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
 import { useStickyHeader } from '../../hooks/useStickyHeader';
+import { useSurface } from '../SurfaceProvider';
+import SurfaceSwitcher from '../SurfaceSwitcher';
 import {
   sovereignPrimaryNav,
   sovereignToolsDropdown,
@@ -15,6 +17,14 @@ import {
 } from '@/app/lib/nav/sovereignMarketingNav';
 
 export default function ProductionNavbar() {
+  // When this navbar is rendered inside an aliased route on the O. surface
+  // (e.g. /architecture served via app/open/architecture/page.tsx), the
+  // SurfaceProvider in app/open/layout.tsx returns 'open' and we suppress
+  // the Pocket nav entirely — the OpenNavbar in the parent layout handles
+  // navigation for the B2B surface.
+  const surface = useSurface();
+  if (surface === 'open') return null;
+
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
@@ -388,6 +398,7 @@ export default function ProductionNavbar() {
                   return linkEl;
                 })}
                 {renderNavLink(faqItem)}
+                <SurfaceSwitcher target="open" label="Developers" />
               </nav>
 
               {/* Action Buttons */}

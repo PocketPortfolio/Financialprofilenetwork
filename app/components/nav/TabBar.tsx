@@ -13,6 +13,7 @@ import {
   HeartHandshake,
   type LucideIcon,
 } from 'lucide-react';
+import { isOpenPortfolioHost } from '@/lib/surface-host';
 
 interface TabItem {
   id: string;
@@ -91,6 +92,7 @@ export default function TabBar({ className = '' }: { className?: string }) {
   const pathname = usePathname();
   const { isAuthenticated, loading } = useAuth();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [onOpenSurface, setOnOpenSurface] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -99,6 +101,14 @@ export default function TabBar({ className = '' }: { className?: string }) {
     mq.addEventListener('change', apply);
     return () => mq.removeEventListener('change', apply);
   }, []);
+
+  useEffect(() => {
+    setOnOpenSurface(isOpenPortfolioHost(window.location.hostname));
+  }, []);
+
+  if (onOpenSurface) {
+    return null;
+  }
 
   if (isMobile === null) {
     return null;

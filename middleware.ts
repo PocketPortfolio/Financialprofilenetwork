@@ -1,5 +1,54 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import {
+  isOpenStaticAssetPath,
+  isOpenSurfaceRoute,
+  isPocketOnlyMarketingPath,
+  pocketSurfaceBaseUrl,
+} from '@/lib/surface-host';
+
+// Open Portfolio (B2B) host gate — see lib/canonical-claims.ts (OPEN_HOSTS, OPEN_CANONICAL_HOST).
+// Inlined here so middleware stays in Edge runtime with zero module-graph overhead.
+const OPEN_HOSTS_PRODUCTION = [
+  'openportfolio.co.uk',
+  'www.openportfolio.co.uk',
+  'openportfolio.uk',
+  'www.openportfolio.uk',
+] as const;
+/** Production canonical apex for the O. surface. */
+const OPEN_CANONICAL_HOST_PRODUCTION = 'www.openportfolio.co.uk';
+/**
+ * Local dev only: open.localhost resolves to 127.0.0.1 in Chrome/Edge/Firefox
+ * without editing the hosts file. Use http://open.localhost:3001 for O. and
+ * http://localhost:3001 for Pocket. Alternatively browse http://localhost:3001/open/*
+ */
+const OPEN_HOSTS_DEV = ['open.localhost', 'www.open.localhost'] as const;
+const OPEN_CANONICAL_HOST_DEV = 'open.localhost';
+
+function isDevOpenLocalHost(host: string): boolean {
+  return (
+    process.env.NODE_ENV === 'development' &&
+    (host === 'open.localhost' || host === 'www.open.localhost')
+  );
+}
+
+function isOpenHost(host: string): boolean {
+  if ((OPEN_HOSTS_PRODUCTION as readonly string[]).includes(host)) return true;
+  return isDevOpenLocalHost(host);
+}
+
+function openCanonicalHost(requestHost: string): string {
+  if (isDevOpenLocalHost(requestHost)) return OPEN_CANONICAL_HOST_DEV;
+  return OPEN_CANONICAL_HOST_PRODUCTION;
+}
+const OPEN_SPECIAL_FILES: ReadonlySet<string> = new Set([
+  '/robots.txt',
+  '/llms.txt',
+  '/sitemap.xml',
+]);
+
+/** Middleware rewrite target — page calls notFound() → app/open/not-found.tsx. */
+const OPEN_NOT_FOUND_REWRITE = '/open/__not-a-b2b-route__';
 
 export function middleware(request: NextRequest) {
   // Canonical host: apex → www so referral sessionStorage + cookies stay on one origin (ref survives signup).
@@ -10,34 +59,110 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 307);
   }
 
-  // #region agent log - DISABLED FOR PRODUCTION (causes timeouts during rapid testing)
-  // const logData = {pathname:request.nextUrl.pathname,timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug',hypothesisId:'D'};
-  // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:5',message:'Middleware invoked',data:logData,...logData})}).catch(()=>{});
-  // #endregion
-  
+  // Open Portfolio (B2B surface): path-fork before any P.-specific logic runs.
+  // Any O. host other than the canonical apex 307-redirects to www.openportfolio.co.uk.
+  // The canonical host gets an internal rewrite to /open/<path> so the Next.js
+  // route group at app/open/ handles the request with O. chrome + metadata.
+  if (isOpenHost(host)) {
+    const openCanonical = openCanonicalHost(host);
+    if (host !== openCanonical) {
+      const url = request.nextUrl.clone();
+      url.hostname = openCanonical;
+      return NextResponse.redirect(url, 307);
+    }
+
+    const pathname = request.nextUrl.pathname;
+    const hostHeader = request.headers.get('host') ?? '';
+
+    // Public-folder assets (/book-assets, /images, /brand, …) must not rewrite to
+    // /open/* — that 404s figures on aliased pages (e.g. /designchallenge).
+    if (isOpenStaticAssetPath(pathname)) {
+      return NextResponse.next();
+    }
+
+    // On the O. host, the implementation-detail `/open/*` URLs must canonicalize
+    // back to the bare path so search engines don't index both /architecture
+    // and /open/architecture. 308 preserves method semantics.
+    if (pathname === '/open' || pathname.startsWith('/open/')) {
+      const url = request.nextUrl.clone();
+      url.pathname = pathname === '/open' ? '/' : pathname.replace(/^\/open/, '');
+      return NextResponse.redirect(url, 308);
+    }
+
+    // Static files (robots/llms/sitemap) get rewritten to /open/<file> so the
+    // O. surface serves its own indexing artifacts at the root path.
+    if (OPEN_SPECIAL_FILES.has(pathname)) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/open${pathname}`;
+      return NextResponse.rewrite(url);
+    }
+
+    // Consumer-only routes (linked from /learn etc.). Production: 307 to Pocket apex.
+    // Dev open.localhost: serve the same Next routes without redirect — middleware collapses
+    // same-deployment redirects to `Location: /path`, causing ERR_TOO_MANY_REDIRECTS.
+    if (!isOpenSurfaceRoute(pathname) && isPocketOnlyMarketingPath(pathname)) {
+      if (host === 'open.localhost' || host === 'www.open.localhost') {
+        return NextResponse.next();
+      }
+      const pocketOrigin = pocketSurfaceBaseUrl(hostHeader);
+      const absoluteDest = `${pocketOrigin.replace(/\/$/, '')}${pathname}${request.nextUrl.search}`;
+      return NextResponse.redirect(absoluteDest, 307);
+    }
+
+    // Only known B2B routes rewrite into app/open/. Pocket is reached via SurfaceSwitcher only.
+    if (!isOpenSurfaceRoute(pathname)) {
+      const url = request.nextUrl.clone();
+      url.pathname = OPEN_NOT_FOUND_REWRITE;
+      return NextResponse.rewrite(url);
+    }
+
+    const url = request.nextUrl.clone();
+    url.pathname = `/open${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
+  // On the Pocket Portfolio host, /open/* is the implementation detail of the
+  // O. surface — it must not be directly browsable so search engines can't
+  // index duplicate content under pocketportfolio.app/open/*. Redirect any
+  // such hit to the openportfolio.co.uk canonical equivalent.
+  // In development, localhost and 127.0.0.1 may browse /open/* directly
+  // (http://localhost:3001/open/architecture) without a cross-domain redirect.
+  const isLocalDevPocketHost =
+    process.env.NODE_ENV === 'development' &&
+    (host === 'localhost' || host === '127.0.0.1');
+  if (
+    !isLocalDevPocketHost &&
+    (host === 'www.pocketportfolio.app' || host === 'pocketportfolio.app') &&
+    request.nextUrl.pathname.startsWith('/open/')
+  ) {
+    const url = request.nextUrl.clone();
+    url.hostname = OPEN_CANONICAL_HOST_PRODUCTION;
+    url.pathname = request.nextUrl.pathname.replace(/^\/open/, '') || '/';
+    return NextResponse.redirect(url, 308);
+  }
+  // Also handle the bare /open landing prefix on the Pocket host.
+  if (
+    !isLocalDevPocketHost &&
+    (host === 'www.pocketportfolio.app' || host === 'pocketportfolio.app') &&
+    request.nextUrl.pathname === '/open'
+  ) {
+    const url = request.nextUrl.clone();
+    url.hostname = OPEN_CANONICAL_HOST_PRODUCTION;
+    url.pathname = '/';
+    return NextResponse.redirect(url, 308);
+  }
+
   // Rewrite programmatic risk pages: /tools/track-{ticker}-risk -> /tools/track/{ticker}
   // Remove "-risk" suffix so route folder track-[ticker] can match with ticker param
   // Only match the original URL pattern, not the rewritten one (avoid infinite loop)
   const riskPageMatch = request.nextUrl.pathname.match(/^\/tools\/track-([a-z0-9]+)-risk$/i);
-  
-  // #region agent log - DISABLED FOR PRODUCTION
-  // const logCheck = {location:'middleware.ts:13',message:'Risk page pattern check',data:{pathname:request.nextUrl.pathname,matched:!!riskPageMatch,matchResult:riskPageMatch?.[1]},timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug-v5',hypothesisId:'I'};
-  // console.warn('[MIDDLEWARE] Risk page check', logCheck.data);
-  // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logCheck)}).catch(()=>{});
-  // #endregion
-  
+
   if (riskPageMatch) {
     const ticker = riskPageMatch[1];
     const url = request.nextUrl.clone();
     // Rewrite to /tools/track/{ticker} (without -risk suffix)
     url.pathname = `/tools/track/${ticker}`;
-    
-    // #region agent log - DISABLED FOR PRODUCTION
-    // const logRewrite = {location:'middleware.ts:22',message:'Rewriting risk page URL',data:{original:request.nextUrl.pathname,rewritten:url.pathname,ticker},timestamp:Date.now(),sessionId:'debug-session',runId:'middleware-debug-v5',hypothesisId:'I'};
-    // console.warn('[MIDDLEWARE] Rewriting', logRewrite.data);
-    // fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logRewrite)}).catch(()=>{});
-    // #endregion
-    
+
     return NextResponse.rewrite(url);
   }
 
@@ -112,13 +237,16 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - brand/public folder
      * - api/ (API routes)
-     * - sitemap.xml (sitemap file)
-     * - robots.txt (robots file)
-     * - llms.txt (LLM context file)
+     *
+     * sitemap.xml / robots.txt / llms.txt are intentionally NOT excluded:
+     * the Open Portfolio host gate above rewrites them to /open/<file> so
+     * the O. surface can serve its own indexing artifacts. The existing
+     * P.-only handlers (cache headers for sitemaps; pass-through for robots/llms)
+     * still run for the Pocket host as before.
      */
-    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|sitemap.*\\.xml|sitemap.*\\.xml\\.gz|robots\\.txt|llms\\.txt).*)',
+    '/((?!_next/static|_next/image|favicon\\.ico|brand|public|api|book-assets|images|fonts|icon-).*)',
   ],
 };
 
