@@ -5,7 +5,6 @@
  */
 
 const GITHUB_REPO = 'PocketPortfolio/Financialprofilenetwork';
-const LOG_ENDPOINT = 'http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8';
 const CHECK_INTERVAL = 30000; // 30 seconds
 
 interface WorkflowRun {
@@ -42,25 +41,9 @@ interface QueueSnapshot {
   };
 }
 
-// #region agent log
-async function logDebug(data: any) {
-  try {
-    await fetch(LOG_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'monitor-queue-events.ts',
-        message: data.message || 'Queue monitoring',
-        data: data.data || data,
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: data.runId || 'monitoring',
-        hypothesisId: data.hypothesisId || 'G-J'
-      })
-    }).catch(() => {});
-  } catch (e) {}
+function logDebug(data: Record<string, unknown>) {
+  console.log('[monitor-queue-events]', data.message ?? '', JSON.stringify(data.data ?? data));
 }
-// #endregion
 
 async function getQueueSnapshot(headers: any): Promise<QueueSnapshot> {
   const workflowsUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows`;
@@ -171,19 +154,16 @@ async function monitorQueue() {
 
   let previousSnapshot: QueueSnapshot | null = null;
 
-  // #region agent log
   await logDebug({
     hypothesisId: 'G-J',
     message: 'Monitoring started',
     data: { repo: GITHUB_REPO, interval_ms: CHECK_INTERVAL }
   });
-  // #endregion
 
   while (true) {
     try {
       const snapshot = await getQueueSnapshot(headers);
       
-      // #region agent log
       await logDebug({
         hypothesisId: 'G',
         message: 'Queue snapshot',
@@ -196,7 +176,6 @@ async function monitorQueue() {
           queued_details: snapshot.details.queued_runs
         }
       });
-      // #endregion
 
       // Detect queue events
       if (snapshot.queued > 0) {
@@ -212,7 +191,6 @@ async function monitorQueue() {
           });
         }
 
-        // #region agent log
         await logDebug({
           hypothesisId: 'G',
           message: 'Queue event detected',
@@ -226,7 +204,6 @@ async function monitorQueue() {
             } : null
           }
         });
-        // #endregion
       }
 
       // Detect sudden increase in queued runs
@@ -234,7 +211,6 @@ async function monitorQueue() {
         const delta = snapshot.queued - previousSnapshot.queued;
         console.log(`\n📈 Queue increased by ${delta} (${previousSnapshot.queued} → ${snapshot.queued})`);
         
-        // #region agent log
         await logDebug({
           hypothesisId: 'H',
           message: 'Queue spike detected',
@@ -244,14 +220,12 @@ async function monitorQueue() {
             in_progress: snapshot.in_progress
           }
         });
-        // #endregion
       }
 
       // Detect high cancellation rate
       if (snapshot.cancelled_last_5min > 3) {
         console.log(`\n⚠️  High cancellation rate: ${snapshot.cancelled_last_5min} in last 5 minutes`);
         
-        // #region agent log
         await logDebug({
           hypothesisId: 'I',
           message: 'High cancellation rate',
@@ -261,14 +235,12 @@ async function monitorQueue() {
             in_progress: snapshot.in_progress
           }
         });
-        // #endregion
       }
 
       // Detect simultaneous trigger storm
       if (snapshot.workflows_triggered_last_5min > 5) {
         console.log(`\n⚡ Trigger storm: ${snapshot.workflows_triggered_last_5min} workflows triggered in last 5 minutes`);
         
-        // #region agent log
         await logDebug({
           hypothesisId: 'G',
           message: 'Trigger storm detected',
@@ -278,7 +250,6 @@ async function monitorQueue() {
             in_progress: snapshot.in_progress
           }
         });
-        // #endregion
       }
 
       previousSnapshot = snapshot;
@@ -287,13 +258,11 @@ async function monitorQueue() {
       await new Promise(resolve => setTimeout(resolve, CHECK_INTERVAL));
 
     } catch (error: any) {
-      // #region agent log
       await logDebug({
         hypothesisId: 'ALL',
         message: 'Monitoring error',
         data: { error: error.message }
       });
-      // #endregion
       console.error(`\n❌ Error: ${error.message}`);
       await new Promise(resolve => setTimeout(resolve, CHECK_INTERVAL));
     }

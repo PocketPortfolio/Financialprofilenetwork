@@ -123,6 +123,21 @@ interface AnalyticsData {
     signups: Array<{ id: string; email: string; createdAt: string; source?: string }>;
     error?: string;
   };
+  openPortfolioContactLeads?: {
+    total: number;
+    last7Days: number;
+    byContext: Record<string, number>;
+    signups: Array<{
+      id: string;
+      email: string;
+      company?: string;
+      role?: string;
+      message: string;
+      context?: string;
+      createdAt: string;
+    }>;
+    error?: string;
+  };
   googleSignups?: {
     total: number;
     last7Days: number;
@@ -1927,6 +1942,166 @@ export default function AdminAnalyticsPage() {
                     </p>
                   )}
                 </>
+            )}
+          </section>
+
+          {/* Open Portfolio B2B contact form */}
+          <section
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: 'var(--space-6)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: 'var(--space-4)',
+                color: 'var(--text)',
+              }}
+            >
+              Open Portfolio contact (B2B)
+            </h2>
+            <p
+              style={{
+                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                marginBottom: 'var(--space-4)',
+                lineHeight: 1.5,
+              }}
+            >
+              Briefing requests from{' '}
+              <Link href="https://www.openportfolio.co.uk" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+                openportfolio.co.uk
+              </Link>{' '}
+              (Firestore: <code style={{ fontSize: '12px' }}>open_portfolio_contact_leads</code>).
+            </p>
+            {!analyticsData.openPortfolioContactLeads ? (
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                Data not in API response — redeploy to enable Open Portfolio funnel analytics.
+              </p>
+            ) : analyticsData.openPortfolioContactLeads.error ? (
+              <p style={{ color: 'var(--destructive, #ef4444)', fontSize: '14px' }}>
+                {analyticsData.openPortfolioContactLeads.error}
+              </p>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: 'var(--space-4)',
+                    marginBottom: 'var(--space-6)',
+                  }}
+                >
+                  <div
+                    style={{
+                      background: 'var(--bg)',
+                      padding: 'var(--space-4)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: 'var(--signal)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {analyticsData.openPortfolioContactLeads.total}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Submissions in range</div>
+                  </div>
+                  <div
+                    style={{
+                      background: 'var(--bg)',
+                      padding: 'var(--space-4)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: 'var(--accent-warm)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {analyticsData.openPortfolioContactLeads.last7Days}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                      In last 7 days (within range)
+                    </div>
+                  </div>
+                </div>
+                {analyticsData.openPortfolioContactLeads.signups.length > 0 ? (
+                  <div>
+                    <h3
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        marginBottom: 'var(--space-4)',
+                        color: 'var(--text)',
+                      }}
+                    >
+                      Recent submissions (up to 100)
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                      {analyticsData.openPortfolioContactLeads.signups.map((row) => (
+                        <div
+                          key={row.id}
+                          style={{
+                            background: 'var(--bg)',
+                            padding: 'var(--space-3)',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border)',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              flexWrap: 'wrap',
+                              gap: '8px',
+                              marginBottom: '8px',
+                            }}
+                          >
+                            <a
+                              href={`mailto:${row.email}`}
+                              style={{ fontWeight: '600', color: 'var(--text)', textDecoration: 'none' }}
+                            >
+                              {row.email}
+                            </a>
+                            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                              {row.context ?? 'general'} ·{' '}
+                              {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                            </span>
+                          </div>
+                          {(row.company || row.role) && (
+                            <p style={{ margin: '0 0 6px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+                              {[row.company, row.role].filter(Boolean).join(' · ')}
+                            </p>
+                          )}
+                          <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                            {row.message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                    No B2B contact submissions in this time range yet.
+                  </p>
+                )}
+              </>
             )}
           </section>
 

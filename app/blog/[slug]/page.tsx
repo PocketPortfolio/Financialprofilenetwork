@@ -1,8 +1,12 @@
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import { isNextNavigationError } from '@/lib/next-navigation-errors';
+import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
 import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
@@ -137,9 +141,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const fileContents = fs.readFileSync(postPath, 'utf-8');
     const { data } = matter(fileContents);
 
-    const fallbackOgImage = `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
+    const host = (await headers()).get('host')?.split(':')[0] ?? '';
+    const onOpen = isOpenPortfolioHost(host);
+    const siteBase = onOpen ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
+    const brand = onOpen ? SURFACE_ORG.open.name : 'Pocket Portfolio';
+    const fallbackOgImage = `${siteBase}/api/og?title=${encodeURIComponent(data.title || `${brand} Blog`)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
     return {
-      title: `${data.title} | Pocket Portfolio Blog`,
+      title: `${data.title} | ${brand} Blog`,
       description: data.description,
       keywords: data.tags || [],
       openGraph: {
@@ -148,10 +156,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         images: [data.image || fallbackOgImage],
         type: 'article',
         publishedTime: data.date, // Will be updated below if publishedAt exists
-        authors: [data.author || 'Pocket Portfolio Team'],
+        authors: [data.author || `${brand} Team`],
+        url: `${siteBase}/blog/${resolvedParams.slug}`,
       },
       alternates: {
-        canonical: `https://www.pocketportfolio.app/blog/${resolvedParams.slug}`,
+        canonical: `${siteBase}/blog/${resolvedParams.slug}`,
       },
     };
   } catch (error) {
@@ -215,7 +224,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     const parsed = matter(fileContents);
     data = parsed.data;
     content = sanitizeMdxBodyAfterFrontmatter(parsed.content);
-    
+
     // ✅ Validate parsed data
     if (!data || !data.title) {
       throw new Error('Frontmatter missing required fields (title)');
@@ -232,16 +241,29 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       contentLength: content.length,
       hasImage: !!data.image,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    if (isNextNavigationError(error)) throw error;
+    const err = error as { message?: string; stack?: string };
     console.error('[Blog Post] Error parsing MDX file:', {
       slug: resolvedParams.slug,
       postPath,
       fileExists: fs.existsSync(postPath),
       fileSize: fs.existsSync(postPath) ? fs.statSync(postPath).size : 0,
-      error: error.message,
-      errorStack: error.stack,
+      error: err.message,
+      errorStack: err.stack,
     });
-    throw new Error(`Failed to parse blog post: ${error.message}`);
+    throw new Error(`Failed to parse blog post: ${err.message ?? 'Unknown error'}`);
+  }
+
+  const host = (await headers()).get('host')?.split(':')[0] ?? '';
+  const onOpenSurface = isOpenPortfolioHost(host);
+  const category = typeof data.category === 'string' ? data.category : 'deep-dive';
+  const technical = isOpenBlogCategory(category);
+  if (onOpenSurface && !technical) {
+    redirect(`${pocketSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
+  }
+  if (!onOpenSurface && technical) {
+    redirect(`${openSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
   }
 
   // ✅ Load publishedAt from calendar files
@@ -304,7 +326,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const { extractFAQsFromContent, extractHowToSteps, generateFAQPageSchema, generateHowToSchema, generateQAPageSchema } = await import('@/app/lib/blog/aeoSchema');
   const faqs = extractFAQsFromContent(content);
   const howToSteps = extractHowToSteps(content, data.title);
-  const postUrl = `https://www.pocketportfolio.app/blog/${resolvedParams.slug}`;
+  const siteBase = onOpenSurface ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
+  const brand = onOpenSurface ? SURFACE_ORG.open.name : 'Pocket Portfolio';
+  const postUrl = `${siteBase}/blog/${resolvedParams.slug}`;
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -312,20 +336,22 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     headline: data.title,
     description: data.description,
     image: data.image
-      ? `https://www.pocketportfolio.app${data.image}`
-      : `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(data.title || 'Pocket Portfolio Blog')}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`,
+      ? `${siteBase}${data.image}`
+      : `${siteBase}/api/og?title=${encodeURIComponent(data.title || `${brand} Blog`)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`,
     datePublished: publishedAt || data.date,
     dateModified: data.dateModified || publishedAt || data.date,
     author: {
       '@type': 'Organization',
-      name: data.author || 'Pocket Portfolio Team',
+      name: data.author || `${brand} Team`,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Pocket Portfolio',
+      name: brand,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
+        url: onOpenSurface
+          ? `${OPEN_URLS.home}/brand/pp-monogram-amber.png`
+          : 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
       },
     },
     mainEntityOfPage: {
@@ -345,9 +371,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         title={data.title}
         description={data.description}
         keywords={data.tags || []}
-        canonical={`https://www.pocketportfolio.app/blog/${resolvedParams.slug}`}
+        canonical={postUrl}
         ogType="article"
-        ogImage={data.image ? `https://www.pocketportfolio.app${data.image}` : undefined}
+        ogImage={data.image ? `${siteBase}${data.image}` : undefined}
       />
       <script
         type="application/ld+json"

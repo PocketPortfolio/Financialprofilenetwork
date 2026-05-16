@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import DashboardClientLayout from '../dashboard/DashboardClientLayout';
 
 export const metadata: Metadata = {
   title: 'Settings | Pocket Portfolio',
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <DashboardClientLayout>{children}</DashboardClientLayout>;
 }

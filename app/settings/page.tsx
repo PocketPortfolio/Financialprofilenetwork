@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import { auth } from '../lib/firebase';
 import { AccountService } from '../services/accountService';
 import { useTrades } from '../hooks/useTrades';
@@ -438,26 +437,21 @@ export default function SettingsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div 
-        data-tier={getTierForDataAttribute(tier)}
-        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-        style={{
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}
-      >
-        <SEOHead 
+      <>
+        <SEOHead
           title="Settings - Pocket Portfolio"
           description="Manage your account settings and preferences"
         />
-        <ProductionNavbar />
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          padding: '20px',
-          paddingTop: 'calc(64px + 48px + 4px)' // Header (64px) + Banner (~48px) + gap (4px)
-        }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            minHeight: '50vh',
+          }}
+        >
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Sign in to access settings</h1>
             <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
@@ -481,32 +475,23 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div 
-      data-tier={getTierForDataAttribute(tier)}
-      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-      style={{
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}
-    >
-      <SEOHead 
+    <>
+      <SEOHead
         title="Settings - Pocket Portfolio"
         description="Manage your account settings and preferences"
       />
-      <ProductionNavbar />
-      
-      <main style={{ 
-        flex: 1, 
-        padding: '20px',
-        paddingTop: 'calc(64px + 48px + 4px)', // Header (64px) + Banner (~48px) + gap (4px)
-        maxWidth: '800px',
-        margin: '0 auto',
-        width: '100%'
-      }}>
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
         <div style={{ marginBottom: '32px' }}>
           <div style={{ 
             display: 'flex', 
@@ -1075,7 +1060,7 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Confirmation Modals */}
       <ConfirmationModal
@@ -1122,6 +1107,6 @@ export default function SettingsPage() {
         type={alertModal.type}
         onClose={() => setAlertModal({ ...alertModal, isOpen: false })}
       />
-    </div>
+    </>
   );
 }

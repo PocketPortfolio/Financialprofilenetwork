@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import dynamic from 'next/dynamic';
+import { headers } from 'next/headers';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
+import { SurfaceHostProvider } from './components/SurfaceHostContext';
 import './globals.css';
 import './styles/tokens.css';
 import './styles/brand.css';
@@ -93,11 +95,13 @@ export const viewport: Viewport = {
   viewportFit: 'cover', // For iOS safe areas
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const host = (await headers()).get('host')?.split(':')[0] ?? 'www.pocketportfolio.app';
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -196,6 +200,7 @@ export default function RootLayout({
             dangerouslySetInnerHTML={renderJsonLd(getHomePageSchema())}
           />
         )}
+        <SurfaceHostProvider host={host}>
         <BrandProvider>
           <PremiumTierProvider>
           <ErrorBoundary scope="app-root">
@@ -230,6 +235,7 @@ export default function RootLayout({
           </ErrorBoundary>
           </PremiumTierProvider>
         </BrandProvider>
+        </SurfaceHostProvider>
       </body>
     </html>
   );

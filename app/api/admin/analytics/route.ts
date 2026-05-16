@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getArchitectureChallengeLeadsAnalytics } from '@/lib/challenge/challenge-leads-firestore';
+import { getOpenPortfolioLeadsAnalytics } from '@/lib/open-portfolio/contact-leads-firestore';
 import { getViralMomentBlastMetrics } from '@/lib/marketing/viral-moment-blast-stats';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
@@ -397,6 +398,31 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Open Portfolio (B2B) contact-form submissions (Firestore)
+    let openPortfolioContactLeads: Awaited<ReturnType<typeof getOpenPortfolioLeadsAnalytics>>;
+    if (firestoreDegraded) {
+      openPortfolioContactLeads = {
+        total: 0,
+        last7Days: 0,
+        byContext: {},
+        signups: [],
+        error: 'skipped_firestore_degraded',
+      };
+    } else {
+      try {
+        openPortfolioContactLeads = await getOpenPortfolioLeadsAnalytics(startDate);
+      } catch (e: any) {
+        console.error('[Analytics API] 🎯 Open Portfolio leads failed:', e?.message);
+        openPortfolioContactLeads = {
+          total: 0,
+          last7Days: 0,
+          byContext: {},
+          signups: [],
+          error: e?.message,
+        };
+      }
+    }
+
     const body = {
       monetization,
       toolUsage,
@@ -410,6 +436,7 @@ export async function GET(request: NextRequest) {
       conversionFunnel,
       monetizationFunnelBoard,
       architectureChallengeLeads,
+      openPortfolioContactLeads,
       timeRange: range,
       lastUpdated: new Date().toISOString(),
     };

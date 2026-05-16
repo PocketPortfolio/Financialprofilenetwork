@@ -1,40 +1,11 @@
-import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
+import DashboardClientLayout from '../dashboard/DashboardClientLayout';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
 
-export default function ImportLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ImportLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        background: 'var(--bg)',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        width: '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden'
-      }}
-    >
-      <ProductionNavbar />
+    <DashboardClientLayout>
       <SEOPageTracker />
-      <main
-        style={{
-          flexGrow: 1,
-          width: '100%',
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '16px var(--space-4)',
-          paddingTop: '16px',
-          boxSizing: 'border-box'
-        }}
-      >
-        {children}
-      </main>
-    </div>
+      {children}
+    </DashboardClientLayout>
   );
 }
-

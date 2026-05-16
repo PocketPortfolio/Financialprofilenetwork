@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import MarketingLink from '@/app/components/MarketingLink';
 import {
   ShieldAlert,
   Crosshair,
@@ -17,10 +18,10 @@ import styles from './SovereignStrikeMatrix.module.css';
 function AppNavLink() {
   return (
     <div className={styles.appNavRow}>
-      <Link href="/dashboard" className={styles.appNavLink}>
+      <MarketingLink href="/dashboard" className={styles.appNavLink}>
         <ChevronLeft className={styles.iconXs} aria-hidden />
         Main app (Dashboard)
-      </Link>
+      </MarketingLink>
       <p className={styles.appNavHint}>Full navigation: fixed bar at bottom of screen</p>
     </div>
   );

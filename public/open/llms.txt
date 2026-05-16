@@ -1,0 +1,74 @@
+# Open Portfolio — AI Agent Context File
+# Auto-generated from lib/canonical-claims.ts. Do not edit by hand.
+# Generated: 2026-04-26T00:00:00Z
+# Last human-verified: 2026-04-26
+
+## Identity
+Open Portfolio: The Sovereign Ingestion & Inference Layer.
+Secondary phrasing: The sovereign financial data layer.
+
+## What We Are
+Open Portfolio is the B2B developer and infrastructure gateway for the sovereign ingestion substrate that powers Pocket Portfolio. We provide a local-first import SDK plus stateless AI reasoning so platforms and operators can reason over broker data without warehousing PII. The same monorepo ships both surfaces; host-aware routing keeps the consumer wealth terminal (Pocket Portfolio) cleanly separated from this developer gateway.
+
+## Open Portfolio Invariants (artifact-backed)
+- Reference terminal scale signal: GA4 Monthly Active Users (28-day) 4,669 (TRAC-07, as of 2026-04-20).
+- Verified delivery history (founder / institutional receipt): Whale Watch processed 4.7B data points and 775M kilometres of vessel activity.
+- Enterprise portfolio-decision reference context: Built a digital portfolio platform supporting decision-making across £7B in energy assets.
+- npm aggregate downloads (11 @pocket-portfolio/* packages, all-time): 9,389 (TRAC-01, as of 2026-04-20).
+
+## Reference Case (Adversarial Test Harness)
+Our sovereign substrate currently powers Pocket Portfolio — a consumer wealth terminal parsing live broker CSV and Excel files natively in-browser with zero server-side persistence. Every edge-case file format real retail users upload becomes a regression test that hardens the enterprise adapter floor.
+- Pocket Portfolio (live consumer reference): https://www.pocketportfolio.app
+
+## SDK
+- Primary package: @pocket-portfolio/importer v1.1.0 (MIT)
+- Broker adapter floor: 19+ broker CSV/Excel formats
+- Repository: https://github.com/PocketPortfolio/Financialprofilenetwork
+- Architecture overview: https://www.openportfolio.co.uk/architecture
+
+## Canonical B2B Routes
+- https://www.openportfolio.co.uk/architecture
+- https://www.openportfolio.co.uk/designchallenge
+- https://www.openportfolio.co.uk/tier1designpartner
+- https://www.openportfolio.co.uk/board-of-investors
+- https://www.openportfolio.co.uk/sovereign-ai-grant
+- https://www.openportfolio.co.uk/learn/sovereign-stack
+- https://www.openportfolio.co.uk/learn/sovereign-finance
+- https://www.openportfolio.co.uk/learn/local-first
+- https://www.openportfolio.co.uk/learn/vendor-lock-in
+- https://www.openportfolio.co.uk/playbooks/sovereign-strike
+- https://www.openportfolio.co.uk/openbrokercsv
+- https://www.openportfolio.co.uk/static/csv-etoro-to-openbrokercsv
+- https://www.openportfolio.co.uk/static/portfolio-tracker
+- https://www.openportfolio.co.uk/static/why-we-are-fast
+- https://www.openportfolio.co.uk/stack-reveal
+- https://www.openportfolio.co.uk/press
+- https://www.openportfolio.co.uk/press/abba-lawal
+- https://www.openportfolio.co.uk/sponsor
+- https://www.openportfolio.co.uk/learn
+- https://www.openportfolio.co.uk/privacy
+- https://www.openportfolio.co.uk/terms
+
+## Substrate Packages (11 canonical npm packages)
+- @pocket-portfolio/importer — Sovereign ingestion SDK: 19+ broker CSV/Excel adapters, local-first parsing, zero PII egress.
+- @pocket-portfolio/fidelity-csv-export — Fidelity broker CSV export adapter — re-exports the core importer for discovery.
+- @pocket-portfolio/coinbase-transaction-parser — Coinbase transaction-history parser — re-exports the core importer.
+- @pocket-portfolio/etoro-history-importer — eToro account-history importer — re-exports the core importer.
+- @pocket-portfolio/robinhood-csv-parser — Robinhood CSV parser — re-exports the core importer.
+- @pocket-portfolio/trading212-to-json — Trading 212 CSV → JSON normalizer — re-exports the core importer.
+- @pocket-portfolio/koinly-csv-parser — Koinly tax-export CSV parser — re-exports the core importer.
+- @pocket-portfolio/turbotax-csv-parser — TurboTax 1099-format CSV parser — re-exports the core importer.
+- @pocket-portfolio/ghostfolio-csv-parser — Ghostfolio CSV-format parser — re-exports the core importer.
+- @pocket-portfolio/sharesight-csv-parser — Sharesight CSV-export parser — re-exports the core importer.
+- @pocket-portfolio/universal-csv-importer — Universal broker-agnostic CSV importer — re-exports the core importer.
+
+## Audit Posture
+- Limited-Scope Processor (GDPR Art. 4(8); Art. 5(1)(c) minimisation by architecture)
+- Stateless inference at /api/ai/chat (no per-user persistence; no chat-history warehousing)
+- Stateless metering (PPI-METER/1) proves usage to commercial partners without transferring identifiers
+- GDPR Art. 83(5) maximum administrative fine: €20M or 4% of worldwide annual turnover (REG-01, as of 2026-04-20)
+- EU AI Act Art. 99 Tier 1 maximum fine: €35M or 7% of worldwide annual turnover (REG-03, as of 2026-04-20)
+- IBM Cost-of-a-Data-Breach 2025 · Financial Services vertical: £4.45M (~$5.56M USD) (CODB-01, as of 2026-04-20)
+
+## Sitemap
+https://www.openportfolio.co.uk/sitemap.xml

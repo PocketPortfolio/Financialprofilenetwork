@@ -38,7 +38,11 @@ export function sovereignPrimaryNav(
     { label: 'Terminal', href: L('#features') },
     { label: 'Architecture', href: architectureHref(utmContext) },
     { label: 'Developers', href: L('#developer') },
-    { label: 'Partners', href: '/designchallenge' },
+    // Per CEO mandate 2026-05-15: B2C nav stops promoting the design challenge
+    // (now an O. surface). Swap to For Advisors so the wealth-manager funnel
+    // surfaces the right institutional ramp. The design challenge stays linked
+    // from the Partners column of GlobalFooter for legacy users.
+    { label: 'For Advisors', href: '/for/advisors' },
     { label: 'Mission', href: L('#mission') },
     { label: 'FIN Pillars', href: L('#fin-pillars') },
     { label: 'FAQ', href: L('#faq') },

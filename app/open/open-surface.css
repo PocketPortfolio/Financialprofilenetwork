@@ -1,0 +1,38 @@
+/**
+ * Open Portfolio (B2B) surface chrome — border & link resets.
+ * Scoped under .open-surface (see app/open/layout.tsx).
+ *
+ * Neutral borders use --border-subtle only; amber (--accent-warm) appears
+ * on deliberate accents (eyebrows, hover, focus), not from Pocket spine/grid bleed.
+ */
+
+.open-surface .open-brand-header.brand-spine::before,
+.open-surface .open-brand-header.brand-spine::after {
+  display: none;
+}
+
+.open-surface a.open-btn-secondary {
+  box-sizing: border-box;
+  color: var(--text) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 6px;
+  background: transparent;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.open-surface a.open-btn-secondary:hover {
+  border-color: color-mix(in srgb, var(--accent-warm) 38%, var(--border-subtle) 62%) !important;
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+}
+
+.open-surface a.open-btn-secondary:focus-visible {
+  outline: 2px solid var(--accent-warm);
+  outline-offset: 2px;
+}
+
+.open-surface .open-tag {
+  box-sizing: border-box;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+}

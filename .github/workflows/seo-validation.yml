@@ -63,12 +63,12 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
-      - name: Re-generate public/llms.txt from canonical-claims
+      - name: Re-generate public/llms.txt and public/open/llms.txt from canonical-claims
         run: npm run build:llms
-      - name: Assert no drift between committed llms.txt and freshly generated
+      - name: Assert no drift between committed llms.txt files and freshly generated
         run: |
-          if ! git diff --exit-code -- public/llms.txt; then
-            echo "::error::public/llms.txt is stale. Run 'npm run build:llms' locally and commit the result."
+          if ! git diff --exit-code -- public/llms.txt public/open/llms.txt; then
+            echo "::error::public/llms.txt or public/open/llms.txt is stale. Run 'npm run build:llms' locally and commit the result."
             exit 1
           fi
 

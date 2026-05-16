@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useTrades } from '../hooks/useTrades';
 import { useAuth } from '../hooks/useAuth';
 import { startFoundersClubCheckout } from '@/app/lib/checkout/startFoundersClubCheckout';
+import { isOpenPortfolioHost } from '@/lib/surface-host';
 
 /**
  * Global Founders Club banner shown on all pages.
@@ -17,6 +18,13 @@ export default function GlobalFoundersClubBanner() {
   const { trades } = useTrades();
   const { user } = useAuth();
   const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [onOpenSurface, setOnOpenSurface] = useState(false);
+
+  useEffect(() => {
+    setOnOpenSurface(isOpenPortfolioHost(window.location.hostname));
+  }, []);
+
+  if (onOpenSurface) return null;
 
   const isPaid = tier === 'corporateSponsor' || tier === 'foundersClub';
   const hasTrades = trades && trades.length > 0;

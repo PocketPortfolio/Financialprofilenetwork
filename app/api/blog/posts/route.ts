@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { isOpenBlogCategory, isPocketBlogCategory } from '@/lib/canonical-claims';
 
 // Disable caching to ensure fresh posts are always returned
 export const dynamic = 'force-dynamic';
@@ -9,8 +10,9 @@ export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const surface = request.nextUrl.searchParams.get('surface');
     const postsDir = path.join(process.cwd(), 'content', 'posts');
     
     if (!fs.existsSync(postsDir)) {
@@ -99,8 +101,16 @@ export async function GET() {
     }
     
     // Convert map back to array and sort
-    const posts = Array.from(postMap.values())
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    let posts = Array.from(postMap.values()).sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    // Presentation-only filter: cron still writes all MDX to content/posts.
+    if (surface === 'open') {
+      posts = posts.filter((p) => isOpenBlogCategory(p.category));
+    } else if (surface === 'pocket') {
+      posts = posts.filter((p) => isPocketBlogCategory(p.category));
+    }
 
     return NextResponse.json(posts, {
       headers: {
