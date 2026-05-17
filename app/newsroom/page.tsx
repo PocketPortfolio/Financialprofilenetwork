@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import NewsRoomBriefingCard from '../components/newsroom/NewsRoomBriefingCard';
-import { NEWSROOM_CACHE_SECONDS } from '@/lib/newsroom/constants';
 import { getNewsroomPayload } from '@/lib/newsroom/store';
 import { SURFACE_CROSS_LINKS } from '@/lib/canonical-claims';
 
@@ -15,7 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = NEWSROOM_CACHE_SECONDS;
+/** Next.js requires a literal — keep in sync with NEWSROOM_CACHE_SECONDS (1800) in lib/newsroom/constants.ts */
+export const revalidate = 1800;
 
 export default async function NewsroomPage() {
   const payload = await getNewsroomPayload();
