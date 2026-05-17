@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import {
   motion,
   useMotionValue,
@@ -89,6 +89,208 @@ function ScanLine() {
         pointerEvents: 'none',
       }}
     />
+  );
+}
+
+/**
+ * Hero-only: “data gravity” streams inward toward centralisation; shield perimeter
+ * absorbs/dissipates packets — contextual motion without replacing the static art.
+ * Tuned for a readable “risk → blocked” read without carnival brightness.
+ */
+function HeroDataGravityBlock() {
+  const reduceMotion = useReducedMotion();
+  const gid = useId().replace(/:/g, '');
+
+  const packets = useMemo(
+    () =>
+      [
+        /* Faster cadence + brighter peaks; targets ~shield centroid (≈62%, 44%) */
+        { sx: 4, sy: 22, mx: 59, my: 39, dur: 2.55, delay: 0 },
+        { sx: 7, sy: 58, mx: 61, my: 46, dur: 2.85, delay: 0.22 },
+        { sx: 2, sy: 42, mx: 58, my: 41, dur: 2.65, delay: 0.44 },
+        { sx: 12, sy: 72, mx: 60, my: 48, dur: 3.05, delay: 0.66 },
+        { sx: 9, sy: 14, mx: 57, my: 36, dur: 2.6, delay: 0.88 },
+        { sx: 18, sy: 88, mx: 62, my: 51, dur: 3.15, delay: 0.11 },
+        { sx: 15, sy: 33, mx: 59, my: 38, dur: 2.75, delay: 1.1 },
+        { sx: 6, sy: 95, mx: 61, my: 50, dur: 2.95, delay: 1.32 },
+        { sx: 22, sy: 48, mx: 60, my: 43, dur: 2.7, delay: 1.54 },
+        { sx: 11, sy: 66, mx: 58, my: 47, dur: 2.9, delay: 1.76 },
+        { sx: 3, sy: 78, mx: 59, my: 49, dur: 2.8, delay: 1.98 },
+        { sx: 16, sy: 24, mx: 58, my: 37, dur: 2.62, delay: 2.2 },
+        { sx: 20, sy: 62, mx: 61, my: 45, dur: 2.88, delay: 2.05 },
+        { sx: 8, sy: 52, mx: 59, my: 43, dur: 2.58, delay: 2.42 },
+      ].map((r, i) => ({ ...r, i })),
+    [],
+  );
+
+  if (reduceMotion) return null;
+
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 5,
+        overflow: 'hidden',
+      }}
+    >
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid slice"
+        style={{ position: 'absolute', inset: 0 }}
+      >
+        <defs>
+          <radialGradient id={`hero-shield-field-${gid}`} cx="62%" cy="44%" r="46%">
+            <stop offset="0%" stopColor={ACCENT} stopOpacity="0.28" />
+            <stop offset="45%" stopColor={ACCENT} stopOpacity="0.1" />
+            <stop offset="100%" stopColor={ACCENT} stopOpacity="0" />
+          </radialGradient>
+          <filter id={`hero-data-soft-${gid}`} x="-25%" y="-25%" width="150%" height="150%">
+            <feGaussianBlur stdDeviation="0.28" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <motion.rect
+          width="100"
+          height="100"
+          fill={`url(#hero-shield-field-${gid})`}
+          initial={{ opacity: 0.42 }}
+          animate={{ opacity: [0.38, 0.62, 0.38] }}
+          transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        {/* Large “risk front” arcs — gravity wells pressing toward the shield */}
+        <motion.path
+          fill="none"
+          stroke="rgba(245,158,11,0.4)"
+          strokeWidth="0.38"
+          strokeLinecap="round"
+          d="M -6 30 A 54 48 0 0 1 56 41"
+          animate={{
+            opacity: [0.18, 0.52, 0.2],
+            strokeWidth: [0.32, 0.52, 0.34],
+          }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.path
+          fill="none"
+          stroke="rgba(245,158,11,0.32)"
+          strokeWidth="0.32"
+          strokeLinecap="round"
+          d="M -10 62 A 62 54 0 0 1 57 49"
+          animate={{
+            opacity: [0.14, 0.45, 0.16],
+            strokeWidth: [0.26, 0.46, 0.28],
+          }}
+          transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut', delay: 0.35 }}
+        />
+        <motion.path
+          fill="none"
+          stroke="rgba(245,158,11,0.26)"
+          strokeWidth="0.26"
+          strokeLinecap="round"
+          d="M -4 46 A 48 42 0 0 1 55 44"
+          animate={{
+            opacity: [0.12, 0.38, 0.14],
+          }}
+          transition={{ duration: 2.35, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
+        />
+        <motion.path
+          filter={`url(#hero-data-soft-${gid})`}
+          fill="none"
+          stroke="rgba(245,158,11,0.42)"
+          strokeWidth="0.2"
+          strokeLinecap="round"
+          d="M 8 32 Q 38 40 58 42"
+          initial={{ pathLength: 0.15, opacity: 0.28 }}
+          animate={{ pathLength: [0.1, 1, 0.12], opacity: [0.28, 0.78, 0.26] }}
+          transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.path
+          filter={`url(#hero-data-soft-${gid})`}
+          fill="none"
+          stroke="rgba(245,158,11,0.36)"
+          strokeWidth="0.16"
+          strokeLinecap="round"
+          d="M 6 68 Q 34 54 57 47"
+          initial={{ pathLength: 0.2 }}
+          animate={{ pathLength: [0.15, 1, 0.14], opacity: [0.22, 0.68, 0.22] }}
+          transition={{ duration: 4.1, repeat: Infinity, ease: 'easeInOut', delay: 0.45 }}
+        />
+        {/* Outer perimeter — harder pulse when packets “impact” */}
+        <motion.ellipse
+          cx="62"
+          cy="44"
+          rx="14"
+          ry="18.5"
+          fill="none"
+          stroke="rgba(245,158,11,0.28)"
+          strokeWidth="0.14"
+          animate={{
+            opacity: [0.12, 0.38, 0.12],
+            rx: [13.2, 15.2, 13.2],
+            ry: [17.5, 19.8, 17.5],
+          }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.ellipse
+          cx="62"
+          cy="44"
+          rx="11"
+          ry="15"
+          fill="none"
+          stroke={ACCENT}
+          strokeWidth="0.28"
+          opacity={0.45}
+          animate={{
+            opacity: [0.32, 0.92, 0.32],
+            strokeWidth: [0.22, 0.42, 0.22],
+            rx: [10, 12.2, 10],
+            ry: [13.8, 16.4, 13.8],
+          }}
+          transition={{ duration: 2.65, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </svg>
+
+      {packets.map(({ sx, sy, mx, my, dur, delay, i }) => (
+        <motion.span
+          key={i}
+          aria-hidden
+          initial={false}
+          animate={{
+            left: [`${sx}%`, `${mx}%`, `${mx}%`],
+            top: [`${sy}%`, `${my}%`, `${my}%`],
+            opacity: [0, 0.92, 0],
+            scale: [0.55, 1.18, 0.08],
+            rotate: [18 + i * 5, -8, 0],
+          }}
+          transition={{
+            duration: dur,
+            repeat: Infinity,
+            delay,
+            times: [0, 0.68, 1],
+            ease: ['easeIn', 'easeIn'],
+          }}
+          style={{
+            position: 'absolute',
+            width: 7,
+            height: 14,
+            marginLeft: -3.5,
+            marginTop: -7,
+            borderRadius: 2,
+            background: `linear-gradient(180deg, rgba(245,158,11,1) 0%, rgba(245,158,11,0.28) 100%)`,
+            boxShadow:
+              '0 0 14px rgba(245,158,11,0.65), 0 0 28px rgba(245,158,11,0.22)',
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -374,6 +576,8 @@ export default function OpenLandingVisual({
           />
         )}
 
+        {visual.id === 'hero' && <HeroDataGravityBlock />}
+
         {isBriefingPlay && (
           <BriefingRoomFace
             pupilX={pupilShiftX}
@@ -419,7 +623,7 @@ export default function OpenLandingVisual({
             borderRadius: '10px',
             boxShadow: 'inset 0 0 0 1px rgba(245,158,11,0.15)',
             pointerEvents: 'none',
-            zIndex: 4,
+            zIndex: 6,
           }}
         />
       </div>
