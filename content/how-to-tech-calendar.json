@@ -2204,14 +2204,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Docker Swarm for Orchestration",
     "slug": "how-to-use-docker-swarm-for-orchestration",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "use",
       "swarm"
-    ]
+    ],
+    "publishedAt": "2026-05-17T14:00:48.394Z"
   },
   {
     "id": "how-to-building-a-notification-system-may-18",
