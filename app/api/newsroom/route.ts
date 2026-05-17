@@ -3,7 +3,8 @@ import { NEWSROOM_CACHE_SECONDS } from '@/lib/newsroom/constants';
 import { getNewsroomPayload } from '@/lib/newsroom/store';
 
 export const runtime = 'nodejs';
-export const revalidate = NEWSROOM_CACHE_SECONDS;
+/** Next.js requires a literal — keep in sync with NEWSROOM_CACHE_SECONDS in lib/newsroom/constants.ts */
+export const revalidate = 1800;
 
 export async function GET() {
   try {
