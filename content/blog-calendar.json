@@ -832,7 +832,7 @@
     "date": "2026-05-13",
     "title": "The Decentralized Portfolio: Beyond the Cloud",
     "slug": "the-decentralized-portfolio-beyond-the-cloud",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -842,14 +842,15 @@
       "decentralized"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-13T09:01:02.275Z"
   },
   {
     "id": "week-20-post-1",
     "date": "2026-05-17",
     "title": "How to Migrate from Cloud to Sovereign: A Guide",
     "slug": "how-to-migrate-from-cloud-to-sovereign-a-guide",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -859,7 +860,8 @@
       "migrate"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-17T09:00:46.843Z"
   },
   {
     "id": "week-20-post-2",

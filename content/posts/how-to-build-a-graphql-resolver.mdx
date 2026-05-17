@@ -1,0 +1,89 @@
+---
+title: How to Build a GraphQL Resolver
+date: '2026-05-15'
+description: A step-by-step guide to creating a GraphQL resolver efficiently.
+tags:
+  - graphql
+  - resolver
+  - backend
+  - api
+author: Pocket Portfolio Team
+image: /images/blog/how-to-build-a-graphql-resolver.png
+pillar: technology
+category: how-to-in-tech
+---
+
+## Problem
+
+When building a GraphQL API, one of the fundamental tasks is creating resolvers that effectively fetch and return the required data. Resolvers are functions that handle the logic for fetching data for a specific field in a GraphQL query. Without well-structured resolvers, your API can become inefficient, leading to poor performance and maintainability issues.
+
+## Solution
+
+To build a GraphQL resolver, you'll typically follow these steps:
+
+1. **Define Your Schema**: Start by defining your GraphQL schema using SDL (Schema Definition Language).
+
+2. **Implement Resolvers**: Write resolver functions that correspond to the fields in your schema.
+
+3. **Connect Resolvers to Schema**: Finally, connect these resolvers to your GraphQL server setup.
+
+Let's look at a basic example using Node.js and the `graphql-yoga` library.
+
+### Step 1: Define Your Schema
+
+```javascript
+const { gql } = require('graphql-yoga');
+
+const typeDefs = gql`
+  type Query {
+    hello: String
+    user(id: ID!): User
+  }
+
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+  }
+`;
+```
+
+### Step 2: Implement Resolvers
+
+```javascript
+const resolvers = {
+  Query: {
+    hello: () => 'Hello, world!',
+    user: async (_, { id }, { dataSources }) => {
+      return dataSources.userAPI.getUserById(id);
+    },
+  },
+  User: {
+    email: (parent) => `${parent.name}@example.com`,
+  },
+};
+```
+
+### Step 3: Connect Resolvers to Schema
+
+```javascript
+const { GraphQLServer } = require('graphql-yoga');
+
+const server = new GraphQLServer({
+  typeDefs,
+  resolvers,
+  context: { dataSources: { userAPI: new UserAPI() } },
+});
+
+server.start(() => console.log('Server is running on localhost:4000'));
+```
+
+## Key Concepts
+
+- **Schema Definition**: The schema defines the structure of your API, including the types and queries available. It's crucial to keep this organized and scalable.
+  
+- **Resolvers**: These are functions that return the data for a specific field in your schema. Resolvers can perform tasks such as fetching from a database, accessing other APIs, or performing business logic.
+  
+- **Data Sources**: In the example, `dataSources` are used to separate concerns by abstracting data fetching logic, making it easier to maintain and test.
+
+By following these steps, you can build efficient GraphQL resolvers that improve the performance and scalability of your API. Remember to test your resolvers thoroughly to ensure they meet your application's requirements.

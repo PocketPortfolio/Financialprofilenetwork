@@ -2136,7 +2136,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Data Transfer Costs - CDN vs Direct",
     "slug": "research-data-transfer-costs-cdn-vs-direct-2026-05-13",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2144,7 +2144,8 @@
       "data",
       "transfer",
       "costs"
-    ]
+    ],
+    "publishedAt": "2026-05-13T18:01:26.673Z"
   },
   {
     "id": "research-storage-tier-optimization-hot-vs-cold-vs-archive-2026-05-14",
@@ -2152,14 +2153,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Storage Tier Optimization - Hot vs Cold vs Archive",
     "slug": "research-storage-tier-optimization-hot-vs-cold-vs-archive-2026-05-14",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "storage",
       "tier",
       "optimization"
-    ]
+    ],
+    "publishedAt": "2026-05-14T18:01:06.668Z"
   },
   {
     "id": "research-compute-optimization-arm-vs-x86-performance-2026-05-15",
@@ -2167,7 +2169,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Compute Optimization - ARM vs x86 Performance",
     "slug": "research-compute-optimization-arm-vs-x86-performance-2026-05-15",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2175,7 +2177,8 @@
       "compute",
       "optimization",
       "arm"
-    ]
+    ],
+    "publishedAt": "2026-05-15T18:00:55.670Z"
   },
   {
     "id": "research-energy-efficiency-performance-per-watt-2026-05-16",
@@ -2183,14 +2186,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Energy Efficiency - Performance per Watt",
     "slug": "research-energy-efficiency-performance-per-watt-2026-05-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "efficiency",
       "energy"
-    ]
+    ],
+    "publishedAt": "2026-05-16T18:00:56.915Z"
   },
   {
     "id": "research-carbon-footprint-cloud-vs-on-premise-2026-05-17",
