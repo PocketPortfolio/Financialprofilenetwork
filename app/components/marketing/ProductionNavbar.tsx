@@ -12,6 +12,7 @@ import { useSurface } from '../SurfaceProvider';
 import SurfaceSwitcher from '../SurfaceSwitcher';
 import {
   sovereignPrimaryNav,
+  splitSovereignPrimaryNav,
   sovereignToolsDropdown,
   isHashOnlyHref,
 } from '@/app/lib/nav/sovereignMarketingNav';
@@ -116,8 +117,7 @@ export default function ProductionNavbar() {
   };
 
   const primaryNav = sovereignPrimaryNav(safePathname, 'site');
-  const faqItem = primaryNav[primaryNav.length - 1]!;
-  const beforeFaq = primaryNav.slice(0, -1);
+  const { coreNav: beforeFaq, faqItem, architectureItem } = splitSovereignPrimaryNav(primaryNav);
   const toolsLinks = sovereignToolsDropdown(safePathname);
   const partnersLinks = [
     { label: 'Design challenge', href: '/designchallenge' },
@@ -398,6 +398,7 @@ export default function ProductionNavbar() {
                   return linkEl;
                 })}
                 {renderNavLink(faqItem)}
+                {renderNavLink(architectureItem)}
                 <SurfaceSwitcher target="open" label="Developers" />
               </nav>
 
@@ -699,7 +700,7 @@ export default function ProductionNavbar() {
                 }
                 return linkEl;
               })}
-              {(() => {
+              {[faqItem, architectureItem].map((item) => {
                 const handleClick = () => setIsMobileMenuOpen(false);
                 const linkStyle = {
                   fontSize: '16px',
@@ -711,10 +712,10 @@ export default function ProductionNavbar() {
                   border: '1px solid var(--border)',
                   transition: 'all 0.2s ease',
                 };
-                return isHashOnlyHref(faqItem.href) ? (
+                return isHashOnlyHref(item.href) ? (
                   <a
-                    key={faqItem.label}
-                    href={faqItem.href}
+                    key={item.label}
+                    href={item.href}
                     onClick={handleClick}
                     className="brand-link"
                     style={linkStyle}
@@ -727,12 +728,12 @@ export default function ProductionNavbar() {
                       (e.target as HTMLElement).style.color = 'var(--text)';
                     }}
                   >
-                    {faqItem.label}
+                    {item.label}
                   </a>
                 ) : (
                   <Link
-                    key={faqItem.label}
-                    href={faqItem.href}
+                    key={item.label}
+                    href={item.href}
                     onClick={handleClick}
                     className="brand-link"
                     style={linkStyle}
@@ -745,10 +746,10 @@ export default function ProductionNavbar() {
                       (e.target as HTMLElement).style.color = 'var(--text)';
                     }}
                   >
-                    {faqItem.label}
+                    {item.label}
                   </Link>
                 );
-              })()}
+              })}
               
               <div style={{ 
                 height: '1px', 

@@ -26,6 +26,7 @@ import ScrollReveal from '../components/ui/ScrollReveal';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import {
   sovereignPrimaryNav,
+  splitSovereignPrimaryNav,
   sovereignToolsDropdown,
   isHashOnlyHref,
 } from '@/app/lib/nav/sovereignMarketingNav';
@@ -96,8 +97,8 @@ export default function LandingPage() {
   const pathname = usePathname();
   const safePathname = pathname ?? '/';
   const primaryNav = sovereignPrimaryNav(safePathname, 'landing');
-  const faqNavItem = primaryNav[primaryNav.length - 1]!;
-  const beforeFaqNav = primaryNav.slice(0, -1);
+  const { coreNav: beforeFaqNav, faqItem: faqNavItem, architectureItem: architectureNavItem } =
+    splitSovereignPrimaryNav(primaryNav);
   const toolsNavLinks = sovereignToolsDropdown(safePathname);
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -414,48 +415,52 @@ export default function LandingPage() {
                   }
                   return linkEl;
                 })}
-                {isHashOnlyHref(faqNavItem.href) ? (
-                  <a
-                    href={faqNavItem.href}
-                    className="brand-link"
-                    style={{
-                      fontSize: '15px',
-                      padding: '8px 0',
-                      borderBottom: '2px solid transparent',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--signal)';
-                      (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--text)';
-                      (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                    }}
-                  >
-                    {faqNavItem.label}
-                  </a>
-                ) : (
-                  <Link
-                    href={faqNavItem.href}
-                    className="brand-link"
-                    style={{
-                      fontSize: '15px',
-                      padding: '8px 0',
-                      borderBottom: '2px solid transparent',
-                      textDecoration: 'none',
-                      color: 'var(--text)',
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--signal)';
-                      (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.target as HTMLElement).style.color = 'var(--text)';
-                      (e.target as HTMLElement).style.borderBottomColor = 'transparent';
-                    }}
-                  >
-                    {faqNavItem.label}
-                  </Link>
+                {[faqNavItem, architectureNavItem].map((item) =>
+                  isHashOnlyHref(item.href) ? (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      className="brand-link"
+                      style={{
+                        fontSize: '15px',
+                        padding: '8px 0',
+                        borderBottom: '2px solid transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--signal)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--text)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                      }}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="brand-link"
+                      style={{
+                        fontSize: '15px',
+                        padding: '8px 0',
+                        borderBottom: '2px solid transparent',
+                        textDecoration: 'none',
+                        color: 'var(--text)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--signal)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'var(--signal)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.color = 'var(--text)';
+                        (e.target as HTMLElement).style.borderBottomColor = 'transparent';
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+                  )
                 )}
               </nav>
 
@@ -766,37 +771,41 @@ export default function LandingPage() {
               }
               return linkEl;
             })}
-            {isHashOnlyHref(faqNavItem.href) ? (
-              <a
-                href={faqNavItem.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                style={{
-                  color: 'var(--text)',
-                  textDecoration: 'none',
-                  fontSize: '18px',
-                  fontWeight: '500',
-                  padding: '12px 0',
-                  borderBottom: '1px solid var(--border-warm)',
-                }}
-              >
-                {faqNavItem.label}
-              </a>
-            ) : (
-              <Link
-                href={faqNavItem.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                style={{
-                  color: 'var(--text)',
-                  textDecoration: 'none',
-                  fontSize: '18px',
-                  fontWeight: '500',
-                  padding: '12px 0',
-                  borderBottom: '1px solid var(--border-warm)',
-                  display: 'block',
-                }}
-              >
-                {faqNavItem.label}
-              </Link>
+            {[faqNavItem, architectureNavItem].map((item) =>
+              isHashOnlyHref(item.href) ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{
+                    color: 'var(--text)',
+                    textDecoration: 'none',
+                    fontSize: '18px',
+                    fontWeight: '500',
+                    padding: '12px 0',
+                    borderBottom: '1px solid var(--border-warm)',
+                  }}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{
+                    color: 'var(--text)',
+                    textDecoration: 'none',
+                    fontSize: '18px',
+                    fontWeight: '500',
+                    padding: '12px 0',
+                    borderBottom: '1px solid var(--border-warm)',
+                    display: 'block',
+                  }}
+                >
+                  {item.label}
+                </Link>
+              )
             )}
           </nav>
 

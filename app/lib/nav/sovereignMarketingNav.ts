@@ -1,6 +1,8 @@
 /**
- * Ratified marketing IA: Terminal | Architecture | Developers | Partners | Mission | FIN Pillars | Tools | FAQ.
- * Used by landing (`/`, `/landing`) and ProductionNavbar (`/s/*`, tools, learn, etc.) so hrefs resolve correctly.
+ * B2C marketing IA (Pocket Portfolio):
+ * Terminal | For Advisors | Mission | FIN Pillars | Tools | Blog | FAQ | Architecture.
+ * B2B developer bridge lives in SurfaceSwitcher (Open Portfolio), not primary nav.
+ * Used by landing (`/`, `/landing`) and ProductionNavbar (`/s/*`, tools, learn, etc.).
  */
 
 export type SovereignNavItem = {
@@ -27,6 +29,22 @@ function architectureHref(utmContext: 'landing' | 'site'): string {
   return `/architecture?${q}`;
 }
 
+function blogHref(utmContext: 'landing' | 'site'): string {
+  const q =
+    utmContext === 'landing'
+      ? 'utm_source=landing&utm_medium=nav&utm_campaign=blog'
+      : 'utm_source=navbar&utm_medium=global&utm_campaign=blog';
+  return `/blog?${q}`;
+}
+
+/** FAQ and Architecture render after the Tools dropdown; core items are everything before them. */
+export function splitSovereignPrimaryNav(nav: SovereignNavItem[]) {
+  const architectureItem = nav[nav.length - 1]!;
+  const faqItem = nav[nav.length - 2]!;
+  const coreNav = nav.slice(0, -2);
+  return { coreNav, faqItem, architectureItem };
+}
+
 // Partners dropdown is handled in ProductionNavbar (portal dropdown) because it is not a single href.
 
 export function sovereignPrimaryNav(
@@ -36,16 +54,12 @@ export function sovereignPrimaryNav(
   const L = (hash: string) => landingHash(pathname, hash);
   return [
     { label: 'Terminal', href: L('#features') },
-    { label: 'Architecture', href: architectureHref(utmContext) },
-    { label: 'Developers', href: L('#developer') },
-    // Per CEO mandate 2026-05-15: B2C nav stops promoting the design challenge
-    // (now an O. surface). Swap to For Advisors so the wealth-manager funnel
-    // surfaces the right institutional ramp. The design challenge stays linked
-    // from the Partners column of GlobalFooter for legacy users.
     { label: 'For Advisors', href: '/for/advisors' },
     { label: 'Mission', href: L('#mission') },
     { label: 'FIN Pillars', href: L('#fin-pillars') },
+    { label: 'Blog', href: blogHref(utmContext) },
     { label: 'FAQ', href: L('#faq') },
+    { label: 'Architecture', href: architectureHref(utmContext) },
   ];
 }
 
