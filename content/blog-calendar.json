@@ -850,7 +850,7 @@
     "date": "2026-05-17",
     "title": "How to Migrate from Cloud to Sovereign: A Guide",
     "slug": "how-to-migrate-from-cloud-to-sovereign-a-guide",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -860,7 +860,8 @@
       "migrate"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-17T09:00:39.493Z"
   },
   {
     "id": "week-20-post-2",
