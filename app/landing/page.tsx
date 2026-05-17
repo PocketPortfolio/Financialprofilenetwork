@@ -9,7 +9,6 @@ import Logo from '../components/Logo';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import CommunityContent from '../components/CommunityContent';
 import SocialShare from '../components/viral/SocialShare';
-import SocialProof from '../components/viral/SocialProof';
 import FunnelTracker from '../components/analytics/FunnelTracker';
 import { LocalProcessingTerminal } from '../components/LocalProcessingTerminal';
 import { useAuth } from '../hooks/useAuth';
@@ -20,7 +19,6 @@ import DynamicDownloadCount from '../components/DynamicDownloadCount';
 import { useStickyHeader } from '../hooks/useStickyHeader';
 import TickerSearch from '../components/TickerSearch';
 import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
-import LivingPipeline from '../components/landing/LivingPipeline';
 import { AnalystVideo } from '../components/landing/AnalystVideo';
 import ScrollReveal from '../components/ui/ScrollReveal';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
@@ -97,7 +95,7 @@ export default function LandingPage() {
   const pathname = usePathname();
   const safePathname = pathname ?? '/';
   const primaryNav = sovereignPrimaryNav(safePathname, 'landing');
-  const { coreNav: beforeFaqNav, faqItem: faqNavItem, architectureItem: architectureNavItem } =
+  const { coreNav: beforeFaqNav, faqItem: faqNavItem, newsRoomItem: newsRoomNavItem } =
     splitSovereignPrimaryNav(primaryNav);
   const toolsNavLinks = sovereignToolsDropdown(safePathname);
   const { user } = useAuth();
@@ -415,7 +413,7 @@ export default function LandingPage() {
                   }
                   return linkEl;
                 })}
-                {[faqNavItem, architectureNavItem].map((item) =>
+                {[faqNavItem, newsRoomNavItem].map((item) =>
                   isHashOnlyHref(item.href) ? (
                     <a
                       key={item.label}
@@ -771,7 +769,7 @@ export default function LandingPage() {
               }
               return linkEl;
             })}
-            {[faqNavItem, architectureNavItem].map((item) =>
+            {[faqNavItem, newsRoomNavItem].map((item) =>
               isHashOnlyHref(item.href) ? (
                 <a
                   key={item.label}
@@ -899,8 +897,29 @@ export default function LandingPage() {
           padding: 'clamp(20px, 4vw, 32px)',
           boxSizing: 'border-box'
         }}>
-          {/* Living Pipeline: CSV -> Processor -> JSON (motion as meaning) */}
-          <LivingPipeline />
+          {/* Advisor entry — developer pipeline moved to Open / blog */}
+          <Link
+            href="/for/advisors"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginBottom: '24px',
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--accent-warm)',
+              background: 'rgba(245, 158, 11, 0.08)',
+              color: 'var(--accent-warm)',
+              fontSize: '13px',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.06em',
+              textDecoration: 'none',
+              textTransform: 'uppercase',
+            }}
+          >
+            For IFAs &amp; wealth operators →
+          </Link>
           {/* Static protocol strip — factual labels; flex-centered for optical alignment */}
           <div
             id="landing-hero-protocol"
@@ -946,8 +965,8 @@ export default function LandingPage() {
             maxWidth: '800px',
             minHeight: '1.2em'
           }}>
-            The Local-First Portfolio Terminal.
-            <noscript>The Local-First Portfolio Terminal.</noscript>
+            The Local-First Wealth Terminal.
+            <noscript>The Local-First Wealth Terminal.</noscript>
           </h1>
 
           {/* Subhead - Pocket Analyst + sovereignty + drop-zone pointer */}
@@ -1377,7 +1396,7 @@ export default function LandingPage() {
             <span style={{ color: 'var(--accent-warm)' }}>
               <DynamicDownloadCount />
             </span>{' '}
-            ENGINEERS & BUILDERS
+            WEALTH OPERATORS &amp; ADVISORS
           </h2>
           
           {/* Trust Logos Row */}
@@ -1548,7 +1567,7 @@ export default function LandingPage() {
             marginLeft: 'auto',
             marginRight: 'auto'
           }}>
-            Audited by <DynamicDownloadCount /> Engineers. MIT Licensed. Fork it.
+            Trusted by <DynamicDownloadCount /> operators. Local-first ledger. Open substrate on Open Portfolio.
           </p>
         </div>
       </section>
@@ -1577,7 +1596,7 @@ export default function LandingPage() {
             letterSpacing: '-0.02em',
             fontFamily: 'var(--font-sans)',
           }}>
-            Or... Build Your Own Stack.
+            Open Infrastructure Substrate.
           </h2>
 
           <p style={{
@@ -1589,7 +1608,7 @@ export default function LandingPage() {
             marginRight: 'auto',
             lineHeight: '1.6'
           }}>
-            The logic is Open Source. The database is yours.
+            Developer tooling and sovereign packages live on Open Portfolio. Your client ledger stays local-first on Pocket.
           </p>
 
           {/* Terminal Block */}
@@ -1660,7 +1679,7 @@ $ npx pocket-init --sovereign
 
           {/* CTA */}
           <a
-            href="https://github.com/PocketPortfolio/Financialprofilenetwork#readme"
+            href="https://www.openportfolio.co.uk/architecture"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -1685,7 +1704,7 @@ $ npx pocket-init --sovereign
               e.currentTarget.style.background = 'transparent';
             }}
           >
-            Read the API Docs →
+            Open Portfolio architecture →
           </a>
         </div>
       </section>
@@ -2889,25 +2908,8 @@ $ npx pocket-init --sovereign
         </div>
       </section>
 
-      {/* Community Content Section */}
+      {/* News Room — institutional briefings (static local-first grid) */}
       <CommunityContent />
-
-      {/* Social Proof Section */}
-      <section style={{ 
-        marginTop: 'clamp(40px, 6vw, 80px)',
-        marginBottom: 'clamp(40px, 6vw, 80px)', 
-        width: '100%',
-        maxWidth: '100vw',
-        padding: '0 clamp(12px, 3vw, 24px)',
-        boxSizing: 'border-box'
-      }}>
-        <div style={{
-          maxWidth: 'min(1200px, 95vw)',
-          margin: '0 auto'
-        }}>
-          <SocialProof variant="full" />
-        </div>
-      </section>
 
       {/* Share Section */}
       <section style={{ 

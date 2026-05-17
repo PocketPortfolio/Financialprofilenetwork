@@ -117,7 +117,7 @@ export default function ProductionNavbar() {
   };
 
   const primaryNav = sovereignPrimaryNav(safePathname, 'site');
-  const { coreNav: beforeFaq, faqItem, architectureItem } = splitSovereignPrimaryNav(primaryNav);
+  const { coreNav: beforeFaq, faqItem, newsRoomItem } = splitSovereignPrimaryNav(primaryNav);
   const toolsLinks = sovereignToolsDropdown(safePathname);
   const partnersLinks = [
     { label: 'Design challenge', href: '/designchallenge' },
@@ -398,7 +398,7 @@ export default function ProductionNavbar() {
                   return linkEl;
                 })}
                 {renderNavLink(faqItem)}
-                {renderNavLink(architectureItem)}
+                {renderNavLink(newsRoomItem)}
                 <SurfaceSwitcher target="open" label="Developers" />
               </nav>
 
@@ -700,7 +700,7 @@ export default function ProductionNavbar() {
                 }
                 return linkEl;
               })}
-              {[faqItem, architectureItem].map((item) => {
+              {[faqItem, newsRoomItem].map((item) => {
                 const handleClick = () => setIsMobileMenuOpen(false);
                 const linkStyle = {
                   fontSize: '16px',

@@ -21,14 +21,28 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const defaultTickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/news');
+        const params = new URLSearchParams({
+          tickers: defaultTickers.join(','),
+          limit: '30',
+        });
+        const response = await fetch(`/api/news?${params}`);
         if (!response.ok) throw new Error('Failed to fetch news');
         const data = await response.json();
-        setNews(data.articles || []);
+        const articles = Array.isArray(data) ? data : data?.articles ?? [];
+        setNews(
+          articles.map((a: { title: string; url: string; publishedAt: string; source: string; ticker?: string }) => ({
+            title: a.title,
+            url: a.url,
+            publishedAt: a.publishedAt,
+            source: a.source || a.ticker || 'News',
+          })),
+        );
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch news');
       } finally {

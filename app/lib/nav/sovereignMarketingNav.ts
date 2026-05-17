@@ -1,6 +1,6 @@
 /**
  * B2C marketing IA (Pocket Portfolio):
- * Terminal | For Advisors | Mission | FIN Pillars | Tools | Blog | FAQ | Architecture.
+ * Terminal | For Advisors | Mission | FIN Pillars | Tools | Blog | FAQ | News Room.
  * B2B developer bridge lives in SurfaceSwitcher (Open Portfolio), not primary nav.
  * Used by landing (`/`, `/landing`) and ProductionNavbar (`/s/*`, tools, learn, etc.).
  */
@@ -21,12 +21,15 @@ export function landingHash(pathname: string, hash: string): string {
   return isMarketingLandingPath(pathname) ? h : `/landing${h}`;
 }
 
-function architectureHref(utmContext: 'landing' | 'site'): string {
+function newsRoomHref(pathname: string, utmContext: 'landing' | 'site'): string {
+  if (isMarketingLandingPath(pathname)) {
+    return landingHash(pathname, 'news-room');
+  }
   const q =
     utmContext === 'landing'
-      ? 'utm_source=landing&utm_medium=nav&utm_campaign=architecture'
-      : 'utm_source=navbar&utm_medium=global&utm_campaign=architecture';
-  return `/architecture?${q}`;
+      ? 'utm_source=landing&utm_medium=nav&utm_campaign=news_room'
+      : 'utm_source=navbar&utm_medium=global&utm_campaign=news_room';
+  return `/newsroom?${q}`;
 }
 
 function blogHref(utmContext: 'landing' | 'site'): string {
@@ -37,12 +40,12 @@ function blogHref(utmContext: 'landing' | 'site'): string {
   return `/blog?${q}`;
 }
 
-/** FAQ and Architecture render after the Tools dropdown; core items are everything before them. */
+/** FAQ and News Room render after the Tools dropdown; core items are everything before them. */
 export function splitSovereignPrimaryNav(nav: SovereignNavItem[]) {
-  const architectureItem = nav[nav.length - 1]!;
+  const newsRoomItem = nav[nav.length - 1]!;
   const faqItem = nav[nav.length - 2]!;
   const coreNav = nav.slice(0, -2);
-  return { coreNav, faqItem, architectureItem };
+  return { coreNav, faqItem, newsRoomItem };
 }
 
 // Partners dropdown is handled in ProductionNavbar (portal dropdown) because it is not a single href.
@@ -59,7 +62,7 @@ export function sovereignPrimaryNav(
     { label: 'FIN Pillars', href: L('#fin-pillars') },
     { label: 'Blog', href: blogHref(utmContext) },
     { label: 'FAQ', href: L('#faq') },
-    { label: 'Architecture', href: architectureHref(utmContext) },
+    { label: 'News Room', href: newsRoomHref(pathname, utmContext) },
   ];
 }
 
