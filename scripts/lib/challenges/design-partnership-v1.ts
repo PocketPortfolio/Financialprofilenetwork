@@ -6,7 +6,7 @@
 export const CHALLENGE_V1_DISCUSSION_TITLE = 'Design Partnership Challenge: Sovereign Infrastructure Implementation';
 
 export const CHALLENGE_V1_URLS = {
-  landing: 'https://www.pocketportfolio.app/designchallenge',
+  landing: 'https://www.openportfolio.co.uk/designchallenge',
   coderLegionGroup: 'https://coderlegion.com/groups/openfi-builders',
   githubSubmissionThread: 'https://github.com/PocketPortfolio/Financialprofilenetwork/discussions/49',
   githubDiscussions: 'https://github.com/PocketPortfolio/Financialprofilenetwork/discussions',
@@ -50,7 +50,7 @@ This is an **independent framework implementation** exercise. Use Pocket Portfol
 - Early access to sovereign innovation.
 - If a submission reaches revenue modelling, an option to **lead that vertical** (terms to be discussed).
 
-**Full brief, vertical cards & receipts:** [pocketportfolio.app/designchallenge](${CHALLENGE_V1_URLS.landing})
+**Full brief, vertical cards & receipts:** [www.openportfolio.co.uk/designchallenge](${CHALLENGE_V1_URLS.landing})
 
 **[Join the open-fintech-builders cohort on CoderLegion](${CHALLENGE_V1_URLS.coderLegionGroup})**
 
@@ -81,7 +81,7 @@ Canonical challenge copy for **CoderLegion** (recruitment) and **GitHub** (techn
 
 | Surface | Purpose |
 | :--- | :--- |
-| [Public hub — pocketportfolio.app/designchallenge](${CHALLENGE_V1_URLS.landing}) | Canonical landing page; routes architects and community to GitHub + CoderLegion |
+| [Public hub — www.openportfolio.co.uk/designchallenge](${CHALLENGE_V1_URLS.landing}) | Canonical landing page; routes architects and community to GitHub + CoderLegion |
 | [CoderLegion — openfi-builders](${CHALLENGE_V1_URLS.coderLegionGroup}) | Founder-to-founder recruitment, high-agency narrative |
 | [GitHub Discussions #49](${CHALLENGE_V1_URLS.githubSubmissionThread}) | Fork links, strategy docs, prototypes, transparent review |
 | [GitHub Discussions index](${CHALLENGE_V1_URLS.githubDiscussions}) | Fallback / cross-vertical browsing |

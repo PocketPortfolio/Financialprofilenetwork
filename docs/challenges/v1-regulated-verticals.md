@@ -6,7 +6,7 @@ Canonical challenge copy for **CoderLegion** (recruitment) and **GitHub** (techn
 
 | Surface | Purpose |
 | :--- | :--- |
-| [Public hub — pocketportfolio.app/designchallenge](https://www.pocketportfolio.app/designchallenge) | Canonical landing page; routes architects and community to GitHub + CoderLegion |
+| [Public hub — www.openportfolio.co.uk/designchallenge](https://www.openportfolio.co.uk/designchallenge) | Canonical landing page; routes architects and community to GitHub + CoderLegion |
 | [CoderLegion — openfi-builders](https://coderlegion.com/groups/openfi-builders) | Founder-to-founder recruitment, high-agency narrative |
 | [GitHub Discussions #49](https://github.com/PocketPortfolio/Financialprofilenetwork/discussions/49) | Fork links, strategy docs, prototypes, transparent review |
 | [GitHub Discussions index](https://github.com/PocketPortfolio/Financialprofilenetwork/discussions) | Fallback / cross-vertical browsing |
@@ -30,7 +30,7 @@ This is an **independent framework implementation** exercise. Use Pocket Portfol
 - Early access to sovereign innovation.
 - If a submission reaches revenue modelling, an option to **lead that vertical** (terms to be discussed).
 
-**Full brief, vertical cards & receipts:** [pocketportfolio.app/designchallenge](https://www.pocketportfolio.app/designchallenge)
+**Full brief, vertical cards & receipts:** [www.openportfolio.co.uk/designchallenge](https://www.openportfolio.co.uk/designchallenge)
 
 **[Join the open-fintech-builders cohort on CoderLegion](https://coderlegion.com/groups/openfi-builders)**
 
@@ -47,7 +47,7 @@ This is an **independent framework implementation** exercise. Use Pocket Portfol
 ### Overview
 This repository is the boilerplate for the **Pocket Portfolio Design Partnership Challenge**. We are recruiting architects to extend our **limited-scope processor** posture into adjacent regulated industries—Healthcare, Defense, Finance, Energy—with evidence, not narrative alone.
 
-Public hub: https://www.pocketportfolio.app/designchallenge
+Public hub: https://www.openportfolio.co.uk/designchallenge
 
 ### What to submit
 Reply to this discussion with:

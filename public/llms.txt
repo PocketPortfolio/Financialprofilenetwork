@@ -64,7 +64,7 @@ https://www.pocketportfolio.app/api/npm-stats
 - Local-First — https://www.pocketportfolio.app/learn/local-first (2026-04-27)
 
 ## Design Partnership Challenge (open recruitment for regulated-vertical architects)
-- Public hub: https://www.pocketportfolio.app/designchallenge
+- Public hub: https://www.openportfolio.co.uk/designchallenge
 - Hero: The Sovereign AI Design Challenge: Build for Regulated Verticals.
 - Eyebrow: The Future of Regulated AI is Sovereign.
 - Summary: Extend the Pocket Portfolio substrate into Healthcare, Defense, and Finance. Deploy frontier AI without the Sovereignty Lockout.
@@ -81,7 +81,7 @@ https://www.pocketportfolio.app/api/npm-stats
 - Narrative pillars:
   - Audit perimeter reduction (GDPR / DORA posture via architecture)
   - Limited-Scope Processor — we do not warehouse partner/customer PII
-  - Stateless metering (PPI-METER/1): usage counts without data custody
+  - Roadmap: stateless usage attestation (PPI-METER/1 vocabulary — not asserted as shipped in-repo)
 
 ## Board of Investors Program (seed governance board; scarcity enforced)
 - Public hub: https://www.pocketportfolio.app/board-of-investors
