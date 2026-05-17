@@ -74,7 +74,7 @@ const result = await parseCSV(file, 'en-US', 'robinhood');
 ### Crypto Exchanges
 - **Kraken** - Date, Type, Asset, Amount, Price
 - **Binance** - Date, Type, Market, Amount, Price
-- **Coinbase** - Timestamp, Transaction Type, Asset, Quantity Transacted, Spot Price
+- **Coinbase** - Timestamp, Transaction Type, Asset, Quantity Transacted, Spot/Price at Transaction
 
 ### Portfolio Trackers & Tax Software
 - **Koinly** - Koinly Date, Pair, Sent Amount, Received Amount, Fee Amount

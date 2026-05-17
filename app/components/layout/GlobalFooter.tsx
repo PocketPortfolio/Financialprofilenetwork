@@ -3,7 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import {
+  BOARD_OF_INVESTORS,
+  DESIGN_CHALLENGE,
+  SURFACE_CROSS_LINKS,
+  TIER1_DESIGN_PARTNER,
+} from '@/lib/canonical-claims';
+import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
 
 interface TrendingAsset {
   symbol: string;
@@ -14,6 +21,18 @@ interface TrendingAsset {
 export default function GlobalFooter() {
   const pathname = usePathname();
   const [trendingAssets, setTrendingAssets] = useState<TrendingAsset[]>([]);
+  const footerRef = useRef<HTMLElement | null>(null);
+  const [onOpenSurface, setOnOpenSurface] = useState(false);
+  const [crossLinkHref, setCrossLinkHref] = useState<string>(SURFACE_CROSS_LINKS.pocket.href);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    const open = isOpenPortfolioHost(host);
+    setOnOpenSurface(open);
+    setCrossLinkHref(
+      open ? pocketSurfaceBaseUrl(host) : openSurfaceBaseUrl(host),
+    );
+  }, []);
 
   // Determine footer variant based on pathname
   const isLiteFooter = pathname?.startsWith('/login') || 
@@ -21,24 +40,63 @@ export default function GlobalFooter() {
                        pathname?.startsWith('/checkout') ||
                        pathname?.startsWith('/join');
 
-  // Fetch trending assets for the dynamic bar
+  // Fetch trending assets only when the footer is near-viewport + idle (keeps main thread free early).
   useEffect(() => {
-    if (isLiteFooter) return; // Skip fetch for lite footer
-    
+    if (isLiteFooter || onOpenSurface) return;
+
+    let cancelled = false;
+
     const fetchTrending = async () => {
       try {
         const response = await fetch('/api/most-traded?count=5&region=US');
-        if (response.ok) {
-          const data = await response.json();
-          setTrendingAssets(data.slice(0, 5));
-        }
+        if (!response.ok || cancelled) return;
+        const data = await response.json();
+        if (!cancelled) setTrendingAssets(data.slice(0, 5));
       } catch (error) {
-        console.error('Failed to fetch trending assets:', error);
+        if (!cancelled) console.error('Failed to fetch trending assets:', error);
       }
     };
 
-    fetchTrending();
-  }, [isLiteFooter]);
+    const schedule = () => {
+      const w = typeof window !== 'undefined' ? window : undefined;
+      if (!w) return;
+      const ric = (w as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void })
+        .requestIdleCallback;
+      if (typeof ric === 'function') {
+        ric(() => void fetchTrending(), { timeout: 4000 });
+      } else {
+        w.setTimeout(() => void fetchTrending(), 2000);
+      }
+    };
+
+    const el = footerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      schedule();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        schedule();
+      },
+      { root: null, rootMargin: '280px 0px 0px 0px', threshold: 0 }
+    );
+    io.observe(el);
+
+    return () => {
+      cancelled = true;
+      io.disconnect();
+    };
+  }, [isLiteFooter, onOpenSurface]);
+
+  // Pocket footer is not shown on the B2B surface (OpenNavbar + page footers only).
+  if (onOpenSurface) {
+    return null;
+  }
 
   // Lite Footer (Login, Sign-up, Checkout)
   if (isLiteFooter) {
@@ -72,6 +130,7 @@ export default function GlobalFooter() {
   // Full Footer (4-Column Structure)
   return (
     <footer
+      ref={footerRef}
       style={{
         marginTop: 'clamp(40px, 8vw, 80px)',
         paddingTop: 'clamp(20px, 4vw, 32px)',
@@ -100,6 +159,60 @@ export default function GlobalFooter() {
           }}
           className="footer-columns"
         >
+          {/* Verified Importers (Authority Injection) */}
+          <div>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
+              Verified Importers
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>
+                <Link
+                  href="/import/trade-republic"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Trade Republic CSV Importer
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/import/interactive-brokers"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Interactive Brokers (IBKR) Importer
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/import"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  All broker importers →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Column 1: Product (Sovereign Pitch) */}
           <div>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
@@ -332,6 +445,78 @@ export default function GlobalFooter() {
             </ul>
           </div>
 
+          {/* Partners (Institutional funnel) */}
+          <div>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
+              Partners
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>
+                <Link
+                  href={DESIGN_CHALLENGE.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  {DESIGN_CHALLENGE.footerCommunityLabel}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={TIER1_DESIGN_PARTNER.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Tier 1 design partner
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href={BOARD_OF_INVESTORS.path}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  Board of investors (BIP)
+                </Link>
+              </li>
+              <li>
+                <a
+                  href={crossLinkHref}
+                  {...(onOpenSurface ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-warm)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+                >
+                  {onOpenSurface
+                    ? SURFACE_CROSS_LINKS.open.label
+                    : SURFACE_CROSS_LINKS.pocket.label}
+                </a>
+              </li>
+            </ul>
+          </div>
+
           {/* Column 3: Market Data (SEO Hubs) */}
           <div>
             <h3 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
@@ -439,6 +624,21 @@ export default function GlobalFooter() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <Link
+                  href="/s/api"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  JSON API Hub
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/tools/risk-calculator"
                   style={{
                     color: 'var(--text-secondary)',
@@ -532,6 +732,21 @@ export default function GlobalFooter() {
               Resources
             </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>
+                <Link
+                  href="/press"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-warm)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
+                >
+                  Press Kit
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/book"
@@ -704,11 +919,13 @@ export default function GlobalFooter() {
             grid-template-columns: 1fr !important;
             gap: 24px !important;
           }
-          /* Mobile stacking order: Product -> Market Data -> Community -> Resources */
-          .footer-columns > div:nth-child(1) { order: 1; }
-          .footer-columns > div:nth-child(2) { order: 3; }
-          .footer-columns > div:nth-child(3) { order: 2; }
-          .footer-columns > div:nth-child(4) { order: 4; }
+          /* Mobile stacking order: Verified Importers -> Product -> Partners -> Community -> Market Data -> Resources */
+          .footer-columns > div:nth-child(1) { order: 1; } /* Verified Importers */
+          .footer-columns > div:nth-child(2) { order: 2; } /* Product */
+          .footer-columns > div:nth-child(3) { order: 4; } /* Community */
+          .footer-columns > div:nth-child(4) { order: 3; } /* Partners */
+          .footer-columns > div:nth-child(5) { order: 5; } /* Market Data */
+          .footer-columns > div:nth-child(6) { order: 6; } /* Resources */
         }
       `}</style>
     </footer>

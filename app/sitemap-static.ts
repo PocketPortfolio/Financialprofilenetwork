@@ -1,6 +1,13 @@
 /**
- * Sitemap: Static Pages
- * Core application pages, tools, and feature pages
+ * Sitemap: Static Pages — Pocket Portfolio (B2C wealth-manager surface)
+ *
+ * The 12 developer/infrastructure routes (architecture, designchallenge,
+ * tier1designpartner, board-of-investors, sovereign-ai-grant, learn/sovereign-*,
+ * learn/local-first, learn/vendor-lock-in, playbooks/sovereign-strike,
+ * openbrokercsv, stack-reveal) live on the Open Portfolio surface and are
+ * indexed via app/open/sitemap-static.ts under www.openportfolio.co.uk.
+ * Removing them from this Pocket sitemap is part of the CEO mandate 2026-05-15:
+ * B2C sitemaps target wealth-manager intent; B2B sitemaps target developer intent.
  */
 
 import { MetadataRoute } from 'next';
@@ -180,22 +187,32 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/learn/sovereign-stack`,
+      url: `${baseUrl}/learn/realised-vs-unrealised`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/learn/sovereign-finance`,
+      url: `${baseUrl}/learn/dollar-cost-averaging`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/architecture`,
+      url: `${baseUrl}/learn/json-finance`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.85,
+      priority: 0.8,
+    },
+    // /learn/sovereign-stack and /learn/sovereign-finance migrated to Open Portfolio
+    // (B2B developer surface). See app/open/sitemap-static.ts.
+    // /architecture migrated to Open Portfolio (B2B developer surface).
+    // Press / AEO substrate (canonical machine-readable identity page)
+    {
+      url: `${baseUrl}/press`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
     // ✅ Waitlist Page (Priority Queue)
     {
@@ -218,6 +235,8 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.92,
     },
+    // /designchallenge, /tier1designpartner, /board-of-investors migrated to
+    // Open Portfolio (B2B developer surface). See app/open/sitemap-static.ts.
     {
       url: `${baseUrl}/book/universal-llm-import`,
       lastModified: now,

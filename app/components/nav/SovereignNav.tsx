@@ -6,6 +6,7 @@ export {
   isMarketingLandingPath,
   landingHash,
   sovereignPrimaryNav,
+  splitSovereignPrimaryNav,
   sovereignToolsDropdown,
   isHashOnlyHref,
   type SovereignNavItem,

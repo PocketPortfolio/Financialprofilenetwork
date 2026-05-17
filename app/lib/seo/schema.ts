@@ -29,11 +29,11 @@ export function getHomePageSchema(): HomePageSchema {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Pocket Portfolio',
-    description: 'The privacy-first portfolio tracker that turns Google Drive into your personal database. Edit trades in JSON, own your data, and sync bidirectionally. No vendor lock-in.',
+    description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
     url: 'https://www.pocketportfolio.app',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://www.pocketportfolio.app/brand/pp-wordmark.svg'
+      url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png'
     },
     sameAs: [
       'https://github.com/PocketPortfolio/Financialprofilenetwork',

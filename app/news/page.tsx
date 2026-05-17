@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useQuotes } from '../hooks/useDataFetching';
 import SEOHead from '../components/SEOHead';
-import Header from '../components/Header';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 
 interface NewsArticle {
   title: string;
@@ -54,7 +54,7 @@ export default function NewsPage() {
           title="News - Pocket Portfolio"
           description="Stay updated with the latest financial news and market insights"
         />
-        <Header />
+        <ProductionNavbar />
         <div style={{ 
           flex: 1, 
           display: 'flex', 
@@ -101,7 +101,7 @@ export default function NewsPage() {
         title="News - Pocket Portfolio"
         description="Stay updated with the latest financial news and market insights"
       />
-      <Header />
+      <ProductionNavbar />
       
       <main style={{ 
         flex: 1, 

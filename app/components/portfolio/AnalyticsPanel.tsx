@@ -35,7 +35,7 @@ export default function AnalyticsPanel({
           padding: 'var(--space-4)',
           background: 'var(--surface)',
           borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border)',
+          border: '1px solid var(--dashboard-chrome-border)',
         }}
       >
         {[...Array(8)].map((_, i) => (
@@ -60,8 +60,8 @@ export default function AnalyticsPanel({
           padding: 'var(--space-4)',
           background: 'var(--surface)',
           borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border)',
-          color: 'var(--muted)',
+          border: '1px solid var(--dashboard-chrome-border)',
+          color: 'var(--dashboard-muted-foreground)',
           textAlign: 'center',
         }}
       >
@@ -151,7 +151,7 @@ export default function AnalyticsPanel({
         padding: 'var(--space-4)',
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border)',
+        border: '1px solid var(--dashboard-chrome-border)',
       }}
     >
       {metrics.map((metric, index) => (
@@ -161,7 +161,7 @@ export default function AnalyticsPanel({
             padding: 'var(--space-4)',
             background: 'var(--surface-elevated)',
             borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border)',
+            border: '1px solid var(--dashboard-chrome-border)',
             position: 'relative',
             transition: 'var(--transition-base)',
             cursor: metric.premium && !isPremium ? 'pointer' : 'default',
@@ -175,7 +175,7 @@ export default function AnalyticsPanel({
             e.currentTarget.style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
           title={metric.premium && !isPremium ? 'Upgrade to unlock' : metric.description}

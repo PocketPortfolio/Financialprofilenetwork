@@ -9,7 +9,7 @@ const BOOK_PATH = path.join(process.cwd(), 'docs', 'book', 'UNIVERSAL-LLM-IMPORT
 
 const baseUrl = 'https://www.pocketportfolio.app';
 const bookUrl = `${baseUrl}/book/universal-llm-import`;
-const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Universal LLM Import')}&description=${encodeURIComponent('Building Local-First, Sovereign CSV Ingestion')}&v=3`;
+const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Universal LLM Import')}&description=${encodeURIComponent('Building Local-First, Sovereign CSV Ingestion')}&v=6`;
 
 export const metadata: Metadata = {
   title: 'Universal LLM Import: Building Local-First, Sovereign CSV Ingestion | Pocket Portfolio',
@@ -22,7 +22,16 @@ export const metadata: Metadata = {
     description: 'Local-first, sovereign CSV ingestion with heuristic and optional LLM mapping.',
     type: 'article',
     url: bookUrl,
-    images: [{ url: ogImageUrl, width: 1200, height: 630, alt: 'Universal LLM Import: Building Local-First, Sovereign CSV Ingestion' }],
+    images: [
+      {
+        url: ogImageUrl,
+        secureUrl: ogImageUrl,
+        width: 1200,
+        height: 630,
+        alt: 'Universal LLM Import: Building Local-First, Sovereign CSV Ingestion',
+        type: 'image/png',
+      },
+    ],
     siteName: 'Pocket Portfolio',
     locale: 'en_GB',
   },
@@ -57,7 +66,7 @@ const universalLLMImportArticleSchema = {
   publisher: {
     '@type': 'Organization' as const,
     name: 'Pocket Portfolio',
-    logo: { '@type': 'ImageObject' as const, url: `${baseUrl}/brand/pp-wordmark.svg` },
+    logo: { '@type': 'ImageObject' as const, url: `${baseUrl}/brand/pp-monogram-amber.png` },
   },
   mainEntityOfPage: { '@type': 'WebPage' as const, '@id': bookUrl },
 };

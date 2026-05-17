@@ -1,6 +1,8 @@
 // Analytics events for Pocket Portfolio
 // GA4 tracking functions for user interactions
 
+import { getFirstTouchAttribution } from './attribution';
+
 // Google Sign-In tracking
 export function trackGoogleSignIn(params?: string | { landingPage?: string; utmSource?: any; utmMedium?: any; utmCampaign?: any; utmContent?: any }) {
   if (typeof window !== 'undefined' && window.gtag) {
@@ -262,11 +264,13 @@ function getCurrentUtm() {
   if (typeof window === 'undefined') return { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null };
   const qs = new URLSearchParams(window.location.search);
   const fromSession = (k: string) => sessionStorage.getItem(k);
+  const firstTouch = getFirstTouchAttribution();
   return {
-    utm_source: qs.get('utm_source') || fromSession('utm_source'),
-    utm_medium: qs.get('utm_medium') || fromSession('utm_medium'),
-    utm_campaign: qs.get('utm_campaign') || fromSession('utm_campaign'),
-    utm_content: qs.get('utm_content') || fromSession('utm_content'),
+    // Prefer persisted first-touch so “Unassigned” can be stitched post-navigation.
+    utm_source: firstTouch?.utm_source || qs.get('utm_source') || fromSession('utm_source'),
+    utm_medium: firstTouch?.utm_medium || qs.get('utm_medium') || fromSession('utm_medium'),
+    utm_campaign: firstTouch?.utm_campaign || qs.get('utm_campaign') || fromSession('utm_campaign'),
+    utm_content: firstTouch?.utm_content || qs.get('utm_content') || fromSession('utm_content'),
   };
 }
 
@@ -489,9 +493,19 @@ export function trackEvent(
   eventName: string,
   params?: Record<string, string | number | boolean | undefined>
 ) {
+  const ft = typeof window !== 'undefined' ? getFirstTouchAttribution() : null;
+  const stitched = ft
+    ? {
+        first_touch_referrer: ft.referrer || 'null',
+        first_touch_path: ft.landing_path || 'null',
+        first_touch_ts: ft.captured_at,
+      }
+    : undefined;
+
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, {
       event_category: 'Conversion',
+      ...(stitched ? stitched : {}),
       ...params,
     });
   }

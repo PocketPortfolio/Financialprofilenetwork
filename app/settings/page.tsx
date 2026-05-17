@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import { auth } from '../lib/firebase';
 import { AccountService } from '../services/accountService';
 import { useTrades } from '../hooks/useTrades';
@@ -31,6 +30,8 @@ export default function SettingsPage() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
   const [tierFromApi, setTier] = useState<string | null>(null);
+  /** Prefer explicit `/api/api-keys/user` tier; fall back to app-wide tier (admin claim / PremiumTier cache). */
+  const seatTierForUi = tierFromApi ?? tier;
   const [loadingKeys, setLoadingKeys] = useState(false);
   const [seatAllocations, setSeatAllocations] = useState<SeatAllocation[]>([]);
   const [seatMaxSeats, setSeatMaxSeats] = useState(0);
@@ -67,17 +68,20 @@ export default function SettingsPage() {
       const cachedData = localStorage.getItem(cacheKey);
       const cacheTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
       
-      // Use cached data if it's less than 5 minutes old
+      // Use cached data if it's less than 5 minutes old (only when tier is present — null-tier
+      // cache would block recovery after admin claim / env / API fixes).
       if (cachedData && cacheTimestamp) {
         const age = Date.now() - parseInt(cacheTimestamp, 10);
         if (age < 5 * 60 * 1000) { // 5 minutes
           try {
             const data = JSON.parse(cachedData);
-            setApiKey(data.apiKey);
-            setCorporateLicense(data.corporateLicense);
-            setTier(data.tier);
-            setLoadingKeys(false);
-            return; // Don't fetch if we have fresh cache
+            if (data.tier) {
+              setApiKey(data.apiKey);
+              setCorporateLicense(data.corporateLicense);
+              setTier(data.tier);
+              setLoadingKeys(false);
+              return;
+            }
           } catch (e) {
             // Invalid cache, continue to fetch
           }
@@ -140,8 +144,8 @@ export default function SettingsPage() {
 
   const fetchSeats = async () => {
     if (!auth || !user) return;
-    const tier = tierFromApi ?? null;
-    if (tier !== 'corporateSponsor' && tier !== 'foundersClub') return;
+    const st = seatTierForUi;
+    if (st !== 'corporateSponsor' && st !== 'foundersClub') return;
     setLoadingSeats(true);
     try {
       const idToken = await user.getIdToken();
@@ -159,10 +163,14 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated && user && (tierFromApi === 'corporateSponsor' || tierFromApi === 'foundersClub')) {
+    if (
+      isAuthenticated &&
+      user &&
+      (seatTierForUi === 'corporateSponsor' || seatTierForUi === 'foundersClub')
+    ) {
       fetchSeats();
     }
-  }, [isAuthenticated, user, tierFromApi]);
+  }, [isAuthenticated, user, seatTierForUi]);
 
   const handleSeatInvite = async (email: string) => {
     if (!user) return;
@@ -224,17 +232,19 @@ export default function SettingsPage() {
           localStorage.removeItem('pocket-portfolio-premium-theme');
           localStorage.removeItem('pocket-portfolio-tier-timestamp');
         }
-      } else if (response.status === 503 || response.status === 500) {
-        // If quota exceeded or service unavailable, try to use cached data as fallback
+      } else if (response.status === 429 || response.status === 503 || response.status === 500) {
+        // Throttle / quota / unavailable — use cached tier if present (do not prefer null-tier cache).
         const cacheKey = `apiKeys_${user.email}`;
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
           try {
             const data = JSON.parse(cachedData);
-            setApiKey(data.apiKey);
-            setCorporateLicense(data.corporateLicense);
-            setTier(data.tier);
-            console.warn('Using cached API keys due to service limit');
+            if (data.tier) {
+              setApiKey(data.apiKey);
+              setCorporateLicense(data.corporateLicense);
+              setTier(data.tier);
+              console.warn('Using cached API keys due to service limit');
+            }
           } catch (e) {
             // Invalid cache
           }
@@ -427,30 +437,21 @@ export default function SettingsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div 
-        data-tier={getTierForDataAttribute(tier)}
-        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-        style={{
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}
-      >
-        <SEOHead 
+      <>
+        <SEOHead
           title="Settings - Pocket Portfolio"
           description="Manage your account settings and preferences"
         />
-        <SovereignHeader 
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-          lastSyncTime={syncState.lastSyncTime}
-          user={user}
-        />
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          padding: '20px',
-          paddingTop: 'calc(64px + 48px + 4px)' // Header (64px) + Banner (~48px) + gap (4px)
-        }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            minHeight: '50vh',
+          }}
+        >
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Sign in to access settings</h1>
             <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
@@ -474,36 +475,23 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div 
-      data-tier={getTierForDataAttribute(tier)}
-      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-      style={{
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}
-    >
-      <SEOHead 
+    <>
+      <SEOHead
         title="Settings - Pocket Portfolio"
         description="Manage your account settings and preferences"
       />
-      <SovereignHeader 
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-        lastSyncTime={syncState.lastSyncTime}
-        user={user}
-      />
-      
-      <main style={{ 
-        flex: 1, 
-        padding: '20px',
-        paddingTop: 'calc(64px + 48px + 4px)', // Header (64px) + Banner (~48px) + gap (4px)
-        maxWidth: '800px',
-        margin: '0 auto',
-        width: '100%'
-      }}>
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
         <div style={{ marginBottom: '32px' }}>
           <div style={{ 
             display: 'flex', 
@@ -595,9 +583,9 @@ export default function SettingsPage() {
         <DriveSyncSettings />
 
         {/* Sovereign Team Access - Corporate & Founders Club only */}
-        {(tierFromApi === 'corporateSponsor' || tierFromApi === 'foundersClub') && (
+        {(seatTierForUi === 'corporateSponsor' || seatTierForUi === 'foundersClub') && (
           <SeatManager
-            tier={tierFromApi}
+            tier={seatTierForUi}
             usedSeats={seatAllocations.length}
             maxSeats={seatMaxSeats}
             allocations={seatAllocations}
@@ -872,7 +860,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Power User Card - For developers needing higher rate limits */}
-        {(!apiKey || tierFromApi !== 'foundersClub') && (
+        {(!apiKey || seatTierForUi !== 'foundersClub') && (
           <div
             style={{
               background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
@@ -1072,7 +1060,7 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Confirmation Modals */}
       <ConfirmationModal
@@ -1119,6 +1107,6 @@ export default function SettingsPage() {
         type={alertModal.type}
         onClose={() => setAlertModal({ ...alertModal, isOpen: false })}
       />
-    </div>
+    </>
   );
 }

@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useWatchlist } from '../hooks/useWatchlist';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import AlertModal from '../components/modals/AlertModal';
 import { getDeviceInfo } from '../lib/utils/device';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
@@ -158,29 +157,21 @@ export default function WatchlistPage() {
 
   if (!isAuthenticated) {
     return (
-      <div 
-        data-tier={getTierForDataAttribute(tier)}
-        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-        style={{
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}
-      >
-        <SEOHead 
+      <>
+        <SEOHead
           title="Watchlist - Pocket Portfolio"
           description="Track your favorite stocks and investments"
         />
-        <SovereignHeader 
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-          user={user}
-        />
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          padding: '20px',
-          paddingTop: 'calc(64px + 48px + 4px)' // Header (64px) + Banner (~48px) + gap (4px)
-        }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            minHeight: '50vh',
+          }}
+        >
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Sign in to view watchlist</h1>
             <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
@@ -204,37 +195,16 @@ export default function WatchlistPage() {
             </button>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div 
-      data-tier={getTierForDataAttribute(tier)}
-      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-      style={{
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}
-    >
-      <SEOHead 
+    <>
+      <SEOHead
         title="Watchlist - Pocket Portfolio"
         description="Track your favorite stocks and investments"
       />
-      <SovereignHeader 
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-        user={user}
-      />
-      
-      <main style={{ 
-        flex: 1, 
-        padding: isMobile ? '16px' : '20px',
-        paddingTop: 'calc(64px + 48px + 4px)', // Header (64px) + Banner (~48px) + gap (4px)
-        maxWidth: '1200px',
-        margin: '0 auto',
-        width: '100%',
-        boxSizing: 'border-box',
-        overflowX: 'hidden'
-      }}>
         <div style={{ marginBottom: isMobile ? '24px' : '32px' }}>
           <div style={{ 
             display: 'flex', 
@@ -557,8 +527,7 @@ export default function WatchlistPage() {
             ))}
           </div>
         )}
-      </main>
-      
+
       {alertModalData && (
         <AlertModal
           isOpen={showAlertModal}
@@ -568,6 +537,6 @@ export default function WatchlistPage() {
           onClose={() => setShowAlertModal(false)}
         />
       )}
-    </div>
+    </>
   );
 }

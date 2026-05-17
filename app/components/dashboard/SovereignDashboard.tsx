@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { SovereignHeader } from './SovereignHeader';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import { MorningBrief } from './MorningBrief';
 import { AssetTerminal } from './AssetTerminal';
 import { X } from 'lucide-react';
@@ -69,7 +69,7 @@ export default function SovereignDashboard({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-emerald-500/30" style={{backgroundColor: '#020617'}}>
-      <SovereignHeader />
+      <ProductionNavbar />
       
       <main className="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6">
         

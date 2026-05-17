@@ -41,18 +41,18 @@ interface PortfolioAllocationChartProps {
   onSegmentClick?: (ticker: string) => void;
 }
 
-// Color palette - brand-aligned
+// Color palette — warm ledger tones only (no sky/green/indigo defaults)
 const COLORS = [
-  '#ff6b35', // signal orange
-  '#0ea5e9', // info sky
-  '#10b981', // success green
-  '#f59e0b', // warning amber
-  '#8b5cf6', // purple
-  '#ec4899', // pink
-  '#06b6d4', // cyan
-  '#84cc16', // lime
-  '#f97316', // orange
-  '#6366f1', // indigo
+  '#ff6b35',
+  '#f59e0b',
+  '#ea580c',
+  '#d97706',
+  '#c2410c',
+  '#b45309',
+  '#9a3412',
+  '#f97316',
+  '#fb923c',
+  '#78716c',
 ];
 
 // getSector is now imported from sectorService
@@ -184,8 +184,8 @@ export default function PortfolioAllocationChart({
           height: '400px',
           background: 'var(--surface)',
           borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border)',
-          color: 'var(--muted)',
+          border: '1px solid var(--dashboard-chrome-border)',
+          color: 'var(--dashboard-muted-foreground)',
           fontSize: 'var(--font-size-base)',
         }}
       >
@@ -208,7 +208,7 @@ export default function PortfolioAllocationChart({
     
     if (chartData.length === 0) {
       return (
-        <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--muted)' }}>
+        <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--dashboard-muted-foreground)' }}>
           No data to display
         </div>
       );
@@ -218,7 +218,7 @@ export default function PortfolioAllocationChart({
     const hasValidValues = chartData.some((item) => item.value && item.value > 0);
     if (!hasValidValues) {
       return (
-        <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--muted)' }}>
+        <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--dashboard-muted-foreground)' }}>
           All values are zero
         </div>
       );
@@ -243,7 +243,7 @@ export default function PortfolioAllocationChart({
         // Ensure data is valid
         if (chartData.length === 0 || !chartData.some(d => d.value > 0)) {
           return (
-            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--muted)' }}>
+            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--dashboard-muted-foreground)' }}>
               No valid data to display
             </div>
           );
@@ -278,7 +278,7 @@ export default function PortfolioAllocationChart({
                 }
                 outerRadius={outerRadius}
                 innerRadius={innerRadius}
-                fill="#8884d8"
+                fill="#fdba74"
                 dataKey="value"
                 onClick={(data) => {
                   onSegmentClick?.(data.ticker || data.name);
@@ -314,7 +314,7 @@ export default function PortfolioAllocationChart({
                 bottom: isMobile ? 80 : 60 // More space for rotated labels on mobile
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--dashboard-chrome-border)" />
               <XAxis
                 dataKey="name"
                 angle={isMobile ? -90 : -45}
@@ -363,7 +363,7 @@ export default function PortfolioAllocationChart({
         
         if (treemapData.length === 0 || treemapData.every(d => d.value <= 0)) {
           return (
-            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--muted)', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--dashboard-muted-foreground)', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               No data to display
             </div>
           );
@@ -380,7 +380,7 @@ export default function PortfolioAllocationChart({
               data={treemapData}
               dataKey="value"
               stroke="#fff"
-              fill="#8884d8"
+              fill="#fdba74"
               isAnimationActive={false}
               content={(props: any) => {
                 // Skip root node (depth 0) - only render leaf nodes (depth 1)
@@ -486,7 +486,7 @@ export default function PortfolioAllocationChart({
         
         if (heatmapData.length === 0 || heatmapData.every(d => d.value <= 0)) {
           return (
-            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--muted)', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--dashboard-muted-foreground)', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               No data to display
             </div>
           );
@@ -503,7 +503,7 @@ export default function PortfolioAllocationChart({
               marginBottom: isMobile ? 'var(--space-2)' : 'var(--space-2)', 
               textAlign: 'center', 
               fontSize: isMobile ? '10px' : 'var(--font-size-sm)', 
-              color: 'var(--muted)',
+              color: 'var(--dashboard-muted-foreground)',
               padding: isMobile ? '0 var(--space-1)' : '0',
               lineHeight: isMobile ? '1.3' : '1.5',
             }}>
@@ -520,7 +520,7 @@ export default function PortfolioAllocationChart({
                     <Treemap
                       data={heatmapData}
                       dataKey="value"
-                      stroke="var(--border)"
+                      stroke="var(--dashboard-chrome-border)"
                       fill="var(--signal)"
                       isAnimationActive={false}
               content={(props: any) => {
@@ -578,7 +578,7 @@ export default function PortfolioAllocationChart({
                         width={width}
                         height={height}
                         fill={heatmapColor}
-                        stroke="var(--border)"
+                        stroke="var(--dashboard-chrome-border)"
                         strokeWidth={isMobile ? 1 : 2}
                         style={{ cursor: 'pointer' }}
                         onClick={() => onSegmentClick?.(ticker || name)}
@@ -652,7 +652,7 @@ export default function PortfolioAllocationChart({
       style={{
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border)',
+        border: '1px solid var(--dashboard-chrome-border)',
         padding: isMobile ? '12px' : 'var(--space-4)',
         width: '100%',
         maxWidth: isMobile ? '100%' : '45%', // Reduce border length on desktop
@@ -689,7 +689,7 @@ export default function PortfolioAllocationChart({
               display: 'flex',
               gap: isMobile ? '2px' : '4px',
               flexWrap: 'wrap',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--dashboard-chrome-border)',
               boxSizing: 'border-box',
               overflowX: isMobile ? 'auto' : 'visible', // Allow horizontal scroll on very small screens
               WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
@@ -722,7 +722,7 @@ export default function PortfolioAllocationChart({
                   color:
                     chartView === id ? 'var(--bg)' : 'var(--text)',
                   border: `1px solid ${
-                    chartView === id ? 'var(--signal)' : 'var(--border)'
+                    chartView === id ? 'var(--signal)' : 'var(--dashboard-chrome-border)'
                   }`,
                   borderRadius: 'var(--radius-sm)',
                   fontSize: isMobile ? '10px' : '11px',
@@ -745,7 +745,7 @@ export default function PortfolioAllocationChart({
                 onMouseLeave={(e) => {
                   if (chartView !== id) {
                     e.currentTarget.style.background = 'var(--surface-elevated)';
-                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
                   }
                 }}
               >
@@ -804,7 +804,7 @@ export default function PortfolioAllocationChart({
             gap: 'var(--space-2)',
             marginTop: 'var(--space-4)',
             paddingTop: 'var(--space-4)',
-            borderTop: '1px solid var(--border)',
+            borderTop: '1px solid var(--dashboard-chrome-border-subtle)',
             maxWidth: isMobile ? '100%' : '60%', // Reduce border length on desktop
             marginLeft: isMobile ? '0' : 'auto', // Center with equal spacing on both sides
             marginRight: isMobile ? '0' : 'auto',

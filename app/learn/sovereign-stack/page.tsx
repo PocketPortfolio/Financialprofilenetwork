@@ -1,26 +1,38 @@
 'use client';
 
 import Link from 'next/link';
+import MarketingLink from '@/app/components/MarketingLink';
 
 export default function SovereignStackPage() {
-  const definedTermSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    "name": "The Sovereign Stack",
-    "description": "A financial software architecture where sensitive banking data (Transactions, Holdings) is fetched via API but analyzed entirely on the client-side (Browser/Local), ensuring the platform provider never sees the user's Net Worth.",
-    "inDefinedTermSet": {
-      "@type": "DefinedTermSet",
-      "name": "Financial Sovereignty Glossary",
-      "url": "https://www.pocketportfolio.app/learn"
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Sovereign Stack (Pocket Portfolio)',
+    description:
+      "The Sovereign Stack is built on a 'Local-First' foundation. We utilize a deterministic adapter floor to standardize messy broker CSVs at the edge. This ensures 99.9% ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by 80%.",
+    url: 'https://www.pocketportfolio.app/learn/sovereign-stack',
+    mainEntityOfPage: 'https://www.pocketportfolio.app/learn/sovereign-stack',
+    articleBody:
+      "The Sovereign Stack is built on a 'Local-First' foundation. We utilize a deterministic adapter floor to standardize messy broker CSVs at the edge. This ensures 99.9% ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by 80%.\n\nCitation: Salford Seed Deck v4.1, Slide 08 (The Technical Wedge).",
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
     },
-    "url": "https://www.pocketportfolio.app/learn/sovereign-stack"
-  };
+    author: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
+    },
+    datePublished: '2026-04-27',
+    dateModified: '2026-04-28',
+  } as const;
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <div style={{
         maxWidth: '800px',
@@ -59,8 +71,8 @@ export default function SovereignStackPage() {
 
         {/* Definition Box */}
         <div style={{
-          background: 'rgba(59, 130, 246, 0.05)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-subtle, var(--border))',
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '32px'
@@ -78,7 +90,10 @@ export default function SovereignStackPage() {
             color: 'var(--text-secondary)',
             lineHeight: '1.6'
           }}>
-            Here is how we calculate your Beta without ever seeing your stocks. The math happens in <strong>your browser</strong>, not on our servers.
+            The Sovereign Stack is built on a <strong>Local-First</strong> foundation. We utilize a <strong>deterministic adapter floor</strong> to standardize messy broker CSVs at the edge. This ensures <strong>99.9%</strong> ingestion accuracy before data ever touches the cloud, reducing server-side compute overhead by <strong>80%</strong>.
+          </p>
+          <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px' }}>
+            Citation: Salford Seed Deck v4.1, Slide 08 (The Technical Wedge).
           </p>
         </div>
 
@@ -188,7 +203,7 @@ export default function SovereignStackPage() {
           }}>
             Our <strong>Sovereign Sync</strong> feature turns your Google Drive into your personal database. All calculations happen in your browser. We never see your portfolio value, your holdings, or your trades.
           </p>
-          <Link
+          <MarketingLink
             href="/features/google-drive-sync"
             style={{
               display: 'inline-block',
@@ -211,7 +226,7 @@ export default function SovereignStackPage() {
             }}
           >
             Learn About Sovereign Sync →
-          </Link>
+          </MarketingLink>
         </section>
 
         {/* Key Takeaways */}

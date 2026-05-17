@@ -42,8 +42,13 @@ export function toNumber(value: string | number, locale: string): number {
   const v = (value ?? '').toString().trim();
   if (!v) return NaN;
   
-  // Remove currency prefixes (e.g., "USD 111.97" -> "111.97")
+  // Remove currency prefixes/symbols (e.g., "USD 111.97", "£111.97", "€ 1.234,56")
+  // Keep separators/signs; strip everything else at the ends.
   let cleaned = v.replace(/^[A-Z]{3}\s+/i, '');
+  cleaned = cleaned.replace(/^\uFEFF/, '').trim();
+  cleaned = cleaned.replace(/^[^\d\-\+]+/, ''); // leading symbols like £, €, $, whitespace
+  cleaned = cleaned.replace(/[^\d,.\-\+]+$/, ''); // trailing junk
+  cleaned = cleaned.replace(/\s+/g, ''); // allow space thousands separators
   
   // Detect decimal comma vs point
   const hasComma = cleaned.includes(',');

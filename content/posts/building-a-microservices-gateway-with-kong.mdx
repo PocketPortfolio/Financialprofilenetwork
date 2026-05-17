@@ -1,0 +1,104 @@
+---
+title: Building a Microservices Gateway with Kong
+date: '2026-05-04'
+description: >-
+  Learn how to build a microservices gateway using Kong to efficiently manage
+  API traffic.
+tags:
+  - microservices
+  - gateway
+  - Kong
+  - API management
+author: Pocket Portfolio Team
+image: /images/blog/building-a-microservices-gateway-with-kong.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+As organizations grow and adopt microservices architecture, managing the communication between services becomes increasingly complex. A microservices gateway helps streamline this process by providing a single entry point for API traffic, handling concerns such as load balancing, authentication, and rate limiting. Kong, an open-source API gateway, is a powerful tool that can be leveraged to manage these complexities efficiently.
+
+## Solution with Code
+
+To build a microservices gateway using Kong, follow these steps:
+
+### Step 1: Install Kong
+
+First, install Kong on your system. Kong can be set up using Docker for simplicity:
+
+```bash
+docker run -d --name kong-database \
+  -p 5432:5432 \
+  -e "POSTGRES_USER=kong" \
+  -e "POSTGRES_DB=kong" \
+  postgres:9.6
+```
+
+Initialize the database:
+
+```bash
+docker run --rm \
+  --link kong-database:kong-database \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=kong-database" \
+  kong kong migrations bootstrap
+```
+
+Start Kong:
+
+```bash
+docker run -d --name kong \
+  --link kong-database:kong-database \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=kong-database" \
+  -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+  -p 8000:8000 \
+  -p 8443:8443 \
+  -p 8001:8001 \
+  -p 8444:8444 \
+  kong
+```
+
+### Step 2: Configure Your Services
+
+Register your microservices with Kong:
+
+```bash
+curl -i -X POST \
+  --url http://localhost:8001/services/ \
+  --data 'name=example-service' \
+  --data 'url=http://example-service:8000'
+```
+
+### Step 3: Set Up Routes
+
+Create a route for your service:
+
+```bash
+curl -i -X POST \
+  --url http://localhost:8001/services/example-service/routes \
+  --data 'paths[]=/example'
+```
+
+### Step 4: Apply Plugins
+
+Enable plugins for additional functionality like rate limiting:
+
+```bash
+curl -i -X POST \
+  --url http://localhost:8001/services/example-service/plugins/ \
+  --data 'name=rate-limiting' \
+  --data 'config.second=5'
+```
+
+## Key Concepts
+
+- **Service Registration**: Registering services with Kong allows it to manage and route traffic effectively.
+- **Route Configuration**: Routes define how Kong forwards requests to the appropriate service based on URL paths.
+- **Plugins**: Kong's plugins provide modular functionalities such as authentication, logging, and traffic control, enhancing the API gateway's capabilities.
+
+By following these steps, you can efficiently manage your microservices architecture using Kong as your API gateway, simplifying and enhancing your system's scalability and security.

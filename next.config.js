@@ -32,9 +32,51 @@ const withPWA = require('next-pwa')({
   publicExcludes: ['!firebase-messaging-sw.js'],
 });
 
+/**
+ * B2B routes migrated off Pocket — 301 to www.openportfolio.co.uk (Slice 1).
+ * Sync with lib/canonical-claims.ts OPEN_ALIAS_ROUTES.
+ * Excludes `/press` only: consumer press hub stays on Pocket (growth audit Item 5).
+ */
+const OPEN_ALIAS_POCKET_TO_OPEN_PATHS = [
+  '/architecture',
+  '/designchallenge',
+  '/tier1designpartner',
+  '/board-of-investors',
+  '/sovereign-ai-grant',
+  '/learn/sovereign-stack',
+  '/learn/sovereign-finance',
+  '/learn/local-first',
+  '/learn/vendor-lock-in',
+  '/playbooks/sovereign-strike',
+  '/openbrokercsv',
+  '/static/csv-etoro-to-openbrokercsv',
+  '/static/portfolio-tracker',
+  '/static/why-we-are-fast',
+  '/stack-reveal',
+  '/press/abba-lawal',
+  '/sponsor',
+  '/learn',
+  '/privacy',
+  '/terms',
+];
+
+const POCKET_HOSTS_CANONICAL_AND_APEX = ['www.pocketportfolio.app', 'pocketportfolio.app'];
+
+function pocketHostsToOpenPortfolioRedirects() {
+  return OPEN_ALIAS_POCKET_TO_OPEN_PATHS.flatMap((pathname) =>
+    POCKET_HOSTS_CANONICAL_AND_APEX.map((host) => ({
+      source: pathname,
+      destination: `https://www.openportfolio.co.uk${pathname}`,
+      permanent: true,
+      has: [{ type: 'host', value: host }],
+    })),
+  );
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  typedRoutes: false,
   // Keep server-only packages external so API routes (e.g. /api/ai/*) resolve at build
   serverExternalPackages: ['firebase-admin'],
   // Enable standalone output for Docker (Vercel handles this automatically)
@@ -107,6 +149,8 @@ const nextConfig = {
   async redirects() {
     return [
       // HTTP to HTTPS redirects (force HTTPS) - exclude API routes
+      // Host-scoped to pocketportfolio.app so openportfolio.co.uk traffic is not
+      // rewritten into the Pocket apex (would otherwise infinite-loop the O. surface).
       {
         source: '/:path((?!api).)*',
         destination: 'https://www.pocketportfolio.app/:path*',
@@ -117,8 +161,14 @@ const nextConfig = {
             key: 'x-forwarded-proto',
             value: 'http',
           },
+          {
+            type: 'host',
+            value: 'pocketportfolio.app',
+          },
         ],
       },
+      // Stage 7: Pocket → Open permanent authority transfer (before apex→www catch-all).
+      ...pocketHostsToOpenPortfolioRedirects(),
       // Non-www to www redirects (canonical domain) - exclude API routes
       {
         source: '/:path((?!api).)*',
@@ -128,6 +178,90 @@ const nextConfig = {
           {
             type: 'host',
             value: 'pocketportfolio.app',
+          },
+        ],
+      },
+      // Open Portfolio (B2B) — parallel HTTP→HTTPS force, host-scoped to the O. apex.
+      {
+        source: '/:path((?!api).)*',
+        destination: 'https://www.openportfolio.co.uk/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: 'http',
+          },
+          {
+            type: 'host',
+            value: 'openportfolio.co.uk',
+          },
+        ],
+      },
+      // Open Portfolio — apex to www canonical (mirrors the Pocket rule for SEO parity).
+      {
+        source: '/:path((?!api).)*',
+        destination: 'https://www.openportfolio.co.uk/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'host',
+            value: 'openportfolio.co.uk',
+          },
+        ],
+      },
+      // Open Portfolio — openportfolio.uk TLD → canonical B2B host (parity with .co.uk).
+      {
+        source: '/:path((?!api).)*',
+        destination: 'https://www.openportfolio.co.uk/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: 'http',
+          },
+          {
+            type: 'host',
+            value: 'openportfolio.uk',
+          },
+        ],
+      },
+      {
+        source: '/:path((?!api).)*',
+        destination: 'https://www.openportfolio.co.uk/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'host',
+            value: 'openportfolio.uk',
+          },
+        ],
+      },
+      {
+        source: '/:path((?!api).)*',
+        destination: 'https://www.openportfolio.co.uk/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-proto',
+            value: 'http',
+          },
+          {
+            type: 'host',
+            value: 'www.openportfolio.uk',
+          },
+        ],
+      },
+      {
+        source: '/:path((?!api).)*',
+        destination: 'https://www.openportfolio.co.uk/:path*',
+        permanent: true,
+        has: [
+          {
+            type: 'host',
+            value: 'www.openportfolio.uk',
           },
         ],
       },

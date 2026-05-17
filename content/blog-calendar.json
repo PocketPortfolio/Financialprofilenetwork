@@ -724,7 +724,7 @@
     "date": "2026-04-22",
     "title": "JSON Schema Validation: Ensuring Data Integrity",
     "slug": "json-schema-validation-ensuring-data-integrity",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -734,14 +734,15 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-22T09:01:04.954Z"
   },
   {
     "id": "week-17-post-1",
     "date": "2026-04-26",
     "title": "From SaaS to Sovereignty: The Evolution of Personal Finance Tools",
     "slug": "from-saas-to-sovereignty-the-evolution-of-personal-finance-t",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -751,14 +752,15 @@
       "sovereignty:"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-26T09:01:04.622Z"
   },
   {
     "id": "week-17-post-2",
     "date": "2026-04-29",
     "title": "The Hidden Costs of Active Trading: A Data Analysis",
     "slug": "the-hidden-costs-of-active-trading-a-data-analysis",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -768,14 +770,15 @@
       "hidden"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-04-29T09:01:00.250Z"
   },
   {
     "id": "week-18-post-1",
     "date": "2026-05-03",
     "title": "Performance Optimization: Making JSON Finance Fast",
     "slug": "performance-optimization-making-json-finance-fast",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -785,14 +788,15 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-03T09:01:08.493Z"
   },
   {
     "id": "week-18-post-2",
     "date": "2026-05-06",
     "title": "The Evolution of Pocket Portfolio: From Cloud to Sovereign",
     "slug": "the-evolution-of-pocket-portfolio-from-cloud-to-sovereign",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -802,14 +806,15 @@
       "evolution"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-06T09:00:53.641Z"
   },
   {
     "id": "week-19-post-1",
     "date": "2026-05-10",
     "title": "Sector Rotation Strategies: What the Data Reveals",
     "slug": "sector-rotation-strategies-what-the-data-reveals",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -819,14 +824,15 @@
       "sector"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-10T09:00:36.579Z"
   },
   {
     "id": "week-19-post-2",
     "date": "2026-05-13",
     "title": "The Decentralized Portfolio: Beyond the Cloud",
     "slug": "the-decentralized-portfolio-beyond-the-cloud",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -836,14 +842,15 @@
       "decentralized"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-13T09:01:02.275Z"
   },
   {
     "id": "week-20-post-1",
     "date": "2026-05-17",
     "title": "How to Migrate from Cloud to Sovereign: A Guide",
     "slug": "how-to-migrate-from-cloud-to-sovereign-a-guide",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -853,7 +860,8 @@
       "migrate"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-17T09:00:46.843Z"
   },
   {
     "id": "week-20-post-2",

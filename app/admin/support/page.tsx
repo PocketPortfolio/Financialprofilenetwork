@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import Link from 'next/link';
-import MobileHeader from '@/app/components/nav/MobileHeader';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 
 interface SupportSubmission {
   id: string;
@@ -88,7 +88,7 @@ export default function AdminSupportPage() {
   if (!isAuthenticated || !isAdmin) {
     return (
       <div style={{ minHeight: '100vh', padding: 'var(--space-6)', background: 'var(--bg)', color: 'var(--text)' }}>
-        <MobileHeader />
+        <ProductionNavbar />
         <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', paddingTop: 'var(--space-8)' }}>
           <p>{!isAuthenticated ? 'Please sign in to access this page.' : 'You need admin privileges to access this page.'}</p>
         </div>
@@ -98,7 +98,7 @@ export default function AdminSupportPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
-      <MobileHeader />
+      <ProductionNavbar />
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: 'var(--space-6)' }}>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginBottom: 'var(--space-6)' }}>
           <Link href="/admin/analytics" style={{ padding: '8px 16px', borderRadius: '6px', background: 'var(--muted)', color: 'var(--text)', textDecoration: 'none', fontSize: '14px' }}>Analytics</Link>

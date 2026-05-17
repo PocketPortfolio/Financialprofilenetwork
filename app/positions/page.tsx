@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useTrades } from '../hooks/useTrades';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
 import ConsolidatedPortfolioTable from '../components/ConsolidatedPortfolioTable';
 import { usePortfolioNotes } from '../hooks/usePortfolioNotes';
 import { Trade } from '../services/tradeService';
@@ -151,29 +150,21 @@ export default function PositionsPage() {
 
   if (!isAuthenticated) {
     return (
-      <div 
-        data-tier={getTierForDataAttribute(tier)}
-        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-        style={{
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}
-      >
-        <SEOHead 
+      <>
+        <SEOHead
           title="Positions - Pocket Portfolio"
           description="View your portfolio positions and holdings"
         />
-        <SovereignHeader 
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-          user={user}
-        />
-        <div style={{ 
+        <div
+          style={{
           flex: 1, 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
           padding: '20px',
-          paddingTop: 'calc(64px + 48px + 4px)' // Header (64px) + Banner (~48px) + gap (4px)
-        }}>
+          minHeight: '50vh',
+        }}
+        >
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Sign in to view positions</h1>
             <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
@@ -197,35 +188,16 @@ export default function PositionsPage() {
             </button>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div 
-      data-tier={getTierForDataAttribute(tier)}
-      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-      style={{
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}
-    >
-      <SEOHead 
+    <>
+      <SEOHead
         title="Positions - Pocket Portfolio"
         description="View your portfolio positions and holdings"
       />
-      <SovereignHeader 
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'} 
-        user={user}
-      />
-      
-      <main style={{ 
-        flex: 1, 
-        padding: '20px',
-        paddingTop: 'calc(64px + 48px + 4px)', // Header (64px) + Banner (~48px) + gap (4px)
-        maxWidth: '1200px',
-        margin: '0 auto',
-        width: '100%'
-      }}>
         <div style={{ marginBottom: '32px' }}>
           <div style={{ 
             display: 'flex', 
@@ -305,8 +277,7 @@ export default function PositionsPage() {
             onRemoveOrphan={portfolioNotes.removeOrphan}
           />
         )}
-      </main>
-      
+
       {alertModalData && (
         <AlertModal
           isOpen={showAlertModal}
@@ -316,6 +287,6 @@ export default function PositionsPage() {
           onClose={() => setShowAlertModal(false)}
         />
       )}
-    </div>
+    </>
   );
 }

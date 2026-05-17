@@ -1,0 +1,83 @@
+---
+title: Building a File Upload System with Multer
+date: '2026-04-24'
+description: Learn how to build a robust file upload system using Multer in Node.js.
+tags:
+  - building
+  - file
+  - upload
+  - Node.js
+  - Multer
+author: Pocket Portfolio Team
+image: /images/blog/building-a-file-upload-system-with-multer.png
+pillar: Build
+category: how-to-in-tech
+---
+
+### Problem
+
+Uploading files to a server is a common requirement in many web applications. Handling file uploads securely and efficiently can be challenging, especially when dealing with large files or various file types. Node.js, a popular JavaScript runtime, lacks built-in support for handling multipart/form-data, which is the form encoding used for file uploads. To address this, we can use the `Multer` middleware to handle file uploads seamlessly.
+
+### Solution with Code
+
+To implement a file upload system with Multer, follow these steps:
+
+1. **Install Dependencies**
+
+   First, ensure you have Node.js installed. Then, initialize your project and install the required packages:
+
+   ```bash
+   npm init -y
+   npm install express multer
+   ```
+
+2. **Set Up Express Server**
+
+   Create a basic Express server setup. In a file named `server.js`, set up the server as follows:
+
+   ```javascript
+   const express = require('express');
+   const multer = require('multer');
+
+   const app = express();
+   const PORT = process.env.PORT || 3000;
+
+   // Configure Multer storage
+   const storage = multer.diskStorage({
+     destination: (req, file, cb) => {
+       cb(null, 'uploads/');
+     },
+     filename: (req, file, cb) => {
+       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+       cb(null, file.fieldname + '-' + uniqueSuffix);
+     }
+   });
+
+   const upload = multer({ storage: storage });
+
+   // Define a file upload route
+   app.post('/upload', upload.single('file'), (req, res) => {
+     if (!req.file) {
+       return res.status(400).send('No file uploaded.');
+     }
+     res.send(`File uploaded successfully: ${req.file.filename}`);
+   });
+
+   app.listen(PORT, () => {
+     console.log(`Server running on port ${PORT}`);
+   });
+   ```
+
+3. **Test the File Upload**
+
+   You can test the file upload functionality using tools like Postman. Create a POST request to `http://localhost:3000/upload` and attach a file under the form-data section with the key `file`.
+
+### Key Concepts
+
+- **Multer Middleware**: Multer is a Node.js middleware for handling `multipart/form-data`, used primarily for uploading files. It makes the process of handling file uploads in Express applications straightforward and efficient.
+  
+- **Storage Configuration**: Multer allows you to configure storage options, such as the destination directory and filename pattern, providing flexibility in how files are stored on your server.
+
+- **Handling Single vs. Multiple Files**: In the code example, `upload.single('file')` is used for single file uploads. To handle multiple files, you can use `upload.array('files', maxCount)`.
+
+By following this guide, you can set up a basic file upload system using Multer in a Node.js application, enabling efficient handling of file uploads with minimal setup.

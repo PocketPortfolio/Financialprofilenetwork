@@ -79,7 +79,6 @@ const AlertModal: React.FC<AlertModalProps> = ({
   const modalContentRef = useRef<HTMLDivElement>(null);
   const isClosingRef = useRef(false);
 
-  // #region agent log
   useEffect(() => {
     renderCountRef.current += 1;
     const wasOpen = prevIsOpenRef.current;
@@ -110,7 +109,6 @@ const AlertModal: React.FC<AlertModalProps> = ({
       }
     };
   }, [isOpen, type, shouldAnimate]);
-  // #endregion
 
   // Memoize colors to prevent recalculation on every render
   const colors = useMemo(() => getColors(type), [type]);
@@ -160,27 +158,6 @@ const AlertModal: React.FC<AlertModalProps> = ({
     isolation: 'isolate' as const, // Create new stacking context
     contain: 'layout style paint' as const // Isolate modal from parent layout recalculations
   }), [shouldAnimate, animationStartedRef.current]);
-
-  // #region agent log
-  // Track overlay repaints using ResizeObserver
-  useEffect(() => {
-    if (!isOpen || !overlayRef.current) return;
-    
-    const overlay = overlayRef.current;
-    let repaintCount = 0;
-    
-    // Use ResizeObserver to detect layout changes (repaints)
-    const resizeObserver = new ResizeObserver(() => {
-      repaintCount++;
-    });
-    
-    resizeObserver.observe(overlay);
-    
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [isOpen]);
-  // #endregion
 
   if (!isOpen) return null;
 

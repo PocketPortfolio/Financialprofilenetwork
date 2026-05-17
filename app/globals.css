@@ -57,6 +57,8 @@
     --border: 28 25% 88%;           /* Warm light border */
     --input: 28 25% 88%;            /* Same as border */
     --ring: 14 100% 60%;            /* Brand Salmon for focus rings */
+    /* Warm accent for color-mix / components (premium themes override on body) */
+    --border-warm: #d97706;
     
     /* 11. DANGER: Alias for destructive */
     --danger: 0 84% 60%;            /* Rose-500 */
@@ -95,6 +97,7 @@
     --border: 217 33% 17%;          /* Slate-800 */
     --input: 217 33% 17%;
     --ring: 212.7 26.8% 83.9%;
+    --border-warm: #f59e0b;
     
     --danger: 0 84% 60%;            /* Rose-500 */
   }
@@ -238,6 +241,23 @@
   /* Use semantic variables - automatically switches with theme */
   color: hsl(var(--foreground));
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Warm-tinted chrome — avoids cool grey planks on dashboard panels/tabs */
+  --dashboard-chrome-border: color-mix(in srgb, hsl(var(--border)) 72%, var(--border-warm) 28%);
+  --dashboard-chrome-border-subtle: color-mix(in srgb, hsl(var(--border)) 82%, var(--border-warm) 18%);
+  /* Inactive labels/tabs: pull toward accent so dark-mode slate muted-foreground does not read "fintech grey" */
+  --dashboard-muted-foreground: color-mix(in srgb, hsl(var(--muted-foreground)) 72%, hsl(var(--accent)) 28%);
+  /* Menu/hover fills: warm vs raw slate --muted */
+  --dashboard-surface-hover: color-mix(in srgb, hsl(var(--muted)) 82%, hsl(var(--accent)) 18%);
+}
+
+/* Warm chrome + secondary text inside dashboard cards (base .dashboard-card uses cool shadcn border/muted + !important) */
+.sovereign-dashboard .dashboard-card {
+  border-color: var(--dashboard-chrome-border) !important;
+}
+
+.sovereign-dashboard .dashboard-card p,
+.sovereign-dashboard .dashboard-card span:not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-accent"]):not([class*="text-danger"]) {
+  color: var(--dashboard-muted-foreground) !important;
 }
 
 /* Apply dashboard-card styles to all card-like elements - Theme-Aware */
@@ -245,7 +265,7 @@
 .sovereign-dashboard [class*="mobile-card"],
 .sovereign-dashboard [class*="brand-card"] {
   background-color: hsl(var(--card)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  border: 1px solid var(--dashboard-chrome-border) !important;
   border-radius: 2px;
   padding: 24px;
   color: hsl(var(--card-foreground)) !important;
@@ -386,7 +406,7 @@ a {
   --text: var(--text-inverse);
   --muted: var(--muted-inverse);
   --card: var(--card-on-dark);
-  --card-border: var(--card-border-on-dark);
+  --card-border: var(--border);
 }
 
 /* ============================================
@@ -660,8 +680,13 @@ textarea:focus-visible {
   
   /* Mobile-specific optimizations */
   body {
-    padding: 0 !important;
     margin: 0 !important;
+    /* useStickyHeader sets --header-offset on body; !important here beats legacy inline padding fights */
+    padding-top: calc(var(--header-offset, 0px) + 4px) !important;
+    padding-bottom: 0 !important;
+    /* horizontal padding comes from .mobile-container (do not zero with shorthand) */
+    padding-left: 0;
+    padding-right: 0;
   }
   
   /* Remove horizontal padding on mobile */
@@ -935,20 +960,21 @@ select option:checked {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    background: transparent !important;
-    border: none !important;
+    background: var(--accent-warm) !important;
+    border: 2px solid var(--border-warm) !important;
     cursor: pointer !important;
     padding: 8px !important;
     border-radius: 6px !important;
-    transition: background-color 0.2s ease !important;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
     min-height: 40px !important;
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.28) !important;
   }
   
   .hamburger-btn:hover {
-    background: var(--chrome) !important;
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;
   }
   
   .hamburger-btn:focus {
@@ -961,8 +987,8 @@ select option:checked {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    background: transparent !important;
-    border: none !important;
+    background: var(--accent-warm) !important;
+    border: 2px solid var(--border-warm) !important;
     position: relative !important;
     z-index: 1000 !important;
   }
@@ -1025,8 +1051,21 @@ select option:checked {
 
 .blog-content h2 {
   font-size: 2em;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-warm) 55%, transparent);
   padding-bottom: 0.5em;
+}
+
+.blog-content hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-warm) 50%,
+    transparent 100%
+  );
+  opacity: 0.7;
+  margin: 2.5em 0;
 }
 
 .blog-content h3 {
@@ -1063,7 +1102,7 @@ select option:checked {
   border-radius: 8px;
   overflow-x: auto;
   margin-bottom: 1.5em;
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border-warm) 35%, transparent);
 }
 
 .blog-content pre code {

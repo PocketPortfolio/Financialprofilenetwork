@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MobileHeader from '@/app/components/nav/MobileHeader';
+import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 
 export default function AdminSalesStrategyPage() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -61,7 +61,7 @@ export default function AdminSalesStrategyPage() {
   if (!isAuthenticated || !isAdmin) {
     return (
       <>
-        <MobileHeader title="Sales Strategy" />
+        <ProductionNavbar />
         <div style={{ 
           minHeight: '100vh', 
           display: 'flex', 
@@ -98,7 +98,7 @@ export default function AdminSalesStrategyPage() {
 
   return (
     <>
-      <MobileHeader title="Sales Strategy" />
+      <ProductionNavbar />
       <div className="brand-surface" style={{ minHeight: '100vh', padding: 'var(--space-6)' }}>
         <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
           {/* Admin Navigation */}

@@ -7,6 +7,8 @@ interface TickerSearchProps {
   onTickerSelect?: (ticker: string) => void;
   placeholder?: string;
   linkToTickerPage?: boolean; // New prop to enable linking to /s/[symbol] pages
+  /** Hero / marketing: amber stroke instead of tier-primary grey-adjacent idle border */
+  marketingChrome?: boolean;
 }
 
 interface TickerResult {
@@ -32,7 +34,14 @@ const popularTickers = [
   { symbol: 'SPY', name: 'SPDR S&P 500 ETF Trust' },
 ];
 
-export default function TickerSearch({ onTickerSelect, placeholder = "Search stocks or crypto...", linkToTickerPage = false }: TickerSearchProps) {
+const MARKETING_DIVIDER = '1px solid rgba(245, 158, 11, 0.28)';
+
+export default function TickerSearch({
+  onTickerSelect,
+  placeholder = 'Search stocks or crypto...',
+  linkToTickerPage = false,
+  marketingChrome = false,
+}: TickerSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TickerResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -153,34 +162,92 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
     }
   };
 
+  // Tier-aware: `--primary` is derived from `[data-tier]` in globals.css
+  const borderIdle = marketingChrome
+    ? 'rgba(245, 158, 11, 0.38)'
+    : 'hsl(var(--primary) / 0.28)';
+  const borderHover = marketingChrome ? 'rgba(245, 158, 11, 0.52)' : 'hsl(var(--primary) / 0.40)';
+  const borderFocus = marketingChrome ? 'var(--accent-warm)' : 'hsl(var(--primary))';
+  const ringFocus = marketingChrome ? 'rgba(245, 158, 11, 0.22)' : 'hsl(var(--primary) / 0.20)';
+  const dropdownDivider = marketingChrome ? MARKETING_DIVIDER : '1px solid var(--border-subtle)';
+
   return (
     <div ref={searchRef} style={{ position: 'relative', width: '100%', zIndex: 1 }}>
-      <input
-        ref={inputRef}
-        type="text"
-        value={query}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        onFocus={(e) => {
-          setIsOpen(query.length > 0);
-          (e.target as HTMLElement).style.borderColor = 'var(--brand)';
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            .pp-ticker-search-input::placeholder { color: rgba(15, 23, 42, 0.45); }
+            @media (prefers-color-scheme: dark) {
+              .pp-ticker-search-input::placeholder { color: rgba(255, 255, 255, 0.42); }
+            }
+          `,
         }}
-        placeholder={placeholder}
-        style={{
-          width: '100%',
-          padding: '8px',
-          border: '1px solid var(--card-border)',
-          borderRadius: '6px',
-          background: 'var(--bg)',
-          color: 'var(--text)',
-          fontSize: '12px',
-          fontWeight: '500',
-          outline: 'none',
-          transition: 'all 0.2s ease',
-          boxSizing: 'border-box'
-        }}
-        onBlur={(e) => (e.target as HTMLElement).style.borderColor = 'var(--card-border)'}
       />
+
+      <div style={{ position: 'relative' }}>
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 12,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: 16,
+            height: 16,
+            color: 'var(--text-secondary)',
+            pointerEvents: 'none',
+            opacity: 0.9,
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </div>
+
+        <input
+          ref={inputRef}
+          className="pp-ticker-search-input"
+          type="text"
+          value={query}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onFocus={(e) => {
+            setIsOpen(query.length > 0);
+            (e.target as HTMLElement).style.borderColor = borderFocus;
+            (e.target as HTMLElement).style.boxShadow = `0 0 0 3px ${ringFocus}`;
+          }}
+          placeholder={placeholder}
+          style={{
+            width: '100%',
+            padding: '11px 12px 11px 36px',
+            border: `1px solid ${borderIdle}`,
+            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.55)',
+            color: 'var(--text)',
+            fontSize: '13px',
+            fontWeight: '650',
+            outline: 'none',
+            transition: 'all 0.2s ease',
+            boxSizing: 'border-box',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)',
+            backdropFilter: 'blur(6px)',
+            WebkitBackdropFilter: 'blur(6px)',
+          }}
+          onMouseEnter={(e) => {
+            if (document.activeElement === e.target) return;
+            (e.target as HTMLElement).style.borderColor = borderHover;
+          }}
+          onBlur={(e) => {
+            (e.target as HTMLElement).style.borderColor = borderIdle;
+            (e.target as HTMLElement).style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.35)';
+          }}
+          onMouseLeave={(e) => {
+            if (document.activeElement === e.target) return;
+            (e.target as HTMLElement).style.borderColor = borderIdle;
+          }}
+        />
+      </div>
 
       {isOpen && (
         <div style={{
@@ -205,7 +272,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
               fontSize: '12px', 
               color: 'var(--muted)', 
               background: 'var(--surface)',
-              borderBottom: '1px solid var(--card-border)'
+              borderBottom: dropdownDivider
             }}>
               Found {results.length} result{results.length !== 1 ? 's' : ''}
             </div>
@@ -226,7 +293,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                   width: '16px',
                   height: '16px',
                   border: '2px solid var(--muted)',
-                  borderTop: '2px solid var(--brand)',
+                  borderTop: '2px solid var(--accent-warm)',
                   borderRadius: '50%',
                   animation: 'spin 1s linear infinite'
                 }}></div>
@@ -242,7 +309,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                   color: 'var(--text)',
                   textAlign: 'left' as const,
                   cursor: 'pointer',
-                  borderBottom: index < results.length - 1 ? '1px solid var(--card-border)' : 'none',
+                  borderBottom: index < results.length - 1 ? dropdownDivider : 'none',
                   transition: 'all 0.2s ease',
                   fontSize: '14px',
                   display: 'flex',
@@ -373,7 +440,7 @@ export default function TickerSearch({ onTickerSelect, placeholder = "Search sto
                         required
                         style={{
                           padding: '8px 12px',
-                          border: '1px solid var(--border)',
+                          border: marketingChrome ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid var(--border)',
                           borderRadius: '6px',
                           background: 'var(--surface)',
                           color: 'var(--text)',

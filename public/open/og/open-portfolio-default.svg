@@ -1,0 +1,45 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif">
+  <title>Open Portfolio - The Sovereign Ingestion and Inference Layer</title>
+  <defs>
+    <radialGradient id="bgGlow" cx="90%" cy="-10%" r="60%">
+      <stop offset="0%" stop-color="#1a1e24"/>
+      <stop offset="100%" stop-color="#0b0d10"/>
+    </radialGradient>
+    <radialGradient id="bgAccent" cx="-5%" cy="110%" r="55%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#0b0d10" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#1f242c" stroke-width="1" opacity="0.35"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bgGlow)"/>
+  <rect width="1200" height="630" fill="url(#bgAccent)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <g transform="translate(72,64)">
+    <rect x="0" y="0" width="64" height="64" rx="14" fill="#0b0d10" stroke="#1f242c" stroke-width="1"/>
+    <g transform="translate(0,0) scale(0.25)" fill="#f59e0b">
+      <path d="M62 138a40 40 0 1 1 80 0 40 40 0 0 1-80 0zm20 0a20 20 0 1 0 40 0 20 20 0 0 0-40 0z"/>
+      <rect x="160" y="138" width="36" height="36" rx="8" opacity=".9"/>
+    </g>
+    <text x="84" y="28" fill="#e7eaf0" font-size="22" font-weight="700" letter-spacing="0.02em" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" text-transform="uppercase">OPEN PORTFOLIO</text>
+    <text x="84" y="54" fill="#fbbf24" font-size="15" letter-spacing="0.16em" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SOVEREIGN INGESTION  STATELESS INFERENCE  AUDIT-READY</text>
+  </g>
+
+  <g transform="translate(72,240)">
+    <rect x="0" y="0" width="88" height="6" rx="3" fill="#f59e0b"/>
+    <text x="0" y="80" fill="#e7eaf0" font-size="84" font-weight="800" letter-spacing="-0.03em">The Sovereign Ingestion</text>
+    <text x="0" y="170" fill="#e7eaf0" font-size="84" font-weight="800" letter-spacing="-0.03em">&amp; Inference Layer.</text>
+    <text x="0" y="240" fill="#9aa3ae" font-size="30" font-weight="400">Local-first import SDK. Stateless AI reasoning.</text>
+    <text x="0" y="276" fill="#9aa3ae" font-size="30" font-weight="400">Audit-ready under GDPR Art. 4(8) and the EU AI Act.</text>
+  </g>
+
+  <g transform="translate(72,560)">
+    <line x1="0" y1="0" x2="1056" y2="0" stroke="#1f242c" stroke-width="1"/>
+    <circle cx="6" cy="22" r="5" fill="#f59e0b"/>
+    <text x="22" y="28" fill="#e7eaf0" font-size="22" font-weight="600" letter-spacing="0.02em" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">openportfolio.co.uk</text>
+    <text x="1056" y="28" fill="#fbbf24" font-size="18" font-weight="600" letter-spacing="0.1em" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" text-transform="uppercase">BUILD ON THE SUBSTRATE</text>
+  </g>
+</svg>

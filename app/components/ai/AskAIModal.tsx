@@ -11,6 +11,7 @@ import { startFoundersClubCheckout } from '@/app/lib/checkout/startFoundersClubC
 import { trackEvent, trackPaywallImpression } from '@/app/lib/analytics/events';
 import { LocalProcessingTerminal } from '@/app/components/LocalProcessingTerminal';
 import Link from 'next/link';
+import { useAuth } from '@/app/hooks/useAuth';
 
 const ATTACHMENT_MAX_CHARS = 50000;
 
@@ -97,6 +98,8 @@ export function AskAIModal({
   portfolioContext,
   isPaid = false,
 }: AskAIModalProps) {
+  const { signInWithGoogle, loading: authLoading } = useAuth();
+  const [signInBusy, setSignInBusy] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -194,6 +197,8 @@ export function AskAIModal({
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      setError(null);
+      setSignInBusy(false);
       setShowQuotaExceededModal(false);
       setShowAttachmentUpsellModal(false);
       setAttachmentProcessing(false);
@@ -255,12 +260,15 @@ export function AskAIModal({
 
     try {
       const token = await user.getIdToken();
+
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        // Prevent infinite "thinking..." when network hangs; surfaces a concrete error instead.
+        signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? (AbortSignal as any).timeout(20000) : undefined,
         body: JSON.stringify({
           message: text,
           context: portfolioContext,
@@ -409,176 +417,257 @@ export function AskAIModal({
           </div>
         </div>
 
-        <div
-          style={{
-            flex: 1,
-            overflow: 'auto',
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}
-        >
-          {messages.length === 0 && (
-            <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>
-              Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.
-            </p>
-          )}
-          {messages.map((m) => {
-            if (m.role === 'assistant' && !m.content && isLoading) return null;
-            return (
-              <div
-                key={m.id}
-                style={{
-                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                  maxWidth: '90%',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  background: m.role === 'user' ? 'var(--warning)' : 'hsl(var(--muted))',
-                  color: m.role === 'user' ? '#000' : 'hsl(var(--foreground))',
-                  fontSize: '14px',
-                  wordBreak: 'break-word',
-                  ...(m.role === 'assistant' ? {} : { whiteSpace: 'pre-wrap' }),
-                }}
-              >
-                {m.role === 'user'
-                  ? m.content
-                  : m.content
-                    ? <AssistantMessageContent content={m.content} />
-                    : null}
-              </div>
-            );
-          })}
-          {isLoading && (
-            <>
-              <style>{`@keyframes pocket-analyst-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }`}</style>
-              <div
-                style={{
-                  alignSelf: 'flex-start',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  background: 'hsl(var(--muted))',
-                  border: '1px dashed hsl(var(--border))',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '13px',
-                  color: 'hsl(var(--muted-foreground))',
-                }}
-                aria-live="polite"
-                aria-busy="true"
-              >
-                <Sparkles size={16} style={{ color: 'var(--warning)', flexShrink: 0, animation: 'pocket-analyst-pulse 1.2s ease-in-out infinite' }} />
-                <span>Pocket Analyst is thinking…</span>
-              </div>
-            </>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            padding: '16px',
-            borderTop: '1px solid hsl(var(--border))',
-            flexShrink: 0,
-          }}
-        >
-          {error && (
-            <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'hsl(var(--destructive))' }}>
-              {error}
-            </p>
-          )}
-          <LocalProcessingTerminal
-            active={attachmentTerminalActive}
-            onSequenceComplete={finishAttachmentTheater}
-            style={{ marginBottom: '10px' }}
-          />
-          <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.txt,text/csv,text/plain"
-              onChange={handleFileAttach}
-              style={{ display: 'none' }}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                trackEvent('ai_attachment_button_click', { is_paid: Boolean(isPaid) });
-                fileInputRef.current?.click();
-              }}
-              disabled={attachmentProcessing || isLoading}
-              aria-label="Add file"
-              style={{
-                padding: '6px 10px',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
-                background: 'hsl(var(--muted))',
-                color: 'hsl(var(--foreground))',
-                cursor: attachmentProcessing || isLoading ? 'not-allowed' : 'pointer',
-                opacity: attachmentProcessing || isLoading ? 0.7 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '13px',
-              }}
-            >
-              <Paperclip size={14} />
-              Add file (CSV or text)
-            </button>
-            {isPaid && attachedFileName && (
-              <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                {attachedFileName}
-                <button
-                  type="button"
-                  onClick={() => { setAttachedContent(''); setAttachedFileName(null); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'hsl(var(--destructive))', fontSize: '12px' }}
-                >
-                  Remove
-                </button>
-              </span>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about your portfolio or markets..."
-              rows={1}
-              disabled={isLoading || attachmentProcessing}
+        {user ? (
+          <>
+            <div
               style={{
                 flex: 1,
-                padding: '10px 12px',
-                borderRadius: '8px',
-                border: '1px solid hsl(var(--border))',
-                background: 'hsl(var(--background))',
-                color: 'hsl(var(--foreground))',
-                fontSize: '14px',
-                resize: 'none',
-                minHeight: '44px',
-                maxHeight: '120px',
+                overflow: 'auto',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
               }}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || attachmentProcessing || !input.trim()}
+            >
+              {messages.length === 0 && (
+                <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>
+                  Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.
+                </p>
+              )}
+              {messages.map((m) => {
+                if (m.role === 'assistant' && !m.content && isLoading) return null;
+                return (
+                  <div
+                    key={m.id}
+                    style={{
+                      alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                      maxWidth: '90%',
+                      padding: '10px 14px',
+                      borderRadius: '12px',
+                      background: m.role === 'user' ? 'var(--warning)' : 'hsl(var(--muted))',
+                      color: m.role === 'user' ? '#000' : 'hsl(var(--foreground))',
+                      fontSize: '14px',
+                      wordBreak: 'break-word',
+                      ...(m.role === 'assistant' ? {} : { whiteSpace: 'pre-wrap' }),
+                    }}
+                  >
+                    {m.role === 'user'
+                      ? m.content
+                      : m.content
+                        ? <AssistantMessageContent content={m.content} />
+                        : null}
+                  </div>
+                );
+              })}
+              {isLoading && (
+                <>
+                  <style>{`@keyframes pocket-analyst-pulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }`}</style>
+                  <div
+                    style={{
+                      alignSelf: 'flex-start',
+                      padding: '10px 14px',
+                      borderRadius: '12px',
+                      background: 'hsl(var(--muted))',
+                      border: '1px dashed hsl(var(--border))',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '13px',
+                      color: 'hsl(var(--muted-foreground))',
+                    }}
+                    aria-live="polite"
+                    aria-busy="true"
+                  >
+                    <Sparkles size={16} style={{ color: 'var(--warning)', flexShrink: 0, animation: 'pocket-analyst-pulse 1.2s ease-in-out infinite' }} />
+                    <span>Pocket Analyst is thinking…</span>
+                  </div>
+                </>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
               style={{
-                padding: '10px 16px',
+                padding: '16px',
+                borderTop: '1px solid hsl(var(--border))',
+                flexShrink: 0,
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
+              {error && (
+                <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'hsl(var(--destructive))' }}>
+                  {error}
+                </p>
+              )}
+              <LocalProcessingTerminal
+                active={attachmentTerminalActive}
+                onSequenceComplete={finishAttachmentTheater}
+                style={{ marginBottom: '10px' }}
+              />
+              <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.txt,text/csv,text/plain"
+                  onChange={handleFileAttach}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackEvent('ai_attachment_button_click', { is_paid: Boolean(isPaid) });
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={attachmentProcessing || isLoading}
+                  aria-label="Add file"
+                  style={{
+                    padding: '6px 10px',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    background: 'hsl(var(--muted))',
+                    color: 'hsl(var(--foreground))',
+                    cursor: attachmentProcessing || isLoading ? 'not-allowed' : 'pointer',
+                    opacity: attachmentProcessing || isLoading ? 0.7 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '13px',
+                  }}
+                >
+                  <Paperclip size={14} />
+                  Add file (CSV or text)
+                </button>
+                {isPaid && attachedFileName && (
+                  <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {attachedFileName}
+                    <button
+                      type="button"
+                      onClick={() => { setAttachedContent(''); setAttachedFileName(null); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'hsl(var(--destructive))', fontSize: '12px' }}
+                    >
+                      Remove
+                    </button>
+                  </span>
+                )}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'stretch',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about your portfolio or markets..."
+                  rows={1}
+                  disabled={isLoading || attachmentProcessing}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid hsl(var(--border))',
+                    background: 'hsl(var(--background))',
+                    color: 'hsl(var(--foreground))',
+                    fontSize: '14px',
+                    resize: 'none',
+                    minHeight: '44px',
+                    maxHeight: '120px',
+                    alignSelf: 'stretch',
+                    boxSizing: 'border-box',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading || attachmentProcessing || !input.trim()}
+                  style={{
+                    flexShrink: 0,
+                    padding: '10px 16px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: 'var(--warning)',
+                    color: '#000',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: isLoading || attachmentProcessing || !input.trim() ? 'not-allowed' : 'pointer',
+                    opacity: isLoading || attachmentProcessing || !input.trim() ? 0.7 : 1,
+                    minHeight: '44px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    alignSelf: 'stretch',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  {isLoading ? '...' : 'Send'}
+                </button>
+              </div>
+            </form>
+          </>
+        ) : (
+          <div
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '20px 16px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: '16px',
+            }}
+          >
+            <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0, lineHeight: 1.5 }}>
+              Sign in with Google to use Pocket Analyst on your portfolio. Your holdings stay on your device; we only send a short summary to the model. New accounts get free monthly questions.
+            </p>
+            {error && (
+              <p style={{ margin: 0, fontSize: '13px', color: 'hsl(var(--destructive))' }}>{error}</p>
+            )}
+            <button
+              type="button"
+              onClick={async () => {
+                setSignInBusy(true);
+                setError(null);
+                try {
+                  await signInWithGoogle();
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : 'Sign-in failed');
+                } finally {
+                  setSignInBusy(false);
+                }
+              }}
+              disabled={signInBusy || authLoading}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                padding: '12px 18px',
                 borderRadius: '8px',
                 border: 'none',
                 background: 'var(--warning)',
                 color: '#000',
                 fontSize: '14px',
                 fontWeight: 600,
-                cursor: isLoading || attachmentProcessing || !input.trim() ? 'not-allowed' : 'pointer',
-                opacity: isLoading || attachmentProcessing || !input.trim() ? 0.7 : 1,
+                cursor: signInBusy || authLoading ? 'not-allowed' : 'pointer',
+                opacity: signInBusy || authLoading ? 0.75 : 1,
               }}
             >
-              {isLoading ? '...' : 'Send'}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+              </svg>
+              {signInBusy || authLoading ? 'Signing in…' : 'Sign in with Google'}
             </button>
           </div>
-        </form>
+        )}
 
         {showQuotaExceededModal && (
           <div

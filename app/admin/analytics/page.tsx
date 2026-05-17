@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MobileHeader from '@/app/components/nav/MobileHeader';
+import { SovereignHeader } from '@/app/components/dashboard/SovereignHeader';
+import { useGoogleDrive } from '@/app/hooks/useGoogleDrive';
 
 interface AnalyticsData {
   monetization: {
@@ -122,6 +123,21 @@ interface AnalyticsData {
     signups: Array<{ id: string; email: string; createdAt: string; source?: string }>;
     error?: string;
   };
+  openPortfolioContactLeads?: {
+    total: number;
+    last7Days: number;
+    byContext: Record<string, number>;
+    signups: Array<{
+      id: string;
+      email: string;
+      company?: string;
+      role?: string;
+      message: string;
+      context?: string;
+      createdAt: string;
+    }>;
+    error?: string;
+  };
   googleSignups?: {
     total: number;
     last7Days: number;
@@ -168,7 +184,7 @@ interface AnalyticsData {
     mobileSetupRequested: { total: number; last7Days: number };
     quotaUpgradeInitiated: { total: number; last7Days: number };
   };
-  /** Traffic → intent → checkout → Founders (Firestore monetizationFunnelEvents + apiKeysByEmail) */
+  /** Traffic → intent → checkout → Founders */
   monetizationFunnelBoard?: {
     organicTraffic: number;
     paywallImpressions: number;
@@ -183,6 +199,7 @@ interface AnalyticsData {
 
 export default function AdminAnalyticsPage() {
   const { user, isAuthenticated, loading } = useAuth();
+  const { syncState } = useGoogleDrive();
   const router = useRouter();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loadingData, setLoadingData] = useState(true);
@@ -198,14 +215,14 @@ export default function AdminAnalyticsPage() {
       if (!user) {
         setIsAdmin(false);
         setCheckingAdmin(false);
-        return;
+                return;
       }
 
       try {
         const token = await user.getIdTokenResult();
         const hasAdminClaim = token.claims.admin === true;
         setIsAdmin(hasAdminClaim);
-        
+                
         if (!hasAdminClaim) {
           // Don't redirect immediately, let user see the access denied message
           console.log('User does not have admin privileges');
@@ -213,7 +230,7 @@ export default function AdminAnalyticsPage() {
       } catch (err) {
         console.error('Error checking admin status:', err);
         setIsAdmin(false);
-      } finally {
+              } finally {
         setCheckingAdmin(false);
       }
     };
@@ -227,27 +244,27 @@ export default function AdminAnalyticsPage() {
 
   const fetchAnalyticsData = useCallback(async () => {
     if (!isAdmin || checkingAdmin) {
-      return;
+            return;
     }
     try {
       setLoadingData(true);
       setError(null);
-
-      const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
+      
+            const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
         cache: 'no-store',
         headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
       });
-      if (!response.ok) {
+            if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Failed to fetch analytics data' }));
-        throw new Error(errorData.error || 'Failed to fetch analytics data');
+                throw new Error(errorData.error || 'Failed to fetch analytics data');
       }
 
       const data = await response.json();
       setAnalyticsData(data);
-    } catch (err: any) {
+          } catch (err: any) {
       setError(err.message || 'Failed to load analytics');
       console.error('Analytics fetch error:', err);
-    } finally {
+          } finally {
       setLoadingData(false);
     }
   }, [isAdmin, checkingAdmin, timeRange]);
@@ -260,7 +277,8 @@ export default function AdminAnalyticsPage() {
 
     void fetchAnalyticsData();
 
-    const intervalMs = 45 * 1000;
+    // Long interval: admin dashboard previously polled every 45s and contributed to Firestore read spikes.
+    const intervalMs = 10 * 60 * 1000;
     const interval = setInterval(() => {
       void fetchAnalyticsData();
     }, intervalMs);
@@ -270,16 +288,28 @@ export default function AdminAnalyticsPage() {
   // Show loading while checking auth
   if (loading || checkingAdmin) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'var(--bg)',
-        color: 'var(--text)'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <p>Loading...</p>
+      <div
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans"
+        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      >
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
+        <div
+          style={{
+            minHeight: 'calc(100vh - 80px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <p>Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -288,36 +318,48 @@ export default function AdminAnalyticsPage() {
   // Show access denied if not authenticated or not admin
   if (!isAuthenticated || !isAdmin) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'var(--bg)',
-        color: 'var(--text)',
-        padding: '20px'
-      }}>
-        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-          <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Access Denied</h1>
-          <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>
-            {!isAuthenticated 
-              ? 'You must be logged in to access this page.'
-              : 'You need admin privileges to access this page.'}
-          </p>
-          <Link 
-            href="/dashboard"
-            style={{
-              padding: '12px 24px',
-              background: 'var(--signal)',
-              color: 'white',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              display: 'inline-block',
-              fontWeight: '500'
-            }}
-          >
-            Go to Dashboard
-          </Link>
+      <div
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans"
+        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      >
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
+        <div
+          style={{
+            minHeight: 'calc(100vh - 80px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'var(--bg)',
+            color: 'var(--text)',
+            padding: '20px',
+          }}
+        >
+          <div style={{ textAlign: 'center', maxWidth: '500px' }}>
+            <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Access Denied</h1>
+            <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>
+              {!isAuthenticated
+                ? 'You must be logged in to access this page.'
+                : 'You need admin privileges to access this page.'}
+            </p>
+            <Link
+              href="/dashboard"
+              style={{
+                padding: '12px 24px',
+                background: 'var(--signal)',
+                color: 'white',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                display: 'inline-block',
+                fontWeight: '500',
+              }}
+            >
+              Go to Dashboard
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -325,11 +367,17 @@ export default function AdminAnalyticsPage() {
 
   return (
     <>
-      {/* Mobile Header - matches dashboard */}
-      <MobileHeader title="Analytics Dashboard" />
-      
+      <div
+        className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans"
+        style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+      >
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
       <div style={{
-        minHeight: '100vh',
+        minHeight: 'calc(100vh - 80px)',
         background: 'var(--bg)',
         color: 'var(--text)',
         padding: 'var(--space-6)',
@@ -383,7 +431,7 @@ export default function AdminAnalyticsPage() {
                     color: 'var(--text-tertiary)',
                     marginLeft: '4px'
                   }}>
-                    (Auto-refreshes every 45 seconds)
+                    (Auto-refreshes every 10 minutes)
                   </span>
                 )}
               </p>
@@ -502,7 +550,7 @@ export default function AdminAnalyticsPage() {
                 <MetricCard
                   label="Paywall impressions"
                   value={analyticsData.monetizationFunnelBoard.paywallImpressions.toLocaleString()}
-                  subtitle="Firestore monetizationFunnelEvents (period)"
+                  subtitle="Paywall views in selected range"
                 />
                 <MetricCard
                   label="Checkout starts"
@@ -512,7 +560,7 @@ export default function AdminAnalyticsPage() {
                 <MetricCard
                   label="Founders (active)"
                   value={analyticsData.monetizationFunnelBoard.paidFoundersActive.toLocaleString()}
-                  subtitle="apiKeysByEmail tier = foundersClub"
+                  subtitle="Active founder memberships"
                 />
               </div>
               <div
@@ -580,12 +628,12 @@ export default function AdminAnalyticsPage() {
               <MetricCard
                 label="Founders Club MRR"
                 value={`£${analyticsData.monetization.foundersClub.revenue.toFixed(2)}`}
-                subtitle={`${analyticsData.monetization.foundersClub.count} members (valuation / run rate)`}
+                subtitle={`${analyticsData.monetization.foundersClub.count} active members`}
               />
               <MetricCard
                 label="Founders Club Cash Collected"
                 value={`£${(analyticsData.monetization.foundersClub.cashCollected ?? 0).toFixed(2)}`}
-                subtitle="Total cash in period (runway)"
+                subtitle="Cash collected in selected period"
               />
             </div>
 
@@ -1897,6 +1945,166 @@ export default function AdminAnalyticsPage() {
             )}
           </section>
 
+          {/* Open Portfolio B2B contact form */}
+          <section
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: 'var(--space-6)',
+              marginBottom: 'var(--space-6)',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: 'var(--space-4)',
+                color: 'var(--text)',
+              }}
+            >
+              Open Portfolio contact (B2B)
+            </h2>
+            <p
+              style={{
+                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                marginBottom: 'var(--space-4)',
+                lineHeight: 1.5,
+              }}
+            >
+              Briefing requests from{' '}
+              <Link href="https://www.openportfolio.co.uk" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+                openportfolio.co.uk
+              </Link>{' '}
+              (Firestore: <code style={{ fontSize: '12px' }}>open_portfolio_contact_leads</code>).
+            </p>
+            {!analyticsData.openPortfolioContactLeads ? (
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                Data not in API response — redeploy to enable Open Portfolio funnel analytics.
+              </p>
+            ) : analyticsData.openPortfolioContactLeads.error ? (
+              <p style={{ color: 'var(--destructive, #ef4444)', fontSize: '14px' }}>
+                {analyticsData.openPortfolioContactLeads.error}
+              </p>
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: 'var(--space-4)',
+                    marginBottom: 'var(--space-6)',
+                  }}
+                >
+                  <div
+                    style={{
+                      background: 'var(--bg)',
+                      padding: 'var(--space-4)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: 'var(--signal)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {analyticsData.openPortfolioContactLeads.total}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Submissions in range</div>
+                  </div>
+                  <div
+                    style={{
+                      background: 'var(--bg)',
+                      padding: 'var(--space-4)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: 'var(--accent-warm)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {analyticsData.openPortfolioContactLeads.last7Days}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                      In last 7 days (within range)
+                    </div>
+                  </div>
+                </div>
+                {analyticsData.openPortfolioContactLeads.signups.length > 0 ? (
+                  <div>
+                    <h3
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        marginBottom: 'var(--space-4)',
+                        color: 'var(--text)',
+                      }}
+                    >
+                      Recent submissions (up to 100)
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                      {analyticsData.openPortfolioContactLeads.signups.map((row) => (
+                        <div
+                          key={row.id}
+                          style={{
+                            background: 'var(--bg)',
+                            padding: 'var(--space-3)',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border)',
+                            fontSize: '14px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              flexWrap: 'wrap',
+                              gap: '8px',
+                              marginBottom: '8px',
+                            }}
+                          >
+                            <a
+                              href={`mailto:${row.email}`}
+                              style={{ fontWeight: '600', color: 'var(--text)', textDecoration: 'none' }}
+                            >
+                              {row.email}
+                            </a>
+                            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                              {row.context ?? 'general'} ·{' '}
+                              {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
+                            </span>
+                          </div>
+                          {(row.company || row.role) && (
+                            <p style={{ margin: '0 0 6px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+                              {[row.company, row.role].filter(Boolean).join(' · ')}
+                            </p>
+                          )}
+                          <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                            {row.message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                    No B2B contact submissions in this time range yet.
+                  </p>
+                )}
+              </>
+            )}
+          </section>
+
           {/* Leads Section */}
           <section style={{
             background: 'var(--surface)',
@@ -2043,6 +2251,7 @@ export default function AdminAnalyticsPage() {
          </Link>
        </div>
      </div>
+      </div>
     </>
   );
 }

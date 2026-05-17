@@ -28,20 +28,32 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
   const symbol = resolvedParams.symbol.toUpperCase();
-  const metaVariant = process.env.NEXT_PUBLIC_GSC_META_VARIANT === 'B' ? 'B' : 'A';
-  const inMetaTest = metaVariant === 'B' && new Set(['xvlxx', 'vhxxx', 'vvlxx', 'xinxx', 'nse']).has(symbol.toLowerCase().replace(/-/g, ''));
+  const zeroClickRecoverySet = new Set([
+    // Zero-click recovery (Queries.csv; impressions>=40, clicks=0, ticker-like queries)
+    'yglix',
+    'pteix',
+    'entru',
+    'aterx',
+    'aathy',
+    'tenrx',
+    'mvlxx',
+    'isgv',
+    'aaoty',
+  ]);
+  const inRecovery = zeroClickRecoverySet.has(symbol.toLowerCase().replace(/-/g, ''));
   const metadata = await getTickerMetadata(symbol);
+  const canonical = `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`;
 
   if (symbol.replace(/-/g, '') === 'NSE') {
-    if (inMetaTest) {
+    if (inRecovery) {
       return {
-        title: 'NSE JSON API & Historical CSV Download | Pocket Portfolio',
+        title: 'NSE JSON Endpoint (REST API) + CSV Export | Pocket Portfolio',
         description:
-          'Fetch NSE history as normalized JSON (stateless endpoint) and download clean CSVs. No login. Local-first workflow for National Stock Exchange tickers.',
+          'Free NSE JSON endpoint (REST API) + CSV export for historical data. Copy‑paste examples. No API key. No login. Stateless + local-first workflow.',
         openGraph: {
-          title: 'NSE JSON API & Historical CSV Download | Pocket Portfolio',
+          title: 'NSE JSON Endpoint (REST API) + CSV Export | Pocket Portfolio',
           description:
-            'Fetch NSE history as JSON and download clean CSVs. No login. Local-first workflow.',
+            'Free NSE JSON endpoint (REST API) + CSV export. No API key. No login. Stateless + local-first workflow.',
           type: 'website',
           url: 'https://www.pocketportfolio.app/s/nse/json-api',
         },
@@ -69,33 +81,51 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: inMetaTest ? `${symbol} JSON API & Historical CSV | Pocket Portfolio` : `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
-      description: inMetaTest
-        ? `Fetch ${symbol} history as normalized JSON (stateless endpoint) or download CSV. No login required.`
+      title: inRecovery
+        ? `${symbol} JSON API & CSV Export (REST) | No API Key | Pocket Portfolio`
+        : `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+      description: inRecovery
+        ? `Institutional-grade ${symbol} JSON API (REST) + CSV export for historical data. No API key. No login. Instant endpoints + copy-paste examples.`
         : `Download ${symbol} historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
+      alternates: { canonical },
+      openGraph: {
+        title: inRecovery
+          ? `${symbol} JSON API & CSV Export (REST) | No API Key | Pocket Portfolio`
+          : `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
+        description: inRecovery
+          ? `Institutional-grade ${symbol} JSON API + CSV export. No API key. No login. Copy‑paste examples.`
+          : `Download ${symbol} historical CSVs instantly. No login required. Free local-first JSON API.`,
+        type: 'website',
+        url: canonical,
+      },
     };
   }
 
-  if (inMetaTest) {
+  if (inRecovery) {
     return {
-      title: `${symbol} JSON API & Historical CSV | Pocket Portfolio`,
-      description: `Fetch ${metadata.name} (${symbol}) history as normalized JSON (stateless endpoint) or download CSV. No login required.`,
+      title: `${symbol} JSON API & CSV Export (REST) | No API Key | Pocket Portfolio`,
+      description: `Institutional-grade ${symbol} JSON API (REST) + CSV export for historical data. No API key. No login. Examples for ${metadata.name} (${symbol}).`,
       keywords: [
-        `${symbol} JSON API`,
+        `${symbol} JSON endpoint`,
+        `${symbol} REST API`,
         `${symbol} historical data JSON`,
         `${symbol} historical data CSV`,
         `${symbol} price API`,
+        `${symbol} csv export endpoint`,
+        `${symbol} json api example`,
         `download ${symbol} JSON`,
         `download ${symbol} CSV`,
+        `no api key ${symbol} api`,
+        `free ${symbol} api`,
       ],
       openGraph: {
-        title: `${symbol} JSON API & Historical CSV | Pocket Portfolio`,
-        description: `Fetch ${metadata.name} (${symbol}) history as JSON or download CSV. No login required.`,
+        title: `${symbol} JSON API & CSV Export (REST) | No API Key | Pocket Portfolio`,
+        description: `Institutional-grade ${symbol} JSON API + CSV export. No API key. No login. Copy‑paste examples.`,
         type: 'website',
-        url: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
+        url: canonical,
       },
       alternates: {
-        canonical: `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`,
+        canonical,
       },
     };
   }
@@ -208,6 +238,9 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const ABS_BASE = 'https://www.pocketportfolio.app';
+  const absJsonUrl = `${ABS_BASE}/api/tickers/${encodeURIComponent(normalizedSymbol)}/json?range=max`;
+  const absCsvUrl = `${ABS_BASE}/api/tickers/${encodeURIComponent(normalizedSymbol)}/csv?range=max`;
   const bridgeVariant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
   const jsonApiBridge = jsonApiBridgeCopy(normalizedSymbol, bridgeVariant);
   const metadata = await getTickerMetadata(normalizedSymbol);
@@ -336,6 +369,39 @@ export default async function JsonApiPage({ params }: { params: Promise<{ symbol
           }}>
             {normalizedSymbol} JSON Data API
           </h1>
+          {/* Directive 3: closing the URL-as-query loophole */}
+          <div
+            style={{
+              marginTop: '-6px',
+              marginBottom: '18px',
+              borderRadius: '12px',
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--surface-elevated)',
+              padding: '12px 14px',
+            }}
+          >
+            <div style={{ fontSize: '12px', fontWeight: 900, marginBottom: '8px', color: 'var(--text)' }}>
+              Absolute endpoints (copy‑paste)
+            </div>
+            <div style={{ display: 'grid', gap: '8px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                JSON:
+                <code style={{ display: 'block', marginTop: 6, wordBreak: 'break-all' }}>{absJsonUrl}</code>
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                CSV:
+                <code style={{ display: 'block', marginTop: 6, wordBreak: 'break-all' }}>{absCsvUrl}</code>
+              </div>
+              {normalizedSymbol === 'SPY' && (
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                  Literal URL query target:
+                  <code style={{ display: 'block', marginTop: 6, wordBreak: 'break-all' }}>
+                    https://www.pocketportfolio.app/api/tickers/spy/json
+                  </code>
+                </div>
+              )}
+            </div>
+          </div>
           <p style={{
             fontSize: '18px',
             color: 'var(--text-secondary)',

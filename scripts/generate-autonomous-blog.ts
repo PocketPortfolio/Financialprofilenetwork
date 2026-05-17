@@ -1,7 +1,8 @@
 /**
  * Autonomous Blog Post Generation Script
- * Uses OpenAI GPT-4 for content and DALL-E 3 for images
- * Runs via cron/GitHub Actions to generate scheduled posts
+ * Uses OpenAI GPT-4 for content and OpenAI GPT Image models for images
+ * (defaults to gpt-image-1-mini, overridable via OPENAI_IMAGE_MODEL env var).
+ * Runs via cron/GitHub Actions to generate scheduled posts.
  */
 
 import fs from 'fs';
@@ -681,31 +682,42 @@ pillar: "${post.pillar}"
     content = validatedContent;
 
     // ✅ DIFFERENT IMAGE PROMPT FOR HOW-TO AND RESEARCH POSTS
-    // CRITICAL: Strong text prohibition to prevent DALL-E from generating text in images
+    // CRITICAL: Strong text prohibition to prevent the image model from generating text in images
     const imagePrompt = isHowTo
       ? `Minimalist terminal interface, dark mode, bright green (#00ff41) text on black background, hacker aesthetic, code-focused, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, terminal windows, code blocks, command prompts, connecting lines. Theme: ${post.title}. Clean, technical, command-line style.`
       : isResearch
       ? `Academic research visualization, data charts and graphs, professional blue (#3b82f6) and grey (#64748b) palette, minimalist, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, data charts, graphs, pie charts, bar graphs, stacked blocks, connecting lines. Theme: ${post.title}. Scholarly, analytical, research-focused aesthetic.`
       : `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, data charts, graphs, pie charts, bar graphs, stacked blocks, connecting lines. Theme: ${post.title}. Professional, modern, technical aesthetic.`;
     
-    console.log(`🎨 Generating image for: ${post.slug}`);
-    let imageUrl: string | null = null;
+    // OpenAI deprecated dall-e-3 on 2026-05-12. Default to gpt-image-1-mini
+    // (cost-optimized successor); set OPENAI_IMAGE_MODEL=gpt-image-2 for flagship.
+    // GPT image models return base64 inline, removing the legacy URL-download
+    // failure mode (no more 60-min URL expiry).
+    const imageModel = (process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini') as
+      | 'gpt-image-2'
+      | 'gpt-image-1.5'
+      | 'gpt-image-1'
+      | 'gpt-image-1-mini';
+
+    console.log(`🎨 Generating image for: ${post.slug} (model: ${imageModel})`);
+    let imageBuffer: Buffer | null = null;
     attempts = 0;
-    
-    while (!imageUrl && attempts < maxAttempts) {
+
+    while (!imageBuffer && attempts < maxAttempts) {
       attempts++;
       try {
         const imageResponse = await openai.images.generate({
-          model: 'dall-e-3',
+          model: imageModel,
           prompt: imagePrompt,
           size: '1024x1024',
-          quality: 'standard',
+          quality: 'medium',
         });
 
-        imageUrl = imageResponse.data?.[0]?.url || null;
-        if (!imageUrl) {
-          throw new Error('No image URL returned from DALL-E');
+        const b64 = imageResponse.data?.[0]?.b64_json;
+        if (!b64) {
+          throw new Error(`No image returned from OpenAI image model (${imageModel})`);
         }
+        imageBuffer = Buffer.from(b64, 'base64');
       } catch (error: any) {
         if (attempts >= maxAttempts) {
           throw new Error(`Failed to generate image after ${maxAttempts} attempts: ${error.message}`);
@@ -715,40 +727,14 @@ pillar: "${post.pillar}"
       }
     }
 
-    if (!imageUrl) {
-      throw new Error('Failed to generate image after all retries');
-    }
-
-    // Download and save image with retry logic
-    console.log(`📥 Downloading image: ${imageUrl}`);
-    let imageBuffer: ArrayBuffer | null = null;
-    attempts = 0;
-    
-    while (!imageBuffer && attempts < maxAttempts) {
-      attempts++;
-      try {
-        const imageRes = await fetch(imageUrl);
-        if (!imageRes.ok) {
-          throw new Error(`HTTP ${imageRes.status}: ${imageRes.statusText}`);
-        }
-        imageBuffer = await imageRes.arrayBuffer();
-      } catch (error: any) {
-        if (attempts >= maxAttempts) {
-          throw new Error(`Failed to download image after ${maxAttempts} attempts: ${error.message}`);
-        }
-        console.warn(`⚠️ Image download attempt ${attempts} failed, retrying... (${error.message})`);
-        await new Promise(resolve => setTimeout(resolve, 3000 * attempts));
-      }
-    }
-
     if (!imageBuffer) {
-      throw new Error('Failed to download image after all retries');
+      throw new Error('Failed to generate image after all retries');
     }
 
     // Save image (direct write to avoid EPERM on rename under Windows/OneDrive)
     const imagePath = path.join(process.cwd(), 'public', 'images', 'blog', `${post.slug}.png`);
     fs.mkdirSync(path.dirname(imagePath), { recursive: true });
-    fs.writeFileSync(imagePath, Buffer.from(imageBuffer));
+    fs.writeFileSync(imagePath, imageBuffer);
 
     // Verify image was written correctly
     if (!fs.existsSync(imagePath)) {

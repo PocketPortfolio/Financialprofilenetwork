@@ -146,7 +146,7 @@ const mdxComponents = {
       borderRadius: '8px',
       overflowX: 'auto',
       marginBottom: '1.5em',
-      border: '1px solid var(--border)',
+      border: '1px solid color-mix(in srgb, var(--border-warm) 35%, transparent)',
       ...props.style,
     },
   }),
@@ -167,8 +167,11 @@ const mdxComponents = {
     ...props,
     style: {
       border: 'none',
-      borderTop: '1px solid var(--border)',
-      margin: '2em 0',
+      height: '1px',
+      background:
+        'linear-gradient(90deg, transparent 0%, var(--border-warm) 50%, transparent 100%)',
+      opacity: 0.7,
+      margin: '2.5em 0',
       ...props.style,
     },
   }),
@@ -189,7 +192,7 @@ const mdxComponents = {
       marginBottom: '2em',
       marginTop: '1.5em',
       borderRadius: '12px',
-      border: '1px solid rgba(128, 128, 128, 0.2)',
+      border: '1px solid color-mix(in srgb, var(--border-warm) 40%, transparent)',
       background: 'var(--surface-elevated)',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
     },
@@ -208,7 +211,7 @@ const mdxComponents = {
     ...props,
     style: {
       background: 'var(--surface)',
-      borderBottom: '2px solid rgba(128, 128, 128, 0.3)',
+      borderBottom: '2px solid color-mix(in srgb, var(--border-warm) 55%, transparent)',
       ...props.style,
     },
   }),
@@ -216,7 +219,7 @@ const mdxComponents = {
   tr: (props: React.HTMLAttributes<HTMLTableRowElement>) => createElement('tr', {
     ...props,
     style: {
-      borderBottom: '1px solid rgba(128, 128, 128, 0.15)',
+      borderBottom: '1px solid color-mix(in srgb, var(--border-warm) 22%, transparent)',
       transition: 'background 0.2s ease',
       ...props.style,
     },
@@ -230,7 +233,7 @@ const mdxComponents = {
       color: 'var(--text)',
       fontSize: '15px',
       letterSpacing: '0.01em',
-      borderRight: '1px solid rgba(128, 128, 128, 0.15)',
+      borderRight: '1px solid color-mix(in srgb, var(--border-warm) 22%, transparent)',
       whiteSpace: 'nowrap',
       ...props.style,
     },
@@ -240,7 +243,7 @@ const mdxComponents = {
     style: {
       padding: '18px 20px',
       color: 'var(--text-secondary)',
-      borderRight: '1px solid rgba(128, 128, 128, 0.15)',
+      borderRight: '1px solid color-mix(in srgb, var(--border-warm) 22%, transparent)',
       verticalAlign: 'top',
       fontSize: '15px',
       lineHeight: '1.7',
@@ -282,7 +285,7 @@ export default function MDXRenderer({ source }: MDXRendererProps) {
         padding: '2em',
         background: 'var(--surface-elevated)',
         borderRadius: '8px',
-        border: '1px solid var(--border)',
+        border: '2px solid var(--border-warm)',
         color: 'var(--text)',
       }}>
         <h2 style={{ color: 'var(--accent-warm)', marginBottom: '1em' }}>
@@ -292,11 +295,13 @@ export default function MDXRenderer({ source }: MDXRendererProps) {
           There was an error rendering this blog post. Please try refreshing the page.
         </p>
         <pre style={{
-          background: '#f5f5f5',
+          background: 'var(--surface)',
           padding: '1em',
           borderRadius: '4px',
           overflow: 'auto',
           fontSize: '12px',
+          border: '1px solid color-mix(in srgb, var(--border-warm) 35%, transparent)',
+          color: 'var(--text)',
         }}>
           Error: {error.message || 'Unknown error'}
           {process.env.NODE_ENV === 'production' && error.stack && (

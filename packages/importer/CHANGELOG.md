@@ -25,6 +25,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed debug instrumentation from registry and index files
 - Improved adapter detection order to prevent false matches (Binance/Coinbase before Degiro)
 
+## [1.1.2] - 2026-05-05
+
+### Fixed
+- **Coinbase** adapter - Support Coinbase exports using `Price at Transaction` (in addition to `Spot Price at Transaction`).
+- **Number parsing** - Handle currency symbols/prefixes like `£`, `$`, `€` when parsing numeric fields (prevents `NaN`/zero values during adapter normalization).
+
+## [1.1.3] - 2026-05-05
+
+### Added
+- **Universal import hardening** - Sanitized headers/sample rows before inference and any optional mapping request.
+- **Adversarial detection** - Detect duplicate normalized headers, injection markers, and oversized payloads; skip LLM path on high severity.
+
+### Changed
+- **Universal heuristics** - Replace “first match wins” with scored, deterministic mapping using synonym + value-shape evidence.
+
+### Security
+- **LLM mapping validation** - Enforce strict response validation (only known fields, only provided headers, unique header assignment); otherwise fall back to heuristics.
+
 ## [1.0.5] - 2025-01-XX
 
 ### Fixed

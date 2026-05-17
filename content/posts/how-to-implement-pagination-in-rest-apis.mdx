@@ -1,0 +1,86 @@
+---
+title: How to Implement Pagination in REST APIs
+date: '2026-05-01'
+description: >-
+  Learn how to implement efficient pagination in REST APIs to enhance
+  performance and scalability.
+tags:
+  - api
+  - rest
+  - pagination
+  - implementation
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-pagination-in-rest-apis.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+When developing RESTful APIs, handling large datasets efficiently is crucial for performance and user experience. Fetching too much data in a single request can lead to slow response times and increased load on the server. Pagination is a technique that solves this issue by dividing the dataset into manageable chunks, allowing clients to request data page-by-page.
+
+## Solution with Code
+
+Pagination can be implemented in REST APIs using query parameters to specify the page number and page size. Here's a simple Node.js and Express example to illustrate this:
+
+### Step 1: Setup Express Server
+
+First, set up an Express server with a sample dataset.
+
+```javascript
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+// Sample dataset
+const data = Array.from({ length: 100 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` }));
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+```
+
+### Step 2: Implement Pagination Logic
+
+Add an endpoint that supports pagination using query parameters `page` and `limit`.
+
+```javascript
+app.get('/items', (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  const results = {};
+
+  if (endIndex < data.length) {
+    results.next = {
+      page: page + 1,
+      limit: limit
+    };
+  }
+
+  if (startIndex > 0) {
+    results.previous = {
+      page: page - 1,
+      limit: limit
+    };
+  }
+
+  results.results = data.slice(startIndex, endIndex);
+  res.json(results);
+});
+```
+
+### Key Concepts
+
+- **Page Number and Limit**: Use `page` and `limit` as query parameters to control pagination. The `page` parameter indicates the current page, while `limit` specifies the number of items per page.
+  
+- **Start and End Index**: Calculate the `startIndex` and `endIndex` for slicing the dataset based on the page and limit.
+
+- **Navigation Links**: Include `next` and `previous` page information to help clients navigate through pages.
+
+- **Default Values**: Set sensible default values for `page` and `limit` to ensure the API behaves predictably even when parameters are omitted.
+
+Implementing pagination not only improves performance by reducing payload sizes but also enhances user experience by providing a structured way to access large datasets. This approach is scalable and can be adapted to various data sources and API frameworks.

@@ -7,14 +7,14 @@
  * - Network-first for navigations inside /app with cached fallback
  * - Never intercept /api/* (server decides)
  */
-const SW_VERSION = 'pp-v13';
+const SW_VERSION = 'pp-v14';
 
 const APP_SHELL = [
   '/app/',
   '/app/index.html',
   '/app/style.css',
   '/app/manifest.webmanifest',
-  '/brand/pp-maskable.svg'
+  '/brand/pp-monogram-amber.svg'
 ];
 
 self.addEventListener('install', (event) => {

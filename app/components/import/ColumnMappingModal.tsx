@@ -24,24 +24,54 @@ interface ColumnMappingModalProps {
 
 export default function ColumnMappingModal({ data, onConfirm, onCancel }: ColumnMappingModalProps) {
   const [mapping, setMapping] = useState<UniversalMapping>({ ...data.proposedMapping });
+  const [mappingError, setMappingError] = useState<string | null>(null);
 
   const headers = useMemo(() => data.headers, [data.headers]);
   const optionValues = useMemo(() => ['', ...headers], [headers]);
+  const sampleRows = useMemo(() => data.sampleRows ?? [], [data.sampleRows]);
 
   const handleChange = (field: StandardField, value: string) => {
+    setMappingError(null);
     setMapping((prev: UniversalMapping) => {
       const next = { ...prev };
       if (value === '') {
         delete next[field];
       } else {
+        const alreadyUsedBy = Object.entries(next).find(
+          ([k, v]) => k !== field && v === value && REQUIRED_FIELDS.includes(k as StandardField)
+        )?.[0] as StandardField | undefined;
+        if (alreadyUsedBy) {
+          setMappingError(
+            `"${value}" is already mapped to "${STANDARD_FIELD_LABELS[alreadyUsedBy]}". Each required field must use a unique column.`
+          );
+          return prev;
+        }
         next[field] = value;
       }
       return next;
     });
   };
 
+  const dateLooksValid = useMemo(() => {
+    const col = mapping.date;
+    if (!col) return false;
+    let seen = 0;
+    let ok = 0;
+    for (const r of sampleRows.slice(0, 6)) {
+      const v = (r as any)?.[col];
+      if (v == null || String(v).trim() === '') continue;
+      seen += 1;
+      const s = String(v).trim();
+      const t = Date.parse(s);
+      if (!Number.isNaN(t)) ok += 1;
+      else if (/^\d{4}-\d{2}-\d{2}/.test(s)) ok += 1;
+    }
+    if (seen === 0) return false;
+    return ok / seen >= 0.6;
+  }, [mapping.date, sampleRows]);
+
   const requiredFilled = REQUIRED_FIELDS.every((f) => mapping[f]);
-  const canConfirm = requiredFilled;
+  const canConfirm = requiredFilled && dateLooksValid;
 
   const overlayStyle = useMemo(
     () => ({
@@ -102,6 +132,39 @@ export default function ColumnMappingModal({ data, onConfirm, onCancel }: Column
         >
           Map your CSV columns to the required fields. Required fields must be set to continue.
         </p>
+        {!dateLooksValid && mapping.date && (
+          <div
+            style={{
+              margin: '0 0 14px 0',
+              padding: '10px 12px',
+              borderRadius: 10,
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              fontSize: 13,
+              lineHeight: 1.4,
+            }}
+          >
+            The selected <strong>Date</strong> column doesn’t look like a date/time value in the preview rows. Pick a
+            different column (e.g. Date, Time, Timestamp).
+          </div>
+        )}
+        {mappingError && (
+          <div
+            style={{
+              margin: '0 0 14px 0',
+              padding: '10px 12px',
+              borderRadius: 10,
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--surface)',
+              color: 'var(--text)',
+              fontSize: 13,
+              lineHeight: 1.4,
+            }}
+          >
+            {mappingError}
+          </div>
+        )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {(Object.keys(STANDARD_FIELD_LABELS) as StandardField[]).map((field) => {
@@ -178,7 +241,12 @@ export default function ColumnMappingModal({ data, onConfirm, onCancel }: Column
           </button>
           <button
             type="button"
-            onClick={() => onConfirm(mapping)}
+            onClick={() => {
+              if (!canConfirm) {
+                return;
+              }
+              onConfirm(mapping);
+            }}
             disabled={!canConfirm}
             style={{
               padding: '10px 20px',

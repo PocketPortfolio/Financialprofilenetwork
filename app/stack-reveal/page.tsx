@@ -7,7 +7,7 @@ import ProductionNavbar from '../components/marketing/ProductionNavbar';
 
 function StackRevealContent() {
   const searchParams = useSearchParams();
-  const unsubscribed = searchParams.get('unsubscribed') === '1';
+  const unsubscribed = (searchParams?.get('unsubscribed') ?? null) === '1';
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.pocketportfolio.app';
   const utm = '?utm_source=weekly_stack_reveal&utm_medium=portal&utm_campaign=stack_reveal';
 

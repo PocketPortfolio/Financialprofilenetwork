@@ -5,6 +5,10 @@
 
 import type { UniversalMapping } from './types';
 import { inferColumnMapping, type InferResult } from './inferColumnMapping';
+import { sanitizeHeaders, sanitizeSampleRows } from './sanitize';
+import { detectAdversarialSchema } from './adversarial';
+import type { StandardField } from './types';
+import { REQUIRED_FIELDS } from './types';
 
 const HEURISTIC_CONFIDENCE_THRESHOLD = 0.9;
 
@@ -30,7 +34,14 @@ export interface InferMappingOutput {
  */
 export async function inferMapping(input: InferMappingInput): Promise<InferMappingOutput> {
   const { headers, sampleRows } = input;
-  const heuristic: InferResult = inferColumnMapping(headers, sampleRows);
+  const sanitizedHeaders = sanitizeHeaders(headers);
+  const sanitizedRows = sanitizeSampleRows(sampleRows, { maxRows: 5 });
+  const adversarial = detectAdversarialSchema(sanitizedHeaders, sanitizedRows);
+  const heuristicClean: InferResult = inferColumnMapping(sanitizedHeaders.headers, sanitizedRows.rows);
+  const heuristic: InferResult = {
+    mapping: translateMappingToRawHeaders(heuristicClean.mapping, sanitizedHeaders),
+    confidence: heuristicClean.confidence,
+  };
 
   if (heuristic.confidence >= HEURISTIC_CONFIDENCE_THRESHOLD) {
     return {
@@ -40,12 +51,18 @@ export async function inferMapping(input: InferMappingInput): Promise<InferMappi
     };
   }
 
-  if (isLLMImportEnabled()) {
+  const allowLLM =
+    isLLMImportEnabled() && !(adversarial.isAdversarial && adversarial.severity === 'high');
+
+  if (allowLLM) {
     try {
-      const llmMapping = await fetchLLMMapping(headers, sampleRows);
-      if (llmMapping && Object.keys(llmMapping).length > 0) {
+      const llmMapping = await fetchLLMMapping(sanitizedHeaders.headers, sanitizedRows.rows);
+      const validated = llmMapping
+        ? validateLLMMapping(llmMapping, sanitizedHeaders.headers)
+        : null;
+      if (validated && Object.keys(validated).length > 0) {
         return {
-          mapping: llmMapping,
+          mapping: translateMappingToRawHeaders(validated, sanitizedHeaders),
           confidence: 0.85,
           source: 'llm',
         };
@@ -80,4 +97,57 @@ async function fetchLLMMapping(
     return data.mapping;
   }
   return null;
+}
+
+function validateLLMMapping(
+  mapping: UniversalMapping,
+  headers: string[]
+): UniversalMapping | null {
+  if (!mapping || typeof mapping !== 'object') return null;
+  const headerSet = new Set(headers);
+  const out: UniversalMapping = {};
+  const used = new Set<string>();
+  const allowed = new Set<StandardField>([
+    'date',
+    'ticker',
+    'action',
+    'quantity',
+    'price',
+    'currency',
+    'fees',
+  ]);
+
+  for (const [k, v] of Object.entries(mapping)) {
+    const key = k as StandardField;
+    if (!allowed.has(key)) continue;
+    if (typeof v !== 'string') continue;
+    if (!headerSet.has(v)) continue;
+    if (used.has(v)) continue;
+    out[key] = v;
+    used.add(v);
+  }
+
+  const requiredMapped = REQUIRED_FIELDS.filter((f) => out[f]).length;
+  if (requiredMapped === 0) return null;
+  return out;
+}
+
+function translateMappingToRawHeaders(
+  mapping: UniversalMapping,
+  sanitizedHeaders: ReturnType<typeof sanitizeHeaders>
+): UniversalMapping {
+  // `genericParse()` must receive a mapping whose values are the *actual CSV headers* (raw),
+  // not sanitized variants used only for matching.
+  const out: UniversalMapping = {};
+  const usedRaw = new Set<string>();
+  for (const [field, cleanHeader] of Object.entries(mapping)) {
+    if (typeof cleanHeader !== 'string' || !cleanHeader) continue;
+    const idx = sanitizedHeaders.headers.findIndex((h) => h === cleanHeader);
+    if (idx < 0) continue;
+    const raw = sanitizedHeaders.meta.rawByIndex[idx];
+    if (!raw || usedRaw.has(raw)) continue;
+    out[field as StandardField] = raw;
+    usedRaw.add(raw);
+  }
+  return out;
 }

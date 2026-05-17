@@ -147,7 +147,7 @@ export default function ConsolidatedPortfolioTable({
           </h2>
           <p style={{ 
             fontSize: '14px', 
-            color: 'var(--muted)', 
+            color: 'var(--dashboard-muted-foreground)', 
             margin: '4px 0 0 0' 
           }}>
             {viewMode === 'notes'
@@ -399,7 +399,7 @@ export default function ConsolidatedPortfolioTable({
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--dashboard-muted-foreground)', marginTop: '2px' }}>
                       {position.shares} shares • Avg {position.currency === 'GBP' ? '£' : position.currency === 'GBp' ? '£' : '$'}{position.avgCost?.toFixed(2) || 'N/A'} • {position.totalTrades || 0} trades
                     </div>
                   </td>
@@ -407,7 +407,7 @@ export default function ConsolidatedPortfolioTable({
                     <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text)' }}>
                       {formatCurrency(position.currentValue, position.currency)}
                     </div>
-                    <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--dashboard-muted-foreground)' }}>
                       @ {position.currency === 'GBP' ? '£' : position.currency === 'GBp' ? '£' : '$'}{position.currentPrice?.toFixed(2) || 'N/A'}
                     </div>
                   </td>
@@ -602,14 +602,14 @@ export default function ConsolidatedPortfolioTable({
         <div style={{ 
           textAlign: 'center', 
           padding: '48px 24px',
-          color: 'var(--muted)'
+          color: 'var(--dashboard-muted-foreground)'
         }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="3" y="3" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
-              <rect x="14" y="3" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
-              <rect x="14" y="14" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
-              <rect x="3" y="14" width="7" height="7" rx="1" stroke="var(--muted)" strokeWidth="2"/>
+              <rect x="3" y="3" width="7" height="7" rx="1" stroke="var(--dashboard-muted-foreground)" strokeWidth="2"/>
+              <rect x="14" y="3" width="7" height="7" rx="1" stroke="var(--dashboard-muted-foreground)" strokeWidth="2"/>
+              <rect x="14" y="14" width="7" height="7" rx="1" stroke="var(--dashboard-muted-foreground)" strokeWidth="2"/>
+              <rect x="3" y="14" width="7" height="7" rx="1" stroke="var(--dashboard-muted-foreground)" strokeWidth="2"/>
             </svg>
           </div>
           <h3 style={{ fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0', color: 'var(--text)' }}>

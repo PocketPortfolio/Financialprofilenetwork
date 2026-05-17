@@ -13,6 +13,8 @@
   --muted: #5a6572;
   --border: #1c232b;
   --border-subtle: #151921;
+  /** Aligns shadcn-style `var(--card-border)` with visible structural borders */
+  --card-border: var(--border);
   
   /* Accent Colors */
   --signal: #ff6b35; /* orange - growth, positive */
@@ -148,6 +150,7 @@
         --muted: #4a5568; /* More readable */
         --border: #e2e8f0;
         --border-subtle: #f7fafc; /* Softer borders */
+        --card-border: var(--border);
         
         /* Enhanced human-centered accents */
         --signal: #ff6b35; /* More vibrant, accessible orange */
@@ -219,6 +222,7 @@
   --muted: #5a6572;
   --border: #1c232b;
   --border-subtle: #151921;
+  --card-border: var(--border);
   
   --signal: #ff6b35;
   --signal-muted: #cc4a1a;
@@ -246,6 +250,7 @@
   --muted: #9ca3af;
   --border: #374151;
   --border-subtle: #1f2937;
+  --card-border: var(--border);
   
   --signal: #22d3ee; /* brighter for contrast */
   --signal-muted: #083344;
@@ -265,6 +270,7 @@
     --text: #000000;
     --text-secondary: #4b5563;
     --border: #d1d5db;
+    --card-border: var(--border);
   }
 }
 

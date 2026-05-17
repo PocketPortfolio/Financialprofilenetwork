@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
+import { headers } from 'next/headers';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
+import { SurfaceHostProvider } from './components/SurfaceHostContext';
 import './globals.css';
 import './styles/tokens.css';
 import './styles/brand.css';
@@ -16,12 +19,26 @@ import ReferralPendingNotice from './components/ReferralPendingNotice';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
 import { PremiumTierProvider } from './contexts/PremiumTierContext';
-import GlobalFooter from './components/layout/GlobalFooter';
 import PWAInstallPromptWrapper from './components/PWAInstallPromptWrapper';
 import GlobalFoundersClubBanner from './components/GlobalFoundersClubBanner';
 import { PocketAnalystProvider } from './components/ai/PocketAnalystProvider';
 
 const inter = Inter({ subsets: ['latin'] });
+
+/** Code-split footer so first interaction isn’t blocked parsing a large client chunk. */
+const GlobalFooter = dynamic(() => import('./components/layout/GlobalFooter'), {
+  loading: () => (
+    <footer
+      style={{
+        marginTop: 'auto',
+        minHeight: '100px',
+        borderTop: '1px solid var(--border-warm)',
+        background: 'var(--bg)',
+      }}
+      aria-label="Site footer"
+    />
+  ),
+});
 
 // Use brand V2 metadata if enabled, fallback to legacy
 const brandEnabled = process.env.NEXT_PUBLIC_BRAND_V2 === 'true';
@@ -47,9 +64,11 @@ export const metadata: Metadata = brandEnabled
         images: [
           {
             url: siteConfig.ogImage,
+            secureUrl: siteConfig.ogImage,
             width: 1200,
             height: 630,
-            alt: 'Pocket Portfolio app preview',
+            alt: 'Pocket Portfolio — Sovereign Local-First Wealth Tracker',
+            type: 'image/png',
           },
         ],
         locale: 'en_GB',
@@ -76,16 +95,26 @@ export const viewport: Viewport = {
   viewportFit: 'cover', // For iOS safe areas
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const host = (await headers()).get('host')?.split(':')[0] ?? 'www.pocketportfolio.app';
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/brand/pp-maskable.svg" />
-        <link rel="apple-touch-icon" href="/brand/pp-maskable.svg" />
+        {/* Brand SSOT: amber-on-dark monogram across every channel.
+            - SVG: scalable favicon for Chrome/Firefox/Edge (preferred over PNG).
+            - PNG 192/512: crawlers + iOS Safari rich link previews
+              (iOS does NOT render SVG for apple-touch-icon).
+            ?v=2 query busts cached legacy blue/emerald favicon on returning visitors. */}
+        <link rel="icon" type="image/svg+xml" href="/brand/pp-monogram-amber.svg?v=2" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=2" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=2" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png?v=2" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png?v=2" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
         <link rel="preconnect" href="https://www.gstatic.com" crossOrigin="anonymous" />
@@ -171,6 +200,7 @@ export default function RootLayout({
             dangerouslySetInnerHTML={renderJsonLd(getHomePageSchema())}
           />
         )}
+        <SurfaceHostProvider host={host}>
         <BrandProvider>
           <PremiumTierProvider>
           <ErrorBoundary scope="app-root">
@@ -205,6 +235,7 @@ export default function RootLayout({
           </ErrorBoundary>
           </PremiumTierProvider>
         </BrandProvider>
+        </SurfaceHostProvider>
       </body>
     </html>
   );

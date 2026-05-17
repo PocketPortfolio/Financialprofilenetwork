@@ -1792,7 +1792,7 @@
     "scheduledTime": "18:00",
     "title": "Research: gRPC vs REST Performance - Serialization Overhead",
     "slug": "research-grpc-vs-rest-performance-serialization-overhead-2026-04-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1801,7 +1801,8 @@
       "gRPC",
       "grpc",
       "rest"
-    ]
+    ],
+    "publishedAt": "2026-04-22T18:01:10.003Z"
   },
   {
     "id": "research-graphql-query-performance-n-1-problem-analysis-2026-04-23",
@@ -1809,7 +1810,7 @@
     "scheduledTime": "18:00",
     "title": "Research: GraphQL Query Performance - N+1 Problem Analysis",
     "slug": "research-graphql-query-performance-n-1-problem-analysis-2026-04-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1817,7 +1818,8 @@
       "GraphQL",
       "graphql",
       "query"
-    ]
+    ],
+    "publishedAt": "2026-04-23T18:01:10.734Z"
   },
   {
     "id": "research-websocket-reconnection-strategies-performance-impact-2026-04-24",
@@ -1825,7 +1827,7 @@
     "scheduledTime": "18:00",
     "title": "Research: WebSocket Reconnection Strategies - Performance Impact",
     "slug": "research-websocket-reconnection-strategies-performance-impact-2026-04-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1833,7 +1835,8 @@
       "websocket",
       "reconnection",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-04-24T18:01:07.397Z"
   },
   {
     "id": "research-dns-resolution-performance-caching-strategies-2026-04-25",
@@ -1841,14 +1844,15 @@
     "scheduledTime": "18:00",
     "title": "Research: DNS Resolution Performance - Caching Strategies",
     "slug": "research-dns-resolution-performance-caching-strategies-2026-04-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "dns",
       "resolution"
-    ]
+    ],
+    "publishedAt": "2026-04-25T18:01:12.621Z"
   },
   {
     "id": "research-tcp-vs-udp-application-performance-comparison-2026-04-26",
@@ -1856,7 +1860,7 @@
     "scheduledTime": "18:00",
     "title": "Research: TCP vs UDP - Application Performance Comparison",
     "slug": "research-tcp-vs-udp-application-performance-comparison-2026-04-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1864,7 +1868,8 @@
       "tcp",
       "udp",
       "application"
-    ]
+    ],
+    "publishedAt": "2026-04-26T18:01:20.159Z"
   },
   {
     "id": "research-network-partitioning-cap-theorem-in-practice-2026-04-27",
@@ -1872,14 +1877,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Network Partitioning - CAP Theorem in Practice",
     "slug": "research-network-partitioning-cap-theorem-in-practice-2026-04-27",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "network",
       "partitioning",
       "cap"
-    ]
+    ],
+    "publishedAt": "2026-04-27T18:01:19.980Z"
   },
   {
     "id": "research-content-delivery-optimization-multi-cdn-strategies-2026-04-28",
@@ -1887,7 +1893,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Content Delivery Optimization - Multi-CDN Strategies",
     "slug": "research-content-delivery-optimization-multi-cdn-strategies-2026-04-28",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -1895,7 +1901,8 @@
       "content",
       "delivery",
       "optimization"
-    ]
+    ],
+    "publishedAt": "2026-04-28T18:01:21.929Z"
   },
   {
     "id": "research-apm-tool-overhead-new-relic-vs-datadog-vs-dynatrace-2026-04-29",
@@ -1903,14 +1910,15 @@
     "scheduledTime": "18:00",
     "title": "Research: APM Tool Overhead - New Relic vs Datadog vs Dynatrace",
     "slug": "research-apm-tool-overhead-new-relic-vs-datadog-vs-dynatrace-2026-04-29",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "apm",
       "tool",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-04-29T18:01:20.532Z"
   },
   {
     "id": "research-log-aggregation-performance-elk-vs-loki-vs-splunk-2026-04-30",
@@ -1918,14 +1926,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Log Aggregation Performance - ELK vs Loki vs Splunk",
     "slug": "research-log-aggregation-performance-elk-vs-loki-vs-splunk-2026-04-30",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "log",
       "aggregation"
-    ]
+    ],
+    "publishedAt": "2026-04-30T18:01:05.802Z"
   },
   {
     "id": "research-distributed-tracing-sampling-strategies-2026-05-01",
@@ -1933,14 +1942,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Distributed Tracing - Sampling Strategies",
     "slug": "research-distributed-tracing-sampling-strategies-2026-05-01",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "tracing",
       "distributed",
       "sampling"
-    ]
+    ],
+    "publishedAt": "2026-05-01T18:01:09.733Z"
   },
   {
     "id": "research-metrics-collection-overhead-prometheus-vs-statsd-2026-05-02",
@@ -1948,14 +1958,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Metrics Collection Overhead - Prometheus vs StatsD",
     "slug": "research-metrics-collection-overhead-prometheus-vs-statsd-2026-05-02",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "metrics",
       "collection",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-05-02T18:01:11.643Z"
   },
   {
     "id": "research-alert-fatigue-threshold-optimization-2026-05-03",
@@ -1963,14 +1974,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Alert Fatigue - Threshold Optimization",
     "slug": "research-alert-fatigue-threshold-optimization-2026-05-03",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "alert",
       "fatigue",
       "threshold"
-    ]
+    ],
+    "publishedAt": "2026-05-03T18:00:59.260Z"
   },
   {
     "id": "research-dashboard-rendering-performance-real-time-updates-2026-05-04",
@@ -1978,14 +1990,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Dashboard Rendering Performance - Real-Time Updates",
     "slug": "research-dashboard-rendering-performance-real-time-updates-2026-05-04",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "dashboard",
       "rendering"
-    ]
+    ],
+    "publishedAt": "2026-05-04T18:01:27.647Z"
   },
   {
     "id": "research-synthetic-monitoring-performance-impact-2026-05-05",
@@ -1993,14 +2006,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Synthetic Monitoring - Performance Impact",
     "slug": "research-synthetic-monitoring-performance-impact-2026-05-05",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "monitoring",
       "synthetic"
-    ]
+    ],
+    "publishedAt": "2026-05-05T18:01:38.296Z"
   },
   {
     "id": "research-error-tracking-overhead-sentry-vs-rollbar-2026-05-06",
@@ -2008,14 +2022,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Error Tracking Overhead - Sentry vs Rollbar",
     "slug": "research-error-tracking-overhead-sentry-vs-rollbar-2026-05-06",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "error",
       "tracking",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-05-06T18:01:11.261Z"
   },
   {
     "id": "research-performance-budget-enforcement-ci-cd-integration-2026-05-07",
@@ -2023,14 +2038,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Performance Budget Enforcement - CI/CD Integration",
     "slug": "research-performance-budget-enforcement-ci-cd-integration-2026-05-07",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "budget",
       "enforcement"
-    ]
+    ],
+    "publishedAt": "2026-05-07T18:01:29.548Z"
   },
   {
     "id": "research-user-experience-monitoring-rum-vs-synthetic-2026-05-08",
@@ -2038,14 +2054,15 @@
     "scheduledTime": "18:00",
     "title": "Research: User Experience Monitoring - RUM vs Synthetic",
     "slug": "research-user-experience-monitoring-rum-vs-synthetic-2026-05-08",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "monitoring",
       "user",
       "experience"
-    ]
+    ],
+    "publishedAt": "2026-05-08T18:01:16.021Z"
   },
   {
     "id": "research-cloud-cost-optimization-reserved-vs-on-demand-2026-05-09",
@@ -2053,7 +2070,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Cloud Cost Optimization - Reserved vs On-Demand",
     "slug": "research-cloud-cost-optimization-reserved-vs-on-demand-2026-05-09",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2061,7 +2078,8 @@
       "cost optimization",
       "cost",
       "optimization"
-    ]
+    ],
+    "publishedAt": "2026-05-09T18:01:05.445Z"
   },
   {
     "id": "research-resource-right-sizing-cpu-vs-memory-analysis-2026-05-10",
@@ -2069,14 +2087,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Resource Right-Sizing - CPU vs Memory Analysis",
     "slug": "research-resource-right-sizing-cpu-vs-memory-analysis-2026-05-10",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "resource",
       "right",
       "sizing"
-    ]
+    ],
+    "publishedAt": "2026-05-10T18:01:20.717Z"
   },
   {
     "id": "research-auto-scaling-policies-cost-vs-performance-2026-05-11",
@@ -2084,7 +2103,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Auto-Scaling Policies - Cost vs Performance",
     "slug": "research-auto-scaling-policies-cost-vs-performance-2026-05-11",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2092,7 +2111,8 @@
       "auto",
       "scaling",
       "policies"
-    ]
+    ],
+    "publishedAt": "2026-05-11T18:00:34.311Z"
   },
   {
     "id": "research-spot-instance-performance-interruption-analysis-2026-05-12",
@@ -2100,14 +2120,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Spot Instance Performance - Interruption Analysis",
     "slug": "research-spot-instance-performance-interruption-analysis-2026-05-12",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "spot",
       "instance"
-    ]
+    ],
+    "publishedAt": "2026-05-12T18:00:58.396Z"
   },
   {
     "id": "research-data-transfer-costs-cdn-vs-direct-2026-05-13",
@@ -2115,7 +2136,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Data Transfer Costs - CDN vs Direct",
     "slug": "research-data-transfer-costs-cdn-vs-direct-2026-05-13",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2123,7 +2144,8 @@
       "data",
       "transfer",
       "costs"
-    ]
+    ],
+    "publishedAt": "2026-05-13T18:01:26.673Z"
   },
   {
     "id": "research-storage-tier-optimization-hot-vs-cold-vs-archive-2026-05-14",
@@ -2131,14 +2153,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Storage Tier Optimization - Hot vs Cold vs Archive",
     "slug": "research-storage-tier-optimization-hot-vs-cold-vs-archive-2026-05-14",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "storage",
       "tier",
       "optimization"
-    ]
+    ],
+    "publishedAt": "2026-05-14T18:01:06.668Z"
   },
   {
     "id": "research-compute-optimization-arm-vs-x86-performance-2026-05-15",
@@ -2146,7 +2169,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Compute Optimization - ARM vs x86 Performance",
     "slug": "research-compute-optimization-arm-vs-x86-performance-2026-05-15",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2154,7 +2177,8 @@
       "compute",
       "optimization",
       "arm"
-    ]
+    ],
+    "publishedAt": "2026-05-15T18:00:55.670Z"
   },
   {
     "id": "research-energy-efficiency-performance-per-watt-2026-05-16",
@@ -2162,14 +2186,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Energy Efficiency - Performance per Watt",
     "slug": "research-energy-efficiency-performance-per-watt-2026-05-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "efficiency",
       "energy"
-    ]
+    ],
+    "publishedAt": "2026-05-16T18:00:56.915Z"
   },
   {
     "id": "research-carbon-footprint-cloud-vs-on-premise-2026-05-17",

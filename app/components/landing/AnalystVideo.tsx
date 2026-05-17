@@ -20,6 +20,8 @@ function trimTo42Seconds(url: string): string {
   return url.slice(0, insert) + 'so_0,eo_42/' + url.slice(insert);
 }
 const DEFAULT_VIDEO_URL = RAW_VIDEO_URL ? trimTo42Seconds(RAW_VIDEO_URL) : '';
+const FALLBACK_PUBLIC_VIDEO_URL = '/pocketanalyst.mp4';
+const VIDEO_URL = DEFAULT_VIDEO_URL || FALLBACK_PUBLIC_VIDEO_URL;
 
 export function AnalystVideo() {
   const videoRef = useRef<HTMLDivElement>(null);
@@ -184,7 +186,7 @@ export function AnalystVideo() {
               borderRadius: '16px',
               overflow: 'hidden',
               boxShadow: '0 24px 48px rgba(0,0,0,0.15)',
-              border: '1px solid var(--border)',
+              border: '1px solid var(--border-warm)',
               background: '#000',
             }}
             className="group"
@@ -202,9 +204,9 @@ export function AnalystVideo() {
               className="group-hover:opacity-75"
               aria-hidden
             />
-            {DEFAULT_VIDEO_URL ? (
+            {VIDEO_URL ? (
               <video
-                src={DEFAULT_VIDEO_URL}
+                src={VIDEO_URL}
                 autoPlay
                 muted
                 loop

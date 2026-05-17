@@ -1,0 +1,45 @@
+name: sameAs Reciprocity Probe (Phase 2 · B-1)
+
+# Pillar B-1: probes every URL in ORG.sameAs and PERSON_ABBA.sameAs daily
+# and asserts presence of a "pocketportfolio.app" back-link in the rendered HTML.
+# Failure is loud — this guards the Authority Graph against profile drift.
+#
+# Publication gate (Command-ratified, 2026-04-26):
+# Pillar A profile rewrites do NOT publish until 3 consecutive daily cron runs
+# of this workflow have completed green.
+
+on:
+  schedule:
+    - cron: '17 6 * * *'   # 06:17 UTC daily
+  pull_request:
+    paths:
+      - 'lib/canonical-claims.ts'
+      - 'scripts/check-reciprocity.ts'
+      - '.github/workflows/sameAs-reciprocity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reciprocity:
+    name: Probe sameAs URLs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install (lockfile-frozen)
+        run: npm ci --no-audit --no-fund
+
+      - name: Run reciprocity probe
+        run: npx tsx scripts/check-reciprocity.ts
+        env:
+          NODE_OPTIONS: '--no-warnings'

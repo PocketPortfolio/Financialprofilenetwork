@@ -89,7 +89,7 @@ export default function SectorFilter({
         padding: 'var(--space-4)',
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border)',
+        border: '1px solid var(--dashboard-chrome-border)',
       }}
     >
       <div
@@ -114,7 +114,7 @@ export default function SectorFilter({
             padding: 'var(--space-2) var(--space-3)',
             background: 'var(--surface-elevated)',
             color: 'var(--text)',
-            border: '1px solid var(--border)',
+            border: '1px solid var(--dashboard-chrome-border)',
             borderRadius: 'var(--radius-sm)',
             fontSize: 'var(--font-size-sm)',
             cursor: 'pointer',
@@ -126,7 +126,7 @@ export default function SectorFilter({
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'var(--surface-elevated)';
-            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
           }}
         >
           {selectedSectors.length === availableSectors.length ? 'Deselect All' : 'Select All'}
@@ -275,7 +275,7 @@ export default function SectorFilter({
         <div
           style={{
             paddingTop: 'var(--space-4)',
-            borderTop: '1px solid var(--border)',
+            borderTop: '1px solid var(--dashboard-chrome-border-subtle)',
           }}
         >
           <div
@@ -309,7 +309,7 @@ export default function SectorFilter({
                 color:
                   comparisonMode === 'growth' ? 'var(--bg)' : 'var(--text)',
                 border: `1px solid ${
-                  comparisonMode === 'growth' ? 'var(--signal)' : 'var(--border)'
+                  comparisonMode === 'growth' ? 'var(--signal)' : 'var(--dashboard-chrome-border)'
                 }`,
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
@@ -336,7 +336,7 @@ export default function SectorFilter({
                 border: `1px solid ${
                   comparisonMode === 'dividend'
                     ? 'var(--signal)'
-                    : 'var(--border)'
+                    : 'var(--dashboard-chrome-border)'
                 }`,
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',

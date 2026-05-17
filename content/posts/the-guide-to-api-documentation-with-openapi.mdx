@@ -1,0 +1,95 @@
+---
+title: The Guide to API Documentation with OpenAPI
+date: '2026-05-06'
+description: >-
+  Learn how to efficiently document APIs using OpenAPI for better developer
+  experiences.
+tags:
+  - api
+  - documentation
+  - OpenAPI
+  - developer tools
+author: Pocket Portfolio Team
+image: /images/blog/the-guide-to-api-documentation-with-openapi.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+APIs are critical for modern applications, enabling communication between different systems and services. However, poorly documented APIs can lead to confusion and increased development time. Developers often struggle with understanding the expected behavior, request parameters, and response formats without clear documentation.
+
+## Solution with Code
+
+OpenAPI Specification (OAS) provides a standardized way to document APIs, making them easier to understand and use. It allows you to describe the entire API including endpoints, operations, input/output parameters, and authentication methods.
+
+### Step 1: Define the OpenAPI Specification
+
+Create an `openapi.yaml` file to define your API. Below is a basic example of an OpenAPI document.
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+  description: A sample API to illustrate OpenAPI documentation.
+servers:
+  - url: https://api.example.com/v1
+paths:
+  /users:
+    get:
+      summary: List all users
+      tags:
+        - users
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "John Doe"
+```
+
+### Step 2: Integrate Swagger UI
+
+Swagger UI can be used to generate interactive API documentation from an OpenAPI specification file. Install Swagger UI in your project:
+
+```bash
+npm install swagger-ui-express
+```
+
+Set up an Express server to serve the Swagger UI:
+
+```javascript
+const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs');
+
+const app = express();
+const swaggerDocument = yaml.load('./openapi.yaml');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server started on http://localhost:${PORT}`);
+});
+```
+
+### Key Concepts
+
+- **OpenAPI Specification**: A standard for API documentation that describes the API's endpoints, operations, inputs, outputs, and authentication methods.
+- **Swagger UI**: An interactive interface for exploring and testing APIs based on OpenAPI specifications.
+- **Endpoints**: Paths defined in the API that perform specific operations.
+- **Schemas**: Definitions of input and output data structures used in the API.
+
+By following this guide, you can create comprehensive and interactive API documentation that enhances usability and reduces development friction. OpenAPI, combined with tools like Swagger UI, provides a robust framework for ensuring your APIs are well-documented and easy to understand.

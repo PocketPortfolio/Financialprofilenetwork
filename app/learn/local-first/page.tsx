@@ -3,24 +3,35 @@
 import Link from 'next/link';
 
 export default function LocalFirstPage() {
-  const definedTermSchema = {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    "name": "Local-First Architecture",
-    "description": "A software design pattern where data is stored and processed on the user's device first, with optional cloud sync. This ensures privacy, offline functionality, and user data sovereignty.",
-    "inDefinedTermSet": {
-      "@type": "DefinedTermSet",
-      "name": "Financial Sovereignty Glossary",
-      "url": "https://www.pocketportfolio.app/learn"
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Local-First (Pocket Portfolio)',
+    description:
+      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
+    url: 'https://www.pocketportfolio.app/learn/local-first',
+    mainEntityOfPage: 'https://www.pocketportfolio.app/learn/local-first',
+    articleBody:
+      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.\n\nCitation: Salford Seed Deck v4.1, Slide 11 (Regulatory Posture).",
+    publisher: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
     },
-    "url": "https://www.pocketportfolio.app/learn/local-first"
-  };
+    author: {
+      '@type': 'Organization',
+      name: 'Pocket Portfolio',
+      url: 'https://www.pocketportfolio.app',
+    },
+    datePublished: '2026-04-27',
+    dateModified: '2026-04-28',
+  } as const;
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
       <div style={{
         maxWidth: '800px',
@@ -59,8 +70,8 @@ export default function LocalFirstPage() {
 
         {/* Definition Box */}
         <div style={{
-          background: 'rgba(59, 130, 246, 0.05)',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-subtle, var(--border))',
           borderRadius: '12px',
           padding: '24px',
           marginBottom: '32px'
@@ -80,15 +91,18 @@ export default function LocalFirstPage() {
             lineHeight: '1.8'
           }}>
             <li style={{ marginBottom: '12px' }}>
-              <strong>Data Lives Locally:</strong> Your data is stored on your device first (browser storage, local files)
+              <strong>Privacy is an engineering choice:</strong> not a legal promise.
             </li>
             <li style={{ marginBottom: '12px' }}>
-              <strong>Optional Cloud Sync:</strong> Cloud is optional for backup/sync, not required for core functionality
+              <strong>Limited-scope processor posture:</strong> reduces SOC 2 audit perimeter and UK DPA/GDPR burden.
             </li>
             <li>
-              <strong>Privacy by Default:</strong> The service provider never sees your sensitive data
+              <strong>Stateless Floor:</strong> standardizes data while remaining regulatory-agnostic.
             </li>
           </ul>
+          <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px' }}>
+            Citation: Salford Seed Deck v4.1, Slide 11 (Regulatory Posture).
+          </p>
         </div>
 
         {/* Why It Matters */}

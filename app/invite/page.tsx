@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '../hooks/useAuth';
 import SEOHead from '../components/SEOHead';
-import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import ReferralProgram from '../components/viral/ReferralProgram';
 
@@ -22,11 +22,7 @@ export default function InvitePage() {
           title="Refer 1, get 7 days — Pocket Portfolio"
           description="Invite a friend with your REF- link. When they join, unlock 7 days of Founders Club: Sovereign AI + attachments. Limited-time offer."
         />
-        <SovereignHeader
-          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
-          lastSyncTime={syncState.lastSyncTime}
-          user={user}
-        />
+        <ProductionNavbar />
         <div
           style={{
             flex: 1,
@@ -74,11 +70,7 @@ export default function InvitePage() {
         title="Refer 1, get 7 days — Pocket Portfolio"
         description="Invite a friend with your REF- link. When they join, unlock 7 days of Founders Club: Sovereign AI + attachments. Limited-time offer."
       />
-      <SovereignHeader
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
-        lastSyncTime={syncState.lastSyncTime}
-        user={user}
-      />
+      <ProductionNavbar />
       <main
         style={{
           flex: 1,

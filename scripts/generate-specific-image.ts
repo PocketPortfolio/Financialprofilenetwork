@@ -1,6 +1,7 @@
 /**
  * Generate Specific Image for Blog Post
- * Generates a DALL-E 3 image for a specific post
+ * Generates an image for a specific post using OpenAI GPT Image models.
+ * Defaults to gpt-image-1-mini; override via OPENAI_IMAGE_MODEL env var.
  */
 
 import fs from 'fs';
@@ -56,42 +57,41 @@ if (!OPENAI_API_KEY) {
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 /**
- * Generate image using DALL-E
+ * Generate image using OpenAI GPT Image model.
  */
 async function generateImage(title: string, imagePath: string, pillar: string = 'Philosophy'): Promise<string | null> {
   try {
     const imagePrompt = `Abstract FinTech data visualization, isometric, dark mode, orange (#f59e0b) and slate grey (#475569) palette, minimalist, 8k resolution. Absolutely no text, no letters, no words, no numbers, no labels, no typography. Pure abstract visual elements only: geometric shapes, data charts, graphs, pie charts, bar graphs, stacked blocks, connecting lines. Theme: ${title}. Professional, modern, technical aesthetic. Pillar: ${pillar}.`;
-    
+
+    const imageModel = (process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini') as
+      | 'gpt-image-2'
+      | 'gpt-image-1.5'
+      | 'gpt-image-1'
+      | 'gpt-image-1-mini';
+
     console.log(`🎨 Generating image: ${imagePath}`);
-    console.log(`   Theme: ${title}`);
+    console.log(`   Theme:  ${title}`);
     console.log(`   Pillar: ${pillar}`);
-    
+    console.log(`   Model:  ${imageModel}`);
+
     const imageResponse = await openai.images.generate({
-      model: 'dall-e-3',
+      model: imageModel,
       prompt: imagePrompt,
       size: '1024x1024',
-      quality: 'standard',
+      quality: 'medium',
     });
 
-    const imageUrl = imageResponse.data?.[0]?.url;
-    if (!imageUrl) {
-      console.warn(`⚠️  No image URL returned`);
+    const b64 = imageResponse.data?.[0]?.b64_json;
+    if (!b64) {
+      console.warn(`⚠️  No image returned from ${imageModel}`);
       return null;
     }
 
-    // Download and save image
-    console.log(`📥 Downloading image...`);
-    const imageRes = await fetch(imageUrl);
-    if (!imageRes.ok) {
-      throw new Error(`Failed to download image: ${imageRes.statusText}`);
-    }
-    
-    const imageBuffer = await imageRes.arrayBuffer();
     const fullPath = path.join(process.cwd(), 'public', imagePath);
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-    fs.writeFileSync(fullPath, Buffer.from(imageBuffer));
+    fs.writeFileSync(fullPath, Buffer.from(b64, 'base64'));
     console.log(`💾 Image saved: ${fullPath}`);
-    
+
     return imagePath;
   } catch (error) {
     console.error(`❌ Failed to generate image:`, error);

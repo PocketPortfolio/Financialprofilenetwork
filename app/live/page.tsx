@@ -155,7 +155,7 @@ export default function LivePage() {
           'cryptocurrency prices'
         ]}
         canonical="https://www.pocketportfolio.app/live"
-        ogImage="/brand/preview-live.svg"
+        ogImage="https://www.pocketportfolio.app/api/og?title=Live%20Market%20Data&description=Real-Time%20Stock%20%26%20Crypto%20Prices&v=6"
         ogType="website"
       />
       

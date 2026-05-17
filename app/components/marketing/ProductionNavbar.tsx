@@ -8,13 +8,24 @@ import { usePathname } from 'next/navigation';
 import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
 import { useStickyHeader } from '../../hooks/useStickyHeader';
+import { useSurface } from '../SurfaceProvider';
+import SurfaceSwitcher from '../SurfaceSwitcher';
 import {
   sovereignPrimaryNav,
+  splitSovereignPrimaryNav,
   sovereignToolsDropdown,
   isHashOnlyHref,
 } from '@/app/lib/nav/sovereignMarketingNav';
 
 export default function ProductionNavbar() {
+  // When this navbar is rendered inside an aliased route on the O. surface
+  // (e.g. /architecture served via app/open/architecture/page.tsx), the
+  // SurfaceProvider in app/open/layout.tsx returns 'open' and we suppress
+  // the Pocket nav entirely — the OpenNavbar in the parent layout handles
+  // navigation for the B2B surface.
+  const surface = useSurface();
+  if (surface === 'open') return null;
+
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [showHamburger, setShowHamburger] = useState(false);
@@ -23,6 +34,10 @@ export default function ProductionNavbar() {
   const [toolsPanelRect, setToolsPanelRect] = useState<{ top: number; left: number } | null>(null);
   const toolsTriggerRef = useRef<HTMLDivElement>(null);
   const toolsCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [partnersOpen, setPartnersOpen] = useState(false);
+  const [partnersPanelRect, setPartnersPanelRect] = useState<{ top: number; left: number } | null>(null);
+  const partnersTriggerRef = useRef<HTMLDivElement>(null);
+  const partnersCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -34,13 +49,20 @@ export default function ProductionNavbar() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [pathname]);
 
   const updateToolsPanelRect = () => {
     const el = toolsTriggerRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     setToolsPanelRect({ top: r.bottom + 4, left: r.left });
+  };
+
+  const updatePartnersPanelRect = () => {
+    const el = partnersTriggerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPartnersPanelRect({ top: r.bottom + 4, left: r.left });
   };
 
   useLayoutEffect(() => {
@@ -57,9 +79,24 @@ export default function ProductionNavbar() {
     };
   }, [toolsOpen]);
 
+  useLayoutEffect(() => {
+    if (!partnersOpen) {
+      setPartnersPanelRect(null);
+      return;
+    }
+    updatePartnersPanelRect();
+    window.addEventListener('scroll', updatePartnersPanelRect, true);
+    window.addEventListener('resize', updatePartnersPanelRect);
+    return () => {
+      window.removeEventListener('scroll', updatePartnersPanelRect, true);
+      window.removeEventListener('resize', updatePartnersPanelRect);
+    };
+  }, [partnersOpen]);
+
   useEffect(() => {
     return () => {
       if (toolsCloseTimeoutRef.current) clearTimeout(toolsCloseTimeoutRef.current);
+      if (partnersCloseTimeoutRef.current) clearTimeout(partnersCloseTimeoutRef.current);
     };
   }, []);
 
@@ -70,10 +107,23 @@ export default function ProductionNavbar() {
   // Ensure header stays visible when scrolling
   useStickyHeader('header.brand-header');
 
-  const primaryNav = sovereignPrimaryNav(pathname, 'site');
-  const faqItem = primaryNav[primaryNav.length - 1]!;
-  const beforeFaq = primaryNav.slice(0, -1);
-  const toolsLinks = sovereignToolsDropdown(pathname);
+  const safePathname = pathname ?? '/';
+  const isMarketingHome = safePathname === '/' || safePathname === '/landing';
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isMarketingHome) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const primaryNav = sovereignPrimaryNav(safePathname, 'site');
+  const { coreNav: beforeFaq, faqItem, architectureItem } = splitSovereignPrimaryNav(primaryNav);
+  const toolsLinks = sovereignToolsDropdown(safePathname);
+  const partnersLinks = [
+    { label: 'Design challenge', href: '/designchallenge' },
+    { label: 'Tier 1 design partner', href: '/tier1designpartner' },
+    { label: 'Board of investors', href: '/board-of-investors' },
+  ];
 
   const renderNavLink = (link: { label: string; href: string }) => {
     const linkStyle = {
@@ -145,7 +195,13 @@ export default function ProductionNavbar() {
           }}>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Link href="/" style={{ textDecoration: 'none' }}>
+              <Link
+                href="/"
+                scroll={!isMarketingHome}
+                onClick={handleLogoClick}
+                style={{ textDecoration: 'none' }}
+                aria-label={isMarketingHome ? 'Back to top' : 'Pocket Portfolio home'}
+              >
                 <Logo size="medium" showWordmark={!isMobile} />
               </Link>
             </div>
@@ -253,9 +309,97 @@ export default function ProductionNavbar() {
                       </React.Fragment>
                     );
                   }
+                  if (link.label === 'Partners') {
+                    return (
+                      <React.Fragment key={link.label}>
+                        <div
+                          ref={partnersTriggerRef}
+                          style={{ position: 'relative', display: 'inline-block' }}
+                          onMouseEnter={() => {
+                            if (partnersCloseTimeoutRef.current) {
+                              clearTimeout(partnersCloseTimeoutRef.current);
+                              partnersCloseTimeoutRef.current = null;
+                            }
+                            setPartnersOpen(true);
+                          }}
+                          onMouseLeave={() => {
+                            partnersCloseTimeoutRef.current = setTimeout(() => setPartnersOpen(false), 200);
+                          }}
+                        >
+                          <span
+                            className="brand-link"
+                            style={{
+                              fontSize: '15px',
+                              padding: '8px 0',
+                              borderBottom: '2px solid transparent',
+                              cursor: 'pointer',
+                              borderBottomColor: partnersOpen ? 'var(--signal)' : 'transparent',
+                              color: partnersOpen ? 'var(--signal)' : 'var(--text)'
+                            }}
+                            onClick={() => setPartnersOpen(!partnersOpen)}
+                          >
+                            Partners ▾
+                          </span>
+                          {partnersOpen && partnersPanelRect && typeof document !== 'undefined' && createPortal(
+                            <div
+                              role="menu"
+                              onMouseEnter={() => {
+                                if (partnersCloseTimeoutRef.current) {
+                                  clearTimeout(partnersCloseTimeoutRef.current);
+                                  partnersCloseTimeoutRef.current = null;
+                                }
+                                setPartnersOpen(true);
+                              }}
+                              onMouseLeave={() => {
+                                partnersCloseTimeoutRef.current = setTimeout(() => setPartnersOpen(false), 200);
+                              }}
+                              style={{
+                                position: 'fixed',
+                                top: partnersPanelRect.top,
+                                left: partnersPanelRect.left,
+                                minWidth: '220px',
+                                background: 'var(--surface-elevated)',
+                                border: '1px solid var(--border)',
+                                borderRadius: '8px',
+                                boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                padding: '8px 0',
+                                zIndex: 10050
+                              }}
+                            >
+                              {partnersLinks.map((t) => (
+                                <Link
+                                  key={t.label}
+                                  href={t.href}
+                                  onClick={() => setPartnersOpen(false)}
+                                  style={{
+                                    display: 'block',
+                                    padding: '10px 16px',
+                                    fontSize: '14px',
+                                    color: 'var(--text)',
+                                    textDecoration: 'none'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = 'var(--muted)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'transparent';
+                                  }}
+                                >
+                                  {t.label}
+                                </Link>
+                              ))}
+                            </div>,
+                            document.body
+                          )}
+                        </div>
+                      </React.Fragment>
+                    );
+                  }
                   return linkEl;
                 })}
                 {renderNavLink(faqItem)}
+                {renderNavLink(architectureItem)}
+                <SurfaceSwitcher target="open" label="Developers" />
               </nav>
 
               {/* Action Buttons */}
@@ -382,32 +526,32 @@ export default function ProductionNavbar() {
                     <span style={{
                       width: '36px',
                       height: '8px',
-                      background: '#ff6b35',
+                      background: 'var(--text, hsl(var(--foreground)))',
                       borderRadius: '4px',
                       transition: 'all 0.3s ease',
                       transform: isMobileMenuOpen ? 'rotate(45deg) translate(9px, 9px)' : 'none',
-                      boxShadow: '0 4px 12px rgba(255, 107, 53, 0.6), 0 0 0 1px rgba(255, 107, 53, 0.3)',
-                      border: '1px solid #ff6b35'
+                      boxShadow: 'none',
+                      border: '1px solid var(--border-subtle, hsl(var(--border)))'
                     }}></span>
                     <span style={{
                       width: '36px',
                       height: '8px',
-                      background: '#ff6b35',
+                      background: 'var(--text, hsl(var(--foreground)))',
                       borderRadius: '4px',
                       transition: 'all 0.3s ease',
                       opacity: isMobileMenuOpen ? 0 : 1,
-                      boxShadow: '0 4px 12px rgba(255, 107, 53, 0.6), 0 0 0 1px rgba(255, 107, 53, 0.3)',
-                      border: '1px solid #ff6b35'
+                      boxShadow: 'none',
+                      border: '1px solid var(--border-subtle, hsl(var(--border)))'
                     }}></span>
                     <span style={{
                       width: '36px',
                       height: '8px',
-                      background: '#ff6b35',
+                      background: 'var(--text, hsl(var(--foreground)))',
                       borderRadius: '4px',
                       transition: 'all 0.3s ease',
                       transform: isMobileMenuOpen ? 'rotate(-45deg) translate(9px, -9px)' : 'none',
-                      boxShadow: '0 4px 12px rgba(255, 107, 53, 0.6), 0 0 0 1px rgba(255, 107, 53, 0.3)',
-                      border: '1px solid #ff6b35'
+                      boxShadow: 'none',
+                      border: '1px solid var(--border-subtle, hsl(var(--border)))'
                     }}></span>
                   </div>
                 </button>
@@ -453,7 +597,7 @@ export default function ProductionNavbar() {
                   textDecoration: 'none' as const,
                   color: 'var(--text)',
                   background: 'var(--surface)',
-                  border: '1px solid var(--border)',
+                  border: '1px solid var(--border-subtle)',
                   transition: 'all 0.2s ease',
                 };
                 const linkEl = isHashOnlyHref(link.href) ? (
@@ -464,12 +608,13 @@ export default function ProductionNavbar() {
                     className="brand-link"
                     style={linkStyle}
                     onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.background = 'var(--signal)';
-                      (e.target as HTMLElement).style.color = 'white';
+                      (e.target as HTMLElement).style.background = 'var(--surface-elevated)';
+                      (e.target as HTMLElement).style.borderColor = 'var(--accent-warm)';
                     }}
                     onMouseLeave={(e) => {
                       (e.target as HTMLElement).style.background = 'var(--surface)';
                       (e.target as HTMLElement).style.color = 'var(--text)';
+                      (e.target as HTMLElement).style.borderColor = 'var(--border-subtle)';
                     }}
                   >
                     {link.label}
@@ -482,17 +627,47 @@ export default function ProductionNavbar() {
                     className="brand-link"
                     style={linkStyle}
                     onMouseEnter={(e) => {
-                      (e.target as HTMLElement).style.background = 'var(--signal)';
-                      (e.target as HTMLElement).style.color = 'white';
+                      (e.target as HTMLElement).style.background = 'var(--surface-elevated)';
+                      (e.target as HTMLElement).style.borderColor = 'var(--accent-warm)';
                     }}
                     onMouseLeave={(e) => {
                       (e.target as HTMLElement).style.background = 'var(--surface)';
                       (e.target as HTMLElement).style.color = 'var(--text)';
+                      (e.target as HTMLElement).style.borderColor = 'var(--border-subtle)';
                     }}
                   >
                     {link.label}
                   </Link>
                 );
+                if (link.label === 'Partners') {
+                  return (
+                    <details key={link.label} style={{ margin: 0 }}>
+                      <summary style={{ ...linkStyle, cursor: 'pointer', listStyle: 'none' }}>
+                        Partners
+                      </summary>
+                      <div
+                        style={{
+                          paddingLeft: '16px',
+                          marginTop: '8px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px',
+                        }}
+                      >
+                        {partnersLinks.map((p) => (
+                          <Link
+                            key={p.label}
+                            href={p.href}
+                            onClick={handleClick}
+                            style={{ ...linkStyle, padding: '10px 16px' }}
+                          >
+                            {p.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </details>
+                  );
+                }
                 if (link.label === 'FIN Pillars') {
                   return (
                     <React.Fragment key={link.label}>
@@ -525,7 +700,7 @@ export default function ProductionNavbar() {
                 }
                 return linkEl;
               })}
-              {(() => {
+              {[faqItem, architectureItem].map((item) => {
                 const handleClick = () => setIsMobileMenuOpen(false);
                 const linkStyle = {
                   fontSize: '16px',
@@ -537,10 +712,10 @@ export default function ProductionNavbar() {
                   border: '1px solid var(--border)',
                   transition: 'all 0.2s ease',
                 };
-                return isHashOnlyHref(faqItem.href) ? (
+                return isHashOnlyHref(item.href) ? (
                   <a
-                    key={faqItem.label}
-                    href={faqItem.href}
+                    key={item.label}
+                    href={item.href}
                     onClick={handleClick}
                     className="brand-link"
                     style={linkStyle}
@@ -553,12 +728,12 @@ export default function ProductionNavbar() {
                       (e.target as HTMLElement).style.color = 'var(--text)';
                     }}
                   >
-                    {faqItem.label}
+                    {item.label}
                   </a>
                 ) : (
                   <Link
-                    key={faqItem.label}
-                    href={faqItem.href}
+                    key={item.label}
+                    href={item.href}
                     onClick={handleClick}
                     className="brand-link"
                     style={linkStyle}
@@ -571,10 +746,10 @@ export default function ProductionNavbar() {
                       (e.target as HTMLElement).style.color = 'var(--text)';
                     }}
                   >
-                    {faqItem.label}
+                    {item.label}
                   </Link>
                 );
-              })()}
+              })}
               
               <div style={{ 
                 height: '1px', 

@@ -94,55 +94,15 @@ export default function SocialShare({
   };
 
   return (
-    <div className={`social-share brand-card ${className}`} style={{ 
-      display: 'flex', 
-      gap: '8px', 
-      flexWrap: 'wrap', 
-      alignItems: 'center' 
-    }}>
-      {showLabel && (
-        <span style={{ 
-          fontSize: 'var(--font-size-sm)', 
-          color: 'var(--text-secondary)', 
-          marginRight: '8px',
-          fontWeight: '500'
-        }}>
-          Share:
-        </span>
-      )}
+    <div className={`social-share ${className}`.trim()}>
+      {showLabel && <span className="social-share__label">Share:</span>}
       {platforms.map((platform) => (
         <button
           key={platform}
+          type="button"
           onClick={() => handleShare(platform)}
-          className="brand-button"
+          className="social-share__btn"
           aria-label={`Share on ${platformLabels[platform]}`}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            border: '2px solid var(--border-warm)',
-            background: 'var(--surface)',
-            color: 'var(--text)',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            fontSize: 'var(--font-size-sm)',
-            gap: '6px',
-            fontWeight: '500'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--surface-elevated)';
-            e.currentTarget.style.borderColor = 'var(--signal)';
-            e.currentTarget.style.color = 'var(--signal)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--surface)';
-            e.currentTarget.style.borderColor = 'var(--border-warm)';
-            e.currentTarget.style.color = 'var(--text)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
         >
           {platformIcons[platform]}
           {showLabel && <span>{platformLabels[platform]}</span>}

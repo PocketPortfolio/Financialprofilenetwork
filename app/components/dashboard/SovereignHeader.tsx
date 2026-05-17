@@ -91,7 +91,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
         className="sovereign-header"
         data-tour="sovereign-header"
         style={{
-          borderBottom: '1px solid hsl(var(--border))',
+          borderBottom: '1px solid var(--dashboard-chrome-border)',
           background: 'hsl(var(--background))',
           backdropFilter: 'blur(12px)',
           position: 'sticky', // Will be converted to 'fixed' by useStickyHeader hook
@@ -124,23 +124,23 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             style={{
               background: 'transparent',
-              border: `1px solid hsl(var(--border) / 0.3)`,
+              border: `1px solid color-mix(in srgb, var(--dashboard-chrome-border) 30%, transparent)`,
               borderRadius: '4px',
               padding: '6px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'hsl(var(--muted-foreground))',
+              color: 'var(--dashboard-muted-foreground)',
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'hsl(var(--foreground))';
-              e.currentTarget.style.borderColor = 'hsl(var(--border))';
+              e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
-              e.currentTarget.style.borderColor = 'hsl(var(--border) / 0.3)';
+              e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
+              e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--dashboard-chrome-border) 30%, transparent)';
             }}
             aria-label="Open menu"
           >
@@ -268,7 +268,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   </span>
                 </div>
                 <div style={{
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   fontSize: '10px',
                   fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
                   wordBreak: 'break-word',
@@ -360,7 +360,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
               top: '0px',
               left: '0px',
               background: 'hsl(var(--background))',
-              borderRight: '1px solid hsl(var(--border))',
+              borderRight: '1px solid var(--dashboard-chrome-border)',
               boxShadow: '0 25px 50px -12px hsl(var(--foreground) / 0.1)',
               padding: '0px',
               width: '300px',
@@ -380,7 +380,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
               alignItems: 'center',
               padding: '16px',
               background: 'hsl(var(--card))',
-              borderBottom: '1px solid hsl(var(--border))',
+              borderBottom: '1px solid var(--dashboard-chrome-border)',
             }}>
               <span style={{ color: 'hsl(var(--foreground))', fontSize: '14px', fontWeight: '600' }}>Navigation</span>
               <button
@@ -388,7 +388,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: 'hsl(var(--muted-foreground))',
+                  color: 'var(--dashboard-muted-foreground)',
                   fontSize: '24px',
                   cursor: 'pointer',
                   padding: '4px 8px',
@@ -437,7 +437,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   background: 'transparent',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'hsl(var(--muted))';
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
@@ -459,7 +459,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   background: 'transparent',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'hsl(var(--muted))';
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
@@ -494,7 +494,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'hsl(var(--muted))';
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
@@ -516,7 +516,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   background: 'transparent',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'hsl(var(--muted))';
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
@@ -546,20 +546,20 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                     justifyContent: 'space-between',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'hsl(var(--muted))';
+                    e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'transparent';
                   }}
                 >
                   Tools
-                  <span style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))' }}>{toolsMenuOpen ? '▾' : '▸'}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--dashboard-muted-foreground)' }}>{toolsMenuOpen ? '▾' : '▸'}</span>
                 </button>
                 {toolsMenuOpen && (
                   <div style={{ paddingLeft: '12px', marginTop: '2px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <Link href="/live" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(var(--muted))'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Live Market Data</Link>
-                    <Link href="/tools" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(var(--muted))'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Tax Converters</Link>
-                    <Link href="/s/directory" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'hsl(var(--muted))'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>JSON API Directory</Link>
+                    <Link href="/live" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--dashboard-surface-hover)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Live Market Data</Link>
+                    <Link href="/tools" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--dashboard-surface-hover)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>Tax Converters</Link>
+                    <Link href="/s/directory" onClick={() => setIsMenuOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', color: 'hsl(var(--foreground))', textDecoration: 'none', fontSize: '13px' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--dashboard-surface-hover)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>JSON API Directory</Link>
                   </div>
                 )}
               </div>
@@ -583,7 +583,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'hsl(var(--muted))';
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
@@ -597,7 +597,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                 <>
                   <div style={{
                     height: '1px',
-                    background: 'hsl(var(--border))',
+                    background: 'var(--dashboard-chrome-border)',
                     margin: '16px 0',
                   }} />
                   
@@ -614,7 +614,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                       background: 'transparent',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'hsl(var(--muted))';
+                      e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent';
@@ -636,7 +636,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                       background: 'transparent',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'hsl(var(--muted))';
+                      e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent';
@@ -658,7 +658,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                       background: 'transparent',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'hsl(var(--muted))';
+                      e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent';

@@ -12,6 +12,10 @@ export const SYNONYMS: Record<StandardField, string[]> = {
     'Run Date',
     'Time',
     'Timestamp',
+    'OpenTime', // eToro
+    'Open Time', // eToro
+    'CloseTime', // eToro
+    'Close Time', // eToro
     'Transaction Date',
     'Settlement Date',
     'Koinly Date',

@@ -11,7 +11,9 @@ export default function DashboardClientLayout({ children }: { children: React.Re
   const { tier } = usePremiumTheme();
   const { syncState } = useGoogleDrive();
   useEffect(() => {
-    try { sessionStorage.setItem('pp-post-auth-redirect-done', '1'); } catch (_) {}
+    try {
+      sessionStorage.setItem('pp-post-auth-redirect-done', '1');
+    } catch (_) {}
   }, []);
 
   const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
@@ -25,7 +27,7 @@ export default function DashboardClientLayout({ children }: { children: React.Re
       data-tier={getTierForDataAttribute(tier)}
       className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
       style={{
-        fontFamily: 'system-ui, -apple-system, sans-serif'
+        fontFamily: 'system-ui, -apple-system, sans-serif',
       }}
     >
       <SovereignHeader
@@ -35,14 +37,10 @@ export default function DashboardClientLayout({ children }: { children: React.Re
       />
 
       <main
-        className="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6"
+        className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-[calc(96px+env(safe-area-inset-bottom,0px))] md:px-6 md:pb-8"
         data-dashboard-content
         style={{
-          maxWidth: '1600px',
-          margin: '0 auto',
-          padding: '16px',
-          paddingTop: 'calc(var(--header-height, 64px) + 4px)',
-          minHeight: 'calc(100vh - 80px)'
+          minHeight: 'calc(100vh - 80px)',
         }}
       >
         {children}

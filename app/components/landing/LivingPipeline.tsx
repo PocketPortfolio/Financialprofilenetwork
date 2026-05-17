@@ -20,7 +20,7 @@ const CARD_STYLE: React.CSSProperties = {
   fontSize: '11px',
   padding: '10px 14px',
   borderRadius: '8px',
-  border: '1px solid var(--border-subtle, rgba(255,255,255,0.1))',
+  border: '1px solid rgba(245, 158, 11, 0.35)',
   background: 'var(--surface-elevated, rgba(26,30,36,0.9))',
   color: 'var(--text-secondary, #9aa3ae)',
   whiteSpace: 'nowrap',

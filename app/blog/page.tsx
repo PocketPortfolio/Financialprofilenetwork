@@ -7,8 +7,70 @@ import { trackBlogPostClick, trackBlogPlatformView } from '../lib/analytics/even
 import { featuredArticles, type Article } from '../lib/blog/articles';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import SEOPageTracker from '../components/SEOPageTracker';
+import { isOpenPortfolioHost } from '@/lib/surface-host';
+import {
+  OPEN_BLOG_FILTER_CHIPS,
+  POCKET_BLOG_FILTER_CHIPS,
+  type OpenBlogFilterId,
+  type PocketBlogFilterId,
+} from '@/lib/canonical-claims';
 
 const POSTS_PER_PAGE = 20;
+
+/** Amber-tinted stroke (not slate); rgba reads warm on peach backgrounds where color-mix can look grey */
+const BLOG_CARD_BORDER = '1px solid rgba(245, 158, 11, 0.42)';
+const BLOG_CARD_BORDER_COLOR = 'rgba(245, 158, 11, 0.42)';
+
+const OPEN_BLOG_CARD_BORDER = '1px solid var(--border-subtle)';
+const OPEN_BLOG_CARD_BORDER_COLOR = 'var(--border-subtle)';
+const OPEN_BLOG_CARD_HOVER_BORDER = 'rgba(245, 158, 11, 0.4)';
+const OPEN_BLOG_CARD_HOVER_SHADOW = '0 8px 24px rgba(245, 158, 11, 0.15)';
+const OPEN_BLOG_CARD_REST_SHADOW = '0 4px 18px rgba(245, 158, 11, 0.06)';
+
+type BlogCardKind = 'regular' | 'research' | 'how-to' | 'external';
+
+function blogCardHover(
+  el: HTMLElement,
+  surface: 'open' | 'pocket',
+  kind: BlogCardKind,
+  platform?: string,
+) {
+  el.style.transform = 'translateY(-4px)';
+  if (surface === 'open') {
+    el.style.boxShadow = OPEN_BLOG_CARD_HOVER_SHADOW;
+    el.style.borderColor = OPEN_BLOG_CARD_HOVER_BORDER;
+    return;
+  }
+  if (kind === 'research') {
+    el.style.boxShadow = '0 8px 24px rgba(59, 130, 246, 0.15)';
+    el.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+    return;
+  }
+  if (kind === 'how-to') {
+    el.style.boxShadow = '0 8px 24px rgba(0, 255, 65, 0.15)';
+    el.style.borderColor = 'rgba(0, 255, 65, 0.4)';
+    return;
+  }
+  if (kind === 'external') {
+    el.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.15)';
+    el.style.borderColor =
+      platform === 'dev.to' ? 'rgba(59, 73, 223, 0.4)' : 'rgba(139, 92, 246, 0.4)';
+    return;
+  }
+  el.style.boxShadow = OPEN_BLOG_CARD_HOVER_SHADOW;
+  el.style.borderColor = OPEN_BLOG_CARD_HOVER_BORDER;
+}
+
+function blogCardRest(
+  el: HTMLElement,
+  surface: 'open' | 'pocket',
+  borderColor: string,
+  restShadow: string,
+) {
+  el.style.transform = 'translateY(0)';
+  el.style.boxShadow = restShadow;
+  el.style.borderColor = borderColor;
+}
 
 interface GeneratedPost {
   slug: string;
@@ -29,44 +91,38 @@ type GridItem =
   | { kind: 'how-to'; post: GeneratedPost }
   | { kind: 'external'; article: Article };
 
-function buildVisibleItems(
-  filter:
-    | 'all'
-    | 'dev.to'
-    | 'coderlegion'
-    | 'generated'
-    | 'how-to-in-tech'
-    | 'research'
-    | 'sovereign-engineering',
+function postKind(post: GeneratedPost): GridItem['kind'] {
+  if (post.category === 'research') return 'research';
+  if (post.category === 'how-to-in-tech') return 'how-to';
+  return 'regular';
+}
+
+function buildOpenVisibleItems(filter: OpenBlogFilterId, posts: GeneratedPost[]): GridItem[] {
+  const filtered =
+    filter === 'all' ? posts : posts.filter((p) => p.category === filter);
+  return filtered.map((post) => {
+    const kind = postKind(post);
+    if (kind === 'research') return { kind: 'research' as const, post };
+    if (kind === 'how-to') return { kind: 'how-to' as const, post };
+    return { kind: 'regular' as const, post };
+  });
+}
+
+function buildPocketVisibleItems(
+  filter: PocketBlogFilterId,
   regularPosts: GeneratedPost[],
-  sovereignEngineeringPosts: GeneratedPost[],
-  researchPosts: GeneratedPost[],
-  howToPosts: GeneratedPost[],
-  filteredArticles: Article[]
+  filteredArticles: Article[],
 ): GridItem[] {
   const items: GridItem[] = [];
 
   if (filter === 'all' || filter === 'generated') {
     regularPosts.forEach((post) => items.push({ kind: 'regular', post }));
   }
-  if (filter === 'all' || filter === 'sovereign-engineering') {
-    sovereignEngineeringPosts.forEach((post) => items.push({ kind: 'regular', post }));
-  }
-  if (filter === 'all' || filter === 'research') {
-    researchPosts.forEach((post) => items.push({ kind: 'research', post }));
-  }
-  if (filter === 'all' || filter === 'how-to-in-tech') {
-    howToPosts.forEach((post) => items.push({ kind: 'how-to', post }));
-  }
-
-  const showExternal =
-    filter === 'all' ||
-    (filter !== 'generated' &&
-      filter !== 'how-to-in-tech' &&
-      filter !== 'research' &&
-      filter !== 'sovereign-engineering');
-  if (showExternal) {
-    filteredArticles.forEach((article) => items.push({ kind: 'external', article }));
+  if (filter === 'all' || filter === 'dev.to' || filter === 'coderlegion') {
+    const platform = filter === 'all' ? null : filter;
+    filteredArticles
+      .filter((a) => platform === null || a.platform === platform)
+      .forEach((article) => items.push({ kind: 'external', article }));
   }
 
   return items;
@@ -76,24 +132,24 @@ function BlogPageInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [filter, setFilter] = useState<
-    | 'all'
-    | 'dev.to'
-    | 'coderlegion'
-    | 'generated'
-    | 'how-to-in-tech'
-    | 'research'
-    | 'sovereign-engineering'
-  >('all');
+  const [openFilter, setOpenFilter] = useState<OpenBlogFilterId>('all');
+  const [pocketFilter, setPocketFilter] = useState<PocketBlogFilterId>('all');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
-  const prevFilter = useRef(filter);
+  const [blogSurface, setBlogSurface] = useState<'pocket' | 'open'>('pocket');
 
   useEffect(() => {
-    fetch('/api/blog/posts')
+    const surface = isOpenPortfolioHost(window.location.hostname) ? 'open' : 'pocket';
+    setBlogSurface(surface);
+    setOpenFilter('all');
+    setPocketFilter('all');
+    fetch(`/api/blog/posts?surface=${surface}`)
       .then((res) => res.json())
       .then((data) => setGeneratedPosts(data || []))
       .catch(() => setGeneratedPosts([]));
   }, []);
+
+  const filter = blogSurface === 'open' ? openFilter : pocketFilter;
+  const prevFilter = useRef(filter);
 
   useEffect(() => {
     if (prevFilter.current !== filter) {
@@ -102,32 +158,26 @@ function BlogPageInner() {
     }
   }, [filter, pathname, router]);
 
-  const howToPosts = generatedPosts.filter((post) => post.category === 'how-to-in-tech');
-  const researchPosts = generatedPosts.filter((post) => post.category === 'research');
-  // excludeFromLanding is for the homepage “Building in Public” grid only — /blog lists every published post
-  const sovereignEngineeringPosts = generatedPosts.filter(
-    (post) => post.category === 'sovereign-engineering'
-  );
-  const regularPosts = generatedPosts.filter(
-    (post) =>
-      post.category !== 'how-to-in-tech' &&
-      post.category !== 'research' &&
-      post.category !== 'sovereign-engineering'
-  );
+  const pocketRegularPosts = generatedPosts;
 
-  const filteredArticles =
-    filter === 'all' ? featuredArticles : featuredArticles.filter((article) => article.platform === filter);
+  const pocketArticles =
+    pocketFilter === 'all'
+      ? featuredArticles
+      : pocketFilter === 'generated'
+        ? []
+        : featuredArticles.filter((article) => article.platform === pocketFilter);
 
-  const visibleItems = buildVisibleItems(
-    filter,
-    regularPosts,
-    sovereignEngineeringPosts,
-    researchPosts,
-    howToPosts,
-    filteredArticles
-  );
+  const visibleItems =
+    blogSurface === 'open'
+      ? buildOpenVisibleItems(openFilter, generatedPosts)
+      : buildPocketVisibleItems(pocketFilter, pocketRegularPosts, pocketArticles);
 
-  const rawPage = parseInt(searchParams.get('page') || '1', 10);
+  const cardBorder = blogSurface === 'open' ? OPEN_BLOG_CARD_BORDER : BLOG_CARD_BORDER;
+  const cardBorderColor = blogSurface === 'open' ? OPEN_BLOG_CARD_BORDER_COLOR : BLOG_CARD_BORDER_COLOR;
+  const cardRestShadow =
+    blogSurface === 'open' ? OPEN_BLOG_CARD_REST_SHADOW : '0 4px 18px rgba(245, 158, 11, 0.06)';
+
+  const rawPage = parseInt(searchParams?.get('page') ?? '1', 10);
   const pageFromUrl = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
   const totalPages = Math.max(1, Math.ceil(visibleItems.length / POSTS_PER_PAGE));
   const currentPage = Math.min(pageFromUrl, totalPages);
@@ -160,13 +210,17 @@ function BlogPageInner() {
               fontSize: '48px',
               fontWeight: '700',
               marginBottom: '16px',
-              background: 'linear-gradient(135deg, #6366f1 0%, #ff6b35 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              ...(blogSurface === 'open'
+                ? { color: 'var(--text)' }
+                : {
+                    background: 'linear-gradient(135deg, #6366f1 0%, #ff6b35 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }),
             }}
           >
-            Building in Public
+            {blogSurface === 'open' ? 'Open Portfolio Engineering' : 'Building in Public'}
           </h1>
           <p
             style={{
@@ -176,7 +230,9 @@ function BlogPageInner() {
               margin: '0 auto 32px',
             }}
           >
-            Technical deep-dives, architecture decisions, and devlogs from the Pocket Portfolio team.
+            {blogSurface === 'open'
+              ? 'Research, sovereign engineering, and infrastructure deep-dives from the Open Portfolio substrate team.'
+              : 'Technical deep-dives, architecture decisions, and devlogs from the Pocket Portfolio team.'}
           </p>
 
           <div
@@ -188,126 +244,43 @@ function BlogPageInner() {
               marginBottom: '32px',
             }}
           >
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'all' ? 'var(--accent-warm)' : 'var(--border-warm)'}`,
-                background: filter === 'all' ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                color: filter === 'all' ? 'var(--accent-warm)' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              All Posts
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('dev.to')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'dev.to' ? 'rgb(59, 73, 223)' : 'var(--border-warm)'}`,
-                background: filter === 'dev.to' ? 'rgba(59, 73, 223, 0.1)' : 'transparent',
-                color: filter === 'dev.to' ? 'rgb(59, 73, 223)' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Dev.to
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('coderlegion')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'coderlegion' ? 'rgb(139, 92, 246)' : 'var(--border-warm)'}`,
-                background: filter === 'coderlegion' ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-                color: filter === 'coderlegion' ? 'rgb(139, 92, 246)' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              CoderLegion
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('sovereign-engineering')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'sovereign-engineering' ? 'var(--accent-warm)' : 'var(--border-warm)'}`,
-                background:
-                  filter === 'sovereign-engineering' ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                color: filter === 'sovereign-engineering' ? 'var(--accent-warm)' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Sovereign Engineering
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('generated')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'generated' ? 'var(--accent-warm)' : 'var(--border-warm)'}`,
-                background: filter === 'generated' ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                color: filter === 'generated' ? 'var(--accent-warm)' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Pocket Portfolio Posts
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('how-to-in-tech')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'how-to-in-tech' ? '#00ff41' : 'var(--border-warm)'}`,
-                background: filter === 'how-to-in-tech' ? 'rgba(0, 255, 65, 0.1)' : 'transparent',
-                color: filter === 'how-to-in-tech' ? '#00ff41' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              How to in Tech
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('research')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                border: `2px solid ${filter === 'research' ? '#3b82f6' : 'var(--border-warm)'}`,
-                background: filter === 'research' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                color: filter === 'research' ? '#3b82f6' : 'var(--text)',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              Research
-            </button>
+            {(blogSurface === 'open' ? OPEN_BLOG_FILTER_CHIPS : POCKET_BLOG_FILTER_CHIPS).map(
+              (chip) => {
+                const active = filter === chip.id;
+                const accent =
+                  blogSurface === 'open'
+                    ? 'var(--accent-warm)'
+                    : (chip as (typeof POCKET_BLOG_FILTER_CHIPS)[number]).accent;
+                const activeBg =
+                  blogSurface === 'open'
+                    ? 'rgba(245, 158, 11, 0.12)'
+                    : (chip as (typeof POCKET_BLOG_FILTER_CHIPS)[number]).activeBg;
+                const setChip =
+                  blogSurface === 'open'
+                    ? () => setOpenFilter(chip.id as OpenBlogFilterId)
+                    : () => setPocketFilter(chip.id as PocketBlogFilterId);
+                return (
+                  <button
+                    key={chip.id}
+                    type="button"
+                    onClick={setChip}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      border: `2px solid ${active ? accent : 'var(--border-subtle)'}`,
+                      background: active ? activeBg : 'transparent',
+                      color: active ? accent : 'var(--text)',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {chip.label}
+                  </button>
+                );
+              },
+            )}
           </div>
         </header>
 
@@ -345,24 +318,19 @@ function BlogPageInner() {
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: cardBorder,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
                     cursor: 'pointer',
+                    boxShadow: cardRestShadow,
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(245, 158, 11, 0.15)';
-                    e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
-                  }}
+                  onMouseEnter={(e) => blogCardHover(e.currentTarget, blogSurface, 'regular')}
+                  onMouseLeave={(e) =>
+                    blogCardRest(e.currentTarget, blogSurface, cardBorderColor, cardRestShadow)
+                  }
                 >
                   <div style={{ marginBottom: '12px' }}>
                     <span
@@ -438,24 +406,19 @@ function BlogPageInner() {
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: cardBorder,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
                     cursor: 'pointer',
+                    boxShadow: cardRestShadow,
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(59, 130, 246, 0.15)';
-                    e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
-                  }}
+                  onMouseEnter={(e) => blogCardHover(e.currentTarget, blogSurface, 'research')}
+                  onMouseLeave={(e) =>
+                    blogCardRest(e.currentTarget, blogSurface, cardBorderColor, cardRestShadow)
+                  }
                 >
                   <div style={{ marginBottom: '12px' }}>
                     <span
@@ -465,8 +428,9 @@ function BlogPageInner() {
                         fontSize: '12px',
                         fontWeight: '600',
                         borderRadius: '6px',
-                        background: 'rgba(59, 130, 246, 0.1)',
-                        color: '#3b82f6',
+                        background:
+                          blogSurface === 'open' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                        color: blogSurface === 'open' ? 'var(--accent-warm)' : '#3b82f6',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
                       }}
@@ -531,24 +495,19 @@ function BlogPageInner() {
                   style={{
                     display: 'block',
                     padding: '24px',
-                    background: 'var(--card)',
-                    border: '1px solid var(--card-border)',
+                    background: 'hsl(var(--card))',
+                    border: cardBorder,
                     borderRadius: '12px',
                     transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     color: 'inherit',
                     cursor: 'pointer',
+                    boxShadow: cardRestShadow,
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 255, 65, 0.15)';
-                    e.currentTarget.style.borderColor = 'rgba(0, 255, 65, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.borderColor = 'var(--card-border)';
-                  }}
+                  onMouseEnter={(e) => blogCardHover(e.currentTarget, blogSurface, 'how-to')}
+                  onMouseLeave={(e) =>
+                    blogCardRest(e.currentTarget, blogSurface, cardBorderColor, cardRestShadow)
+                  }
                 >
                   <div style={{ marginBottom: '12px' }}>
                     <span
@@ -558,8 +517,9 @@ function BlogPageInner() {
                         fontSize: '12px',
                         fontWeight: '600',
                         borderRadius: '6px',
-                        background: 'rgba(0, 255, 65, 0.1)',
-                        color: '#00ff41',
+                        background:
+                          blogSurface === 'open' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(0, 255, 65, 0.1)',
+                        color: blogSurface === 'open' ? 'var(--accent-warm)' : '#00ff41',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
                       }}
@@ -625,25 +585,21 @@ function BlogPageInner() {
                 style={{
                   display: 'block',
                   padding: '24px',
-                  background: 'var(--card)',
-                  border: '1px solid var(--card-border)',
+                  background: 'hsl(var(--card))',
+                  border: cardBorder,
                   borderRadius: '12px',
                   transition: 'all 0.2s ease',
                   textDecoration: 'none',
                   color: 'inherit',
                   cursor: 'pointer',
+                  boxShadow: cardRestShadow,
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.15)';
-                  e.currentTarget.style.borderColor =
-                    article.platform === 'dev.to' ? 'rgba(59, 73, 223, 0.4)' : 'rgba(139, 92, 246, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = 'var(--card-border)';
-                }}
+                onMouseEnter={(e) =>
+                  blogCardHover(e.currentTarget, blogSurface, 'external', article.platform)
+                }
+                onMouseLeave={(e) =>
+                  blogCardRest(e.currentTarget, blogSurface, cardBorderColor, cardRestShadow)
+                }
               >
                 <div style={{ marginBottom: '12px' }}>
                   <span
@@ -761,13 +717,15 @@ function BlogPageInner() {
           </nav>
         )}
 
+        {blogSurface === 'pocket' && (
         <div
           style={{
             textAlign: 'center',
             padding: '48px 24px',
-            background: 'var(--card)',
+            background: 'hsl(var(--card))',
             borderRadius: '12px',
-            border: '1px solid var(--card-border)',
+            border: BLOG_CARD_BORDER,
+            boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
           }}
         >
           <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>Want More Content?</h2>
@@ -812,7 +770,7 @@ function BlogPageInner() {
             <Link
               href="/blog?page=1"
               onClick={() => {
-                setFilter('generated');
+                setPocketFilter('generated');
                 trackBlogPlatformView('pocket-portfolio', 'view_all');
               }}
               style={{
@@ -866,6 +824,7 @@ function BlogPageInner() {
             </a>
           </div>
         </div>
+        )}
       </div>
     </>
   );

@@ -1794,14 +1794,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Versioning Best Practices",
     "slug": "the-guide-to-api-versioning-best-practices",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "versioning"
-    ]
+    ],
+    "publishedAt": "2026-04-22T14:00:52.727Z"
   },
   {
     "id": "how-to-how-to-use-webhooks-for-event-notifications-apr-23",
@@ -1809,14 +1810,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Webhooks for Event Notifications",
     "slug": "how-to-use-webhooks-for-event-notifications",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "webhooks",
       "event"
-    ]
+    ],
+    "publishedAt": "2026-04-23T14:01:08.243Z"
   },
   {
     "id": "how-to-building-a-file-upload-system-with-multer-apr-24",
@@ -1824,14 +1826,15 @@
     "scheduledTime": "14:00",
     "title": "Building a File Upload System with Multer",
     "slug": "building-a-file-upload-system-with-multer",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "file",
       "upload"
-    ]
+    ],
+    "publishedAt": "2026-04-24T14:00:57.870Z"
   },
   {
     "id": "how-to-how-to-implement-search-functionality-with-elasticsearch-apr-25",
@@ -1839,7 +1842,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Search Functionality with Elasticsearch",
     "slug": "how-to-implement-search-functionality-with-elasticsearch",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1848,7 +1851,8 @@
       "implement",
       "search",
       "functionality"
-    ]
+    ],
+    "publishedAt": "2026-04-25T14:00:48.408Z"
   },
   {
     "id": "how-to-understanding-message-queues-rabbitmq-vs-kafka-apr-26",
@@ -1856,7 +1860,7 @@
     "scheduledTime": "14:00",
     "title": "Understanding Message Queues: RabbitMQ vs Kafka",
     "slug": "understanding-message-queues-rabbitmq-vs-kafka",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1865,7 +1869,8 @@
       "understanding",
       "message",
       "queues"
-    ]
+    ],
+    "publishedAt": "2026-04-26T14:00:49.261Z"
   },
   {
     "id": "how-to-how-to-set-up-monitoring-with-prometheus-apr-27",
@@ -1873,7 +1878,7 @@
     "scheduledTime": "14:00",
     "title": "How to Set Up Monitoring with Prometheus",
     "slug": "how-to-set-up-monitoring-with-prometheus",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1881,7 +1886,8 @@
       "rome",
       "prometheus",
       "set"
-    ]
+    ],
+    "publishedAt": "2026-04-27T14:00:33.601Z"
   },
   {
     "id": "how-to-the-complete-guide-to-environment-variables-apr-28",
@@ -1889,7 +1895,7 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to Environment Variables",
     "slug": "the-complete-guide-to-environment-variables",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1897,7 +1903,8 @@
       "complete",
       "guide",
       "environment"
-    ]
+    ],
+    "publishedAt": "2026-04-28T14:01:43.051Z"
   },
   {
     "id": "how-to-how-to-build-a-graphql-subscription-server-apr-29",
@@ -1905,14 +1912,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a GraphQL Subscription Server",
     "slug": "how-to-build-a-graphql-subscription-server",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "graphql",
       "build",
       "subscription"
-    ]
+    ],
+    "publishedAt": "2026-04-29T14:01:16.565Z"
   },
   {
     "id": "how-to-april-retro-api-design-patterns-we-learned-apr-30",
@@ -1920,14 +1928,15 @@
     "scheduledTime": "14:00",
     "title": "April Retro: API Design Patterns We Learned",
     "slug": "april-retro-api-design-patterns-we-learned",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "april",
       "retro"
-    ]
+    ],
+    "publishedAt": "2026-04-30T14:01:06.309Z"
   },
   {
     "id": "how-to-how-to-implement-pagination-in-rest-apis-may-1",
@@ -1935,7 +1944,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Pagination in REST APIs",
     "slug": "how-to-implement-pagination-in-rest-apis",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -1943,7 +1952,8 @@
       "rest",
       "implement",
       "pagination"
-    ]
+    ],
+    "publishedAt": "2026-05-01T14:01:15.949Z"
   },
   {
     "id": "how-to-understanding-database-transactions-may-2",
@@ -1951,14 +1961,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Database Transactions",
     "slug": "understanding-database-transactions",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "database",
       "understanding",
       "transactions"
-    ]
+    ],
+    "publishedAt": "2026-05-02T14:01:14.019Z"
   },
   {
     "id": "how-to-how-to-use-docker-for-local-development-may-3",
@@ -1966,14 +1977,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Docker for Local Development",
     "slug": "how-to-use-docker-for-local-development",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "use",
       "local"
-    ]
+    ],
+    "publishedAt": "2026-05-03T14:01:11.936Z"
   },
   {
     "id": "how-to-building-a-microservices-gateway-with-kong-may-4",
@@ -1981,14 +1993,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Microservices Gateway with Kong",
     "slug": "building-a-microservices-gateway-with-kong",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "microservices",
       "building",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-05-04T14:01:23.664Z"
   },
   {
     "id": "how-to-how-to-implement-file-compression-in-node-js-may-5",
@@ -1996,7 +2009,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement File Compression in Node.js",
     "slug": "how-to-implement-file-compression-in-node-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2004,7 +2017,8 @@
       "implement",
       "file",
       "compression"
-    ]
+    ],
+    "publishedAt": "2026-05-05T14:01:08.321Z"
   },
   {
     "id": "how-to-the-guide-to-api-documentation-with-openapi-may-6",
@@ -2012,14 +2026,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Documentation with OpenAPI",
     "slug": "the-guide-to-api-documentation-with-openapi",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "documentation"
-    ]
+    ],
+    "publishedAt": "2026-05-06T14:01:30.382Z"
   },
   {
     "id": "how-to-how-to-use-message-brokers-for-async-processing-may-7",
@@ -2027,14 +2042,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Message Brokers for Async Processing",
     "slug": "how-to-use-message-brokers-for-async-processing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "message",
       "brokers"
-    ]
+    ],
+    "publishedAt": "2026-05-07T14:01:20.202Z"
   },
   {
     "id": "how-to-understanding-cqrs-pattern-may-8",
@@ -2042,14 +2058,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding CQRS Pattern",
     "slug": "understanding-cqrs-pattern",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "cqrs",
       "pattern"
-    ]
+    ],
+    "publishedAt": "2026-05-08T14:01:05.523Z"
   },
   {
     "id": "how-to-how-to-implement-background-jobs-with-bull-may-9",
@@ -2057,14 +2074,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Background Jobs with Bull",
     "slug": "how-to-implement-background-jobs-with-bull",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "implement",
       "background",
       "jobs"
-    ]
+    ],
+    "publishedAt": "2026-05-09T14:01:13.135Z"
   },
   {
     "id": "how-to-building-a-multi-tenant-application-may-10",
@@ -2072,14 +2090,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Multi-Tenant Application",
     "slug": "building-a-multi-tenant-application",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "multi",
       "tenant"
-    ]
+    ],
+    "publishedAt": "2026-05-10T14:01:11.620Z"
   },
   {
     "id": "how-to-how-to-use-typescript-generics-effectively-may-11",
@@ -2087,14 +2106,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use TypeScript Generics Effectively",
     "slug": "how-to-use-typescript-generics-effectively",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "typescript",
       "use",
       "generics"
-    ]
+    ],
+    "publishedAt": "2026-05-11T14:01:30.580Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-security-may-12",
@@ -2102,7 +2122,7 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to API Security",
     "slug": "the-complete-guide-to-api-security",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2110,7 +2130,8 @@
       "security",
       "complete",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-05-12T14:01:11.443Z"
   },
   {
     "id": "how-to-how-to-implement-caching-strategies-may-13",
@@ -2118,14 +2139,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Caching Strategies",
     "slug": "how-to-implement-caching-strategies",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "caching",
       "implement",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-05-13T14:00:52.764Z"
   },
   {
     "id": "how-to-understanding-domain-driven-design-may-14",
@@ -2133,14 +2155,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Domain-Driven Design",
     "slug": "understanding-domain-driven-design",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "domain",
       "driven"
-    ]
+    ],
+    "publishedAt": "2026-05-14T14:01:14.312Z"
   },
   {
     "id": "how-to-how-to-build-a-graphql-resolver-may-15",
@@ -2148,14 +2171,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a GraphQL Resolver",
     "slug": "how-to-build-a-graphql-resolver",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "graphql",
       "build",
       "resolver"
-    ]
+    ],
+    "publishedAt": "2026-05-15T14:00:59.298Z"
   },
   {
     "id": "how-to-the-developer-s-guide-to-api-testing-may-16",
@@ -2163,7 +2187,7 @@
     "scheduledTime": "14:00",
     "title": "The Developer's Guide to API Testing",
     "slug": "the-developer-s-guide-to-api-testing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2171,7 +2195,8 @@
       "testing",
       "developer",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-05-16T14:01:14.668Z"
   },
   {
     "id": "how-to-how-to-use-docker-swarm-for-orchestration-may-17",
@@ -2179,14 +2204,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Docker Swarm for Orchestration",
     "slug": "how-to-use-docker-swarm-for-orchestration",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "use",
       "swarm"
-    ]
+    ],
+    "publishedAt": "2026-05-17T14:00:48.394Z"
   },
   {
     "id": "how-to-building-a-notification-system-may-18",

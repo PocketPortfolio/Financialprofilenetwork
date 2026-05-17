@@ -1,0 +1,85 @@
+---
+title: The Complete Guide to Environment Variables
+date: '2026-04-28'
+description: >-
+  Learn how to manage and utilize environment variables in your projects
+  effectively.
+tags:
+  - environment variables
+  - guide
+  - development
+author: Pocket Portfolio Team
+image: /images/blog/the-complete-guide-to-environment-variables.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+Environment variables are a crucial part of software development, providing a way to manage configuration settings that differ between environments such as development, testing, and production. They help keep sensitive information secure and ensure your application behaves correctly across different systems.
+
+### Problem
+
+When developing applications, you often need to configure settings that should not be hard-coded into your codebase, such as API keys, database URLs, or other sensitive information. Hardcoding these values can lead to security vulnerabilities and make it difficult to manage configurations across multiple environments.
+
+### Solution
+
+Using environment variables provides a secure and flexible way to handle configuration data. Here's a step-by-step guide on how to set and use environment variables in different systems.
+
+#### Setting Environment Variables
+
+**Unix/Linux/macOS**
+
+You can set environment variables in the terminal session by using the `export` command:
+
+```bash
+export DATABASE_URL="postgresql://username:password@localhost:5432/mydatabase"
+```
+
+To make a variable persistent across sessions, add it to your shell's startup file (e.g., `.bashrc` or `.zshrc`):
+
+```bash
+echo 'export DATABASE_URL="postgresql://username:password@localhost:5432/mydatabase"' >> ~/.bashrc
+```
+
+**Windows**
+
+On Windows, use the `set` command for the current session:
+
+```cmd
+set DATABASE_URL=postgresql://username:password@localhost:5432/mydatabase
+```
+
+To set it permanently, use the `setx` command:
+
+```cmd
+setx DATABASE_URL "postgresql://username:password@localhost:5432/mydatabase"
+```
+
+#### Accessing Environment Variables in Code
+
+**Node.js**
+
+Use `process.env` to access environment variables in a Node.js application:
+
+```javascript
+const databaseUrl = process.env.DATABASE_URL;
+console.log(`Database URL: ${databaseUrl}`);
+```
+
+**Python**
+
+In Python, use the `os` module to retrieve environment variables:
+
+```python
+import os
+
+database_url = os.getenv('DATABASE_URL')
+print(f'Database URL: {database_url}')
+```
+
+### Key Concepts
+
+- **Security**: By keeping sensitive data like API keys and passwords in environment variables, you minimize the risk of exposing them in your codebase.
+- **Flexibility**: Environment variables allow you to change configurations without modifying your code, making it easier to switch between different setups.
+- **Portability**: They provide a standardized way to manage environment-specific settings, enhancing the portability of your application across different environments.
+
+By leveraging environment variables, you can create a more secure, maintainable, and flexible application. Remember to document the required environment variables for your project to ensure smooth setup and deployment processes.

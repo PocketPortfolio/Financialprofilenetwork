@@ -24,6 +24,14 @@ export default function CompanyLogo({
   
   const fallbacks = getCompanyLogoFallbacks(symbol, metadata);
   const currentUrl = fallbacks[currentSourceIndex] || fallbacks[0];
+
+  // Dashboard uses small logos (e.g. 18px). With the previous fixed padding/border,
+  // the inner image area could collapse and appear "invisible".
+  // Also: `<img width/height>` does NOT include padding by default (content-box),
+  // so padding can accidentally make the "square" much bigger than `size`.
+  const isCompact = size <= 32;
+  const borderPx = isCompact ? 1 : 2;
+  const paddingPx = isCompact ? 2 : 8;
   
   // Mark as mounted after hydration to avoid SSR mismatch
   useEffect(() => {
@@ -65,7 +73,7 @@ export default function CompanyLogo({
         height: `${size}px`,
         borderRadius: '8px',
         background: 'var(--surface)',
-        border: '2px solid var(--border-warm)',
+        border: `${borderPx}px solid var(--border-warm)`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -106,11 +114,13 @@ export default function CompanyLogo({
         borderRadius: '8px',
         objectFit: 'contain',
         background: 'var(--surface)',
-        padding: '8px',
-        border: '2px solid var(--border-warm)',
+        boxSizing: 'border-box',
+        padding: `${paddingPx}px`,
+        border: `${borderPx}px solid var(--border-warm)`,
         flexShrink: 0
       }}
-      loading="lazy"
+      loading={isCompact ? 'eager' : 'lazy'}
+      decoding="async"
     />
   );
 }

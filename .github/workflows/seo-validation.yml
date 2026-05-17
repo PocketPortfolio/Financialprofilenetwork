@@ -1,0 +1,107 @@
+name: SEO / AEO substrate validation
+
+# Phase 1 — Sovereign Build. Gates the canonical substrate so the deck and the
+# answer-engine substrate cannot drift. Triggered on any change to the SSOT,
+# the press page, llms.txt, or the build script that links them.
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'lib/canonical-claims.ts'
+      - 'app/press/**'
+      - 'public/llms.txt'
+      - 'scripts/build-llms-txt.ts'
+      - 'scripts/validate-press-jsonld.mjs'
+      - 'scripts/tsconfig.build.json'
+      - 'tests/unit/canonical-claims.spec.ts'
+      - '.github/workflows/seo-validation.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'lib/canonical-claims.ts'
+      - 'app/press/**'
+      - 'public/llms.txt'
+      - 'scripts/build-llms-txt.ts'
+      - 'scripts/validate-press-jsonld.mjs'
+      - 'scripts/tsconfig.build.json'
+      - 'tests/unit/canonical-claims.spec.ts'
+      - '.github/workflows/seo-validation.yml'
+
+concurrency:
+  group: seo-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  sovereign-thresholds:
+    name: Sovereign Thresholds (canonical-claims spec)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run canonical-claims spec (#1 one-liner, #2 signal floor, #3 resolution, #4 recency)
+        run: npx vitest run tests/unit/canonical-claims.spec.ts
+
+  llms-drift-guard:
+    name: llms.txt drift guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Re-generate public/llms.txt and public/open/llms.txt from canonical-claims
+        run: npm run build:llms
+      - name: Assert no drift between committed llms.txt files and freshly generated
+        run: |
+          if ! git diff --exit-code -- public/llms.txt public/open/llms.txt; then
+            echo "::error::public/llms.txt or public/open/llms.txt is stale. Run 'npm run build:llms' locally and commit the result."
+            exit 1
+          fi
+
+  press-jsonld:
+    name: /press JSON-LD validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build app
+        env:
+          NODE_ENV: production
+          # Press page reads /api/npm-stats at request time; tolerate failure during CI.
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: npm run build
+      - name: Start Next on :3001
+        run: |
+          npm run start -- -p 3001 &
+          echo $! > .nextpid
+      - name: Validate JSON-LD on /press
+        env:
+          PRESS_URL: http://localhost:3001/press
+        run: node scripts/validate-press-jsonld.mjs
+      - name: Stop Next
+        if: always()
+        run: |
+          if [ -f .nextpid ]; then
+            kill "$(cat .nextpid)" || true
+            rm -f .nextpid
+          fi

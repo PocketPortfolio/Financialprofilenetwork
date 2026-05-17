@@ -1,0 +1,124 @@
+---
+title: How to Build a GraphQL Subscription Server
+date: '2026-04-29'
+description: >-
+  Learn to build a GraphQL Subscription Server to enable real-time data updates
+  in your applications.
+tags:
+  - graphql
+  - subscription
+  - real-time
+  - server
+author: Pocket Portfolio Team
+image: /images/blog/how-to-build-a-graphql-subscription-server.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+## Problem
+
+In modern applications, real-time data capabilities are essential for enhancing user engagement and interactivity. Traditional GraphQL queries and mutations offer static data fetching, which is inadequate for scenarios requiring real-time updates, such as chat applications, live scores, or collaborative tools. The challenge is to implement a system that can push updates from the server to the client as soon as changes occur.
+
+## Solution
+
+GraphQL Subscriptions provide a way to stream real-time data from the server to the client. By leveraging WebSockets, subscriptions maintain a persistent connection, allowing the server to push data as events occur. Below, we will guide you through setting up a GraphQL Subscription Server using Node.js, Apollo Server, and the `graphql-subscriptions` library.
+
+### Key Concepts
+
+1. **Subscription**: A GraphQL operation that allows clients to listen for real-time messages from the server.
+2. **PubSub**: A publish-subscribe mechanism used to broadcast events from the server to subscribers.
+3. **WebSocket**: A protocol for full-duplex communication channels over a single TCP connection, essential for real-time communication.
+
+### Step-by-Step Guide
+
+First, set up a basic Node.js project with Apollo Server:
+
+1. **Install Dependencies**
+
+   ```bash
+   npm init -y
+   npm install apollo-server graphql graphql-subscriptions
+   ```
+
+2. **Define Schema with Subscription**
+
+   Create a `schema.js` file to define your types and subscription:
+
+   ```javascript
+   import { gql } from 'apollo-server';
+
+   const typeDefs = gql`
+     type Message {
+       id: ID!
+       content: String!
+     }
+
+     type Query {
+       messages: [Message]
+     }
+
+     type Subscription {
+       messageAdded: Message
+     }
+   `;
+
+   export default typeDefs;
+   ```
+
+3. **Set Up PubSub and Resolvers**
+
+   Use `graphql-subscriptions` to create a simple PubSub instance:
+
+   ```javascript
+   import { PubSub } from 'graphql-subscriptions';
+   const pubsub = new PubSub();
+
+   const resolvers = {
+     Query: {
+       messages: () => [], // Replace with your data source
+     },
+     Subscription: {
+       messageAdded: {
+         subscribe: () => pubsub.asyncIterator(['MESSAGE_ADDED']),
+       },
+     },
+   };
+
+   export { resolvers, pubsub };
+   ```
+
+4. **Initialize Apollo Server with WebSocket Support**
+
+   In your main server file, integrate Apollo Server with WebSocket support:
+
+   ```javascript
+   import { ApolloServer } from 'apollo-server';
+   import { makeExecutableSchema } from '@graphql-tools/schema';
+   import { resolvers, pubsub } from './resolvers';
+   import typeDefs from './schema';
+
+   const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+   const server = new ApolloServer({
+     schema,
+     subscriptions: {
+       onConnect: () => console.log('Connected to WebSocket'),
+     },
+   });
+
+   server.listen().then(({ url, subscriptionsUrl }) => {
+     console.log(`Server ready at ${url}`);
+     console.log(`Subscriptions ready at ${subscriptionsUrl}`);
+   });
+   ```
+
+5. **Trigger Subscription Events**
+
+   Whenever data changes, publish an event to notify subscribers:
+
+   ```javascript
+   const newMessage = { id: '1', content: 'Hello, world!' };
+   pubsub.publish('MESSAGE_ADDED', { messageAdded: newMessage });
+   ```
+
+This setup provides a foundational GraphQL Subscription Server capable of handling real-time data updates. Adjust the schema and resolvers to suit your application's needs.

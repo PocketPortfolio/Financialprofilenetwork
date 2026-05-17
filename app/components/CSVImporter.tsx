@@ -44,16 +44,6 @@ function debugLog(step: string, data: Record<string, unknown>) {
   }
 }
 
-// Debug instrumentation: only when explicitly enabled (avoids localhost fetch in production)
-function agentLog(_location: string, _message: string, _data: Record<string, unknown>, _hypothesisId: string) {
-  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_DEBUG_ANALYTICS !== 'true') return;
-  fetch('http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ location: _location, message: _message, data: _data, timestamp: Date.now(), hypothesisId: _hypothesisId }),
-  }).catch(() => {});
-}
-
 export default function CSVImporter({ onImport, initialFile }: CSVImporterProps) {
   const [dragActive, setDragActive] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -64,6 +54,11 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
   const [showIntentUpsellModal, setShowIntentUpsellModal] = useState(false);
   const [pendingUniversal, setPendingUniversal] = useState<RequiresMappingResult | null>(null);
   const [unknownFile, setUnknownFile] = useState<{ file: File; rawFile: import('@pocket-portfolio/importer').RawFile; csvContent: string; reason?: 'unknown' | 'zero_trades' } | null>(null);
+  const [smartImportCompile, setSmartImportCompile] = useState<{
+    status: 'idle' | 'running' | 'success' | 'error';
+    summary?: string;
+    details?: string[];
+  }>({ status: 'idle' });
 
   // Helper function to show alerts
   const showAlert = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
@@ -1355,6 +1350,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
 
       // Auto-detect broker from CSV sample
       const sample = csvContent.slice(0, 2048);
+
+      
       
       
       
@@ -1416,9 +1413,12 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         // Manual Coinbase detection (has unique "Transaction Type" + "Spot Price at Transaction" + "Asset")
         const hasTransactionType = /Transaction Type/i.test(firstLine);
         const hasSpotPriceAtTransaction = /Spot Price at Transaction/i.test(firstLine);
+        const hasPriceAtTransaction = /Price at Transaction/i.test(firstLine);
         const hasAsset = /Asset/i.test(firstLine);
         // Coinbase has Transaction Type + Spot Price at Transaction + Asset, but NOT Action or Product (which Degiro has)
-        const manualCoinbaseDetect = hasTransactionType && hasSpotPriceAtTransaction && hasAsset && !hasAction && !hasProduct;
+        const manualCoinbaseDetect = hasTransactionType && (hasSpotPriceAtTransaction || hasPriceAtTransaction) && hasAsset && !hasAction && !hasProduct;
+
+        
         
         
         
@@ -1565,6 +1565,8 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
 
       debugLog('STEP_DETECTION_DONE', { detectedBroker });
       console.log('🔍 Detected broker:', detectedBroker);
+
+      
       
       
       
@@ -1573,9 +1575,6 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
 
       if (detectedBroker === 'unknown') {
         debugLog('STEP_UNKNOWN', { fileName: file?.name });
-        // #region agent log
-        agentLog('CSVImporter.tsx:unknown', 'Unknown broker: showing dropdown', { fileName: file?.name, firstLine: csvContent.split('\n')[0]?.slice(0, 120) }, 'A');
-        // #endregion
         setUnknownFile({ file, rawFile, csvContent });
         setProcessing(false);
         return;
@@ -1585,12 +1584,16 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         try {
           result = await parseCSVAdapter(rawFile, 'en-US', detectedBroker);
           debugLog('STEP_ADAPTER_RESULT', { broker: result?.broker, tradesCount: result?.trades?.length, warningsCount: result?.warnings?.length });
+
+          
         
         console.log('Parsing complete:', result.trades.length, 'trades found');
         console.log('Broker:', result.broker);
         console.log('Warnings:', result.warnings);
       } catch (parseError: any) {
         console.error('[CSVImporter] parseCSVAdapter error', parseError);
+
+        
         
         
         // If adapter not found, implement parser directly for specific brokers
@@ -1965,9 +1968,6 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
           errorMessage: 'No valid trades found in CSV',
           broker
         });
-        // #region agent log
-        agentLog('CSVImporter.tsx:zero_trades', 'Detected broker produced zero trades', { fileName: file?.name, broker: (parseResultForConvert as { broker?: string })?.broker }, 'C');
-        // #endregion
         setUnknownFile({ file, rawFile, csvContent, reason: 'zero_trades' });
         setProcessing(false);
         return;
@@ -2081,9 +2081,6 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
 
   const handleUniversalMappingConfirm = (mapping: Record<string, string>) => {
     if (!pendingUniversal) return;
-    // #region agent log
-    agentLog('CSVImporter.tsx:handleUniversalMappingConfirm', 'User confirmed column mapping', { mappingKeys: Object.keys(mapping).length, keys: Object.keys(mapping) }, 'E');
-    // #endregion
     try {
       const parseResult = genericParse(pendingUniversal.rawCsvText, mapping as import('@pocket-portfolio/importer').UniversalMapping, 'en-US');
       const trades: Trade[] = parseResult.trades
@@ -2111,9 +2108,6 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
           return isValid;
         });
       if (trades.length === 0) {
-        // #region agent log
-        agentLog('CSVImporter.tsx:handleUniversalMappingConfirm', 'genericParse + filter produced zero trades', { rawTradesCount: parseResult.trades?.length }, 'E');
-        // #endregion
         showAlert(
           'No Trades Found',
           'No valid trades found with this column mapping. Please check your mapping and try again.',
@@ -2135,9 +2129,6 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
       setShowIntentUpsellModal(true);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      // #region agent log
-      agentLog('CSVImporter.tsx:handleUniversalMappingConfirm', 'genericParse threw', { errorMessage: msg }, 'E');
-      // #endregion
       showAlert('Import Error', `Failed to parse CSV: ${msg}`, 'error');
     }
     setPendingUniversal(null);
@@ -2150,18 +2141,16 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
           <UnknownBrokerInterstitial
             fileName={unknownFile.file.name}
             reason={unknownFile.reason}
-            onCancel={() => setUnknownFile(null)}
+            smartImportState={smartImportCompile}
+            onCancel={() => {
+              setSmartImportCompile({ status: 'idle' });
+              setUnknownFile(null);
+            }}
             onSelectBroker={async (brokerId) => {
-              // #region agent log
-              agentLog('CSVImporter.tsx:onSelectBroker', 'User selected broker from dropdown', { brokerId, fileName: unknownFile.file.name }, 'C');
-              // #endregion
               try {
                 const result = await parseCSVAdapter(unknownFile.rawFile, 'en-US', brokerId);
                 const trades = convertToAppTrades(result);
                 if (trades.length === 0) {
-                  // #region agent log
-                  agentLog('CSVImporter.tsx:onSelectBroker', 'Adapter returned zero trades after convert', { brokerId, rawTradesCount: result?.trades?.length }, 'C');
-                  // #endregion
                   showAlert('No Trades Found', 'No valid trades found with the selected broker format.', 'warning');
                   return;
                 }
@@ -2169,41 +2158,66 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'}.`, 'success');
                 trackPaywallImpression('csv_import_success', '/dashboard');
                 setShowIntentUpsellModal(true);
+                setSmartImportCompile({ status: 'idle' });
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
-                // #region agent log
-                agentLog('CSVImporter.tsx:onSelectBroker', 'parseCSVAdapter threw', { brokerId, errorMessage: msg }, 'C');
-                // #endregion
                 showAlert('Import Error', msg, 'error');
               }
             }}
             onSmartImport={async () => {
-              // #region agent log
-              agentLog('CSVImporter.tsx:onSmartImport', 'Smart Import started', { fileName: unknownFile.file.name }, 'D');
-              // #endregion
+              setSmartImportCompile({ status: 'running', summary: 'Initializing local parse…' });
               try {
                 const result = await parseUniversal(unknownFile.rawFile, 'en-US');
                 if ('type' in result && result.type === 'REQUIRES_MAPPING') {
-                  // #region agent log
-                  agentLog('CSVImporter.tsx:onSmartImport', 'parseUniversal returned REQUIRES_MAPPING', { fileName: unknownFile.file.name }, 'D');
-                  // #endregion
+                  const headers = result.headers ?? [];
+                  const proposed = result.proposedMapping ?? {};
+                  const hasAnyDateHeader = headers.some((h) => /date|time|timestamp/i.test(String(h)));
+                  const missingDate = !proposed.date;
+                  if (missingDate && !hasAnyDateHeader) {
+                    setSmartImportCompile({
+                      status: 'error',
+                      summary: 'Missing required column: Date/Time',
+                      details: [
+                        'Smart Import can map columns, but it can’t invent missing data. This file does not include trade timestamps.',
+                        'Export an eToro “account statement / history” (trade history) CSV that includes a Date/Time column, then re-import.',
+                        `File: ${unknownFile.file?.name ?? 'unknown'}`,
+                        `Headers found: ${headers.slice(0, 12).join(', ')}`,
+                      ],
+                    });
+                    return;
+                  }
+                  setSmartImportCompile({
+                    status: 'success',
+                    summary: 'Mapping required — open the mapping editor to confirm columns.',
+                    details: [
+                      `Headers: ${result.headers.length}`,
+                      `Sample rows: ${result.sampleRows.length}`,
+                      `Confidence: ${(result.confidence * 100).toFixed(0)}%`,
+                    ],
+                  });
                   setPendingUniversal(result);
                   setUnknownFile(null);
                   return;
                 }
                 const trades = convertToAppTrades(result as import('@pocket-portfolio/importer').ParseResult);
                 if (trades.length === 0) {
-                  // #region agent log
-                  agentLog('CSVImporter.tsx:onSmartImport', 'parseUniversal ParseResult produced zero trades after convert', { rawTradesCount: (result as { trades?: unknown[] })?.trades?.length }, 'E');
-                  // #endregion
-                  showAlert('No Trades Found', 'No valid trades found. Try adjusting column mapping.', 'warning');
-                  setUnknownFile(null);
+                  const warnings =
+                    (result as import('@pocket-portfolio/importer').ParseResult)?.warnings?.slice(0, 3) ?? [];
+                  setSmartImportCompile({
+                    status: 'error',
+                    summary: 'Compiled, but no valid trades were produced from this CSV.',
+                    details: warnings.length ? warnings : ['Try selecting a broker format, or use a different CSV export.'],
+                  });
                   return;
                 }
-                // #region agent log
-                agentLog('CSVImporter.tsx:onSmartImport', 'Smart Import success', { tradesCount: trades.length }, 'D');
-                // #endregion
+                const warnings =
+                  (result as import('@pocket-portfolio/importer').ParseResult)?.warnings?.slice(0, 3) ?? [];
+                setSmartImportCompile({
+                  status: 'success',
+                  summary: `Compiled successfully — found ${trades.length} trade${trades.length === 1 ? '' : 's'}.`,
+                  details: warnings.length ? warnings : ['No warnings.'],
+                });
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} with Smart Import.`, 'success');
                 trackPaywallImpression('csv_import_success', '/dashboard');
@@ -2211,9 +2225,11 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
-                // #region agent log
-                agentLog('CSVImporter.tsx:onSmartImport', 'parseUniversal threw', { errorMessage: msg }, 'D');
-                // #endregion
+                setSmartImportCompile({
+                  status: 'error',
+                  summary: 'Smart Import compile failed.',
+                  details: [msg],
+                });
                 showAlert(
                   'Smart Import failed',
                   'Smart Import couldn\'t read this file. Try choosing a broker from the list above, or use a different CSV.',

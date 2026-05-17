@@ -72,10 +72,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
           description,
           images: [
             {
-              url: `/og?title=${encodeURIComponent('Ghostfolio CSV Import')}`,
+              url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First, No Uploads')}&v=6`,
+              secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First, No Uploads')}&v=6`,
               width: 1200,
               height: 630,
               alt: 'Ghostfolio CSV Import - Pocket Portfolio',
+              type: 'image/png',
             },
           ],
         },
@@ -83,7 +85,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
           card: 'summary_large_image',
           title,
           description,
-          images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+          images: [
+            `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First, No Uploads')}&v=6`,
+          ],
         },
         alternates: {
           canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -100,10 +104,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
           'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
         images: [
           {
-            url: `/og?title=${encodeURIComponent('Ghostfolio CSV Import')}`,
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First Portfolio Alternative')}&v=6`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First Portfolio Alternative')}&v=6`,
             width: 1200,
             height: 630,
             alt: 'Ghostfolio CSV Import - Pocket Portfolio',
+            type: 'image/png',
           },
         ],
       },
@@ -112,7 +118,57 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         title: 'Ghostfolio CSV Import | The Local-First Portfolio Alternative',
         description:
           'Migrating from Ghostfolio? Drag and drop your portfolio CSV into our zero-trust, local-first visualization terminal. No servers, no tracking, complete data sovereignty.',
-        images: ['/og?title=' + encodeURIComponent('Ghostfolio CSV Import')],
+        images: [
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Ghostfolio CSV Import')}&description=${encodeURIComponent('Local-First Portfolio Alternative')}&v=6`,
+        ],
+      },
+      alternates: {
+        canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
+      },
+    };
+  }
+
+  // High-impression developer/ops intent: Interactive Brokers (Flex Queries, exports, schema)
+  if (broker === 'interactive-brokers') {
+    const title = inMetaTest
+      ? 'Interactive Brokers CSV Import (Flex Query) | Verified Schema, Local-First'
+      : 'Interactive Brokers CSV Export → Local-First Import | Verified Ingestion Schema';
+    const description = inMetaTest
+      ? 'Parse Interactive Brokers CSV/Flex Query exports in-browser (no uploads). Verified ingestion schema + local-first parsing for portfolio tracking.'
+      : 'Export Interactive Brokers activity (Flex Query / statements) to CSV, then import locally. Verified ingestion schema, no uploads, your ledger stays on-device.';
+    return {
+      title,
+      description,
+      keywords: [
+        'Interactive Brokers CSV export',
+        'Interactive Brokers Flex Query CSV',
+        'IBKR CSV import',
+        'Interactive Brokers trade history CSV',
+        'Interactive Brokers activity statement CSV',
+        'local-first CSV parser',
+        'verified ingestion schema',
+      ],
+      openGraph: {
+        title,
+        description,
+        images: [
+          {
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=6`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=6`,
+            width: 1200,
+            height: 630,
+            alt: 'Interactive Brokers CSV Import - Pocket Portfolio',
+            type: 'image/png',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=6`,
+        ],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -143,10 +199,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         description,
         images: [
           {
-            url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Local-First, No Uploads')}&v=6`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Local-First, No Uploads')}&v=6`,
             width: 1200,
             height: 630,
             alt: `${config.displayName} CSV Import - Pocket Portfolio`,
+            type: 'image/png',
           },
         ],
       },
@@ -154,7 +212,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         card: 'summary_large_image',
         title,
         description,
-        images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
+        images: [
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Local-First, No Uploads')}&v=6`,
+        ],
       },
       alternates: {
         canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -190,10 +250,12 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         : `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
       images: [
         {
-          url: `/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}`,
+          url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
+          secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
           width: 1200,
           height: 630,
           alt: `${config.displayName} CSV Import - Pocket Portfolio`,
+          type: 'image/png',
         },
       ],
     },
@@ -203,7 +265,9 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       description: inMetaTest
         ? `Import your ${config.displayName} CSV in-browser. No uploads. Your data stays on your device.`
         : `Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
-      images: ['/og?title=' + encodeURIComponent(`${config.displayName} CSV Import`)],
+      images: [
+        `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
+      ],
     },
     alternates: {
       canonical: `https://www.pocketportfolio.app/import/${resolvedParams.broker}`,
@@ -225,6 +289,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
   const exportStep1Text = isUsRetailSeo
     ? getUsBrokerExportStep1Text(broker, config.displayName)
     : `Log into your ${config.displayName} account and export your trading history or account statement as a CSV file.`;
+  const isIbkr = broker === 'interactive-brokers';
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -346,7 +411,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             margin: '0 auto',
             lineHeight: '1.6'
           }}>
-            {isUsRetailSeo
+            {isIbkr
+              ? 'Export an Interactive Brokers Flex Query or activity statement as CSV, then parse locally. Verified ingestion schema, local-first parsing, and zero uploads.'
+              : isUsRetailSeo
               ? `Export your ${config.displayName} transaction history to CSV, then import in seconds. Everything runs in your browser — your data stays on your device.`
               : `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.`}
           </p>
@@ -407,7 +474,9 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
               color: 'var(--text-secondary)',
               margin: '0'
             }}>
-              {config.description}
+              {isIbkr
+                ? 'Interactive Brokers exports are powerful but inconsistent across report types. Pocket Portfolio treats IBKR as a verified ingestion route: parse CSV locally, normalize trades, and keep your ledger off servers.'
+                : config.description}
             </p>
           </div>
         </section>

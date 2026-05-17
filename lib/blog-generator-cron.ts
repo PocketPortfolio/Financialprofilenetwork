@@ -228,18 +228,24 @@ export async function generatePostForCron(post: BlogPost): Promise<{ mdxContent:
       ? `Academic data viz, blue/grey, charts, no text. Theme: ${post.title}.`
       : `Abstract FinTech viz, orange/slate, charts, no text. Theme: ${post.title}.`;
 
+  // OpenAI deprecated dall-e-3 on 2026-05-12. Default to gpt-image-1-mini
+  // (cost-optimized successor); set OPENAI_IMAGE_MODEL=gpt-image-2 for
+  // flagship quality. GPT image models return base64 inline (no URL fetch).
+  const imageModel = (process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-1-mini') as
+    | 'gpt-image-2'
+    | 'gpt-image-1.5'
+    | 'gpt-image-1'
+    | 'gpt-image-1-mini';
+
   const imageRes = await openai.images.generate({
-    model: 'dall-e-3',
+    model: imageModel,
     prompt: imagePrompt,
     size: '1024x1024',
-    quality: 'standard',
+    quality: 'medium',
   });
-  const imageUrl = imageRes.data?.[0]?.url;
-  if (!imageUrl) throw new Error('No image from DALL-E');
-
-  const imgRes = await fetch(imageUrl);
-  if (!imgRes.ok) throw new Error(`Failed to download image: ${imgRes.status}`);
-  const imageBuffer = Buffer.from(await imgRes.arrayBuffer());
+  const b64 = imageRes.data?.[0]?.b64_json;
+  if (!b64) throw new Error(`No image returned from OpenAI image model (${imageModel})`);
+  const imageBuffer = Buffer.from(b64, 'base64');
 
   return { mdxContent: content, imageBuffer };
 }

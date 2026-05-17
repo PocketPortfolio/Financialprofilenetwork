@@ -5,7 +5,6 @@
  */
 
 const GITHUB_REPO = 'PocketPortfolio/Financialprofilenetwork';
-const LOG_ENDPOINT = 'http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8';
 
 interface WorkflowRun {
   id: number;
@@ -43,25 +42,9 @@ interface Workflow {
   state: string;
 }
 
-// #region agent log
-async function logDebug(data: any) {
-  try {
-    await fetch(LOG_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'deep-investigate-queue.ts',
-        message: data.message || 'Debug log',
-        data: data.data || data,
-        timestamp: Date.now(),
-        sessionId: 'debug-session',
-        runId: data.runId || 'investigation',
-        hypothesisId: data.hypothesisId || 'N/A'
-      })
-    }).catch(() => {});
-  } catch (e) {}
+function logDebug(data: Record<string, unknown>) {
+  console.log('[deep-investigate-queue]', data.message ?? '', JSON.stringify(data.data ?? data));
 }
-// #endregion
 
 async function deepInvestigateQueue() {
   let token = process.env.GITHUB_TOKEN;
@@ -96,13 +79,11 @@ async function deepInvestigateQueue() {
     'Accept': 'application/vnd.github.v3+json',
   };
 
-  // #region agent log
   await logDebug({
     hypothesisId: 'ALL',
     message: 'Investigation started',
     data: { repo: GITHUB_REPO, timestamp: new Date().toISOString() }
   });
-  // #endregion
 
   console.log('🔍 DEEP CTO INVESTIGATION: GitHub Actions Queue Issue\n');
   console.log('='.repeat(80));
@@ -121,20 +102,17 @@ async function deepInvestigateQueue() {
     // ============================================================
     console.log('📋 HYPOTHESIS A: API Response Delay/Caching\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'A',
       message: 'Testing API response timing',
       data: { test: 'multiple_requests' }
     });
-    // #endregion
 
     const workflowsUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows`;
     const startTime = Date.now();
     const workflowsResponse = await fetch(workflowsUrl, { headers });
     const apiLatency = Date.now() - startTime;
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'A',
       message: 'API response received',
@@ -145,7 +123,6 @@ async function deepInvestigateQueue() {
         etag: workflowsResponse.headers.get('etag')
       }
     });
-    // #endregion
 
     if (!workflowsResponse.ok) {
       console.error(`   ❌ Failed to fetch workflows: ${workflowsResponse.status}`);
@@ -164,13 +141,11 @@ async function deepInvestigateQueue() {
     // ============================================================
     console.log('📋 HYPOTHESIS B: Organization Runner Usage\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'B',
       message: 'Checking organization runner usage',
       data: { org: 'PocketPortfolio' }
     });
-    // #endregion
 
     // Get organization info
     const orgUrl = `https://api.github.com/orgs/PocketPortfolio`;
@@ -178,7 +153,6 @@ async function deepInvestigateQueue() {
     
     if (orgResponse.ok) {
       const orgData = await orgResponse.json();
-      // #region agent log
       await logDebug({
         hypothesisId: 'B',
         message: 'Organization data retrieved',
@@ -188,18 +162,15 @@ async function deepInvestigateQueue() {
           total_private_repos: orgData.total_private_repos
         }
       });
-      // #endregion
       console.log(`   ✅ Organization: ${orgData.login}`);
       console.log(`   ✅ Public Repos: ${orgData.public_repos}`);
       console.log(`   ⚠️  Note: Cannot check runner usage across org via API (GitHub limitation)\n`);
     } else {
-      // #region agent log
       await logDebug({
         hypothesisId: 'B',
         message: 'Organization API failed',
         data: { status: orgResponse.status }
       });
-      // #endregion
       console.log(`   ⚠️  Cannot access organization data: ${orgResponse.status}\n`);
     }
 
@@ -208,13 +179,11 @@ async function deepInvestigateQueue() {
     // ============================================================
     console.log('📋 HYPOTHESIS C: Concurrency Configuration Analysis\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'C',
       message: 'Analyzing concurrency groups',
       data: { workflow_count: workflows.length }
     });
-    // #endregion
 
     const concurrencyGroups = new Map<string, string[]>();
     let conflicts: Array<[string, string[]]> = []; // Declare in broader scope
@@ -242,7 +211,6 @@ async function deepInvestigateQueue() {
         }
       }
       
-      // #region agent log
       await logDebug({
         hypothesisId: 'C',
         message: 'Concurrency groups analyzed',
@@ -251,7 +219,6 @@ async function deepInvestigateQueue() {
           conflicts: Array.from(concurrencyGroups.entries()).filter(([_, files]) => files.length > 1)
         }
       });
-      // #endregion
 
       console.log(`   ✅ Analyzed ${workflowFiles.length} workflow files`);
       console.log(`   ✅ Found ${concurrencyGroups.size} unique concurrency groups`);
@@ -275,13 +242,11 @@ async function deepInvestigateQueue() {
     // ============================================================
     console.log('📋 HYPOTHESIS D: Service Status & Rate Limits\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'D',
       message: 'Checking rate limits',
       data: { endpoint: 'workflows' }
     });
-    // #endregion
 
     const rateLimitUrl = `https://api.github.com/rate_limit`;
     const rateLimitResponse = await fetch(rateLimitUrl, { headers });
@@ -291,7 +256,6 @@ async function deepInvestigateQueue() {
       const core = rateLimitData.resources?.core || {};
       const actions = rateLimitData.resources?.actions || {};
       
-      // #region agent log
       await logDebug({
         hypothesisId: 'D',
         message: 'Rate limit data retrieved',
@@ -303,7 +267,6 @@ async function deepInvestigateQueue() {
           actions_limit: actions.limit
         }
       });
-      // #endregion
 
       console.log(`   ✅ Core API: ${core.remaining}/${core.limit} remaining`);
       console.log(`   ✅ Actions API: ${actions.remaining}/${actions.limit} remaining`);
@@ -322,13 +285,11 @@ async function deepInvestigateQueue() {
     // ============================================================
     console.log('📋 HYPOTHESIS E: Cancellation Loop Detection\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'E',
       message: 'Checking for cancellation patterns',
       data: { repo: GITHUB_REPO }
     });
-    // #endregion
 
     const recentCancelled: Array<{workflow: string, run: WorkflowRun}> = [];
     const recentQueued: Array<{workflow: string, run: WorkflowRun}> = [];
@@ -355,7 +316,6 @@ async function deepInvestigateQueue() {
       }
     }
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'E',
       message: 'Cancellation pattern analysis',
@@ -368,7 +328,6 @@ async function deepInvestigateQueue() {
         }, {} as Record<string, number>)
       }
     });
-    // #endregion
 
     console.log(`   ✅ Cancelled in last hour: ${recentCancelled.length}`);
     console.log(`   ✅ Currently queued: ${recentQueued.length}`);
@@ -391,13 +350,11 @@ async function deepInvestigateQueue() {
     // ============================================================
     console.log('📋 HYPOTHESIS F: Job Dependencies & Waiting States\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'F',
       message: 'Checking job dependencies',
       data: { queued_runs: recentQueued.length }
     });
-    // #endregion
 
     // Get detailed job information for queued runs
     for (const {workflow, run} of recentQueued.slice(0, 5)) {
@@ -408,7 +365,6 @@ async function deepInvestigateQueue() {
           const jobsData = await jobsResponse.json();
           const jobs: WorkflowJob[] = jobsData.jobs || [];
           
-          // #region agent log
           await logDebug({
             hypothesisId: 'F',
             message: 'Job details retrieved',
@@ -419,7 +375,6 @@ async function deepInvestigateQueue() {
               job_statuses: jobs.map(j => ({ name: j.name, status: j.status, conclusion: j.conclusion }))
             }
           });
-          // #endregion
 
           const waitingJobs = jobs.filter(j => j.status === 'waiting' || j.status === 'queued');
           if (waitingJobs.length > 0) {
@@ -444,7 +399,6 @@ async function deepInvestigateQueue() {
     console.log('='.repeat(80));
     console.log('📊 INVESTIGATION SUMMARY\n');
     
-    // #region agent log
     await logDebug({
       hypothesisId: 'ALL',
       message: 'Investigation complete',
@@ -456,7 +410,6 @@ async function deepInvestigateQueue() {
         concurrency_groups: concurrencyGroups.size
       }
     });
-    // #endregion
 
     console.log('HYPOTHESIS EVALUATION:\n');
     console.log(`   A. API Delay/Caching: ${apiLatency < 1000 ? '✅ REJECTED' : '⚠️  INCONCLUSIVE'} (${apiLatency}ms latency)`);
@@ -478,13 +431,11 @@ async function deepInvestigateQueue() {
     console.log('');
 
   } catch (error: any) {
-    // #region agent log
     await logDebug({
       hypothesisId: 'ALL',
       message: 'Investigation error',
       data: { error: error.message, stack: error.stack }
     });
-    // #endregion
     console.error(`\n❌ Fatal error: ${error.message}`);
     process.exit(1);
   }

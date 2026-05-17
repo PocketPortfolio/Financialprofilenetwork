@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getArchitectureChallengeLeadsAnalytics } from '@/lib/challenge/challenge-leads-firestore';
+import { getOpenPortfolioLeadsAnalytics } from '@/lib/open-portfolio/contact-leads-firestore';
 import { getViralMomentBlastMetrics } from '@/lib/marketing/viral-moment-blast-stats';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import fs from 'fs';
 import path from 'path';
+import {
+  clearFirestoreReadsDegraded,
+  isFirestoreResourceExhausted,
+  markFirestoreReadsDegraded,
+  shouldDegradeFirestoreReads,
+} from '@/app/lib/server/firestore-quota-circuit';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -14,6 +21,19 @@ export const dynamicParams = true;
 export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
+
+/** In-process cache to cut Firestore read storms (polling, remounts). Serverless: per instance. */
+type AdminAnalyticsCacheEntry = { range: string; body: unknown; expiresAt: number };
+let adminAnalyticsResponseCache: AdminAnalyticsCacheEntry | null = null;
+
+function adminAnalyticsResponseCacheTtlMs(): number {
+  const raw = process.env.ADMIN_ANALYTICS_RESPONSE_CACHE_TTL_MS;
+  if (raw === '0' || raw === '') return 0;
+  const def = 120_000;
+  const n = raw !== undefined && raw !== '' ? Number.parseInt(String(raw), 10) : def;
+  if (!Number.isFinite(n) || n < 0) return def;
+  return Math.min(n, 15 * 60 * 1000);
+}
 
 // Lazy initialization for Firebase Admin
 function getDb() {
@@ -42,6 +62,18 @@ const stripe = process.env.STRIPE_SECRET_KEY
 
 const MONTHLY_GOAL = 200;
 
+/**
+ * Caps documents read per time-ranged Firestore query in this route. Uncapped `.get()` on
+ * `toolUsage` / `pageViews` / funnels scanned the whole collection and exhausted daily reads
+ * (RESOURCE_EXHAUSTED). Override with `ADMIN_ANALYTICS_MAX_FIRESTORE_DOCS` (200–50000).
+ */
+function adminAnalyticsFirestoreScanLimit(): number {
+  const raw = process.env.ADMIN_ANALYTICS_MAX_FIRESTORE_DOCS;
+  const n = raw !== undefined && raw !== '' ? Number.parseInt(String(raw), 10) : NaN;
+  if (Number.isFinite(n) && n >= 200 && n <= 50_000) return n;
+  return 3500;
+}
+
 // Price IDs from /sponsor page - track all monetization tiers
 const SPONSOR_PRICE_IDS = {
   // Monthly subscriptions
@@ -60,6 +92,9 @@ const SPONSOR_PRICE_IDS = {
   oneTimeDonation: process.env.NEXT_PUBLIC_STRIPE_PRICE_DONATION || 'price_1SeZj0D4sftWa1WtXkkVps9a',
 };
 
+/** Dashboard/env typo alias — must match stripe-paid-tier.ts */
+const FOUNDERS_CLUB_ANNUAL_PRICE_TYPO = 'price_1TAWCxD4sftWa1WtEZtg2OIi';
+
 // Map Price IDs to tier names (for display)
 const PRICE_ID_TO_TIER: Record<string, string> = {
   [SPONSOR_PRICE_IDS.codeSupporterMonthly]: 'Code Supporter (Monthly)',
@@ -70,6 +105,7 @@ const PRICE_ID_TO_TIER: Record<string, string> = {
   [SPONSOR_PRICE_IDS.corporateSponsorAnnual]: 'Corporate Ecosystem (Annual)',
   [SPONSOR_PRICE_IDS.foundersClubMonthly]: "Founder's Club (Monthly)",
   [SPONSOR_PRICE_IDS.foundersClubAnnual]: "Founder's Club (Annual)",
+  [FOUNDERS_CLUB_ANNUAL_PRICE_TYPO]: "Founder's Club (Annual)",
   [SPONSOR_PRICE_IDS.foundersClubLegacy]: "Founder's Club (Legacy one-time)",
   [SPONSOR_PRICE_IDS.oneTimeDonation]: 'One-Time Donation',
 };
@@ -84,6 +120,7 @@ const VALID_PRICE_IDS = new Set([
   SPONSOR_PRICE_IDS.corporateSponsorAnnual,
   SPONSOR_PRICE_IDS.foundersClubMonthly,
   SPONSOR_PRICE_IDS.foundersClubAnnual,
+  FOUNDERS_CLUB_ANNUAL_PRICE_TYPO,
   SPONSOR_PRICE_IDS.foundersClubLegacy,
   SPONSOR_PRICE_IDS.oneTimeDonation,
 ]);
@@ -91,8 +128,11 @@ const VALID_PRICE_IDS = new Set([
 const FOUNDERS_CLUB_PRICE_IDS = new Set([
   SPONSOR_PRICE_IDS.foundersClubMonthly,
   SPONSOR_PRICE_IDS.foundersClubAnnual,
+  FOUNDERS_CLUB_ANNUAL_PRICE_TYPO,
   SPONSOR_PRICE_IDS.foundersClubLegacy,
 ]);
+
+const SUBSCRIPTION_OK_FOR_MRR = new Set(['active', 'trialing', 'past_due']);
 
 // NPM packages to track
 const NPM_PACKAGES = [
@@ -115,7 +155,21 @@ export async function GET(request: NextRequest) {
     // Get time range from query params
     const searchParams = request.nextUrl.searchParams;
     const range = searchParams.get('range') || '30d';
-    
+    const responseCacheTtlMs = adminAnalyticsResponseCacheTtlMs();
+    if (
+      responseCacheTtlMs > 0 &&
+      adminAnalyticsResponseCache &&
+      adminAnalyticsResponseCache.range === range &&
+      Date.now() < adminAnalyticsResponseCache.expiresAt
+    ) {
+      return NextResponse.json(adminAnalyticsResponseCache.body, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          Pragma: 'no-cache',
+        },
+      });
+    }
+
     console.log('[Analytics API] 📊 Fetching data with range:', range);
     
     // Calculate date range
@@ -137,47 +191,65 @@ export async function GET(request: NextRequest) {
 
     // Fetch monetization data from Stripe
     console.log('[Analytics API] 💰 Fetching monetization data...');
-    const monetization = await getMonetizationData(startDate);
-    
-    // Fetch tool usage from Firestore
-    console.log('[Analytics API] 🛠️ Fetching tool usage data...');
-    const toolUsage = await getToolUsageData(startDate);
-    
-    // Fetch SEO page data from Firestore
+        const monetization = await getMonetizationData(startDate);
+        
+    // SEO page views before heavy toolUsage scan: aligns with production UX when toolUsage
+    // hits quota — do not open the global Firestore circuit from this route (see get* opts).
     console.log('[Analytics API] 📈 Fetching SEO page data...');
-    const seoPages = await getSEOPageData(startDate);
-
+        const boundedFirestoreOpts = {
+      openGlobalCircuitOnQuota: false,
+      /** Bounded reads are safe; do not skip them when user routes opened the global circuit. */
+      ignoreGlobalCircuit: true,
+    };
+    const seoPages = await getSEOPageData(startDate, boundedFirestoreOpts);
+        
+    console.log('[Analytics API] 🛠️ Fetching tool usage data...');
+        const toolUsage = await getToolUsageData(startDate, boundedFirestoreOpts);
+        
+    /**
+     * Skip heavy Firestore (listUsers, referrals, …) only when **both** bounded admin reads failed.
+     * If SEO succeeds but toolUsage fails (or vice versa), still attempt other collections — partial
+     * dashboard beats `skipped_firestore_degraded` everywhere when quota is tight.
+     */
+    const toolFirestoreBad =
+      Boolean((toolUsage as any)?.degraded) &&
+      (toolUsage as any)?.degradedReason !== 'dev_no_firestore';
+    const seoFirestoreBad =
+      Boolean((seoPages as any)?.degraded) &&
+      (seoPages as any)?.degradedReason !== 'dev_no_firestore';
+    const firestoreDegraded = toolFirestoreBad && seoFirestoreBad;
+    
     // Fetch NPM package data
     console.log('[Analytics API] 📦 Fetching NPM data...');
-    const npmData = await getNPMData();
-
+        const npmData = await getNPMData();
+        
     // Fetch blog posts data
     console.log('[Analytics API] 📝 Fetching blog posts data...');
-    const blogPosts = await getBlogPostsData();
-    console.log('[Analytics API] ✅ Blog posts fetched:', blogPosts.total, 'total posts,', blogPosts.posts.filter((p: any) => p.category === 'research').length, 'research posts');
-
+        const blogPosts = await getBlogPostsData();
+        console.log('[Analytics API] ✅ Blog posts fetched:', blogPosts.total, 'total posts,', blogPosts.posts.filter((p: any) => p.category === 'research').length, 'research posts');
+    
     // Fetch leads data
     console.log('[Analytics API] 👥 Fetching leads data...');
-    const leadsData = await getLeadsData(startDate);
-
-    // Fetch app signups (Google) from Firebase Auth (isolated so failure doesn't 500 the whole dashboard)
+        const leadsData = await getLeadsData(startDate);
+        
+    // Fetch app signups (Google) — listUsers is heavy; skip entirely when Firestore is degraded
     let googleSignups: Awaited<ReturnType<typeof getGoogleSignupsData>>;
-    try {
-      console.log('[Analytics API] 🔐 Fetching Google signups...');
-      googleSignups = await getGoogleSignupsData(startDate);
-    } catch (e: any) {
-      console.error('[Analytics API] 🔐 Google signups failed:', e?.message);
-      googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: e?.message };
+    if (firestoreDegraded) {
+            googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: 'skipped_firestore_degraded' };
+    } else {
+      try {
+        console.log('[Analytics API] 🔐 Fetching Google signups...');
+                googleSignups = await getGoogleSignupsData(startDate);
+              } catch (e: any) {
+        console.error('[Analytics API] 🔐 Google signups failed:', e?.message);
+        googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: e?.message };
+              }
     }
 
-    // Fetch referral events (clicks + conversions)
+    // Fetch referral events (Firestore) — skip when Firestore is degraded
     let referral: Awaited<ReturnType<typeof getReferralData>>;
-    try {
-      console.log('[Analytics API] 🔗 Fetching referral data...');
-      referral = await getReferralData(startDate);
-    } catch (e: any) {
-      console.error('[Analytics API] 🔗 Referral data failed:', e?.message);
-      referral = {
+    if (firestoreDegraded) {
+            referral = {
         clicks: 0,
         conversions: 0,
         last7DaysClicks: 0,
@@ -185,6 +257,21 @@ export async function GET(request: NextRequest) {
         bySource: {},
         byCampaign: {},
       };
+    } else {
+      try {
+        console.log('[Analytics API] 🔗 Fetching referral data...');
+                referral = await getReferralData(startDate);
+              } catch (e: any) {
+        console.error('[Analytics API] 🔗 Referral data failed:', e?.message);
+        referral = {
+          clicks: 0,
+          conversions: 0,
+          last7DaysClicks: 0,
+          last7DaysConversions: 0,
+          bySource: {},
+          byCampaign: {},
+        };
+              }
     }
 
     let viralMomentEmailBlast: {
@@ -198,20 +285,8 @@ export async function GET(request: NextRequest) {
       lastCronRunEvaluated: number;
       lastCronRunSuppressed: number;
     };
-    try {
-      const db = getDb();
-      const m = await getViralMomentBlastMetrics(db, startDate);
-      const viralConv = referral.byCampaign?.['viral_moment_v1']?.conversions ?? 0;
-      const emails = m.emailsSentInSelectedRange;
-      viralMomentEmailBlast = {
-        ...m,
-        viralMomentV1ConversionsInRange: viralConv,
-        loopVelocityPer100Emails:
-          emails > 0 ? Math.round((viralConv / emails) * 10_000) / 100 : null,
-      };
-    } catch (e: any) {
-      console.error('[Analytics API] 📧 Viral blast metrics failed:', e?.message);
-      viralMomentEmailBlast = {
+    if (firestoreDegraded) {
+            viralMomentEmailBlast = {
         totalSentAllTime: 0,
         emailsSentInSelectedRange: 0,
         emailsSentLast7Days: 0,
@@ -222,28 +297,59 @@ export async function GET(request: NextRequest) {
         lastCronRunEvaluated: 0,
         lastCronRunSuppressed: 0,
       };
+    } else {
+      try {
+                const db = getDb();
+        const m = await getViralMomentBlastMetrics(db, startDate);
+        const viralConv = referral.byCampaign?.['viral_moment_v1']?.conversions ?? 0;
+        const emails = m.emailsSentInSelectedRange;
+        viralMomentEmailBlast = {
+          ...m,
+          viralMomentV1ConversionsInRange: viralConv,
+          loopVelocityPer100Emails:
+            emails > 0 ? Math.round((viralConv / emails) * 10_000) / 100 : null,
+        };
+              } catch (e: any) {
+        console.error('[Analytics API] 📧 Viral blast metrics failed:', e?.message);
+                viralMomentEmailBlast = {
+          totalSentAllTime: 0,
+          emailsSentInSelectedRange: 0,
+          emailsSentLast7Days: 0,
+          viralMomentV1ConversionsInRange: 0,
+          loopVelocityPer100Emails: null,
+          lastCronRunAt: null,
+          lastCronRunSent: 0,
+          lastCronRunEvaluated: 0,
+          lastCronRunSuppressed: 0,
+        };
+      }
     }
 
     // Fetch conversion funnel (lead_magnet_clicked, mobile_setup_requested, quota_upgrade_initiated)
     let conversionFunnel: Awaited<ReturnType<typeof getConversionFunnelData>>;
-    try {
-      console.log('[Analytics API] 📊 Fetching conversion funnel data...');
-      conversionFunnel = await getConversionFunnelData(startDate);
-    } catch (e: any) {
-      console.error('[Analytics API] 📊 Conversion funnel failed:', e?.message);
-      conversionFunnel = {
+    if (firestoreDegraded) {
+            conversionFunnel = {
         leadMagnetClicked: { total: 0, last7Days: 0, byTicker: {} },
         mobileSetupRequested: { total: 0, last7Days: 0 },
         quotaUpgradeInitiated: { total: 0, last7Days: 0 },
       };
+    } else {
+      try {
+        console.log('[Analytics API] 📊 Fetching conversion funnel data...');
+                conversionFunnel = await getConversionFunnelData(startDate);
+              } catch (e: any) {
+        console.error('[Analytics API] 📊 Conversion funnel failed:', e?.message);
+                conversionFunnel = {
+          leadMagnetClicked: { total: 0, last7Days: 0, byTicker: {} },
+          mobileSetupRequested: { total: 0, last7Days: 0 },
+          quotaUpgradeInitiated: { total: 0, last7Days: 0 },
+        };
+      }
     }
 
     let monetizationFunnelBoard: Awaited<ReturnType<typeof getMonetizationFunnelBoardData>>;
-    try {
-      monetizationFunnelBoard = await getMonetizationFunnelBoardData(startDate, seoPages.totalViews);
-    } catch (e: any) {
-      console.error('[Analytics API] 📈 Monetization funnel board failed:', e?.message);
-      monetizationFunnelBoard = {
+    if (firestoreDegraded) {
+            monetizationFunnelBoard = {
         organicTraffic: seoPages.totalViews,
         paywallImpressions: 0,
         checkoutStarts: 0,
@@ -251,21 +357,70 @@ export async function GET(request: NextRequest) {
         paywallToCheckoutPercent: null,
         checkoutToPaidDropoffPercent: null,
       };
+    } else {
+      try {
+                monetizationFunnelBoard = await getMonetizationFunnelBoardData(startDate, seoPages.totalViews);
+              } catch (e: any) {
+        console.error('[Analytics API] 📈 Monetization funnel board failed:', e?.message);
+                monetizationFunnelBoard = {
+          organicTraffic: seoPages.totalViews,
+          paywallImpressions: 0,
+          checkoutStarts: 0,
+          paidFoundersActive: 0,
+          paywallToCheckoutPercent: null,
+          checkoutToPaidDropoffPercent: null,
+        };
+      }
     }
 
     // Architecture Challenge (/challenge) — CTO funnel emails (Firestore)
     let architectureChallengeLeads: Awaited<ReturnType<typeof getArchitectureChallengeLeadsAnalytics>>;
-    try {
-      console.log('[Analytics API] 🎯 Fetching architecture challenge leads...');
-      architectureChallengeLeads = await getArchitectureChallengeLeadsAnalytics(startDate);
-    } catch (e: any) {
-      console.error('[Analytics API] 🎯 Architecture challenge leads failed:', e?.message);
-      architectureChallengeLeads = {
+    if (firestoreDegraded) {
+            architectureChallengeLeads = {
         total: 0,
         last7Days: 0,
         signups: [],
-        error: e?.message,
+        // Intentionally not firestore_quota_exceeded — we did not query; bounded reads already failed.
+        error: 'skipped_firestore_degraded',
       };
+    } else {
+      try {
+        console.log('[Analytics API] 🎯 Fetching architecture challenge leads...');
+                architectureChallengeLeads = await getArchitectureChallengeLeadsAnalytics(startDate);
+              } catch (e: any) {
+        console.error('[Analytics API] 🎯 Architecture challenge leads failed:', e?.message);
+                architectureChallengeLeads = {
+          total: 0,
+          last7Days: 0,
+          signups: [],
+          error: e?.message,
+        };
+      }
+    }
+
+    // Open Portfolio (B2B) contact-form submissions (Firestore)
+    let openPortfolioContactLeads: Awaited<ReturnType<typeof getOpenPortfolioLeadsAnalytics>>;
+    if (firestoreDegraded) {
+      openPortfolioContactLeads = {
+        total: 0,
+        last7Days: 0,
+        byContext: {},
+        signups: [],
+        error: 'skipped_firestore_degraded',
+      };
+    } else {
+      try {
+        openPortfolioContactLeads = await getOpenPortfolioLeadsAnalytics(startDate);
+      } catch (e: any) {
+        console.error('[Analytics API] 🎯 Open Portfolio leads failed:', e?.message);
+        openPortfolioContactLeads = {
+          total: 0,
+          last7Days: 0,
+          byContext: {},
+          signups: [],
+          error: e?.message,
+        };
+      }
     }
 
     const body = {
@@ -281,10 +436,18 @@ export async function GET(request: NextRequest) {
       conversionFunnel,
       monetizationFunnelBoard,
       architectureChallengeLeads,
+      openPortfolioContactLeads,
       timeRange: range,
       lastUpdated: new Date().toISOString(),
     };
 
+        if (responseCacheTtlMs > 0) {
+      adminAnalyticsResponseCache = {
+        range,
+        body: JSON.parse(JSON.stringify(body)),
+        expiresAt: Date.now() + responseCacheTtlMs,
+      };
+    }
     return NextResponse.json(body, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -294,7 +457,7 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('[Analytics API] ❌ ERROR:', error);
     console.error('[Analytics API] ❌ Stack:', error.stack);
-    return NextResponse.json(
+        return NextResponse.json(
       { error: error.message || 'Failed to fetch analytics' },
       { status: 500 }
     );
@@ -319,9 +482,9 @@ async function getMonetizationData(startDate: Date) {
 
   try {
     const subscriptions = await stripe.subscriptions.list({
-      status: 'active',
+      status: 'all',
       limit: 100,
-      expand: ['data.customer', 'data.items.data.price']
+      expand: ['data.customer', 'data.items.data.price'],
     });
 
     const startTimestamp = Math.floor(startDate.getTime() / 1000);
@@ -331,16 +494,23 @@ async function getMonetizationData(startDate: Date) {
     let foundersClubMRR = 0;
     const foundersClubSubscriberIds = new Set<string>();
     let foundersClubCashCollected = 0;
+    let scannedItems = 0;
+    let matchedItems = 0;
+    const unmatchedPriceIds = new Map<string, number>();
 
     for (const sub of subscriptions.data) {
+      if (!SUBSCRIPTION_OK_FOR_MRR.has(sub.status)) continue;
       for (const item of sub.items.data) {
         const price = item.price;
         const priceId = price.id;
+        scannedItems += 1;
         
         // Only track subscriptions from /sponsor page (filter by Price ID)
         if (!VALID_PRICE_IDS.has(priceId)) {
+          unmatchedPriceIds.set(priceId, (unmatchedPriceIds.get(priceId) || 0) + 1);
           continue;
         }
+        matchedItems += 1;
         
         // Handle both monthly and annual subscriptions
         if (price.recurring && price.unit_amount) {
@@ -472,20 +642,64 @@ async function getMonetizationData(startDate: Date) {
   }
 }
 
-async function getToolUsageData(startDate: Date) {
+type AdminFirestoreReadOpts = {
+  /** When false, RESOURCE_EXHAUSTED on this read does not open the process-wide circuit (admin must not starve tier/SEO). */
+  openGlobalCircuitOnQuota?: boolean;
+  /** When true, run bounded queries even if `shouldDegradeFirestoreReads()` — otherwise admin shows zeros until circuit TTL expires. */
+  ignoreGlobalCircuit?: boolean;
+};
+
+async function getToolUsageData(
+  startDate: Date,
+  opts?: AdminFirestoreReadOpts
+) {
+  const openGlobalCircuitOnQuota = opts?.openGlobalCircuitOnQuota !== false;
+  const ignoreGlobalCircuit = opts?.ignoreGlobalCircuit === true;
   try {
+    // In local dev, avoid hanging the dashboard on production Firestore reads unless explicitly enabled.
+    const useFirestoreInDev = process.env.NEXT_PUBLIC_DEV_USE_FIRESTORE_TIERS === 'true';
+    if (process.env.NODE_ENV === 'development' && !useFirestoreInDev) {
+            return {
+        taxConverter: { total: 0, successful: 0, byPair: {}, last7Days: 0 },
+        googleSheets: { total: 0, formulasGenerated: 0, copies: 0, last7Days: 0 },
+        advisorTool: { total: 0, pdfsGenerated: 0, last7Days: 0 },
+        csvDownloads: { total: 0, last7Days: 0, last24Hours: 0, byTicker: {} },
+        pocketAnalyst: { questions: 0, errors: 0, quotaExceeded: 0, uniqueUsers: 0, last7Days: 0, byTier: {}, byProvider: {} },
+        degraded: true,
+        degradedReason: 'dev_no_firestore',
+      } as any;
+    }
+
+    if (!ignoreGlobalCircuit && shouldDegradeFirestoreReads()) {
+            return {
+        taxConverter: { total: 0, successful: 0, byPair: {}, last7Days: 0 },
+        googleSheets: { total: 0, formulasGenerated: 0, copies: 0, last7Days: 0 },
+        advisorTool: { total: 0, pdfsGenerated: 0, last7Days: 0 },
+        csvDownloads: { total: 0, last7Days: 0, last24Hours: 0, byTicker: {} },
+        pocketAnalyst: { questions: 0, errors: 0, quotaExceeded: 0, uniqueUsers: 0, last7Days: 0, byTier: {}, byProvider: {} },
+        degraded: true,
+        degradedReason: 'firestore_circuit_open',
+      } as any;
+    }
+    if (ignoreGlobalCircuit && shouldDegradeFirestoreReads()) {
+          }
+
     const db = getDb();
-    
+        
     // Fetch tool usage events from Firestore
     // Same startDate as dashboard range (7d / 30d / 90d / epoch for "all").
     // Admin UI must not label aggregates as "all time" unless range=all — otherwise totals are period-scoped.
     const toolEventsRef = db.collection('toolUsage');
     const startTimestamp = Timestamp.fromDate(startDate);
-    
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
+
     const snapshot = await toolEventsRef
       .where('timestamp', '>=', startTimestamp)
+      .orderBy('timestamp', 'desc')
+      .limit(scanLimit)
       .get();
-
+        clearFirestoreReadsDegraded();
+    
     const taxConverter = {
       total: 0,
       successful: 0,
@@ -637,9 +851,32 @@ async function getToolUsageData(startDate: Date) {
         byTier: pocketAnalyst.byTier,
         byProvider: pocketAnalyst.byProvider,
       },
+      firestoreScan: {
+        maxDocs: scanLimit,
+        docsRead: snapshot.size,
+        order: 'timestamp_desc',
+        note:
+          snapshot.size >= scanLimit
+            ? 'Totals are from the most recent events in range only (read cap). Raise ADMIN_ANALYTICS_MAX_FIRESTORE_DOCS or enable Firestore billing for full scans.'
+            : 'Full sample for selected window under read cap.',
+      },
     };
   } catch (error) {
     console.error('Tool usage fetch error:', error);
+        if (isFirestoreResourceExhausted(error)) {
+      if (openGlobalCircuitOnQuota) {
+        markFirestoreReadsDegraded();
+      }
+            return {
+        taxConverter: { total: 0, successful: 0, byPair: {}, last7Days: 0 },
+        googleSheets: { total: 0, formulasGenerated: 0, copies: 0, last7Days: 0 },
+        advisorTool: { total: 0, pdfsGenerated: 0, last7Days: 0 },
+        csvDownloads: { total: 0, last7Days: 0, last24Hours: 0, byTicker: {} },
+        pocketAnalyst: { questions: 0, errors: 0, quotaExceeded: 0, uniqueUsers: 0, last7Days: 0, byTier: {}, byProvider: {} },
+        degraded: true,
+        degradedReason: 'firestore_quota_exceeded',
+      } as any;
+    }
     return {
       taxConverter: { total: 0, successful: 0, byPair: {}, last7Days: 0 },
       googleSheets: { total: 0, formulasGenerated: 0, copies: 0, last7Days: 0 },
@@ -650,18 +887,39 @@ async function getToolUsageData(startDate: Date) {
   }
 }
 
-async function getSEOPageData(startDate: Date) {
+async function getSEOPageData(
+  startDate: Date,
+  opts?: AdminFirestoreReadOpts
+) {
+  const openGlobalCircuitOnQuota = opts?.openGlobalCircuitOnQuota !== false;
+  const ignoreGlobalCircuit = opts?.ignoreGlobalCircuit === true;
   try {
+    if (!ignoreGlobalCircuit && shouldDegradeFirestoreReads()) {
+            return {
+        totalViews: 0,
+        topPages: [],
+        conversionRate: 0,
+        degraded: true,
+        degradedReason: 'firestore_circuit_open',
+      } as any;
+    }
+    if (ignoreGlobalCircuit && shouldDegradeFirestoreReads()) {
+          }
     const db = getDb();
     
     // Fetch page view events
     const pageViewsRef = db.collection('pageViews');
     const startTimestamp = Timestamp.fromDate(startDate);
-    
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
+
     const snapshot = await pageViewsRef
       .where('timestamp', '>=', startTimestamp)
+      .orderBy('timestamp', 'desc')
+      .limit(scanLimit)
       .get();
 
+    clearFirestoreReadsDegraded();
+    
     // Separate old records (without sessionId) from new records (with sessionId)
     // Old records need different deduplication logic since we can't use sessionId
     const oldRecords: Array<{ path: string; converted: boolean; timestamp: Timestamp }> = [];
@@ -800,15 +1058,31 @@ async function getSEOPageData(startDate: Date) {
     return {
       totalViews,
       topPages,
-      conversionRate
+      conversionRate,
+      firestoreScan: {
+        maxDocs: scanLimit,
+        docsRead: snapshot.size,
+        order: 'timestamp_desc',
+        note:
+          snapshot.size >= scanLimit
+            ? 'Views are deduped from the most recent page view docs in range only (read cap).'
+            : 'Full sample for selected window under read cap.',
+      },
     };
   } catch (error) {
     console.error('SEO page data fetch error:', error);
+    if (isFirestoreResourceExhausted(error) && openGlobalCircuitOnQuota) {
+      markFirestoreReadsDegraded();
+    }
+    if (isFirestoreResourceExhausted(error)) {
+          }
     return {
       totalViews: 0,
       topPages: [],
-      conversionRate: 0
-    };
+      conversionRate: 0,
+      degraded: true,
+      degradedReason: isFirestoreResourceExhausted(error) ? 'firestore_quota_exceeded' : 'unknown',
+    } as any;
   }
 }
 
@@ -818,9 +1092,12 @@ async function getReferralData(startDate: Date) {
     const ref = db.collection('referralEvents');
     const startTimestamp = Timestamp.fromDate(startDate);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
 
     const snapshot = await ref
       .where('timestamp', '>=', startTimestamp)
+      .orderBy('timestamp', 'desc')
+      .limit(scanLimit)
       .get();
 
     let clicks = 0;
@@ -899,7 +1176,13 @@ async function getMonetizationFunnelBoardData(startDate: Date, organicTraffic: n
   try {
     const db = getDb();
     const startTimestamp = Timestamp.fromDate(startDate);
-    const snap = await db.collection('monetizationFunnelEvents').where('timestamp', '>=', startTimestamp).get();
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
+    const snap = await db
+      .collection('monetizationFunnelEvents')
+      .where('timestamp', '>=', startTimestamp)
+      .orderBy('timestamp', 'desc')
+      .limit(scanLimit)
+      .get();
     let paywallImpressions = 0;
     let checkoutStarts = 0;
     snap.docs.forEach((doc) => {
@@ -912,10 +1195,8 @@ async function getMonetizationFunnelBoardData(startDate: Date, organicTraffic: n
       const agg = await db.collection('apiKeysByEmail').where('tier', '==', 'foundersClub').count().get();
       paidFoundersActive = agg.data().count;
     } catch {
-      const q = await db.collection('apiKeysByEmail').limit(5000).get();
-      q.docs.forEach((d) => {
-        if (d.data()?.tier === 'foundersClub') paidFoundersActive++;
-      });
+      // Never fall back to a 5k-doc table scan (it reproduced quota exhaustion).
+      paidFoundersActive = 0;
     }
     const paywallToCheckoutPercent =
       paywallImpressions > 0 ? Math.round((checkoutStarts / paywallImpressions) * 1000) / 10 : null;
@@ -952,8 +1233,13 @@ async function getConversionFunnelData(startDate: Date) {
     const startTimestamp = Timestamp.fromDate(startDate);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
 
-    const snapshot = await ref.where('timestamp', '>=', startTimestamp).get();
+    const snapshot = await ref
+      .where('timestamp', '>=', startTimestamp)
+      .orderBy('timestamp', 'desc')
+      .limit(scanLimit)
+      .get();
 
     const leadMagnetClicked = { total: 0, last7Days: 0, byTicker: {} as Record<string, number> };
     const mobileSetupRequested = { total: 0, last7Days: 0 };
@@ -1058,7 +1344,7 @@ async function fetchWithRetry(
 async function processBatch<T, R>(
   items: T[],
   processor: (item: T) => Promise<R>,
-  concurrency: number = 5
+  concurrency: number = 10
 ): Promise<R[]> {
   const results: R[] = [];
   
@@ -1079,6 +1365,8 @@ async function getNPMData() {
         try {
           let last7Days = 0;
           let monthlyDownloads = 0;
+          // Avoid long-running "all time" ranges in serverless/dev.
+          // If we need this later, add caching + a scheduled job.
           let allTimeDownloads = 0;
           let version = 'unknown';
 
@@ -1089,8 +1377,8 @@ async function getNPMData() {
               {
                 headers: { 'Accept': 'application/json' },
               },
-              3,
-              1000
+              1,
+              0
             );
 
             if (weeklyResponse.ok) {
@@ -1105,71 +1393,23 @@ async function getNPMData() {
 
           // Fetch last 30 days (monthly) downloads with retry
           try {
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 30);
-            const startDateStr = startDate.toISOString().split('T')[0];
-            const endDateStr = endDate.toISOString().split('T')[0];
-            
             const monthlyResponse = await fetchWithRetry(
-              `https://api.npmjs.org/downloads/range/${startDateStr}:${endDateStr}/${encodeURIComponent(packageName)}`,
+              `https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(packageName)}`,
               {
                 headers: { 'Accept': 'application/json' },
               },
-              3,
-              1000
+              1,
+              0
             );
 
             if (monthlyResponse.ok) {
               const monthlyData = await monthlyResponse.json();
-              if (monthlyData.downloads && Array.isArray(monthlyData.downloads)) {
-                monthlyDownloads = monthlyData.downloads.reduce((sum: number, day: any) => sum + (day.downloads || 0), 0);
-              }
+              monthlyDownloads = monthlyData.downloads || 0;
             } else {
-              // Fallback: try the point endpoint
-              try {
-                const altResponse = await fetchWithRetry(
-                  `https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(packageName)}`,
-                  {
-                    headers: { 'Accept': 'application/json' },
-                  },
-                  2,
-                  500
-                );
-                if (altResponse.ok) {
-                  const altData = await altResponse.json();
-                  monthlyDownloads = altData.downloads || 0;
-                }
-              } catch (altError) {
-                console.warn(`Fallback monthly endpoint failed for ${packageName}`);
-              }
+              console.warn(`Failed to fetch monthly stats for ${packageName}: ${monthlyResponse.status}`);
             }
           } catch (error: any) {
             console.warn(`Error fetching monthly stats for ${packageName}:`, error.message);
-          }
-
-          // Fetch all-time downloads (from npm stats epoch to today)
-          try {
-            const endDate = new Date();
-            const allTimeStartDate = new Date('2010-01-01');
-            const startDateStr = allTimeStartDate.toISOString().split('T')[0];
-            const endDateStr = endDate.toISOString().split('T')[0];
-
-            const allTimeResponse = await fetchWithRetry(
-              `https://api.npmjs.org/downloads/point/${startDateStr}:${endDateStr}/${encodeURIComponent(packageName)}`,
-              {
-                headers: { 'Accept': 'application/json' },
-              },
-              3,
-              1000
-            );
-
-            if (allTimeResponse.ok) {
-              const allTimeData = await allTimeResponse.json();
-              allTimeDownloads = allTimeData.downloads || 0;
-            }
-          } catch (error: any) {
-            console.warn(`Error fetching all-time stats for ${packageName}:`, error.message);
           }
 
           // Fetch package metadata for version info with retry
@@ -1179,8 +1419,8 @@ async function getNPMData() {
               {
                 headers: { 'Accept': 'application/json' },
               },
-              3,
-              1000
+              1,
+              0
             );
 
             if (metaResponse.ok) {
@@ -1562,53 +1802,141 @@ async function getBlogPostsData() {
 
 async function getLeadsData(startDate: Date) {
   try {
-    const { db } = await import('@/db/sales/client');
-    const { leads } = await import('@/db/sales/schema');
-    const { gte, desc, like, and } = await import('drizzle-orm');
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const scanLimit = adminAnalyticsFirestoreScanLimit();
+    const db = getDb();
+    const startTimestamp = Timestamp.fromDate(startDate);
 
-    // ✅ FILTER: Only get leads from waitlist (exclude autonomous sales engine)
-    const leadsList = await db
-      .select({
-        id: leads.id,
-        email: leads.email,
-        firstName: leads.firstName,
-        lastName: leads.lastName,
-        companyName: leads.companyName,
-        status: leads.status,
-        createdAt: leads.createdAt,
-        dataSource: leads.dataSource,
-      })
-      .from(leads)
-      .where(and(
-        gte(leads.createdAt, startDate),
-        like(leads.dataSource, 'waitlist_%')  // ✅ Only waitlist leads
-      ))
-      .orderBy(desc(leads.createdAt));
+    // 1) Firestore: identity gate leads (this is what /admin/analytics must reflect)
+    let identityDocs: Array<{
+      id: string;
+      email: string;
+      firstName: null;
+      lastName: null;
+      companyName: string;
+      status: string;
+      createdAt: string;
+      dataSource: string | null;
+    }> = [];
 
-    const total = leadsList.length;
-    const byStatus = leadsList.reduce((acc, lead) => {
+    try {
+      const snapshot = await db
+        .collection('identityGateLeads')
+        .where('timestamp', '>=', startTimestamp)
+        .orderBy('timestamp', 'desc')
+        .limit(scanLimit)
+        .get();
+
+      identityDocs = snapshot.docs.map((d) => {
+        const data = d.data() as any;
+        const ts = data?.timestamp as Timestamp | undefined;
+        const createdAt = ts?.toDate ? ts.toDate().toISOString() : new Date().toISOString();
+        const action = typeof data?.action === 'string' ? data.action : 'unknown';
+        return {
+          id: d.id,
+          email: typeof data?.email === 'string' ? data.email : '',
+          firstName: null,
+          lastName: null,
+          companyName: 'Individual',
+          status: 'NEW',
+          createdAt,
+          dataSource: `identity_gate:${action}`,
+        };
+      });
+    } catch (e) {
+      console.error('[admin/analytics] identityGateLeads fetch failed:', e);
+    }
+
+    // 1b) Firestore: waitlist leads (Broker Sync /waitlist)
+    let waitlistDocs: Array<{
+      id: string;
+      email: string;
+      firstName: string | null;
+      lastName: string | null;
+      companyName: string;
+      status: string;
+      createdAt: string;
+      dataSource: string | null;
+    }> = [];
+
+    try {
+      const snapshot = await db
+        .collection('waitlistLeads')
+        .where('timestamp', '>=', startTimestamp)
+        .orderBy('timestamp', 'desc')
+        .limit(scanLimit)
+        .get();
+
+      waitlistDocs = snapshot.docs.map((d) => {
+        const data = d.data() as any;
+        const ts = data?.timestamp as Timestamp | undefined;
+        const createdAt = ts?.toDate ? ts.toDate().toISOString() : new Date().toISOString();
+        const source = typeof data?.source === 'string' ? data.source : 'unknown';
+        return {
+          id: d.id,
+          email: typeof data?.email === 'string' ? data.email : '',
+          firstName: typeof data?.first_name === 'string' ? data.first_name : null,
+          lastName: null,
+          companyName: typeof data?.company_name === 'string' ? data.company_name : 'Individual',
+          status: 'NEW',
+          createdAt,
+          dataSource: `waitlist_${source}`,
+        };
+      });
+    } catch (e) {
+      console.error('[admin/analytics] waitlistLeads fetch failed:', e);
+    }
+
+    // 2) Sales DB: waitlist leads (best effort)
+    let waitlistLeads: Array<any> = [];
+    try {
+      const { db: salesDb } = await import('@/db/sales/client');
+      const { leads } = await import('@/db/sales/schema');
+      const { gte, desc, like, and } = await import('drizzle-orm');
+
+      waitlistLeads = await salesDb
+        .select({
+          id: leads.id,
+          email: leads.email,
+          firstName: leads.firstName,
+          lastName: leads.lastName,
+          companyName: leads.companyName,
+          status: leads.status,
+          createdAt: leads.createdAt,
+          dataSource: leads.dataSource,
+        })
+        .from(leads)
+        .where(and(gte(leads.createdAt, startDate), like(leads.dataSource, 'waitlist_%')))
+        .orderBy(desc(leads.createdAt));
+    } catch (e) {
+      console.error('[admin/analytics] Sales leads fetch failed:', e);
+    }
+
+    const combined = [...identityDocs, ...waitlistDocs, ...waitlistLeads].filter((l) => l?.email);
+    combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const total = combined.length;
+    const byStatus = combined.reduce((acc, lead) => {
       const status = lead.status || 'NEW';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    // ✅ Simplified: All leads are from waitlist now
-    const bySource = {
-      waitlist: total
-    };
+    const bySource: Record<string, number> = {};
+    for (const lead of combined) {
+      const ds = typeof lead.dataSource === 'string' ? lead.dataSource : '';
+      const key = ds.startsWith('identity_gate:') ? 'identity_gate' : ds.startsWith('waitlist_') ? 'waitlist' : 'other';
+      bySource[key] = (bySource[key] || 0) + 1;
+    }
 
-    // Last 7 days count
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const last7Days = leadsList.filter(lead => 
-      lead.createdAt && new Date(lead.createdAt) >= sevenDaysAgo
-    ).length;
+    const last7Days = combined.filter((lead) => lead.createdAt && new Date(lead.createdAt) >= sevenDaysAgo).length;
 
     return {
       total,
       last7Days,
       byStatus,
       bySource,
-      recent: leadsList.slice(0, 10), // First 10 leads (already sorted desc, so most recent)
+      recent: combined.slice(0, 10),
     };
   } catch (error) {
     console.error('Leads data fetch error:', error);

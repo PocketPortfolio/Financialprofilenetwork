@@ -13,7 +13,7 @@ function JoinWaitlistContent() {
   const [source, setSource] = useState<'web:join' | 'web:footer' | 'web:header'>('web:join');
   
   useEffect(() => {
-    const sourceParam = searchParams.get('source') as 'web:footer' | 'web:header' | null;
+    const sourceParam = (searchParams?.get('source') ?? null) as 'web:footer' | 'web:header' | null;
     if (sourceParam && ['web:footer', 'web:header'].includes(sourceParam)) {
       setSource(sourceParam);
     }
@@ -40,7 +40,7 @@ function JoinWaitlistContent() {
           'financial technology'
         ]}
         canonical="https://www.pocketportfolio.app/join"
-        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3"
+        ogImage="https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=6"
         ogType="website"
       />
       

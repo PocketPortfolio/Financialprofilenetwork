@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Position } from '@/app/lib/utils/portfolioCalculations';
 import { exportToCSV, exportChartAsPNG, exportChartAsSVG } from '@/app/lib/portfolio/export';
+import IdentityGate from '@/app/components/auth/IdentityGate';
 
 interface SharePortfolioProps {
   positions: Position[];
@@ -88,7 +89,7 @@ export default function SharePortfolio({
         padding: 'var(--space-4)',
         background: 'var(--surface)',
         borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border)',
+        border: '1px solid var(--dashboard-chrome-border)',
       }}
     >
       <h3
@@ -109,40 +110,15 @@ export default function SharePortfolio({
           gap: 'var(--space-2)',
         }}
       >
-        <button
-          onClick={handleExportCSV}
-          style={{
-            padding: 'var(--space-3)',
-            background: 'var(--surface-elevated)',
-            color: 'var(--text)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-medium)',
-            cursor: 'pointer',
-            transition: 'var(--transition-base)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--surface)';
-            e.currentTarget.style.borderColor = 'var(--signal)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--surface-elevated)';
-            e.currentTarget.style.borderColor = 'var(--border)';
-          }}
-        >
-          📥 Export to CSV
-        </button>
-
-        {chartElementRef && (
-          <>
+        <IdentityGate action="export_csv" contextId="portfolio" onContinue={handleExportCSV}>
+          {({ request }) => (
             <button
-              onClick={handleExportChartPNG}
+              onClick={request}
               style={{
                 padding: 'var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 fontWeight: 'var(--font-medium)',
@@ -155,7 +131,36 @@ export default function SharePortfolio({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
+              }}
+            >
+              📥 Export to CSV
+            </button>
+          )}
+        </IdentityGate>
+
+        {chartElementRef && (
+          <>
+            <button
+              onClick={handleExportChartPNG}
+              style={{
+                padding: 'var(--space-3)',
+                background: 'var(--surface-elevated)',
+                color: 'var(--text)',
+                border: '1px solid var(--dashboard-chrome-border)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-medium)',
+                cursor: 'pointer',
+                transition: 'var(--transition-base)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--surface)';
+                e.currentTarget.style.borderColor = 'var(--signal)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'var(--surface-elevated)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               🖼️ Export Chart as PNG
@@ -167,7 +172,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-3)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 fontWeight: 'var(--font-medium)',
@@ -180,7 +185,7 @@ export default function SharePortfolio({
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'var(--surface-elevated)';
-                e.currentTarget.style.borderColor = 'var(--border)';
+                e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
               }}
             >
               🎨 Export Chart as SVG
@@ -193,33 +198,37 @@ export default function SharePortfolio({
       <div
         style={{
           paddingTop: 'var(--space-4)',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--dashboard-chrome-border-subtle)',
         }}
       >
-        <button
-          onClick={handleGenerateShareLink}
-          style={{
-            padding: 'var(--space-3)',
-            background: 'var(--signal)',
-            color: 'var(--bg)',
-            border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: 'var(--font-size-sm)',
-            fontWeight: 'var(--font-semibold)',
-            cursor: 'pointer',
-            transition: 'var(--transition-base)',
-            width: '100%',
-            marginBottom: shareLink ? 'var(--space-2)' : 0,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.9';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '1';
-          }}
-        >
-          🔗 Generate Share Link
-        </button>
+        <IdentityGate action="share_portfolio" contextId="portfolio" onContinue={handleGenerateShareLink}>
+          {({ request }) => (
+            <button
+              onClick={request}
+              style={{
+                padding: 'var(--space-3)',
+                background: 'var(--signal)',
+                color: 'var(--bg)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-semibold)',
+                cursor: 'pointer',
+                transition: 'var(--transition-base)',
+                width: '100%',
+                marginBottom: shareLink ? 'var(--space-2)' : 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+              }}
+            >
+              🔗 Generate Share Link
+            </button>
+          )}
+        </IdentityGate>
 
         {shareLink && (
           <div
@@ -238,7 +247,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-2)',
                 background: 'var(--surface-elevated)',
                 color: 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
               }}
@@ -249,7 +258,7 @@ export default function SharePortfolio({
                 padding: 'var(--space-2) var(--space-3)',
                 background: copied ? 'var(--signal)' : 'var(--surface-elevated)',
                 color: copied ? 'var(--bg)' : 'var(--text)',
-                border: '1px solid var(--border)',
+                border: '1px solid var(--dashboard-chrome-border)',
                 borderRadius: 'var(--radius-sm)',
                 fontSize: 'var(--font-size-sm)',
                 cursor: 'pointer',

@@ -2,6 +2,7 @@
 
 import { TrendingUp, TrendingDown, Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import CompanyLogo from '@/app/components/CompanyLogo';
 
 interface Asset {
   symbol: string;
@@ -64,6 +65,7 @@ export function AssetTerminal({
   setShowImportModal
 }: AssetTerminalProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const LOGO_SIZE = 18;
 
   const handleSort = (column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => {
     if (onSort) {
@@ -84,17 +86,17 @@ export function AssetTerminal({
         overflowX: 'auto',
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'thin',
-        scrollbarColor: 'hsl(var(--muted-foreground)) hsl(var(--border))'
+        scrollbarColor: 'var(--dashboard-muted-foreground) var(--dashboard-chrome-border)'
       }}>
         <style>{`
           div::-webkit-scrollbar {
             height: 8px;
           }
           div::-webkit-scrollbar-track {
-            background: hsl(var(--border));
+            background: var(--dashboard-chrome-border);
           }
           div::-webkit-scrollbar-thumb {
-            background: hsl(var(--muted-foreground));
+            background: var(--dashboard-muted-foreground);
             border-radius: 4px;
           }
         `}</style>
@@ -106,12 +108,12 @@ export function AssetTerminal({
         }}>
           <thead style={{
             background: 'hsl(var(--card))',
-            color: 'hsl(var(--muted-foreground))',
+            color: 'var(--dashboard-muted-foreground)',
             fontFamily: MONO_FONT,
             fontSize: '10px',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
-            borderBottom: `1px solid hsl(var(--border))`
+            borderBottom: `1px solid var(--dashboard-chrome-border)`
           }}>
             <tr>
               {view === 'trades' ? (
@@ -126,7 +128,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('date')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Date {getSortIcon('date')}
                   </th>
@@ -140,7 +142,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('symbol')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Ticker {getSortIcon('symbol')}
                   </th>
@@ -154,7 +156,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('type')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Type {getSortIcon('type')}
                   </th>
@@ -168,7 +170,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('qty')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Qty {getSortIcon('qty')}
                   </th>
@@ -182,7 +184,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('price')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Price {getSortIcon('price')}
                   </th>
@@ -196,7 +198,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('value')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Value {getSortIcon('value')}
                   </th>
@@ -219,7 +221,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('symbol')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Asset {getSortIcon('symbol')}
                   </th>
@@ -233,7 +235,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('price')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Price {getSortIcon('price')}
                   </th>
@@ -247,7 +249,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('change')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     24h % {getSortIcon('change')}
                   </th>
@@ -262,7 +264,7 @@ export function AssetTerminal({
                     }}
                     onClick={() => handleSort('value')}
                     onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
-                    onMouseLeave={(e) => e.currentTarget.style.color = 'hsl(var(--muted-foreground))'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
                   >
                     Value {getSortIcon('value')}
                   </th>
@@ -279,7 +281,7 @@ export function AssetTerminal({
               <th style={{ padding: '12px 16px', width: '96px', fontWeight: '500' }}>Actions</th>
             </tr>
           </thead>
-          <tbody style={{ borderTop: `1px solid hsl(var(--border) / 0.5)` }}>
+          <tbody style={{ borderTop: `1px solid hsl(var(--border) / 0.5) color-mix(in srgb, var(--dashboard-chrome-border) 50%, transparent)` }}>
             {loading ? (
               Array.from({ length: SKELETON_ROW_COUNT }).map((_, i) => (
                 <tr key={`skeleton-${i}`} aria-hidden="true">
@@ -331,7 +333,7 @@ export function AssetTerminal({
                     </h3>
                     <p style={{
                       fontSize: '14px',
-                      color: 'hsl(var(--muted-foreground))',
+                      color: 'var(--dashboard-muted-foreground)',
                       marginBottom: '24px'
                     }}>
                       Import your CSV file or add your first trade to get started.
@@ -384,7 +386,7 @@ export function AssetTerminal({
                           padding: '12px 24px',
                           background: 'transparent',
                           color: 'hsl(var(--foreground))',
-                          border: `1px solid hsl(var(--border))`,
+                          border: `1px solid var(--dashboard-chrome-border)`,
                           borderRadius: '6px',
                           fontSize: '14px',
                           fontWeight: '600',
@@ -392,12 +394,12 @@ export function AssetTerminal({
                           transition: 'all 0.2s ease'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'hsl(var(--muted))';
-                          e.currentTarget.style.borderColor = 'hsl(var(--muted-foreground))';
+                          e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
+                          e.currentTarget.style.borderColor = 'var(--dashboard-muted-foreground)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = 'transparent';
-                          e.currentTarget.style.borderColor = 'hsl(var(--border))';
+                          e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
                         }}
                       >
                         Add First Trade
@@ -416,7 +418,7 @@ export function AssetTerminal({
                     key={rowKey} 
                     style={{
                       transition: 'background 0.2s ease',
-                      background: isHovered ? 'hsl(var(--muted) / 0.4)' : 'transparent'
+                      background: isHovered ? 'color-mix(in srgb, var(--dashboard-surface-hover) 40%, transparent)' : 'transparent'
                     }}
                     onMouseEnter={() => setHoveredRow(rowKey)}
                     onMouseLeave={() => setHoveredRow(null)}
@@ -442,7 +444,10 @@ export function AssetTerminal({
                           fontSize: '14px',
                           whiteSpace: 'nowrap'
                         }}>
-                          {asset.symbol}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <CompanyLogo symbol={asset.symbol} name={asset.name} size={LOGO_SIZE} />
+                            <span>{asset.symbol}</span>
+                          </div>
                         </td>
                         <td style={{ 
                           padding: '12px 16px', 
@@ -513,7 +518,7 @@ export function AssetTerminal({
                             fontSize: '12px',
                             fontWeight: '500',
                             background: asset.mock ? 'hsla(var(--primary), 0.1)' : 'hsla(142, 71%, 45%, 0.1)',
-                            color: asset.mock ? 'hsl(var(--primary))' : 'hsl(142, 71%, 45%)'
+                            color: asset.mock ? 'hsl(var(--primary))' : 'hsl(var(--accent))'
                           }}>
                             {asset.mock ? 'Mock' : 'Real'}
                           </span>
@@ -529,17 +534,20 @@ export function AssetTerminal({
                           fontWeight: '500',
                           fontSize: '14px'
                         }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span>{asset.symbol}</span>
-                            {asset.name && asset.name !== asset.symbol && (
-                              <span style={{ 
-                                fontSize: '11px', 
-                                color: 'hsl(var(--muted-foreground))',
-                                fontWeight: '400'
-                              }}>
-                                {asset.name}
-                              </span>
-                            )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <CompanyLogo symbol={asset.symbol} name={asset.name} size={LOGO_SIZE} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <span>{asset.symbol}</span>
+                              {asset.name && asset.name !== asset.symbol && (
+                                <span style={{ 
+                                  fontSize: '11px', 
+                                  color: 'var(--dashboard-muted-foreground)',
+                                  fontWeight: '400'
+                                }}>
+                                  {asset.name}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td style={{ 
@@ -561,7 +569,7 @@ export function AssetTerminal({
                         <td style={{ 
                           padding: '12px 16px', 
                           textAlign: 'right', 
-                          color: 'hsl(var(--muted-foreground))', 
+                          color: 'var(--dashboard-muted-foreground)', 
                           fontFamily: MONO_FONT 
                         }}>
                           {asset.holdings.toFixed(4)}
@@ -581,11 +589,11 @@ export function AssetTerminal({
                         }}>
                           <div style={{
                             fontSize: '12px',
-                            color: 'hsl(var(--muted-foreground))',
+                            color: 'var(--dashboard-muted-foreground)',
                             fontFamily: MONO_FONT,
                             textAlign: 'center',
                             padding: '4px 8px',
-                            background: 'hsl(var(--muted) / 0.3)',
+                            background: 'color-mix(in srgb, var(--dashboard-surface-hover) 30%, transparent)',
                             borderRadius: '4px'
                           }}>
                             {isPos ? (
@@ -619,7 +627,7 @@ export function AssetTerminal({
                               borderRadius: '4px',
                               background: 'transparent',
                               border: 'none',
-                              color: 'hsl(var(--muted-foreground))',
+                              color: 'var(--dashboard-muted-foreground)',
                               cursor: 'pointer',
                               transition: 'all 0.2s ease',
                               display: 'flex',
@@ -627,12 +635,12 @@ export function AssetTerminal({
                               justifyContent: 'center'
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'hsl(var(--muted))';
+                              e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                               e.currentTarget.style.color = 'hsl(var(--accent))';
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = 'transparent';
-                              e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                              e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
                             }}
                             title="Edit"
                           >
@@ -647,7 +655,7 @@ export function AssetTerminal({
                               borderRadius: '4px',
                               background: 'transparent',
                               border: 'none',
-                              color: 'hsl(var(--muted-foreground))',
+                              color: 'var(--dashboard-muted-foreground)',
                               cursor: 'pointer',
                               transition: 'all 0.2s ease',
                               display: 'flex',
@@ -655,12 +663,12 @@ export function AssetTerminal({
                               justifyContent: 'center'
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'hsl(var(--muted))';
+                              e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
                               e.currentTarget.style.color = 'hsl(var(--danger))';
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = 'transparent';
-                              e.currentTarget.style.color = 'hsl(var(--muted-foreground))';
+                              e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
                             }}
                             title="Delete"
                           >

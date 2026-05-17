@@ -1,45 +1,27 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import http from 'http';
 
 puppeteer.use(StealthPlugin());
 
 const TARGET_CITY = "London";
 
-// Helper function to send logs (works in Node.js)
-function sendLog(data: any) {
-  const payload = JSON.stringify(data);
-  const options = {
-    hostname: '127.0.0.1',
-    port: 43110,
-    path: '/ingest/d533f77b-679d-4262-93fb-10488bb36bd8',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(payload)
-    }
-  };
-  
-  const req = http.request(options, () => {});
-  req.on('error', () => {}); // Silently fail
-  req.write(payload);
-  req.end();
+function sendLog(data: unknown) {
+  console.log('[predator-probe]', JSON.stringify(data));
 }
 
 async function runProbe() {
   console.log("🦅 Predator V9: Operation X-Ray (Network Probe)...");
   console.log("   Waiting to intercept API calls...");
   console.log(`   Target City: ${TARGET_CITY}`);
-  console.log("   Logging endpoint: http://127.0.0.1:43110/ingest/d533f77b-679d-4262-93fb-10488bb36bd8");
-  
-  // #region agent log - Probe started
-  try {
-    sendLog({location:'predator-probe.ts:10',message:'Probe script started (V9)',data:{targetCity:TARGET_CITY},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    console.log("   ✅ Initial log sent");
-  } catch (e) {
-    console.error("   ❌ Failed to send initial log:", e);
-  }
-  // #endregion
+  sendLog({
+    location: 'predator-probe.ts:10',
+    message: 'Probe script started (V9)',
+    data: { targetCity: TARGET_CITY },
+    timestamp: Date.now(),
+    sessionId: 'debug-session',
+    runId: 'v9-probe',
+    hypothesisId: 'H13',
+  });
 
   let browser;
   let page;
@@ -58,9 +40,7 @@ async function runProbe() {
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
     
-    // #region agent log - Browser launched
     sendLog({location:'predator-probe.ts:20',message:'Browser launched (V9)',data:{headless:false},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    // #endregion
 
     page = await browser.newPage();
 
@@ -73,9 +53,7 @@ async function runProbe() {
     
     // Log ALL XHR/Fetch requests (not just filtered) to see what's happening
     if (['xhr', 'fetch'].includes(resourceType)) {
-      // #region agent log - Log ALL XHR/Fetch requests
       sendLog({location:'predator-probe.ts:35',message:'All XHR/Fetch Request (V9)',data:{method:request.method(),url,resourceType,postData:request.postData()?.substring(0,200)||null},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-      // #endregion
       
       // Log ALL requests to SJP domain (not just filtered keywords)
       if (url.includes('sjp.co.uk')) {
@@ -83,9 +61,7 @@ async function runProbe() {
            console.log(`   Headers:`, JSON.stringify(request.headers(), null, 2));
            console.log(`   PostData:`, request.postData() || '(none)');
            
-           // #region agent log - Log SJP request to debug.log
            sendLog({location:'predator-probe.ts:45',message:'SJP Domain Request (V9)',data:{method:request.method(),url,headers:request.headers(),postData:request.postData()||null,resourceType},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-           // #endregion
            
            interceptedRequests.push({
              method: request.method(),
@@ -102,9 +78,7 @@ async function runProbe() {
            console.log(`   Headers:`, JSON.stringify(request.headers(), null, 2));
            console.log(`   PostData:`, request.postData() || '(none)');
            
-           // #region agent log - Log intercepted request to debug.log
            sendLog({location:'predator-probe.ts:60',message:'INTERCEPTED API Request (V9)',data:{method:request.method(),url,headers:request.headers(),postData:request.postData()||null,resourceType},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-           // #endregion
            
            interceptedRequests.push({
              method: request.method(),
@@ -135,9 +109,7 @@ async function runProbe() {
             console.log(`   Body (truncated):`, responseBody.substring(0, 1000), '...');
           }
           
-          // #region agent log - Log intercepted response to debug.log
           sendLog({location:'predator-probe.ts:55',message:'INTERCEPTED API Response (V9)',data:{status,url,bodyPreview:bodyPreview.substring(0,500),bodyLength:responseBody.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-          // #endregion
         } catch (e) {
           // Response might not be text
         }
@@ -150,18 +122,14 @@ async function runProbe() {
       if (frame === page.mainFrame()) {
         const url = frame.url();
         console.log(`\n🧭 NAVIGATION: ${url}`);
-        // #region agent log - Navigation event
         sendLog({location:'predator-probe.ts:120',message:'Page navigation (V9)',data:{url},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-        // #endregion
       }
     });
 
     // Main interaction flow
     // 1. Load Page
     console.log("\n📄 Loading SJP search page...");
-    // #region agent log
     sendLog({location:'predator-probe.ts:75',message:'Starting probe - loading page (V9)',data:{targetCity:TARGET_CITY},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    // #endregion
     await page.goto('https://www.sjp.co.uk/individuals/find-an-adviser', { waitUntil: 'domcontentloaded', timeout: 60000 });
     
     // 2. Clear Cookies (Start Fresh)
@@ -204,9 +172,7 @@ async function runProbe() {
     
     // 4. TRIGGER ATTEMPTS
     console.log("\n   🖱️ Attempting triggers...");
-    // #region agent log
     sendLog({location:'predator-probe.ts:120',message:'Starting trigger attempts (V9)',data:{targetCity:TARGET_CITY},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    // #endregion
     
     // Trigger A: Arrow + Enter
     await page.focus(inputSelector);
@@ -214,9 +180,7 @@ async function runProbe() {
     await new Promise(resolve => setTimeout(resolve, 500));
     await page.keyboard.press('Enter');
     console.log("   ⌨️ Pressed ArrowDown + Enter");
-    // #region agent log
     sendLog({location:'predator-probe.ts:127',message:'Trigger A: ArrowDown+Enter (V9)',data:{targetCity:TARGET_CITY},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    // #endregion
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     // Trigger B: Click Search Button (if visible)
@@ -225,9 +189,7 @@ async function runProbe() {
         if (searchButton) {
           await searchButton.click();
           console.log("   🖱️ Clicked Submit Button.");
-          // #region agent log
           sendLog({location:'predator-probe.ts:136',message:'Trigger B: Button click (V9)',data:{targetCity:TARGET_CITY},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-          // #endregion
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
     } catch(e) {
@@ -236,36 +198,47 @@ async function runProbe() {
 
     // 5. OBSERVE
     console.log("\n   👀 Watching for 15 seconds...");
-    // #region agent log - Starting observation period
     sendLog({location:'predator-probe.ts:200',message:'Starting observation period (V9)',data:{duration:15000},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    // #endregion
     await new Promise(resolve => setTimeout(resolve, 15000));
-    // #region agent log - Observation period complete
     sendLog({location:'predator-probe.ts:205',message:'Observation period complete (V9)',data:{interceptedCount:interceptedRequests.length},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    // #endregion
 
   } catch (e) {
     console.error("   ❌ Probe Failed:", e);
     console.error("   Error details:", e instanceof Error ? e.stack : String(e));
-    // #region agent log - Probe error
-    try {
-      sendLog({location:'predator-probe.ts:180',message:'Probe error (V9)',data:{error:String(e),errorMessage:e instanceof Error ? e.message : 'Unknown error',stack:e instanceof Error ? e.stack : undefined},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    } catch (logError) {
-      console.error("   ❌ Failed to log error:", logError);
-    }
-    // #endregion
+    sendLog({
+      location: 'predator-probe.ts:180',
+      message: 'Probe error (V9)',
+      data: {
+        error: String(e),
+        errorMessage: e instanceof Error ? e.message : 'Unknown error',
+        stack: e instanceof Error ? e.stack : undefined,
+      },
+      timestamp: Date.now(),
+      sessionId: 'debug-session',
+      runId: 'v9-probe',
+      hypothesisId: 'H13',
+    });
   } finally {
     console.log("\n🦅 Probe Complete.");
     console.log(`\n📊 Summary: Intercepted ${interceptedRequests.length} API requests`);
-    
-    // #region agent log - Probe summary
-    try {
-      sendLog({location:'predator-probe.ts:190',message:'Probe summary (V9)',data:{interceptedCount:interceptedRequests.length,requests:interceptedRequests.map(r=>({method:r.method,url:r.url,hasPostData:!!r.postData}))},timestamp:Date.now(),sessionId:'debug-session',runId:'v9-probe',hypothesisId:'H13'});
-    } catch (logError) {
-      console.error("   ❌ Failed to log summary:", logError);
-    }
-    // #endregion
-    
+
+    sendLog({
+      location: 'predator-probe.ts:190',
+      message: 'Probe summary (V9)',
+      data: {
+        interceptedCount: interceptedRequests.length,
+        requests: interceptedRequests.map((r) => ({
+          method: r.method,
+          url: r.url,
+          hasPostData: !!r.postData,
+        })),
+      },
+      timestamp: Date.now(),
+      sessionId: 'debug-session',
+      runId: 'v9-probe',
+      hypothesisId: 'H13',
+    });
+
     if (interceptedRequests.length > 0) {
       console.log("\n🎯 KEY FINDINGS:");
       interceptedRequests.forEach((req, idx) => {

@@ -18,13 +18,13 @@ export default function SEOHead({
   description,
   keywords = [],
   canonical,
-  ogImage = 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Evidence-First%20Investing&v=3',
+  ogImage = 'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=6',
   ogType = 'website',
   noIndex = false,
   structuredData
 }: SEOHeadProps) {
   const fullTitle = title.includes('Pocket Portfolio') ? title : `${title} | Pocket Portfolio`;
-  const fullDescription = description || 'Pocket Portfolio is an open-source, community-led investing dashboard with live prices, profit/loss, mock trades, news, and simple trade import. Invest smarter, together.';
+  const fullDescription = description || 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.';
   
   const defaultKeywords = [
     'portfolio tracker',
@@ -78,7 +78,12 @@ export default function SEOHead({
     updateMetaTag('og:type', ogType, true);
     updateMetaTag('og:title', fullTitle, true);
     updateMetaTag('og:description', fullDescription, true);
-    updateMetaTag('og:image', ogImage.startsWith('http') ? ogImage : `https://www.pocketportfolio.app${ogImage}`, true);
+    const absoluteOgImage = ogImage.startsWith('http')
+      ? ogImage
+      : `https://www.pocketportfolio.app${ogImage}`;
+    updateMetaTag('og:image', absoluteOgImage, true);
+    updateMetaTag('og:image:secure_url', absoluteOgImage, true);
+    updateMetaTag('og:image:type', 'image/png', true);
     updateMetaTag('og:image:width', '1200', true);
     updateMetaTag('og:image:height', '630', true);
     updateMetaTag('og:image:alt', `Pocket Portfolio - ${title}`, true);
@@ -90,7 +95,7 @@ export default function SEOHead({
     updateMetaTag('twitter:card', 'summary_large_image');
     updateMetaTag('twitter:title', fullTitle);
     updateMetaTag('twitter:description', fullDescription);
-    updateMetaTag('twitter:image', ogImage.startsWith('http') ? ogImage : `https://www.pocketportfolio.app${ogImage}`);
+    updateMetaTag('twitter:image', absoluteOgImage);
     updateMetaTag('twitter:image:alt', `Pocket Portfolio - ${title}`);
     updateMetaTag('twitter:site', '@pocketportfolio');
     updateMetaTag('twitter:creator', '@pocketportfolio');

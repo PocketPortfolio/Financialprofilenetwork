@@ -1,6 +1,8 @@
 # Claude Code CLI: .claudesignore is intentionally tracked (repo guardrails)
 node_modules/
 dist/
+# Package build output (commit source only; CI builds dist)
+packages/importer/dist/
 .vite/
 .vercel/
 .next/
@@ -17,6 +19,11 @@ public/sw.js
 # Test / tooling output
 coverage/
 *.tsbuildinfo
+test-results/
+ui-audit/
+
+# Local npm auth at repo root (use NPM_TOKEN in env; packages/*/ may ship a tokenless stub)
+/.npmrc
 
 # OS / editor
 .DS_Store
@@ -29,3 +36,15 @@ Thumbs.db
 # Avoid committing secrets (use env vars / Vercel)
 temp_api_key.txt
 *.key
+.vercel
+.env*.local
+
+# Seed decks / binaries (keep repo text-first)
+docs/seed/*.pptx
+
+# Marketing binaries + caches (keep repo text-first)
+docs/marketing/*.pptx
+docs/marketing/*.pdf
+docs/marketing/~$*
+docs/marketing/_freetrade-deck-cache/
+docs/marketing/_plaid-deck-cache/

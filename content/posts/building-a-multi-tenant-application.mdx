@@ -1,0 +1,75 @@
+---
+title: Building a Multi-Tenant Application
+date: '2026-05-10'
+description: >-
+  Learn how to build a multi-tenant application from scratch, including key
+  concepts and code examples.
+tags:
+  - multi-tenant
+  - application development
+  - software architecture
+author: Pocket Portfolio Team
+image: /images/blog/building-a-multi-tenant-application.png
+pillar: Development
+category: how-to-in-tech
+---
+
+### Problem
+
+In today's SaaS-driven world, building scalable applications that serve multiple clients (tenants) is crucial. A multi-tenant architecture allows you to serve multiple customers using a single instance of the application, reducing costs and simplifying maintenance. However, it poses challenges such as ensuring data isolation, managing tenant-specific customizations, and achieving scalability.
+
+### Solution with Code
+
+To build a multi-tenant application, you can use several strategies, such as database-per-tenant, schema-per-tenant, or a single database with tenant identifiers. For this guide, we'll focus on a single database with tenant identifiers as it strikes a good balance between complexity and scalability.
+
+#### Step 1: Define the Data Model
+
+Add a `tenant_id` column to your tables to segregate data by tenant. Here's an example using SQL:
+
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    tenant_id INT NOT NULL,
+    name VARCHAR(100),
+    email VARCHAR(100),
+    password VARCHAR(255),
+    CONSTRAINT fk_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+
+CREATE TABLE tenants (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+```
+
+#### Step 2: Application Logic
+
+Incorporate tenant context in your application logic. For example, in an Express.js application, you can use middleware to attach the `tenant_id` to each request based on the subdomain or a request header.
+
+```javascript
+function tenantMiddleware(req, res, next) {
+    const tenantId = req.header('X-Tenant-ID'); // Example of retrieving tenant ID
+    if (!tenantId) {
+        return res.status(400).send('Tenant ID is missing');
+    }
+    req.tenantId = tenantId;
+    next();
+}
+
+// Usage in an endpoint
+app.get('/users', tenantMiddleware, async (req, res) => {
+    const users = await User.findAll({
+        where: { tenant_id: req.tenantId }
+    });
+    res.json(users);
+});
+```
+
+### Key Concepts
+
+- **Isolation**: Ensure that each tenant's data is isolated using the `tenant_id` column.
+- **Security**: Validate `tenant_id` on each request to prevent data leaks across tenants.
+- **Scalability**: Optimize queries and indexes to handle multiple tenants efficiently.
+- **Customization**: Allow tenant-specific configurations, such as themes or feature toggles, to enhance user experience.
+
+By incorporating these strategies and best practices, you can build a robust multi-tenant application that efficiently serves multiple clients while maintaining data security and scalability.
