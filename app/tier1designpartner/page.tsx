@@ -108,8 +108,11 @@ export default function Tier1DesignPartnerPage() {
             PPI-METER/1
           </p>
           <h2 style={{ margin: '10px 0 8px', fontSize: '18px', fontWeight: 900 }}>Stateless metering (usage without data custody)</h2>
+          <p style={{ margin: '0 0 8px', color: 'var(--text-secondary)', lineHeight: 1.65, fontSize: '13px' }}>
+            Roadmap specification — not asserted as production metering shipped in this repository.
+          </p>
           <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: '14px' }}>
-            A Tier 1 partner needs billing, quotas, and governance without expanding audit scope. We meter capability usage without ingesting partner/customer PII.
+            A Tier 1 partner needs billing, quotas, and governance without expanding audit scope. Target posture: meter capability usage without ingesting partner/customer PII.
           </p>
           <pre
             style={{

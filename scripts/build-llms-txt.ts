@@ -206,7 +206,7 @@ ${packagesSection}
 ## Audit Posture
 - Limited-Scope Processor (GDPR Art. 4(8); Art. 5(1)(c) minimisation by architecture)
 - Stateless inference at /api/ai/chat (no per-user persistence; no chat-history warehousing)
-- Stateless metering (PPI-METER/1) proves usage to commercial partners without transferring identifiers
+- PPI-METER/1: roadmap vocabulary for usage attestation without identifier transfer — **not** asserted as in-repo or production metering.
 ${auditBullets}
 
 ## Sitemap

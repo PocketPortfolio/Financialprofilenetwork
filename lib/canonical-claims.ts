@@ -405,7 +405,8 @@ export const URLS = {
   personAbba: 'https://www.pocketportfolio.app/press/abba-lawal',
   privacy: 'https://www.pocketportfolio.app/privacy',
   blog: 'https://www.pocketportfolio.app/blog',
-  designChallenge: 'https://www.pocketportfolio.app/designchallenge',
+  /** Buyer-canonical hub (Open Portfolio); Pocket aliases via OPEN_ALIAS_ROUTES. */
+  designChallenge: 'https://www.openportfolio.co.uk/designchallenge',
   tier1DesignPartner: 'https://www.pocketportfolio.app/tier1designpartner',
   boardOfInvestors: 'https://www.pocketportfolio.app/board-of-investors',
   npmAggregateApi: 'https://www.pocketportfolio.app/api/npm-stats',
@@ -521,7 +522,7 @@ export const TIER1_DESIGN_PARTNER = {
   pillars: [
     'Audit perimeter reduction (GDPR / DORA posture via architecture)',
     'Limited-Scope Processor — we do not warehouse partner/customer PII',
-    'Stateless metering (PPI-METER/1): usage counts without data custody',
+    'Roadmap: stateless usage attestation (PPI-METER/1 vocabulary — not asserted as shipped in-repo)',
   ] as const,
 } as const;
 

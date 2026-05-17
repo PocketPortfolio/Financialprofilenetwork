@@ -20,7 +20,7 @@
 
 | Asset | Target URL | Notes |
 | :--- | :--- | :--- |
-| Landing (future) | `https://www.pocketportfolio.app/designchallenge` | **Not live** until implemented. |
+| Buyer-canonical hub | `https://www.openportfolio.co.uk/designchallenge` | Institution-facing URL per Open Portfolio programme; Pocket may 301-alias per `OPEN_ALIAS_ROUTES`. |
 | Boilerplate / fork | `https://github.com/PocketPortfolio/Financialprofilenetwork` | “Fork the Substrate” primary technical destination. |
 | GitHub submissions | `https://github.com/PocketPortfolio/Financialprofilenetwork/discussions` | Index today; **Discussion #49** cited in CT2 must be **verified to exist** before hard-coding in UI (use discussions index or create thread + update SSOT). |
 | CoderLegion | `https://coderlegion.com/groups/openfi-builders` | “Join the Open-Fi Builders” secondary path; May 11 launch sync per ops. |
@@ -154,7 +154,7 @@ CoderLegion **“Launching May 11th”** (CT1) vs full CT2 calendar: treat **May
 
 1. [ ] **GitHub Discussion #49** exists and is open in `PocketPortfolio/Financialprofilenetwork`.
 2. [ ] `/sponsor?tier=founder` deep-link verified in production.
-3. [ ] LinkedIn + CoderLegion launch copy (May 11, 08:45 GMT) updated to point at `https://www.pocketportfolio.app/designchallenge`.
+3. [ ] LinkedIn + CoderLegion launch copy updated to point at `https://www.openportfolio.co.uk/designchallenge` (buyer-canonical).
 4. [ ] OG share preview verified on LinkedIn & X using the static `/og/designchallenge.png`.
 5. [ ] `LAST_HUMAN_VERIFIED` in `lib/canonical-claims.ts` refreshed to within 30 days (Sovereign Threshold #4).
 
