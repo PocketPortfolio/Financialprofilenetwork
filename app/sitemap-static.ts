@@ -186,6 +186,24 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/learn/realised-vs-unrealised`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/learn/dollar-cost-averaging`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/learn/json-finance`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
     // /learn/sovereign-stack and /learn/sovereign-finance migrated to Open Portfolio
     // (B2B developer surface). See app/open/sitemap-static.ts.
     // /architecture migrated to Open Portfolio (B2B developer surface).
