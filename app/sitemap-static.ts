@@ -67,6 +67,12 @@ export default async function sitemapStatic(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/newsroom`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.75,
+    },
+    {
       url: `${baseUrl}/join`,
       lastModified: now,
       changeFrequency: 'monthly',

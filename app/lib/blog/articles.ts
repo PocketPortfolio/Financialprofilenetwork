@@ -1,7 +1,7 @@
 /**
  * Shared Blog Articles Data
  * Centralized source for all blog post information
- * Used by CommunityContent component and Blog page
+ * Used by Blog page fallback cards
  */
 
 export interface Article {

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Market intelligence">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#121418"/>
+      <stop offset="100%" stop-color="#1f1a12"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bg)"/>
+  <g opacity="0.12" stroke="#f59e0b" stroke-width="1">
+    <path d="M0 60 H640 M0 120 H640 M0 180 H640 M0 240 H640 M0 300 H640"/>
+  </g>
+  <g fill="none" stroke="#f59e0b" stroke-width="2.5" opacity="0.9">
+    <path d="M120 260 L200 200 L280 220 L360 140 L440 180 L520 100"/>
+    <path d="M120 280 H520"/>
+  </g>
+  <text x="32" y="48" fill="#f59e0b" font-family="ui-monospace,monospace" font-size="14" font-weight="700" letter-spacing="0.14em">MARKETS</text>
+</svg>

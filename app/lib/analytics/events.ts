@@ -226,6 +226,28 @@ export function trackBlogPlatformView(platform: string, action: string) {
   }
 }
 
+export function trackNewsroomBriefingClick(title: string, category: string, url: string) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'newsroom_briefing_click', {
+      event_category: 'Newsroom',
+      event_label: title,
+      custom_parameter_category: category,
+      custom_parameter_url: url,
+      value: 1,
+    });
+  }
+}
+
+export function trackNewsroomCtaClick(target: string) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'newsroom_cta_click', {
+      event_category: 'Newsroom',
+      event_label: target,
+      value: 1,
+    });
+  }
+}
+
 // Error tracking
 export function trackError(error: string, context?: string) {
   if (typeof window !== 'undefined' && window.gtag) {
