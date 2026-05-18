@@ -2202,14 +2202,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Carbon Footprint - Cloud vs On-Premise",
     "slug": "research-carbon-footprint-cloud-vs-on-premise-2026-05-17",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "cloud",
       "carbon",
       "footprint"
-    ]
+    ],
+    "publishedAt": "2026-05-18T11:01:07.669Z"
   },
   {
     "id": "research-total-cost-of-ownership-cloud-migration-analysis-2026-05-18",
