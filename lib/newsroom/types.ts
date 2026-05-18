@@ -25,5 +25,5 @@ export interface NewsroomBriefing {
 export interface NewsroomPayload {
   updatedAt: string;
   briefings: NewsroomBriefing[];
-  source: 'google-news-rss' | 'seed' | 'kv-cache';
+  source: 'google-news-rss' | 'kv-cache' | 'unavailable' | 'seed';
 }

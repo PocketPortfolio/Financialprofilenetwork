@@ -1,3 +1,4 @@
+/** Dev/docs only — never returned by getNewsroomPayload() in production. */
 import type { NewsroomBriefing, NewsroomPayload } from './types';
 import { CATEGORY_MEDIA } from './categories';
 import { CATEGORY_ART_URL, publisherLogoUrl } from './category-art';

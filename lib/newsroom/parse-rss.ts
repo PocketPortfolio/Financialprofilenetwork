@@ -40,6 +40,12 @@ function extractSourceSiteUrl(xml: string): string | null {
   return match?.[1]?.trim() || null;
 }
 
+function parsePubDate(raw: string): string {
+  if (!raw.trim()) return new Date().toISOString();
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
+
 export function parseRssFeed(xml: string, feedLabel: string): ParsedRssItem[] {
   const items: ParsedRssItem[] = [];
   const parts = xml.split(/<item>/i).slice(1).map((x) => x.split(/<\/item>/i)[0]);
@@ -66,7 +72,7 @@ export function parseRssFeed(xml: string, feedLabel: string): ParsedRssItem[] {
       url: link,
       source: extractText(item, 'source') || extractDomain(link) || feedLabel,
       sourceSiteUrl,
-      publishedAt: publishedAt ? new Date(publishedAt).toISOString() : new Date().toISOString(),
+      publishedAt: parsePubDate(publishedAt),
       image: extractImage(item),
     });
   }

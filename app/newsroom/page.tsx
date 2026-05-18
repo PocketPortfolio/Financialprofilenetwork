@@ -68,9 +68,25 @@ export default async function NewsroomPage() {
               fontFamily: 'ui-monospace, Menlo, monospace',
             }}
           >
-            Last updated {new Date(payload.updatedAt).toLocaleString('en-GB')} · source: {payload.source}
+            {payload.briefings.length === 0
+              ? 'Briefings updating — no live feed yet'
+              : `Last updated ${new Date(payload.updatedAt).toLocaleString('en-GB')} · live RSS`}
           </p>
         </header>
+
+        {payload.briefings.length === 0 ? (
+          <p
+            style={{
+              textAlign: 'center',
+              color: 'var(--muted)',
+              fontFamily: 'ui-monospace, Menlo, monospace',
+              fontSize: '14px',
+              marginBottom: '40px',
+            }}
+          >
+            Publisher feeds are being refreshed. Cron ingest runs every 4 hours.
+          </p>
+        ) : null}
 
         <div
           style={{
