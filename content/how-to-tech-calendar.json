@@ -2220,14 +2220,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Notification System",
     "slug": "building-a-notification-system",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "notification",
       "system"
-    ]
+    ],
+    "publishedAt": "2026-05-18T14:00:33.181Z"
   },
   {
     "id": "how-to-how-to-implement-data-validation-with-yup-may-19",
