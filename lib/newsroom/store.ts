@@ -8,19 +8,27 @@ import {
 } from './constants';
 import type { NewsroomPayload } from './types';
 import { normalizeBriefings } from './normalize-briefing';
-import { SEED_NEWSROOM_PAYLOAD } from './seed';
 
 export const NEWSROOM_KV_KEY = 'newsroom:briefings:v1';
+
+const EMPTY_PAYLOAD: NewsroomPayload = {
+  updatedAt: new Date().toISOString(),
+  briefings: [],
+  source: 'unavailable',
+};
 
 /** Cached live RSS ingest — used when KV is empty or stale. */
 const getCachedLiveIngest = unstable_cache(
   async () => ingestNewsroomBriefings(),
-  ['newsroom-live-ingest-v2'],
+  ['newsroom-live-ingest-v3'],
   { revalidate: NEWSROOM_CACHE_SECONDS, tags: ['newsroom'] },
 );
 
 function isLivePayload(payload: NewsroomPayload): boolean {
-  return payload.source === 'google-news-rss' || payload.source === 'kv-cache';
+  return (
+    (payload.source === 'google-news-rss' || payload.source === 'kv-cache') &&
+    payload.briefings.length > 0
+  );
 }
 
 function payloadAgeHours(updatedAt: string): number {
@@ -53,7 +61,7 @@ export async function getNewsroomPayload(): Promise<NewsroomPayload> {
 
   try {
     const live = await getCachedLiveIngest();
-    if (live.briefings.length >= 3 && live.source === 'google-news-rss') {
+    if (live.briefings.length > 0) {
       if (process.env.KV_REST_API_URL) {
         void setNewsroomPayload(live).catch((err) => {
           console.warn('[newsroom] KV backfill after live ingest failed:', err);
@@ -65,13 +73,17 @@ export async function getNewsroomPayload(): Promise<NewsroomPayload> {
     console.warn('[newsroom] Live ingest failed:', error);
   }
 
-  return { ...SEED_NEWSROOM_PAYLOAD, briefings: normalizeBriefings(SEED_NEWSROOM_PAYLOAD.briefings) };
+  return { ...EMPTY_PAYLOAD, updatedAt: new Date().toISOString() };
 }
 
 export async function setNewsroomPayload(payload: NewsroomPayload): Promise<boolean> {
   if (!process.env.KV_REST_API_URL) {
     return false;
   }
-  await kv.set(NEWSROOM_KV_KEY, payload, { ex: NEWSROOM_KV_TTL_SECONDS });
+  if (payload.briefings.length === 0 || payload.source === 'unavailable' || payload.source === 'seed') {
+    console.warn('[newsroom] Skipping KV write — no live briefings');
+    return false;
+  }
+  await kv.set(NEWSROOM_KV_KEY, { ...payload, source: 'google-news-rss' }, { ex: NEWSROOM_KV_TTL_SECONDS });
   return true;
 }

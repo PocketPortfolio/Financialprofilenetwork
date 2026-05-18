@@ -20,6 +20,21 @@ export async function GET(request: Request) {
     const persisted = await setNewsroomPayload(payload);
     revalidateTag('newsroom');
 
+    if (payload.briefings.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Ingest returned zero briefings — KV not updated',
+          count: 0,
+          source: payload.source,
+          persisted: false,
+          updatedAt: payload.updatedAt,
+          timestamp: new Date().toISOString(),
+        },
+        { status: 502 },
+      );
+    }
+
     return NextResponse.json({
       success: true,
       count: payload.briefings.length,

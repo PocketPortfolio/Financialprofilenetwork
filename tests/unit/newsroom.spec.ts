@@ -5,6 +5,7 @@ import {
   tagsForCategory,
 } from '../../lib/newsroom/categories';
 import { parseRssFeed } from '../../lib/newsroom/parse-rss';
+import { resolveBriefingHref } from '../../lib/newsroom/resolve-href';
 
 describe('newsroom categories', () => {
   it('classifies FCA/compliance headlines', () => {
@@ -58,5 +59,33 @@ describe('parseRssFeed', () => {
     </item></channel></rss>`;
     const items = parseRssFeed(xml, 'Example');
     expect(items[0].sourceSiteUrl).toBe('https://www.professionaladviser.com');
+  });
+
+  it('extracts direct FCA article links', () => {
+    const xml = `<?xml version="1.0"?><rss><channel><item>
+      <title>FCA press release</title>
+      <link>https://www.fca.org.uk/news/press-releases/example-story</link>
+      <pubDate>Mon, 18 May 2026 10:00:00 GMT</pubDate>
+    </item></channel></rss>`;
+    const items = parseRssFeed(xml, 'FCA');
+    expect(resolveBriefingHref(items[0])).toBe(
+      'https://www.fca.org.uk/news/press-releases/example-story',
+    );
+  });
+});
+
+describe('resolveBriefingHref', () => {
+  it('maps Google News article URLs to title search', () => {
+    const item = {
+      title: 'Revolut wins FCA approval',
+      url: 'https://news.google.com/rss/articles/CBMiabc123?oc=5',
+      source: 'TheBanker',
+      sourceSiteUrl: 'https://www.thebanker.com',
+      publishedAt: new Date().toISOString(),
+      image: null,
+    };
+    const href = resolveBriefingHref(item);
+    expect(href).toContain('news.google.com/search');
+    expect(href).toContain(encodeURIComponent('Revolut wins FCA approval'));
   });
 });

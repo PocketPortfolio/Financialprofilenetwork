@@ -6,17 +6,17 @@ import {
 } from './categories';
 import { MAX_BRIEFING_AGE_HOURS } from './constants';
 import { CATEGORY_ART_URL, publisherLogoUrl } from './category-art';
+import { CURATED_NEWS_FEEDS } from './feeds';
 import { parseRssFeed, type ParsedRssItem } from './parse-rss';
+import { resolveBriefingHref } from './resolve-href';
 import type { NewsroomBriefing, NewsroomCategory, NewsroomPayload } from './types';
-import { SEED_NEWSROOM_PAYLOAD } from './seed';
 
-const RSS_QUERIES: { query: string; preferredCategory?: NewsroomCategory }[] = [
+/** Supplemental Google News queries when curated feeds are thin. */
+const GOOGLE_NEWS_QUERIES: { query: string; preferredCategory?: NewsroomCategory }[] = [
   { query: 'FCA consumer duty UK wealth management', preferredCategory: 'REGULATORY COMPLIANCE' },
-  { query: 'UK financial advisor compliance regulation', preferredCategory: 'REGULATORY COMPLIANCE' },
-  { query: 'wealth tech fintech UK platform', preferredCategory: 'WEALTH-TECH SCALING' },
-  { query: 'portfolio software local first', preferredCategory: 'WEALTH-TECH SCALING' },
-  { query: 'UK asset allocation wealth managers', preferredCategory: 'MARKET INTELLIGENCE' },
-  { query: 'financial markets UK advisers', preferredCategory: 'MARKET INTELLIGENCE' },
+  { query: 'UK financial advisor regulation', preferredCategory: 'REGULATORY COMPLIANCE' },
+  { query: 'wealth tech fintech UK', preferredCategory: 'WEALTH-TECH SCALING' },
+  { query: 'UK asset allocation advisers', preferredCategory: 'MARKET INTELLIGENCE' },
 ];
 
 const PER_CATEGORY = 2;
@@ -38,17 +38,18 @@ function slugify(input: string): string {
 function snippetFromTitle(title: string, source: string): string {
   const base = title.trim();
   if (base.length >= 120) return `${base.slice(0, 117)}…`;
-  return `${base} — reported via ${source}.`;
+  return `${base} — ${source}`;
 }
 
 function toBriefing(item: ParsedRssItem, category: NewsroomCategory): NewsroomBriefing {
+  const href = resolveBriefingHref(item);
   return {
-    id: slugify(`${category}-${item.title}`),
+    id: slugify(`${category}-${item.title}-${href}`),
     category,
     title: item.title,
     snippet: snippetFromTitle(item.title, item.source),
     tags: tagsForCategory(category),
-    href: item.url,
+    href,
     source: item.source,
     publishedAt: item.publishedAt,
     imageUrl: item.image,
@@ -58,41 +59,70 @@ function toBriefing(item: ParsedRssItem, category: NewsroomCategory): NewsroomBr
   };
 }
 
-async function fetchGoogleNewsRss(query: string): Promise<ParsedRssItem[]> {
-  const newsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-GB&gl=GB&ceid=GB:en`;
-  const response = await fetch(newsUrl, {
+async function fetchRss(url: string, label: string): Promise<ParsedRssItem[]> {
+  const response = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (PocketPortfolio/Newsroom)',
-      Accept: 'application/rss+xml,text/xml,*/*',
+      Accept: 'application/rss+xml,application/xml,text/xml,*/*',
     },
     cache: 'no-store',
   });
-  if (!response.ok) return [];
+  if (!response.ok) {
+    console.warn(`[newsroom] RSS ${label} HTTP ${response.status}`);
+    return [];
+  }
   const xml = await response.text();
-  return parseRssFeed(xml, 'Google News');
+  return parseRssFeed(xml, label);
 }
 
-/** Fetch UK wealth/fintech RSS lanes and balance across three institutional categories. */
-export async function ingestNewsroomBriefings(): Promise<NewsroomPayload> {
-  const results = await Promise.all(
-    RSS_QUERIES.map(async ({ query, preferredCategory }) => {
-      const items = await fetchGoogleNewsRss(query);
-      return items.map((item) => ({
-        item,
-        category: preferredCategory ?? classifyNewsroomCategory(item.title, item.source),
-      }));
-    }),
-  );
+async function fetchGoogleNewsRss(query: string): Promise<ParsedRssItem[]> {
+  const newsUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-GB&gl=GB&ceid=GB:en`;
+  return fetchRss(newsUrl, 'Google News');
+}
 
-  const byUrl = new Map<string, { item: ParsedRssItem; category: NewsroomCategory }>();
-  for (const entry of results.flat()) {
-    const { item } = entry;
+function collectCandidates(
+  items: ParsedRssItem[],
+  preferredCategory: NewsroomCategory | undefined,
+  byHref: Map<string, { item: ParsedRssItem; category: NewsroomCategory }>,
+): void {
+  for (const item of items) {
     if (!isFreshEnough(item.publishedAt)) continue;
     if (!isRelevantWealthHeadline(item.title, item.source)) continue;
-    if (!byUrl.has(item.url)) byUrl.set(item.url, entry);
+    const href = resolveBriefingHref(item);
+    if (byHref.has(href)) continue;
+    const category = preferredCategory ?? classifyNewsroomCategory(item.title, item.source);
+    byHref.set(href, { item, category });
+  }
+}
+
+/** Fetch curated publisher RSS + supplemental Google News; balance three lanes. */
+export async function ingestNewsroomBriefings(): Promise<NewsroomPayload> {
+  const byHref = new Map<string, { item: ParsedRssItem; category: NewsroomCategory }>();
+
+  const curatedResults = await Promise.all(
+    CURATED_NEWS_FEEDS.map(async (feed) => ({
+      feed,
+      items: await fetchRss(feed.url, feed.label),
+    })),
+  );
+
+  for (const { feed, items } of curatedResults) {
+    collectCandidates(items, feed.preferredCategory, byHref);
   }
 
-  const sorted = [...byUrl.values()].sort(
+  if (byHref.size < MAX_BRIEFINGS) {
+    const googleResults = await Promise.all(
+      GOOGLE_NEWS_QUERIES.map(async ({ query, preferredCategory }) => ({
+        preferredCategory,
+        items: await fetchGoogleNewsRss(query),
+      })),
+    );
+    for (const { items, preferredCategory } of googleResults) {
+      collectCandidates(items, preferredCategory, byHref);
+    }
+  }
+
+  const sorted = [...byHref.values()].sort(
     (a, b) => new Date(b.item.publishedAt).getTime() - new Date(a.item.publishedAt).getTime(),
   );
 
@@ -102,25 +132,19 @@ export async function ingestNewsroomBriefings(): Promise<NewsroomPayload> {
     'MARKET INTELLIGENCE': [],
   };
 
-  for (const { item } of sorted) {
+  for (const { item, category: preferred } of sorted) {
     const lane = classifyNewsroomCategory(item.title, item.source);
-    if (buckets[lane].length >= PER_CATEGORY) continue;
-    if (buckets[lane].some((b) => b.href === item.url)) continue;
-    buckets[lane].push(toBriefing(item, lane));
+    const target = buckets[lane].length < PER_CATEGORY ? lane : preferred;
+    if (buckets[target].length >= PER_CATEGORY) continue;
+    if (buckets[target].some((b) => b.href === resolveBriefingHref(item))) continue;
+    buckets[target].push(toBriefing(item, target));
   }
 
-  let briefings = Object.values(buckets).flat().slice(0, MAX_BRIEFINGS);
-
-  if (briefings.length < 3) {
-    return {
-      ...SEED_NEWSROOM_PAYLOAD,
-      updatedAt: new Date().toISOString(),
-    };
-  }
+  const briefings = Object.values(buckets).flat().slice(0, MAX_BRIEFINGS);
 
   return {
     updatedAt: new Date().toISOString(),
     briefings,
-    source: 'google-news-rss',
+    source: briefings.length > 0 ? 'google-news-rss' : 'unavailable',
   };
 }

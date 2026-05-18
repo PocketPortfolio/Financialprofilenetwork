@@ -31,7 +31,9 @@ export default function CommunityContent() {
 
   const briefings = payload?.briefings ?? [];
   const updatedAt = payload?.updatedAt ?? new Date().toISOString();
-  const isLiveFeed = payload?.source === 'google-news-rss' || payload?.source === 'kv-cache';
+  const isLiveFeed =
+    briefings.length > 0 &&
+    (payload?.source === 'google-news-rss' || payload?.source === 'kv-cache');
 
   const primaryStyle: React.CSSProperties = {
     padding: '12px 24px',
@@ -127,7 +129,9 @@ export default function CommunityContent() {
             <p style={{ fontSize: '12px', color: 'var(--muted)', ...MONO }}>
               {loading
                 ? 'Loading market briefings…'
-                : `Updated ${new Date(updatedAt).toLocaleDateString('en-GB', { dateStyle: 'medium' })} · ${isLiveFeed ? 'live RSS' : 'editorial fallback'}`}
+                : briefings.length === 0
+                  ? 'Briefings updating — no live feed yet'
+                  : `Updated ${new Date(updatedAt).toLocaleDateString('en-GB', { dateStyle: 'medium' })} · live RSS`}
             </p>
           </div>
 
@@ -139,6 +143,20 @@ export default function CommunityContent() {
               marginBottom: '36px',
             }}
           >
+            {!loading && briefings.length === 0 ? (
+              <p
+                style={{
+                  gridColumn: '1 / -1',
+                  textAlign: 'center',
+                  color: 'var(--muted)',
+                  fontSize: '14px',
+                  padding: '32px 16px',
+                  ...MONO,
+                }}
+              >
+                Briefings are updating — we only show live publisher headlines, not placeholder copy.
+              </p>
+            ) : null}
             {loading
               ? Array.from({ length: 3 }).map((_, i) => (
                   <div
