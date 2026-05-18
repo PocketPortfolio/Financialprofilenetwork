@@ -61,7 +61,10 @@ export function middleware(request: NextRequest) {
   }
 
   // Open Portfolio (B2B surface): path-fork before any P.-specific logic runs.
-  // Any O. host other than the canonical apex 307-redirects to www.openportfolio.co.uk.
+  // Any O. host other than the canonical hostname uses a permanent redirect (308)
+  // to www.openportfolio.co.uk so crawlers consolidate duplicates (GSC:
+  // "Duplicate without user-selected canonical" on apex). Temporary 307 here would
+  // override next.config permanent redirects because middleware runs first on Vercel.
   // The canonical host gets an internal rewrite to /open/<path> so the Next.js
   // route group at app/open/ handles the request with O. chrome + metadata.
   if (isOpenHost(host)) {
@@ -69,7 +72,7 @@ export function middleware(request: NextRequest) {
     if (host !== openCanonical) {
       const url = request.nextUrl.clone();
       url.hostname = openCanonical;
-      return NextResponse.redirect(url, 307);
+      return NextResponse.redirect(url, 308);
     }
 
     const pathname = request.nextUrl.pathname;
