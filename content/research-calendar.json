@@ -2218,7 +2218,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Total Cost of Ownership - Cloud Migration Analysis",
     "slug": "research-total-cost-of-ownership-cloud-migration-analysis-2026-05-18",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -2226,7 +2226,8 @@
       "total",
       "cost",
       "ownership"
-    ]
+    ],
+    "publishedAt": "2026-05-18T18:01:27.258Z"
   },
   {
     "id": "research-webassembly-performance-javascript-vs-wasm-2026-05-19",
