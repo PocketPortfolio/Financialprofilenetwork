@@ -2236,7 +2236,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement Data Validation with Yup",
     "slug": "how-to-implement-data-validation-with-yup",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2244,7 +2244,8 @@
       "implement",
       "data",
       "validation"
-    ]
+    ],
+    "publishedAt": "2026-05-19T14:00:56.291Z"
   },
   {
     "id": "how-to-understanding-api-gateway-patterns-may-20",
