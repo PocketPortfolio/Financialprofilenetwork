@@ -2235,14 +2235,15 @@
     "scheduledTime": "18:00",
     "title": "Research: WebAssembly Performance - JavaScript vs WASM",
     "slug": "research-webassembly-performance-javascript-vs-wasm-2026-05-19",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "webassembly",
       "javascript"
-    ]
+    ],
+    "publishedAt": "2026-05-19T18:00:58.318Z"
   },
   {
     "id": "research-edge-computing-latency-vs-consistency-2026-05-20",
