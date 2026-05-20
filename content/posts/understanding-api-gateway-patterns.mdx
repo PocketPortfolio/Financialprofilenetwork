@@ -1,0 +1,94 @@
+---
+title: Understanding API Gateway Patterns
+date: '2026-05-20'
+description: A technical guide to understanding and implementing API Gateway patterns.
+tags:
+  - api
+  - gateway
+  - patterns
+  - tech-guide
+author: Pocket Portfolio Team
+image: /images/blog/understanding-api-gateway-patterns.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+In modern microservices architecture, APIs are used extensively to allow communication between different services. However, as the number of microservices grows, managing these APIs becomes complex. Without a structured approach, this can lead to issues such as inconsistent security policies, inefficient routing, and difficulty in managing API versions. An API Gateway acts as a single entry point for all client interactions, simplifying these challenges and offering additional capabilities like authentication, logging, and rate limiting.
+
+## Solution with Code
+
+Implementing an API Gateway effectively requires understanding common patterns. Here are some key patterns you can implement using popular tools like AWS API Gateway or Kong.
+
+### Pattern 1: Gateway Routing
+
+This pattern involves routing incoming requests to the appropriate microservice. You can define routes based on URL paths, HTTP methods, or headers.
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.use('/service1', (req, res) => {
+  // Forward request to Service 1
+});
+
+app.use('/service2', (req, res) => {
+  // Forward request to Service 2
+});
+
+app.listen(3000, () => {
+  console.log("API Gateway running on port 3000");
+});
+```
+
+### Pattern 2: Aggregation
+
+The aggregation pattern combines multiple service responses into one unified response, reducing the number of client calls.
+
+```javascript
+app.get('/aggregate', async (req, res) => {
+  const response1 = await fetch('http://service1/data');
+  const response2 = await fetch('http://service2/data');
+
+  const data1 = await response1.json();
+  const data2 = await response2.json();
+
+  res.json({
+    data1,
+    data2
+  });
+});
+```
+
+### Pattern 3: Authentication and Rate Limiting
+
+By implementing authentication and rate limiting at the gateway level, you ensure consistent security policies across all services without modifying each microservice.
+
+```javascript
+const rateLimit = require('express-rate-limit');
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+app.use('/api/', apiLimiter);
+
+app.use((req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer your-token') {
+    return res.status(401).send('Unauthorized');
+  }
+  next();
+});
+```
+
+## Key Concepts
+
+- **Routing**: Directing requests to the appropriate microservice based on the request's characteristics.
+- **Aggregation**: Combining results from multiple services into a single response.
+- **Security**: Implementing authentication, authorization, and rate limiting to secure APIs.
+- **Centralized Management**: Using the gateway for logging, monitoring, and policy enforcement.
+
+By understanding and applying these API Gateway patterns, you can significantly enhance the efficiency, security, and manageability of your API ecosystem.
