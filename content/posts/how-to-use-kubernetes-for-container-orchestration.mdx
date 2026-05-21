@@ -1,0 +1,79 @@
+---
+title: How to Use Kubernetes for Container Orchestration
+date: '2026-05-21'
+description: >-
+  A technical guide to using Kubernetes for managing containerized applications
+  efficiently.
+tags:
+  - kubernetes
+  - container
+  - orchestration
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-kubernetes-for-container-orchestration.png
+pillar: Tech
+category: how-to-in-tech
+---
+
+## Problem
+
+Managing containerized applications in a production environment can be complex and error-prone. With multiple containers running, you need a robust system to automate deployment, scaling, and management. Kubernetes is an open-source platform designed to automate these tasks, ensuring your applications run smoothly and reliably.
+
+## Solution
+
+Kubernetes orchestrates containerized applications across a cluster of machines. It provides tools for deploying applications, scaling them as necessary, managing changes, and optimizing resource usage. Here's a step-by-step guide to using Kubernetes for container orchestration:
+
+1. **Install Kubernetes**: You can install Kubernetes locally via Minikube for development purposes or use a cloud provider like Google Kubernetes Engine (GKE), Amazon Elastic Kubernetes Service (EKS), or Azure Kubernetes Service (AKS) for production.
+
+2. **Create a Kubernetes Cluster**: A cluster consists of a set of nodes that run containerized applications. Create a new cluster using the command line interface of your chosen platform.
+
+3. **Deploy Your Application**: Define your application using a YAML file. This file will describe the desired state for your application, including the Docker image to use, the number of replicas, and the ports to expose.
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: my-app
+   spec:
+     replicas: 3
+     selector:
+       matchLabels:
+         app: my-app
+     template:
+       metadata:
+         labels:
+           app: my-app
+       spec:
+         containers:
+         - name: my-app
+           image: my-docker-image:latest
+           ports:
+           - containerPort: 80
+   ```
+
+4. **Apply the Configuration**: Use `kubectl` to apply your configuration and deploy the application.
+
+   ```bash
+   kubectl apply -f my-app-deployment.yaml
+   ```
+
+5. **Expose the Application**: Create a service to expose your application to the outside world.
+
+   ```bash
+   kubectl expose deployment my-app --type=LoadBalancer --port=80
+   ```
+
+6. **Monitor and Scale**: Use Kubernetes' built-in monitoring and scaling tools to ensure your application can handle load increases.
+
+   ```bash
+   kubectl scale deployment my-app --replicas=5
+   ```
+
+## Key Concepts
+
+- **Cluster**: A set of nodes where Kubernetes deploys containers.
+- **Node**: A virtual or physical machine that runs containerized applications.
+- **Pod**: The smallest deployable unit in Kubernetes, which can contain one or more containers.
+- **Deployment**: A Kubernetes object that manages the deployment and scaling of a set of Pods.
+- **Service**: An abstraction that defines a logical set of Pods and a policy to access them.
+
+Kubernetes simplifies container management by automating deployment, scaling, and operation, allowing you to focus on developing applications rather than managing infrastructure.
