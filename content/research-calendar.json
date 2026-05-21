@@ -2269,14 +2269,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Serverless Cold Starts - Optimization Techniques",
     "slug": "research-serverless-cold-starts-optimization-techniques-2026-05-21",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "serverless",
       "cold",
       "starts"
-    ]
+    ],
+    "publishedAt": "2026-05-21T18:00:51.396Z"
   },
   {
     "id": "research-blockchain-scalability-layer-1-vs-layer-2-2026-05-22",
