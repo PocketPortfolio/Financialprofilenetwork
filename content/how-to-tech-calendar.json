@@ -2285,14 +2285,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to Database Migrations",
     "slug": "the-guide-to-database-migrations",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "database",
       "guide",
       "migrations"
-    ]
+    ],
+    "publishedAt": "2026-05-22T14:00:46.913Z"
   },
   {
     "id": "how-to-how-to-implement-api-throttling-may-23",
