@@ -2285,7 +2285,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Blockchain Scalability - Layer 1 vs Layer 2",
     "slug": "research-blockchain-scalability-layer-1-vs-layer-2-2026-05-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2293,7 +2293,8 @@
       "AI",
       "blockchain",
       "layer"
-    ]
+    ],
+    "publishedAt": "2026-05-22T18:00:47.625Z"
   },
   {
     "id": "research-quantum-computing-readiness-algorithm-analysis-2026-05-23",
