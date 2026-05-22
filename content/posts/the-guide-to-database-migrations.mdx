@@ -1,0 +1,78 @@
+---
+title: The Guide to Database Migrations
+date: '2026-05-22'
+description: >-
+  A technical guide to understanding and implementing database migrations
+  effectively.
+tags:
+  - database
+  - migrations
+  - guide
+  - how-to
+author: Pocket Portfolio Team
+image: /images/blog/the-guide-to-database-migrations.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Database migrations are a critical part of managing changes in the database schema over time. As applications evolve, new features often require modifications to the database structure. These changes can include adding or removing tables, altering columns, or updating data types. Without a proper migration strategy, teams face the risk of database inconsistencies, data loss, and deployment failures.
+
+## Solution with Code
+
+To manage database migrations efficiently, it's essential to follow a structured approach using migration tools. Here is a basic example using a popular tool, `Flyway`, to handle these migrations in a Java application.
+
+### Step 1: Add Flyway Dependency
+
+First, integrate Flyway into your build system. If you're using Maven, add the following dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+    <version>9.0.0</version>
+</dependency>
+```
+
+### Step 2: Configure Flyway
+
+Next, configure Flyway in your `application.properties` file:
+
+```properties
+spring.flyway.url=jdbc:mysql://localhost:3306/mydatabase
+spring.flyway.user=dbuser
+spring.flyway.password=dbpassword
+```
+
+### Step 3: Create Migration Scripts
+
+Flyway uses SQL files for migrations, typically located in `src/main/resources/db/migration`. Name these files with a version number, a double underscore, and a description, like `V1__Initial_setup.sql`. Here's an example of a SQL migration script:
+
+```sql
+-- V1__Initial_setup.sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+```
+
+### Step 4: Execute Migrations
+
+Run the migrations by executing the Flyway command:
+
+```bash
+mvn flyway:migrate
+```
+
+This command applies all pending migrations, updating the database schema to the latest version.
+
+## Key Concepts
+
+- **Version Control**: Migrations should be versioned and stored in a version control system alongside your application code.
+- **Repeatability**: Migrations must be idempotent where possible, ensuring they can be applied multiple times without adverse effects.
+- **Order of Execution**: Migrations are executed in sequence based on their version number, ensuring a predictable update path.
+- **Rollback Strategy**: Plan for rollback procedures in case a migration fails; this might involve creating `undo` scripts or backups.
+
+By following these practices and utilizing tools like Flyway, teams can maintain a robust and adaptable database schema that evolves with their application's needs.
