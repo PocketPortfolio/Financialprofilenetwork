@@ -2301,14 +2301,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Throttling",
     "slug": "how-to-implement-api-throttling",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "throttling"
-    ]
+    ],
+    "publishedAt": "2026-05-23T14:00:38.836Z"
   },
   {
     "id": "how-to-building-a-task-queue-system-may-24",
