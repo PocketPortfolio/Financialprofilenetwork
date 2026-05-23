@@ -2302,14 +2302,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Quantum Computing Readiness - Algorithm Analysis",
     "slug": "research-quantum-computing-readiness-algorithm-analysis-2026-05-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "quantum",
       "computing",
       "readiness"
-    ]
+    ],
+    "publishedAt": "2026-05-23T18:00:29.024Z"
   },
   {
     "id": "research-5g-network-performance-mobile-app-optimization-2026-05-24",
