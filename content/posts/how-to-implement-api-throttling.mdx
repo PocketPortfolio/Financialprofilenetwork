@@ -2,76 +2,99 @@
 title: How to Implement API Throttling
 date: '2026-05-23'
 description: >-
-  Learn how to implement API throttling to protect your server from overload and
-  ensure fair resource distribution.
+  Learn how to implement API throttling to manage traffic and enhance
+  performance.
 tags:
   - api
   - throttling
-  - implementation
   - rate limiting
+  - backend
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-api-throttling.png
 pillar: Technology
 category: how-to-in-tech
 ---
 
-# Problem
+API throttling is a critical aspect of managing traffic in any scalable API-based application. It prevents abuse by limiting the number of requests made to an API within a specified timeframe, ensuring fair use and optimizing server resource usage.
 
-APIs can face performance issues and increased costs due to excessive requests from users or applications. Without proper throttling mechanisms, an API can become overwhelmed, leading to service degradation or downtime. API throttling helps in controlling the number of requests a client can make in a given time frame, ensuring fair resource usage and protecting the backend systems.
+### Problem
 
-# Solution
+Without API throttling, a service can become overwhelmed by too many requests, leading to poor performance or downtime. This can be due to intentional abuse or an unexpected spike in legitimate traffic. Implementing throttling helps maintain service quality and availability.
 
-API throttling is often implemented using a rate limiting algorithm, such as the Token Bucket or Leaky Bucket. Here, we'll focus on the Token Bucket algorithm, which provides a flexible way to handle request bursts while maintaining a steady average rate. Below is a basic implementation using Node.js and Express.
+### Solution with Code
 
-```javascript
-const express = require('express');
-const app = express();
+A common way to implement API throttling is by using an in-memory data store like Redis to track request counts. Here's a basic implementation using Node.js and Express:
 
-const RATE_LIMIT = 100; // Max requests per time window
-const TIME_WINDOW = 60000; // Time window in milliseconds (1 minute)
-const buckets = new Map(); // Map to store tokens for each client
+1. **Install Dependencies**
 
-app.use((req, res, next) => {
-  const clientIP = req.ip;
-  const currentTime = Date.now();
+   First, ensure you have Node.js and Redis installed. You will also need the `express` and `ioredis` packages:
 
-  if (!buckets.has(clientIP)) {
-    buckets.set(clientIP, { tokens: RATE_LIMIT, last: currentTime });
-  }
+   ```bash
+   npm install express ioredis
+   ```
 
-  const bucket = buckets.get(clientIP);
-  const timePassed = currentTime - bucket.last;
+2. **Set Up Express and Redis**
 
-  // Refill tokens
-  const refillTokens = Math.floor(timePassed * (RATE_LIMIT / TIME_WINDOW));
-  bucket.tokens = Math.min(RATE_LIMIT, bucket.tokens + refillTokens);
-  bucket.last = currentTime;
+   Create an `index.js` file and set up Express with Redis:
 
-  if (bucket.tokens > 0) {
-    bucket.tokens -= 1;
-    next(); // Allow request
-  } else {
-    res.status(429).send('Too Many Requests');
-  }
-});
+   ```javascript
+   const express = require('express');
+   const Redis = require('ioredis');
 
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
+   const app = express();
+   const redis = new Redis();
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
-```
+   const PORT = process.env.PORT || 3000;
+   ```
 
-# Key Concepts
+3. **Implement Throttling Middleware**
 
-- **Token Bucket Algorithm**: This algorithm controls the flow of requests by maintaining a "bucket" of tokens. Each request requires a token; tokens are refilled at a constant rate. If the bucket is empty, the request is denied.
+   Add middleware to check and update request counts:
 
-- **Rate Limit**: The maximum number of requests that can be processed in a specified time frame. In this example, it's set to 100 requests per minute.
+   ```javascript
+   const rateLimit = (req, res, next) => {
+     const ip = req.ip;
+     const timeWindow = 60; // time window in seconds
+     const maxRequests = 100; // max requests per window
 
-- **Time Window**: The duration over which the rate limit is applied. Here, it is set to 60,000 milliseconds (1 minute).
+     redis.multi()
+       .set([ip, 0, 'EX', timeWindow, 'NX'])
+       .incr(ip)
+       .exec((err, replies) => {
+         if (err) return res.status(500).send('Server Error');
+         const requestCount = replies[1][1];
 
-- **Client Identification**: Each client is identified by their IP address to maintain individual request limits.
+         if (requestCount > maxRequests) {
+           res.status(429).send('Too many requests. Please try again later.');
+         } else {
+           next();
+         }
+       });
+   };
 
-This simple implementation can be expanded to use data stores like Redis for distributed applications, ensuring consistency across multiple server instances.
+   app.use(rateLimit);
+   ```
+
+4. **Run Your Server**
+
+   Lastly, add a simple endpoint and start your server:
+
+   ```javascript
+   app.get('/', (req, res) => {
+     res.send('Welcome to the API.');
+   });
+
+   app.listen(PORT, () => {
+     console.log(`Server running on port ${PORT}`);
+   });
+   ```
+
+### Key Concepts
+
+- **Rate Limiting**: This involves setting a threshold for the number of API calls allowed within a certain timeframe. Once the limit is reached, further requests are rejected until the window resets.
+
+- **Redis Usage**: Redis is used here to store and check the count of requests per client IP. It supports operations like incrementing counts and setting expiration times efficiently.
+
+- **Middleware**: The rate-limiting logic is encapsulated in middleware, making it easy to apply to any endpoint in the Express application.
+
+By implementing API throttling, you can significantly improve your service's resilience and maintain performance, even under high load conditions.
