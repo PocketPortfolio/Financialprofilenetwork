@@ -1,0 +1,77 @@
+---
+title: How to Implement API Throttling
+date: '2026-05-23'
+description: >-
+  Learn how to implement API throttling to protect your server from overload and
+  ensure fair resource distribution.
+tags:
+  - api
+  - throttling
+  - implementation
+  - rate limiting
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-api-throttling.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+# Problem
+
+APIs can face performance issues and increased costs due to excessive requests from users or applications. Without proper throttling mechanisms, an API can become overwhelmed, leading to service degradation or downtime. API throttling helps in controlling the number of requests a client can make in a given time frame, ensuring fair resource usage and protecting the backend systems.
+
+# Solution
+
+API throttling is often implemented using a rate limiting algorithm, such as the Token Bucket or Leaky Bucket. Here, we'll focus on the Token Bucket algorithm, which provides a flexible way to handle request bursts while maintaining a steady average rate. Below is a basic implementation using Node.js and Express.
+
+```javascript
+const express = require('express');
+const app = express();
+
+const RATE_LIMIT = 100; // Max requests per time window
+const TIME_WINDOW = 60000; // Time window in milliseconds (1 minute)
+const buckets = new Map(); // Map to store tokens for each client
+
+app.use((req, res, next) => {
+  const clientIP = req.ip;
+  const currentTime = Date.now();
+
+  if (!buckets.has(clientIP)) {
+    buckets.set(clientIP, { tokens: RATE_LIMIT, last: currentTime });
+  }
+
+  const bucket = buckets.get(clientIP);
+  const timePassed = currentTime - bucket.last;
+
+  // Refill tokens
+  const refillTokens = Math.floor(timePassed * (RATE_LIMIT / TIME_WINDOW));
+  bucket.tokens = Math.min(RATE_LIMIT, bucket.tokens + refillTokens);
+  bucket.last = currentTime;
+
+  if (bucket.tokens > 0) {
+    bucket.tokens -= 1;
+    next(); // Allow request
+  } else {
+    res.status(429).send('Too Many Requests');
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+# Key Concepts
+
+- **Token Bucket Algorithm**: This algorithm controls the flow of requests by maintaining a "bucket" of tokens. Each request requires a token; tokens are refilled at a constant rate. If the bucket is empty, the request is denied.
+
+- **Rate Limit**: The maximum number of requests that can be processed in a specified time frame. In this example, it's set to 100 requests per minute.
+
+- **Time Window**: The duration over which the rate limit is applied. Here, it is set to 60,000 milliseconds (1 minute).
+
+- **Client Identification**: Each client is identified by their IP address to maintain individual request limits.
+
+This simple implementation can be expanded to use data stores like Redis for distributed applications, ensuring consistency across multiple server instances.
