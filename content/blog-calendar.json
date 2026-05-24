@@ -886,7 +886,7 @@
     "date": "2026-05-24",
     "title": "From Prisoner to Sovereign: Escaping Financial Data Jails",
     "slug": "from-prisoner-to-sovereign-escaping-financial-data-jails",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -896,7 +896,8 @@
       "prisoner"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-24T09:01:10.135Z"
   },
   {
     "id": "week-21-post-2",
