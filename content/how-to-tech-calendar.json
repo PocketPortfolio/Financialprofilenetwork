@@ -2317,14 +2317,15 @@
     "scheduledTime": "14:00",
     "title": "Building a Task Queue System",
     "slug": "building-a-task-queue-system",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "building",
       "task",
       "queue"
-    ]
+    ],
+    "publishedAt": "2026-05-24T14:00:38.435Z"
   },
   {
     "id": "how-to-how-to-use-grpc-for-high-performance-apis-may-25",
