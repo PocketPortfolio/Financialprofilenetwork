@@ -2318,14 +2318,15 @@
     "scheduledTime": "18:00",
     "title": "Research: 5G Network Performance - Mobile App Optimization",
     "slug": "research-5g-network-performance-mobile-app-optimization-2026-05-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "network",
       "mobile"
-    ]
+    ],
+    "publishedAt": "2026-05-24T18:00:40.057Z"
   },
   {
     "id": "research-iot-device-communication-protocol-comparison-2026-05-25",
