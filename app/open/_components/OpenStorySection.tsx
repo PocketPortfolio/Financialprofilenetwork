@@ -16,18 +16,20 @@ export default function OpenStorySection({
   visual,
   visualPosition = 'right',
   visualPriority = false,
+  adapterCount = 19,
   band,
   children,
 }: {
   visual: OpenLandingVisualMeta;
   visualPosition?: 'left' | 'right';
   visualPriority?: boolean;
+  adapterCount?: number;
   /** Optional full-bleed background band */
   band?: boolean;
   children: ReactNode;
 }) {
   const visualNode = (
-    <OpenLandingVisual visual={visual} priority={visualPriority} />
+    <OpenLandingVisual visual={visual} priority={visualPriority} adapterCount={adapterCount} />
   );
 
   return (

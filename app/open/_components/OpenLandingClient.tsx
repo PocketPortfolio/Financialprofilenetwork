@@ -64,7 +64,7 @@ export default function OpenLandingClient({
       }}
     >
       <Hero copy={copy} />
-      <SubHero copy={copy} />
+      <SubHero copy={copy} adapterCount={sdk.brokerAdapterCount} />
       <ThreatSection threats={threats} copy={copy} />
       <BridgeSection copy={copy} receipts={receipts} />
       <PillarsSection copy={copy} sdk={sdk} />
@@ -217,9 +217,14 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
 
 // ─── Sub-hero: AI + privacy ───────────────────────────────────────────────────
 
-function SubHero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+function SubHero({ copy, adapterCount }: { copy: typeof OPEN_LANDING_COPY; adapterCount: number }) {
   return (
-    <OpenStorySection visual={OPEN_LANDING_VISUALS.subHero} visualPosition="left" band>
+    <OpenStorySection
+      visual={OPEN_LANDING_VISUALS.subHero}
+      visualPosition="left"
+      band
+      adapterCount={adapterCount}
+    >
       <span style={eyebrowStyle}>{copy.subHero.eyebrow}</span>
       <h2
         style={{

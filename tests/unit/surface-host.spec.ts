@@ -9,6 +9,7 @@ describe('isOpenStaticAssetPath', () => {
 
   it('includes B2B landing art under /open/landing/ (public/open/landing)', () => {
     expect(isOpenStaticAssetPath('/open/landing/hero-sovereign-layer.png')).toBe(true);
+    expect(isOpenStaticAssetPath('/open/landing/plates/web-boundary-frontier.png')).toBe(true);
     expect(isOpenStaticAssetPath('/open/landing/svg/privacy-architecture.svg')).toBe(true);
   });
 });

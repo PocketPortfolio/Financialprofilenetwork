@@ -1,18 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useId, useMemo, useRef, useState } from 'react';
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
-import type { MotionValue } from 'framer-motion';
-import type { OpenLandingVisualId, OpenLandingVisualMeta } from '@/lib/open-landing-visuals';
-
-const ACCENT = '#f59e0b';
+import { motion, useReducedMotion } from 'framer-motion';
+import type { OpenLandingVisualMeta } from '@/lib/open-landing-visuals';
+import OpenLandingBriefingConsole from './briefing-iad/OpenLandingBriefingConsole';
+import OpenLandingDigitalFootprintMap from './OpenLandingDigitalFootprintMap';
+import OpenLandingPackageTerminal from './OpenLandingPackageTerminal';
+import OpenLandingPlateOverlay from './OpenLandingPlateOverlay';
+import OpenLandingSovereignGrid from './OpenLandingSovereignGrid';
 
 const fadeVisual = {
   initial: { opacity: 0, scale: 0.98 },
@@ -21,455 +16,27 @@ const fadeVisual = {
   transition: { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] as const },
 };
 
-function AmbientOrbs({ variant }: { variant: 'briefing' | 'vault' | 'default' }) {
-  if (variant === 'default') return null;
-
-  const orbs =
-    variant === 'briefing'
-      ? [
-          { x: '12%', y: '18%', size: 140, delay: 0 },
-          { x: '72%', y: '62%', size: 180, delay: 1.2 },
-          { x: '48%', y: '38%', size: 100, delay: 0.6 },
-        ]
-      : [
-          { x: '50%', y: '45%', size: 200, delay: 0 },
-          { x: '28%', y: '55%', size: 120, delay: 0.8 },
-        ];
-
-  return (
-    <>
-      {orbs.map((orb, i) => (
-        <motion.div
-          key={i}
-          aria-hidden
-          animate={{
-            opacity: [0.12, 0.32, 0.12],
-            scale: [1, 1.12, 1],
-          }}
-          transition={{
-            duration: variant === 'briefing' ? 5 + i : 6,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: orb.delay,
-          }}
-          style={{
-            position: 'absolute',
-            left: orb.x,
-            top: orb.y,
-            width: orb.size,
-            height: orb.size,
-            marginLeft: -orb.size / 2,
-            marginTop: -orb.size / 2,
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(245,158,11,0.35) 0%, rgba(245,158,11,0) 70%)',
-            pointerEvents: 'none',
-            filter: 'blur(2px)',
-          }}
-        />
-      ))}
-    </>
-  );
-}
-
-function ScanLine() {
-  return (
-    <motion.div
-      aria-hidden
-      initial={{ top: '-20%' }}
-      animate={{ top: ['-20%', '120%'] }}
-      transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
-      style={{
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        height: '28%',
-        background:
-          'linear-gradient(180deg, transparent 0%, rgba(245,158,11,0.08) 45%, transparent 100%)',
-        pointerEvents: 'none',
-      }}
-    />
-  );
-}
-
-/**
- * Hero-only: “data gravity” streams inward toward centralisation; shield perimeter
- * absorbs/dissipates packets — contextual motion without replacing the static art.
- * Tuned for a readable “risk → blocked” read without carnival brightness.
- */
-function HeroDataGravityBlock() {
-  const reduceMotion = useReducedMotion();
-  const gid = useId().replace(/:/g, '');
-
-  const packets = useMemo(
-    () =>
-      [
-        /* Faster cadence + brighter peaks; targets ~shield centroid (≈62%, 44%) */
-        { sx: 4, sy: 22, mx: 59, my: 39, dur: 2.55, delay: 0 },
-        { sx: 7, sy: 58, mx: 61, my: 46, dur: 2.85, delay: 0.22 },
-        { sx: 2, sy: 42, mx: 58, my: 41, dur: 2.65, delay: 0.44 },
-        { sx: 12, sy: 72, mx: 60, my: 48, dur: 3.05, delay: 0.66 },
-        { sx: 9, sy: 14, mx: 57, my: 36, dur: 2.6, delay: 0.88 },
-        { sx: 18, sy: 88, mx: 62, my: 51, dur: 3.15, delay: 0.11 },
-        { sx: 15, sy: 33, mx: 59, my: 38, dur: 2.75, delay: 1.1 },
-        { sx: 6, sy: 95, mx: 61, my: 50, dur: 2.95, delay: 1.32 },
-        { sx: 22, sy: 48, mx: 60, my: 43, dur: 2.7, delay: 1.54 },
-        { sx: 11, sy: 66, mx: 58, my: 47, dur: 2.9, delay: 1.76 },
-        { sx: 3, sy: 78, mx: 59, my: 49, dur: 2.8, delay: 1.98 },
-        { sx: 16, sy: 24, mx: 58, my: 37, dur: 2.62, delay: 2.2 },
-        { sx: 20, sy: 62, mx: 61, my: 45, dur: 2.88, delay: 2.05 },
-        { sx: 8, sy: 52, mx: 59, my: 43, dur: 2.58, delay: 2.42 },
-      ].map((r, i) => ({ ...r, i })),
-    [],
-  );
-
-  if (reduceMotion) return null;
-
-  return (
-    <div
-      aria-hidden
-      style={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        zIndex: 5,
-        overflow: 'hidden',
-      }}
-    >
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="xMidYMid slice"
-        style={{ position: 'absolute', inset: 0 }}
-      >
-        <defs>
-          <radialGradient id={`hero-shield-field-${gid}`} cx="62%" cy="44%" r="46%">
-            <stop offset="0%" stopColor={ACCENT} stopOpacity="0.28" />
-            <stop offset="45%" stopColor={ACCENT} stopOpacity="0.1" />
-            <stop offset="100%" stopColor={ACCENT} stopOpacity="0" />
-          </radialGradient>
-          <filter id={`hero-data-soft-${gid}`} x="-25%" y="-25%" width="150%" height="150%">
-            <feGaussianBlur stdDeviation="0.28" result="b" />
-            <feMerge>
-              <feMergeNode in="b" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        <motion.rect
-          width="100"
-          height="100"
-          fill={`url(#hero-shield-field-${gid})`}
-          initial={{ opacity: 0.42 }}
-          animate={{ opacity: [0.38, 0.62, 0.38] }}
-          transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Large “risk front” arcs — gravity wells pressing toward the shield */}
-        <motion.path
-          fill="none"
-          stroke="rgba(245,158,11,0.4)"
-          strokeWidth="0.38"
-          strokeLinecap="round"
-          d="M -6 30 A 54 48 0 0 1 56 41"
-          animate={{
-            opacity: [0.18, 0.52, 0.2],
-            strokeWidth: [0.32, 0.52, 0.34],
-          }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.path
-          fill="none"
-          stroke="rgba(245,158,11,0.32)"
-          strokeWidth="0.32"
-          strokeLinecap="round"
-          d="M -10 62 A 62 54 0 0 1 57 49"
-          animate={{
-            opacity: [0.14, 0.45, 0.16],
-            strokeWidth: [0.26, 0.46, 0.28],
-          }}
-          transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut', delay: 0.35 }}
-        />
-        <motion.path
-          fill="none"
-          stroke="rgba(245,158,11,0.26)"
-          strokeWidth="0.26"
-          strokeLinecap="round"
-          d="M -4 46 A 48 42 0 0 1 55 44"
-          animate={{
-            opacity: [0.12, 0.38, 0.14],
-          }}
-          transition={{ duration: 2.35, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
-        />
-        <motion.path
-          filter={`url(#hero-data-soft-${gid})`}
-          fill="none"
-          stroke="rgba(245,158,11,0.42)"
-          strokeWidth="0.2"
-          strokeLinecap="round"
-          d="M 8 32 Q 38 40 58 42"
-          initial={{ pathLength: 0.15, opacity: 0.28 }}
-          animate={{ pathLength: [0.1, 1, 0.12], opacity: [0.28, 0.78, 0.26] }}
-          transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.path
-          filter={`url(#hero-data-soft-${gid})`}
-          fill="none"
-          stroke="rgba(245,158,11,0.36)"
-          strokeWidth="0.16"
-          strokeLinecap="round"
-          d="M 6 68 Q 34 54 57 47"
-          initial={{ pathLength: 0.2 }}
-          animate={{ pathLength: [0.15, 1, 0.14], opacity: [0.22, 0.68, 0.22] }}
-          transition={{ duration: 4.1, repeat: Infinity, ease: 'easeInOut', delay: 0.45 }}
-        />
-        {/* Outer perimeter — harder pulse when packets “impact” */}
-        <motion.ellipse
-          cx="62"
-          cy="44"
-          rx="14"
-          ry="18.5"
-          fill="none"
-          stroke="rgba(245,158,11,0.28)"
-          strokeWidth="0.14"
-          animate={{
-            opacity: [0.12, 0.38, 0.12],
-            rx: [13.2, 15.2, 13.2],
-            ry: [17.5, 19.8, 17.5],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.ellipse
-          cx="62"
-          cy="44"
-          rx="11"
-          ry="15"
-          fill="none"
-          stroke={ACCENT}
-          strokeWidth="0.28"
-          opacity={0.45}
-          animate={{
-            opacity: [0.32, 0.92, 0.32],
-            strokeWidth: [0.22, 0.42, 0.22],
-            rx: [10, 12.2, 10],
-            ry: [13.8, 16.4, 13.8],
-          }}
-          transition={{ duration: 2.65, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </svg>
-
-      {packets.map(({ sx, sy, mx, my, dur, delay, i }) => (
-        <motion.span
-          key={i}
-          aria-hidden
-          initial={false}
-          animate={{
-            left: [`${sx}%`, `${mx}%`, `${mx}%`],
-            top: [`${sy}%`, `${my}%`, `${my}%`],
-            opacity: [0, 0.92, 0],
-            scale: [0.55, 1.18, 0.08],
-            rotate: [18 + i * 5, -8, 0],
-          }}
-          transition={{
-            duration: dur,
-            repeat: Infinity,
-            delay,
-            times: [0, 0.68, 1],
-            ease: ['easeIn', 'easeIn'],
-          }}
-          style={{
-            position: 'absolute',
-            width: 7,
-            height: 14,
-            marginLeft: -3.5,
-            marginTop: -7,
-            borderRadius: 2,
-            background: `linear-gradient(180deg, rgba(245,158,11,1) 0%, rgba(245,158,11,0.28) 100%)`,
-            boxShadow:
-              '0 0 14px rgba(245,158,11,0.65), 0 0 28px rgba(245,158,11,0.22)',
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/** Minimal “console” face layered over the briefing art — pupils + mouth follow pointer (sprung). */
-function BriefingRoomFace({
-  pupilX,
-  pupilY,
-  mouthX,
-  mouthY,
-}: {
-  pupilX: MotionValue<number>;
-  pupilY: MotionValue<number>;
-  mouthX: MotionValue<number>;
-  mouthY: MotionValue<number>;
-}) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 260 100"
-      style={{
-        position: 'absolute',
-        left: '50%',
-        bottom: '8%',
-        width: 'min(48%, 248px)',
-        height: 'auto',
-        transform: 'translateX(-50%)',
-        overflow: 'visible',
-        pointerEvents: 'none',
-        zIndex: 6,
-      }}
-    >
-      <defs>
-        <filter id="open-briefing-face-soft" x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="0.8" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#open-briefing-face-soft)">
-        <circle
-          cx="88"
-          cy="42"
-          r="17"
-          fill="rgba(6,8,11,0.5)"
-          stroke={ACCENT}
-          strokeWidth="1.35"
-          opacity={0.88}
-        />
-        <circle
-          cx="172"
-          cy="42"
-          r="17"
-          fill="rgba(6,8,11,0.5)"
-          stroke={ACCENT}
-          strokeWidth="1.35"
-          opacity={0.88}
-        />
-        <motion.g style={{ x: pupilX, y: pupilY }}>
-          <circle cx="88" cy="42" r="6" fill={ACCENT} />
-          <circle cx="172" cy="42" r="6" fill={ACCENT} />
-        </motion.g>
-        <motion.g style={{ x: mouthX, y: mouthY }}>
-          <line
-            x1="74"
-            y1="74"
-            x2="186"
-            y2="74"
-            stroke={ACCENT}
-            strokeWidth="2.25"
-            strokeLinecap="round"
-            opacity={0.92}
-          />
-        </motion.g>
-      </g>
-    </svg>
-  );
-}
-
-function interactionFor(id: OpenLandingVisualId): {
-  orbs: 'briefing' | 'vault' | 'default';
-  scan: boolean;
-  kenBurns: boolean;
-  hoverLift: number;
-  /** Text is baked into the art board — skip overlays that wash out labels */
-  textHeavy: boolean;
-} {
-  switch (id) {
-    case 'contact':
-      return { orbs: 'briefing', scan: true, kenBurns: true, hoverLift: 6, textHeavy: false };
-    case 'subHero':
-      return { orbs: 'vault', scan: false, kenBurns: false, hoverLift: 5, textHeavy: true };
-    case 'threat':
-      return { orbs: 'default', scan: true, kenBurns: false, hoverLift: 4, textHeavy: false };
-    case 'pillars':
-      return { orbs: 'default', scan: false, kenBurns: false, hoverLift: 5, textHeavy: true };
-    case 'packages':
-      return { orbs: 'default', scan: false, kenBurns: false, hoverLift: 4, textHeavy: true };
-    case 'tracks':
-      return { orbs: 'default', scan: false, kenBurns: false, hoverLift: 4, textHeavy: true };
-    default:
-      return { orbs: 'default', scan: false, kenBurns: true, hoverLift: 4, textHeavy: false };
-  }
+function aspectCss(ratio: OpenLandingVisualMeta['aspectRatio']): string {
+  return ratio === '16/10' ? '16 / 10' : '16 / 9';
 }
 
 export default function OpenLandingVisual({
   visual,
   priority = false,
+  adapterCount = 19,
 }: {
   visual: OpenLandingVisualMeta;
   priority?: boolean;
+  adapterCount?: number;
 }) {
   const reduceMotion = useReducedMotion();
-  const surfaceRef = useRef<HTMLDivElement>(null);
-  const [hasInteracted, setHasInteracted] = useState(false);
-
-  const mouseNormX = useMotionValue(0);
-  const mouseNormY = useMotionValue(0);
-  const springX = useSpring(mouseNormX, { stiffness: 300, damping: 30, mass: 0.35 });
-  const springY = useSpring(mouseNormY, { stiffness: 300, damping: 30, mass: 0.35 });
-
-  const isBriefingPlay = visual.id === 'contact' && !reduceMotion;
-
-  const pupilShiftX = useTransform(springX, [-1, 1], [-11, 11]);
-  const pupilShiftY = useTransform(springY, [-1, 1], [-8, 8]);
-  const mouthShiftX = useTransform(springX, [-1, 1], [-6, 6]);
-  const mouthShiftY = useTransform(springY, [-1, 1], [-4, 4]);
-  const orbLayerX = useTransform(springX, [-1, 1], [-24, 24]);
-  const orbLayerY = useTransform(springY, [-1, 1], [-20, 20]);
-  const imgLayerX = useTransform(springX, [-1, 1], [14, -14]);
-  const imgLayerY = useTransform(springY, [-1, 1], [11, -11]);
-  const vignetteStrength = useTransform([springX, springY], ([x, y]) => {
-    const nx = Number(x);
-    const ny = Number(y);
-    return Math.min(1, Math.hypot(nx, ny));
-  });
-  const vignetteOpacity = useTransform(vignetteStrength, [0, 0.35, 1], [0.22, 0.5, 0.78]);
-
-  const updatePointer = useCallback(
-    (clientX: number, clientY: number) => {
-      const el = surfaceRef.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const w = Math.max(r.width, 1);
-      const h = Math.max(r.height, 1);
-      mouseNormX.set(((clientX - r.left) / w - 0.5) * 2);
-      mouseNormY.set(((clientY - r.top) / h - 0.5) * 2);
-    },
-    [mouseNormX, mouseNormY],
-  );
-
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!isBriefingPlay) return;
-      updatePointer(e.clientX, e.clientY);
-      setHasInteracted(true);
-    },
-    [isBriefingPlay, updatePointer],
-  );
-
-  const onPointerLeave = useCallback(() => {
-    mouseNormX.set(0);
-    mouseNormY.set(0);
-  }, [mouseNormX, mouseNormY]);
-
-  const [w, h] =
-    visual.aspectRatio === '21/9'
-      ? [21, 9]
-      : visual.aspectRatio === '4/3'
-        ? [4, 3]
-        : [16, 10];
-
-  const fx = interactionFor(visual.id);
+  const kenBurns = visual.id === 'hero' && !reduceMotion;
+  const objectFit = visual.objectFit ?? 'cover';
 
   return (
     <motion.figure
       {...fadeVisual}
-      whileHover={reduceMotion ? undefined : { y: -fx.hoverLift }}
+      whileHover={reduceMotion ? undefined : { y: -4 }}
       transition={{ type: 'spring', stiffness: 320, damping: 28 }}
       style={{
         margin: 0,
@@ -477,59 +44,31 @@ export default function OpenLandingVisual({
         borderRadius: '16px',
         overflow: 'hidden',
         border: '1px solid rgba(245,158,11,0.12)',
-        background: '#06080b',
+        background: '#09090b',
         boxShadow:
           '0 32px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset',
       }}
     >
       <div
-        ref={surfaceRef}
-        role={isBriefingPlay ? 'region' : undefined}
-        aria-label={
-          isBriefingPlay
-            ? 'Interactive executive briefing preview — move your pointer inside the frame; lighting and focus respond.'
-            : undefined
-        }
-        onPointerMove={isBriefingPlay ? onPointerMove : undefined}
-        onPointerLeave={isBriefingPlay ? onPointerLeave : undefined}
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: `${w} / ${h}`,
+          aspectRatio: aspectCss(visual.aspectRatio),
           overflow: 'hidden',
-          cursor: isBriefingPlay ? 'crosshair' : undefined,
         }}
       >
-        {!reduceMotion && fx.orbs !== 'default' && (
-          <motion.div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              pointerEvents: 'none',
-              ...(isBriefingPlay ? { x: orbLayerX, y: orbLayerY } : {}),
-            }}
-          >
-            <AmbientOrbs variant={fx.orbs} />
-          </motion.div>
-        )}
-        {!reduceMotion && fx.scan && <ScanLine />}
-
         <motion.div
           style={{
             position: 'absolute',
             inset: 0,
             overflow: 'hidden',
-            ...(isBriefingPlay ? { x: imgLayerX, y: imgLayerY } : {}),
+            background: objectFit === 'contain' ? '#09090b' : undefined,
           }}
-          animate={
-            reduceMotion || !fx.kenBurns
-              ? undefined
-              : { scale: [1, 1.04, 1] }
-          }
+          animate={kenBurns ? { scale: [1, 1.03, 1] } : undefined}
           transition={
-            reduceMotion || !fx.kenBurns
-              ? undefined
-              : { duration: 20, repeat: Infinity, ease: 'easeInOut' }
+            kenBurns
+              ? { duration: 22, repeat: Infinity, ease: 'easeInOut' }
+              : undefined
           }
         >
           <Image
@@ -537,86 +76,46 @@ export default function OpenLandingVisual({
             alt={visual.alt}
             fill
             priority={priority}
-            quality={100}
+            quality={90}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, min(960px, 45vw)"
             style={{
-              objectFit: 'cover',
+              objectFit,
               objectPosition: 'center center',
             }}
           />
         </motion.div>
 
-        {isBriefingPlay && (
+        {visual.motion === 'sovereign-grid' && <OpenLandingSovereignGrid />}
+        {visual.motion === 'digital-footprint' && (
+          <OpenLandingDigitalFootprintMap
+            placement={visual.id === 'tracks' ? 'full' : 'dual-pane'}
+          />
+        )}
+        {visual.motion === 'package-terminal' && <OpenLandingPackageTerminal />}
+        {visual.motion === 'briefing-console' && <OpenLandingBriefingConsole />}
+
+        {visual.overlay && (
+          <OpenLandingPlateOverlay variant={visual.overlay} adapterCount={adapterCount} />
+        )}
+
+        {!reduceMotion && visual.motion !== 'briefing-console' && (
           <motion.div
             aria-hidden
+            animate={{ opacity: [0.08, 0.2, 0.08] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
             style={{
               position: 'absolute',
               inset: 0,
+              background:
+                'linear-gradient(105deg, transparent 38%, rgba(245,158,11,0.1) 50%, transparent 62%)',
               pointerEvents: 'none',
               zIndex: 2,
-              background:
-                'radial-gradient(ellipse 88% 72% at 50% 42%, transparent 32%, rgba(245,158,11,0.09) 100%)',
-              opacity: vignetteOpacity,
             }}
           />
         )}
 
-        {!fx.textHeavy && (
-          <motion.div
-            aria-hidden
-            animate={reduceMotion ? undefined : { opacity: [0.1, 0.28, 0.1] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'linear-gradient(105deg, transparent 38%, rgba(245,158,11,0.14) 50%, transparent 62%)',
-              pointerEvents: 'none',
-            }}
-          />
-        )}
-
-        {visual.id === 'hero' && <HeroDataGravityBlock />}
-
-        {isBriefingPlay && (
-          <BriefingRoomFace
-            pupilX={pupilShiftX}
-            pupilY={pupilShiftY}
-            mouthX={mouthShiftX}
-            mouthY={mouthShiftY}
-          />
-        )}
-
-        {isBriefingPlay && (
-          <motion.p
-            id="briefing-play-hint"
-            aria-hidden
-            initial={false}
-            animate={{ opacity: hasInteracted ? 0 : 0.5 }}
-            transition={{ duration: 0.55 }}
-            style={{
-              position: 'absolute',
-              top: 14,
-              left: 12,
-              right: 12,
-              margin: 0,
-              textAlign: 'center',
-              fontSize: 11,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--text-secondary)',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-              pointerEvents: 'none',
-              zIndex: 5,
-            }}
-          >
-            Move inside the screen — the room reacts
-          </motion.p>
-        )}
-
-        <motion.div
+        <div
           aria-hidden
-          whileHover={reduceMotion ? undefined : { opacity: 0.9 }}
           style={{
             position: 'absolute',
             inset: 0,
