@@ -21,17 +21,56 @@ function extractDomain(url: string): string {
   }
 }
 
+function decodeEntities(url: string): string {
+  return url
+    .replace(/&amp;/g, '&')
+    .replace(/&#038;/g, '&')
+    .replace(/&quot;/g, '"')
+    .trim();
+}
+
+function isHeroImageUrl(url: string): boolean {
+  const u = url.toLowerCase();
+  if (!u.startsWith('http')) return false;
+  if (u.includes('addtoany') || u.includes('gravatar') || u.includes('/emoji/')) return false;
+  if (u.includes('100x100') || u.includes('150x150') || u.includes('logo-usable')) return false;
+  return true;
+}
+
+function extractImageFromHtml(html: string): string | null {
+  const matches = [...html.matchAll(/<img[^>]+src=['"]([^'"]+)['"][^>]*>/gi)];
+  for (const match of matches) {
+    const url = decodeEntities(match[1]);
+    if (isHeroImageUrl(url)) return url;
+  }
+  return null;
+}
+
 function extractImage(xml: string): string | null {
   const patterns = [
-    /<media:content[^>]*\burl="([^"]+)"[^>]*>/i,
-    /<media:thumbnail[^>]*\burl="([^"]+)"[^>]*>/i,
-    /<enclosure[^>]*\burl="([^"]+)"[^>]*\btype="image[^"]*"[^>]*>/i,
-    /<enclosure[^>]*\btype="image[^"]*"[^>]*\burl="([^"]+)"[^>]*>/i,
+    /<media:content[^>]*\burl=['"]([^'"]+)['"][^>]*(?:medium=['"]image['"]|type=['"]image)/i,
+    /<media:content[^>]*\b(?:medium=['"]image['"]|type=['"]image[^'"]*['"])[^>]*\burl=['"]([^'"]+)['"]/i,
+    /<media:thumbnail[^>]*\burl=['"]([^'"]+)['"][^>]*>/i,
+    /<enclosure[^>]*\burl=['"]([^'"]+)['"][^>]*\btype=['"]image[^'"]*['"][^>]*>/i,
+    /<enclosure[^>]*\btype=['"]image[^'"]*['"][^>]*\burl=['"]([^'"]+)['"][^>]*>/i,
+    /<itunes:image[^>]*\bhref=['"]([^'"]+)['"][^>]*>/i,
   ];
   for (const pattern of patterns) {
     const match = xml.match(pattern);
-    if (match?.[1]) return match[1];
+    if (match?.[1] && isHeroImageUrl(decodeEntities(match[1]))) {
+      return decodeEntities(match[1]);
+    }
   }
+
+  const content =
+    extractText(xml, 'content:encoded') ||
+    extractText(xml, 'content') ||
+    extractText(xml, 'description');
+  if (content) {
+    const fromHtml = extractImageFromHtml(content);
+    if (fromHtml) return fromHtml;
+  }
+
   return null;
 }
 

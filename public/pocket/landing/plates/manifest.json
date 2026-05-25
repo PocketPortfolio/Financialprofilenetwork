@@ -1,0 +1,137 @@
+{
+  "syncedAt": "2026-05-25T20:22:08.629Z",
+  "plates": [
+    {
+      "dest": "web-portal-terminal.png",
+      "src": "slide-03-traction.png",
+      "hash": "5b2a3be17e0a",
+      "label": "portalTerminal — amber data-matrix crop",
+      "region": {
+        "left": 0,
+        "top": 0.08,
+        "width": 0.48,
+        "height": 0.84
+      }
+    },
+    {
+      "dest": "web-portal-storage.png",
+      "src": "slide-01-frontier.png",
+      "hash": "c18f3a0b7b06",
+      "label": "portalStorage — glass vault crop",
+      "region": {
+        "left": 0.5,
+        "top": 0.06,
+        "width": 0.48,
+        "height": 0.88
+      }
+    },
+    {
+      "dest": "web-portal-founders.png",
+      "src": "slide-05-control-panel.png",
+      "hash": "9d4749f3ce63",
+      "label": "portalFounders — command insignia crop",
+      "region": {
+        "left": 0.08,
+        "top": 0.1,
+        "width": 0.84,
+        "height": 0.8
+      }
+    },
+    {
+      "dest": "web-why-choose.png",
+      "src": "slide-04-receipts.png",
+      "hash": "7df657ad3bdb",
+      "label": "whyChoose — obsidian micro-grid texture",
+      "region": {
+        "left": 0.05,
+        "top": 0.15,
+        "width": 0.9,
+        "height": 0.7
+      }
+    },
+    {
+      "dest": "web-ad-free-invariant.png",
+      "src": "slide-05-control-panel.png",
+      "hash": "ebd3d156eefe",
+      "label": "adFreeInvariant — invariant ledger crop",
+      "region": {
+        "left": 0.05,
+        "top": 0.02,
+        "width": 0.9,
+        "height": 0.45
+      }
+    },
+    {
+      "dest": "web-fin-pillars.png",
+      "src": "slide-02-split-brain.png",
+      "hash": "8246a709780f",
+      "label": "finPillars — fiber pipeline crop",
+      "region": {
+        "left": 0.48,
+        "top": 0.05,
+        "width": 0.5,
+        "height": 0.9
+      }
+    },
+    {
+      "dest": "web-community-nodes.png",
+      "src": "slide-01-frontier.png",
+      "hash": "476c62601a9c",
+      "label": "community — decentralized node mesh",
+      "region": {
+        "left": 0.02,
+        "top": 0.08,
+        "width": 0.46,
+        "height": 0.84
+      }
+    },
+    {
+      "dest": "web-news-regulatory.png",
+      "src": "slide-02-split-brain.png",
+      "hash": "2cbcf7373335",
+      "label": "newsRegulatory — abstract regulatory geometry",
+      "region": {
+        "left": 0,
+        "top": 0.1,
+        "width": 0.48,
+        "height": 0.8
+      }
+    },
+    {
+      "dest": "web-news-infra.png",
+      "src": "slide-03-traction.png",
+      "hash": "b6da3bad6624",
+      "label": "newsInfra — abstract network sphere",
+      "region": {
+        "left": 0.52,
+        "top": 0.12,
+        "width": 0.46,
+        "height": 0.76
+      }
+    },
+    {
+      "dest": "web-news-wealth-tech.png",
+      "src": "slide-05-control-panel.png",
+      "hash": "a4a8b2a243de",
+      "label": "newsWealthTech — abstract scaling geometry",
+      "region": {
+        "left": 0.1,
+        "top": 0.52,
+        "width": 0.8,
+        "height": 0.42
+      }
+    },
+    {
+      "dest": "web-news-market.png",
+      "src": "slide-04-receipts.png",
+      "hash": "5c4ada3d3657",
+      "label": "newsMarket — abstract market geometry",
+      "region": {
+        "left": 0.55,
+        "top": 0.2,
+        "width": 0.4,
+        "height": 0.65
+      }
+    }
+  ]
+}
