@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import type { NewsroomBriefing, NewsroomCategory } from '@/lib/newsroom/types';
-import { CATEGORY_ART_URL } from '@/lib/newsroom/category-art';
+import Image from 'next/image';
+import type { NewsroomBriefing } from '@/lib/newsroom/types';
+import { plateUrlForBriefing } from '@/lib/pocket-landing/newsroom-plates';
 import { trackNewsroomBriefingClick } from '@/app/lib/analytics/events';
 
 const CARD_BORDER = '1px solid rgba(245, 158, 11, 0.42)';
@@ -13,50 +14,57 @@ const MONO: React.CSSProperties = {
   fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
 };
 
-function resolveCategoryArt(briefing: NewsroomBriefing): string {
-  return briefing.categoryArtUrl ?? CATEGORY_ART_URL[briefing.category as NewsroomCategory];
-}
-
 function MediaCanvas({ briefing }: { briefing: NewsroomBriefing }) {
-  const categoryArt = resolveCategoryArt(briefing);
-  const heroSrc = briefing.imageUrl || categoryArt;
-  const [displaySrc, setDisplaySrc] = useState(heroSrc);
+  const sourceImage = briefing.imageUrl?.trim() || null;
+  const plateFallback = plateUrlForBriefing(briefing);
+  const [heroMode, setHeroMode] = useState<'source' | 'plate'>(sourceImage ? 'source' : 'plate');
 
   const showPublisherLogo = Boolean(briefing.publisherLogoUrl);
 
   useEffect(() => {
-    setDisplaySrc(briefing.imageUrl || categoryArt);
-  }, [briefing.imageUrl, categoryArt]);
+    setHeroMode(sourceImage ? 'source' : 'plate');
+  }, [sourceImage]);
 
   return (
     <div
-      className="aspect-video"
+      className="aspect-video pocket-landing-sota"
       style={{
         position: 'relative',
         width: '100%',
         aspectRatio: '16 / 9',
-        background: briefing.mediaBackground,
+        background: briefing.mediaBackground ?? '#09090b',
         borderBottom: '1px solid var(--border-subtle, var(--border-warm))',
         overflow: 'hidden',
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- RSS thumbnails + local SVG art */}
-      <img
-        src={displaySrc}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-        }}
-        onError={() => {
-          if (displaySrc !== categoryArt) setDisplaySrc(categoryArt);
-        }}
-      />
+      {heroMode === 'plate' ? (
+        <Image
+          src={plateFallback}
+          alt=""
+          fill
+          loading="lazy"
+          quality={90}
+          sizes="(max-width: 768px) 100vw, 400px"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+        />
+      ) : (
+        /* eslint-disable-next-line @next/next/no-img-element -- publisher RSS thumbnails; hotlink domains vary */
+        <img
+          src={sourceImage!}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+          onError={() => setHeroMode('plate')}
+        />
+      )}
       {showPublisherLogo && (
         <div
           style={{

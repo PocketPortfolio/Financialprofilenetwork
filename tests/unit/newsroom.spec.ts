@@ -72,6 +72,29 @@ describe('parseRssFeed', () => {
       'https://www.fca.org.uk/news/press-releases/example-story',
     );
   });
+
+  it('extracts hero image from content:encoded img tags', () => {
+    const xml = `<?xml version="1.0"?><rss><channel><item>
+      <title>Wealth tech headline</title>
+      <link>https://example.com/article</link>
+      <pubDate>Mon, 25 May 2026 10:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<p><img src="https://cdn.example.com/uploads/hero-photo.jpg" alt="" /></p>]]></content:encoded>
+    </item></channel></rss>`;
+    const items = parseRssFeed(xml, 'Example');
+    expect(items[0].image).toBe('https://cdn.example.com/uploads/hero-photo.jpg');
+  });
+
+  it('prefers media:content image over inline logos in description', () => {
+    const xml = `<?xml version="1.0"?><rss><channel><item>
+      <title>Market headline</title>
+      <link>https://example.com/story</link>
+      <pubDate>Mon, 25 May 2026 10:00:00 GMT</pubDate>
+      <media:content url="https://cdn.example.com/featured.jpg" medium="image" />
+      <description><![CDATA[<img src="https://cdn.example.com/logo-100x100.png" />]]></description>
+    </item></channel></rss>`;
+    const items = parseRssFeed(xml, 'Example');
+    expect(items[0].image).toBe('https://cdn.example.com/featured.jpg');
+  });
 });
 
 describe('resolveBriefingHref', () => {
