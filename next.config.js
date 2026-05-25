@@ -122,6 +122,7 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     localPatterns: [
+      { pathname: '/brand/**' },
       { pathname: '/pocket/landing/plates/**', search: '?v=*' },
       { pathname: '/pocket/landing/plates/**' },
       { pathname: '/open/landing/plates/**', search: '?v=*' },
