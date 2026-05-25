@@ -2334,14 +2334,15 @@
     "scheduledTime": "18:00",
     "title": "Research: IoT Device Communication - Protocol Comparison",
     "slug": "research-iot-device-communication-protocol-comparison-2026-05-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "iot",
       "device",
       "communication"
-    ]
+    ],
+    "publishedAt": "2026-05-25T18:01:06.533Z"
   },
   {
     "id": "research-ar-vr-rendering-performance-real-time-constraints-2026-05-26",
