@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /**
- * Open Portfolio landing — editorial art boards (SVG → 4K PNG).
- * Split layout: copy left, illustration right — never text inside wireframes.
+ * @deprecated Operation SOTA Parity — do not use for new work.
+ * Landing heroes now use cinematic plates in public/open/landing/plates/
+ * synced via npm run sync:open-web-plates. SSOT: docs/seed/open-portfolio-web-sota-brief.md
+ *
+ * Legacy: Open Portfolio landing — editorial art boards (SVG → 4K PNG).
  */
 import fs from 'fs';
 import path from 'path';

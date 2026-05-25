@@ -63,7 +63,7 @@ export default function OpenContactForm() {
     width: '100%',
     padding: '12px 14px',
     background: 'var(--bg)',
-    border: '1px solid var(--border-subtle)',
+    border: '1px solid rgba(245, 158, 11, 0.22)',
     borderRadius: '6px',
     color: 'var(--text)',
     fontSize: '14px',
@@ -92,11 +92,14 @@ export default function OpenContactForm() {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{
         background: 'var(--surface)',
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid rgba(245, 158, 11, 0.45)',
+        borderLeft: '3px solid var(--accent-warm)',
         borderRadius: '12px',
         padding: 'clamp(24px, 4vw, 36px)',
         maxWidth: '720px',
         margin: '0 auto',
+        boxShadow:
+          '0 24px 64px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(245, 158, 11, 0.12) inset',
       }}
     >
       <AnimatePresence mode="wait">
@@ -166,7 +169,7 @@ export default function OpenContactForm() {
                     e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.18)';
                   }}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.22)';
                     e.currentTarget.style.boxShadow = 'none';
                   }}
                 />

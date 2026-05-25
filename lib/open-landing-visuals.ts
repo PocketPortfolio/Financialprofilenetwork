@@ -1,8 +1,13 @@
 /**
- * Open Portfolio landing — editorial visuals (SSOT).
- * Policy-maker & enterprise storytelling; not technical diagrams.
- * Run: node scripts/generate-open-landing-visuals.mjs
+ * Open Portfolio landing — SOTA cinematic plates (SSOT).
+ * Plates: public/open/landing/plates/ · sync: npm run sync:open-web-plates
+ * Brief: docs/seed/open-portfolio-web-sota-brief.md
+ *
+ * Each slot has a physically unique baked PNG (sharp crop at sync time).
+ * Headline ↔ art alignment documented per slot below.
  */
+
+import { plateSrc } from './open-landing-plate-cache';
 
 export type OpenLandingVisualId =
   | 'hero'
@@ -14,80 +19,118 @@ export type OpenLandingVisualId =
   | 'packages'
   | 'contact';
 
+export type OpenLandingOverlay = 'exposure' | 'moat';
+
+export type OpenLandingMotion =
+  | 'sovereign-grid'
+  | 'digital-footprint'
+  | 'package-terminal'
+  | 'briefing-console';
+
 export interface OpenLandingVisualMeta {
   id: OpenLandingVisualId;
-  /** Public path (PNG preferred for photo-real gradients; SVG fallback). */
   src: string;
-  srcSvg: string;
   alt: string;
-  /** Short editorial caption under the frame — human, not legal. */
   caption: string;
-  aspectRatio: '16/10' | '4/3' | '21/9';
+  aspectRatio: '16/9' | '16/10';
+  objectPosition: 'center';
+  objectFit?: 'cover' | 'contain';
+  overlay?: OpenLandingOverlay;
+  /** Client-side motion layer over plate (procurement-grade storytelling). */
+  motion?: OpenLandingMotion;
+  plateSource: 'deck-reuse' | 'net-new';
+  headlineAlign: string;
 }
 
 export const OPEN_LANDING_VISUALS: Record<OpenLandingVisualId, OpenLandingVisualMeta> = {
   hero: {
     id: 'hero',
-    src: '/open/landing/hero-sovereign-layer.png',
-    srcSvg: '/open/landing/svg/hero-sovereign-layer.svg',
-    alt: 'Open Portfolio as the privacy layer for deploying AI in regulated environments — on-device data and session-forgetful inference.',
+    src: plateSrc('web-hero-glass-vault.png'),
+    alt: 'Client-edge glass nodes on an obsidian frontier — sovereign perimeter for regulated AI.',
     caption: 'Finance proved the substrate — regulated verticals inherit the same perimeter.',
-    aspectRatio: '16/10',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    motion: 'sovereign-grid',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-01 right — frosted glass cubes / edge sovereignty',
   },
   subHero: {
     id: 'subHero',
-    src: '/open/landing/privacy-architecture.png',
-    srcSvg: '/open/landing/svg/privacy-architecture.svg',
-    alt: 'A protected vault of personal data with no warehouse in the cloud.',
+    src: plateSrc('web-boundary-split-brain.png'),
+    alt: 'Split-brain edge processing — raw rows compressed client-side before stateless inference.',
     caption: 'Privacy decided in architecture — before the auditor asks.',
     aspectRatio: '16/10',
+    objectPosition: 'center',
+    overlay: 'moat',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-02 left — ingest + client node pipeline',
   },
   threat: {
     id: 'threat',
-    src: '/open/landing/regulatory-stakes.png',
-    srcSvg: '/open/landing/svg/regulatory-stakes.svg',
-    alt: 'Regulatory pressure rising over legacy data warehouses.',
+    src: plateSrc('web-boundary-frontier.png'),
+    alt: 'Legacy cloud monolith versus the compliance boundary — regulatory exposure zone.',
     caption: 'The bill for warehousing PII has arrived.',
-    aspectRatio: '21/9',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    overlay: 'exposure',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-01 left — legacy cloud density / board risk',
   },
   bridge: {
     id: 'bridge',
-    src: '/open/landing/live-proof-bridge.png',
-    srcSvg: '/open/landing/svg/live-proof-bridge.svg',
-    alt: 'Open Portfolio substrate validated daily through production consumer workloads.',
+    src: plateSrc('web-traction-dual-pane.png'),
+    alt: 'npm terminal traction — Open Portfolio substrate validated in production workloads.',
     caption: 'Stress-tested in the wild — hardened before your audit.',
-    aspectRatio: '16/10',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    objectFit: 'contain',
+    motion: 'digital-footprint',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-03 full — npm terminal + global footprint map',
   },
   pillars: {
     id: 'pillars',
-    src: '/open/landing/substrate-pillars.png',
-    srcSvg: '/open/landing/svg/substrate-pillars.svg',
-    alt: 'Three pillars: ingestion, inference, and audit perimeter.',
+    src: plateSrc('web-split-brain-pillars.png'),
+    alt: 'Stateless inference path — ingestion, compression, and zero persistence.',
     caption: 'One substrate. Three guarantees your board can name.',
-    aspectRatio: '4/3',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-02 right — server dissipation / audit perimeter',
   },
   tracks: {
     id: 'tracks',
-    src: '/open/landing/partner-tracks.png',
-    srcSvg: '/open/landing/svg/partner-tracks.svg',
-    alt: 'Four paths for engineers, institutions, investors, and grant teams.',
+    src: plateSrc('web-traction-heatmap.png'),
+    alt: 'Global MAU heatmap — four partner mandate paths stress-tested in production.',
     caption: 'Pick the door that matches your mandate.',
-    aspectRatio: '16/10',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    motion: 'digital-footprint',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-03 right — MAU heatmap / mandate paths + firefly overlay',
   },
   packages: {
     id: 'packages',
-    src: '/open/landing/open-packages.png',
-    srcSvg: '/open/landing/svg/open-packages.svg',
-    alt: 'Open packages orbiting a sovereign core SDK.',
+    src: plateSrc('web-substrate-matrix.png'),
+    alt: 'FIN control matrix — MIT importer and broker adapter packages on npm.',
     caption: 'Built in the open. Metered without surveillance.',
-    aspectRatio: '16/10',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    objectFit: 'contain',
+    motion: 'package-terminal',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-05 — control matrix grid / OSS package substrate (interim; Epic 3.2 wafer pending)',
   },
   contact: {
     id: 'contact',
-    src: '/open/landing/briefing-room.png',
-    srcSvg: '/open/landing/svg/briefing-room.svg',
-    alt: 'A briefing room ready for procurement and policy conversations.',
+    src: plateSrc('web-clean-room-console.png'),
+    alt: 'Executive FIN glass console — interactive architecture demonstrations before briefing.',
     caption: 'Thirty minutes to shorten your audit perimeter.',
-    aspectRatio: '16/10',
+    aspectRatio: '16/9',
+    objectPosition: 'center',
+    objectFit: 'contain',
+    motion: 'briefing-console',
+    plateSource: 'deck-reuse',
+    headlineAlign: 'slide-05 — FIN console + IAD mount (chess / sort / router)',
   },
 } as const;

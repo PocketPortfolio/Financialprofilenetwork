@@ -1,0 +1,91 @@
+{
+  "syncedAt": "2026-05-25T18:23:49.566Z",
+  "plates": [
+    {
+      "dest": "web-hero-glass-vault.png",
+      "src": "slide-01-frontier.png",
+      "hash": "1db1a7b11bc5",
+      "label": "hero — client-edge glass cubes (sovereign perimeter)",
+      "region": {
+        "left": 0.52,
+        "top": 0,
+        "width": 0.48,
+        "height": 1
+      }
+    },
+    {
+      "dest": "web-boundary-split-brain.png",
+      "src": "slide-02-split-brain.png",
+      "hash": "6899a78c914b",
+      "label": "subHero — ingest + client node (architecture moat)",
+      "region": {
+        "left": 0,
+        "top": 0,
+        "width": 0.58,
+        "height": 1
+      }
+    },
+    {
+      "dest": "web-boundary-frontier.png",
+      "src": "slide-01-frontier.png",
+      "hash": "5181509ba0a7",
+      "label": "threat — legacy cloud monolith (regulatory exposure)",
+      "region": {
+        "left": 0,
+        "top": 0,
+        "width": 0.48,
+        "height": 1
+      }
+    },
+    {
+      "dest": "web-traction-dual-pane.png",
+      "src": "slide-03-traction.png",
+      "hash": "ee258932a851",
+      "label": "bridge — full dual-pane (npm + global map, contain fit)",
+      "region": "full"
+    },
+    {
+      "dest": "web-traction-heatmap.png",
+      "src": "slide-03-traction.png",
+      "hash": "83b9d6ce7db0",
+      "label": "tracks — MAU heatmap pane + firefly map overlay",
+      "region": {
+        "left": 0.5,
+        "top": 0,
+        "width": 0.5,
+        "height": 1
+      }
+    },
+    {
+      "dest": "web-split-brain-pillars.png",
+      "src": "slide-02-split-brain.png",
+      "hash": "4feb58258e91",
+      "label": "pillars — stateless server + dissipation (three guarantees)",
+      "region": {
+        "left": 0.48,
+        "top": 0,
+        "width": 0.52,
+        "height": 1
+      }
+    },
+    {
+      "dest": "web-substrate-matrix.png",
+      "src": "slide-05-control-panel.png",
+      "hash": "89d20f3eb903",
+      "label": "packages — FIN control matrix grid (interim until 3.2 net-new wafer)",
+      "region": {
+        "left": 0.04,
+        "top": 0.02,
+        "width": 0.92,
+        "height": 0.84
+      }
+    },
+    {
+      "dest": "web-clean-room-console.png",
+      "src": "slide-05-control-panel.png",
+      "hash": "8e7d994884a6",
+      "label": "contact — FIN glass briefing console (executive perimeter)",
+      "region": "full"
+    }
+  ]
+}
