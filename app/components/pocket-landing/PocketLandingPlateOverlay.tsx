@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   POCKET_AD_FREE_COPY,
   POCKET_FIN_NODES,
@@ -31,19 +32,172 @@ function LockGlyph() {
   );
 }
 
-function FiberConnector() {
+function FinStepCard({
+  node,
+  active,
+}: {
+  node: (typeof POCKET_FIN_NODES)[number];
+  active: boolean;
+}) {
   return (
     <div
-      aria-hidden
       style={{
-        alignSelf: 'center',
-        width: 'clamp(24px, 4vw, 40px)',
-        height: '2px',
-        background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`,
-        boxShadow: `0 0 8px ${ACCENT}`,
-        flexShrink: 0,
+        flex: '0 0 min(94%, 520px)',
+        scrollSnapAlign: 'center',
+        padding: 'clamp(16px, 2.5vw, 22px) clamp(18px, 3vw, 24px)',
+        background: active ? 'rgba(9, 9, 11, 0.92)' : 'rgba(9, 9, 11, 0.78)',
+        border: `1px solid ${active ? 'rgba(245,158,11,0.55)' : 'rgba(245,158,11,0.28)'}`,
+        borderLeft: `3px solid ${ACCENT}`,
+        borderRadius: '8px',
+        fontFamily: MONO,
       }}
-    />
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+        <span
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            border: `1px solid ${ACCENT}`,
+            color: ACCENT,
+            fontSize: 16,
+            fontWeight: 800,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {node.key}
+        </span>
+        <div style={{ minWidth: 0 }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 'clamp(11px, 1.8vw, 12px)',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              color: ACCENT,
+              textTransform: 'uppercase',
+            }}
+          >
+            {node.title}
+          </p>
+          <p
+            style={{
+              margin: '2px 0 0',
+              fontSize: 'clamp(15px, 2.4vw, 18px)',
+              fontWeight: 700,
+              color: TEXT,
+              lineHeight: 1.25,
+            }}
+          >
+            {node.subtitle}
+          </p>
+        </div>
+      </div>
+      <p style={{ margin: '0 0 10px', fontSize: 'clamp(12px, 1.8vw, 14px)', lineHeight: 1.55, color: MUTED }}>
+        {node.body}
+      </p>
+      <ul
+        style={{
+          margin: 0,
+          padding: 0,
+          listStyle: 'none',
+          fontSize: 'clamp(11px, 1.6vw, 13px)',
+          color: MUTED,
+          lineHeight: 1.5,
+        }}
+      >
+        {node.bullets.map((b) => (
+          <li key={b} style={{ marginBottom: '4px' }}>
+            <span style={{ color: ACCENT }}>›</span> {b}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Full-width bottom dock — horizontal scroll carousel (mirrors Open moat HUD). */
+function FinPipelineOverlay() {
+  const [active, setActive] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const steps = POCKET_FIN_NODES;
+
+  const onScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const cardWidth = el.firstElementChild?.clientWidth ?? el.offsetWidth * 0.94;
+    const idx = Math.round(el.scrollLeft / (cardWidth + 12));
+    setActive(Math.min(steps.length - 1, Math.max(0, idx)));
+  }, [steps.length]);
+
+  return (
+    <div
+      role="region"
+      aria-label="The FIN pillars — Future, Investment, Now"
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 5,
+        padding: '14px 16px 16px',
+        background:
+          'linear-gradient(180deg, transparent 0%, rgba(9,9,11,0.88) 18%, rgba(9,9,11,0.98) 100%)',
+        pointerEvents: 'auto',
+      }}
+    >
+      <p
+        style={{
+          margin: '0 0 10px 4px',
+          fontSize: 'clamp(9px, 1.6vw, 11px)',
+          fontWeight: 700,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          color: ACCENT,
+          fontFamily: MONO,
+        }}
+      >
+        The FIN pillars: open core → shipped insight
+      </p>
+      <div
+        onScroll={onScroll}
+        style={{
+          display: 'flex',
+          gap: 12,
+          overflowX: 'auto',
+          scrollSnapType: 'x mandatory',
+          scrollPaddingInline: '3%',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 6,
+          scrollbarWidth: 'thin',
+        }}
+      >
+        {steps.map((node, i) => (
+          <FinStepCard key={node.key} node={node} active={active === i} />
+        ))}
+      </div>
+      {!reduceMotion && (
+        <motion.div
+          aria-hidden
+          style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 10 }}
+        >
+          {steps.map((node, i) => (
+            <span
+              key={node.key}
+              style={{
+                width: active === i ? 20 : 6,
+                height: 6,
+                borderRadius: 999,
+                background: active === i ? ACCENT : 'rgba(161,161,170,0.45)',
+                transition: 'width 0.25s ease, background 0.25s ease',
+              }}
+            />
+          ))}
+        </motion.div>
+      )}
+    </div>
   );
 }
 
@@ -160,93 +314,6 @@ function AdFreeOverlay() {
         <p style={{ margin: 0, fontSize: 'clamp(11px, 1.6vw, 13px)', color: TEXT, lineHeight: 1.55 }}>
           {POCKET_AD_FREE_COPY}
         </p>
-      </div>
-    </div>
-  );
-}
-
-function FinPipelineOverlay() {
-  return (
-    <div
-      role="presentation"
-      aria-hidden
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'clamp(8px, 2vw, 16px)',
-        pointerEvents: 'none',
-        zIndex: 4,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          alignItems: 'stretch',
-          justifyContent: 'center',
-          gap: 'clamp(4px, 1vw, 8px)',
-          width: '100%',
-          maxWidth: '920px',
-        }}
-      >
-        {POCKET_FIN_NODES.map((node, i) => (
-          <React.Fragment key={node.key}>
-            {i > 0 && <FiberConnector />}
-            <div
-              style={{
-                flex: '1 1 160px',
-                maxWidth: '280px',
-                padding: 'clamp(10px, 1.8vw, 16px)',
-                background: OBSIDIAN,
-                border: '1px solid rgba(245, 158, 11, 0.3)',
-                borderRadius: '8px',
-                fontFamily: MONO,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  color: ACCENT,
-                  marginBottom: '4px',
-                }}
-              >
-                {node.key} — {node.title.toUpperCase()}
-              </div>
-              <div
-                style={{
-                  fontSize: 'clamp(11px, 1.5vw, 13px)',
-                  fontWeight: 700,
-                  color: TEXT,
-                  marginBottom: '6px',
-                }}
-              >
-                {node.subtitle}
-              </div>
-              <ul
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  listStyle: 'none',
-                  fontSize: 'clamp(9px, 1.3vw, 10px)',
-                  color: MUTED,
-                  lineHeight: 1.45,
-                }}
-              >
-                {node.bullets.map((b) => (
-                  <li key={b} style={{ marginBottom: '3px' }}>
-                    <span style={{ color: ACCENT }}>›</span> {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </React.Fragment>
-        ))}
       </div>
     </div>
   );

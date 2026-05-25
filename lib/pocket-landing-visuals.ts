@@ -109,7 +109,7 @@ export const POCKET_LANDING_VISUALS: Record<PocketLandingVisualId, PocketLanding
     alt: 'Volumetric FIN fiber pipeline render',
     overlay: 'finPipeline',
     caption: 'Future • Investment • Now — open core, human-centered execution, shipped insight.',
-    aspectRatio: '16 / 9',
+    aspectRatio: '16 / 10',
     objectPosition: '50% 45%',
     headlineAlign: 'center',
     motion: 'drift',
