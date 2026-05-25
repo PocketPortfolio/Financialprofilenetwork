@@ -2333,7 +2333,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use gRPC for High-Performance APIs",
     "slug": "how-to-use-grpc-for-high-performance-apis",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2342,7 +2342,8 @@
       "grpc",
       "use",
       "high"
-    ]
+    ],
+    "publishedAt": "2026-05-25T14:00:30.484Z"
   },
   {
     "id": "how-to-understanding-event-sourcing-may-26",
