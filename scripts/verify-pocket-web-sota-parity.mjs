@@ -89,14 +89,20 @@ function main() {
     }
   }
 
-  const overlays = ['metrics', 'adFreeInvariant', 'finPipeline', 'portal'];
+  if (!pocketComponentSrc.includes('FinPillarsCarousel')) {
+    markFail('FinPillarsCarousel section component missing');
+  } else {
+    pass('FIN pillars scroll carousel wired in section');
+  }
+
+  const overlays = ['metrics', 'adFreeInvariant', 'portal'];
   for (const ov of overlays) {
     if (!visualsSrc.includes(`overlay: '${ov}'`)) {
       markFail(`overlay '${ov}' not configured in SSOT`);
     }
   }
   if (overlays.every((ov) => visualsSrc.includes(`overlay: '${ov}'`))) {
-    pass('metrics + adFree + finPipeline + portal overlays configured');
+    pass('metrics + adFree + portal overlays configured');
   }
 
   if (!fs.existsSync(MANIFEST)) {

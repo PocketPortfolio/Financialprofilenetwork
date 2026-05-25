@@ -2,15 +2,29 @@
 
 import ScrollReveal from '@/app/components/ui/ScrollReveal';
 import PocketLandingVisual from './PocketLandingVisual';
+import FinPillarsCarousel from './FinPillarsCarousel';
 import { pocketVisual } from '@/lib/pocket-landing-visuals';
 
 export default function FinPillarsSection() {
+  const finPlate = {
+    ...pocketVisual('finPillars'),
+    overlay: 'none' as const,
+    caption: undefined,
+    motion: 'none' as const,
+  };
+
   return (
     <ScrollReveal>
       <section
         id="fin-pillars"
         className="pocket-landing-sota"
-        style={{ marginBottom: '120px', textAlign: 'center' }}
+        style={{
+          marginBottom: '120px',
+          textAlign: 'center',
+          width: '100%',
+          maxWidth: '100%',
+          overflow: 'hidden',
+        }}
       >
         <h2
           style={{
@@ -27,13 +41,24 @@ export default function FinPillarsSection() {
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)',
             color: 'var(--muted)',
             marginBottom: '32px',
+            maxWidth: '800px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
           }}
         >
           Future • Investment • Now — one engine: open core, human-centered execution, shipped insight.
         </p>
 
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <PocketLandingVisual visual={pocketVisual('finPillars')} />
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '1000px',
+            margin: '0 auto',
+            boxSizing: 'border-box',
+          }}
+        >
+          <PocketLandingVisual visual={finPlate} />
+          <FinPillarsCarousel />
           <p
             style={{
               margin: '20px 0 0',

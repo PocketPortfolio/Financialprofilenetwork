@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import type { NewsroomBriefing } from '@/lib/newsroom/types';
 import { plateUrlForBriefing } from '@/lib/pocket-landing/newsroom-plates';
 import { trackNewsroomBriefingClick } from '@/app/lib/analytics/events';
@@ -14,16 +13,35 @@ const MONO: React.CSSProperties = {
   fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
 };
 
+type HeroMode = 'source' | 'plate' | 'svg';
+
+const HERO_IMG_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+};
+
 function MediaCanvas({ briefing }: { briefing: NewsroomBriefing }) {
   const sourceImage = briefing.imageUrl?.trim() || null;
   const plateFallback = plateUrlForBriefing(briefing);
-  const [heroMode, setHeroMode] = useState<'source' | 'plate'>(sourceImage ? 'source' : 'plate');
+  const svgFallback = briefing.categoryArtUrl;
+  const [heroMode, setHeroMode] = useState<HeroMode>(sourceImage ? 'source' : 'plate');
 
   const showPublisherLogo = Boolean(briefing.publisherLogoUrl);
 
   useEffect(() => {
     setHeroMode(sourceImage ? 'source' : 'plate');
-  }, [sourceImage]);
+  }, [sourceImage, briefing.id]);
+
+  const heroSrc =
+    heroMode === 'source'
+      ? sourceImage!
+      : heroMode === 'plate'
+        ? plateFallback
+        : svgFallback;
 
   return (
     <div
@@ -37,34 +55,21 @@ function MediaCanvas({ briefing }: { briefing: NewsroomBriefing }) {
         overflow: 'hidden',
       }}
     >
-      {heroMode === 'plate' ? (
-        <Image
-          src={plateFallback}
-          alt=""
-          fill
-          loading="lazy"
-          quality={90}
-          sizes="(max-width: 768px) 100vw, 400px"
-          style={{ objectFit: 'cover', objectPosition: 'center' }}
-        />
-      ) : (
-        /* eslint-disable-next-line @next/next/no-img-element -- publisher RSS thumbnails; hotlink domains vary */
-        <img
-          src={sourceImage!}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-          onError={() => setHeroMode('plate')}
-        />
-      )}
+      {/* Native img — RSS + local plates use query strings; next/image localPatterns is brittle in cards */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        key={`${briefing.id}-${heroMode}`}
+        src={heroSrc}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        style={HERO_IMG_STYLE}
+        onError={() => {
+          if (heroMode === 'source') setHeroMode('plate');
+          else if (heroMode === 'plate') setHeroMode('svg');
+        }}
+      />
       {showPublisherLogo && (
         <div
           style={{

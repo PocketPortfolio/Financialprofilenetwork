@@ -20,12 +20,15 @@ export default function PocketLandingVisual({
   priority = false,
   variant = 'section',
   className,
+  bottomDock,
 }: {
   visual: PocketLandingVisualMeta;
   priority?: boolean;
   /** section = full card with border; news = flat hero fill for briefing cards */
   variant?: 'section' | 'news';
   className?: string;
+  /** Optional HUD docked to plate bottom (e.g. FIN pillars carousel) */
+  bottomDock?: React.ReactNode;
 }) {
   const reduceMotion = useReducedMotion();
   const drift = visual.motion === 'drift' && !reduceMotion;
@@ -66,7 +69,9 @@ export default function PocketLandingVisual({
       </motion.div>
 
       {visual.overlay !== 'none' && (
-        <PocketLandingPlateOverlay variant={visual.overlay} visual={visual} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 10, pointerEvents: 'none' }}>
+          <PocketLandingPlateOverlay variant={visual.overlay} visual={visual} />
+        </div>
       )}
 
       {!reduceMotion && !isNews && (
@@ -95,6 +100,8 @@ export default function PocketLandingVisual({
           zIndex: 3,
         }}
       />
+
+      {bottomDock}
     </div>
   );
 

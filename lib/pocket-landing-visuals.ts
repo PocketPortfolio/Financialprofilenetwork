@@ -22,7 +22,6 @@ export type PocketLandingOverlayVariant =
   | 'none'
   | 'metrics'
   | 'adFreeInvariant'
-  | 'finPipeline'
   | 'portal';
 
 export type PocketLandingVisualMeta = {
@@ -107,12 +106,12 @@ export const POCKET_LANDING_VISUALS: Record<PocketLandingVisualId, PocketLanding
     id: 'finPillars',
     plateFile: 'web-fin-pillars.png',
     alt: 'Volumetric FIN fiber pipeline render',
-    overlay: 'finPipeline',
+    overlay: 'none',
     caption: 'Future • Investment • Now — open core, human-centered execution, shipped insight.',
     aspectRatio: '16 / 10',
     objectPosition: '50% 45%',
     headlineAlign: 'center',
-    motion: 'drift',
+    motion: 'none',
   },
   community: {
     id: 'community',
