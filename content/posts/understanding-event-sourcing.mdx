@@ -1,92 +1,102 @@
 ---
 title: Understanding Event Sourcing
 date: '2026-05-26'
-description: >-
-  A technical guide to understanding and implementing event sourcing in software
-  systems.
+description: A guide to understanding and implementing event sourcing in your applications.
 tags:
   - event sourcing
-  - CQRS
   - software architecture
+  - CQRS
+  - events
+  - data consistency
 author: Pocket Portfolio Team
 image: /images/blog/understanding-event-sourcing.png
-pillar: Technology
+pillar: technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-In traditional CRUD (Create, Read, Update, Delete) operations, each update to a data entity overwrites the previous state, resulting in a loss of historical data. This can be problematic for systems requiring audit trails, historical data analysis, or complex business logic that depends on the sequence of changes.
+In traditional CRUD-based systems, maintaining a consistent state across distributed systems can be challenging. Such systems often face issues with data integrity and auditability, as changes overwrite previous states. This makes it difficult to reconstruct the state of the system at any point in time.
 
-## Solution with Code
+## Solution
 
-Event sourcing addresses these issues by storing a sequence of events that represent state changes, rather than the current state itself. Each event is an immutable fact about what happened. Here's a basic implementation in JavaScript to illustrate the concept.
+Event sourcing offers a solution by storing a sequence of events that represent all changes to the state of the system. Instead of persisting the current state, you persist events that lead to that state. This approach enhances traceability, auditability, and consistency across distributed applications.
+
+### Key Concepts
+
+1. **Event**: A record of a change that occurred. Events are immutable and append-only, meaning they cannot be altered once stored.
+   
+2. **Event Store**: A database or storage system that saves events. It acts as the primary source of truth in an event-sourced system.
+
+3. **Aggregate**: An entity or group of entities treated as a single unit for the purpose of data changes. Aggregates apply events to transition between states.
+
+4. **Command**: A request to perform an action that results in one or more events. Commands are not part of the event store but trigger the creation of events.
+
+5. **Projection**: A read model derived from events, optimized for querying. It represents the current state by replaying events and can be tailored for specific query patterns.
+
+### Implementation
+
+Here's a simple implementation example in Node.js using a hypothetical event sourcing library:
 
 ```javascript
-class EventStore {
-  constructor() {
-    this.events = [];
-  }
+const { EventStore, AggregateRoot, CommandHandler } = require('event-sourcing-lib');
 
-  saveEvent(event) {
-    this.events.push(event);
-  }
-
-  getEvents() {
-    return this.events;
-  }
-}
-
-class Account {
+class Account extends AggregateRoot {
   constructor(id) {
+    super();
     this.id = id;
     this.balance = 0;
-    this.eventStore = new EventStore();
   }
 
-  applyEvents(events) {
-    events.forEach(event => {
-      if (event.type === 'DEPOSIT') {
+  apply(event) {
+    switch (event.type) {
+      case 'AccountCreated':
+        this.balance = 0;
+        break;
+      case 'MoneyDeposited':
         this.balance += event.amount;
-      } else if (event.type === 'WITHDRAWAL') {
+        break;
+      case 'MoneyWithdrawn':
         this.balance -= event.amount;
-      }
-    });
+        break;
+    }
   }
 
-  deposit(amount) {
-    const event = { type: 'DEPOSIT', amount };
-    this.eventStore.saveEvent(event);
-    this.applyEvents([event]);
+  createAccount() {
+    this.applyEvent({ type: 'AccountCreated', id: this.id });
   }
 
-  withdraw(amount) {
-    const event = { type: 'WITHDRAWAL', amount };
-    this.eventStore.saveEvent(event);
-    this.applyEvents([event]);
+  depositMoney(amount) {
+    this.applyEvent({ type: 'MoneyDeposited', amount });
   }
 
-  getBalance() {
-    this.applyEvents(this.eventStore.getEvents());
-    return this.balance;
+  withdrawMoney(amount) {
+    if (this.balance >= amount) {
+      this.applyEvent({ type: 'MoneyWithdrawn', amount });
+    } else {
+      throw new Error('Insufficient funds');
+    }
   }
 }
 
-// Usage
-const account = new Account(1);
-account.deposit(100);
-account.withdraw(50);
-console.log(account.getBalance()); // Outputs: 50
+const commandHandler = new CommandHandler();
+const eventStore = new EventStore();
+
+commandHandler.register(Account, eventStore);
+
+const account = new Account('123456');
+account.createAccount();
+account.depositMoney(100);
+account.withdrawMoney(50);
+
+eventStore.save(account);
 ```
 
-## Key Concepts
+### Benefits
 
-1. **Events as Immutable Facts**: Instead of storing the current state, each state change is captured as an immutable event. This ensures a complete audit trail and allows for rebuilding the current state from the event log.
+- **Auditability**: Every change is logged as an event, providing a clear audit trail.
+- **Scalability**: Event stores can be optimized for high throughput.
+- **Flexibility**: New projections can be created without altering existing data.
+- **Resilience**: Systems can recover from failures by replaying events.
 
-2. **Reproducibility and Debugging**: As all events are stored, the entire history of a given entity can be replayed, aiding in debugging and understanding past states.
-
-3. **Scalability and Performance**: Event sourcing can be combined with Command Query Responsibility Segregation (CQRS) to optimize read and write operations separately, improving the performance of complex systems.
-
-4. **Eventual Consistency**: Systems using event sourcing typically embrace eventual consistency, where the state is eventually consistent after propagating through the system.
-
-By implementing event sourcing, systems can achieve high levels of transparency and flexibility, essential for modern applications requiring robust data handling capabilities.
+By understanding and implementing event sourcing, you can build systems that are more reliable, maintainable, and aligned with modern distributed architectures.
