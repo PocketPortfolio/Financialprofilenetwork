@@ -1,5 +1,6 @@
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
+import './advisors/advisors.css';
 
 export default function ForLayout({
   children,
@@ -13,6 +14,7 @@ export default function ForLayout({
         display: 'flex',
         flexDirection: 'column',
         background: 'var(--bg)',
+        color: 'var(--text)',
         fontFamily: 'system-ui, -apple-system, sans-serif',
         width: '100%',
         maxWidth: '100vw',
