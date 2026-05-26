@@ -222,7 +222,7 @@ export default function ProductionNavbar() {
               }}>
                 {beforeFaq.map((link) => {
                   const linkEl = renderNavLink(link);
-                  if (link.label === 'FIN Pillars') {
+                  if (link.label === 'Mission') {
                     return (
                       <React.Fragment key={link.label}>
                         {linkEl}
@@ -668,7 +668,7 @@ export default function ProductionNavbar() {
                     </details>
                   );
                 }
-                if (link.label === 'FIN Pillars') {
+                if (link.label === 'Mission') {
                   return (
                     <React.Fragment key={link.label}>
                       {linkEl}
