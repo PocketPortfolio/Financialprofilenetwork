@@ -924,41 +924,6 @@ export default function LandingPage() {
           >
             For IFAs &amp; wealth operators →
           </Link>
-          {/* Static protocol strip — factual labels; flex-centered for optical alignment */}
-          <div
-            id="landing-hero-protocol"
-            aria-hidden
-            style={{
-              width: '100%',
-              maxWidth: '720px',
-              minHeight: '44px',
-              marginBottom: '18px',
-              padding: '0 clamp(12px, 3vw, 20px)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-warm)',
-              background: 'var(--surface-elevated)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              columnGap: '10px',
-              rowGap: '6px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 'var(--font-size-xs)',
-              letterSpacing: '0.06em',
-              color: 'var(--text-secondary)',
-              lineHeight: 'var(--line-tight)',
-              boxSizing: 'border-box',
-            }}
-          >
-            <span style={{ color: 'var(--accent-warm)', fontWeight: 700 }}>PROTOCOL</span>
-            <span aria-hidden style={{ color: 'var(--muted)' }}>
-              ·
-            </span>
-            <span>
-              LEDGER_LOCAL_FIRST · SYNC_OPTIONAL_USER_OWNED · AI_CONTEXT_BOUNDED_STATELESS
-            </span>
-          </div>
           {/* Headline - system-led category */}
           <h1 className="brand-text" style={{ 
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', 
