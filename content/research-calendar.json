@@ -2350,7 +2350,7 @@
     "scheduledTime": "18:00",
     "title": "Research: AR/VR Rendering Performance - Real-Time Constraints",
     "slug": "research-ar-vr-rendering-performance-real-time-constraints-2026-05-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2358,7 +2358,8 @@
       "AI",
       "rendering",
       "real"
-    ]
+    ],
+    "publishedAt": "2026-05-26T18:00:50.029Z"
   },
   {
     "id": "research-voice-interface-latency-speech-recognition-2026-05-27",
