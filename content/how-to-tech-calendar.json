@@ -2351,14 +2351,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Event Sourcing",
     "slug": "understanding-event-sourcing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "understanding",
       "event",
       "sourcing"
-    ]
+    ],
+    "publishedAt": "2026-05-26T14:00:46.389Z"
   },
   {
     "id": "how-to-how-to-implement-api-authentication-with-passport-may-27",
