@@ -1,6 +1,6 @@
 /**
  * B2C marketing IA (Pocket Portfolio):
- * Terminal | For Advisors | Mission | FIN Pillars | Tools | Blog | FAQ | News Room.
+ * Terminal | For Advisors | Mission | Tools | Blog | FAQ | News Room.
  * B2B developer bridge lives in SurfaceSwitcher (Open Portfolio), not primary nav.
  * Used by landing (`/`, `/landing`) and ProductionNavbar (`/s/*`, tools, learn, etc.).
  */
@@ -59,7 +59,6 @@ export function sovereignPrimaryNav(
     { label: 'Terminal', href: L('#features') },
     { label: 'For Advisors', href: '/for/advisors' },
     { label: 'Mission', href: L('#mission') },
-    { label: 'FIN Pillars', href: L('#fin-pillars') },
     { label: 'Blog', href: blogHref(utmContext) },
     { label: 'FAQ', href: L('#faq') },
     { label: 'News Room', href: newsRoomHref(pathname, utmContext) },

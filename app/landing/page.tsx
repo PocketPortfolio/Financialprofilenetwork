@@ -32,6 +32,9 @@ import {
   sovereignToolsDropdown,
   isHashOnlyHref,
 } from '@/app/lib/nav/sovereignMarketingNav';
+import { ADAPTERS } from '@pocket-portfolio/importer';
+
+const BROKER_ADAPTER_COUNT = ADAPTERS.length;
 
 const LANDING_FAQ_ENTRIES: { question: string; answer: React.ReactNode }[] = [
   {
@@ -329,7 +332,7 @@ export default function LandingPage() {
                       {link.label}
                     </Link>
                   );
-                  if (link.label === 'FIN Pillars') {
+                  if (link.label === 'Mission') {
                     return (
                       <React.Fragment key={link.label}>
                         {linkEl}
@@ -708,7 +711,7 @@ export default function LandingPage() {
                   {link.label}
                 </Link>
               );
-              if (link.label === 'FIN Pillars') {
+              if (link.label === 'Mission') {
                 return (
                   <React.Fragment key={link.label}>
                     {linkEl}
@@ -924,7 +927,7 @@ export default function LandingPage() {
           >
             For IFAs &amp; wealth operators →
           </Link>
-          {/* Headline - system-led category */}
+          {/* Headline - consumer outcome; sovereignty qualified in subhead + demo zone */}
           <h1 className="brand-text" style={{ 
             fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', 
             fontWeight: 'bold', 
@@ -934,28 +937,67 @@ export default function LandingPage() {
             maxWidth: '800px',
             minHeight: '1.2em'
           }}>
-            The Local-First Wealth Terminal.
-            <noscript>The Local-First Wealth Terminal.</noscript>
+            Sovereign Intelligence for Serious Portfolios.
+            <noscript>Sovereign Intelligence for Serious Portfolios.</noscript>
           </h1>
 
-          {/* Subhead - Pocket Analyst + sovereignty + drop-zone pointer */}
+          {/* Subhead - Pocket Analyst outcome + inference-boundary calibration */}
           <p className="brand-text-secondary" style={{ 
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
             lineHeight: '1.6', 
-            marginBottom: '24px',
+            marginBottom: '20px',
             maxWidth: '720px',
             color: 'var(--text-secondary)'
           }}>
-            Analyze broker CSVs with <strong style={{ color: 'var(--text)' }}>Pocket Analyst</strong> and a
-            local-first pipeline built for serious portfolios. Your raw financial ledger is processed in your
-            browser and is not warehoused on our servers —{' '}
-            <strong style={{ color: 'var(--text)' }}>for the hero demo below, your file never leaves your device.</strong>
-            <br />
-            <span style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', display: 'block', marginTop: '12px' }}>
-              <strong style={{ color: 'var(--accent-warm)' }}>Founders Club: £12/mo or £100/yr.</strong> Cancel anytime.
-              {' '}Prosumer-grade terminal for serious portfolios.
-            </span>
+            Aggregate {BROKER_ADAPTER_COUNT}+ brokers in seconds.{' '}
+            <strong style={{ color: 'var(--text)' }}>Pocket Analyst</strong> delivers AI insights on your full
+            portfolio picture, while our edge architecture ensures your raw, itemized ledger is never warehoused for
+            AI inference.
           </p>
+
+          {/* Trust band — engineering signal in mono amber; pricing retained for annual conversion */}
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '720px',
+              marginBottom: '24px',
+              padding: '14px clamp(12px, 3vw, 18px)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-warm)',
+              background: 'rgba(245, 158, 11, 0.06)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'clamp(0.8125rem, 1.5vw, 0.9375rem)',
+              lineHeight: '1.55',
+              letterSpacing: '0.02em',
+              color: '#f59e0b',
+              textAlign: 'center',
+              boxSizing: 'border-box',
+            }}
+          >
+            Bank-grade privacy. Zero inference warehousing. 100% analytical command.
+            <br />
+            <span style={{ opacity: 0.92 }}>
+              Founders Club: £12/mo or £100/yr. Prosumer-grade infrastructure.
+            </span>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <DashboardLaunchLink
+              className="brand-button brand-button-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '14px 28px',
+                fontSize: '15px',
+                fontWeight: 800,
+                letterSpacing: '0.02em',
+                textDecoration: 'none',
+              }}
+            >
+              Launch The Terminal
+            </DashboardLaunchLink>
+          </div>
 
           {/* Directive B — 3s affordance: explicit next actions before scroll */}
           <div
@@ -1089,6 +1131,19 @@ export default function LandingPage() {
               aria-hidden
               onChange={handleHeroDemoInputChange}
             />
+            <p
+              style={{
+                margin: '0 0 10px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '12px',
+                lineHeight: 1.5,
+                letterSpacing: '0.04em',
+                color: 'var(--text-secondary)',
+                textAlign: 'center',
+              }}
+            >
+              For the live test-harness below, your file never leaves your device.
+            </p>
             <div
               id="landing-hero-dropzone"
               role="button"
