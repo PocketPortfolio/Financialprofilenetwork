@@ -1,0 +1,100 @@
+/**
+ * /for/advisors — theme-aware SOTA surfaces (light + dark via design tokens).
+ */
+
+.advisor-hero-shell {
+  background: var(--bg);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-warm) 18%, var(--border));
+}
+
+.advisor-hero-plate {
+  opacity: 0.55;
+}
+
+[data-theme='light'] .advisor-hero-plate {
+  opacity: 0.22;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .advisor-hero-plate {
+    opacity: 0.22;
+  }
+}
+
+.advisor-hero-overlay {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 25%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 82%, transparent) 55%,
+    var(--bg) 100%
+  );
+}
+
+.advisor-trust-band {
+  display: inline-block;
+  max-width: 720px;
+  padding: 14px clamp(12px, 3vw, 18px);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--accent-warm) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent-warm) 10%, var(--surface));
+  font-family: var(--font-mono);
+  font-size: clamp(0.8125rem, 1.5vw, 0.9375rem);
+  line-height: 1.55;
+  letter-spacing: 0.03em;
+  color: var(--accent-warm);
+}
+
+.advisor-glass-panel {
+  background: color-mix(in srgb, var(--surface-elevated) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-warm) 28%, var(--border));
+  border-radius: 16px;
+  padding: var(--space-6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lg);
+}
+
+.advisor-moat-card {
+  padding: var(--space-5);
+  background: var(--surface-elevated);
+  border: 1px solid color-mix(in srgb, var(--accent-warm) 22%, var(--border));
+  border-radius: var(--radius-md);
+}
+
+.advisor-eyebrow {
+  margin: 0 0 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-warm);
+}
+
+.advisor-architecture-link {
+  color: var(--accent-warm);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.advisor-architecture-link:hover {
+  text-decoration: underline;
+}
+
+.advisor-download-gate {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.advisor-download-gate a {
+  color: var(--accent-warm);
+  font-weight: var(--font-semibold);
+}
+
+.advisor-download-preview {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  background: var(--surface-elevated);
+}

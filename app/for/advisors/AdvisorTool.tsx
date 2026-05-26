@@ -581,7 +581,7 @@ export default function AdvisorTool() {
 
   return (
     <>
-      <div className="brand-card" style={{ padding: 'var(--space-6)' }}>
+      <div className="advisor-glass-panel">
       {/* Client Name Editor */}
       <div style={{ marginBottom: 'var(--space-6)' }}>
         <label style={{
@@ -704,29 +704,25 @@ export default function AdvisorTool() {
           fontSize: 'var(--font-size-sm)',
           color: 'var(--text-secondary)'
         }}>
-          Your logo will replace Pocket Portfolio branding in the report preview
+          Logo files stay in your browser for preview and PDF generation — not uploaded to our servers for this
+          workflow.
         </p>
       </div>
 
       {/* PDF Preview */}
       <div style={{ marginBottom: 'var(--space-8)' }}>
-        <h2 style={{
-          fontSize: 'var(--font-size-xl)',
+        <h3 style={{
+          fontSize: 'var(--font-size-lg)',
           fontWeight: 'var(--font-semibold)',
           color: 'var(--text)',
           marginBottom: 'var(--space-4)'
         }}>
-          Report Preview
-        </h2>
-        <div 
+          Live Report Preview
+        </h3>
+        <div
           ref={reportPreviewRef}
-          style={{
-            border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-6)',
-            background: 'var(--surface-elevated)',
-            position: 'relative'
-          }}
+          className="advisor-download-preview"
+          style={{ position: 'relative' }}
         >
           {/* Report Header */}
           <div style={{
@@ -934,25 +930,17 @@ export default function AdvisorTool() {
           style={{
             padding: 'var(--space-4) var(--space-8)',
             fontSize: 'var(--font-size-lg)',
-            opacity: hasCorporateLicense ? 1 : 0.7
+            borderColor: hasCorporateLicense ? undefined : 'var(--border-warm)',
           }}
         >
           Download High-Res PDF
         </button>
         {!hasCorporateLicense && (
-          <p style={{
-            marginTop: 'var(--space-3)',
-            fontSize: 'var(--font-size-sm)',
-            color: 'var(--text-secondary)'
-          }}>
+          <p className="advisor-download-gate">
             Requires Corporate License ($100/mo) •{' '}
-            <Link 
+            <Link
               href="/sponsor?utm_source=advisor_tool&utm_medium=download_gate&utm_campaign=corporate"
               className="brand-link"
-              style={{
-                color: 'var(--signal)',
-                fontWeight: 'var(--font-semibold)'
-              }}
             >
               Get License →
             </Link>
