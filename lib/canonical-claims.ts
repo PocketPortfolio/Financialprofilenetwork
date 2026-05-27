@@ -830,7 +830,7 @@ export const OPEN_PRIMARY_CTA = {
 
 export const OPEN_LANDING_COPY = {
   eyebrow: 'Open Portfolio — wealth-tech proven · regulated verticals forward',
-  heroTitle: 'Your data stays yours. Your story stays clear.',
+  heroTitle: 'Sovereign Infrastructure for Regulated AI.',
   heroBody:
     'Open Portfolio is the privacy layer for deploying AI in regulated environments: import broker data on the device, reason with AI that forgets every session, and prove the model in production before procurement asks the hard questions.',
   subHero: {
