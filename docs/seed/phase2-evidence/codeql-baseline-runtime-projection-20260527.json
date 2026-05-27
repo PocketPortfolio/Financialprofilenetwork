@@ -1,0 +1,386 @@
+{
+  "capturedAt": "2026-05-27",
+  "branch": "main",
+  "totalOpen": 62,
+  "phase0Excluded": 27,
+  "projectedRuntimeBaseline": 35,
+  "otherOutOfScopePaths": 0,
+  "excludedAlerts": [
+    {
+      "id": 87,
+      "rule": "js/identity-replacement",
+      "severity": "warning",
+      "path": "scripts/migrate-research-slugs.ts"
+    },
+    {
+      "id": 86,
+      "rule": "js/identity-replacement",
+      "severity": "warning",
+      "path": "scripts/generate-research-calendar.ts"
+    },
+    {
+      "id": 85,
+      "rule": "js/identity-replacement",
+      "severity": "warning",
+      "path": "scripts/generate-research-calendar.ts"
+    },
+    {
+      "id": 81,
+      "rule": "js/redos",
+      "severity": "error",
+      "path": "scripts/import-external-content.ts"
+    },
+    {
+      "id": 80,
+      "rule": "js/redos",
+      "severity": "error",
+      "path": "scripts/fix-imported-posts.ts"
+    },
+    {
+      "id": 79,
+      "rule": "js/functionality-from-untrusted-source",
+      "severity": "warning",
+      "path": "zero-server-stack-marketing.html"
+    },
+    {
+      "id": 67,
+      "rule": "js/incomplete-multi-character-sanitization",
+      "severity": "warning",
+      "path": "scripts/extract-devto-urls.js"
+    },
+    {
+      "id": 66,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/generate-post-images.ts"
+    },
+    {
+      "id": 65,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/generate-post-images.ts"
+    },
+    {
+      "id": 64,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/fix-imported-posts.ts"
+    },
+    {
+      "id": 63,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/fix-imported-posts.ts"
+    },
+    {
+      "id": 62,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/fix-tables.ts"
+    },
+    {
+      "id": 61,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/fix-tables.ts"
+    },
+    {
+      "id": 60,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/enforce-pocket-mdx.ts"
+    },
+    {
+      "id": 59,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "scripts/enforce-pocket-mdx.ts"
+    },
+    {
+      "id": 57,
+      "rule": "js/xss-through-dom",
+      "severity": "warning",
+      "path": "coverage/sorter.js"
+    },
+    {
+      "id": 53,
+      "rule": "js/insecure-randomness",
+      "severity": "warning",
+      "path": "src_backup/lib/telemetry.ts"
+    },
+    {
+      "id": 50,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/verify-env-setup.ts"
+    },
+    {
+      "id": 49,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/test-week1-deployment.ts"
+    },
+    {
+      "id": 48,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/predator-probe.ts"
+    },
+    {
+      "id": 47,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/predator-probe-simple.ts"
+    },
+    {
+      "id": 46,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/import-external-content.ts"
+    },
+    {
+      "id": 45,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/inspect-vouchedfor.ts"
+    },
+    {
+      "id": 44,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/inspect-vouchedfor.ts"
+    },
+    {
+      "id": 43,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/inspect-vouchedfor.ts"
+    },
+    {
+      "id": 42,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/inspect-vouchedfor.ts"
+    },
+    {
+      "id": 41,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "scripts/fix-env-connection.ts"
+    }
+  ],
+  "runtimeAlerts": [
+    {
+      "id": 88,
+      "rule": "js/polynomial-redos",
+      "severity": "warning",
+      "path": "app/api/agent/webhooks/resend/route.ts"
+    },
+    {
+      "id": 84,
+      "rule": "js/identity-replacement",
+      "severity": "warning",
+      "path": "app/lib/waitlist/analytics.ts"
+    },
+    {
+      "id": 69,
+      "rule": "js/tainted-format-string",
+      "severity": "warning",
+      "path": "app/lib/portfolio/sectorService.ts"
+    },
+    {
+      "id": 58,
+      "rule": "js/incomplete-sanitization",
+      "severity": "warning",
+      "path": "app/components/forms/FilePicker.tsx"
+    },
+    {
+      "id": 56,
+      "rule": "js/xss-through-dom",
+      "severity": "warning",
+      "path": "app/components/TickerSearch.tsx"
+    },
+    {
+      "id": 55,
+      "rule": "js/xss-through-dom",
+      "severity": "warning",
+      "path": "app/components/TickerSearch.tsx"
+    },
+    {
+      "id": 54,
+      "rule": "js/reflected-xss",
+      "severity": "error",
+      "path": "app/og/route.tsx"
+    },
+    {
+      "id": 52,
+      "rule": "js/insecure-randomness",
+      "severity": "warning",
+      "path": "app/lib/analytics/seo.ts"
+    },
+    {
+      "id": 51,
+      "rule": "js/insecure-randomness",
+      "severity": "warning",
+      "path": "app/lib/analytics/conversion.ts"
+    },
+    {
+      "id": 40,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 39,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 38,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 37,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 36,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 35,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 34,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "lib/sales/sourcing/predator-scraper.ts"
+    },
+    {
+      "id": 33,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "app/components/landing/AnalystVideo.tsx"
+    },
+    {
+      "id": 32,
+      "rule": "js/incomplete-url-substring-sanitization",
+      "severity": "warning",
+      "path": "app/components/CompanyLogo.tsx"
+    },
+    {
+      "id": 31,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/components/EnvDebug.tsx"
+    },
+    {
+      "id": 30,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/components/EnvDebug.tsx"
+    },
+    {
+      "id": 29,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/components/EnvDebug.tsx"
+    },
+    {
+      "id": 26,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 25,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 23,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 18,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 16,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 15,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 14,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 13,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 7,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 6,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 4,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 3,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 2,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    },
+    {
+      "id": 1,
+      "rule": "js/clear-text-logging",
+      "severity": "error",
+      "path": "app/api/dividend/[ticker]/route.ts"
+    }
+  ],
+  "otherAlerts": [],
+  "note": "Phase 0 CodeQL config scopes analysis to app/, lib/, packages/importer/src/, middleware.ts. Full rescan requires green CodeQL CI."
+}

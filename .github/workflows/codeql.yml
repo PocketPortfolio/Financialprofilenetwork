@@ -2,9 +2,16 @@ name: CodeQL
 
 on:
   push:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+      - infra/codeql-hardening
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+      - infra/codeql-hardening
+  workflow_dispatch:
 
 permissions:
   security-events: write
@@ -15,6 +22,7 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,7 +30,12 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: javascript
+          languages: javascript-typescript
+          config-file: ./.github/codeql/codeql-config.yml
+          # Next.js build requires secrets not available in CI; extract from source.
+          build-mode: none
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:javascript-typescript

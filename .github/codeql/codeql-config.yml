@@ -1,0 +1,24 @@
+# CodeQL scope — runtime blast radius only (Phase 0).
+# Dev scripts, coverage artifacts, backups, and static HTML are out of scope.
+# See docs/command/tier1-codeql-remediation-plan.md
+
+name: pocket-portfolio-runtime-sast
+
+paths:
+  - app
+  - lib
+  - packages/importer/src
+  - middleware.ts
+
+paths-ignore:
+  - scripts
+  - coverage
+  - src_backup
+  - tests_backup
+  - playwright-report
+  - .next
+  - docs
+  - content
+  - public
+  - '**/*.html'
+  - zero-server-stack-marketing.html
