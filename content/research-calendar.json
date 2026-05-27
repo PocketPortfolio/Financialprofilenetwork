@@ -2367,14 +2367,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Voice Interface Latency - Speech Recognition",
     "slug": "research-voice-interface-latency-speech-recognition-2026-05-27",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "latency",
       "voice",
       "interface"
-    ]
+    ],
+    "publishedAt": "2026-05-27T18:00:38.969Z"
   },
   {
     "id": "research-biometric-authentication-performance-vs-security-2026-05-28",
