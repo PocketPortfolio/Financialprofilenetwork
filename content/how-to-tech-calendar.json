@@ -2367,7 +2367,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Authentication with Passport",
     "slug": "how-to-implement-api-authentication-with-passport",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2375,7 +2375,8 @@
       "authentication",
       "passport",
       "implement"
-    ]
+    ],
+    "publishedAt": "2026-05-27T14:01:00.065Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-error-responses-may-28",
