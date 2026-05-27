@@ -6,19 +6,19 @@
 Add this to Vercel → Project Settings → Environment Variables:
 
 ```
-NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1768684914/pocket-portfolio/dashboard-demo-4k.mp4
+NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906039/pocket-portfolio/dashboard-demo-4k.mp4
+NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906828/pocket-portfolio/pocket-analyst-demo.mp4
 ```
 
 **Environments**: Production, Preview, Development
 
-### Required for Pocket Analyst landing video (same flow as dashboard video)
-1. Put your video file at **`public/pocketanalyst.mp4`** (or `pocketanalyst.MP4`).
-2. Run: **`npm run upload-pocket-analyst-cloudinary`** (uses Cloudinary credentials already in .env.local).
-3. Copy the printed URL and add to **.env.local** and **Vercel → Environment Variables**:
-   ```
-   NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL=<paste the URL the script printed>
-   ```
-4. Restart dev server (or redeploy on Vercel). No Cloudinary portal visit needed.
+Both URLs are also hardcoded in `lib/landing-product-video.ts` with version-stamp guards, so stale `.env.*.local` overrides cannot serve old clips in dev or prod.
+
+### Pocket Analyst landing video (same flow as dashboard video)
+1. Put source at project root (`Newpocketanalyst.mp4`) or encode to **`public/pocket-analyst-demo.mp4`** (3840×2110).
+2. Run: **`npm run upload-pocket-analyst-cloudinary`**
+3. Bump `POCKET_ANALYST_BRANDED_VERSION` in `lib/landing-product-video.ts` with the new Cloudinary version stamp from the upload URL.
+4. Update Vercel env + redeploy.
 
 ### Required for PWA Push Notifications (NEW)
 Add this to Vercel → Project Settings → Environment Variables:
@@ -76,7 +76,8 @@ npm install
 - [ ] **Optional:** Leave `ENABLE_LLM_IMPORT` / `NEXT_PUBLIC_ENABLE_LLM_IMPORT` unset or `false` unless you use LLM CSV mapping
 - [ ] **Pocket Analyst (Ask AI):** At least one of `GOOGLE_GENERATIVE_AI_API_KEY` or `OPENAI_API_KEY` set in Production; Firebase Admin vars set; optional `CRON_SECRET` for monthly quota reset; optional `NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL` for landing demo. See `docs/POCKET-ANALYST-PROD.md`.
 - [ ] **Viral referral (Refer 1 / Get 7):** After deploy, run `firebase deploy --only firestore:rules` for `referralIndex` + `referralRewardClaims`, then follow `docs/DEPLOY-VIRAL-REFERRAL-PROD.md` smoke tests before the public campaign.
-- [ ] `public/dashboard-demo-4k.mp4` exists (18.15 MB)
+- [ ] `public/dashboard-demo-4k.mp4` exists (3840×2098, ~18 MB)
+- [ ] `public/pocket-analyst-demo.mp4` exists (3840×2110, ~6.6 MB)
 - [ ] `public/firebase-messaging-sw.js` exists
 - [ ] `public/manifest.webmanifest` updated
 - [ ] No TypeScript errors in production code (test files OK)

@@ -4,15 +4,14 @@ import { useRef } from 'react';
 import { parseHttpsUrl } from '../../lib/safe-external-url';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { LandingProductVideo } from './LandingProductVideo';
+import {
+  POCKET_ANALYST_ASPECT_RATIO,
+  POCKET_ANALYST_FALLBACK,
+  resolvePocketAnalystVideoSrc,
+} from '../../../lib/landing-product-video';
 
-// Same pattern as hero: set NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL to the full Cloudinary URL in .env.local and Vercel.
-const RAW_VIDEO_URL =
-  typeof process.env.NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL === 'string' &&
-  process.env.NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL.trim() !== ''
-    ? process.env.NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL.trim()
-    : '';
-
-// Trim Cloudinary video to 42 seconds (so_0 = start 0s, eo_42 = end 42s). Use slash after params so version/path is not parsed as transformation (fixes 404).
+// Trim Cloudinary video to 42 seconds (so_0 = start 0s, eo_42 = end 42s).
 function trimTo42Seconds(url: string): string {
   const parsed = parseHttpsUrl(url);
   if (!parsed || parsed.hostname !== 'res.cloudinary.com') return url;
@@ -21,9 +20,8 @@ function trimTo42Seconds(url: string): string {
   const insert = uploadIdx + '/upload/'.length;
   return url.slice(0, insert) + 'so_0,eo_42/' + url.slice(insert);
 }
-const DEFAULT_VIDEO_URL = RAW_VIDEO_URL ? trimTo42Seconds(RAW_VIDEO_URL) : '';
-const FALLBACK_PUBLIC_VIDEO_URL = '/pocketanalyst.mp4';
-const VIDEO_URL = DEFAULT_VIDEO_URL || FALLBACK_PUBLIC_VIDEO_URL;
+
+const POCKET_ANALYST_VIDEO_SRC = trimTo42Seconds(resolvePocketAnalystVideoSrc());
 
 export function AnalystVideo() {
   const videoRef = useRef<HTMLDivElement>(null);
@@ -206,59 +204,13 @@ export function AnalystVideo() {
               className="group-hover:opacity-75"
               aria-hidden
             />
-            {VIDEO_URL ? (
-              <video
-                src={VIDEO_URL}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  objectFit: 'contain',
-                  borderRadius: 14,
-                }}
-                onError={(e) => {
-                  const video = e.target as HTMLVideoElement;
-                  console.error('Pocket Analyst video load error:', video.error);
-                }}
-              >
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              <div
-                style={{
-                  aspectRatio: '16/9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'rgba(255,255,255,0.5)',
-                  fontSize: 14,
-                }}
-              >
-                Put video in public/pocketanalyst.mp4 → npm run upload-pocket-analyst-cloudinary → add printed URL to .env.local
-              </div>
-            )}
-            <div
-              style={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-                padding: '4px 8px',
-                background: 'rgba(0,0,0,0.6)',
-                backdropFilter: 'blur(8px)',
-                borderRadius: 6,
-                fontSize: 10,
-                fontFamily: 'ui-monospace, monospace',
-                color: 'rgba(255,255,255,0.85)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
-            >
-              4K
-            </div>
+            <LandingProductVideo
+              src={POCKET_ANALYST_VIDEO_SRC}
+              fallbackSrc={POCKET_ANALYST_FALLBACK}
+              aspectRatio={POCKET_ANALYST_ASPECT_RATIO}
+              borderRadius={14}
+              show4KBadge
+            />
           </motion.div>
         </div>
       </div>

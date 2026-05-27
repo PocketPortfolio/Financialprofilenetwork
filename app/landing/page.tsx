@@ -20,6 +20,11 @@ import { useStickyHeader } from '../hooks/useStickyHeader';
 import TickerSearch from '../components/TickerSearch';
 import { getFoundersClubSpotsRemaining, getFoundersClubScarcityMessage } from '../lib/utils/foundersClub';
 import { AnalystVideo } from '../components/landing/AnalystVideo';
+import { LandingProductVideo } from '../components/landing/LandingProductVideo';
+import {
+  DASHBOARD_DEMO_ASPECT_RATIO,
+  DASHBOARD_DEMO_VIDEO_SRC,
+} from '../../lib/landing-product-video';
 import ScrollReveal from '../components/ui/ScrollReveal';
 import ProductPortalSection from '../components/pocket-landing/ProductPortalSection';
 import WhyChooseSection from '../components/pocket-landing/WhyChooseSection';
@@ -1343,49 +1348,11 @@ export default function LandingPage() {
             background: 'var(--surface)',
             position: 'relative'
           }}>
-            <video 
-              src={process.env.NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL || "/dashboard-demo-4k.mp4"}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              crossOrigin="anonymous"
-              style={{
-                width: '100%',
-                height: 'auto',
-                display: 'block',
-                objectFit: 'contain',
-                imageRendering: 'auto' as const
-              }}
-              onError={(e) => {
-                const video = e.target as HTMLVideoElement;
-                const error = video.error;
-                console.error('Video load error:', e, error);
-                // Fallback to local MP4 if CDN fails
-                if (!video.src.includes('/dashboard-demo-4k.mp4')) {
-                  video.src = '/dashboard-demo-4k.mp4';
-                }
-              }}
-            >
-              Your browser does not support the video tag.
-            </video>
-            <div style={{
-              position: 'absolute',
-              bottom: '12px',
-              right: '12px',
-              background: 'color-mix(in srgb, var(--surface-elevated) 92%, transparent)',
-              color: 'var(--accent-warm)',
-              padding: '8px 16px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '12px',
-              fontFamily: 'var(--font-mono)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid var(--border-warm)',
-              boxShadow: 'var(--shadow-sm)',
-            }}>
-              Actual footage of Pocket Portfolio running on localhost
-            </div>
+            <LandingProductVideo
+              src={DASHBOARD_DEMO_VIDEO_SRC}
+              fallbackSrc="/dashboard-demo-4k.mp4"
+              aspectRatio={DASHBOARD_DEMO_ASPECT_RATIO}
+            />
           </div>
         </div>
       </main>

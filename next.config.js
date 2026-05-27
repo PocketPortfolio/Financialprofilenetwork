@@ -291,14 +291,30 @@ const nextConfig = {
       },
     ];
   },
-  // Headers for security (only in production)
+  // Headers for security (only in production) + byte-range support for hero demo video
   async headers() {
+    const heroVideoHeaders = [
+      {
+        source: '/dashboard-demo-4k.mp4',
+        headers: [{ key: 'Accept-Ranges', value: 'bytes' }],
+      },
+      {
+        source: '/pocket-analyst-demo.mp4',
+        headers: [{ key: 'Accept-Ranges', value: 'bytes' }],
+      },
+      {
+        source: '/pocketanalyst.mp4',
+        headers: [{ key: 'Accept-Ranges', value: 'bytes' }],
+      },
+    ];
+
     // Skip security headers in development to avoid CSP issues with Next.js dev server
     if (process.env.NODE_ENV === 'development') {
-      return [];
+      return heroVideoHeaders;
     }
     
     return [
+      ...heroVideoHeaders,
       // Prevent caching root and dashboard HTML so post-auth always gets fresh layout (avoids "nav lost" from cache)
       {
         source: '/',
