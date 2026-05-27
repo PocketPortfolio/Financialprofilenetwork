@@ -904,7 +904,7 @@
     "date": "2026-05-27",
     "title": "The Efficient Market Hypothesis: Still Relevant?",
     "slug": "the-efficient-market-hypothesis-still-relevant",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -914,7 +914,8 @@
       "efficient"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-27T09:01:14.241Z"
   },
   {
     "id": "week-22-post-1",
