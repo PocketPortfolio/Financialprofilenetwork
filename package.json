@@ -22,6 +22,8 @@
     "typecheck": "tsc --noEmit",
     "audit:open-404": "node scripts/audit-open-404.mjs",
     "audit:growth-b2c-pocket": "node scripts/growth-b2c-pocket-audit.mjs",
+    "audit:npm": "npm audit",
+    "sbom": "node scripts/generate-sbom.mjs",
     "newsroom:ingest": "node -e \"fetch('http://localhost:3001/api/cron/newsroom-ingest',{headers:{Authorization:'Bearer '+process.env.CRON_SECRET}}).then(r=>r.json()).then(console.log).catch(console.error)\"",
     "audit:b2b-open": "node scripts/growth-b2b-open-audit.mjs",
     "generate:gocardless-plan": "node scripts/generate-gocardless-plan-pdf.mjs",
@@ -46,6 +48,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:e2e": "PLAYWRIGHT_BASE_URL=http://localhost:3001 playwright test",
+    "e2e:dual-surface": "playwright test --project=dual-surface-pocket --project=dual-surface-open",
+    "test:inference-boundary": "vitest run tests/unit/ai/chat-inference-boundary.spec.ts",
     "test:rules": "firebase emulators:exec --only firestore \"vitest tests/rules\"",
     "test:lighthouse": "lhci autorun",
     "e2e": "playwright test",
@@ -208,6 +212,7 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@cyclonedx/cyclonedx-npm": "^4.2.1",
     "@playwright/test": "^1.47.0",
     "@resvg/resvg-js": "^2.6.2",
     "@testing-library/jest-dom": "^6.5.0",
