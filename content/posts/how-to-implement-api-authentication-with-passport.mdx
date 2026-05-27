@@ -1,0 +1,116 @@
+---
+title: How to Implement API Authentication with Passport
+date: '2026-05-27'
+description: Learn to secure your API using Passport.js for authentication.
+tags:
+  - api
+  - authentication
+  - passport
+  - nodejs
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-api-authentication-with-passport.png
+pillar: Tech
+category: how-to-in-tech
+---
+
+## Problem
+
+Securing an API is crucial to prevent unauthorized access and protect sensitive data. Authentication is a key aspect of this security. Passport.js is a flexible authentication middleware for Node.js that simplifies the process of securing APIs. However, implementing Passport for API authentication can be challenging for developers unfamiliar with its setup and configuration.
+
+## Solution with Code
+
+To implement API authentication using Passport, follow these steps:
+
+### Step 1: Install Dependencies
+
+First, ensure you have Node.js installed. Then, install the required packages:
+
+```bash
+npm install express passport passport-jwt jsonwebtoken body-parser
+```
+
+### Step 2: Configure Passport
+
+Create a `passport.js` file to configure Passport strategies. Use `passport-jwt` for token-based authentication:
+
+```javascript
+const passport = require('passport');
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: 'your_jwt_secret', // Use a secure key for production
+};
+
+passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
+  // Replace with a database call
+  const user = getUserById(jwt_payload.id);
+  if (user) {
+    return done(null, user);
+  } else {
+    return done(null, false);
+  }
+}));
+
+function getUserById(id) {
+  // Dummy function to simulate database retrieval
+  const users = [{ id: 1, username: "testuser" }];
+  return users.find(user => user.id === id);
+}
+
+module.exports = passport;
+```
+
+### Step 3: Set Up Express Server
+
+In your main server file (e.g., `app.js`), integrate Passport into your Express application:
+
+```javascript
+const express = require('express');
+const bodyParser = require('body-parser');
+const passport = require('./passport'); // Import the passport configuration
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(passport.initialize());
+
+app.get('/protected', passport.authenticate('jwt', { session: false }), (req, res) => {
+  res.json({ message: 'This is a protected route', user: req.user });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+### Step 4: Generate and Use JWTs
+
+To authenticate a user, generate a JWT token upon successful login and use it to access protected routes:
+
+```javascript
+const jwt = require('jsonwebtoken');
+
+function login(req, res) {
+  const { username, password } = req.body;
+  // Mock user authentication
+  if (username === 'testuser' && password === 'password') {
+    const user = { id: 1, username };
+    const token = jwt.sign(user, 'your_jwt_secret', { expiresIn: '1h' });
+    res.json({ message: 'Authentication successful', token });
+  } else {
+    res.status(401).json({ message: 'Authentication failed' });
+  }
+}
+
+app.post('/login', login);
+```
+
+## Key Concepts
+
+- **Passport**: A middleware for Node.js that provides various strategies for authentication, including JWT.
+- **JWT (JSON Web Tokens)**: A compact, URL-safe token used for securely transmitting information between parties.
+- **Bearer Token**: A type of token used in HTTP authentication as a part of the Authorization header.
+
+By following these steps, you can set up a secure API authentication system using Passport.js, ensuring that your application remains protected against unauthorized access.
