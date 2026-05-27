@@ -9,6 +9,9 @@ export interface WaitlistInput {
   userAgent?: string;
 }
 
+/** Client payload for POST /api/waitlist/join */
+export type WaitlistData = WaitlistInput;
+
 export interface WaitlistDoc {
   id?: string;
   email_normalized: string;

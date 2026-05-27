@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { checkKvRateLimit, clientIpFromRequest } from '@/app/lib/server/kv-rate-limit';
+import { createHash } from 'crypto';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -25,6 +27,15 @@ if (!getApps().length) {
 
 export async function POST(request: NextRequest) {
   try {
+    const ipHash = createHash('sha256')
+      .update(clientIpFromRequest(request))
+      .digest('hex')
+      .slice(0, 32);
+    const rl = await checkKvRateLimit('analytics:page-views:ip', ipHash, 180, 60);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
+    }
+
     const body = await request.json();
     const { path, converted, sessionId, conversionType } = body;
 

@@ -8,10 +8,10 @@ last_updated: 2026-05-27
 
 # Supply Chain Audit Snapshot
 
-## Surgical `npm audit fix` (non-force)
+## Phase 1 — Surgical `npm audit fix` (non-force)
 
-| Metric | Before | After surgical fix |
-|--------|--------|-------------------|
+| Metric | Before | After Phase 1 |
+|--------|--------|---------------|
 | Total advisories | 58 | **45** |
 | Critical | 0 | **0** |
 | High | 19 | **13** |
@@ -20,17 +20,43 @@ last_updated: 2026-05-27
 
 Command: `npm audit fix` (no `--force`). **33 packages updated**, no React/Next rendering dependency forced to breaking majors.
 
-## Isolated — requires breaking change or no upstream fix
+## Phase 2 — Perimeter + dependency cleanup (2026-05-27)
 
-| Package / chain | Severity | Action |
-|-----------------|----------|--------|
-| `xlsx` | High | **Accepted risk** — compensating controls in `tier1-diligence-xlsx-compensating-control.md` |
-| `@trigger.dev/sdk` → `@opentelemetry/sdk-node` | High | Dev/cron only; `--force` would bump to v4.4.6 — **quarantined** for post-diligence |
-| `eslint-config-next` → `glob` | High | Dev-only lint chain; force → Next 16 eslint config — **quarantined** |
-| `next-pwa` → `serialize-javascript` | High | PWA build chain; force → next-pwa@2 — **quarantined** |
-| `vitest` / `vite` / `esbuild` | Moderate | Dev/test only; force → vitest@4 — **quarantined** |
-| `firebase` → `undici` | High | Partially transitive; monitor Firebase SDK releases |
-| `drizzle-kit` → esbuild | Moderate | Dev tooling only (not production runtime per architecture rules) |
+| Metric | After Phase 1 | After Phase 2 |
+|--------|---------------|---------------|
+| Total advisories | 45 | **34** |
+| Critical | 0 | **0** |
+| High | 13 | **5** |
+| Moderate | 32 | **29** |
+
+### Actions taken
+
+| Action | High CVEs removed | Notes |
+|--------|------------------|-------|
+| Removed unused `@trigger.dev/sdk` | 3 | Zero imports in codebase — dead dependency |
+| Removed `next-pwa` wrapper | 5 | Committed `public/sw.js` retained; FCM uses `firebase-messaging-sw.js` |
+| `npm audit fix` (undici/Firebase chain) | Partial | Remaining `undici` tracked via Firebase SDK |
+
+### Remaining High (5) — triage
+
+| Package | Runtime? | Fix |
+|---------|----------|-----|
+| `xlsx` | Client import path | **No upstream fix** — `tier1-diligence-xlsx-compensating-control.md` |
+| `undici` | Firebase transitive | Monitor Firebase SDK releases |
+| `eslint-config-next` / `glob` / `@next/eslint-plugin-next` | **Dev/lint only** | Force → Next 16 eslint — quarantined |
+
+**Procurement framing:** **9 of 13** original High advisories were build/dev-only; Phase 2 eliminated **8 High** without breaking UI or cron logic.
+
+## Firestore perimeter (Phase 2)
+
+| Collection | Before | After |
+|------------|--------|-------|
+| `toolUsage` | Anonymous client `create` | **Server-only** (Admin SDK) |
+| `pageViews` | Anonymous client `create` | **Server-only** (Admin SDK) |
+| `waitlist` | Anonymous client `create` | **Server-only** via `POST /api/waitlist/join` |
+| `waitlist_rate_limit` | Open client write | **Denied** — replaced by KV on API routes |
+
+API routes `/api/tool-usage`, `/api/page-views`, `/api/waitlist/join`, `/api/waitlist/submit` enforce Vercel KV sliding-window rate limits when `KV_REST_API_URL` is set.
 
 ## SBOM
 
@@ -41,6 +67,7 @@ Command: `npm audit fix` (no `--force`). **33 packages updated**, no React/Next 
 ## Regeneration
 
 ```bash
-npm audit > docs/seed/phase2-evidence/npm-audit-$(date +%Y%m%d).txt
+npm audit
 npm run sbom
+npm run test:inference-boundary
 ```

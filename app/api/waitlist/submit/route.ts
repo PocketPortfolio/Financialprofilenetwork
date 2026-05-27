@@ -4,6 +4,8 @@ import { leads, auditLogs } from '@/db/sales/schema';
 import { eq } from 'drizzle-orm';
 import { validateEmail } from '@/lib/sales/email-validation';
 import { isPlaceholderEmail } from '@/lib/sales/email-resolution';
+import { checkKvRateLimit, clientIpFromRequest } from '@/app/lib/server/kv-rate-limit';
+import { createHash } from 'crypto';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
@@ -31,6 +33,16 @@ function getAdminDb() {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = clientIpFromRequest(request);
+    const ipHash = createHash('sha256').update(ip).digest('hex').slice(0, 32);
+    const ipLimit = await checkKvRateLimit('waitlist:submit:ip', ipHash, 8, 3600);
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many submissions. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': '3600' } },
+      );
+    }
+
     const body = await request.json();
 
     // Validate required fields

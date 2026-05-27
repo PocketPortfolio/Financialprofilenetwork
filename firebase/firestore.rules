@@ -99,17 +99,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Waitlist: allow unauthenticated users to create entries
+    // Waitlist: server-only via POST /api/waitlist/join (Admin SDK + KV rate limit)
     match /waitlist/{waitlistId} {
-      allow create: if true; // Allow all creates for waitlist entries
-      allow read: if isAdmin(); // Only admins can read waitlist data
-      allow update, delete: if false; // Immutable once created
+      allow read: if isAdmin();
+      allow write: if false;
     }
     
-    // Rate limiting for waitlist: create/update by server
+    // Legacy client rate-limit docs — deprecated; KV handles rate limits on API routes
     match /waitlist_rate_limit/{rateLimitId} {
-      allow read: if false; // No reads allowed
-      allow create, update: if true; // Allow server to manage rate limits
+      allow read, write: if false;
     }
     
     // API Keys: Server-side only (via Admin SDK)
@@ -137,18 +135,16 @@ service cloud.firestore {
       allow read, write: if false; // Only server can access via Admin SDK
     }
     
-    // Tool Usage Tracking: anyone can write (for analytics), only admins can read
+    // Tool Usage: server-only via Admin SDK (/api/tool-usage, /api/ai/chat)
     match /toolUsage/{eventId} {
-      allow create: if true; // Allow anonymous tracking
-      allow read: if isAdmin(); // Only admins can read analytics
-      allow update, delete: if false; // Immutable once written
+      allow read: if isAdmin();
+      allow write: if false;
     }
     
-    // Page Views Tracking: anyone can write (for analytics), only admins can read
+    // Page Views: server-only via Admin SDK (/api/page-views)
     match /pageViews/{eventId} {
-      allow create: if true; // Allow anonymous tracking
-      allow read: if isAdmin(); // Only admins can read analytics
-      allow update, delete: if false; // Immutable once written
+      allow read: if isAdmin();
+      allow write: if false;
     }
 
     // Referral events: written by server via POST /api/referral-event (Admin SDK), read by admin analytics

@@ -1,55 +1,55 @@
-import { db } from '../firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import type { WaitlistInput as WaitlistData } from './types';
 
-export interface WaitlistData {
-  email: string;
-  name?: string;
-  region?: string;
-  role?: string;
-  source: 'web:join' | 'web:footer' | 'web:header';
-  userAgent?: string;
-}
-
-export async function saveToWaitlist(data: WaitlistData): Promise<{ success: boolean; message: string; duplicate?: boolean; id?: string }> {
+export async function saveToWaitlist(
+  data: WaitlistData,
+): Promise<{ success: boolean; message: string; duplicate?: boolean; id?: string }> {
   try {
-    // Skip duplicate checking for now - we'll handle this server-side later
-    // or implement a different approach that doesn't require read permissions
-    
-    // Add to Firestore with simpler structure that matches existing rules
-    const waitlistRef = collection(db, 'waitlist');
-    const docRef = await addDoc(waitlistRef, {
-      email: data.email.toLowerCase().trim(),
-      name: data.name || '',
-      region: data.region || '',
-      role: data.role || '',
-      source: data.source,
-      userAgent: data.userAgent || '',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+    const res = await fetch('/api/waitlist/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: data.email,
+        name: data.name,
+        region: data.region,
+        role: data.role,
+        source: data.source,
+        userAgent: data.userAgent,
+      }),
     });
-    
-    console.log('Waitlist submission saved to Firestore:', {
-      id: docRef.id,
-      email: data.email,
-      name: data.name,
-      region: data.region,
-      role: data.role,
-      source: data.source,
-      timestamp: new Date().toISOString()
-    });
-    
-    return {
-      success: true,
-      message: 'Successfully joined the waitlist!',
-      duplicate: false,
-      id: docRef.id
+
+    const result = (await res.json()) as {
+      success?: boolean;
+      message?: string;
+      duplicate?: boolean;
+      id?: string;
+      error?: string;
     };
-    
+
+    if (res.status === 429) {
+      return {
+        success: false,
+        message: result.message || 'Too many attempts. Please try again later.',
+      };
+    }
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: result.message || result.error || 'Something went wrong. Please try again later.',
+      };
+    }
+
+    return {
+      success: result.success ?? true,
+      message: result.message || 'Successfully joined the waitlist!',
+      duplicate: result.duplicate,
+      id: result.id,
+    };
   } catch (error) {
     console.error('Error saving to waitlist:', error);
     return {
       success: false,
-      message: 'Something went wrong. Please try again later.'
+      message: 'Something went wrong. Please try again later.',
     };
   }
 }
