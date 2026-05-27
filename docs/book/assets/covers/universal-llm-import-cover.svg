@@ -26,30 +26,32 @@
     <circle cx="220" cy="140" r="260" fill="#f59e0b" opacity="0.08"/>
     <circle cx="950" cy="480" r="300" fill="#fbbf24" opacity="0.06"/>
   </g>
-  <!-- Right: topic illustration - CSV to normalized pipeline -->
+  <!-- Right: topic illustration - vertical pipeline -->
   <g fill="none" stroke="#1c232b" stroke-width="0.8" opacity="0.9">
     <rect x="600" y="60" width="540" height="500" rx="12"/>
   </g>
-  <g fill="#111418" stroke="#f59e0b" stroke-width="1.2">
-    <rect x="640" y="100" width="140" height="100" rx="6"/>
-    <path d="M 650 125 h 120 M 650 145 h 120 M 650 165 h 80 M 650 185 h 100" stroke="#1c232b" stroke-width="0.8" fill="none"/>
+  <g id="uli-pipeline" transform="translate(870 0)">
+    <text y="92" fill="#fbbf24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700" font-size="13" text-anchor="middle">Broker CSV</text>
+    <g fill="#111418" stroke="#f59e0b" stroke-width="1.2">
+      <rect x="-70" y="104" width="140" height="100" rx="6"/>
+      <path d="M -58 129 h 116 M -58 149 h 116 M -58 169 h 76 M -58 189 h 96" stroke="#1c232b" stroke-width="0.8" fill="none"/>
+    </g>
+    <path d="M 0 204 L 0 252" stroke="url(#uli-accent)" stroke-width="2" fill="none" opacity="0.9"/>
+    <polygon points="-6,252 0,264 6,252" fill="#f59e0b" opacity="0.9"/>
+    <g filter="url(#uli-glow-filter)">
+      <rect x="-90" y="264" width="180" height="52" rx="8" fill="#1a1e24" stroke="#f59e0b" stroke-width="1.2"/>
+      <text y="292" fill="#e7eaf0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="12" text-anchor="middle">Schema inference</text>
+      <text y="306" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" text-anchor="middle">Heuristic + optional LLM</text>
+    </g>
+    <path d="M 0 316 L 0 358" stroke="url(#uli-accent)" stroke-width="2" fill="none" opacity="0.9"/>
+    <polygon points="-6,358 0,370 6,358" fill="#f59e0b" opacity="0.9"/>
+    <g filter="url(#uli-glow-filter)">
+      <rect x="-90" y="374" width="180" height="52" rx="8" fill="#1a1e24" stroke="#f59e0b" stroke-width="1.2"/>
+      <text y="399" fill="#e7eaf0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="12" text-anchor="middle">NormalizedTrade[]</text>
+      <text y="416" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" text-anchor="middle">Sovereign, local-first</text>
+    </g>
+    <text y="460" fill="#5a6572" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="11" text-anchor="middle">Universal import pipeline</text>
   </g>
-  <text x="710" y="225" fill="#fbbf24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700" font-size="14" text-anchor="middle">Broker CSV</text>
-  <path d="M 710 200 L 710 270" stroke="url(#uli-accent)" stroke-width="2" fill="none" opacity="0.9"/>
-  <polygon points="700,270 710,290 720,270" fill="#f59e0b" opacity="0.9"/>
-  <g filter="url(#uli-glow-filter)">
-    <rect x="620" y="290" width="180" height="52" rx="8" fill="#1a1e24" stroke="#f59e0b" stroke-width="1.2"/>
-    <text x="710" y="318" fill="#e7eaf0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="12" text-anchor="middle">Schema inference</text>
-    <text x="710" y="332" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" text-anchor="middle">Heuristic + optional LLM</text>
-  </g>
-  <path d="M 710 342 L 710 400" stroke="url(#uli-accent)" stroke-width="2" fill="none" opacity="0.9"/>
-  <polygon points="700,400 710,420 720,400" fill="#f59e0b" opacity="0.9"/>
-  <g filter="url(#uli-glow-filter)">
-    <rect x="620" y="420" width="180" height="52" rx="8" fill="#1a1e24" stroke="#f59e0b" stroke-width="1.2"/>
-    <text x="710" y="445" fill="#e7eaf0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="12" text-anchor="middle">NormalizedTrade[]</text>
-    <text x="710" y="462" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" text-anchor="middle">Sovereign, local-first</text>
-  </g>
-  <text x="710" y="520" fill="#5a6572" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="11" text-anchor="middle">Universal import pipeline</text>
   <!-- Left: title block and branding -->
   <text id="uli-title" x="56" y="168" fill="#e7eaf0" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="48" letter-spacing="-0.02em">Universal LLM Import</text>
   <text id="uli-subtitle" x="56" y="218" fill="#9aa3ae" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="22">Building Local-First, Sovereign CSV Ingestion</text>

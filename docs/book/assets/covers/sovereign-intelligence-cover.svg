@@ -26,27 +26,36 @@
     <circle cx="1000" cy="160" r="320" fill="#f59e0b" opacity="0.08"/>
     <circle cx="180" cy="500" r="280" fill="#fbbf24" opacity="0.06"/>
   </g>
-  <!-- Right: topic illustration - Local data to RAG -->
+  <!-- Right: topic illustration - vertical pipeline (no label/line overlap) -->
   <g fill="none" stroke="#1c232b" stroke-width="0.8" opacity="0.9">
     <rect x="620" y="80" width="520" height="480" rx="12"/>
   </g>
-  <g fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.9">
-    <rect x="660" y="120" width="80" height="56" rx="8"/>
-    <path d="M 668 148 h 64 M 668 156 h 48"/>
+  <g id="si-pipeline" transform="translate(880 0)">
+    <!-- Local data node -->
+    <text y="112" fill="#fbbf24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700" font-size="13" text-anchor="middle">Your data (local)</text>
+    <g fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.9">
+      <rect x="-60" y="124" width="120" height="56" rx="8"/>
+      <path d="M -52 152 h 104 M -52 164 h 72"/>
+    </g>
+    <!-- Connector 1 -->
+    <path d="M 0 180 L 0 232" stroke="url(#si-accent)" stroke-width="2" stroke-dasharray="6 4" fill="none" opacity="0.9"/>
+    <polygon points="-6,232 0,244 6,232" fill="#f59e0b" opacity="0.9"/>
+    <!-- Sanitized context node -->
+    <g filter="url(#si-glow-filter)">
+      <rect x="-72" y="248" width="144" height="48" rx="8" fill="#111418" stroke="#f59e0b" stroke-width="1.2"/>
+      <text y="276" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="12" text-anchor="middle">Sanitized context</text>
+    </g>
+    <!-- Connector 2 -->
+    <path d="M 0 296 L 0 338" stroke="url(#si-accent)" stroke-width="2" stroke-dasharray="6 4" fill="none" opacity="0.9"/>
+    <polygon points="-6,338 0,350 6,338" fill="#f59e0b" opacity="0.9"/>
+    <!-- RAG node -->
+    <g filter="url(#si-glow-filter)">
+      <circle cx="0" cy="400" r="50" fill="#1a1e24" stroke="#f59e0b" stroke-width="1.5"/>
+      <text y="395" fill="#e7eaf0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800" font-size="14" text-anchor="middle">RAG</text>
+      <text y="412" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" text-anchor="middle">Gemini</text>
+    </g>
+    <text y="470" fill="#5a6572" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="11" text-anchor="middle">Local-first AI for finance</text>
   </g>
-  <text x="700" y="200" fill="#fbbf24" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="700" font-size="14" text-anchor="middle">Your data (local)</text>
-  <path d="M 740 176 L 820 260" stroke="url(#si-accent)" stroke-width="2" stroke-dasharray="6 4" fill="none" opacity="0.9"/>
-  <g filter="url(#si-glow-filter)">
-    <rect x="780" y="250" width="120" height="48" rx="8" fill="#111418" stroke="#1c232b" stroke-width="1.2"/>
-    <text x="840" y="280" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="12" text-anchor="middle">Sanitized context</text>
-  </g>
-  <path d="M 840 298 L 840 360" stroke="url(#si-accent)" stroke-width="2" stroke-dasharray="6 4" fill="none" opacity="0.9"/>
-  <g filter="url(#si-glow-filter)">
-    <circle cx="840" cy="400" r="50" fill="#1a1e24" stroke="#f59e0b" stroke-width="1.5"/>
-    <text x="840" y="395" fill="#e7eaf0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="800" font-size="14" text-anchor="middle">RAG</text>
-    <text x="840" y="412" fill="#9aa3ae" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" text-anchor="middle">Gemini</text>
-  </g>
-  <text x="840" y="470" fill="#5a6572" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-weight="600" font-size="11" text-anchor="middle">Local-first AI for finance</text>
   <!-- Left: title block and branding -->
   <text id="si-title" x="56" y="180" fill="#e7eaf0" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="56" letter-spacing="-0.02em">Sovereign Intelligence</text>
   <text id="si-subtitle" x="56" y="232" fill="#9aa3ae" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="24">Building Local-First RAG for Finance</text>
