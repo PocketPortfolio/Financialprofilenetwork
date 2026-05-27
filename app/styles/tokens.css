@@ -31,6 +31,12 @@
   --accent-warm: #f59e0b; /* Warm accent color */
   --text-warm: #fbbf24; /* Bright warm text for dark theme */
   --border-warm: #f59e0b; /* Warm border color */
+
+  /* Foreground on dark landing plate artwork (HUD overlays) */
+  --on-plate-surface: color-mix(in srgb, var(--surface) 88%, transparent);
+  --on-plate-text: var(--text);
+  --on-plate-muted: var(--text-secondary);
+  --on-plate-accent: var(--accent-warm);
   
   /* Typography */
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -174,6 +180,12 @@
         --accent-warm: #f59e0b; /* More vibrant warm accent color */
         --text-warm: #92400e; /* More visible warm text color */
         --border-warm: #f59e0b; /* Much more visible warm border */
+
+        /* Plates stay dark — HUD keeps dark-theme contrast in light mode */
+        --on-plate-surface: color-mix(in srgb, #111418 88%, transparent);
+        --on-plate-text: #e7eaf0;
+        --on-plate-muted: #9aa3ae;
+        --on-plate-accent: var(--accent-warm);
   }
 }
 
@@ -210,6 +222,12 @@
         --accent-warm: #f59e0b; /* More vibrant warm accent color */
         --text-warm: #92400e; /* More visible warm text color */
         --border-warm: #f59e0b; /* Much more visible warm border */
+
+  /* Plates stay dark — HUD keeps dark-theme contrast in light mode */
+  --on-plate-surface: color-mix(in srgb, #111418 88%, transparent);
+  --on-plate-text: #e7eaf0;
+  --on-plate-muted: #9aa3ae;
+  --on-plate-accent: var(--accent-warm);
 }
 
 /* Explicit Dark Theme */
@@ -238,6 +256,11 @@
   --accent-warm: #f59e0b; /* Keep warm accent color */
   --text-warm: #fbbf24; /* Bright warm text for dark theme */
   --border-warm: #f59e0b; /* Keep warm border color */
+
+  --on-plate-surface: color-mix(in srgb, var(--surface) 88%, transparent);
+  --on-plate-text: var(--text);
+  --on-plate-muted: var(--text-secondary);
+  --on-plate-accent: var(--accent-warm);
 }
 
 /* High Contrast Mode */

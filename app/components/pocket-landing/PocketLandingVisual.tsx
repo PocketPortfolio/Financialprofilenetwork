@@ -4,9 +4,11 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { PocketLandingVisualMeta } from '@/lib/pocket-landing-visuals';
 import { pocketPlateUrl } from '@/lib/pocket-landing-visuals';
+import {
+  pocketPlateFrameStyle,
+  pocketPlateHud,
+} from '@/lib/pocket-landing-theme';
 import PocketLandingPlateOverlay from './PocketLandingPlateOverlay';
-
-const OBSIDIAN = '#09090b';
 
 const fadeVisual = {
   initial: { opacity: 0, scale: 0.98 },
@@ -42,7 +44,7 @@ export default function PocketLandingVisual({
         width: '100%',
         aspectRatio: visual.aspectRatio,
         overflow: 'hidden',
-        background: OBSIDIAN,
+        ...pocketPlateFrameStyle,
       }}
     >
       <motion.div
@@ -83,7 +85,7 @@ export default function PocketLandingVisual({
             position: 'absolute',
             inset: 0,
             background:
-              'linear-gradient(105deg, transparent 38%, rgba(245,158,11,0.08) 50%, transparent 62%)',
+              'linear-gradient(105deg, transparent 38%, color-mix(in srgb, var(--accent-warm) 8%, transparent) 50%, transparent 62%)',
             pointerEvents: 'none',
             zIndex: 2,
           }}
@@ -95,7 +97,7 @@ export default function PocketLandingVisual({
         style={{
           position: 'absolute',
           inset: 0,
-          boxShadow: 'inset 0 0 80px rgba(0,0,0,0.35)',
+          boxShadow: 'inset 0 0 80px color-mix(in srgb, var(--bg) 35%, transparent)',
           pointerEvents: 'none',
           zIndex: 3,
         }}
@@ -120,9 +122,10 @@ export default function PocketLandingVisual({
         position: 'relative',
         borderRadius: '16px',
         overflow: 'hidden',
-        border: '1px solid rgba(245,158,11,0.12)',
-        background: OBSIDIAN,
-        boxShadow: '0 32px 100px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset',
+        border: `1px solid ${pocketPlateHud.borderSubtle}`,
+        ...pocketPlateFrameStyle,
+        boxShadow:
+          'var(--shadow-lg), 0 0 0 1px color-mix(in srgb, var(--text) 4%, transparent) inset',
       }}
     >
       {shell}
@@ -131,10 +134,10 @@ export default function PocketLandingVisual({
           style={{
             padding: '12px 16px',
             fontSize: '13px',
-            color: 'var(--muted)',
+            color: 'var(--text-secondary)',
             textAlign: visual.headlineAlign ?? 'center',
-            borderTop: '1px solid rgba(245,158,11,0.1)',
-            background: OBSIDIAN,
+            borderTop: `1px solid ${pocketPlateHud.borderSubtle}`,
+            background: 'var(--surface-elevated)',
           }}
         >
           {visual.caption}

@@ -2,6 +2,7 @@
 
 import PocketLandingVisual from './PocketLandingVisual';
 import { pocketVisual } from '@/lib/pocket-landing-visuals';
+import { pocketLandingHeadingStyle } from '@/lib/pocket-landing-theme';
 
 export default function CommunitySection() {
   return (
@@ -12,6 +13,7 @@ export default function CommunitySection() {
     >
       <h2
         style={{
+          ...pocketLandingHeadingStyle,
           fontSize: 'clamp(2rem, 4vw, 2.25rem)',
           fontWeight: 'bold',
           marginBottom: '24px',
@@ -60,7 +62,7 @@ export default function CommunitySection() {
           style={{
             padding: '12px 24px',
             background: 'var(--accent-warm)',
-            color: 'white',
+            color: 'var(--surface-elevated)',
             textDecoration: 'none',
             borderRadius: '6px',
             fontWeight: '500',
@@ -75,7 +77,7 @@ export default function CommunitySection() {
           style={{
             padding: '12px 24px',
             background: 'transparent',
-            border: '2px solid rgba(245, 158, 11, 0.35)',
+            border: '2px solid color-mix(in srgb, var(--accent-warm) 35%, transparent)',
             color: 'var(--text)',
             textDecoration: 'none',
             borderRadius: '6px',

@@ -5,12 +5,14 @@ import DashboardLaunchLink from '@/app/components/nav/DashboardLaunchLink';
 import ScrollReveal from '@/app/components/ui/ScrollReveal';
 import PocketLandingVisual from './PocketLandingVisual';
 import { pocketVisual } from '@/lib/pocket-landing-visuals';
+import {
+  pocketLandingCardStyle,
+  pocketLandingHeadingStyle,
+  pocketPlateHud,
+} from '@/lib/pocket-landing-theme';
 
-const OBSIDIAN = '#09090b';
 const CARD_SHELL: React.CSSProperties = {
-  background: OBSIDIAN,
-  border: '1px solid rgba(245, 158, 11, 0.18)',
-  borderRadius: '16px',
+  ...pocketLandingCardStyle,
   padding: 'clamp(20px, 4vw, 28px)',
   display: 'flex',
   flexDirection: 'column',
@@ -27,14 +29,14 @@ const PORTAL_CARDS = [
       <DashboardLaunchLink
         style={{
           padding: '12px 24px',
-          background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-          color: 'white',
+          background: 'linear-gradient(135deg, var(--accent-warm) 0%, var(--warning) 100%)',
+          color: 'var(--surface-elevated)',
           textDecoration: 'none',
           borderRadius: '8px',
           fontSize: '15px',
           fontWeight: '600',
           textAlign: 'center',
-          border: '2px solid rgba(245, 158, 11, 0.35)',
+          border: `2px solid ${pocketPlateHud.border}`,
         }}
       >
         Launch App
@@ -51,7 +53,7 @@ const PORTAL_CARDS = [
         style={{
           padding: '12px 24px',
           background: 'transparent',
-          border: '2px solid rgba(245, 158, 11, 0.35)',
+          border: `2px solid ${pocketPlateHud.border}`,
           color: 'var(--text-warm)',
           textDecoration: 'none',
           borderRadius: '8px',
@@ -74,7 +76,7 @@ const PORTAL_CARDS = [
         style={{
           padding: '12px 24px',
           background: 'transparent',
-          border: '2px solid rgba(245, 158, 11, 0.4)',
+          border: `2px solid color-mix(in srgb, var(--accent-warm) 40%, transparent)`,
           color: 'var(--accent-warm)',
           textDecoration: 'none',
           borderRadius: '8px',
@@ -105,6 +107,7 @@ export default function ProductPortalSection() {
       >
         <h2
           style={{
+            ...pocketLandingHeadingStyle,
             fontSize: 'clamp(2rem, 4vw, 2.5rem)',
             fontWeight: 'bold',
             textAlign: 'center',
@@ -143,12 +146,12 @@ export default function ProductPortalSection() {
               style={CARD_SHELL}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.45)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(245, 158, 11, 0.12)';
+                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent-warm) 45%, var(--border))';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.18)';
+                e.currentTarget.style.borderColor = '';
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >

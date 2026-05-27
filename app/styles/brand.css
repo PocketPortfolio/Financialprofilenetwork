@@ -1219,8 +1219,19 @@ body:has(header.brand-header) {
   }
 }
 
+/* === Pocket landing SOTA — theme-aware typography & panels === */
+.pocket-landing-sota {
+  color: var(--text);
+}
 
+.pocket-landing-sota h2,
+.pocket-landing-sota h3 {
+  color: var(--text);
+}
 
+.pocket-landing-sota p {
+  color: inherit;
+}
 
 
 

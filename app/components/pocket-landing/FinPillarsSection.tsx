@@ -4,6 +4,7 @@ import ScrollReveal from '@/app/components/ui/ScrollReveal';
 import PocketLandingVisual from './PocketLandingVisual';
 import FinPillarsCarousel from './FinPillarsCarousel';
 import { pocketVisual } from '@/lib/pocket-landing-visuals';
+import { pocketLandingHeadingStyle } from '@/lib/pocket-landing-theme';
 
 export default function FinPillarsSection() {
   const finPlate = {
@@ -28,6 +29,7 @@ export default function FinPillarsSection() {
       >
         <h2
           style={{
+            ...pocketLandingHeadingStyle,
             fontSize: 'clamp(2rem, 4vw, 2.25rem)',
             fontWeight: 'bold',
             marginBottom: '16px',

@@ -8,24 +8,27 @@ import {
   type PocketLandingOverlayVariant,
   type PocketLandingVisualMeta,
 } from '@/lib/pocket-landing-visuals';
-
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-const ACCENT = '#f59e0b';
-const OBSIDIAN = 'rgba(9, 9, 11, 0.82)';
-const TEXT = '#e2e8f0';
-const MUTED = '#a1a1aa';
+import { pocketLandingMono, pocketPlateHud } from '@/lib/pocket-landing-theme';
 
 function LockGlyph() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <rect x="5" y="10" width="14" height="11" rx="2" stroke={ACCENT} strokeWidth="1.5" />
+      <rect
+        x="5"
+        y="10"
+        width="14"
+        height="11"
+        rx="2"
+        stroke="var(--on-plate-accent)"
+        strokeWidth="1.5"
+      />
       <path
         d="M8 10V8a4 4 0 0 1 8 0v2"
-        stroke={ACCENT}
+        stroke="var(--on-plate-accent)"
         strokeWidth="1.5"
         strokeLinecap="round"
       />
-      <circle cx="12" cy="15" r="1.5" fill={ACCENT} />
+      <circle cx="12" cy="15" r="1.5" fill="var(--on-plate-accent)" />
     </svg>
   );
 }
@@ -35,6 +38,7 @@ function MetricsOverlay() {
     <div
       role="presentation"
       aria-hidden
+      className="pocket-plate-hud"
       style={{
         position: 'absolute',
         inset: 0,
@@ -61,17 +65,17 @@ function MetricsOverlay() {
             style={{
               textAlign: 'center',
               padding: 'clamp(8px, 1.5vw, 14px)',
-              background: OBSIDIAN,
-              border: '1px solid rgba(245, 158, 11, 0.28)',
+              background: pocketPlateHud.bg,
+              border: `1px solid ${pocketPlateHud.border}`,
               borderRadius: '8px',
-              fontFamily: MONO,
+              fontFamily: pocketLandingMono,
             }}
           >
             <div
               style={{
                 fontSize: 'clamp(1.25rem, 2.5vw, 2rem)',
                 fontWeight: 700,
-                color: ACCENT,
+                color: pocketPlateHud.accent,
                 marginBottom: '4px',
               }}
             >
@@ -80,7 +84,7 @@ function MetricsOverlay() {
             <div
               style={{
                 fontSize: 'clamp(9px, 1.4vw, 11px)',
-                color: MUTED,
+                color: pocketPlateHud.muted,
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
               }}
@@ -99,6 +103,7 @@ function AdFreeOverlay() {
     <div
       role="presentation"
       aria-hidden
+      className="pocket-plate-hud"
       style={{
         position: 'absolute',
         inset: 0,
@@ -115,11 +120,11 @@ function AdFreeOverlay() {
           maxWidth: '640px',
           width: '100%',
           padding: 'clamp(16px, 2.5vw, 24px)',
-          background: OBSIDIAN,
-          border: '1px solid rgba(245, 158, 11, 0.35)',
-          borderLeft: `3px solid ${ACCENT}`,
+          background: pocketPlateHud.bg,
+          border: `1px solid color-mix(in srgb, var(--accent-warm) 35%, transparent)`,
+          borderLeft: `3px solid ${pocketPlateHud.accent}`,
           borderRadius: '8px',
-          fontFamily: MONO,
+          fontFamily: pocketLandingMono,
           textAlign: 'center',
         }}
       >
@@ -130,7 +135,7 @@ function AdFreeOverlay() {
             justifyContent: 'center',
             gap: '8px',
             marginBottom: '10px',
-            color: ACCENT,
+            color: pocketPlateHud.accent,
             fontSize: 'clamp(11px, 1.8vw, 13px)',
             fontWeight: 700,
             letterSpacing: '0.08em',
@@ -140,7 +145,14 @@ function AdFreeOverlay() {
           <LockGlyph />
           Ad-Free Invariant
         </div>
-        <p style={{ margin: 0, fontSize: 'clamp(11px, 1.6vw, 13px)', color: TEXT, lineHeight: 1.55 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 'clamp(11px, 1.6vw, 13px)',
+            color: pocketPlateHud.fg,
+            lineHeight: 1.55,
+          }}
+        >
           {POCKET_AD_FREE_COPY}
         </p>
       </div>
@@ -156,25 +168,26 @@ function PortalOverlay({ portalKey }: { portalKey: 'terminal' | 'storage' | 'fou
     <div
       role="presentation"
       aria-hidden
+      className="pocket-plate-hud"
       style={{
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
         padding: 'clamp(10px, 2vw, 16px)',
-        background: 'linear-gradient(180deg, transparent 0%, rgba(9,9,11,0.92) 55%)',
+        background: pocketPlateHud.gradientFade,
         pointerEvents: 'none',
         zIndex: 4,
         textAlign: align,
       }}
     >
-      <div style={{ fontFamily: MONO, paddingLeft: '4px' }}>
+      <div style={{ fontFamily: pocketLandingMono, paddingLeft: '4px' }}>
         <div
           style={{
             fontSize: '9px',
             fontWeight: 700,
             letterSpacing: '0.12em',
-            color: ACCENT,
+            color: pocketPlateHud.accent,
             marginBottom: '4px',
           }}
         >
@@ -184,7 +197,7 @@ function PortalOverlay({ portalKey }: { portalKey: 'terminal' | 'storage' | 'fou
           style={{
             fontSize: 'clamp(14px, 2.2vw, 18px)',
             fontWeight: 800,
-            color: TEXT,
+            color: pocketPlateHud.fg,
             letterSpacing: '-0.02em',
           }}
         >

@@ -969,7 +969,7 @@ export default function LandingPage() {
               fontSize: 'clamp(0.8125rem, 1.5vw, 0.9375rem)',
               lineHeight: '1.55',
               letterSpacing: '0.02em',
-              color: '#f59e0b',
+              color: 'var(--accent-warm)',
               textAlign: 'center',
               boxSizing: 'border-box',
             }}
@@ -1744,7 +1744,7 @@ $ npx pocket-init --sovereign
           padding: '0 clamp(12px, 3vw, 24px)',
           boxSizing: 'border-box'
         }}>
-          <h2 style={{ 
+          <h2 className="brand-text" style={{ 
             fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
             fontWeight: 'bold', 
             textAlign: 'center', 
@@ -1892,7 +1892,7 @@ $ npx pocket-init --sovereign
         {/* Mission Section (Scroll Reveal) */}
         <ScrollReveal>
         <section id="mission" style={{ marginBottom: '120px', textAlign: 'center' }}>
-          <h2 style={{ 
+          <h2 className="brand-text" style={{ 
             fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
             fontWeight: 'bold', 
             marginBottom: '24px',
@@ -2136,7 +2136,7 @@ $ npx pocket-init --sovereign
           style={{ marginBottom: '120px', padding: '0 clamp(12px, 3vw, 24px)', boxSizing: 'border-box' }}
         >
           <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-            <h2 style={{ 
+            <h2 className="brand-text" style={{ 
               fontSize: 'clamp(2rem, 4vw, 2.25rem)', 
               fontWeight: 'bold', 
               marginBottom: '24px',
