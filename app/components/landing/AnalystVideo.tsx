@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef } from 'react';
+import { useRef } from 'react';
+import { parseHttpsUrl } from '../../lib/safe-external-url';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -13,7 +14,8 @@ const RAW_VIDEO_URL =
 
 // Trim Cloudinary video to 42 seconds (so_0 = start 0s, eo_42 = end 42s). Use slash after params so version/path is not parsed as transformation (fixes 404).
 function trimTo42Seconds(url: string): string {
-  if (!url.includes('res.cloudinary.com')) return url;
+  const parsed = parseHttpsUrl(url);
+  if (!parsed || parsed.hostname !== 'res.cloudinary.com') return url;
   const uploadIdx = url.indexOf('/upload/');
   if (uploadIdx === -1) return url;
   const insert = uploadIdx + '/upload/'.length;

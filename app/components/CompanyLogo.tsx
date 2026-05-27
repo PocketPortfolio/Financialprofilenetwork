@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { getCompanyLogoFallbacks } from '../lib/utils/companyLogo';
+import { urlHostMatches } from '../lib/safe-external-url';
 
 interface CompanyLogoProps {
   symbol: string;
@@ -89,7 +90,7 @@ export default function CompanyLogo({
   }
   
   // Only use crossOrigin for sources that support it (Clearbit, etc.)
-  const useCrossOrigin = currentUrl.includes('clearbit.com') || currentUrl.includes('logo.dev');
+  const useCrossOrigin = urlHostMatches(currentUrl, ['clearbit.com', 'logo.dev']);
   
   // Add cache-busting parameter to force browser to reload image when symbol changes
   // Only add cache-bust on client-side (after mount) to avoid SSR hydration mismatch

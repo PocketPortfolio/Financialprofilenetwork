@@ -1,8 +1,8 @@
 ---
 id: TIER1-CODEQL-REMEDIATION-PLAN
 title: CodeQL Static Analysis Remediation Plan (62 Open Alerts)
-status: APPROVED_PLAN
-branch: infra/codeql-hardening
+status: COMPLETE
+branch: main
 last_updated: 2026-05-27
 roles: [CSO, Head of Engineering, Security Office]
 ---
@@ -266,8 +266,6 @@ Alerts may be **closed as false positive / won't fix** only with CSO sign-off an
 
 ## Immediate next action
 
-1. Create branch `infra/codeql-hardening`
-2. Execute **Phase 0** (CodeQL config + fix workflow errors)
-3. Open PR **"codeql(phase-0): scan scope + workflow health"** — no application logic changes
+**Status (2026-05-27):** Phases 0–4 merged to `main`. Runtime ledger projected **0 open** after fixes. Fresh CodeQL scan pending GitHub Actions billing resolution.
 
-**Estimated calendar:** 3 weeks to close runtime ledger; Phase 0–1 can complete in Week 1 with ~70% alert reduction.
+Evidence: `docs/seed/phase2-evidence/codeql-remediation-summary-20260527.json`

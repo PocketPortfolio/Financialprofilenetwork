@@ -411,11 +411,17 @@ async function extractLeadIdFromThread(threadId: string): Promise<string | null>
 /**
  * Extract leadId from sender email address (fallback method)
  */
+function parseEmailFromHeader(value: string): string {
+  const lt = value.indexOf('<');
+  if (lt === -1) return value.trim();
+  const gt = value.indexOf('>', lt + 1);
+  if (gt === -1) return value.trim();
+  return value.slice(lt + 1, gt).trim();
+}
+
 async function extractLeadIdFromEmail(email: string): Promise<string | null> {
   try {
-    // Extract email address from "Name <email@domain.com>" format (use [^>]+ to avoid ReDoS)
-    const emailMatch = email.match(/<([^>]+)>/);
-    const emailAddress = emailMatch ? emailMatch[1] : email;
+    const emailAddress = parseEmailFromHeader(email);
 
     // Look up lead by email
     const [lead] = await db

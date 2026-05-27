@@ -17,7 +17,7 @@ export function emitWaitlistEvent(event: WaitlistAnalyticsEvent): void {
       const { eventType, ...eventData } = event;
       
       // Map our event types to Firebase Analytics event names
-      const analyticsEventName = eventType.replace('waitlist_', 'waitlist_');
+      const analyticsEventName = eventType;
       
       // Skip analytics for now to prevent 500 errors
       console.log('Analytics event (disabled):', analyticsEventName, eventData);

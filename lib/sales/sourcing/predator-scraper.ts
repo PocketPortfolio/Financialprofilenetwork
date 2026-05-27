@@ -26,6 +26,24 @@ import { eq } from 'drizzle-orm';
 // Use puppeteer-extra with stealth plugin to bypass Cloudflare
 puppeteerExtra.use(StealthPlugin());
 
+function networkUrlHostEndsWith(url: string, suffix: string): boolean {
+  try {
+    return new URL(url).hostname.endsWith(suffix);
+  } catch {
+    return false;
+  }
+}
+
+function networkUrlPathOrQueryContains(url: string, terms: string[]): boolean {
+  try {
+    const parsed = new URL(url);
+    const haystack = `${parsed.pathname}${parsed.search}`.toLowerCase();
+    return terms.some((term) => haystack.includes(term));
+  } catch {
+    return false;
+  }
+}
+
 // #region Proxy Configuration
 // PROXY: Required for Global Scaling. Format: http://user:pass@host:port
 // Get from BrightData, IPRoyal, Smartproxy, etc.
@@ -334,7 +352,7 @@ async function processCity(
       const postData = request.postData();
       
       // Track all SJP domain requests
-      if (url.includes('sjp.co.uk')) {
+      if (networkUrlHostEndsWith(url, 'sjp.co.uk')) {
         allNetworkRequests.push({
           url: url.substring(0, 300),
           method,
@@ -345,7 +363,7 @@ async function processCity(
       }
       
       // Track API/search requests
-      if (url.includes('api') || url.includes('search') || url.includes('adviser') || url.includes('advisors') || url.includes('find-an-adviser')) {
+      if (networkUrlPathOrQueryContains(url, ['api', 'search', 'adviser', 'advisors', 'find-an-adviser'])) {
         networkRequests.push({
           url: url.substring(0, 300),
           method,
@@ -360,7 +378,7 @@ async function processCity(
       const status = response.status();
       
       // Track all SJP domain responses
-      if (url.includes('sjp.co.uk')) {
+      if (networkUrlHostEndsWith(url, 'sjp.co.uk')) {
         allNetworkRequests.push({
           url: url.substring(0, 300),
           status,
@@ -370,7 +388,7 @@ async function processCity(
       }
       
       // Track API/search responses
-      if (url.includes('api') || url.includes('search') || url.includes('adviser') || url.includes('advisors') || url.includes('find-an-adviser')) {
+      if (networkUrlPathOrQueryContains(url, ['api', 'search', 'adviser', 'advisors', 'find-an-adviser'])) {
         networkRequests.push({
           url: url.substring(0, 300),
           status,

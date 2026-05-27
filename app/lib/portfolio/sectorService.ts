@@ -30,7 +30,7 @@ export async function getSectorClassification(
         return apiResult;
       }
     } catch (error) {
-      console.error(`API classification failed for ${upperTicker}:`, error);
+      console.error('API classification failed', { ticker: upperTicker, error });
       // Fall through to database
     }
   }

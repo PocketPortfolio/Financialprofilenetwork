@@ -296,7 +296,7 @@ function getOrCreateSessionId(): string {
 
   let sessionId = sessionStorage.getItem('ga_session_id');
   if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionId = `session_${Date.now()}_${crypto.randomUUID()}`;
     sessionStorage.setItem('ga_session_id', sessionId);
   }
   return sessionId;

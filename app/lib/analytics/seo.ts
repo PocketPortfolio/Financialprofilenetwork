@@ -12,7 +12,7 @@ function getOrCreateSessionId(): string {
   
   let sessionId = sessionStorage.getItem('pp_session_id');
   if (!sessionId) {
-    sessionId = `pp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionId = `pp_${Date.now()}_${crypto.randomUUID()}`;
     sessionStorage.setItem('pp_session_id', sessionId);
   }
   return sessionId;

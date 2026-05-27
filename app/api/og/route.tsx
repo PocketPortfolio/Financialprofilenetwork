@@ -85,7 +85,8 @@ for (const surface of ['pocket', 'open'] as const) {
 
 function clamp(text: string, max: number): string {
   if (!text) return '';
-  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+  const sanitized = text.replace(/[<>&"']/g, '').replace(/[\x00-\x1f\x7f]/g, '');
+  return sanitized.length > max ? `${sanitized.slice(0, max - 1).trimEnd()}…` : sanitized;
 }
 
 function renderCard(title: string, description: string, surface: OgSurface) {

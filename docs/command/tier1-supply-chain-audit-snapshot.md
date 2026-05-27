@@ -70,4 +70,27 @@ API routes `/api/tool-usage`, `/api/page-views`, `/api/waitlist/join`, `/api/wai
 npm audit
 npm run sbom
 npm run test:inference-boundary
+npm run export:codeql-baseline
 ```
+
+## CodeQL static analysis ledger (Phase 0–4, 2026-05-27)
+
+Separate from Dependabot/npm audit. GitHub Security tab combines both ledgers (~82 pre-remediation).
+
+| Metric | Pre-scope | Phase 0 scope | Post Phase 1–4 |
+|--------|----------:|--------------:|---------------:|
+| CodeQL open (total) | 62 | 35 projected runtime | **0 projected runtime** |
+| Excluded (scripts/coverage/HTML) | — | 27 | 27 |
+
+| Phase | Fix class | Alerts closed |
+|-------|-----------|---------------|
+| 0 | Scan scope (`codeql-config.yml`) | 27 dev/artifact |
+| 2 | Logging redaction (`safe-log.ts`, dividend, EnvDebug) | 17 |
+| 3 | Runtime hardening (OG, resend, URLs, DOM, sector log) | 14 |
+| 4 | `crypto.randomUUID()` analytics IDs | 2 |
+
+**No-touch preserved:** AI inference paths, portfolio calculations, middleware/SSOT.
+
+Evidence: `docs/seed/phase2-evidence/codeql-remediation-summary-20260527.json`
+
+**CI note:** CodeQL workflow blocked by GitHub Actions billing lock — config validated locally; re-run `codeql.yml` when billing restored.

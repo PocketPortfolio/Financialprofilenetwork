@@ -59,7 +59,11 @@ export default function FilePicker({
         if (type.startsWith('.')) {
           return fileName.endsWith(type);
         }
-        return file.type.includes(type.replace('*', ''));
+        if (type.includes('/')) {
+          const mimeBase = type.replace('*', '');
+          return mimeBase.length === 0 || file.type.startsWith(mimeBase);
+        }
+        return file.type === type;
       });
 
       if (!isAccepted) {

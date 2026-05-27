@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-05-27",
+  "branch": "main",
+  "phase": "1-4-complete",
+  "baselineTotalOpen": 62,
+  "phase0Excluded": 27,
+  "runtimeBaselinePreFix": 35,
+  "runtimeAlertsAddressed": 35,
+  "projectedRuntimeOpen": 0,
+  "noTouchPreserved": [
+    "app/api/ai/**",
+    "app/lib/ai/**",
+    "contextBuilder.ts",
+    "portfolioCalculations",
+    "middleware.ts",
+    "lib/canonical-claims.ts"
+  ],
+  "fixesByPhase": {
+    "phase0": "CodeQL path scope — app/, lib/, packages/importer/src/, middleware.ts",
+    "phase2": "safe-log.ts gating + dividend URL redaction + EnvDebug presence-only logging",
+    "phase3": "OG sanitize, resend linear email parse, sectorService log, URL helpers, FilePicker MIME, TickerSearch style, waitlist identity-replacement, predator-scraper URL parser",
+    "phase4": "crypto.randomUUID() for analytics session IDs (conversion.ts, seo.ts)"
+  },
+  "verification": {
+    "lint": "pass",
+    "testInferenceBoundary": "2/2 pass",
+    "canonicalClaims": "34/35 pass — LAST_HUMAN_VERIFIED recency pre-existing (SSOT no-touch)",
+    "codeqlCi": "blocked — GitHub Actions billing lock"
+  }
+}

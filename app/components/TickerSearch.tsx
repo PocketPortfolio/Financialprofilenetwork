@@ -173,16 +173,12 @@ export default function TickerSearch({
 
   return (
     <div ref={searchRef} style={{ position: 'relative', width: '100%', zIndex: 1 }}>
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
+      <style>{`
             .pp-ticker-search-input::placeholder { color: rgba(15, 23, 42, 0.45); }
             @media (prefers-color-scheme: dark) {
               .pp-ticker-search-input::placeholder { color: rgba(255, 255, 255, 0.42); }
             }
-          `,
-        }}
-      />
+          `}</style>
 
       <div style={{ position: 'relative' }}>
         <div
