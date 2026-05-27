@@ -9,7 +9,7 @@ const BOOK_PATH = path.join(process.cwd(), 'docs', 'book', 'UNIVERSAL-LLM-IMPORT
 
 const baseUrl = 'https://www.pocketportfolio.app';
 const bookUrl = `${baseUrl}/book/universal-llm-import`;
-const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Universal LLM Import')}&description=${encodeURIComponent('Building Local-First, Sovereign CSV Ingestion')}&v=6`;
+const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Universal LLM Import')}&description=${encodeURIComponent('Building Local-First, Sovereign CSV Ingestion')}&v=7`;
 
 export const metadata: Metadata = {
   title: 'Universal LLM Import: Building Local-First, Sovereign CSV Ingestion | Pocket Portfolio',

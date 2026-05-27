@@ -9,7 +9,7 @@ const BOOK_PATH = path.join(process.cwd(), 'docs', 'book', 'SOVEREIGN-INTELLIGEN
 
 const baseUrl = 'https://www.pocketportfolio.app';
 const bookUrl = `${baseUrl}/book/sovereign-intelligence`;
-const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Sovereign Intelligence')}&description=${encodeURIComponent('Building Local-First RAG for Finance')}&v=6`;
+const ogImageUrl = `${baseUrl}/api/og?title=${encodeURIComponent('Sovereign Intelligence')}&description=${encodeURIComponent('Building Local-First RAG for Finance')}&v=7`;
 
 export const metadata: Metadata = {
   title: 'Sovereign Intelligence: Building Local-First RAG for Finance | Pocket Portfolio',
