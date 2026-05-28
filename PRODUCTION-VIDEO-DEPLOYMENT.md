@@ -9,7 +9,7 @@
 
 | Clip | Resolution | Local fallback | Cloudinary version | CDN URL |
 |------|------------|----------------|--------------------|---------|
-| **Hero dashboard demo** | 3840×2098 | `public/dashboard-demo-4k.mp4` (~18 MB) | `v1779906039` | `https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906039/pocket-portfolio/dashboard-demo-4k.mp4` |
+| **Hero dashboard demo** | 3840×2098 | `public/dashboard-demo-4k.mp4` (~18 MB) | `v1780002518` | `https://res.cloudinary.com/dknmhvm7a/video/upload/v1780002518/pocket-portfolio/dashboard-demo-4k.mp4` |
 | **Pocket Analyst demo** | 3840×2110 | `public/pocket-analyst-demo.mp4` (~6.6 MB) | `v1779906828` | `https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906828/pocket-portfolio/pocket-analyst-demo.mp4` |
 
 Both encodes: H.264 Main profile, keyframe every 1s, `fastdecode`, `+faststart`, no audio.
@@ -29,7 +29,7 @@ Both encodes: H.264 Main profile, keyframe every 1s, `fastdecode`, `+faststart`,
 ## Vercel environment (already set)
 
 ```
-NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906039/pocket-portfolio/dashboard-demo-4k.mp4
+NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1780002518/pocket-portfolio/dashboard-demo-4k.mp4
 NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906828/pocket-portfolio/pocket-analyst-demo.mp4
 ```
 

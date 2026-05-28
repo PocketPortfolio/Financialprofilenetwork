@@ -23,7 +23,10 @@ import { AnalystVideo } from '../components/landing/AnalystVideo';
 import { LandingProductVideo } from '../components/landing/LandingProductVideo';
 import {
   DASHBOARD_DEMO_ASPECT_RATIO,
-  DASHBOARD_DEMO_VIDEO_SRC,
+  DASHBOARD_DEMO_POSTER,
+  DASHBOARD_DEMO_CACHE_BUST,
+  dashboardDemoLocalSrc,
+  getDashboardDemoVideoSrc,
 } from '../../lib/landing-product-video';
 import ScrollReveal from '../components/ui/ScrollReveal';
 import ProductPortalSection from '../components/pocket-landing/ProductPortalSection';
@@ -133,6 +136,12 @@ export default function LandingPage() {
   const toolsTriggerRef = useRef<HTMLDivElement>(null);
   const toolsCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  /** Client-resolved src: `npm start` on :3003 sets NODE_ENV=production — localhost still uses public MP4. */
+  const [heroVideoSrc, setHeroVideoSrc] = useState(() => getDashboardDemoVideoSrc());
+
+  useEffect(() => {
+    setHeroVideoSrc(getDashboardDemoVideoSrc(window.location.hostname));
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -1336,23 +1345,51 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Dashboard Screenshot - High Fidelity Visual */}
-          <div style={{
-            width: '100%',
-            maxWidth: '900px',
-            marginTop: '72px',
-            borderRadius: '16px',
-            overflow: 'hidden',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 30px rgba(245, 158, 11, 0.2), 0 0 60px rgba(0, 255, 0, 0.15)',
-            border: '2px solid var(--border-warm)',
-            background: 'var(--surface)',
-            position: 'relative'
-          }}>
-            <LandingProductVideo
-              src={DASHBOARD_DEMO_VIDEO_SRC}
-              fallbackSrc="/dashboard-demo-4k.mp4"
-              aspectRatio={DASHBOARD_DEMO_ASPECT_RATIO}
+          {/* Dashboard hero — 4K product demo (CDN + same-origin fallback) */}
+          <div
+            className="group"
+            style={{
+              width: '100%',
+              maxWidth: 'min(1100px, 100%)',
+              marginTop: '72px',
+              position: 'relative',
+            }}
+          >
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                inset: -8,
+                background:
+                  'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(234,88,12,0.12) 50%, rgba(0,255,136,0.1) 100%)',
+                borderRadius: 24,
+                filter: 'blur(16px)',
+                opacity: 0.55,
+                transition: 'opacity 0.35s ease',
+              }}
+              className="group-hover:opacity-80"
             />
+            <div
+              style={{
+                position: 'relative',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                boxShadow:
+                  '0 24px 64px rgba(0, 0, 0, 0.45), 0 0 40px rgba(245, 158, 11, 0.22), 0 0 80px rgba(0, 255, 136, 0.12)',
+                border: '2px solid var(--border-warm)',
+                background: '#050508',
+              }}
+            >
+              <LandingProductVideo
+                src={heroVideoSrc}
+                fallbackSrc={dashboardDemoLocalSrc()}
+                posterSrc={`${DASHBOARD_DEMO_POSTER}?v=${DASHBOARD_DEMO_CACHE_BUST}`}
+                aspectRatio={DASHBOARD_DEMO_ASPECT_RATIO}
+                variant="hero"
+                show4KBadge
+                borderRadius={14}
+              />
+            </div>
           </div>
         </div>
       </main>

@@ -1,7 +1,10 @@
 /** Branded landing-page product videos (3840px wide, web-optimized H.264). */
 
 export const DASHBOARD_DEMO_FALLBACK = '/dashboard-demo-4k.mp4';
-export const DASHBOARD_DEMO_BRANDED_VERSION = 'v1779906039';
+export const DASHBOARD_DEMO_POSTER = '/dashboard-demo-4k-poster.jpg';
+export const DASHBOARD_DEMO_BRANDED_VERSION = 'v1780002518';
+/** Short stamp for query-string cache busting (no `v` prefix). */
+export const DASHBOARD_DEMO_CACHE_BUST = '1780002518';
 export const DASHBOARD_DEMO_CDN_DEFAULT = `https://res.cloudinary.com/dknmhvm7a/video/upload/${DASHBOARD_DEMO_BRANDED_VERSION}/pocket-portfolio/dashboard-demo-4k.mp4`;
 /** 3840×2098 */
 export const DASHBOARD_DEMO_ASPECT_RATIO = '3840 / 2098';
@@ -23,11 +26,39 @@ export function resolveBrandedCloudinaryVideoSrc(
   return cdnDefault;
 }
 
-export const DASHBOARD_DEMO_VIDEO_SRC = resolveBrandedCloudinaryVideoSrc(
-  process.env.NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL,
-  DASHBOARD_DEMO_BRANDED_VERSION,
-  DASHBOARD_DEMO_CDN_DEFAULT,
-);
+/** CDN URL for production (ignores stale env unless version stamp matches). */
+export function resolveDashboardDemoCdnSrc(): string {
+  return resolveBrandedCloudinaryVideoSrc(
+    process.env.NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL,
+    DASHBOARD_DEMO_BRANDED_VERSION,
+    DASHBOARD_DEMO_CDN_DEFAULT,
+  );
+}
+
+/** Cache-busted same-origin path — use in dev so `public/dashboard-demo-4k.mp4` is always authoritative. */
+export function dashboardDemoLocalSrc(): string {
+  return `${DASHBOARD_DEMO_FALLBACK}?v=${DASHBOARD_DEMO_CACHE_BUST}`;
+}
+
+/** True for local smoke tests (`npm start` on localhost) as well as `npm run dev`. */
+export function isLocalPreviewHost(hostname?: string): boolean {
+  const h = hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '');
+  return h === 'localhost' || h === '127.0.0.1';
+}
+
+/**
+ * Primary hero video URL.
+ * - Development: always serves committed `public/dashboard-demo-4k.mp4` (WYSIWYG with encode).
+ * - Production: Cloudinary CDN with version-stamped fallback.
+ */
+export function getDashboardDemoVideoSrc(hostname?: string): string {
+  const useLocal =
+    process.env.NODE_ENV === 'development' || isLocalPreviewHost(hostname);
+  return useLocal ? dashboardDemoLocalSrc() : resolveDashboardDemoCdnSrc();
+}
+
+/** @deprecated Use getDashboardDemoVideoSrc() — kept for imports that expect a string at module scope. */
+export const DASHBOARD_DEMO_VIDEO_SRC = resolveDashboardDemoCdnSrc();
 
 export function resolvePocketAnalystVideoSrc(): string {
   return resolveBrandedCloudinaryVideoSrc(

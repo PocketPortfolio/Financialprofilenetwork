@@ -104,6 +104,7 @@
     "generate:social-logo": "node scripts/generate-social-logo.mjs",
     "generate-post-images": "ts-node --project scripts/tsconfig.json scripts/generate-post-images.ts",
     "upload-gif": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-vercel-blob.ts",
+    "encode:dashboard-hero-4k": "node scripts/encode-dashboard-hero-4k.mjs",
     "upload-gif-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-cloudinary.ts",
     "upload-pocket-analyst-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-pocket-analyst-video-to-cloudinary.ts",
     "upload-gif-s3": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-s3.ts",
