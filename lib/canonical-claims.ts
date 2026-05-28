@@ -659,7 +659,7 @@ export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; ope
   { path: '/learn/local-first', title: 'Local-First', openUrl: OPEN_URLS.localFirst },
   { path: '/learn/vendor-lock-in', title: 'Vendor Lock-In', openUrl: OPEN_URLS.vendorLockIn },
   { path: '/playbooks/sovereign-strike', title: 'Sovereign Strike Playbook', openUrl: OPEN_URLS.sovereignStrike },
-  { path: '/openbrokercsv', title: 'OpenBrokerCSV', openUrl: OPEN_URLS.openBrokerCsv },
+  { path: '/openbrokercsv', title: 'Sovereign Ingestion', openUrl: OPEN_URLS.openBrokerCsv },
   {
     path: '/static/csv-etoro-to-openbrokercsv',
     title: 'eToro → OpenBrokerCSV',
@@ -862,7 +862,7 @@ export const OPEN_LANDING_COPY = {
   pillars: [
     {
       title: 'Sovereign ingestion',
-      body: 'Broker statements are read on the device — 19+ formats, no raw rows through your servers, no surprise data lake for the DPO to discover.',
+      body: 'Broker statements are read on the device — 19+ verified adapters, no raw rows through your servers, no surprise data lake for the DPO to discover.',
       href: '/openbrokercsv',
     },
     {
@@ -907,5 +907,67 @@ export const OPEN_LANDING_COPY = {
     title: 'Bring your mandate. We will meet it with architecture.',
     body: 'Policy, procurement, or engineering — tell us what success looks like. We reply within one working day and route serious institutional conversations to the right track.',
     submitLabel: 'Request a briefing',
+  },
+} as const;
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Sovereign ingestion (B2B) — /openbrokercsv on the O. surface
+// ──────────────────────────────────────────────────────────────────────────────
+//
+// Pocket→Open 301 for this path (next.config.js). Narrative is infrastructure/SDK;
+// Pocket Portfolio remains the adversarial test harness (CSV import on P. only).
+
+/** Verified adapter floor — keep in sync with packages/importer registry + SDK-04. */
+export const VERIFIED_BROKER_ADAPTER_GROUPS: ReadonlyArray<{
+  title: string;
+  brokers: readonly string[];
+}> = [
+  {
+    title: 'US brokers',
+    brokers: ['Charles Schwab', 'Vanguard', 'E*TRADE', 'Fidelity'],
+  },
+  {
+    title: 'UK & EU brokers',
+    brokers: ['Trading212', 'Freetrade', 'DEGIRO', 'IG', 'Saxo', 'Interactive Investor', 'Revolut'],
+  },
+  {
+    title: 'Crypto exchanges',
+    brokers: ['Kraken', 'Binance', 'Coinbase'],
+  },
+  {
+    title: 'Pro & portfolio tools',
+    brokers: ['Interactive Brokers (Flex)', 'Koinly', 'TurboTax', 'Ghostfolio', 'Sharesight'],
+  },
+] as const;
+
+export const OPEN_SOVEREIGN_INGESTION_COPY = {
+  eyebrow: 'B2B · Sovereign ingestion substrate',
+  title: 'Sovereign ingestion',
+  heroBody:
+    'Broker statements are parsed on the device — not warehoused on ours. The MIT-licensed importer ships 19+ deterministic adapters plus Smart Mapping for everything else, with zero raw-row egress through your perimeter.',
+  formatTitle: 'OpenBrokerCSV — the interchange format',
+  formatBody:
+    'OpenBrokerCSV is the normalized ledger we emit after adapter detection. Third parties can target one schema instead of re-implementing every broker dialect.',
+  adaptersTitle: 'Verified broker adapters',
+  adaptersIntro:
+    'Each adapter is tested against real export fixtures. Unknown brokers fall through to column-level Smart Mapping — still client-side, still out of your data lake.',
+  smartImportNote:
+    'eToro, Robinhood, Trade Republic, and dozens of additional brokers are supported via Smart Import when no dedicated adapter is registered yet.',
+  dualSurfaceTitle: 'Two surfaces, one substrate',
+  dualSurfaceIntro:
+    'We do not blur B2B infrastructure with the consumer terminal. Procurement reads here; operators stress-test on Pocket.',
+  openSurfaceLabel: 'Open Portfolio (this page)',
+  openSurfaceBody:
+    'SDK packages, design partnership, Tier 1 programmes, and procurement narrative for regulated builders.',
+  pocketSurfaceLabel: 'Pocket Portfolio — adversarial test harness',
+  pocketSurfaceBody:
+    'Thousands of real CSVs, messy headers, and everyday edge cases run through the same parsers in production — before your audit.',
+  pocketImportPath: '/import',
+  cta: {
+    npm: 'View on npm',
+    github: 'View source',
+    designChallenge: 'Design Challenge',
+    tier1: 'Tier 1 Design Partnership',
+    sovereignStack: 'The Sovereign Stack',
   },
 } as const;
