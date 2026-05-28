@@ -2384,7 +2384,7 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to API Error Responses",
     "slug": "the-complete-guide-to-api-error-responses",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2392,7 +2392,8 @@
       "ses",
       "complete",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-05-28T14:00:46.989Z"
   },
   {
     "id": "how-to-how-to-build-a-graphql-dataloader-may-29",
