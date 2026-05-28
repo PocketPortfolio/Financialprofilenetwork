@@ -6,8 +6,13 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useTrades } from '@/app/hooks/useTrades';
 import { useQuotes } from '@/app/hooks/useDataFetching';
 import AlertModal from '@/app/components/modals/AlertModal';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import AdvisorPortfolioReport from './AdvisorPortfolioReport';
+import {
+  downloadPortfolioReportPdf,
+  type PortfolioReportInput,
+} from '@/app/lib/advisors/generate-portfolio-report-pdf';
+import { loadImageNaturalSize } from '@/app/lib/advisors/logo-fit';
+import { formatReportDate } from '@/app/lib/advisors/sovereign-report-theme';
 import { 
   trackToolPageView, 
   trackToolInteraction, 
@@ -49,7 +54,6 @@ export default function AdvisorTool() {
     type: 'info'
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const reportPreviewRef = useRef<HTMLDivElement>(null);
 
   // Calculate positions from real trades (filter out mock trades)
   const realTrades = useMemo(() => {
@@ -399,18 +403,6 @@ export default function AdvisorTool() {
     return portfolioData;
   }, [portfolioData, clientName]);
 
-  // Format currency symbol
-  const formatCurrency = (value: number, currency: string = 'GBP') => {
-    const symbols: { [key: string]: string } = {
-      'GBP': '£',
-      'USD': '$',
-      'EUR': '€',
-      'JPY': '¥'
-    };
-    const symbol = symbols[currency] || currency;
-    return `${symbol}${value.toLocaleString()}`;
-  };
-
   const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -474,74 +466,35 @@ export default function AdvisorTool() {
       return;
     }
 
-    if (!reportPreviewRef.current) {
-      setAlertModal({
-        isOpen: true,
-        title: 'Error',
-        message: 'Report preview not found. Please refresh the page and try again.',
-        type: 'error'
-      });
-      return;
-    }
-
     try {
-      // Track PDF generation attempt
       trackToolInteraction('advisor_tool', 'logo_upload', {
         hasCorporateLicense: true,
-        hasLogo: !!logo
+        hasLogo: !!logo,
       });
 
-      // Show loading state
       setAlertModal({
         isOpen: true,
         title: 'Generating PDF',
-        message: 'Please wait while we generate your high-resolution PDF...',
-        type: 'info'
+        message: 'Building your institutional-grade portfolio report…',
+        type: 'info',
       });
 
-      const element = reportPreviewRef.current;
-      
-      // Generate canvas from HTML with high quality settings
-      const canvas = await html2canvas(element, {
-        scale: 2, // Higher quality (2x resolution)
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#0b0d10', // Dark background to match theme
-        width: element.scrollWidth,
-        height: element.scrollHeight,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
-      });
+      const firmLogoNaturalSize = logo ? await loadImageNaturalSize(logo) : null;
 
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      
-      // Calculate PDF dimensions (A4 format)
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
+      const reportPayload: PortfolioReportInput = {
+        clientName: displayData.clientName,
+        reportDate: formatReportDate(),
+        totalValue: displayData.totalValue,
+        primaryCurrency: displayData.primaryCurrency || 'GBP',
+        positions: displayData.positions,
+        firmLogoDataUrl: logo,
+        firmLogoNaturalSize,
+        showWatermark: false,
+      };
 
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Add additional pages if content is taller than one page
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      // Generate filename
       const filename = `portfolio-report-${displayData.clientName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
-      
-      // Download PDF
-      pdf.save(filename);
+
+      await downloadPortfolioReportPdf(reportPayload, filename);
 
       // Track success
       trackToolSuccess('advisor_tool', {
@@ -577,7 +530,7 @@ export default function AdvisorTool() {
         type: 'error'
       });
     }
-  }, [hasCorporateLicense, logo, displayData.clientName]);
+  }, [hasCorporateLicense, logo, displayData]);
 
   return (
     <>
@@ -634,14 +587,17 @@ export default function AdvisorTool() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
           {logo ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-              <img 
-                src={logo} 
-                alt="Firm Logo" 
+              <img
+                src={logo}
+                alt="Firm Logo"
                 style={{
                   height: '64px',
                   width: 'auto',
-                  maxWidth: '300px',
-                  objectFit: 'contain'
+                  maxWidth: '280px',
+                  objectFit: 'contain',
+                  objectPosition: 'left center',
+                  display: 'block',
+                  flexShrink: 0,
                 }}
               />
               <button
@@ -709,217 +665,52 @@ export default function AdvisorTool() {
         </p>
       </div>
 
-      {/* PDF Preview */}
+      {/* Sovereign report preview — matches vector PDF export */}
       <div style={{ marginBottom: 'var(--space-8)' }}>
-        <h3 style={{
-          fontSize: 'var(--font-size-lg)',
-          fontWeight: 'var(--font-semibold)',
-          color: 'var(--text)',
-          marginBottom: 'var(--space-4)'
-        }}>
+        <h3
+          style={{
+            fontSize: 'var(--font-size-lg)',
+            fontWeight: 'var(--font-semibold)',
+            color: 'var(--text)',
+            marginBottom: 'var(--space-2)',
+          }}
+        >
           Live Report Preview
         </h3>
-        <div
-          ref={reportPreviewRef}
-          className="advisor-download-preview"
-          style={{ position: 'relative' }}
+        <p
+          style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--text-secondary)',
+            marginBottom: 'var(--space-4)',
+            maxWidth: '640px',
+          }}
         >
-          {/* Report Header */}
-          <div style={{
-            marginBottom: 'var(--space-6)',
-            paddingBottom: 'var(--space-4)',
-            borderBottom: '1px solid var(--border)'
-          }}>
-            {logo ? (
-              <img 
-                src={logo} 
-                alt="Firm Logo" 
-                style={{
-                  height: '48px',
-                  width: 'auto',
-                  marginBottom: 'var(--space-2)'
-                }}
-              />
-            ) : (
-              <div style={{
-                fontSize: 'var(--font-size-2xl)',
-                fontWeight: 'var(--font-bold)',
-                color: 'var(--signal)',
-                marginBottom: 'var(--space-2)'
-              }}>
-                Pocket Portfolio
-              </div>
-            )}
-            <h3 style={{
-              fontSize: 'var(--font-size-2xl)',
-              fontWeight: 'var(--font-bold)',
-              color: 'var(--text)',
-              marginBottom: 'var(--space-1)'
-            }}>
-              Portfolio Report
-            </h3>
-            <p style={{
-              color: 'var(--text-secondary)',
-              fontSize: 'var(--font-size-sm)'
-            }}>
-              {displayData.clientName} • {new Date().toLocaleDateString()}
-            </p>
-          </div>
-
-          {/* Portfolio Summary */}
-          <div style={{ marginBottom: 'var(--space-6)' }}>
-            <h4 style={{
-              fontSize: 'var(--font-size-lg)',
-              fontWeight: 'var(--font-semibold)',
-              color: 'var(--text)',
-              marginBottom: 'var(--space-3)'
-            }}>
-              Portfolio Summary
-            </h4>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 'var(--space-4)'
-            }}>
-              <div>
-                <p style={{
-                  fontSize: 'var(--font-size-sm)',
-                  color: 'var(--text-secondary)',
-                  marginBottom: 'var(--space-1)'
-                }}>
-                  Total Value
-                </p>
-                <p style={{
-                  fontSize: 'var(--font-size-2xl)',
-                  fontWeight: 'var(--font-bold)',
-                  color: 'var(--text)'
-                }}>
-                  {formatCurrency(displayData.totalValue, displayData.primaryCurrency || 'GBP')}
-                </p>
-              </div>
-              <div>
-                <p style={{
-                  fontSize: 'var(--font-size-sm)',
-                  color: 'var(--text-secondary)',
-                  marginBottom: 'var(--space-1)'
-                }}>
-                  Positions
-                </p>
-                <p style={{
-                  fontSize: 'var(--font-size-2xl)',
-                  fontWeight: 'var(--font-bold)',
-                  color: 'var(--text)'
-                }}>
-                  {displayData.positions.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Holdings Table */}
-          <div>
-            <h4 style={{
-              fontSize: 'var(--font-size-lg)',
-              fontWeight: 'var(--font-semibold)',
-              color: 'var(--text)',
-              marginBottom: 'var(--space-3)'
-            }}>
-              Holdings
-            </h4>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', fontSize: 'var(--font-size-sm)' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    <th style={{
-                      textAlign: 'left',
-                      padding: 'var(--space-2) 0',
-                      color: 'var(--text)',
-                      fontWeight: 'var(--font-semibold)'
-                    }}>
-                      Ticker
-                    </th>
-                    <th style={{
-                      textAlign: 'right',
-                      padding: 'var(--space-2) 0',
-                      color: 'var(--text)',
-                      fontWeight: 'var(--font-semibold)'
-                    }}>
-                      Shares
-                    </th>
-                    <th style={{
-                      textAlign: 'right',
-                      padding: 'var(--space-2) 0',
-                      color: 'var(--text)',
-                      fontWeight: 'var(--font-semibold)'
-                    }}>
-                      Value
-                    </th>
-                    <th style={{
-                      textAlign: 'right',
-                      padding: 'var(--space-2) 0',
-                      color: 'var(--text)',
-                      fontWeight: 'var(--font-semibold)'
-                    }}>
-                      Allocation
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayData.positions.map((position, index) => (
-                    <tr key={index} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{
-                        padding: 'var(--space-2) 0',
-                        fontWeight: 'var(--font-semibold)',
-                        color: 'var(--text)'
-                      }}>
-                        {position.ticker}
-                      </td>
-                      <td style={{
-                        padding: 'var(--space-2) 0',
-                        textAlign: 'right',
-                        color: 'var(--text)'
-                      }}>
-                        {position.shares}
-                      </td>
-                      <td style={{
-                        padding: 'var(--space-2) 0',
-                        textAlign: 'right',
-                        color: 'var(--text)'
-                      }}>
-                        {formatCurrency(position.value, position.currency || displayData.primaryCurrency || 'GBP')}
-                      </td>
-                      <td style={{
-                        padding: 'var(--space-2) 0',
-                        textAlign: 'right',
-                        color: 'var(--text)'
-                      }}>
-                        {position.allocation}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Watermark (for free preview) */}
-          {!hasCorporateLicense && (
-            <div style={{
-              marginTop: 'var(--space-6)',
-              paddingTop: 'var(--space-4)',
-              borderTop: '1px solid var(--border)',
-              textAlign: 'center'
-            }}>
-              <p style={{
-                fontSize: 'var(--font-size-xs)',
-                color: 'var(--text-secondary)',
-                fontStyle: 'italic'
-              }}>
-                Preview Only - Watermark removed with Corporate License
-              </p>
-            </div>
-          )}
+          Institutional print layout (obsidian / amber). Corporate License exports the same design as
+          crisp vector PDF — not a screen screenshot.
+        </p>
+        <div className="advisor-sovereign-report-wrap">
+          <AdvisorPortfolioReport
+            clientName={displayData.clientName}
+            reportDate={formatReportDate()}
+            totalValue={displayData.totalValue}
+            primaryCurrency={displayData.primaryCurrency || 'GBP'}
+            positions={displayData.positions}
+            firmLogoDataUrl={logo}
+            showWatermark={!hasCorporateLicense}
+          />
         </div>
+        {!hasCorporateLicense && (
+          <p
+            style={{
+              marginTop: 'var(--space-3)',
+              fontSize: 'var(--font-size-xs)',
+              color: 'var(--text-secondary)',
+              textAlign: 'center',
+            }}
+          >
+            Preview watermark removed with Corporate License
+          </p>
+        )}
       </div>
 
       {/* Download Button */}

@@ -92,9 +92,10 @@
   font-weight: var(--font-semibold);
 }
 
-.advisor-download-preview {
-  border: 2px solid var(--border);
+/** Outer chrome for sovereign A4 report preview (inner surface is always obsidian). */
+.advisor-sovereign-report-wrap {
+  padding: var(--space-4);
   border-radius: var(--radius-md);
-  padding: var(--space-6);
-  background: var(--surface-elevated);
+  border: 1px solid color-mix(in srgb, var(--accent-warm) 35%, var(--border));
+  background: color-mix(in srgb, var(--bg) 92%, #09090b);
 }
