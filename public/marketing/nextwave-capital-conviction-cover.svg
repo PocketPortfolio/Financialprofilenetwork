@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    
+    <pattern id="gridCap" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#f59e0b" stroke-width="0.35" opacity="0.035"/>
+    </pattern>
+    
+    <pattern id="gridConv" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#f59e0b" stroke-width="0.35" opacity="0.055"/>
+    </pattern>
+    <linearGradient id="splitEdge" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0"/>
+      <stop offset="40%" style="stop-color:#f59e0b;stop-opacity:0.85"/>
+      <stop offset="60%" style="stop-color:#f59e0b;stop-opacity:0.85"/>
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#09090b"/>
+  <rect x="0" y="0" width="600" height="630" fill="url(#gridCap)"/>
+  <rect x="600" y="0" width="600" height="630" fill="url(#gridConv)"/>
+  <text x="40" y="320" fill="#27272a" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="8" opacity="0.28" text-anchor="middle" transform="rotate(-90 40 320)">4.7B</text><text x="1160" y="320" fill="#27272a" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="8" opacity="0.28" text-anchor="middle" transform="rotate(90 1160 320)">£7B</text>
+
+  <rect x="24" y="24" width="1152" height="582" rx="4" fill="none" stroke="#27272a" stroke-width="1.5"/>
+
+  
+  <rect x="36" y="40" width="1128" height="104" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/>
+  <text x="44" y="62" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start" letter-spacing="0.12em">EDGE MATRIX LAYER</text>
+  <text x="1156" y="62" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="end">MCR-2026.05</text>
+  <text x="44" y="90" fill="#52525b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="700" text-anchor="start" letter-spacing="0.1em">CAPITAL</text>
+  <line x1="152" y1="86" x2="976" y2="86" stroke="#3f3f46" stroke-width="2"/>
+  <rect x="160" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="232" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="304" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="384" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="456" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="528" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="600" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="672" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="744" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="824" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="896" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="968" y="76" width="8" height="10" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/>
+  <polygon points="976,81 984,86 976,91" fill="#52525b"/>
+  <text x="1156" y="90" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="end">PERSISTENT ASSET RISK</text>
+  <text x="44" y="120" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="700" text-anchor="start" letter-spacing="0.1em">CONVICTION</text>
+  <path d="M 152 116 C 399.2 112, 605.2 120, 811.2 114 976 116" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="400" cy="112" r="3" fill="#f59e0b"/><circle cx="608" cy="120" r="3" fill="#f59e0b"/><circle cx="808" cy="114" r="3" fill="#f59e0b"/>
+  <polygon points="976,111 984,116 976,121" fill="#f59e0b"/>
+  <text x="1156" y="120" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="end">NAVIGATOR SUBSTRATE</text>
+
+  <line x1="24" y1="248" x2="1176" y2="248" stroke="#f59e0b" stroke-width="1" opacity="0.35"/>
+
+  <text x="52" y="156" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="10" font-weight="600" text-anchor="start" letter-spacing="0.14em">TECH NATION NEXT WAVE 2026 · SISTERS · RENOLD BUILDING · MANCHESTER</text>
+  <text x="52" y="180" fill="#f4f4f5" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="28" font-weight="700" text-anchor="start">Capital vs. Conviction</text>
+  <text x="52" y="212" fill="#a1a1aa" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="400" text-anchor="start">Funding the Person, Not the Plan — Panel Validated</text>
+  <text x="1148" y="212" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" font-weight="700" text-anchor="end" letter-spacing="0.1em">32A ALTRINCHAM ST · M1 7JR · UNITED KINGDOM</text>
+  <text x="52" y="236" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9">
+    <tspan fill="#8b8b96">PANEL:</tspan>
+    <tspan fill="#8b8b96">  </tspan>
+    <tspan fill="#f59e0b">Sarah Finegan · Antler</tspan>
+    <tspan fill="#27272a">  │  </tspan>
+    <tspan fill="#8b8b96">Adam Lovell · Mercia</tspan>
+    <tspan fill="#27272a">  │  </tspan>
+    <tspan fill="#8b8b96">George Mensah · SVV</tspan>
+    <tspan fill="#27272a">  │  </tspan>
+    <tspan fill="#8b8b96">Alex Hazell · HSBC Innovation Banking</tspan>
+  </text>
+
+  <line x1="600" y1="264" x2="600" y2="508" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="598" y="264" width="4" height="244" fill="url(#splitEdge)" opacity="0.3"/>
+
+  
+  <rect x="40" y="256" width="548" height="260" rx="6" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/>
+  
+  <text x="56" y="290" fill="#52525b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="700" text-anchor="start" letter-spacing="0.08em">CAPITAL</text>
+  <text x="56" y="310" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="10" text-anchor="start">blunt instrument · depreciating asset class</text>
+  <text x="56" y="326" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="10" text-anchor="start">fixed map · legacy anchor · locked estates</text>
+  <line x1="56" y1="352" x2="572" y2="352" stroke="#27272a" stroke-width="1" opacity="0.6"/>
+  <rect x="56" y="360" width="116" height="76" rx="4" fill="none" stroke="#27272a" stroke-width="1" opacity="0.5"/>
+  <rect x="56" y="360" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="76" y="360" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="96" y="360" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="116" y="360" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="136" y="360" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="156" y="360" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="56" y="380" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="76" y="380" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="96" y="380" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="116" y="380" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="136" y="380" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="156" y="380" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="56" y="400" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="76" y="400" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="96" y="400" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="116" y="400" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="136" y="400" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="156" y="400" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="56" y="420" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="76" y="420" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="96" y="420" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="116" y="420" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="136" y="420" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/><rect x="156" y="420" width="16" height="16" fill="#18181b" stroke="#3f3f46" stroke-width="0.5"/>
+  
+  <rect x="200" y="360" width="372" height="40" rx="4" fill="#141414" stroke="#3f3f46" stroke-width="1"/>
+  <text x="212" y="384" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">LEGACY_CLOUD_DB</text>
+  <rect x="536" y="370" width="20" height="20" rx="2" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
+  <text x="546" y="384" fill="#52525b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" text-anchor="middle">⊡</text>
+  <rect x="200" y="406" width="372" height="40" rx="4" fill="#141414" stroke="#3f3f46" stroke-width="1"/>
+  <text x="212" y="430" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">STATIC_PLAN_v1</text>
+  <rect x="536" y="416" width="20" height="20" rx="2" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
+  <text x="546" y="430" fill="#52525b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" text-anchor="middle">⊡</text>
+  <rect x="200" y="452" width="372" height="40" rx="4" fill="#141414" stroke="#3f3f46" stroke-width="1"/>
+  <text x="212" y="476" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">SUNK_COST_SUITE</text>
+  <rect x="536" y="462" width="20" height="20" rx="2" fill="#18181b" stroke="#3f3f46" stroke-width="1"/>
+  <text x="546" y="476" fill="#52525b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" text-anchor="middle">⊡</text>
+  <text x="56" y="502" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">fund the machine → roadmap decay</text>
+  
+  <rect x="612" y="256" width="548" height="260" rx="6" fill="#141414" stroke="#f59e0b" stroke-width="1"/>
+  
+  <text x="628" y="290" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="700" text-anchor="start" letter-spacing="0.08em">CONVICTION</text>
+  <text x="628" y="310" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="10" text-anchor="start">navigator substrate · rapid prototyping loop</text>
+  <text x="628" y="326" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="10" text-anchor="start">fund the person · inspectable innovation</text>
+  <line x1="628" y1="352" x2="1144" y2="352" stroke="#27272a" stroke-width="1" opacity="0.6"/>
+  
+  <rect x="628" y="368" width="256" height="24" rx="4" fill="rgba(245,158,11,0.14)" stroke="#f59e0b" stroke-width="1"/>
+  <circle cx="638" cy="380" r="3" fill="#f59e0b"/>
+  <text x="646" y="384" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">contextBuilder.ts</text>
+  <rect x="892" y="368" width="256" height="24" rx="4" fill="rgba(245,158,11,0.14)" stroke="#f59e0b" stroke-width="1"/>
+  <circle cx="902" cy="380" r="3" fill="#f59e0b"/>
+  <text x="910" y="384" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">@pocket-portfolio/importer</text>
+  <rect x="628" y="400" width="256" height="24" rx="4" fill="rgba(245,158,11,0.14)" stroke="#f59e0b" stroke-width="1"/>
+  <circle cx="638" cy="412" r="3" fill="#f59e0b"/>
+  <text x="646" y="416" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">stateless /api/ai/chat</text>
+  <rect x="892" y="400" width="256" height="24" rx="4" fill="rgba(245,158,11,0.14)" stroke="#f59e0b" stroke-width="1"/>
+  <circle cx="902" cy="412" r="3" fill="#f59e0b"/>
+  <text x="910" y="416" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">data minimisation</text>
+  <rect x="628" y="448" width="516" height="40" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/>
+  <text x="640" y="462" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">POCKET × OPEN · client-side aggregation by construction</text>
+  <text x="640" y="480" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">open-source ingest primitives · no rigid closed-source estate</text>
+  <text x="628" y="502" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start">fund the navigator → conviction compounds</text>
+
+  <line x1="52" y1="528" x2="1148" y2="528" stroke="#27272a" stroke-width="1"/>
+  <text x="52" y="548" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="600" text-anchor="start">#nextwave2026</text><text x="224" y="548" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="600" text-anchor="start">#sovereign-infra</text><text x="396" y="548" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="600" text-anchor="start">#manchester-hub</text><text x="568" y="548" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="11" font-weight="600" text-anchor="start">@pocket-portfolio</text>
+  <text x="52" y="602" fill="#8b8b96" font-family="Consolas, Courier New, Menlo, Liberation Mono, monospace" font-size="9" text-anchor="start" letter-spacing="0.04em">POCKET PORTFOLIO × OPEN PORTFOLIO · SALFORD HQ · #sovereignAI #fintech #datacognition</text>
+</svg>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#f59e0b" stroke-width="0.3" opacity="0.06"/>
+    </pattern>
+    <linearGradient id="glow" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.06"/>
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#09090b"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  <rect width="100%" height="100%" fill="url(#glow)"/>
+  <rect x="24" y="24" width="1152" height="582" rx="4" fill="none" stroke="#27272a" stroke-width="1.5"/>
+  <line x1="24" y1="96" x2="1176" y2="96" stroke="#f59e0b" stroke-width="1" opacity="0.45"/>
+  <text x="48" y="72" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="10" font-weight="600" letter-spacing="0.2em">SOVEREIGN INGESTION · PART 01</text>
+  <text x="48" y="152" fill="#f4f4f5" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="700">Invariant boundaries</text>
+  <text x="48" y="188" fill="#a1a1aa" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="14">One deployment · host-aware dual surface</text>
+  
+  <line x1="600" y1="230" x2="600" y2="540" stroke="#f59e0b" stroke-width="2" opacity="0.85"/>
+  <text x="600" y="218" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700" text-anchor="middle" letter-spacing="0.12em">MIDDLEWARE</text>
+  <rect x="48" y="250" width="520" height="270" rx="6" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/>
+  <text x="68" y="286" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="11" font-weight="700">POCKET · B2C</text>
+  <text x="68" y="312" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">www.pocketportfolio.app</text>
+  <text x="68" y="340" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">app/landing · dashboard harness</text>
+  <rect x="632" y="250" width="520" height="270" rx="6" fill="#141414" stroke="#f59e0b" stroke-width="1"/>
+  <text x="652" y="286" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="11" font-weight="700">OPEN · B2B</text>
+  <text x="652" y="312" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">www.openportfolio.co.uk</text>
+  <text x="652" y="340" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">app/open/* rewrite · 308 canonical</text>
+  <text x="48" y="598" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" letter-spacing="0.06em">POCKET PORTFOLIO · SOVEREIGN INGESTION &amp; STATELESS INFERENCE</text>
+</svg>

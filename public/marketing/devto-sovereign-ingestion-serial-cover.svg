@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#f59e0b" stroke-width="0.35" opacity="0.05"/>
+    </pattern>
+    <linearGradient id="edgeGlow" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0"/>
+      <stop offset="45%" style="stop-color:#f59e0b;stop-opacity:0.85"/>
+      <stop offset="55%" style="stop-color:#f59e0b;stop-opacity:0.85"/>
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#09090b"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  <rect x="24" y="24" width="1152" height="582" rx="4" fill="none" stroke="#27272a" stroke-width="1.5"/>
+  <line x1="24" y1="96" x2="1176" y2="96" stroke="#f59e0b" stroke-width="1" opacity="0.4"/>
+
+  <text x="48" y="72" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="10" font-weight="600" letter-spacing="0.18em">DEV.TO · SERIES CONSOLIDATION</text>
+  <text x="48" y="148" fill="#f4f4f5" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="700">Sovereign Ingestion &amp;</text>
+  <text x="48" y="188" fill="#f4f4f5" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="700">Stateless Inference</text>
+
+  <rect x="48" y="228" width="540" height="320" rx="6" fill="#141414" stroke="#27272a" stroke-width="1"/>
+  <line x1="318" y1="248" x2="318" y2="528" stroke="url(#edgeGlow)" stroke-width="2"/>
+  <text x="68" y="262" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="10" font-weight="700">POCKET · harness</text>
+  <text x="338" y="262" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="10" font-weight="700">OPEN · gateway</text>
+  <text x="68" y="290" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">middleware.ts · one monorepo</text>
+  <text x="68" y="320" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">contextBuilder → /api/ai/chat</text>
+  <text x="68" y="350" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">@pocket-portfolio/importer (MIT)</text>
+  <rect x="68" y="380" width="220" height="140" rx="4" fill="#0a0a0a" stroke="rgba(245,158,11,0.4)" stroke-width="1"/>
+  <text x="88" y="412" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">BOUNDED CONTEXT</text>
+  <text x="88" y="434" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">totals + top-N only</text>
+  <rect x="308" y="380" width="260" height="140" rx="4" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1"/>
+  <text x="328" y="412" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="8" font-weight="700">CLONE-AND-GREP MOAT</text>
+  <text x="328" y="434" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">calibration ledger SSOT</text>
+  <text x="328" y="456" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="9">deploy gates · llms.txt</text>
+
+  <rect x="620" y="228" width="128" height="52" rx="4" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1"/><text x="634" y="250" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 01</text><text x="634" y="268" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">boundaries</text><rect x="758" y="228" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="772" y="250" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 02</text><text x="772" y="268" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">sanitization</text><rect x="896" y="228" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="910" y="250" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 03</text><text x="910" y="268" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">inference</text><rect x="1034" y="228" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="1048" y="250" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 04</text><text x="1048" y="268" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">persistence</text><rect x="620" y="290" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="634" y="312" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 05</text><text x="634" y="330" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">importer</text><rect x="758" y="290" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="772" y="312" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 06</text><text x="772" y="330" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">harness</text><rect x="896" y="290" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="910" y="312" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 07</text><text x="910" y="330" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">economics</text><rect x="1034" y="290" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="1048" y="312" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 08</text><text x="1048" y="330" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">compliance</text><rect x="620" y="352" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="634" y="374" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 09</text><text x="634" y="392" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">search moat</text><rect x="758" y="352" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="772" y="374" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 10</text><text x="772" y="392" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">prod gates</text><rect x="896" y="352" width="128" height="52" rx="4" fill="#0a0a0a" stroke="#27272a" stroke-width="1"/><text x="910" y="374" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 11</text><text x="910" y="392" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">terminal UX</text><rect x="1034" y="352" width="128" height="52" rx="4" fill="rgba(245,158,11,0.12)" stroke="#f59e0b" stroke-width="1"/><text x="1048" y="374" fill="#f59e0b" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" font-weight="700">PART 12</text><text x="1048" y="392" fill="#a1a1aa" font-family="Consolas, Courier New, Menlo, monospace" font-size="8">workflow</text>
+
+  <text x="48" y="602" fill="#71717a" font-family="Consolas, Courier New, Menlo, monospace" font-size="9" letter-spacing="0.05em">POCKET PORTFOLIO · CODERLEGION · OPEN PORTFOLIO</text>
+</svg>
