@@ -1,167 +1,184 @@
 'use client';
 
-import { TrendingUp, TrendingDown } from 'lucide-react';
-import { useState } from 'react';
+import type { ClientBriefingState } from '@/app/hooks/useClientBriefing';
 
-interface BriefProps {
-  netWorthChange: number; // e.g., 2.4
-  topMover: { symbol: string; change: number };
+const MONO =
+  'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace';
+
+interface MorningBriefProps {
+  briefing: ClientBriefingState;
 }
 
-export function MorningBrief({ netWorthChange, topMover }: BriefProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const sentiment = netWorthChange >= 0 ? 'Bullish' : 'Bearish';
-  // Use --destructive for bearish: tokens.css overwrites --danger with a hex (#ef4444), which breaks hsl(var(--danger)).
-  const sentimentColor = netWorthChange >= 0 ? 'hsl(var(--accent))' : 'hsl(var(--destructive))';
-  const sentimentBg =
-    netWorthChange >= 0 ? 'hsl(var(--accent) / 0.1)' : 'hsl(var(--destructive) / 0.1)';
-  const sentimentBorder =
-    netWorthChange >= 0 ? 'hsl(var(--accent) / 0.2)' : 'hsl(var(--destructive) / 0.2)';
-  
-  const analysisText = `Your portfolio is ${netWorthChange >= 0 ? 'outperforming' : 'lagging'} the market today. Performance is primarily driven by ${topMover.symbol} moving ${topMover.change > 0 ? '+' : ''}${topMover.change.toFixed(2)}% intraday. Sector exposure remains balanced.`;
-  const truncatedText = analysisText.length > 120 ? analysisText.substring(0, 120) + '...' : analysisText;
-
+function BriefingSkeleton() {
   return (
-    <section className="dashboard-card" data-tour="morning-brief">
-      {/* 🧠 PULITZER BRANDING HEADER */}
-      <div style={{
+    <ul
+      style={{
+        listStyle: 'none',
+        margin: 0,
+        padding: 0,
         display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        marginBottom: '16px'
-      }}>
-        <span style={{ fontSize: '16px' }}>🧠</span>
-        <h3 style={{
-          fontSize: '12px',
-          fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-          color: 'hsl(var(--accent))',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          margin: 0,
-          fontWeight: '600'
-        }}>
-          Pulitzer AI • Autonomous Brief
-        </h3>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: typeof window !== 'undefined' && window.innerWidth >= 768 ? 'auto 1fr auto' : '1fr',
-        gap: '16px',
-        alignItems: 'start'
-      }}>
-        {/* LEFT: Daily Sentiment Badge */}
-        <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            background: sentimentBg,
-            border: `1px solid ${sentimentBorder}`
-          }}>
-            <div
-              aria-hidden
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: sentimentColor,
-                boxShadow:
-                  netWorthChange >= 0
-                    ? '0 0 10px hsl(var(--accent) / 0.5)'
-                    : '0 0 10px hsl(var(--destructive) / 0.5)',
-                animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              }}
-            />
-            <span style={{
-              fontSize: '12px',
-              fontWeight: '600',
-              color: sentimentColor,
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              {sentiment}
-            </span>
-          </div>
-        </div>
-
-        {/* MIDDLE: Analysis Text */}
-        <div>
-          <p style={{
-            fontSize: '14px',
-            color: 'hsl(var(--muted-foreground))',
-            fontWeight: '300',
-            lineHeight: '1.6',
-            margin: 0
-          }}>
-            {isExpanded ? analysisText : truncatedText}
-            {analysisText.length > 120 && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                style={{
-                  marginLeft: '8px',
-                  color: 'hsl(var(--accent))',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                {isExpanded ? 'Read Less' : 'Read More'}
-              </button>
-            )}
-          </p>
-        </div>
-
-        {/* RIGHT: Key Metrics */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', marginBottom: '4px' }}>Top Mover</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{
-                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                fontWeight: '700',
-                color: 'hsl(var(--foreground))'
-              }}>
-                {topMover.symbol}
-              </span>
-              <span style={{
-                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                fontSize: '14px',
-                color: topMover.change >= 0 ? 'hsl(var(--accent))' : 'hsl(var(--destructive))'
-              }}>
-                {topMover.change > 0 ? '+' : ''}{topMover.change.toFixed(2)}%
-              </span>
-              {topMover.change >= 0 ? (
-                <TrendingUp style={{ width: '16px', height: '16px', color: 'hsl(var(--accent))' }} />
-              ) : (
-                <TrendingDown style={{ width: '16px', height: '16px', color: 'hsl(var(--destructive))' }} />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* SOURCE FOOTER */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        fontSize: '11px',
-        color: 'hsl(var(--muted-foreground))',
-        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-        marginTop: '16px',
-        paddingTop: '12px',
-        borderTop: `1px solid hsl(var(--border))`
-      }}>
-        <span>SOURCE: REAL-TIME MARKET DATA</span>
-        <span>•</span>
-        <span>VERIFIED BY POCKET PORTFOLIO</span>
-      </div>
-    </section>
+        flexDirection: 'column',
+        gap: '12px',
+        minHeight: '120px',
+      }}
+    >
+      {[1, 2, 3].map((i) => (
+        <li key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: 'var(--accent-warm)',
+              marginTop: '6px',
+              flexShrink: 0,
+              opacity: 0.5,
+            }}
+          />
+          <div
+            style={{
+              flex: 1,
+              height: '14px',
+              borderRadius: '4px',
+              background: 'color-mix(in srgb, var(--accent-warm) 18%, var(--surface-elevated))',
+              border: '1px solid var(--dashboard-chrome-border-subtle)',
+              animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              width: i === 2 ? '92%' : '100%',
+            }}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }
 
+export function MorningBrief({ briefing }: MorningBriefProps) {
+  const sourceLabel =
+    briefing.status === 'ready'
+      ? 'SOURCE: POCKET ANALYST · STATELESS INFERENCE'
+      : briefing.status === 'fallback'
+        ? 'SOURCE: OFFLINE SUMMARY'
+        : briefing.status === 'loading'
+          ? 'GENERATING CLIENT BRIEF…'
+          : '';
+
+  const bullets =
+    briefing.status === 'ready'
+      ? briefing.bullets
+      : briefing.status === 'fallback'
+        ? briefing.bullets
+        : [];
+
+  return (
+    <section
+      className="dashboard-card"
+      data-tour="morning-brief"
+      style={{
+        marginBottom: '24px',
+        padding: '20px',
+        border: '1px solid var(--dashboard-chrome-border-subtle)',
+        background:
+          'linear-gradient(135deg, color-mix(in srgb, var(--surface) 88%, transparent) 0%, var(--surface) 100%)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        minHeight: '160px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginBottom: '16px',
+        }}
+      >
+        <span style={{ fontSize: '16px' }} aria-hidden>
+          ◈
+        </span>
+        <h3
+          style={{
+            fontSize: '12px',
+            fontFamily: MONO,
+            color: 'var(--accent-warm)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            margin: 0,
+            fontWeight: 600,
+          }}
+        >
+          Client Brief · Pocket Analyst
+        </h3>
+      </div>
+
+      {briefing.status === 'loading' ? (
+        <BriefingSkeleton />
+      ) : briefing.status === 'idle' ? (
+        <p
+          style={{
+            margin: 0,
+            fontSize: '14px',
+            color: 'hsl(var(--muted-foreground))',
+            lineHeight: 1.6,
+          }}
+        >
+          Sign in to generate a stateless client brief, or add trades to see an offline summary.
+        </p>
+      ) : bullets.length > 0 ? (
+        <ul
+          style={{
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
+          {bullets.slice(0, 3).map((text, i) => (
+            <li
+              key={i}
+              style={{
+                display: 'flex',
+                gap: '10px',
+                alignItems: 'flex-start',
+                fontSize: '14px',
+                color: 'hsl(var(--muted-foreground))',
+                lineHeight: 1.6,
+                fontWeight: 400,
+              }}
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-warm)',
+                  marginTop: '8px',
+                  flexShrink: 0,
+                }}
+              />
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {sourceLabel && (
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            fontSize: '11px',
+            color: 'hsl(var(--muted-foreground))',
+            fontFamily: MONO,
+            marginTop: '16px',
+            paddingTop: '12px',
+            borderTop: '1px solid hsl(var(--border))',
+          }}
+        >
+          <span>{sourceLabel}</span>
+        </div>
+      )}
+    </section>
+  );
+}

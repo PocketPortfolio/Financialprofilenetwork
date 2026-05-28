@@ -22,10 +22,11 @@ interface Asset {
 interface AssetTerminalProps {
   assets: Asset[];
   view?: 'positions' | 'trades';
+  totalPortfolioValue?: number;
   onEdit?: (asset: Asset) => void;
   onDelete?: (symbol: string) => void;
-  onSort?: (column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => void;
-  sortBy?: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty';
+  onSort?: (column: 'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty') => void;
+  sortBy?: 'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty';
   sortOrder?: 'asc' | 'desc';
   setShowImportModal?: (show: boolean) => void;
 }
@@ -35,6 +36,7 @@ const MONO_FONT = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Li
 export function AssetTerminal({ 
   assets, 
   view = 'positions',
+  totalPortfolioValue = 0,
   onEdit, 
   onDelete, 
   onSort,
@@ -45,7 +47,7 @@ export function AssetTerminal({
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const LOGO_SIZE = 18;
 
-  const handleSort = (column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => {
+  const handleSort = (column: 'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty') => {
     if (onSort) {
       onSort(column);
     }
@@ -232,6 +234,20 @@ export function AssetTerminal({
                     24h % {getSortIcon('change')}
                   </th>
                   <th style={{ padding: '12px 16px', fontWeight: '500', textAlign: 'right' }}>Holdings</th>
+                  <th
+                    style={{
+                      padding: '12px 16px',
+                      fontWeight: '500',
+                      textAlign: 'right',
+                      cursor: onSort ? 'pointer' : 'default',
+                      userSelect: 'none',
+                    }}
+                    onClick={() => handleSort('weight')}
+                    onMouseEnter={(e) => onSort && (e.currentTarget.style.color = 'hsl(var(--foreground))')}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--dashboard-muted-foreground)'}
+                  >
+                    Weight % {getSortIcon('weight')}
+                  </th>
                   <th 
                     style={{ 
                       padding: '12px 16px', 
@@ -262,7 +278,7 @@ export function AssetTerminal({
           <tbody style={{ borderTop: `1px solid color-mix(in srgb, var(--dashboard-chrome-border) 50%, transparent)` }}>
             {assets.length === 0 ? (
               <tr>
-                <td colSpan={view === 'trades' ? 8 : 7} style={{ padding: 0 }}>
+                <td colSpan={view === 'trades' ? 8 : 8} style={{ padding: 0 }}>
                   <div style={{
                     padding: '64px 32px',
                     textAlign: 'center'
@@ -525,6 +541,19 @@ export function AssetTerminal({
                           fontFamily: MONO_FONT 
                         }}>
                           {asset.holdings.toFixed(4)}
+                        </td>
+                        <td
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'right',
+                            color: 'var(--accent-warm)',
+                            fontFamily: MONO_FONT,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {totalPortfolioValue > 0
+                            ? `${((asset.value / totalPortfolioValue) * 100).toFixed(1)}%`
+                            : '—'}
                         </td>
                         <td style={{ 
                           padding: '12px 16px', 

@@ -20,14 +20,12 @@ export default function ReferralProgram({
   className = '',
   linkSource = 'dashboard',
 }: ReferralProgramProps) {
-  const [referralCode, setReferralCode] = useState<string>('');
   const [referralLink, setReferralLink] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
 
   useEffect(() => {
     const code = generateReferralCode(userId);
-    setReferralCode(code);
     setReferralLink(getReferralLink(code, linkSource));
   }, [userId, linkSource]);
 
@@ -95,7 +93,7 @@ export default function ReferralProgram({
         marginBottom: '20px',
         lineHeight: 'var(--line-snug)'
       }}>
-        Copy your REF- link below. When someone joins Pocket Portfolio through it, you unlock 7 days of
+        Copy your invite link below. When someone joins Pocket Portfolio through it, you unlock 7 days of
         Founders Club (Sovereign AI + file attachments)—one reward per account for this campaign. No card
         required. Your ledgers stay on your device.
       </p>
@@ -182,34 +180,6 @@ export default function ReferralProgram({
           >
             {shareBusy ? '…' : 'Share invite'}
           </button>
-        </div>
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <label style={{ 
-          display: 'block', 
-          fontSize: 'var(--font-size-xs)', 
-          fontWeight: '600', 
-          marginBottom: '8px', 
-          color: 'var(--text-secondary)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em'
-        }}>
-          Your Referral Code
-        </label>
-        <div style={{
-          padding: '12px',
-          background: 'var(--bg)',
-          borderRadius: '8px',
-          border: '1px solid var(--border)',
-          fontFamily: 'var(--font-mono)',
-          fontSize: 'var(--font-size-base)',
-          fontWeight: '600',
-          color: 'var(--signal)',
-          textAlign: 'center',
-          letterSpacing: '0.1em'
-        }}>
-          {referralCode}
         </div>
       </div>
 

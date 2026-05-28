@@ -75,7 +75,7 @@ export default function BenchmarkOverlay({
                 width: '16px',
                 height: '16px',
                 cursor: 'pointer',
-                accentColor: 'var(--signal)',
+                accentColor: 'var(--accent-warm)',
               }}
             />
             <div

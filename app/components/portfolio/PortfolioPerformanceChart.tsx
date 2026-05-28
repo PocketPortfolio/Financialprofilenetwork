@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
-  LineChart,
+  ComposedChart,
   Line,
-  AreaChart,
   Area,
   XAxis,
   YAxis,
@@ -17,6 +16,12 @@ import type { PortfolioSnapshot } from '@/app/lib/portfolio/types';
 import type { TimeRange } from '@/app/lib/portfolio/types';
 import { calculateHistoricalReturns } from '@/app/lib/portfolio/snapshot';
 import { formatCurrencyAxis } from '@/app/lib/utils/currencyFormatter';
+
+/** Recharts SVG attrs do not reliably resolve CSS variables — use hex. */
+const CHART_PORTFOLIO_STROKE = '#f59e0b';
+const CHART_BENCHMARK_STROKE = '#94a3b8';
+const CHART_GRID_STROKE = 'rgba(148, 163, 184, 0.25)';
+const CHART_AXIS_STROKE = '#94a3b8';
 
 interface PortfolioPerformanceChartProps {
   snapshots: PortfolioSnapshot[];
@@ -93,9 +98,113 @@ export default function PortfolioPerformanceChart({
   showBenchmark = false,
   benchmarkData = [],
 }: PortfolioPerformanceChartProps) {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [chartWidth, setChartWidth] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const gradientId = useId().replace(/:/g, '');
+  const chartHeight = isMobile ? 300 : 400;
 
-  // Show empty state if no snapshots
+  useEffect(() => {
+    setMounted(true);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Filter snapshots by time range; fall back to full series if window is too narrow
+  const filteredData = useMemo(() => {
+    if (snapshots.length === 0) return [];
+
+    const { startDate, endDate } = getDateRange(timeRange);
+
+    const filtered = snapshots.filter((snapshot) => {
+      const snapshotDate = new Date(`${snapshot.date}T12:00:00`);
+      return snapshotDate >= startDate && snapshotDate <= endDate;
+    });
+
+    if (filtered.length >= 2) return filtered;
+    if (snapshots.length >= 2) return snapshots;
+    return filtered.length > 0 ? filtered : snapshots;
+  }, [snapshots, timeRange]);
+
+  // Calculate returns
+  const chartData = useMemo(() => {
+    if (filteredData.length === 0) return [];
+
+    const returns = calculateHistoricalReturns(filteredData);
+    const firstValue = filteredData[0]?.totalValue || 0;
+
+    // Normalize benchmark data to match portfolio dates
+    const benchByDate = new Map(benchmarkData.map((b) => [b.date, b.value]));
+    const benchStart =
+      benchmarkData.find((b) => Number.isFinite(b.value) && b.value > 0)?.value ?? 0;
+
+    const normalizedBenchmark =
+      showBenchmark && benchmarkData.length > 0 && benchStart > 0
+        ? filteredData.map((snapshot) => {
+            let close = benchByDate.get(snapshot.date);
+            if (close == null || !Number.isFinite(close)) {
+              for (let i = benchmarkData.length - 1; i >= 0; i--) {
+                if (benchmarkData[i].date <= snapshot.date) {
+                  close = benchmarkData[i].value;
+                  break;
+                }
+              }
+            }
+            if (close == null || !Number.isFinite(close) || close <= 0) return undefined;
+            return (close / benchStart) * firstValue;
+          })
+        : [];
+
+    return filteredData.map((snapshot, index) => ({
+      date: snapshot.date,
+      dateFormatted: formatDate(snapshot.date, timeRange),
+      value: snapshot.totalValue,
+      invested: snapshot.totalInvested,
+      return: returns[index]?.return || 0,
+      returnPercent: returns[index]?.returnPercent || 0,
+      benchmark: normalizedBenchmark[index],
+    }));
+  }, [filteredData, timeRange, showBenchmark, benchmarkData]);
+
+  const showSparseHint = chartData.length > 0 && chartData.length < 2;
+  const valuesValid = chartData.some(
+    (d) => typeof d.value === 'number' && Number.isFinite(d.value) && d.value > 0
+  );
+
+  useEffect(() => {
+    if (!mounted || chartData.length === 0) return;
+    const el = chartContainerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const w = el.offsetWidth;
+      if (w > 0) setChartWidth(w);
+    };
+
+    measure();
+    const raf = requestAnimationFrame(measure);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(measure);
+      resizeObserver.observe(el);
+    } else {
+      window.addEventListener('resize', measure);
+    }
+
+    return () => {
+      cancelAnimationFrame(raf);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [mounted, chartData.length, isMobile, timeRange]);
+
+  // Time range options
+  const timeRanges: TimeRange[] = ['1D', '1W', '1M', '3M', '1Y', 'YTD', 'ALL'];
+
   if (snapshots.length === 0) {
     return (
       <div
@@ -120,81 +229,36 @@ export default function PortfolioPerformanceChart({
         >
           Historical Performance
         </h3>
-        <p
-          style={{
-            color: 'var(--muted)',
-            marginBottom: 'var(--space-2)',
-            fontSize: isMobile ? 'var(--font-size-sm)' : 'var(--font-size-base)',
-            padding: isMobile ? '0 var(--space-2)' : '0',
-          }}
-        >
+        <p style={{ color: 'var(--muted)', fontSize: isMobile ? 'var(--font-size-sm)' : 'var(--font-size-base)' }}>
           Historical data will appear here once daily snapshots are saved.
-        </p>
-        <p
-          style={{
-            fontSize: isMobile ? 'var(--font-size-xs)' : 'var(--font-size-sm)',
-            color: 'var(--text-secondary)',
-            padding: isMobile ? '0 var(--space-2)' : '0',
-          }}
-        >
-          Your portfolio is automatically saved daily. Check back tomorrow to see your portfolio performance over time.
         </p>
       </div>
     );
   }
 
-  // Filter snapshots by time range
-  const filteredData = useMemo(() => {
-    if (snapshots.length === 0) return [];
+  if (chartData.length === 0) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: chartHeight,
+          background: 'var(--surface)',
+          borderRadius: 'var(--radius-md)',
+          border: '1px solid var(--border)',
+          color: 'var(--muted)',
+          fontSize: isMobile ? 'var(--font-size-sm)' : 'var(--font-size-base)',
+          width: '100%',
+          padding: 'var(--space-4)',
+        }}
+      >
+        No data in this range — try ALL or 3M.
+      </div>
+    );
+  }
 
-    const { startDate, endDate } = getDateRange(timeRange);
-    
-    return snapshots.filter((snapshot) => {
-      const snapshotDate = new Date(snapshot.date);
-      return snapshotDate >= startDate && snapshotDate <= endDate;
-    });
-  }, [snapshots, timeRange]);
-
-  // Calculate returns
-  const chartData = useMemo(() => {
-    if (filteredData.length === 0) return [];
-
-    const returns = calculateHistoricalReturns(filteredData);
-    const firstValue = filteredData[0]?.totalValue || 0;
-
-    // Normalize benchmark data to match portfolio dates
-    const normalizedBenchmark = showBenchmark && benchmarkData.length > 0
-      ? filteredData.map((snapshot) => {
-          // Find closest benchmark point
-          const benchmarkPoint = benchmarkData.find(
-            (b) => b.date === snapshot.date
-          ) || benchmarkData[0];
-          
-          // Normalize to start at same value as portfolio
-          const benchmarkStart = benchmarkData[0]?.value || 1;
-          const normalizedValue = benchmarkPoint.value
-            ? (benchmarkPoint.value / benchmarkStart) * firstValue
-            : firstValue;
-          
-          return normalizedValue;
-        })
-      : [];
-
-    return filteredData.map((snapshot, index) => ({
-      date: snapshot.date,
-      dateFormatted: formatDate(snapshot.date, timeRange),
-      value: snapshot.totalValue,
-      invested: snapshot.totalInvested,
-      return: returns[index]?.return || 0,
-      returnPercent: returns[index]?.returnPercent || 0,
-      benchmark: normalizedBenchmark[index] || null,
-    }));
-  }, [filteredData, timeRange, showBenchmark, benchmarkData]);
-
-  // Time range options
-  const timeRanges: TimeRange[] = ['1D', '1W', '1M', '3M', '1Y', 'YTD', 'ALL'];
-
-  // Custom tooltip
+  // Custom tooltip (defined after guards; only used when chart renders)
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload || payload.length === 0) return null;
 
@@ -269,29 +333,6 @@ export default function PortfolioPerformanceChart({
     );
   };
 
-  if (chartData.length === 0) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: isMobile ? '300px' : '400px',
-          background: 'var(--surface)',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border)',
-          color: 'var(--muted)',
-          fontSize: isMobile ? 'var(--font-size-sm)' : 'var(--font-size-base)',
-          width: '100%',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-        }}
-      >
-        No historical data available
-      </div>
-    );
-  }
-
   return (
     <div
       style={{
@@ -357,11 +398,11 @@ export default function PortfolioPerformanceChart({
                   minWidth: isMobile ? '40px' : 'auto',
                   background:
                     timeRange === range
-                      ? 'var(--signal)'
+                      ? CHART_PORTFOLIO_STROKE
                       : 'var(--surface-elevated)',
-                  color: timeRange === range ? 'var(--bg)' : 'var(--text)',
+                  color: timeRange === range ? '#0a0a0a' : 'var(--text)',
                   border: `1px solid ${
-                    timeRange === range ? 'var(--signal)' : 'var(--border)'
+                    timeRange === range ? CHART_PORTFOLIO_STROKE : 'var(--border)'
                   }`,
                   borderRadius: 'var(--radius-sm)',
                   fontSize: isMobile ? '11px' : 'var(--font-size-sm)',
@@ -393,58 +434,122 @@ export default function PortfolioPerformanceChart({
         )}
       </div>
 
-      {/* Chart */}
-      <div 
-        role="img" 
-        aria-label="Portfolio performance chart"
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          height: isMobile ? '300px' : '400px',
-        }}
-      >
-        <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
-        <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-          <defs>
-            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="var(--signal)" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="var(--signal)" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-          <XAxis
-            dataKey="dateFormatted"
-            stroke="var(--text-secondary)"
-            style={{ fontSize: 'var(--font-size-sm)' }}
-          />
-          <YAxis
-            stroke="var(--text-secondary)"
-            style={{ fontSize: 'var(--font-size-sm)' }}
-            tickFormatter={formatCurrencyAxis}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend />
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke="var(--signal)"
-            fillOpacity={1}
-            fill="url(#colorValue)"
-            name="Portfolio Value"
-          />
-          {showBenchmark && (
-            <Line
-              type="monotone"
-              dataKey="benchmark"
-              stroke="var(--text-secondary)"
-              strokeDasharray="5 5"
-              name="Benchmark"
-              dot={false}
-            />
+      {showSparseHint && (
+        <p
+          style={{
+            margin: '0 0 12px',
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--text-secondary)',
+          }}
+        >
+          Limited history in this range — showing available points. Select ALL for the full synthetic curve.
+        </p>
+      )}
+
+      {!valuesValid ? (
+        <div
+          style={{
+            minHeight: chartHeight,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-secondary)',
+            fontSize: 'var(--font-size-sm)',
+            padding: 'var(--space-4)',
+          }}
+        >
+          Portfolio values are still loading — refresh in a moment or try ALL.
+        </div>
+      ) : (
+        <div
+          ref={chartContainerRef}
+          role="img"
+          aria-label="Portfolio performance chart"
+          style={{
+            width: '100%',
+            minWidth: 0,
+            height: chartHeight,
+            minHeight: chartHeight,
+            position: 'relative',
+          }}
+        >
+          {!mounted || chartWidth <= 0 ? (
+            <div
+              style={{
+                height: chartHeight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-secondary)',
+                fontSize: 'var(--font-size-sm)',
+              }}
+            >
+              Loading chart…
+            </div>
+          ) : (
+            <ResponsiveContainer width={chartWidth} height={chartHeight}>
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 12, right: 20, left: 4, bottom: 4 }}
+              >
+                <defs>
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={CHART_PORTFOLIO_STROKE} stopOpacity={0.35} />
+                    <stop offset="95%" stopColor={CHART_PORTFOLIO_STROKE} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_GRID_STROKE} />
+                <XAxis
+                  dataKey="dateFormatted"
+                  stroke={CHART_AXIS_STROKE}
+                  tick={{ fill: CHART_AXIS_STROKE, fontSize: 11 }}
+                  interval="preserveStartEnd"
+                  minTickGap={24}
+                />
+                <YAxis
+                  stroke={CHART_AXIS_STROKE}
+                  tick={{ fill: CHART_AXIS_STROKE, fontSize: 11 }}
+                  tickFormatter={formatCurrencyAxis}
+                  domain={[(dataMin: number) => Math.max(0, dataMin * 0.95), 'auto']}
+                  width={56}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  wrapperStyle={{ color: CHART_AXIS_STROKE, paddingTop: 8 }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke={CHART_PORTFOLIO_STROKE}
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill={`url(#${gradientId})`}
+                  name="Portfolio Value"
+                  dot={chartData.length <= 4}
+                  activeDot={{ r: 4, fill: CHART_PORTFOLIO_STROKE }}
+                  connectNulls
+                  isAnimationActive={false}
+                />
+                {showBenchmark && (
+                  <Line
+                    type="monotone"
+                    dataKey="benchmark"
+                    stroke={CHART_BENCHMARK_STROKE}
+                    strokeWidth={2}
+                    strokeDasharray="6 4"
+                    name="Benchmark"
+                    dot={false}
+                    connectNulls
+                    isAnimationActive={false}
+                  />
+                )}
+              </ComposedChart>
+            </ResponsiveContainer>
           )}
-        </AreaChart>
-      </ResponsiveContainer>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

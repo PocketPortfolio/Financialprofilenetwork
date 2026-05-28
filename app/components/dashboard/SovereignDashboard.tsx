@@ -74,9 +74,16 @@ export default function SovereignDashboard({
       <main className="max-w-[1600px] mx-auto p-4 md:p-6 space-y-6">
         
         {/* Intelligence */}
-        <MorningBrief 
-          netWorthChange={totalUnrealizedPLPercent} 
-          topMover={topMover} 
+        <MorningBrief
+          briefing={{
+            status: 'fallback',
+            bullets: [
+              `Portfolio is ${totalUnrealizedPLPercent >= 0 ? 'up' : 'down'} ${Math.abs(totalUnrealizedPLPercent).toFixed(2)}% on an unrealized basis.`,
+              `${topMover.symbol} is the top mover at ${topMover.change > 0 ? '+' : ''}${topMover.change.toFixed(2)}%.`,
+              'Import trades on the main dashboard for full risk matrix and benchmark alpha.',
+            ],
+            source: 'offline',
+          }}
         />
 
         {/* The Grid */}

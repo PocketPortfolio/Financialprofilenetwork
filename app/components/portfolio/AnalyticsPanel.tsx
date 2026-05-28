@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import type { PortfolioAnalytics } from '@/app/lib/portfolio/types';
 import { trackPaywallCtaClick, trackPaywallImpression } from '@/app/lib/analytics/events';
 
@@ -11,20 +11,13 @@ interface AnalyticsPanelProps {
 }
 
 /**
- * Analytics Panel Component
- * Displays comprehensive portfolio metrics
+ * Retail-focused activity metrics. Risk lives in RiskMatrix.
  */
 export default function AnalyticsPanel({
   analytics,
   loading = false,
   isPremium = false,
 }: AnalyticsPanelProps) {
-  useEffect(() => {
-    if (!isPremium) {
-      trackPaywallImpression('risk_metric_unlock_attempt', '/dashboard', null);
-    }
-  }, [isPremium]);
-
   if (loading) {
     return (
       <div
@@ -38,7 +31,7 @@ export default function AnalyticsPanel({
           border: '1px solid var(--dashboard-chrome-border)',
         }}
       >
-        {[...Array(8)].map((_, i) => (
+        {[...Array(4)].map((_, i) => (
           <div
             key={i}
             style={{
@@ -72,13 +65,6 @@ export default function AnalyticsPanel({
 
   const metrics = [
     {
-      label: 'Total Value',
-      value: `$${analytics.totalValue.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
-      })}`,
-      description: 'Current portfolio value',
-    },
-    {
       label: 'Daily Change',
       value: `${analytics.dailyChange >= 0 ? '+' : ''}$${analytics.dailyChange.toLocaleString(undefined, {
         maximumFractionDigits: 2,
@@ -106,26 +92,7 @@ export default function AnalyticsPanel({
     {
       label: 'Volatility',
       value: `${analytics.volatility.toFixed(2)}%`,
-      description: 'Standard deviation of returns (risk measure)',
-      premium: true,
-    },
-    {
-      label: 'Sharpe Ratio',
-      value: analytics.sharpeRatio.toFixed(2),
-      description: 'Risk-adjusted return (higher is better)',
-      premium: true,
-    },
-    {
-      label: 'Beta',
-      value: analytics.beta.toFixed(2),
-      description: 'Sensitivity to market movements (1.0 = market average)',
-      premium: true,
-    },
-    {
-      label: 'Max Drawdown',
-      value: `${analytics.maxDrawdown.toFixed(2)}%`,
-      color: 'var(--danger)',
-      description: 'Largest peak-to-trough decline',
+      description: 'Standard deviation of returns',
       premium: true,
     },
   ];
@@ -238,4 +205,3 @@ export default function AnalyticsPanel({
     </div>
   );
 }
-

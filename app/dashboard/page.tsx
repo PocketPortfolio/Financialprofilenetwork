@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import SimplePieChart from '../components/SimplePieChart';
 import PortfolioChart from '../components/PortfolioChart';
 import PortfolioAllocationChart from '../components/portfolio/PortfolioAllocationChart';
 import DrillDownChart from '../components/portfolio/DrillDownChart';
 import PortfolioPerformanceChart from '../components/portfolio/PortfolioPerformanceChart';
+import BenchmarkOverlay from '../components/portfolio/BenchmarkOverlay';
 import AnalyticsPanel from '../components/portfolio/AnalyticsPanel';
 import AllocationRecommendations from '../components/portfolio/AllocationRecommendations';
 import { AnalyticsDashboard } from '../components/analytics/AnalyticsDashboard';
@@ -16,11 +17,17 @@ import SharePortfolio from '../components/portfolio/SharePortfolio';
 import { usePortfolioStore } from '../lib/store/portfolioStore';
 import { usePortfolioHistory } from '../hooks/usePortfolioHistory';
 import { calculatePortfolioAnalytics } from '../lib/portfolio/analytics';
-import type { PortfolioSnapshot } from '@/app/lib/portfolio/types';
+import type { Benchmark, BenchmarkDataPoint, PortfolioSnapshot } from '@/app/lib/portfolio/types';
+import { BENCHMARK_NAMES, BENCHMARK_SYMBOLS } from '@/app/lib/portfolio/benchmarks';
+import {
+  alignBenchmarkSeriesToSnapshots,
+  calculatePeriodAlphaPercent,
+} from '@/app/lib/portfolio/benchmarkSeries';
+import { useClientBriefing } from '../hooks/useClientBriefing';
+import { getSectorSync } from '../lib/portfolio/sectorService';
 import { isPaidTier } from '@/app/lib/tier';
 import { saveDailySnapshot } from '../lib/portfolio/snapshot';
 import { usePortfolioNews } from '../hooks/useDataFetching';
-import { getSectorSync } from '../lib/portfolio/sectorService';
 import { GICSSector, GICS_SECTOR_INFO, normalizeSector } from '../lib/portfolio/sectorClassification';
 import Logo from '../components/Logo';
 import CompanyLogo from '../components/CompanyLogo';
@@ -51,6 +58,7 @@ import { initializeMobileAnalytics } from '../lib/analytics/device';
 import { trackEvent, trackPaywallCtaClick, trackPaywallImpression } from '../lib/analytics/events';
 import OnboardingTour from '../components/OnboardingTour';
 import { MorningBrief } from '../components/dashboard/MorningBrief';
+import { RiskMatrix } from '../components/dashboard/RiskMatrix';
 import { useWeeklySnapshotToast } from '../hooks/useWeeklySnapshotToast';
 import { WeeklySnapshotToast } from '../components/WeeklySnapshotToast';
 import { AssetTerminal } from '../components/dashboard/AssetTerminal';
@@ -318,7 +326,8 @@ export default function Dashboard() {
   const [showPostImportUpsell, setShowPostImportUpsell] = useState(false);
   const [importModalFile, setImportModalFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<'performance' | 'insights'>('performance');
-  const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty'>('value');
+  const [sortBy, setSortBy] = useState<'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty'>('value');
+  const [selectedBenchmarks, setSelectedBenchmarks] = useState<string[]>([BENCHMARK_SYMBOLS.SP500]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [portfolioView, setPortfolioView] = useState<'positions' | 'trades' | 'notes'>('positions');
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -376,6 +385,8 @@ export default function Dashboard() {
   const [syntheticSnapshots, setSyntheticSnapshots] = useState<PortfolioSnapshot[]>([]);
   const [syntheticSnapshotsLoading, setSyntheticSnapshotsLoading] = useState(false);
   const [syntheticBenchmarkReturns, setSyntheticBenchmarkReturns] = useState<number[]>([]);
+  const [syntheticBenchmarkData, setSyntheticBenchmarkData] = useState<BenchmarkDataPoint[]>([]);
+  const [historicalBenchmarkData, setHistoricalBenchmarkData] = useState<BenchmarkDataPoint[]>([]);
   const syntheticBuildKeyRef = useRef<string>('');
   const syntheticSeriesCacheRef = useRef<Map<string, Array<{ date: string; close: number }>>>(new Map());
 
@@ -607,15 +618,24 @@ export default function Dashboard() {
           }
         }
 
+        const benchDataPoints: BenchmarkDataPoint[] = snaps
+          .map((s, i) => ({
+            date: s.date,
+            value: alignedBenchmarkCloses[i],
+          }))
+          .filter((p) => Number.isFinite(p.value));
+
         if (!cancelled) {
           setSyntheticSnapshots(snaps);
           setSyntheticBenchmarkReturns(benchReturns);
+          setSyntheticBenchmarkData(benchDataPoints);
           syntheticBuildKeyRef.current = buildKey;
         }
       } catch (e) {
         if (!cancelled) {
           setSyntheticSnapshots([]);
           setSyntheticBenchmarkReturns([]);
+          setSyntheticBenchmarkData([]);
         }
       } finally {
         if (!cancelled) setSyntheticSnapshotsLoading(false);
@@ -1171,6 +1191,155 @@ export default function Dashboard() {
     return computed;
   }, [historicalSnapshots, syntheticSnapshots, syntheticBenchmarkReturns, positions, quotesData]);
 
+  const chartSnapshots = useMemo(
+    () => (historicalSnapshots.length > 0 ? historicalSnapshots : syntheticSnapshots),
+    [historicalSnapshots, syntheticSnapshots]
+  );
+
+  const isSyntheticAnalytics =
+    historicalSnapshots.length === 0 && syntheticSnapshots.length > 0;
+
+  // Fetch benchmark series when using Firestore historical snapshots
+  useEffect(() => {
+    if (historicalSnapshots.length === 0) {
+      setHistoricalBenchmarkData((prev) => (prev.length === 0 ? prev : []));
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        let rows: Array<{ date: string; close: number }> = [];
+        const tryFetch = async (ticker: string) => {
+          const r = await fetch(
+            `/api/tickers/${encodeURIComponent(ticker)}/json?range=1y&desktop=true&source=dashboard-benchmark`
+          );
+          const j = await r.json().catch(() => null);
+          return ((j?.data || []) as Array<{ date: string; close: number }>).filter(
+            (x) => x?.date && typeof x.close === 'number' && Number.isFinite(x.close)
+          );
+        };
+        rows = await tryFetch('^GSPC');
+        if (rows.length < 3) rows = await tryFetch('SPY');
+        if (cancelled) return;
+        const aligned = alignBenchmarkSeriesToSnapshots(historicalSnapshots, rows);
+        setHistoricalBenchmarkData(aligned);
+      } catch {
+        if (!cancelled) setHistoricalBenchmarkData([]);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [historicalSnapshots.length, historicalSnapshots[0]?.date, historicalSnapshots[historicalSnapshots.length - 1]?.date]);
+
+  const benchmarkChartData = useMemo(
+    () =>
+      historicalSnapshots.length > 0 ? historicalBenchmarkData : syntheticBenchmarkData,
+    [historicalSnapshots.length, historicalBenchmarkData, syntheticBenchmarkData]
+  );
+
+  const benchmarkAlphaPercent = useMemo(() => {
+    if (chartSnapshots.length < 3 || benchmarkChartData.length < 3) return null;
+    return calculatePeriodAlphaPercent(chartSnapshots, benchmarkChartData);
+  }, [chartSnapshots, benchmarkChartData]);
+
+  const totalPortfolioValue = useMemo(() => {
+    if (analytics?.totalValue && analytics.totalValue > 0) return analytics.totalValue;
+    return Object.values(positions).reduce(
+      (sum, pos) => sum + (pos.currentValue || pos.avgCost * pos.shares),
+      0
+    );
+  }, [analytics, positions]);
+
+  const portfolioContextForAi = useMemo(
+    () => buildPortfolioContext(displayTrades, positions),
+    [displayTrades, positions]
+  );
+
+  const analyticsContextForAi = useMemo(() => {
+    if (!analytics) return '';
+    const lines = [
+      'Risk & performance snapshot:',
+      `Total value: $${analytics.totalValue.toFixed(2)}`,
+      `All-time return: ${analytics.allTimeReturnPercent.toFixed(2)}%`,
+      `Beta: ${analytics.beta.toFixed(2)}`,
+      `Max drawdown: ${analytics.maxDrawdown.toFixed(2)}%`,
+      `Sharpe: ${analytics.sharpeRatio.toFixed(2)}`,
+    ];
+    if (benchmarkAlphaPercent != null) {
+      lines.push(`Alpha vs S&P 500 (period): ${benchmarkAlphaPercent.toFixed(2)}%`);
+    }
+    return lines.join('\n');
+  }, [analytics, benchmarkAlphaPercent]);
+
+  const briefingFallbackBullets = useCallback(() => {
+    const top = Object.values(positions).sort(
+      (a, b) => Math.abs(b.unrealizedPLPercent) - Math.abs(a.unrealizedPLPercent)
+    )[0];
+    const alphaLine =
+      benchmarkAlphaPercent != null
+        ? `Portfolio ${benchmarkAlphaPercent >= 0 ? 'outperformed' : 'underperformed'} the S&P 500 by ${Math.abs(benchmarkAlphaPercent).toFixed(2)}% over the tracked period.`
+        : 'Benchmark comparison will appear once enough historical data is available.';
+    const driverLine = top
+      ? `${top.ticker} is the largest P/L mover (${top.unrealizedPLPercent >= 0 ? '+' : ''}${top.unrealizedPLPercent.toFixed(1)}% unrealized), with ${getSectorSync(top.ticker)} sector exposure.`
+      : 'Add positions to surface performance drivers.';
+    const riskLine = analytics
+      ? `Risk profile: Beta ${analytics.beta.toFixed(2)}, max drawdown ${analytics.maxDrawdown.toFixed(1)}%, Sharpe ${analytics.sharpeRatio.toFixed(2)}.`
+      : 'Risk metrics populate as daily snapshots accumulate.';
+    return [alphaLine, driverLine, riskLine];
+  }, [positions, benchmarkAlphaPercent, analytics]);
+
+  const getAuthTokenForBriefing = useCallback(async () => {
+    if (!user) return null;
+    try {
+      return await user.getIdToken();
+    } catch {
+      return null;
+    }
+  }, [user]);
+
+  const [debouncedAnalyticsContext, setDebouncedAnalyticsContext] = useState(analyticsContextForAi);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedAnalyticsContext(analyticsContextForAi);
+    }, 800);
+    return () => window.clearTimeout(timer);
+  }, [analyticsContextForAi]);
+
+  const clientBriefingFromApi = useClientBriefing({
+    enabled: trades.length > 0 && !!user,
+    portfolioContext: portfolioContextForAi,
+    analyticsContext: debouncedAnalyticsContext,
+    getAuthToken: getAuthTokenForBriefing,
+    buildFallbackBullets: briefingFallbackBullets,
+  });
+
+  const clientBriefing = useMemo(() => {
+    if (trades.length === 0) return { status: 'idle' as const };
+    if (!user) {
+      return {
+        status: 'fallback' as const,
+        bullets: briefingFallbackBullets(),
+        source: 'offline' as const,
+      };
+    }
+    return clientBriefingFromApi;
+  }, [trades.length, user, clientBriefingFromApi, briefingFallbackBullets]);
+
+  const benchmarkConfigs: Benchmark[] = useMemo(() => {
+    if (benchmarkChartData.length === 0) return [];
+    return [
+      {
+        symbol: BENCHMARK_SYMBOLS.SP500,
+        name: BENCHMARK_NAMES[BENCHMARK_SYMBOLS.SP500] || 'S&P 500',
+        data: benchmarkChartData,
+      },
+    ];
+  }, [benchmarkChartData]);
+
+  const showBenchmarkOnChart = selectedBenchmarks.includes(BENCHMARK_SYMBOLS.SP500);
+
   // Filter positions by selected sectors
   const filteredPositions = useMemo(() => {
     if (selectedSectors.length === 0) return Object.values(positions);
@@ -1207,6 +1376,12 @@ export default function Dashboard() {
   }, 0);
   
   const totalUnrealizedPLPercent = totalInvested > 0 ? (totalUnrealizedPL / totalInvested) * 100 : 0;
+
+  const heroAllTimeReturn = analytics?.allTimeReturn ?? totalUnrealizedPL;
+  const heroAllTimeReturnPercent =
+    analytics?.allTimeReturnPercent ?? totalUnrealizedPLPercent;
+  const heroReturnLabel: 'All-Time' | 'Unrealized' =
+    chartSnapshots.length > 0 ? 'All-Time' : 'Unrealized';
 
   const { showToast: showWeeklySnapshotToast, dismiss: dismissWeeklySnapshotToast } =
     useWeeklySnapshotToast(isAuthenticated ?? false, {
@@ -1780,37 +1955,37 @@ export default function Dashboard() {
             </div>
           </div>
           {/* 🎨 INTELLIGENCE LAYER - Above everything */}
-          {trades.length > 0 && (
-            <MorningBrief 
-              netWorthChange={totalUnrealizedPLPercent}
-              topMover={{
-                symbol: Object.values(positions).length > 0 
-                  ? Object.values(positions).reduce((prev, current) => 
-                      Math.abs(current.unrealizedPLPercent) > Math.abs(prev.unrealizedPLPercent) 
-                        ? current 
-                        : prev
-                    ).ticker || 'N/A'
-                  : 'N/A',
-                change: Object.values(positions).length > 0
-                  ? Object.values(positions).reduce((prev, current) => 
-                      Math.abs(current.unrealizedPLPercent) > Math.abs(prev.unrealizedPLPercent) 
-                        ? current 
-                        : prev
-                    ).unrealizedPLPercent || 0
-                  : 0
-              }}
+          {/* Hero HUD — mark-to-market value + benchmark alpha */}
+          <TerminalSummary
+            totalPortfolioValue={totalPortfolioValue}
+            allTimeReturn={heroAllTimeReturn}
+            allTimeReturnPercent={heroAllTimeReturnPercent}
+            benchmarkAlphaPercent={benchmarkAlphaPercent}
+            totalTrades={totalTrades}
+            totalPositions={totalPositions}
+            totalInvested={totalInvested}
+            returnLabel={heroReturnLabel}
+            loading={!trades || trades.length === 0}
+          />
+
+          {trades.length > 0 && analytics && (
+            <RiskMatrix
+              analytics={analytics}
+              loading={historyLoading || syntheticSnapshotsLoading || tierLoading}
+              isSynthetic={isSyntheticAnalytics}
+              isPremium={isPaidTier(tier)}
             />
           )}
 
-          {/* 🎨 TERMINAL SUMMARY - Metrics Row */}
-          <TerminalSummary
-            totalInvested={totalInvested}
-            totalTrades={totalTrades}
-            totalPositions={totalPositions}
-            totalUnrealizedPL={totalUnrealizedPL}
-            totalUnrealizedPLPercent={totalUnrealizedPLPercent}
-            loading={!trades || trades.length === 0}
-          />
+          {trades.length > 0 && (
+            <MorningBrief
+              briefing={
+                clientBriefing.status === 'idle'
+                  ? { status: 'fallback', bullets: briefingFallbackBullets(), source: 'offline' }
+                  : clientBriefing
+              }
+            />
+          )}
 
 
           {/* Price Pipeline Health */}
@@ -2072,13 +2247,34 @@ export default function Dashboard() {
                     onReset={resetDrillDown}
                   />
 
-                  {/* Performance Chart - Hidden for now */}
-                  {false && (
-                    <PortfolioPerformanceChart
-                      snapshots={historicalSnapshots}
-                      timeRange={timeRange}
-                      onTimeRangeChange={setStoreTimeRange}
-                    />
+                  {chartSnapshots.length > 0 && (
+                    <div
+                      className="grid w-full grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:gap-6"
+                      style={{ alignItems: 'start' }}
+                    >
+                      <div className="min-w-0 w-full">
+                      <PortfolioPerformanceChart
+                        snapshots={chartSnapshots}
+                        timeRange={timeRange}
+                        onTimeRangeChange={setStoreTimeRange}
+                        showBenchmark={showBenchmarkOnChart && benchmarkChartData.length > 0}
+                        benchmarkData={benchmarkChartData}
+                      />
+                      </div>
+                      {benchmarkConfigs.length > 0 && (
+                        <BenchmarkOverlay
+                          benchmarks={benchmarkConfigs}
+                          selectedBenchmarks={selectedBenchmarks}
+                          onToggleBenchmark={(symbol) => {
+                            setSelectedBenchmarks((prev) =>
+                              prev.includes(symbol)
+                                ? prev.filter((s) => s !== symbol)
+                                : [...prev, symbol]
+                            );
+                          }}
+                        />
+                      )}
+                    </div>
                   )}
 
                   {/* Heat Map */}
@@ -2426,6 +2622,12 @@ export default function Dashboard() {
                           aValue = a.change;
                           bValue = b.change;
                           break;
+                        case 'weight':
+                          aValue =
+                            totalPortfolioValue > 0 ? (a.value / totalPortfolioValue) * 100 : 0;
+                          bValue =
+                            totalPortfolioValue > 0 ? (b.value / totalPortfolioValue) * 100 : 0;
+                          break;
                         case 'value':
                         default:
                           aValue = a.value;
@@ -2436,6 +2638,7 @@ export default function Dashboard() {
                     });
                   }
                 })()}
+                totalPortfolioValue={totalPortfolioValue}
                 onEdit={(asset) => {
                   // Scroll to add trade form
                   const addTradeSection = document.getElementById('add-trade');
@@ -2452,7 +2655,7 @@ export default function Dashboard() {
                   });
                 }}
                 setShowImportModal={setShowImportModal}
-                onSort={(column: 'symbol' | 'price' | 'change' | 'value' | 'date' | 'type' | 'qty') => {
+                onSort={(column: 'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty') => {
                   if (sortBy === column) {
                     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
                   } else {
