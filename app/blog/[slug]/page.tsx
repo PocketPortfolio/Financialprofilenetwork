@@ -10,6 +10,7 @@ import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
 import BlogMarkdownBody from '../../components/blog/BlogMarkdownBody';
+import ProductionNavbar from '../../components/marketing/ProductionNavbar';
 import Link from 'next/link';
 import React from 'react';
 
@@ -212,6 +213,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
     return (
       <>
+        <ProductionNavbar />
         <article
           style={{
             maxWidth: '800px',
