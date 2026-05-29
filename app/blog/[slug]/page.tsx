@@ -11,6 +11,13 @@ import { serialize } from 'next-mdx-remote/serialize';
 import remarkGfm from 'remark-gfm';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
+import {
+  extractFAQsFromContent,
+  extractHowToSteps,
+  generateFAQPageSchema,
+  generateHowToSchema,
+  generateQAPageSchema,
+} from '@/app/lib/blog/aeoSchema';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
 import SEOHead from '../../components/SEOHead';
 import Link from 'next/link';
@@ -21,97 +28,33 @@ import MDXRenderer from '../../components/blog/MDXRenderer';
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
-// MDX Content component - now uses client component wrapper to avoid React 19/RSC conflicts
-async function MDXContent({ content, slug }: { content: string; slug: string }) {
-  try {
-    // ✅ Validate content before serialization
-    if (!content || typeof content !== 'string') {
-      throw new Error(`Invalid content: content is ${typeof content}, length: ${content?.length || 0}`);
-    }
-    
-    if (content.trim().length === 0) {
-      throw new Error('Content is empty after trimming');
-    }
-    
-    // Escape < and > before digits so MDX does not parse as JSX (e.g. "latency < 1ms")
-    const safeContent = escapeAngleBracketsInProse(content);
-    
-    // Serialize MDX content on server
-    const mdxSource = await serialize(safeContent, {
-      mdxOptions: {
-        remarkPlugins: [remarkGfm],
-      },
-    });
-    
-    // ✅ Validate serialization result
-    if (!mdxSource) {
-      throw new Error('MDX serialization returned null or undefined');
-    }
-    
-    return <MDXRenderer source={mdxSource} />;
-  } catch (error: any) {
-    // ✅ CRITICAL: Log error in production for debugging (Vercel function logs)
-    console.error('[Blog Post MDX Error]', {
-      slug,
-      error: error.message,
-      errorName: error.name,
-      stack: error.stack?.substring(0, 1000), // Limit stack trace length
-      contentLength: content?.length || 0,
-      contentType: typeof content,
-      contentPreview: content?.substring(0, 200) || 'N/A',
-      nodeEnv: process.env.NODE_ENV,
-      timestamp: new Date().toISOString(),
-    });
-    
-    return (
-      <div style={{
+async function serializeBlogBody(content: string) {
+  const safeContent = escapeAngleBracketsInProse(content);
+  return serialize(safeContent, {
+    mdxOptions: {
+      remarkPlugins: [remarkGfm],
+    },
+  });
+}
+
+function MdxRenderError({ slug, message }: { slug: string; message: string }) {
+  return (
+    <div
+      style={{
         padding: '2em',
         background: 'var(--surface-elevated)',
         borderRadius: '8px',
         border: '2px solid var(--border-warm)',
         color: 'var(--text)',
-      }}>
-        <h2 style={{ color: 'var(--accent-warm)', marginBottom: '1em' }}>
-          Error Loading Content
-        </h2>
-        <p style={{ marginBottom: '1em' }}>
-          There was an error rendering this blog post. Please try refreshing the page.
-        </p>
-        {/* Show error details in production for debugging */}
-        <details style={{ marginTop: '1em' }}>
-          <summary style={{ cursor: 'pointer', color: 'var(--accent-warm)', fontWeight: '600' }}>
-            Technical Details
-          </summary>
-          <pre style={{
-            background: 'var(--surface)',
-            padding: '1em',
-            borderRadius: '4px',
-            overflow: 'auto',
-            fontSize: '12px',
-            marginTop: '0.5em',
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-            border: '1px solid color-mix(in srgb, var(--border-warm) 35%, transparent)',
-            color: 'var(--text)',
-          }}>
-            Error: {error.message || 'Unknown error'}
-            {error.stack && (
-              <>
-                {'\n\nStack Trace:\n'}
-                {error.stack.substring(0, 1000)}
-              </>
-            )}
-            {content && (
-              <>
-                {'\n\nContent Preview (first 500 chars):\n'}
-                {content.substring(0, 500)}
-              </>
-            )}
-          </pre>
-        </details>
-      </div>
-    );
-  }
+      }}
+    >
+      <h2 style={{ color: 'var(--accent-warm)', marginBottom: '1em' }}>Error Loading Content</h2>
+      <p style={{ marginBottom: '1em' }}>
+        There was an error rendering this blog post ({slug}). Please try refreshing the page.
+      </p>
+      <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{message}</p>
+    </div>
+  );
 }
 
 export async function generateStaticParams() {
@@ -322,8 +265,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       })
     : null;
 
-  // Extract AEO schemas from content
-  const { extractFAQsFromContent, extractHowToSteps, generateFAQPageSchema, generateHowToSchema, generateQAPageSchema } = await import('@/app/lib/blog/aeoSchema');
   const faqs = extractFAQsFromContent(content);
   const howToSteps = extractHowToSteps(content, data.title);
   const siteBase = onOpenSurface ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
@@ -364,6 +305,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const faqSchema = generateFAQPageSchema(faqs, postUrl);
   const howToSchema = generateHowToSchema(data.title, data.description, howToSteps, postUrl);
   const qaSchema = generateQAPageSchema(data.title, data.description, faqs, postUrl);
+
+  let mdxBody: React.ReactNode;
+  try {
+    const mdxSource = await serializeBlogBody(content);
+    mdxBody = <MDXRenderer source={mdxSource} />;
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    console.error('[Blog Post MDX Error]', {
+      slug: resolvedParams.slug,
+      error: err.message,
+      timestamp: new Date().toISOString(),
+    });
+    mdxBody = <MdxRenderError slug={resolvedParams.slug} message={err.message ?? 'Unknown error'} />;
+  }
 
   return (
     <>
@@ -544,7 +499,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           }}
           className="blog-content"
         >
-          <MDXContent content={content} slug={resolvedParams.slug} />
+          {mdxBody}
         </div>
         
         {/* Transparency Footer for Research Posts */}

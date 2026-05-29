@@ -12,17 +12,10 @@
  */
 
 import { MetadataRoute } from 'next';
-import {
-  loadBlogPostSitemapEntries,
-  partitionBlogPostsForSitemap,
-} from '../../lib/blog-sitemap-entries';
 import { OPEN_ALIAS_ROUTES, OPEN_URLS } from '../../lib/canonical-claims';
 
 export default async function openSitemapStatic(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const entries = loadBlogPostSitemapEntries();
-  const { open: openBlogPosts } = partitionBlogPostsForSitemap(entries);
-
   return [
     {
       url: OPEN_URLS.home,
@@ -42,12 +35,9 @@ export default async function openSitemapStatic(): Promise<MetadataRoute.Sitemap
       changeFrequency: 'daily',
       priority: 0.88,
     },
-    ...openBlogPosts.map((e) => ({
-      url: `${OPEN_URLS.home}/blog/${e.slug}`,
-      lastModified: e.lastModified,
-      changeFrequency: 'weekly' as const,
-      priority: 0.82,
-    })),
+    // Individual /blog/[slug] URLs omitted until post pages return 200 in production.
+    // Listing ~300 slugs while Googlebot gets 5xx was the primary GSC "Server error" bucket.
+    // Re-enable openBlogPosts.map(...) after blog MDX render is verified on Vercel.
   ];
 }
 

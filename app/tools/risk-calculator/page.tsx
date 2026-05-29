@@ -296,7 +296,7 @@ export default function RiskCalculatorPage() {
                 marginBottom: '16px',
                 lineHeight: '1.6'
               }}>
-                <strong>Want the full picture?</strong> This is just the surface. See your Sector Breakdown, Geographic Exposure, and get Rebalancing Alerts inside the app.
+                <strong>Want the full picture?</strong> This is just the surface. See Sector Breakdown, Risk Matrix & Beta analytics, and stateless allocation insights inside the app.
               </p>
               <Link 
                 href="/sponsor?utm_source=risk_calculator&utm_medium=lead_magnet&utm_campaign=founders_club"
