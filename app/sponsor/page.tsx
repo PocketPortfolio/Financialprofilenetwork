@@ -700,7 +700,7 @@ function SponsorPageContent() {
             </div>
             <ul style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '20px', marginTop: '8px', lineHeight: '1.8', padding: 0, listStyle: 'none' }}>
               <li style={{ marginBottom: '4px' }}>• Unlimited API calls (stock prices, market data)</li>
-              <li style={{ marginBottom: '4px' }}>• Advanced analytics (sector breakdown, portfolio risk, rebalancing)</li>
+              <li style={{ marginBottom: '4px' }}>• Advanced analytics (sector breakdown, Risk Matrix & Beta, stateless allocation insights)</li>
               <li style={{ marginBottom: '4px' }}>• Priority support & onboarding</li>
               <li style={{ marginBottom: '4px' }}>• Your logo on our README</li>
               <li style={{ marginBottom: '4px' }}>• Early access to new features</li>
@@ -880,7 +880,7 @@ function SponsorPageContent() {
             <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>
               <span style={{ color: '#f59e0b', marginRight: '8px', fontSize: '18px' }}>✓</span>
               <span>
-                <strong>Advanced Analytics:</strong> Sector breakdown, portfolio risk (Beta), and rebalancing alerts
+                <strong>Advanced Analytics:</strong> Sector breakdown, Risk Matrix & Beta analytics, and stateless allocation insights
               </span>
             </li>
             <li style={{ marginBottom: '8px', display: 'flex', alignItems: 'center' }}>

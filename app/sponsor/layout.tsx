@@ -23,7 +23,7 @@ export default function SponsorLayout({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Pocket Portfolio Sovereign Membership",
-    "description": "Lifetime access to the sovereign wealth console. Privacy-first tracking, advanced analytics, and rebalancing tools.",
+    "description": "Lifetime access to the sovereign wealth console. Privacy-first tracking, Risk Matrix & Beta analytics, and stateless allocation insights.",
     "brand": {
       "@type": "Brand",
       "name": "Pocket Portfolio"
