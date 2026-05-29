@@ -2401,14 +2401,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a GraphQL DataLoader",
     "slug": "how-to-build-a-graphql-dataloader",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "graphql",
       "build",
       "dataloader"
-    ]
+    ],
+    "publishedAt": "2026-05-29T14:00:51.454Z"
   },
   {
     "id": "how-to-may-retro-backend-architecture-insights-may-30",
