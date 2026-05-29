@@ -7,30 +7,42 @@
 import { OPEN_ALIAS_ROUTES, OPEN_HOSTS } from './canonical-claims';
 
 const OPEN_HOSTS_DEV = ['open.localhost', 'www.open.localhost'] as const;
+const POCKET_HOSTS_DEV = ['localhost', '127.0.0.1'] as const;
+
+/** Local machine hosts — works with `npm run dev` and local `npm start` (NODE_ENV=production). */
+export function isLocalOpenDevHost(host: string): boolean {
+  const h = host.split(':')[0].toLowerCase();
+  return (OPEN_HOSTS_DEV as readonly string[]).includes(h);
+}
+
+export function isLocalPocketDevHost(host: string): boolean {
+  const h = host.split(':')[0].toLowerCase();
+  return (POCKET_HOSTS_DEV as readonly string[]).includes(h);
+}
+
+function localDevPort(): string {
+  return process.env.PORT ?? '3001';
+}
 
 export function isOpenPortfolioHost(host: string): boolean {
   const h = host.split(':')[0].toLowerCase();
   if ((OPEN_HOSTS as readonly string[]).includes(h)) return true;
-  if (process.env.NODE_ENV === 'development' && (OPEN_HOSTS_DEV as readonly string[]).includes(h)) {
-    return true;
-  }
+  if (isLocalOpenDevHost(host)) return true;
   return false;
 }
 
 /** Consumer (Pocket) base URL for cross-surface links — dev-aware. */
 export function pocketSurfaceBaseUrl(host: string): string {
-  const h = host.split(':')[0];
-  if (process.env.NODE_ENV === 'development' && (h === 'open.localhost' || h === 'localhost')) {
-    return 'http://localhost:3001';
+  if (isLocalOpenDevHost(host) || isLocalPocketDevHost(host)) {
+    return `http://localhost:${localDevPort()}`;
   }
   return 'https://www.pocketportfolio.app';
 }
 
 /** B2B (Open) base URL for cross-surface links — dev-aware. */
 export function openSurfaceBaseUrl(host: string): string {
-  const h = host.split(':')[0];
-  if (process.env.NODE_ENV === 'development' && (h === 'localhost' || h === 'open.localhost')) {
-    return 'http://open.localhost:3001';
+  if (isLocalOpenDevHost(host) || isLocalPocketDevHost(host)) {
+    return `http://open.localhost:${localDevPort()}`;
   }
   return 'https://www.openportfolio.co.uk';
 }
@@ -135,6 +147,5 @@ export function isOpenSurfaceRoute(pathname: string): boolean {
 
 /** Local O. dev host — cross-surface redirect loops if Next collapses Location to a relative path. */
 export function isDevOpenLocalHostname(host: string): boolean {
-  const h = host.split(':')[0];
-  return process.env.NODE_ENV === 'development' && (h === 'open.localhost' || h === 'www.open.localhost');
+  return isLocalOpenDevHost(host);
 }

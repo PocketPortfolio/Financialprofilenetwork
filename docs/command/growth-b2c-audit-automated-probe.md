@@ -1,6 +1,6 @@
 # Pocket B2C growth audit — automated probe output
 
-_Generated 2026-05-17T12:48:33.159Z · production GET probes · https://www.pocketportfolio.app_
+_Generated 2026-05-29T15:45:11.827Z · production GET probes · https://www.pocketportfolio.app_
 
 ## Phase 1 — Sitemap index (36-stream invariant)
 - Index HTTP: **200**

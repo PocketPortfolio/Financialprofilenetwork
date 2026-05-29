@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { isOpenSurfaceRoute, isPocketOnlyMarketingPath, isOpenStaticAssetPath } from '@/lib/surface-host';
+import {
+  isOpenSurfaceRoute,
+  isPocketOnlyMarketingPath,
+  isOpenStaticAssetPath,
+  isOpenPortfolioHost,
+  openSurfaceBaseUrl,
+  pocketSurfaceBaseUrl,
+} from '@/lib/surface-host';
 
 describe('isOpenStaticAssetPath', () => {
   it('includes press kit files under /press/ but not HTML routes', () => {
@@ -56,6 +63,24 @@ describe('isOpenSurfaceRoute', () => {
   it('denies other consumer-only paths without B2B rewrite', () => {
     expect(isOpenSurfaceRoute('/dashboard')).toBe(false);
     expect(isOpenSurfaceRoute('/for/advisors')).toBe(false);
+  });
+});
+
+describe('local dual-surface URLs', () => {
+  const env = process.env;
+
+  afterEach(() => {
+    process.env = env;
+  });
+
+  it('keeps cross-surface links on localhost when NODE_ENV is production (local npm start)', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.PORT = '3001';
+    expect(isOpenPortfolioHost('open.localhost')).toBe(true);
+    expect(openSurfaceBaseUrl('open.localhost')).toBe('http://open.localhost:3001');
+    expect(pocketSurfaceBaseUrl('open.localhost')).toBe('http://localhost:3001');
+    expect(openSurfaceBaseUrl('localhost')).toBe('http://open.localhost:3001');
+    expect(pocketSurfaceBaseUrl('localhost')).toBe('http://localhost:3001');
   });
 });
 

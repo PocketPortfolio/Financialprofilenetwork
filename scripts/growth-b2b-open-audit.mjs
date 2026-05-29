@@ -21,9 +21,14 @@ const SAMPLE_PATHS = [
   '/architecture',
   '/designchallenge',
   '/board-of-investors',
+  '/blog',
+  '/blog/the-complete-guide-to-api-error-responses',
   '/sitemap.xml',
   '/llms.txt',
 ];
+
+const POCKET_B2C_BLOG_GATE =
+  'https://www.pocketportfolio.app/blog/the-efficient-market-hypothesis-still-relevant';
 
 async function probeFollow(url) {
   const res = await fetch(url, { redirect: 'follow', headers: UA });
@@ -43,8 +48,17 @@ async function main() {
   push('');
 
   push('## Open sitemap');
-  const sm = await probeFollow(`${BASE}/sitemap.xml`);
+  const smRes = await fetch(`${BASE}/sitemap.xml`, { redirect: 'follow', headers: UA });
+  const sm = smRes.status;
+  const smText = sm === 200 ? await smRes.text() : '';
+  const blogLocs = smText ? (smText.match(/\/blog\//g) ?? []).length : 0;
   push(`- \`/sitemap.xml\` (follow redirects): **${sm}** ${sm === 200 ? '✓' : '⚠'}`);
+  push(`- Blog post \`<loc>\` rows (approx): **${blogLocs}** ${blogLocs > 50 ? '✓' : '⚠ (Phase 2 expects Open-category posts listed)'}`);
+  push('');
+
+  push('## Pocket B2C blog gate (cross-surface)');
+  const pocketBlog = await probeFollow(POCKET_B2C_BLOG_GATE);
+  push(`- B2C slug: **${pocketBlog}** ${pocketBlog === 200 ? '✓' : '⚠'}`);
   push('');
 
   push('## Sample Open URLs (200 expected)');

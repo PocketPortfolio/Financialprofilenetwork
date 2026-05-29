@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import {
+  isLocalOpenDevHost,
+  isLocalPocketDevHost,
   isOpenStaticAssetPath,
   isOpenSurfaceRoute,
   isPocketOnlyMarketingPath,
@@ -26,10 +28,7 @@ const OPEN_HOSTS_DEV = ['open.localhost', 'www.open.localhost'] as const;
 const OPEN_CANONICAL_HOST_DEV = 'open.localhost';
 
 function isDevOpenLocalHost(host: string): boolean {
-  return (
-    process.env.NODE_ENV === 'development' &&
-    (host === 'open.localhost' || host === 'www.open.localhost')
-  );
+  return isLocalOpenDevHost(host);
 }
 
 function isOpenHost(host: string): boolean {
@@ -105,7 +104,7 @@ export function middleware(request: NextRequest) {
     // Dev open.localhost: serve the same Next routes without redirect — middleware collapses
     // same-deployment redirects to `Location: /path`, causing ERR_TOO_MANY_REDIRECTS.
     if (!isOpenSurfaceRoute(pathname) && isPocketOnlyMarketingPath(pathname)) {
-      if (host === 'open.localhost' || host === 'www.open.localhost') {
+      if (isDevOpenLocalHost(hostHeader.split(':')[0])) {
         return NextResponse.next();
       }
       const pocketOrigin = pocketSurfaceBaseUrl(hostHeader);
@@ -131,9 +130,7 @@ export function middleware(request: NextRequest) {
   // such hit to the openportfolio.co.uk canonical equivalent.
   // In development, localhost and 127.0.0.1 may browse /open/* directly
   // (http://localhost:3001/open/architecture) without a cross-domain redirect.
-  const isLocalDevPocketHost =
-    process.env.NODE_ENV === 'development' &&
-    (host === 'localhost' || host === '127.0.0.1');
+  const isLocalDevPocketHost = isLocalPocketDevHost(host);
   if (
     !isLocalDevPocketHost &&
     (host === 'www.pocketportfolio.app' || host === 'pocketportfolio.app') &&
