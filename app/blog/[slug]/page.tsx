@@ -7,17 +7,9 @@ import matter from 'gray-matter';
 import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
 import { isNextNavigationError } from '@/lib/next-navigation-errors';
 import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
-import { marked } from 'marked';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
-import {
-  extractFAQsFromContent,
-  extractHowToSteps,
-  generateFAQPageSchema,
-  generateHowToSchema,
-  generateQAPageSchema,
-} from '@/app/lib/blog/aeoSchema';
-import ProductionNavbar from '../../components/marketing/ProductionNavbar';
+import BlogMarkdownBody from '../../components/blog/BlogMarkdownBody';
 import Link from 'next/link';
 import React from 'react';
 
@@ -122,23 +114,8 @@ function formatPostTime(timeStr?: string | null): string | null {
 }
 
 function renderPostBody(content: string): React.ReactNode {
-  try {
-    const safeContent = escapeAngleBracketsInProse(content);
-    const html = marked.parse(safeContent, { gfm: true, breaks: true });
-    return (
-      <div
-        className="blog-content-markdown"
-        dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : '' }}
-      />
-    );
-  } catch (error) {
-    console.error('[Blog Post] markdown render failed:', error);
-    return (
-      <div style={{ padding: '1.5rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-        Content temporarily unavailable.
-      </div>
-    );
-  }
+  const safeContent = escapeAngleBracketsInProse(content);
+  return <BlogMarkdownBody markdown={safeContent} />;
 }
 
 /** No generateStaticParams — avoids build-time prerender + headers()/RSC crashes on /open/blog/[slug]. */
@@ -231,74 +208,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
     const dateDisplay = formatPostDate(data.date);
     const timeDisplay = formatPostTime(publishedAt);
-    const faqs = extractFAQsFromContent(content);
-    const howToSteps = extractHowToSteps(content, data.title);
-    const siteBase = onOpenSurface ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
-    const brand = onOpenSurface ? SURFACE_ORG.open.name : 'Pocket Portfolio';
-    const postUrl = `${siteBase}/blog/${resolvedParams.slug}`;
-    const datePublished = publishedAt || data.date || undefined;
-    const dateModified = data.dateModified || datePublished;
-
-    const articleSchema = {
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: data.title,
-      description: data.description,
-      image: data.image
-        ? `${siteBase}${data.image}`
-        : `${siteBase}/api/og?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`,
-      datePublished,
-      dateModified,
-      author: {
-        '@type': 'Organization',
-        name: data.author || `${brand} Team`,
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: brand,
-        logo: {
-          '@type': 'ImageObject',
-          url: onOpenSurface
-            ? `${OPEN_URLS.home}/brand/pp-monogram-amber.png`
-            : 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
-        },
-      },
-      mainEntityOfPage: {
-        '@type': 'WebPage',
-        '@id': postUrl,
-      },
-    };
-
-    const faqSchema = generateFAQPageSchema(faqs, postUrl);
-    const howToSchema = generateHowToSchema(data.title, data.description ?? '', howToSteps, postUrl);
-    const qaSchema = generateQAPageSchema(data.title, data.description ?? '', faqs, postUrl);
     const mdxBody = renderPostBody(content);
 
     return (
       <>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-        />
-        {faqSchema ? (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-          />
-        ) : null}
-        {howToSchema ? (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-          />
-        ) : null}
-        {qaSchema ? (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(qaSchema) }}
-          />
-        ) : null}
-        <ProductionNavbar />
         <article
           style={{
             maxWidth: '800px',
