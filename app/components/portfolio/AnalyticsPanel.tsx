@@ -101,6 +101,7 @@ export default function AnalyticsPanel({
     {
       label: 'Volatility',
       value: `${analytics.volatility.toFixed(2)}%`,
+      color: 'hsl(var(--foreground))',
       description: 'Standard deviation of returns',
       premium: true,
     },
