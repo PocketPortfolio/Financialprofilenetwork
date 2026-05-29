@@ -7,8 +7,7 @@ import matter from 'gray-matter';
 import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
 import { isNextNavigationError } from '@/lib/next-navigation-errors';
 import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
-import { MDXRemote } from 'next-mdx-remote/rsc';
-import remarkGfm from 'remark-gfm';
+import { marked } from 'marked';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
 import {
@@ -24,6 +23,7 @@ import React from 'react';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
+export const runtime = 'nodejs';
 
 async function getRequestHost(): Promise<string> {
   try {
@@ -121,19 +121,18 @@ function formatPostTime(timeStr?: string | null): string | null {
   });
 }
 
-async function renderMdxBody(content: string): Promise<React.ReactNode> {
+function renderPostBody(content: string): React.ReactNode {
   try {
     const safeContent = escapeAngleBracketsInProse(content);
-    return await MDXRemote({
-      source: safeContent,
-      options: {
-        mdxOptions: {
-          remarkPlugins: [remarkGfm],
-        },
-      },
-    });
+    const html = marked.parse(safeContent, { gfm: true, breaks: true });
+    return (
+      <div
+        className="blog-content-markdown"
+        dangerouslySetInnerHTML={{ __html: typeof html === 'string' ? html : '' }}
+      />
+    );
   } catch (error) {
-    console.error('[Blog Post MDX Error]', error);
+    console.error('[Blog Post] markdown render failed:', error);
     return (
       <div style={{ padding: '1.5rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
         Content temporarily unavailable.
@@ -142,19 +141,7 @@ async function renderMdxBody(content: string): Promise<React.ReactNode> {
   }
 }
 
-export async function generateStaticParams() {
-  const postsDir = path.join(process.cwd(), 'content', 'posts');
-  if (!fs.existsSync(postsDir)) return [];
-
-  try {
-    return fs
-      .readdirSync(postsDir)
-      .filter((file) => file.endsWith('.mdx'))
-      .map((file) => ({ slug: file.replace(/\.mdx$/i, '') }));
-  } catch {
-    return [];
-  }
-}
+/** No generateStaticParams — avoids build-time prerender + headers()/RSC crashes on /open/blog/[slug]. */
 
 export async function generateMetadata({
   params,
@@ -285,7 +272,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     const faqSchema = generateFAQPageSchema(faqs, postUrl);
     const howToSchema = generateHowToSchema(data.title, data.description ?? '', howToSteps, postUrl);
     const qaSchema = generateQAPageSchema(data.title, data.description ?? '', faqs, postUrl);
-    const mdxBody = await renderMdxBody(content);
+    const mdxBody = renderPostBody(content);
 
     return (
       <>

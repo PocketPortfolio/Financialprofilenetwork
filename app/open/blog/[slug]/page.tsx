@@ -1,5 +1,6 @@
-export { default, generateMetadata, generateStaticParams } from '../../../blog/[slug]/page';
+export { default, generateMetadata } from '../../../blog/[slug]/page';
 
-/** Must match app/blog/[slug]/page.tsx — Open re-export does not inherit route segment config. */
+/** Open re-export does not inherit route segment config from app/blog/[slug]. */
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
+export const runtime = 'nodejs';
