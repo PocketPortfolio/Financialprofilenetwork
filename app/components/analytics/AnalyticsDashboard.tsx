@@ -123,7 +123,7 @@ export function AnalyticsDashboard({ trades, positions, tier, betaOverride = nul
           color: 'var(--text-secondary)',
           marginBottom: 'var(--space-4)'
         }}>
-          Unlock Sector Breakdown, Risk Metrics, and Rebalancing Alerts.
+          Unlock Time-Weighted Return (TWR), Brinson Attribution, and Rebalancing Alerts.
         </p>
         <a
           href="/sponsor"
