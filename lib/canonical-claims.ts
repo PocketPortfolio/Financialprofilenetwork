@@ -145,7 +145,7 @@ export const PERSON_ABBA = {
   award: [
     'Whale Watch — 2024 DataIQ ESG Award (contributor, 4.7B data points)', // FND-03
     'UK Black Business Show 2024 — speaker', // FND-04
-    'UK Global Talent visa — endorsed (Tech Nation track)',
+    'UK Global Talent visa — pending (Tech Nation track)',
   ],
   worksFor: 'Pocket Portfolio',
   sameAs: [

@@ -17,7 +17,7 @@ Pocket Portfolio is the Sovereign Ingestion & Inference Layer for wealth-tech: a
 - Selected receipts:
   - Whale Watch — 2024 DataIQ ESG Award (contributor, 4.7B data points)
   - UK Black Business Show 2024 — speaker
-  - UK Global Talent visa — endorsed (Tech Nation track)
+  - UK Global Talent visa — pending (Tech Nation track)
 - Profiles:
   - https://www.linkedin.com/in/abba-l-0395681b9/
   - https://coderlegion.com/user/Pocket+Portfolio
