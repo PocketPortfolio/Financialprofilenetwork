@@ -7,7 +7,7 @@ import matter from 'gray-matter';
 import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
 import { isNextNavigationError } from '@/lib/next-navigation-errors';
 import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
-import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote/rsc';
 import remarkGfm from 'remark-gfm';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
 import { sanitizeMdxBodyAfterFrontmatter } from '@/lib/mdx-sanitize-body';
@@ -19,546 +19,475 @@ import {
   generateQAPageSchema,
 } from '@/app/lib/blog/aeoSchema';
 import ProductionNavbar from '../../components/marketing/ProductionNavbar';
-import SEOHead from '../../components/SEOHead';
 import Link from 'next/link';
 import React from 'react';
-import MDXRenderer from '../../components/blog/MDXRenderer';
 
-// Force dynamic rendering to avoid React version conflicts during static generation
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
-async function serializeBlogBody(content: string) {
-  const safeContent = escapeAngleBracketsInProse(content);
-  return serialize(safeContent, {
-    mdxOptions: {
-      remarkPlugins: [remarkGfm],
-    },
+type BlogPostFrontmatter = {
+  title: string;
+  description?: string;
+  date?: string;
+  author?: string;
+  image?: string;
+  pillar?: string;
+  category?: string;
+  tags?: string[];
+  videoId?: string;
+  dateModified?: string;
+};
+
+function toSerializableString(value: unknown): string | undefined {
+  if (value == null) return undefined;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return undefined;
+}
+
+function normalizeFrontmatter(raw: Record<string, unknown>): BlogPostFrontmatter {
+  const tags = Array.isArray(raw.tags)
+    ? raw.tags.map((t) => (typeof t === 'string' ? t : String(t)))
+    : undefined;
+
+  return {
+    title: typeof raw.title === 'string' ? raw.title : 'Untitled',
+    description: toSerializableString(raw.description),
+    date: toSerializableString(raw.date),
+    author: toSerializableString(raw.author),
+    image: toSerializableString(raw.image),
+    pillar: toSerializableString(raw.pillar),
+    category: toSerializableString(raw.category),
+    tags,
+    videoId: toSerializableString(raw.videoId),
+    dateModified: toSerializableString(raw.dateModified),
+  };
+}
+
+function loadPost(slug: string): { content: string; data: BlogPostFrontmatter } | null {
+  const postPath = path.join(process.cwd(), 'content', 'posts', `${slug}.mdx`);
+
+  try {
+    if (!fs.existsSync(postPath)) return null;
+
+    const stat = fs.statSync(postPath);
+    if (!stat.isFile() || stat.size === 0) return null;
+
+    const fileContents = fs.readFileSync(postPath, 'utf-8');
+    if (!fileContents.trim()) return null;
+
+    const parsed = matter(fileContents);
+    const data = normalizeFrontmatter((parsed.data ?? {}) as Record<string, unknown>);
+    if (!data.title?.trim()) return null;
+
+    const content = sanitizeMdxBodyAfterFrontmatter(parsed.content);
+    if (!content.trim()) return null;
+
+    return { content, data };
+  } catch (error) {
+    console.error('[Blog Post] loadPost failed:', { slug, error });
+    return null;
+  }
+}
+
+function formatPostDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  const parsed = new Date(dateStr);
+  if (Number.isNaN(parsed.getTime())) return dateStr;
+  return parsed.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 }
 
-function MdxRenderError({ slug, message }: { slug: string; message: string }) {
-  return (
-    <div
-      style={{
-        padding: '2em',
-        background: 'var(--surface-elevated)',
-        borderRadius: '8px',
-        border: '2px solid var(--border-warm)',
-        color: 'var(--text)',
-      }}
-    >
-      <h2 style={{ color: 'var(--accent-warm)', marginBottom: '1em' }}>Error Loading Content</h2>
-      <p style={{ marginBottom: '1em' }}>
-        There was an error rendering this blog post ({slug}). Please try refreshing the page.
-      </p>
-      <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{message}</p>
-    </div>
-  );
+function formatPostTime(timeStr?: string | null): string | null {
+  if (!timeStr) return null;
+  const parsed = new Date(timeStr);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+}
+
+async function renderMdxBody(content: string): Promise<React.ReactNode> {
+  try {
+    const safeContent = escapeAngleBracketsInProse(content);
+    return await MDXRemote({
+      source: safeContent,
+      options: {
+        mdxOptions: {
+          remarkPlugins: [remarkGfm],
+        },
+      },
+    });
+  } catch (error) {
+    console.error('[Blog Post MDX Error]', error);
+    return (
+      <div style={{ padding: '1.5rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+        Content temporarily unavailable.
+      </div>
+    );
+  }
 }
 
 export async function generateStaticParams() {
   const postsDir = path.join(process.cwd(), 'content', 'posts');
   if (!fs.existsSync(postsDir)) return [];
-  
+
   try {
-    const files = fs.readdirSync(postsDir);
-    return files
-      .filter(file => file.endsWith('.mdx'))
-      .map(file => ({ slug: file.replace('.mdx', '') }));
-  } catch (error) {
+    return fs
+      .readdirSync(postsDir)
+      .filter((file) => file.endsWith('.mdx'))
+      .map((file) => ({ slug: file.replace(/\.mdx$/i, '') }));
+  } catch {
     return [];
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  // Next.js 15: params is always a Promise
-  const resolvedParams = await params;
-  const postPath = path.join(process.cwd(), 'content', 'posts', `${resolvedParams.slug}.mdx`);
-  
-  if (!fs.existsSync(postPath)) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const loaded = loadPost(slug);
+  if (!loaded) {
     return { title: 'Post Not Found' };
   }
 
-  try {
-    const fileContents = fs.readFileSync(postPath, 'utf-8');
-    const { data } = matter(fileContents);
+  const { data } = loaded;
+  const host = (await headers()).get('host')?.split(':')[0] ?? '';
+  const onOpen = isOpenPortfolioHost(host);
+  const siteBase = onOpen ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
+  const brand = onOpen ? SURFACE_ORG.open.name : 'Pocket Portfolio';
+  const fallbackOgImage = `${siteBase}/api/og?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
+  const published = data.date ?? undefined;
 
-    const host = (await headers()).get('host')?.split(':')[0] ?? '';
-    const onOpen = isOpenPortfolioHost(host);
-    const siteBase = onOpen ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
-    const brand = onOpen ? SURFACE_ORG.open.name : 'Pocket Portfolio';
-    const fallbackOgImage = `${siteBase}/api/og?title=${encodeURIComponent(data.title || `${brand} Blog`)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
-    return {
-      title: `${data.title} | ${brand} Blog`,
+  return {
+    title: `${data.title} | ${brand} Blog`,
+    description: data.description,
+    keywords: data.tags,
+    openGraph: {
+      title: data.title,
       description: data.description,
-      keywords: data.tags || [],
-      openGraph: {
-        title: data.title,
-        description: data.description,
-        images: [data.image || fallbackOgImage],
-        type: 'article',
-        publishedTime: data.date, // Will be updated below if publishedAt exists
-        authors: [data.author || `${brand} Team`],
-        url: `${siteBase}/blog/${resolvedParams.slug}`,
-      },
-      alternates: {
-        canonical: `${siteBase}/blog/${resolvedParams.slug}`,
-      },
-    };
-  } catch (error) {
-    return { title: 'Post Not Found' };
-  }
+      images: [data.image || fallbackOgImage],
+      type: 'article',
+      publishedTime: published,
+      authors: [data.author || `${brand} Team`],
+      url: `${siteBase}/blog/${slug}`,
+    },
+    alternates: {
+      canonical: `${siteBase}/blog/${slug}`,
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Next.js 15: params is always a Promise
   const resolvedParams = await params;
-  const postPath = path.join(process.cwd(), 'content', 'posts', `${resolvedParams.slug}.mdx`);
-  
-  // ✅ Enhanced file existence check with detailed logging
-  if (!fs.existsSync(postPath)) {
-    console.error('[Blog Post] File not found:', {
-      slug: resolvedParams.slug,
-      postPath,
-      cwd: process.cwd(),
-      postsDir: path.join(process.cwd(), 'content', 'posts'),
-      postsDirExists: fs.existsSync(path.join(process.cwd(), 'content', 'posts')),
-      availableFiles: fs.existsSync(path.join(process.cwd(), 'content', 'posts')) 
-        ? fs.readdirSync(path.join(process.cwd(), 'content', 'posts')).slice(0, 10)
-        : 'N/A',
-    });
-    notFound();
-  }
 
-  // ✅ Validate file is readable and not empty
   try {
-    const fileStats = fs.statSync(postPath);
-    if (fileStats.size === 0) {
-      console.error('[Blog Post] File is empty:', {
-        slug: resolvedParams.slug,
-        postPath,
-        size: fileStats.size,
-      });
-      throw new Error(`Blog post file is empty: ${resolvedParams.slug}`);
+    const loaded = loadPost(resolvedParams.slug);
+    if (!loaded) {
+      notFound();
     }
-  } catch (statError: any) {
-    console.error('[Blog Post] Cannot read file stats:', {
-      slug: resolvedParams.slug,
-      postPath,
-      error: statError.message,
-    });
-    throw new Error(`Cannot access blog post file: ${statError.message}`);
-  }
 
-  // Parse MDX file with error handling
-  let fileContents: string;
-  let data: any;
-  let content: string;
-  
-  try {
-    fileContents = fs.readFileSync(postPath, 'utf-8');
-    
-    // ✅ Validate file contents
-    if (!fileContents || fileContents.trim().length === 0) {
-      throw new Error('File contents are empty');
-    }
-    
-    const parsed = matter(fileContents);
-    data = parsed.data;
-    content = sanitizeMdxBodyAfterFrontmatter(parsed.content);
+    const { content, data } = loaded;
 
-    // ✅ Validate parsed data
-    if (!data || !data.title) {
-      throw new Error('Frontmatter missing required fields (title)');
-    }
-    
-    if (!content || content.trim().length === 0) {
-      throw new Error('Content body is empty');
-    }
-    
-    // ✅ Log successful parsing (helps with debugging)
-    console.log('[Blog Post] Successfully parsed:', {
-      slug: resolvedParams.slug,
-      title: data.title,
-      contentLength: content.length,
-      hasImage: !!data.image,
-    });
-  } catch (error: unknown) {
-    if (isNextNavigationError(error)) throw error;
-    const err = error as { message?: string; stack?: string };
-    console.error('[Blog Post] Error parsing MDX file:', {
-      slug: resolvedParams.slug,
-      postPath,
-      fileExists: fs.existsSync(postPath),
-      fileSize: fs.existsSync(postPath) ? fs.statSync(postPath).size : 0,
-      error: err.message,
-      errorStack: err.stack,
-    });
-    throw new Error(`Failed to parse blog post: ${err.message ?? 'Unknown error'}`);
-  }
+    const host = (await headers()).get('host')?.split(':')[0] ?? '';
+    const onOpenSurface = isOpenPortfolioHost(host);
+    const category = data.category ?? 'deep-dive';
+    const technical = isOpenBlogCategory(category);
 
-  const host = (await headers()).get('host')?.split(':')[0] ?? '';
-  const onOpenSurface = isOpenPortfolioHost(host);
-  const category = typeof data.category === 'string' ? data.category : 'deep-dive';
-  const technical = isOpenBlogCategory(category);
-  if (onOpenSurface && !technical) {
-    redirect(`${pocketSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
-  }
-  if (!onOpenSurface && technical) {
-    redirect(`${openSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
-  }
-
-  // ✅ Load publishedAt from calendar files
-  let publishedAt: string | null = null;
-  try {
-    // Try main calendar first
-    const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
-    if (fs.existsSync(mainCalendarPath)) {
-      const mainCalendar = JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'));
-      const postInCalendar = mainCalendar.find((p: any) => p.slug === resolvedParams.slug);
-      if (postInCalendar?.publishedAt) {
-        publishedAt = postInCalendar.publishedAt;
-      }
+    if (onOpenSurface && !technical) {
+      redirect(`${pocketSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
     }
-    
-    // If not found, try how-to calendar
-    if (!publishedAt) {
-      const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
-      if (fs.existsSync(howToCalendarPath)) {
-        const howToCalendar = JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'));
-        const postInCalendar = howToCalendar.find((p: any) => p.slug === resolvedParams.slug);
-        if (postInCalendar?.publishedAt) {
-          publishedAt = postInCalendar.publishedAt;
+    if (!onOpenSurface && technical) {
+      redirect(`${openSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
+    }
+
+    let publishedAt: string | null = null;
+    try {
+      const calendarPaths = [
+        path.join(process.cwd(), 'content', 'blog-calendar.json'),
+        path.join(process.cwd(), 'content', 'how-to-tech-calendar.json'),
+        path.join(process.cwd(), 'content', 'research-calendar.json'),
+      ];
+      for (const calendarPath of calendarPaths) {
+        if (!publishedAt && fs.existsSync(calendarPath)) {
+          const calendar = JSON.parse(fs.readFileSync(calendarPath, 'utf-8')) as Array<{
+            slug?: string;
+            publishedAt?: string;
+          }>;
+          const hit = calendar.find((p) => p.slug === resolvedParams.slug);
+          if (hit?.publishedAt) {
+            publishedAt = toSerializableString(hit.publishedAt) ?? null;
+          }
         }
       }
+    } catch {
+      publishedAt = null;
     }
-    
-    // If not found, try research calendar
-    if (!publishedAt) {
-      const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
-      if (fs.existsSync(researchCalendarPath)) {
-        const researchCalendar = JSON.parse(fs.readFileSync(researchCalendarPath, 'utf-8'));
-        const postInCalendar = researchCalendar.find((p: any) => p.slug === resolvedParams.slug);
-        if (postInCalendar?.publishedAt) {
-          publishedAt = postInCalendar.publishedAt;
-        }
-      }
-    }
-  } catch (error) {
-    // Silently fail - publishedAt is optional
-    console.warn('Could not load publishedAt from calendar:', error);
-  }
 
-  // Format date and time for display
-  const dateDisplay = new Date(data.date).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-  
-  const timeDisplay = publishedAt 
-    ? new Date(publishedAt).toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        timeZoneName: 'short'
-      })
-    : null;
+    const dateDisplay = formatPostDate(data.date);
+    const timeDisplay = formatPostTime(publishedAt);
+    const faqs = extractFAQsFromContent(content);
+    const howToSteps = extractHowToSteps(content, data.title);
+    const siteBase = onOpenSurface ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
+    const brand = onOpenSurface ? SURFACE_ORG.open.name : 'Pocket Portfolio';
+    const postUrl = `${siteBase}/blog/${resolvedParams.slug}`;
+    const datePublished = publishedAt || data.date || undefined;
+    const dateModified = data.dateModified || datePublished;
 
-  const faqs = extractFAQsFromContent(content);
-  const howToSteps = extractHowToSteps(content, data.title);
-  const siteBase = onOpenSurface ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
-  const brand = onOpenSurface ? SURFACE_ORG.open.name : 'Pocket Portfolio';
-  const postUrl = `${siteBase}/blog/${resolvedParams.slug}`;
-
-  const articleSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: data.title,
-    description: data.description,
-    image: data.image
-      ? `${siteBase}${data.image}`
-      : `${siteBase}/api/og?title=${encodeURIComponent(data.title || `${brand} Blog`)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`,
-    datePublished: publishedAt || data.date,
-    dateModified: data.dateModified || publishedAt || data.date,
-    author: {
-      '@type': 'Organization',
-      name: data.author || `${brand} Team`,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: brand,
-      logo: {
-        '@type': 'ImageObject',
-        url: onOpenSurface
-          ? `${OPEN_URLS.home}/brand/pp-monogram-amber.png`
-          : 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
+    const articleSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: data.title,
+      description: data.description,
+      image: data.image
+        ? `${siteBase}${data.image}`
+        : `${siteBase}/api/og?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`,
+      datePublished,
+      dateModified,
+      author: {
+        '@type': 'Organization',
+        name: data.author || `${brand} Team`,
       },
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': postUrl,
-    },
-  };
+      publisher: {
+        '@type': 'Organization',
+        name: brand,
+        logo: {
+          '@type': 'ImageObject',
+          url: onOpenSurface
+            ? `${OPEN_URLS.home}/brand/pp-monogram-amber.png`
+            : 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
+        },
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': postUrl,
+      },
+    };
 
-  // Generate AEO schemas
-  const faqSchema = generateFAQPageSchema(faqs, postUrl);
-  const howToSchema = generateHowToSchema(data.title, data.description, howToSteps, postUrl);
-  const qaSchema = generateQAPageSchema(data.title, data.description, faqs, postUrl);
+    const faqSchema = generateFAQPageSchema(faqs, postUrl);
+    const howToSchema = generateHowToSchema(data.title, data.description ?? '', howToSteps, postUrl);
+    const qaSchema = generateQAPageSchema(data.title, data.description ?? '', faqs, postUrl);
+    const mdxBody = await renderMdxBody(content);
 
-  let mdxBody: React.ReactNode;
-  try {
-    const mdxSource = await serializeBlogBody(content);
-    mdxBody = <MDXRenderer source={mdxSource} />;
-  } catch (error: unknown) {
-    const err = error as { message?: string };
-    console.error('[Blog Post MDX Error]', {
-      slug: resolvedParams.slug,
-      error: err.message,
-      timestamp: new Date().toISOString(),
-    });
-    mdxBody = <MdxRenderError slug={resolvedParams.slug} message={err.message ?? 'Unknown error'} />;
-  }
-
-  return (
-    <>
-      <SEOHead
-        title={data.title}
-        description={data.description}
-        keywords={data.tags || []}
-        canonical={postUrl}
-        ogType="article"
-        ogImage={data.image ? `${siteBase}${data.image}` : undefined}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      {faqSchema && (
+    return (
+      <>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
         />
-      )}
-      {howToSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-        />
-      )}
-      {qaSchema && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(qaSchema) }}
-        />
-      )}
-      <ProductionNavbar />
-      <article 
-        style={{ 
-          maxWidth: '800px', 
-          margin: '0 auto', 
-          padding: 'clamp(24px, 6vw, 60px) clamp(16px, 4vw, 24px)',
-          minHeight: 'calc(100vh - 200px)',
-          width: '100%',
-          boxSizing: 'border-box',
-          overflowX: 'hidden'
-        }}
-      >
-        <header style={{ marginBottom: 'clamp(32px, 6vw, 48px)' }}>
-          <Link 
-            href="/blog"
-            style={{
-              display: 'inline-block',
-              marginBottom: '24px',
-              color: 'var(--accent-warm)',
-              textDecoration: 'none',
-              fontSize: '14px',
-              fontWeight: '600',
-            }}
-          >
-            ← Back to Blog
-          </Link>
-          <h1 
-            style={{ 
-              fontSize: 'clamp(32px, 6vw, 48px)', 
-              fontWeight: '700', 
-              marginBottom: '16px',
-              lineHeight: '1.2',
-              color: 'var(--text)',
-            }}
-          >
-            {data.title}
-          </h1>
-          <div 
-            style={{ 
-              display: 'flex', 
-              gap: 'clamp(8px, 2vw, 16px)', 
-              flexWrap: 'wrap', 
-              marginBottom: '24px', 
-              fontSize: 'clamp(12px, 2.5vw, 14px)', 
-              color: 'var(--text-secondary)',
-              alignItems: 'center'
-            }}
-          >
-            <span>
-              {dateDisplay}
-              {timeDisplay && (
-                <span style={{ marginLeft: '8px', opacity: 0.8 }}>
-                  at {timeDisplay}
-                </span>
-              )}
-            </span>
-            <span>By {data.author || 'Pocket Portfolio Team'}</span>
-            {data.pillar && (
-              <span style={{
-                padding: '4px 12px',
-                borderRadius: '6px',
-                background: 'var(--surface-elevated)',
-                border: '2px solid var(--border-warm)',
-                fontSize: '12px',
-                textTransform: 'capitalize',
-              }}>
-                {data.pillar}
-              </span>
-            )}
-          </div>
-          {data.image && (
-            <img 
-              src={data.image} 
-              alt={data.title}
-              style={{ 
-                width: '100%', 
-                height: 'auto',
-                borderRadius: '12px', 
-                marginBottom: '32px',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                maxWidth: '100%'
+        {faqSchema ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          />
+        ) : null}
+        {howToSchema ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+          />
+        ) : null}
+        {qaSchema ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(qaSchema) }}
+          />
+        ) : null}
+        <ProductionNavbar />
+        <article
+          style={{
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: 'clamp(24px, 6vw, 60px) clamp(16px, 4vw, 24px)',
+            minHeight: 'calc(100vh - 200px)',
+            width: '100%',
+            boxSizing: 'border-box',
+            overflowX: 'hidden',
+          }}
+        >
+          <header style={{ marginBottom: 'clamp(32px, 6vw, 48px)' }}>
+            <Link
+              href="/blog"
+              style={{
+                display: 'inline-block',
+                marginBottom: '24px',
+                color: 'var(--accent-warm)',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
               }}
-            />
-          )}
-          {data.tags && data.tags.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
-              {data.tags.map((tag: string, i: number) => (
+            >
+              ← Back to Blog
+            </Link>
+            <h1
+              style={{
+                fontSize: 'clamp(32px, 6vw, 48px)',
+                fontWeight: '700',
+                marginBottom: '16px',
+                lineHeight: '1.2',
+                color: 'var(--text)',
+              }}
+            >
+              {data.title}
+            </h1>
+            <div
+              style={{
+                display: 'flex',
+                gap: 'clamp(8px, 2vw, 16px)',
+                flexWrap: 'wrap',
+                marginBottom: '24px',
+                fontSize: 'clamp(12px, 2.5vw, 14px)',
+                color: 'var(--text-secondary)',
+                alignItems: 'center',
+              }}
+            >
+              {dateDisplay ? (
+                <span>
+                  {dateDisplay}
+                  {timeDisplay ? (
+                    <span style={{ marginLeft: '8px', opacity: 0.8 }}>at {timeDisplay}</span>
+                  ) : null}
+                </span>
+              ) : null}
+              <span>By {data.author || 'Pocket Portfolio Team'}</span>
+              {data.pillar ? (
                 <span
-                  key={i}
                   style={{
-                    fontSize: '12px',
                     padding: '4px 12px',
-                    background: 'var(--surface-elevated)',
                     borderRadius: '6px',
-                    color: 'var(--text-secondary)',
+                    background: 'var(--surface-elevated)',
                     border: '2px solid var(--border-warm)',
+                    fontSize: '12px',
+                    textTransform: 'capitalize',
                   }}
                 >
-                  #{tag}
+                  {data.pillar}
                 </span>
-              ))}
+              ) : null}
             </div>
-          )}
-        </header>
-        
-        {/* Video Embed for Research Posts */}
-        {data.category === 'research' && data.videoId && (
-          <div style={{ 
-            marginBottom: '48px',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-            position: 'relative',
-            width: '100%',
-            paddingBottom: '56.25%', // 16:9 aspect ratio
-            height: 0
-          }}>
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${data.videoId}`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%'
-              }}
-            />
-          </div>
-        )}
-        
-        <div 
-          style={{ 
-            fontSize: 'clamp(16px, 3vw, 18px)', 
-            lineHeight: '1.8', 
-            color: 'var(--text)',
-            width: '100%',
-            maxWidth: '100%',
-            overflowWrap: 'break-word',
-            wordWrap: 'break-word'
-          }}
-          className="blog-content"
-        >
-          {mdxBody}
-        </div>
-        
-        {/* Transparency Footer for Research Posts */}
-        {data.category === 'research' && (
-          <div style={{ 
-            marginTop: '48px', 
-            padding: '16px 24px', 
-            fontSize: '14px', 
-            color: 'var(--text-secondary)',
-            fontStyle: 'italic',
-            borderTop: '1px solid color-mix(in srgb, var(--border-warm) 45%, transparent)',
-            textAlign: 'center',
-            background: 'var(--surface-elevated)',
-            borderRadius: '8px',
-          }}>
-            This research was autonomously synthesized by the Pocket Portfolio Engine.
-          </div>
-        )}
-        
-        {/* CTA Section */}
-        <div
-          style={{
-            marginTop: '64px',
-            padding: 'clamp(20px, 4vw, 32px)',
-            background: 'var(--surface-elevated)',
-            borderRadius: '12px',
-            border: '2px solid var(--border-warm)',
-            textAlign: 'center',
-            width: '100%',
-            boxSizing: 'border-box'
-          }}
-        >
-          <h2 style={{ fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: '600', marginBottom: '16px', color: 'var(--text)' }}>
-            Unlock Sovereign Sync
-          </h2>
-          <p style={{ fontSize: 'clamp(14px, 2.5vw, 16px)', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.6' }}>
-            Take control of your financial data with bidirectional Google Drive sync. Available for Corporate Sponsors and Founders Club members.
-          </p>
-          <Link
-            href="/sponsor"
-            style={{
-              display: 'inline-block',
-              padding: 'clamp(12px, 3vw, 14px) clamp(20px, 5vw, 28px)',
-              background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontSize: 'clamp(14px, 3vw, 16px)',
-              fontWeight: '600',
-              transition: 'all 0.2s ease',
-              boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
-              maxWidth: '100%'
-            }}
-          >
-            Upgrade to Unlock →
-          </Link>
-        </div>
-      </article>
-    </>
-  );
-}
+            {data.image ? (
+              <img
+                src={data.image}
+                alt={data.title}
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  borderRadius: '12px',
+                  marginBottom: '32px',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  maxWidth: '100%',
+                }}
+              />
+            ) : null}
+            {data.tags && data.tags.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
+                {data.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    style={{
+                      fontSize: '12px',
+                      padding: '4px 12px',
+                      background: 'var(--surface-elevated)',
+                      borderRadius: '6px',
+                      color: 'var(--text-secondary)',
+                      border: '2px solid var(--border-warm)',
+                    }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </header>
 
+          {data.category === 'research' && data.videoId ? (
+            <div
+              style={{
+                marginBottom: '48px',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                position: 'relative',
+                width: '100%',
+                paddingBottom: '56.25%',
+                height: 0,
+              }}
+            >
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${data.videoId}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+            </div>
+          ) : null}
+
+          <div
+            style={{
+              fontSize: 'clamp(16px, 3vw, 18px)',
+              lineHeight: '1.8',
+              color: 'var(--text)',
+              width: '100%',
+              maxWidth: '100%',
+              overflowWrap: 'break-word',
+              wordWrap: 'break-word',
+            }}
+            className="blog-content"
+          >
+            {mdxBody}
+          </div>
+
+          {data.category === 'research' ? (
+            <div
+              style={{
+                marginTop: '48px',
+                padding: '16px 24px',
+                fontSize: '14px',
+                color: 'var(--text-secondary)',
+                fontStyle: 'italic',
+                borderTop: '1px solid color-mix(in srgb, var(--border-warm) 45%, transparent)',
+                textAlign: 'center',
+                background: 'var(--surface-elevated)',
+                borderRadius: '8px',
+              }}
+            >
+              This research was autonomously synthesized by the Pocket Portfolio Engine.
+            </div>
+          ) : null}
+        </article>
+      </>
+    );
+  } catch (error: unknown) {
+    if (isNextNavigationError(error)) throw error;
+    console.error('[Blog Post] unhandled render error:', {
+      slug: resolvedParams.slug,
+      error,
+    });
+    return (
+      <article style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 24px' }}>
+        <h1 style={{ color: 'var(--text)', marginBottom: '12px' }}>Post temporarily unavailable</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>Content temporarily unavailable.</p>
+        <Link href="/blog" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+          ← Back to Blog
+        </Link>
+      </article>
+    );
+  }
+}
