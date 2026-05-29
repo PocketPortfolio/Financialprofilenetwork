@@ -2094,8 +2094,8 @@ export default function Dashboard() {
                   Import complete. Unlock institutional analytics.
                 </h3>
                 <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Your portfolio data is live. Upgrade to unlock Time-Weighted Return (TWR), Brinson
-                  attribution, and premium AI analysis.
+                  Your portfolio data is live. Upgrade to unlock annualized return, volatility,
+                  sector exposure, allocation recommendations, and premium AI analysis.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <a
