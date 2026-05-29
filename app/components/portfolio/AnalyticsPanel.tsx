@@ -145,7 +145,11 @@ export default function AnalyticsPanel({
             e.currentTarget.style.borderColor = 'var(--dashboard-chrome-border)';
             e.currentTarget.style.transform = 'translateY(0)';
           }}
-          title={metric.premium && !isPremium ? 'Upgrade to unlock' : metric.description}
+          title={
+            metric.premium && !isPremium
+              ? 'Unlock Time-Weighted Return (TWR) & Brinson Attribution'
+              : metric.description
+          }
           role="region"
           aria-label={`${metric.label} metric`}
           tabIndex={0}
@@ -202,6 +206,21 @@ export default function AnalyticsPanel({
           )}
         </div>
       ))}
+      {!isPremium && (
+        <p
+          style={{
+            gridColumn: '1 / -1',
+            margin: 0,
+            paddingTop: 'var(--space-2)',
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+            borderTop: '1px solid var(--dashboard-chrome-border)',
+          }}
+        >
+          Founders unlock Time-Weighted Return (TWR) &amp; Brinson Attribution.
+        </p>
+      )}
     </div>
   );
 }

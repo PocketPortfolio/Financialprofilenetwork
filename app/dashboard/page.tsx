@@ -1987,16 +1987,6 @@ export default function Dashboard() {
             />
           )}
 
-
-          {/* Price Pipeline Health */}
-          <div className="dashboard-card" style={{ marginBottom: '24px' }}>
-            <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: 'hsl(var(--foreground))' }}>
-              Price Pipeline Health
-            </div>
-            <PricePipelineHealth />
-          </div>
-
-
           {/* Sync Upgrade CTA - Show for unauthenticated users with local trades */}
           <SyncUpgradeCTA />
 
@@ -2101,10 +2091,11 @@ export default function Dashboard() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <h3 style={{ margin: '0 0 8px', color: 'var(--text)', fontSize: '18px' }}>
-                  Import complete. Unlock advanced risk intelligence.
+                  Import complete. Unlock institutional analytics.
                 </h3>
                 <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Your portfolio data is live. Upgrade now to unlock Beta, Volatility, and premium AI analysis.
+                  Your portfolio data is live. Upgrade to unlock Time-Weighted Return (TWR), Brinson
+                  attribution, and premium AI analysis.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <a
@@ -2668,6 +2659,30 @@ export default function Dashboard() {
               />
               )}
             </div>
+          </div>
+        )}
+
+        {/* Operations footer — live data pipeline status (below holdings narrative) */}
+        {trades.length > 0 && (
+          <div
+            className="dashboard-card"
+            style={{ marginTop: '8px', marginBottom: '32px' }}
+            data-tour="price-pipeline-health"
+          >
+            <div
+              style={{
+                fontSize: '11px',
+                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'hsl(var(--muted-foreground))',
+                marginBottom: '12px',
+              }}
+            >
+              Operations · Price Pipeline Health
+            </div>
+            <PricePipelineHealth />
           </div>
         )}
 

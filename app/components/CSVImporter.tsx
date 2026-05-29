@@ -2385,9 +2385,12 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
             padding: '20px',
           }}
         >
-          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: 'var(--text)' }}>Import complete. Unlock advanced risk next.</h3>
+          <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: 'var(--text)' }}>
+            Import complete. Unlock institutional analytics.
+          </h3>
           <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
-            Your data is in. Upgrade to Founders Club to unlock Beta, Volatility, and deeper AI analysis for this portfolio.
+            Your data is in. Upgrade to Founders Club to unlock Time-Weighted Return (TWR), Brinson
+            attribution, and deeper AI analysis for this portfolio.
           </p>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <a
