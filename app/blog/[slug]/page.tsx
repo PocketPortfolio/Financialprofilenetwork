@@ -25,6 +25,14 @@ import React from 'react';
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
+async function getRequestHost(): Promise<string> {
+  try {
+    return (await headers()).get('host')?.split(':')[0] ?? '';
+  } catch {
+    return '';
+  }
+}
+
 type BlogPostFrontmatter = {
   title: string;
   description?: string;
@@ -160,7 +168,7 @@ export async function generateMetadata({
   }
 
   const { data } = loaded;
-  const host = (await headers()).get('host')?.split(':')[0] ?? '';
+  const host = await getRequestHost();
   const onOpen = isOpenPortfolioHost(host);
   const siteBase = onOpen ? OPEN_URLS.home : 'https://www.pocketportfolio.app';
   const brand = onOpen ? SURFACE_ORG.open.name : 'Pocket Portfolio';
@@ -197,16 +205,18 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
     const { content, data } = loaded;
 
-    const host = (await headers()).get('host')?.split(':')[0] ?? '';
-    const onOpenSurface = isOpenPortfolioHost(host);
+    const host = await getRequestHost();
+    const onOpenSurface = host ? isOpenPortfolioHost(host) : false;
     const category = data.category ?? 'deep-dive';
     const technical = isOpenBlogCategory(category);
 
-    if (onOpenSurface && !technical) {
-      redirect(`${pocketSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
-    }
-    if (!onOpenSurface && technical) {
-      redirect(`${openSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
+    if (host) {
+      if (onOpenSurface && !technical) {
+        redirect(`${pocketSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
+      }
+      if (!onOpenSurface && technical) {
+        redirect(`${openSurfaceBaseUrl(host)}/blog/${resolvedParams.slug}`);
+      }
     }
 
     let publishedAt: string | null = null;
