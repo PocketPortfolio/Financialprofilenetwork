@@ -2419,14 +2419,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Query Performance - Indexing Strategies Analysis",
     "slug": "research-database-query-performance-indexing-strategies-analysis-2026-05-30",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "database",
       "query"
-    ]
+    ],
+    "publishedAt": "2026-05-30T18:00:30.335Z"
   },
   {
     "id": "research-api-response-time-optimization-best-practices-2026-2026-05-31",
