@@ -2433,14 +2433,15 @@
     "scheduledTime": "14:00",
     "title": "How to Optimize API Response Times",
     "slug": "how-to-optimize-api-response-times",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "optimize",
       "response"
-    ]
+    ],
+    "publishedAt": "2026-05-31T14:00:38.833Z"
   },
   {
     "id": "how-to-how-to-implement-api-rate-limiting-per-user-jun-1",
