@@ -922,7 +922,7 @@
     "date": "2026-05-31",
     "title": "The Power of Raw Data: Why JSON Beats Databases",
     "slug": "the-power-of-raw-data-why-json-beats-databases",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -932,7 +932,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-05-31T09:00:42.565Z"
   },
   {
     "id": "week-22-post-2",
