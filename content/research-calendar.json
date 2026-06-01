@@ -2452,7 +2452,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Container Runtime Performance - Docker vs Podman vs Containerd",
     "slug": "research-container-runtime-performance-docker-vs-podman-vs-containerd-2026-06-01",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2461,7 +2461,8 @@
       "AI",
       "container",
       "runtime"
-    ]
+    ],
+    "publishedAt": "2026-06-01T18:00:40.484Z"
   },
   {
     "id": "research-edge-computing-latency-global-distribution-analysis-2026-06-02",
