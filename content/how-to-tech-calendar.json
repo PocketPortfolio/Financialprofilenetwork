@@ -2449,14 +2449,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Rate Limiting per User",
     "slug": "how-to-implement-api-rate-limiting-per-user",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "rate"
-    ]
+    ],
+    "publishedAt": "2026-06-01T14:00:45.619Z"
   },
   {
     "id": "how-to-understanding-database-connection-pooling-jun-2",
