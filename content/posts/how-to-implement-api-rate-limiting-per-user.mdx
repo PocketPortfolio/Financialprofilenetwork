@@ -1,0 +1,90 @@
+---
+title: How to Implement API Rate Limiting per User
+date: '2026-06-01'
+description: >-
+  A step-by-step guide to implementing API rate limiting per user to manage
+  resource usage efficiently.
+tags:
+  - api
+  - rate limiting
+  - user
+  - backend development
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-api-rate-limiting-per-user.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+## Problem
+
+APIs are essential for modern applications, allowing different software systems to communicate. However, they are susceptible to abuse when users make too many requests, potentially leading to server overloads and degraded performance. Rate limiting is a strategy used to control the number of requests a user can make to an API within a specific timeframe, ensuring fair use and optimal performance.
+
+## Solution with Code
+
+To implement user-specific rate limiting, we'll use a token bucket algorithm, a common method offering flexibility and precision. This guide assumes you're using Node.js with Express.js for your API.
+
+### Step 1: Set Up Your Environment
+
+First, ensure you have Node.js and Express installed:
+
+```bash
+npm init -y
+npm install express
+```
+
+### Step 2: Create a Rate Limiting Middleware
+
+Here's a simple middleware function to limit API requests per user:
+
+```javascript
+const express = require('express');
+const app = express();
+
+const rateLimit = (options) => {
+  const { windowMs, maxRequests } = options;
+  const users = new Map();
+
+  return (req, res, next) => {
+    const userId = req.header('User-ID'); // Assume User-ID is passed in header
+    if (!userId) return res.status(400).send('User-ID header is required');
+
+    const currentTime = Date.now();
+    const userData = users.get(userId) || { lastRequestTime: 0, tokens: maxRequests };
+
+    if (currentTime - userData.lastRequestTime > windowMs) {
+      userData.tokens = maxRequests;
+    }
+
+    if (userData.tokens > 0) {
+      userData.tokens -= 1;
+      userData.lastRequestTime = currentTime;
+      users.set(userId, userData);
+      return next();
+    }
+
+    res.status(429).send('Too Many Requests');
+  };
+};
+
+app.use(rateLimit({ windowMs: 60000, maxRequests: 10 }));
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+### Step 3: Test the Middleware
+
+Start your server using `node app.js` and send requests to test the rate limiting. Adjust `windowMs` (in milliseconds) and `maxRequests` to suit your requirements.
+
+## Key Concepts
+
+- **Token Bucket Algorithm**: A rate-limiting algorithm that uses a "bucket" to hold tokens representing allowed requests. Tokens are consumed as requests are made and refilled over time.
+- **User Identification**: Ensure each request includes a user identifier, such as a token or user ID, to apply rate limits accurately.
+- **Request Window**: Define a time window (`windowMs`) to reset the token count, allowing burst traffic control while ensuring fair access.
+
+Implementing rate limiting per user helps maintain API performance and availability, preventing misuse and ensuring a quality experience for all users.
