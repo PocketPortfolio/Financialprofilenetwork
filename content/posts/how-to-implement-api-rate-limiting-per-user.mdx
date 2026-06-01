@@ -2,74 +2,81 @@
 title: How to Implement API Rate Limiting per User
 date: '2026-06-01'
 description: >-
-  A step-by-step guide to implementing API rate limiting per user to manage
-  resource usage efficiently.
+  Learn how to implement API rate limiting on a per-user basis to manage and
+  control resource access efficiently.
 tags:
   - api
   - rate limiting
-  - user
-  - backend development
+  - implementation
+  - user management
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-api-rate-limiting-per-user.png
-pillar: Engineering
+pillar: Technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-APIs are essential for modern applications, allowing different software systems to communicate. However, they are susceptible to abuse when users make too many requests, potentially leading to server overloads and degraded performance. Rate limiting is a strategy used to control the number of requests a user can make to an API within a specific timeframe, ensuring fair use and optimal performance.
+In API development, one of the critical challenges is managing resource access to ensure fair usage and protect against abuse. Without proper rate limiting, a single user can consume excessive resources, impacting other users' experience and potentially leading to service outages.
 
-## Solution with Code
+## Solution
 
-To implement user-specific rate limiting, we'll use a token bucket algorithm, a common method offering flexibility and precision. This guide assumes you're using Node.js with Express.js for your API.
+Implementing API rate limiting per user allows you to control the number of requests a user can make within a specific timeframe. This can be achieved using various strategies and technologies. Below, we provide a code-centric approach using Node.js and Express.js, with Redis as the rate limiter store.
 
-### Step 1: Set Up Your Environment
+### Key Concepts
 
-First, ensure you have Node.js and Express installed:
+- **Rate Limit**: Maximum number of API requests a user can make in a given period.
+- **User Identification**: Typically achieved via API keys or authentication tokens.
+- **Time Window**: The duration over which the rate limit is calculated.
+
+### Code Implementation
+
+First, ensure you have the necessary packages installed:
 
 ```bash
-npm init -y
-npm install express
+npm install express redis express-rate-limit
 ```
 
-### Step 2: Create a Rate Limiting Middleware
-
-Here's a simple middleware function to limit API requests per user:
+Here is a basic implementation using `express-rate-limit` and Redis to store rate limit data:
 
 ```javascript
 const express = require('express');
+const rateLimit = require('express-rate-limit');
+const RedisStore = require('rate-limit-redis');
+const redis = require('redis');
+
 const app = express();
+const redisClient = redis.createClient();
 
-const rateLimit = (options) => {
-  const { windowMs, maxRequests } = options;
-  const users = new Map();
-
-  return (req, res, next) => {
-    const userId = req.header('User-ID'); // Assume User-ID is passed in header
-    if (!userId) return res.status(400).send('User-ID header is required');
-
-    const currentTime = Date.now();
-    const userData = users.get(userId) || { lastRequestTime: 0, tokens: maxRequests };
-
-    if (currentTime - userData.lastRequestTime > windowMs) {
-      userData.tokens = maxRequests;
-    }
-
-    if (userData.tokens > 0) {
-      userData.tokens -= 1;
-      userData.lastRequestTime = currentTime;
-      users.set(userId, userData);
-      return next();
-    }
-
-    res.status(429).send('Too Many Requests');
-  };
+// Middleware to identify user
+const identifyUser = (req, res, next) => {
+  // Assume userId is passed in headers for simplicity
+  req.userId = req.headers['x-user-id'];
+  if (!req.userId) {
+    return res.status(400).send('User ID is required');
+  }
+  next();
 };
 
-app.use(rateLimit({ windowMs: 60000, maxRequests: 10 }));
+// Define rate limiter
+const limiter = rateLimit({
+  store: new RedisStore({
+    sendCommand: (...args) => redisClient.sendCommand(args),
+  }),
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each user to 100 requests per windowMs
+  keyGenerator: (req) => req.userId, // Use userID for rate limiting
+  handler: (req, res) => {
+    res.status(429).send('Too many requests, please try again later.');
+  },
+});
+
+// Apply middleware
+app.use(identifyUser);
+app.use(limiter);
 
 app.get('/', (req, res) => {
-  res.send('Welcome to the API');
+  res.send('Welcome to our API!');
 });
 
 app.listen(3000, () => {
@@ -77,14 +84,10 @@ app.listen(3000, () => {
 });
 ```
 
-### Step 3: Test the Middleware
+### Explanation
 
-Start your server using `node app.js` and send requests to test the rate limiting. Adjust `windowMs` (in milliseconds) and `maxRequests` to suit your requirements.
+- **Redis Store**: Used to persist rate limit data, ensuring it remains consistent across server restarts or distributed systems.
+- **Key Generator**: The custom function uses `req.userId` to apply rate limits per user.
+- **Rate Limit Window**: Set to 15 minutes, allowing a maximum of 100 requests per user within this timeframe.
 
-## Key Concepts
-
-- **Token Bucket Algorithm**: A rate-limiting algorithm that uses a "bucket" to hold tokens representing allowed requests. Tokens are consumed as requests are made and refilled over time.
-- **User Identification**: Ensure each request includes a user identifier, such as a token or user ID, to apply rate limits accurately.
-- **Request Window**: Define a time window (`windowMs`) to reset the token count, allowing burst traffic control while ensuring fair access.
-
-Implementing rate limiting per user helps maintain API performance and availability, preventing misuse and ensuring a quality experience for all users.
+By implementing rate limiting in this way, you can effectively manage API usage, ensuring a fair distribution of resources among users. Adjust the rate limit parameters to suit your application's needs.
