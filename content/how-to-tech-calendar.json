@@ -2465,14 +2465,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding Database Connection Pooling",
     "slug": "understanding-database-connection-pooling",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "database",
       "understanding",
       "connection"
-    ]
+    ],
+    "publishedAt": "2026-06-02T14:00:53.583Z"
   },
   {
     "id": "how-to-how-to-use-nginx-as-a-reverse-proxy-jun-3",
