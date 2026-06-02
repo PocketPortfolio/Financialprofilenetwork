@@ -2470,7 +2470,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Edge Computing Latency - Global Distribution Analysis",
     "slug": "research-edge-computing-latency-global-distribution-analysis-2026-06-02",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2478,7 +2478,8 @@
       "edge computing",
       "edge",
       "computing"
-    ]
+    ],
+    "publishedAt": "2026-06-02T18:00:33.745Z"
   },
   {
     "id": "research-authentication-token-performance-jwt-vs-paseto-vs-branca-2026-06-03",
