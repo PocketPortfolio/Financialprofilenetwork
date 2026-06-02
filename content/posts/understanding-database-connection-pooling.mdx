@@ -1,0 +1,68 @@
+---
+title: Understanding Database Connection Pooling
+date: '2026-06-02'
+description: >-
+  Learn how to efficiently manage database connections using connection pooling
+  to enhance application performance.
+tags:
+  - database
+  - connection pooling
+  - performance
+author: Pocket Portfolio Team
+image: /images/blog/understanding-database-connection-pooling.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+## Problem
+
+Managing database connections efficiently is crucial for application performance and reliability. Without proper management, each request can open a new database connection, leading to resource exhaustion and degraded performance. This can result in slow query execution, increased latency, and even application crashes under heavy load.
+
+## Solution with Code
+
+Database connection pooling offers a solution by reusing existing connections rather than opening a new one for every request. This reduces the overhead of establishing connections and optimizes resource utilization.
+
+Here's a code example using Node.js with the `pg` library for PostgreSQL:
+
+```javascript
+const { Pool } = require('pg');
+
+// Create a pool with configuration
+const pool = new Pool({
+  user: 'dbuser',
+  host: 'database.server.com',
+  database: 'mydb',
+  password: 'secretpassword',
+  port: 5432,
+  max: 20, // Maximum number of connections in the pool
+  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection cannot be established
+});
+
+// Using the pool to query the database
+async function queryDatabase() {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT * FROM users');
+    console.log(res.rows);
+  } finally {
+    client.release();
+  }
+}
+
+// Call the function
+queryDatabase().catch(err => console.error('Error executing query', err.stack));
+
+```
+
+### Key Concepts
+
+- **Connection Pool**: A cache of database connections maintained so that connections can be reused when future requests are made.
+
+- **Max Connections**: The maximum number of connections that the pool can handle. This should be set according to the database server's capacity.
+
+- **Idle Timeout**: The amount of time a connection can remain idle in the pool before being closed. This helps in freeing up resources when the demand is low.
+
+- **Connection Timeout**: The maximum time to wait while trying to establish a connection before aborting. This prevents long waits in case of connectivity issues.
+
+By implementing connection pooling, applications can maintain performance and stability under varying loads, reduce latency, and minimize overhead costs associated with opening and closing database connections. This is essential for scalable and responsive applications.
