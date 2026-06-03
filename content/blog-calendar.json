@@ -940,7 +940,7 @@
     "date": "2026-06-03",
     "title": "The Developer Tools: JSON Schema and Seed Files",
     "slug": "the-developer-tools-json-schema-and-seed-files",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -950,7 +950,8 @@
       "developer"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-03T09:00:56.032Z"
   },
   {
     "id": "week-23-post-1",
