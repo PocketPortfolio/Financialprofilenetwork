@@ -1,0 +1,90 @@
+---
+title: 'Navigating the Data Chasm: Deploying LLMs Over Regulated Wealth Portfolios'
+description: >-
+  How Chief Information Security Officers can authorize generative AI infrastructure without giving vendor clouds unbounded data custody.
+date: '2026-06-03'
+category: sovereign-engineering
+author: Abba Lawal
+series: B2B Scenario Briefs
+image: /book-assets/b2b-scenario-briefs/bsb-01-cover.png
+tags:
+  - compliance
+  - ciso
+  - wealth-management
+  - ai
+pillar: technical
+---
+
+**B2B Scenario Brief · Part 1 · CISO / InfoSec**
+
+Wealth platforms evaluating generative AI over client portfolios are not blocked by model capability. They are blocked by **data custody on the inference path**: full broker exports, row-level ledgers, and open-ended prompt logs sitting in vendor clouds expand subprocessors, retention surface, and review cycles under **UK GDPR**, **EU AI Act**, and operational resilience expectations (including **DORA** where applicable).
+
+This post maps the architectural choice CISOs actually control: **warehouse-to-infer** versus **sanitization by construction**.
+
+![The Data Chasm — client perimeter, bounded context bridge, and stateless inference API](/book-assets/b2b-scenario-briefs/bsb-01-figure.png)
+
+**Figure 1 — The Data Chasm.** Raw ledger stays on the client; only a bounded summary crosses to the LLM. Body text meets WCAG on obsidian; amber marks the active boundary only.
+
+## The Warehouse-to-Infer Dead End
+
+The default enterprise pattern is familiar:
+
+1. Ingest broker CSVs or API payloads into a **central database**.
+2. Expose a **vendor API** that reads the full ledger.
+3. "Add AI" by sending **row dumps or wide JSON** to a model or vector index.
+
+That path makes inference depend on **unbounded custody**. InfoSec reviews then ask the right questions: Who retains what? For how long? Which subprocessors see account-level detail? Can we scope a DPIA when the vendor's prompt archive is opaque?
+
+The compliance trap is not "using AI." It is **requiring the full narrative to leave the perimeter** before any reasoning happens.
+
+## Sanitization by Construction: Restricting the Inference Path
+
+Open Portfolio's designed boundary is a **pure-function context pipeline**, not regex redaction on the way out.
+
+`buildPortfolioContext()` in `app/lib/ai/contextBuilder.ts` accepts normalized `Trade[]` and emits a **fixed-schema aggregate**: portfolio totals plus up to **10** top holdings by value. No account identifiers, no row-level replay, no PII fields by structural exclusion.
+
+```typescript
+/**
+ * Deterministic pure function: converts trades + positions into a fixed-schema
+ * aggregate string only (totals + top-N holdings). No raw ledger rows, no PII,
+ * no account identifiers—sanitization by construction.
+ */
+export function buildPortfolioContext(
+  trades: Trade[],
+  positions?: Record<string, Position> | Position[]
+): string
+```
+
+The inference API (`POST /api/ai/chat`) receives that bounded string, streams a reply, and **does not persist the portfolio payload**—only quota and telemetry metadata. That is a **forgetful session** on the inference path, not a ledger warehouse with a chatbot skin.
+
+**Operational honesty:** Models still run in the cloud (Gemini/OpenAI). Residency and subprocessors still matter. The design guarantee is **inference-path hygiene**: raw ledgers are not required on the LLM path as architected.
+
+## Client-Edge Compute vs. Cloud Vendor Storage
+
+Ingestion is a separate pipeline from inference. The MIT `@pocket-portfolio/importer` package parses broker exports in the **client runtime** (browser memory). There is **no raw CSV upload API** for parse—the full file does not need to hit our servers for normalization.
+
+| Stage | Where it runs | What crosses outward |
+| --- | --- | --- |
+| Parse | Client edge | Nothing from the full export file |
+| Context | Client edge | Bounded text summary only |
+| Inference | Stateless API | Summary + user message for one request; no portfolio row store |
+
+For CISOs, the question shifts from "Can we trust their database?" to "Can we verify what **actually** crosses the wire?" Network inspection should show a short `context` string, not a replay of the export.
+
+## Frequently asked questions
+
+**Does this eliminate the need for a DPIA?**  
+No. It narrows the data categories on the inference path so your DPIA can scope **bounded aggregates** instead of full ledger custody. Sector-specific process still applies.
+
+**Is this zero-server or air-gapped?**  
+No. Hybrid persistence exists for signed-in users (Firebase trade authority on the consumer harness). Enterprise pilots scope **your** stores. The architectural claim is **no raw ledger on the inference path as designed**.
+
+**How do we verify the boundary in diligence?**  
+Repository receipts: `app/lib/ai/contextBuilder.ts`, `app/api/ai/chat/route.ts`, `packages/importer`, `docs/IP-TECHNICAL-MECHANISMS.md`.
+
+**What if an advisor attaches a full PDF?**  
+Attachments are an explicit second boundary with server-side length caps. Default portfolio Ask AI does not require attachments.
+
+---
+
+**Next steps:** [Architecture](/architecture) · [Tier-1 design partner](/tier1designpartner) · Sovereign Engineering [Serial 01](/blog/sovereign-engineering-serial-01-compliance-trap) · [Serial 03](/blog/sovereign-engineering-serial-03-edge-compiler)

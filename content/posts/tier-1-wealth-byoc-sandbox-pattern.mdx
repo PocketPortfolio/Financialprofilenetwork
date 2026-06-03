@@ -1,0 +1,92 @@
+---
+title: 'The 90-Day Sandbox Reference Architecture: Enterprise BYOC Deployment'
+description: >-
+  A framework for Tier-1 wealth institutions evaluating Bring Your Own Cloud (BYOC) ingestion and stateless inference boundaries.
+date: '2026-06-03'
+category: research
+author: Abba Lawal
+series: B2B Scenario Briefs
+image: /book-assets/b2b-scenario-briefs/bsb-03-cover.png
+tags:
+  - byoc
+  - enterprise
+  - wealth-management
+  - pilot
+pillar: technical
+---
+
+**B2B Scenario Brief · Part 3 · Enterprise procurement & innovation teams**
+
+This document describes a **reference architecture for a 90-day sandbox evaluation**—not a completed institution pilot. Use it to scope design partnerships with product, engineering, InfoSec, and category stakeholders before any production commitment.
+
+Tier-1 wealth teams stall on generative AI when vendors require **warehouse-first** integration. BYOC here means: **you retain auth and storage inside your approved perimeter**; Open Portfolio supplies the **ingestion + inference boundary layer**—edge parse, bounded context, stateless `/api/ai/chat`.
+
+![BYOC perimeter — institution retains identity and storage; Open Portfolio supplies the inspectable boundary layer](/book-assets/b2b-scenario-briefs/bsb-03-figure.png)
+
+**Figure 3 — BYOC perimeter.** Reference pattern only. Institution retains keys; Open Portfolio supplies ingestion + inference boundary.
+
+## Standardizing the 90-Day Enterprise Sandbox
+
+| Phase | Duration | Activities | Exit criteria |
+| --- | --- | --- | --- |
+| **1 — Scope & governance** | Weeks 1–3 | Joint workshop; agree use case, data categories, controller/processor framing; sample exports **you** provide | Signed scope note; DPIA kickoff scheduled |
+| **2 — Edge prototype** | Weeks 4–8 | Adapter + bounded-context demo in **your** sandbox or approved cloud; client-edge parse only until security sign-off | Parse accuracy report; inference boundary walkthrough |
+| **3 — Controlled readout** | Weeks 9–12 | Executive demo to innovation and category stakeholders; go/no-go on expanded design-partner track | Decision on formal Tier-1 path |
+
+No core banking refactor is required. Integration is **additive at the edge**.
+
+## Isomorphic Infrastructure: Retaining the Core Storage Perimeter
+
+BYOC is a **posture**, not a claim that today's retail deployment literally maps Vercel edge into your VPC.
+
+**What institutions retain:**
+
+- Identity and access (your IdP, your RBAC).
+- Ledger storage in **your** approved stores when sync is in scope.
+- Model routing policy inside your network when required.
+
+**What Open Portfolio supplies (inspectable):**
+
+| Layer | Mechanism | Repository receipt |
+| --- | --- | --- |
+| Ingest | `@pocket-portfolio/importer` — client-edge parse | `packages/importer` |
+| Context | `buildPortfolioContext()` — fixed aggregate | `app/lib/ai/contextBuilder.ts` |
+| Inference | Stateless stream; no portfolio payload persistence | `app/api/ai/chat/route.ts` |
+
+The **dual-surface monorepo** keeps a live B2C harness (Pocket Portfolio) stress-testing parsers under real-world chaos while Open Portfolio hosts procurement, SDK, and partnership routes on the same codebase. Your sandbox inherits hardened adapters—not a slide-deck prototype.
+
+**Operational honesty:** Signed-in retail users may use Firebase for trade authority. Enterprise pilots **scope your stores**. The design guarantee for diligence is **inference-path hygiene**, not "zero cloud anywhere."
+
+## Subprocessor Scoping under UK GDPR and the EU AI Act
+
+Procurement should treat subprocessors as **layered**, not monolithic:
+
+1. **Parse layer** — default: none off-device for raw CSV (client-edge).
+2. **Inference layer** — model provider(s) see bounded context + user message for one request.
+3. **Telemetry layer** — quota metadata (`toolUsage`), not prompt archives of the ledger.
+
+| Exposure (indicative) | Ceiling |
+| --- | --- |
+| Average breach cost (financial services) | **GBP 4.45M** |
+| EU AI Act (Art. 99 Tier-1) | **EUR 35M or 7%** global turnover |
+| GDPR (Art. 83(5) higher tier) | **EUR 20M or 4%** global turnover |
+
+Framing for category managers: you are buying a **compliance substrate** that reduces what must be listed on Article 28 flows—not another unlimited data processor.
+
+## Frequently asked questions
+
+**Is this a reference pattern or a live case study?**  
+Reference pattern only. Any future public case study requires explicit partner approval.
+
+**What is the formal design-partner path?**  
+Apply via [Tier-1 design partner](/tier1designpartner) after sandbox readout.
+
+**Can we run the sandbox without sending data to Open Portfolio servers?**  
+Edge parse requires no raw CSV upload API. Inference uses your chosen model routing; bounded context is the designed egress.
+
+**What diligence artifacts should we request?**  
+`docs/IP-TECHNICAL-MECHANISMS.md`, architecture walkthrough at [Architecture](/architecture), and npm download / harness metrics from the Open surface.
+
+---
+
+**Next steps:** [Architecture](/architecture) · [Tier-1 design partner](/tier1designpartner) · Sovereign Engineering [Serial 01](/blog/sovereign-engineering-serial-01-compliance-trap) · [Serial 11](/blog/sovereign-engineering-serial-11-vision-b2b)

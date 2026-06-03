@@ -1131,13 +1131,73 @@ select option:checked {
 .blog-content img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 10px;
   margin: 1.5em 0;
+  border: 1px solid color-mix(in srgb, var(--border-warm) 40%, transparent);
+  background: var(--surface-elevated);
+}
+
+.blog-content .blog-figure-caption {
+  display: block;
+  margin: -0.75em 0 1.75em;
+  font-size: 0.9em;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.blog-content .blog-figure-caption strong {
+  color: var(--text);
+  font-style: normal;
+  font-weight: 600;
 }
 
 .blog-content strong {
   font-weight: 600;
   color: var(--text);
+}
+
+.blog-content .blog-table-wrap {
+  overflow-x: auto;
+  margin: 1.75em 0;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-warm) 45%, transparent);
+  background: var(--surface-elevated);
+}
+
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.blog-content thead {
+  background: color-mix(in srgb, var(--accent-warm) 8%, var(--surface-elevated));
+}
+
+.blog-content th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  padding: 0.85em 1em;
+  border-bottom: 2px solid color-mix(in srgb, var(--border-warm) 55%, transparent);
+  white-space: nowrap;
+}
+
+.blog-content td {
+  padding: 0.75em 1em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+  vertical-align: top;
+}
+
+.blog-content tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.blog-content tbody tr:hover {
+  background: color-mix(in srgb, var(--accent-warm) 4%, transparent);
 }
 
 .blog-cta-button:hover {

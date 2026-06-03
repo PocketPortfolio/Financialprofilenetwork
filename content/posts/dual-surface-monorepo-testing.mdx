@@ -1,0 +1,85 @@
+---
+title: 'The Dual-Surface Monorepo: Hardening Enterprise Infrastructure via Retail Chaos'
+description: >-
+  How a high-volume B2C consumer application functions as an adversarial test harness to de-risk Tier-1 B2B procurement layers.
+date: '2026-06-03'
+category: research
+author: Abba Lawal
+series: B2B Scenario Briefs
+image: /book-assets/b2b-scenario-briefs/bsb-05-cover.png
+tags:
+  - b2b
+  - architecture
+  - open-source
+  - diligence
+pillar: technical
+---
+
+**B2B Scenario Brief · Part 5 · Technical due diligence & venture partners**
+
+Enterprise buyers rightfully distrust infrastructure that only exists in a sales deck. Open Portfolio runs a **dual-surface monorepo**: the same ingestion and inference substrate powers **Pocket Portfolio** (live B2C adversarial harness) and **Open Portfolio** (B2B procurement, SDK, and partnership surface on `www.openportfolio.co.uk`).
+
+Procurement gets inspectable code **and** production chaos data from real broker files—not a fork that never saw a malformed CSV.
+
+![Dual-surface monorepo — shared substrate with Pocket harness and Open procurement surface](/book-assets/b2b-scenario-briefs/bsb-05-figure.png)
+
+**Figure 5 — Dual-surface monorepo.** One codebase; Pocket stress-tests parsers under production chaos; Open hosts procurement narrative.
+
+## Hardening Substrates under Production Chaos
+
+Retail users upload exports vendors never tested: odd date formats, duplicate headers, fractional shares, legacy broker dialects. Each failure modes the MIT importer (`packages/importer`) and the universal adversarial schema path.
+
+What diligence teams should look for:
+
+- **Parser coverage** — 19+ broker adapters with shared `NormalizedTrade` contract.
+- **Production error signals** — automated parser failure collection on the harness (not sanitized demo fixtures only).
+- **Inference boundary tests** — unit specs on `buildPortfolioContext` and `/api/ai/chat` ensuring portfolio payload is not persisted server-side.
+
+The B2C surface is not a distraction from enterprise—it is **where the substrate breaks first**, so B2B deployments inherit hardened adapters.
+
+## Pocket Portfolio vs. Open Portfolio: Operational Separation
+
+One Next.js deployment; host-aware routing via `middleware.ts` and `app/open/*`.
+
+| Surface | Host | Role |
+| --- | --- | --- |
+| **Open Portfolio** | `www.openportfolio.co.uk` | B2B procurement · SDK licensing · architecture narrative |
+| **Pocket Portfolio** | `www.pocketportfolio.app` | Live harness — parsers, UX, inference loops under real load |
+
+B2B paths on Pocket hosts **301 to Open canonical URLs** where configured. Technical due diligence should trace:
+
+- `app/lib/ai/contextBuilder.ts` — sanitization by construction.
+- `app/api/ai/chat/route.ts` — stateless inference.
+- `lib/surface-host.ts` — dual-surface host detection.
+
+**Operational honesty:** Authenticated harness users may sync trades via Firebase. Enterprise pilots scope **your** stores. The diligence question is whether **raw ledgers are required on the inference path**—designed answer: no.
+
+## Open-Source Importers as an Inspectable Wedge
+
+`@pocket-portfolio/importer` ships MIT-licensed on npm. Institutions can read the parse boundary before signing—not trust a black-box ETL pipeline.
+
+Why OSS matters for procurement:
+
+1. **Subprocessor scope** — parse runs client-side; no mandatory CSV warehouse at the vendor.
+2. **Fork risk** — low; the moat is operational harness data and enterprise integration velocity, not secret regex.
+3. **Schema contract** — `SCHEMA.md` and package tests define `NormalizedTrade` for adapter contributions.
+
+npm download counts and MAU on the harness are **traction signals**, not ARR substitutes. B2B contract velocity still drives the seed mandate; the harness de-risks the technical story.
+
+## Frequently asked questions
+
+**Is Pocket a separate codebase?**  
+No. Same monorepo, surface-aware routes. Open re-exports B2B pages under `app/open/*`.
+
+**Can we audit only the OSS packages?**  
+Start with `packages/importer` and `contextBuilder.ts`. Full diligence should include inference route behavior and host routing.
+
+**Does retail traffic pollute enterprise SLAs?**  
+Surfaces share deployment but B2B pilots scope isolated sandboxes. Harness load validates parser robustness—it does not require commingling client data.
+
+**What is the formal partnership path?**  
+[Tier-1 design partner](/tier1designpartner) · [Architecture](/architecture).
+
+---
+
+**Next steps:** [Architecture](/architecture) · [Tier-1 design partner](/tier1designpartner) · Sovereign Engineering [Serial 01](/blog/sovereign-engineering-serial-01-compliance-trap) · [Serial 11](/blog/sovereign-engineering-serial-11-vision-b2b)

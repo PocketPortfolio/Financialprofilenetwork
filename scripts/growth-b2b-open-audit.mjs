@@ -23,6 +23,11 @@ const SAMPLE_PATHS = [
   '/board-of-investors',
   '/blog',
   '/blog/the-complete-guide-to-api-error-responses',
+  '/blog/data-chasm-wealth-management-llms',
+  '/blog/bypassing-approved-supplier-list-compliance',
+  '/blog/tier-1-wealth-byoc-sandbox-pattern',
+  '/blog/structuring-forgetful-sessions-financial-rag',
+  '/blog/dual-surface-monorepo-testing',
   '/sitemap.xml',
   '/llms.txt',
 ];

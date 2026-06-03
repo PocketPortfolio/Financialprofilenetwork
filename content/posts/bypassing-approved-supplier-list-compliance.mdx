@@ -1,0 +1,83 @@
+---
+title: 'Bypassing Central Supplier List Friction via Client-Edge Architecture'
+description: >-
+  When centralized ASL compliance blocks cloud-based wealth tools, localized edge parsing shifts the subprocessor liability story.
+date: '2026-06-03'
+category: sovereign-engineering
+author: Abba Lawal
+series: B2B Scenario Briefs
+image: /book-assets/b2b-scenario-briefs/bsb-02-cover.png
+tags:
+  - compliance
+  - wealth-management
+  - procurement
+  - local-first
+pillar: technical
+---
+
+**B2B Scenario Brief · Part 2 · Wealth practice directors & central compliance**
+
+Regulated wealth networks often block new cloud tools at the **Approved Supplier List (ASL)** layer—not because the use case is wrong, but because the **data-flow story** is wrong. If a vendor requires uploading full broker exports to a central parse API, compliance teams must treat that vendor as a **processor of itemized client ledgers**. Review cycles stall.
+
+Client-edge architecture changes the procurement conversation: the institution evaluates a **limited-scope processor** pattern, not another data lake with a chat UI.
+
+![Browser-side ETL — drop export, parse locally, build context, stream inference with no server file store](/book-assets/b2b-scenario-briefs/bsb-02-figure.png)
+
+**Figure 2 — Browser-side ETL (zero-upload).** Parse and normalize inside client runtime before any cloud inference. No raw CSV upload API.
+
+## The Centralized Procurement Bottleneck
+
+Typical blocked pattern:
+
+1. Adviser exports a client portfolio CSV.
+2. Upload goes to a **vendor cloud** for normalization and storage.
+3. AI features read from that warehouse.
+
+Central compliance sees: new subprocessor, indefinite retention, unclear prompt logging, and expansion of breach blast radius. ASL committees default to **no** because the architecture forces a binary choice—either block the tool or accept full custody transfer.
+
+The structural fix is not a better DPA template alone. It is **not sending the full file to the vendor for parse**.
+
+## Zero-Upload Architecture: What the Server Perimeter Never Receives
+
+`@pocket-portfolio/importer` (MIT, 19+ broker adapters) runs normalization in the **client runtime**. Trades are mapped to a shared `NormalizedTrade` schema locally. The server-side parse API for raw CSV **does not exist** in this design.
+
+What compliance can document:
+
+- **Controller:** the wealth firm (client data stays in workflows they approve).
+- **Processor scope:** bounded inference and optional sync layers—scoped in the pilot, not assumed infinite.
+- **Egress default:** a **semantic summary** for Ask AI, not row replay.
+
+This is the difference between "another SaaS with our CSVs" and "a boundary layer we can inspect."
+
+## Local Browser-Memory Execution for Regulated Wealth Networks
+
+Execution model for a practice or sandbox pilot:
+
+| Step | Location | Data that leaves the device |
+| --- | --- | --- |
+| Load export | Client browser memory | None (local file read) |
+| Normalize trades | Client (`@pocket-portfolio/importer`) | None |
+| Build context | Client (`buildPortfolioContext`) | None until POST |
+| Stream inference | Stateless `/api/ai/chat` | Bounded summary + user message only |
+
+Network monitoring in a pilot should confirm: the **wide** payload (full export) never leaves the approved perimeter unless the institution explicitly chooses a sync path they control.
+
+**Plain limits:** Optional cloud sync (Firebase on the consumer harness) is a separate axis from inference. Enterprise scoping should treat sync, inference, and model providers as **independent subprocessors** in the ASL narrative.
+
+## Frequently asked questions
+
+**Does client-edge parsing mean no vendor review at all?**  
+No. Model providers and hosting still require review. The win is **narrower scope**—you are not approving indefinite warehouse custody of every client row for the sake of a chat feature.
+
+**Can compliance approve a pilot without a full ASL cycle?**  
+Many firms run **sandbox exceptions** when data categories are bounded and retention is forgetful on the inference path. Frame the pilot as edge-only parse with network captures—not production rollout.
+
+**What if our network blocks all external LLM calls?**  
+BYOC and VPC-side deployment are the enterprise extension of the same contract. See the [90-day sandbox reference pattern](/blog/tier-1-wealth-byoc-sandbox-pattern).
+
+**Where is the importer source?**  
+`packages/importer` on npm as `@pocket-portfolio/importer` — inspectable MIT boundary.
+
+---
+
+**Next steps:** [Architecture](/architecture) · [Tier-1 design partner](/tier1designpartner) · Sovereign Engineering [Serial 01](/blog/sovereign-engineering-serial-01-compliance-trap) · [Serial 03](/blog/sovereign-engineering-serial-03-edge-compiler)
