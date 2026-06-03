@@ -2481,14 +2481,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Nginx as a Reverse Proxy",
     "slug": "how-to-use-nginx-as-a-reverse-proxy",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "use",
       "nginx",
       "reverse"
-    ]
+    ],
+    "publishedAt": "2026-06-03T14:01:25.571Z"
   },
   {
     "id": "how-to-building-a-rest-api-with-fastify-jun-4",
