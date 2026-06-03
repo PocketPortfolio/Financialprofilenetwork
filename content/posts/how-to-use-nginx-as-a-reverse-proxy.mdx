@@ -2,44 +2,55 @@
 title: How to Use Nginx as a Reverse Proxy
 date: '2026-06-03'
 description: >-
-  A technical guide on configuring Nginx to function as a reverse proxy for your
-  web applications.
+  Learn how to set up Nginx as a reverse proxy to optimize server performance
+  and security.
 tags:
   - nginx
   - reverse proxy
   - web server
-  - configuration
+  - load balancing
+  - performance optimization
 author: Pocket Portfolio Team
 image: /images/blog/how-to-use-nginx-as-a-reverse-proxy.png
-pillar: Infrastructure
+pillar: engineering
 category: how-to-in-tech
 ---
 
 ## Problem
 
-When managing multiple web services, you often need a method to distribute traffic efficiently. Directly exposing all services to the internet increases complexity and potential security risks. A reverse proxy can help by routing client requests to the appropriate back-end services based on configuration rules, enhancing security and providing an easy way to manage traffic.
+Modern web applications often require scaling and load balancing to handle increased traffic efficiently. Directly exposing application servers to the internet can lead to security vulnerabilities and performance bottlenecks. A reverse proxy can help by distributing client requests across multiple servers and providing a single point of access for external clients.
 
-## Solution with Code
+## Solution
 
-Nginx is a powerful web server that can also be employed as a reverse proxy. Below is a step-by-step guide to configure Nginx as a reverse proxy.
+Nginx is a powerful tool that can be configured to act as a reverse proxy, improving application security and performance. Below, we provide a step-by-step guide to setting up Nginx as a reverse proxy for a simple web application.
 
 ### Step 1: Install Nginx
 
-Ensure that Nginx is installed on your server. On a Debian-based system, you can use:
+First, ensure that Nginx is installed on your server. You can install Nginx using your system's package manager:
 
 ```bash
+# On Debian/Ubuntu
 sudo apt update
 sudo apt install nginx
+
+# On CentOS/RHEL
+sudo yum install epel-release
+sudo yum install nginx
 ```
 
 ### Step 2: Configure Nginx as a Reverse Proxy
 
-Create a new configuration file in the `/etc/nginx/sites-available/` directory. For example, `example-reverse-proxy.conf`.
+Create a new configuration file for your site by navigating to `/etc/nginx/sites-available/` and creating a new file, for example, `myapp`.
+
+```bash
+sudo nano /etc/nginx/sites-available/myapp
+```
+
+Add the following configuration to the file:
 
 ```nginx
 server {
     listen 80;
-
     server_name example.com;
 
     location / {
@@ -47,37 +58,37 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-In this configuration:
-
-- **listen 80;**: This directive tells Nginx to listen on port 80.
-- **server_name example.com;**: Replace `example.com` with your domain name.
-- **proxy_pass http://localhost:3000;**: This forwards incoming requests to the service running on `localhost:3000`.
+This configuration tells Nginx to listen on port 80 and forward all incoming requests to the application server running on `localhost:3000`.
 
 ### Step 3: Enable the Configuration
 
-Link the configuration file from `sites-available` to `sites-enabled`:
+Create a symbolic link to enable the configuration:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/example-reverse-proxy.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
 ```
 
-### Step 4: Test and Reload Nginx
-
-Test the Nginx configuration for syntax errors and reload the service:
+Test the Nginx configuration for syntax errors:
 
 ```bash
 sudo nginx -t
+```
+
+If there are no errors, reload Nginx to apply the changes:
+
+```bash
 sudo systemctl reload nginx
 ```
 
 ## Key Concepts
 
-- **Reverse Proxy**: Acts as an intermediary for requests from clients seeking resources from servers.
-- **proxy_pass**: Directs traffic from the Nginx server to the specified backend.
-- **Headers**: Adding headers like `X-Real-IP` helps in tracking the client's IP address through the proxy.
+- **Reverse Proxy**: A server that forwards client requests to backend servers. It enhances security and load balancing.
+- **Proxy Headers**: Headers like `X-Real-IP` and `X-Forwarded-For` are used to pass the original client IP to the backend servers.
+- **Load Balancing**: Distributing network traffic across multiple servers to ensure no single server becomes a bottleneck.
 
-By using Nginx as a reverse proxy, you can efficiently manage and route traffic to various backend services, improve security by hiding the backend services, and make your system architecture more robust and scalable.
+By following these steps, you can set up Nginx as a reverse proxy, providing a scalable and secure architecture for your web applications.
