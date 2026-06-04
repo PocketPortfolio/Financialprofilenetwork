@@ -36,6 +36,18 @@ describe('newsroom categories', () => {
 });
 
 describe('parseRssFeed', () => {
+  it('decodes HTML entities in titles (e.g. &#8217; apostrophe)', () => {
+    const xml = `<?xml version="1.0"?><rss><channel><item>
+      <title>Greece&#8217;s Fintech Renaissance Supporting Economic Development</title>
+      <link>https://example.com/greece-fintech</link>
+      <pubDate>Mon, 04 Jun 2026 10:00:00 GMT</pubDate>
+    </item></channel></rss>`;
+    const items = parseRssFeed(xml, 'Example');
+    expect(items[0].title).toBe(
+      "Greece's Fintech Renaissance Supporting Economic Development",
+    );
+  });
+
   it('extracts title and link from minimal RSS', () => {
     const xml = `<?xml version="1.0"?>
       <rss><channel>

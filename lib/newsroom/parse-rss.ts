@@ -1,3 +1,5 @@
+import { decodeHtmlEntities } from './decode-html';
+
 export interface ParsedRssItem {
   title: string;
   url: string;
@@ -90,7 +92,7 @@ export function parseRssFeed(xml: string, feedLabel: string): ParsedRssItem[] {
   const parts = xml.split(/<item>/i).slice(1).map((x) => x.split(/<\/item>/i)[0]);
 
   for (const item of parts) {
-    const title = extractText(item, 'title');
+    const title = decodeHtmlEntities(extractText(item, 'title'));
     let link = extractText(item, 'link') || extractText(item, 'guid');
     if (!title || !link) continue;
 
