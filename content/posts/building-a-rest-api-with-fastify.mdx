@@ -2,8 +2,8 @@
 title: Building a REST API with Fastify
 date: '2026-06-04'
 description: >-
-  Learn how to build a REST API using Fastify, a high-performance Node.js
-  framework.
+  Learn how to build a REST API using Fastify with a focus on performance and
+  simplicity.
 tags:
   - api
   - rest
@@ -11,101 +11,72 @@ tags:
   - building
 author: Pocket Portfolio Team
 image: /images/blog/building-a-rest-api-with-fastify.png
-pillar: technology
+pillar: how-to
 category: how-to-in-tech
 ---
 
 ## Problem
 
-Building REST APIs is a common requirement for modern web applications. Traditional frameworks can sometimes be slow or cumbersome, making it challenging to manage performance at scale. Fastify offers a solution with its high-speed, low-overhead architecture suited for building efficient and scalable APIs.
+Building a REST API often requires balancing performance with simplicity. Traditional frameworks can be cumbersome when handling large-scale applications due to their complexity and inefficiencies. Fastify offers a solution by providing a fast and low overhead framework for building APIs, allowing developers to maintain high performance with minimal setup.
 
 ## Solution with Code
 
-To build a REST API with Fastify, follow these steps:
+Fastify is a highly efficient web framework for Node.js. It's built for speed and supports asynchronous operations out-of-the-box. Here's how you can build a simple REST API using Fastify:
 
-1. **Initialize a Node.js Project**
-
-   Start by creating a new Node.js project and installing Fastify.
+1. **Install Fastify**: Start by initializing your Node.js project and installing Fastify.
 
    ```bash
-   mkdir fastify-rest-api
-   cd fastify-rest-api
+   mkdir fastify-api
+   cd fastify-api
    npm init -y
    npm install fastify
    ```
 
-2. **Set Up Fastify Server**
-
-   Create a `server.js` file and set up a basic Fastify server.
+2. **Create a Fastify Server**: Set up a basic server in a new file, `server.js`.
 
    ```javascript
-   // server.js
-   const fastify = require('fastify')({ logger: true });
+   const fastify = require('fastify')({ logger: true })
 
-   fastify.get('/status', async (request, reply) => {
-     return { status: 'ok' };
-   });
+   // Declare a route
+   fastify.get('/api/hello', async (request, reply) => {
+     return { message: 'Hello, World!' }
+   })
 
+   // Run the server!
    const start = async () => {
      try {
-       await fastify.listen({ port: 3000 });
-       console.log('Server listening on http://localhost:3000');
+       await fastify.listen({ port: 3000 })
+       fastify.log.info(`Server listening on ${fastify.server.address().port}`)
      } catch (err) {
-       fastify.log.error(err);
-       process.exit(1);
+       fastify.log.error(err)
+       process.exit(1)
      }
-   };
-
-   start();
+   }
+   start()
    ```
 
-3. **Add Routes**
-
-   Define more routes to handle different API requests. For example, create a CRUD interface for a basic `users` resource.
-
-   ```javascript
-   // Add a new user
-   fastify.post('/users', async (request, reply) => {
-     const user = request.body;
-     // Logic to save user to database
-     return user;
-   });
-
-   // Get user by ID
-   fastify.get('/users/:id', async (request, reply) => {
-     const { id } = request.params;
-     // Logic to get user from database
-     return { id, name: 'John Doe' };
-   });
-
-   // Update user by ID
-   fastify.put('/users/:id', async (request, reply) => {
-     const { id } = request.params;
-     const user = request.body;
-     // Logic to update user in database
-     return { id, ...user };
-   });
-
-   // Delete user by ID
-   fastify.delete('/users/:id', async (request, reply) => {
-     const { id } = request.params;
-     // Logic to delete user from database
-     return { status: 'deleted' };
-   });
-   ```
-
-4. **Test the API**
-
-   Use tools like Postman or curl to test the endpoints. For instance, to test the `/users` endpoint, you can run:
+3. **Test Your API**: You can now run your server and test it by visiting `http://localhost:3000/api/hello` in your browser or using a tool like curl or Postman.
 
    ```bash
-   curl -X POST http://localhost:3000/users -d '{"name":"Alice"}' -H "Content-Type: application/json"
+   node server.js
    ```
+
+   Navigate to your browser or use a curl command:
+
+   ```bash
+   curl http://localhost:3000/api/hello
+   ```
+
+   You should see a JSON response: `{ "message": "Hello, World!" }`.
 
 ## Key Concepts
 
-- **Fastify's Performance**: Fastify is designed to be less than or equal to 20% slower than Node.js core, making it an excellent choice for performance-critical applications.
-- **Schema Validation**: Fastify allows easy integration with JSON Schema for payload validation, ensuring data consistency and reliability.
-- **Plugin Architecture**: Fastify's plugin system encourages modularity, making it straightforward to extend functionality without compromising the core server logic.
+- **Performance**: Fastify is designed to be one of the fastest web frameworks available. It uses a less than 20ms overhead for handling requests, making it suitable for high-performance applications.
 
-By following this guide, you can build efficient and scalable REST APIs using Fastify, leveraging its speed and flexibility for high-performance applications.
+- **Schema Validation**: Fastify supports JSON schema validation for your HTTP requests and responses, ensuring data integrity and reducing overhead errors.
+
+- **Asynchronous**: Fastify natively supports async/await, which simplifies writing asynchronous code, improving readability and maintainability.
+
+- **Plugins**: Fastify's ecosystem includes a wide array of plugins that extend its functionality, such as support for CORS, JWT authentication, and more.
+
+Fastify is an excellent choice for developers looking to build efficient and scalable APIs with minimal setup and maximum performance. By following this guide, you can quickly set up a basic REST API and explore its numerous capabilities to expand your application.
