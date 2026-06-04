@@ -7,7 +7,7 @@ export const OPEN_LANDING_PLATE_CACHE: Record<string, string> = {
   'web-boundary-split-brain.png': '6899a78c914b',
   'web-boundary-frontier.png': '5181509ba0a7',
   'web-traction-dual-pane.png': 'ee258932a851',
-  'web-traction-heatmap.png': '83b9d6ce7db0',
+  'web-traction-heatmap.png': '8a4c27adbe46',
   'web-split-brain-pillars.png': '4feb58258e91',
   'web-substrate-matrix.png': '89d20f3eb903',
   'web-clean-room-console.png': '8e7d994884a6',

@@ -19,7 +19,7 @@ Bakes eight **byte-distinct** 16:9 PNGs from deck plates using sharp region crop
 | `web-boundary-split-brain.png` | subHero | slide-02 | left — client pipeline |
 | `web-split-brain-pillars.png` | pillars | slide-02 | right — stateless server |
 | `web-traction-dual-pane.png` | bridge | slide-03 | full — npm terminal + global map |
-| `web-traction-heatmap.png` | tracks | slide-03 | right — MAU heatmap |
+| `web-traction-heatmap.png` | tracks | slide-03 | map pane only (no npm terminal) |
 | `web-substrate-matrix.png` | packages | slide-05 | control matrix grid (interim; Epic 3.2 wafer pending) |
 | `web-clean-room-console.png` | contact | slide-05 | full — FIN console |
 

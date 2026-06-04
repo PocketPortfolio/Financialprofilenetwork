@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-05-28T20:42:34.190Z",
+  "syncedAt": "2026-06-04T16:28:55.690Z",
   "plates": [
     {
       "dest": "web-hero-glass-vault.png",
@@ -47,13 +47,13 @@
     {
       "dest": "web-traction-heatmap.png",
       "src": "slide-03-traction.png",
-      "hash": "83b9d6ce7db0",
-      "label": "tracks — MAU heatmap pane + firefly map overlay",
+      "hash": "8a4c27adbe46",
+      "label": "tracks — global night-lights map only (no terminal column)",
       "region": {
-        "left": 0.5,
-        "top": 0,
-        "width": 0.5,
-        "height": 1
+        "left": 0.36,
+        "top": 0.02,
+        "width": 0.62,
+        "height": 0.96
       }
     },
     {

@@ -45,8 +45,9 @@ const PLATE_MAP = [
   {
     dest: 'web-traction-heatmap.png',
     src: 'slide-03-traction.png',
-    region: { left: 0.5, top: 0, width: 0.5, height: 1 },
-    label: 'tracks — MAU heatmap pane + firefly map overlay',
+    /* Map pane only — exclude left npm/terminal column (Creative: no dual-pane distraction). */
+    region: { left: 0.36, top: 0.02, width: 0.62, height: 0.96 },
+    label: 'tracks — global night-lights map only (no terminal column)',
   },
   {
     dest: 'web-split-brain-pillars.png',

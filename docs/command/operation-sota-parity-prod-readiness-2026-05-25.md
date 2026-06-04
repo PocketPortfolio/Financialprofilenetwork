@@ -65,7 +65,7 @@ Phase 1 of Operation SOTA Parity is **engineering-complete**. The Open landing a
 | `subHero` | slide-02 client pipeline crop | Moat carousel (scroll-snap, no clip) |
 | `bridge` | slide-03 (plate retained in SSOT) | **Pocket Analyst harness video** (`pocket-analyst-harness`) — see `docs/command/open-portfolio-bridge-harness-video-evaluation-2026-06-04.md` |
 | `pillars` | slide-02 server crop | Plate only |
-| `tracks` | slide-03 full dual-pane (global) | Full-world firefly overlay (`placement: global`) |
+| `tracks` | slide-03 map pane crop (`web-traction-heatmap`) | Map only — no terminal column; `placement: global` |
 | `packages` | slide-05 matrix crop (interim) | Package terminal HUD |
 | `contact` | slide-05 full console | **IAD briefing console** (3 demos) |
 | Executive form | — | Signature gold border (`OpenContactForm.tsx`) |

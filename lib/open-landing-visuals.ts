@@ -101,15 +101,15 @@ export const OPEN_LANDING_VISUALS: Record<OpenLandingVisualId, OpenLandingVisual
   },
   tracks: {
     id: 'tracks',
-    src: plateSrc('web-traction-dual-pane.png'),
+    src: plateSrc('web-traction-heatmap.png'),
     alt: 'Global night-lights footprint — mandate paths stress-tested across production harness.',
     caption: 'Pick the door that matches your mandate.',
     aspectRatio: '16/9',
     objectPosition: 'center',
-    objectFit: 'contain',
+    objectFit: 'cover',
     motion: 'digital-footprint',
     plateSource: 'deck-reuse',
-    headlineAlign: 'slide-03 full — global footprint map + firefly overlay',
+    headlineAlign: 'slide-03 map pane only — full globe, no terminal column',
   },
   packages: {
     id: 'packages',
