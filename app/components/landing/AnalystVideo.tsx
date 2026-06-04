@@ -1,30 +1,19 @@
 'use client';
 
 import { useRef } from 'react';
-import { parseHttpsUrl } from '../../lib/safe-external-url';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { LandingProductVideo } from './LandingProductVideo';
 import {
   POCKET_ANALYST_ASPECT_RATIO,
-  POCKET_ANALYST_FALLBACK,
-  resolvePocketAnalystVideoSrc,
+  POCKET_ANALYST_POSTER,
+  getPocketAnalystVideoSrc,
+  pocketAnalystLocalSrc,
 } from '../../../lib/landing-product-video';
-
-// Trim Cloudinary video to 42 seconds (so_0 = start 0s, eo_42 = end 42s).
-function trimTo42Seconds(url: string): string {
-  const parsed = parseHttpsUrl(url);
-  if (!parsed || parsed.hostname !== 'res.cloudinary.com') return url;
-  const uploadIdx = url.indexOf('/upload/');
-  if (uploadIdx === -1) return url;
-  const insert = uploadIdx + '/upload/'.length;
-  return url.slice(0, insert) + 'so_0,eo_42/' + url.slice(insert);
-}
-
-const POCKET_ANALYST_VIDEO_SRC = trimTo42Seconds(resolvePocketAnalystVideoSrc());
 
 export function AnalystVideo() {
   const videoRef = useRef<HTMLDivElement>(null);
+  const videoSrc = getPocketAnalystVideoSrc();
 
   const scrollToVideo = () => {
     videoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -205,8 +194,9 @@ export function AnalystVideo() {
               aria-hidden
             />
             <LandingProductVideo
-              src={POCKET_ANALYST_VIDEO_SRC}
-              fallbackSrc={POCKET_ANALYST_FALLBACK}
+              src={videoSrc}
+              fallbackSrc={pocketAnalystLocalSrc()}
+              posterSrc={POCKET_ANALYST_POSTER}
               aspectRatio={POCKET_ANALYST_ASPECT_RATIO}
               borderRadius={14}
               show4KBadge

@@ -10,7 +10,10 @@ export const DASHBOARD_DEMO_CDN_DEFAULT = `https://res.cloudinary.com/dknmhvm7a/
 export const DASHBOARD_DEMO_ASPECT_RATIO = '3840 / 2098';
 
 export const POCKET_ANALYST_FALLBACK = '/pocket-analyst-demo.mp4';
-export const POCKET_ANALYST_BRANDED_VERSION = 'v1779906828';
+export const POCKET_ANALYST_POSTER = '/pocket-analyst-demo-poster.jpg';
+/** Action-first trim (~28s). Re-encoded 2026-06-04; Cloudinary v1780578282. */
+export const POCKET_ANALYST_BRANDED_VERSION = 'v1780578282';
+export const POCKET_ANALYST_CACHE_BUST = '1780578282';
 export const POCKET_ANALYST_CDN_DEFAULT = `https://res.cloudinary.com/dknmhvm7a/video/upload/${POCKET_ANALYST_BRANDED_VERSION}/pocket-portfolio/pocket-analyst-demo.mp4`;
 /** 3840×2110 */
 export const POCKET_ANALYST_ASPECT_RATIO = '3840 / 2110';
@@ -66,4 +69,20 @@ export function resolvePocketAnalystVideoSrc(): string {
     POCKET_ANALYST_BRANDED_VERSION,
     POCKET_ANALYST_CDN_DEFAULT,
   );
+}
+
+/** Cache-busted same-origin path — authoritative in local preview after encode. */
+export function pocketAnalystLocalSrc(): string {
+  return `${POCKET_ANALYST_FALLBACK}?v=${POCKET_ANALYST_CACHE_BUST}`;
+}
+
+/**
+ * Pocket Analyst landing section video.
+ * - Development / localhost: committed `public/pocket-analyst-demo.mp4` (trimmed encode).
+ * - Production: Cloudinary CDN (re-upload after encode; bump branded version).
+ */
+export function getPocketAnalystVideoSrc(hostname?: string): string {
+  const useLocal =
+    process.env.NODE_ENV === 'development' || isLocalPreviewHost(hostname);
+  return useLocal ? pocketAnalystLocalSrc() : resolvePocketAnalystVideoSrc();
 }

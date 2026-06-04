@@ -10,7 +10,7 @@
 | Clip | Resolution | Local fallback | Cloudinary version | CDN URL |
 |------|------------|----------------|--------------------|---------|
 | **Hero dashboard demo** | 3840×2098 | `public/dashboard-demo-4k.mp4` (~18 MB) | `v1780002518` | `https://res.cloudinary.com/dknmhvm7a/video/upload/v1780002518/pocket-portfolio/dashboard-demo-4k.mp4` |
-| **Pocket Analyst demo** | 3840×2110 | `public/pocket-analyst-demo.mp4` (~6.6 MB) | `v1779906828` | `https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906828/pocket-portfolio/pocket-analyst-demo.mp4` |
+| **Pocket Analyst demo** | 3840×2110 | `public/pocket-analyst-demo.mp4` (~28s, action-first trim) | `v1780578282` | `https://res.cloudinary.com/dknmhvm7a/video/upload/v1780578282/pocket-portfolio/pocket-analyst-demo.mp4` |
 
 Both encodes: H.264 Main profile, keyframe every 1s, `fastdecode`, `+faststart`, no audio.
 
@@ -21,7 +21,7 @@ Both encodes: H.264 Main profile, keyframe every 1s, `fastdecode`, `+faststart`,
 - **`lib/landing-product-video.ts`** — version-stamped CDN defaults; ignores stale env overrides.
 - **`app/components/landing/LandingProductVideo.tsx`** — shared player: `playsInline`, `muted`, `autoPlay`, `aspect-ratio` (no layout shift on mobile), CDN → local fallback on error.
 - **`app/landing/page.tsx`** — hero uses `LandingProductVideo`.
-- **`app/components/landing/AnalystVideo.tsx`** — analyst section; Cloudinary trim `so_0,eo_42/` for 42s loop.
+- **`app/components/landing/AnalystVideo.tsx`** — analyst section; encode trims typing (`npm run encode:pocket-analyst-landing`).
 - **`next.config.js`** — `Accept-Ranges: bytes` on all fallback MP4 paths; CSP `media-src` allows `https://res.cloudinary.com`.
 
 ---
@@ -30,7 +30,7 @@ Both encodes: H.264 Main profile, keyframe every 1s, `fastdecode`, `+faststart`,
 
 ```
 NEXT_PUBLIC_DASHBOARD_DEMO_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1780002518/pocket-portfolio/dashboard-demo-4k.mp4
-NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1779906828/pocket-portfolio/pocket-analyst-demo.mp4
+NEXT_PUBLIC_POCKET_ANALYST_VIDEO_URL=https://res.cloudinary.com/dknmhvm7a/video/upload/v1780578282/pocket-portfolio/pocket-analyst-demo.mp4
 ```
 
 Production, Preview, and Development — confirm with `vercel env ls`.

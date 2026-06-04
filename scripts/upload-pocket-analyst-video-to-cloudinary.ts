@@ -16,8 +16,8 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 const candidates = [
-  path.join(process.cwd(), 'Newpocketanalyst.mp4'),
   path.join(process.cwd(), 'public', 'pocket-analyst-demo.mp4'),
+  path.join(process.cwd(), 'Newpocketanalyst.mp4'),
   path.join(process.cwd(), 'public', 'pocketanalyst.mp4'),
   path.join(process.cwd(), 'public', 'pocketanalyst.MP4'),
 ];
