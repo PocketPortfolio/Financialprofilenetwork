@@ -63,7 +63,7 @@ Phase 1 of Operation SOTA Parity is **engineering-complete**. The Open landing a
 | `hero` | slide-01 glass vault crop | Sovereign grid animation + left HUD label |
 | `threat` | slide-01 legacy cloud crop | Exposure overlay (calibrated EUR/GBP metrics) |
 | `subHero` | slide-02 client pipeline crop | Moat carousel (scroll-snap, no clip) |
-| `bridge` | slide-03 full dual-pane | Digital footprint fireflies (Atlantic-centered coords) |
+| `bridge` | slide-03 (plate retained in SSOT) | **Pocket Analyst harness video** (`pocket-analyst-harness`) — see `docs/command/open-portfolio-bridge-harness-video-evaluation-2026-06-04.md` |
 | `pillars` | slide-02 server crop | Plate only |
 | `tracks` | slide-03 heatmap crop | Full-map firefly overlay |
 | `packages` | slide-05 matrix crop (interim) | Package terminal HUD |

@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { OpenLandingVisualMeta } from '@/lib/open-landing-visuals';
 import OpenLandingBriefingConsole from './briefing-iad/OpenLandingBriefingConsole';
 import OpenLandingDigitalFootprintMap from './OpenLandingDigitalFootprintMap';
+import OpenLandingPocketAnalystHarness from './OpenLandingPocketAnalystHarness';
 import OpenLandingPackageTerminal from './OpenLandingPackageTerminal';
 import OpenLandingPlateOverlay from './OpenLandingPlateOverlay';
 import OpenLandingSovereignGrid from './OpenLandingSovereignGrid';
@@ -32,6 +33,7 @@ export default function OpenLandingVisual({
   const reduceMotion = useReducedMotion();
   const kenBurns = visual.id === 'hero' && !reduceMotion;
   const objectFit = visual.objectFit ?? 'cover';
+  const isHarnessVideo = visual.motion === 'pocket-analyst-harness';
 
   return (
     <motion.figure
@@ -71,18 +73,20 @@ export default function OpenLandingVisual({
               : undefined
           }
         >
-          <Image
-            src={visual.src}
-            alt={visual.alt}
-            fill
-            priority={priority}
-            quality={90}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, min(960px, 45vw)"
-            style={{
-              objectFit,
-              objectPosition: 'center center',
-            }}
-          />
+          {!isHarnessVideo ? (
+            <Image
+              src={visual.src}
+              alt={visual.alt}
+              fill
+              priority={priority}
+              quality={90}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, min(960px, 45vw)"
+              style={{
+                objectFit,
+                objectPosition: 'center center',
+              }}
+            />
+          ) : null}
         </motion.div>
 
         {visual.motion === 'sovereign-grid' && <OpenLandingSovereignGrid />}
@@ -91,6 +95,7 @@ export default function OpenLandingVisual({
             placement={visual.id === 'tracks' ? 'full' : 'dual-pane'}
           />
         )}
+        {visual.motion === 'pocket-analyst-harness' && <OpenLandingPocketAnalystHarness />}
         {visual.motion === 'package-terminal' && <OpenLandingPackageTerminal />}
         {visual.motion === 'briefing-console' && <OpenLandingBriefingConsole />}
 
@@ -98,7 +103,9 @@ export default function OpenLandingVisual({
           <OpenLandingPlateOverlay variant={visual.overlay} adapterCount={adapterCount} />
         )}
 
-        {!reduceMotion && visual.motion !== 'briefing-console' && (
+        {!reduceMotion &&
+          visual.motion !== 'briefing-console' &&
+          visual.motion !== 'pocket-analyst-harness' && (
           <motion.div
             aria-hidden
             animate={{ opacity: [0.08, 0.2, 0.08] }}

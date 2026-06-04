@@ -6,9 +6,9 @@ import { motion } from 'framer-motion';
 import { LandingProductVideo } from './LandingProductVideo';
 import {
   POCKET_ANALYST_ASPECT_RATIO,
-  POCKET_ANALYST_POSTER,
   getPocketAnalystVideoSrc,
   pocketAnalystLocalSrc,
+  pocketAnalystPosterSrc,
 } from '../../../lib/landing-product-video';
 
 export function AnalystVideo() {
@@ -196,7 +196,7 @@ export function AnalystVideo() {
             <LandingProductVideo
               src={videoSrc}
               fallbackSrc={pocketAnalystLocalSrc()}
-              posterSrc={POCKET_ANALYST_POSTER}
+              posterSrc={pocketAnalystPosterSrc()}
               aspectRatio={POCKET_ANALYST_ASPECT_RATIO}
               borderRadius={14}
               show4KBadge

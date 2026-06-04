@@ -76,6 +76,27 @@ export function pocketAnalystLocalSrc(): string {
   return `${POCKET_ANALYST_FALLBACK}?v=${POCKET_ANALYST_CACHE_BUST}`;
 }
 
+export function pocketAnalystPosterSrc(): string {
+  return `${POCKET_ANALYST_POSTER}?v=${POCKET_ANALYST_CACHE_BUST}`;
+}
+
+/** Open Portfolio hosts always load harness video from Cloudinary (not same-origin). */
+export function isOpenPortfolioHost(hostname: string): boolean {
+  return hostname.includes('openportfolio') || hostname.includes('open.localhost');
+}
+
+/**
+ * Bridge harness on Open — production CDN even in dev (WYSIWYG with live Open host).
+ * Pocket home section uses getPocketAnalystVideoSrc() (local file in dev).
+ */
+export function getPocketAnalystHarnessVideoSrc(hostname?: string): string {
+  const h = hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '');
+  if (isOpenPortfolioHost(h)) {
+    return resolvePocketAnalystVideoSrc();
+  }
+  return getPocketAnalystVideoSrc(h);
+}
+
 /**
  * Pocket Analyst landing section video.
  * - Development / localhost: committed `public/pocket-analyst-demo.mp4` (trimmed encode).

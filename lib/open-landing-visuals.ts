@@ -25,7 +25,8 @@ export type OpenLandingMotion =
   | 'sovereign-grid'
   | 'digital-footprint'
   | 'package-terminal'
-  | 'briefing-console';
+  | 'briefing-console'
+  | 'pocket-analyst-harness';
 
 export interface OpenLandingVisualMeta {
   id: OpenLandingVisualId;
@@ -79,14 +80,14 @@ export const OPEN_LANDING_VISUALS: Record<OpenLandingVisualId, OpenLandingVisual
   bridge: {
     id: 'bridge',
     src: plateSrc('web-traction-dual-pane.png'),
-    alt: 'npm terminal traction — Open Portfolio substrate validated in production workloads.',
-    caption: 'Stress-tested in the wild — hardened before your audit.',
+    alt: 'Pocket Analyst streaming on the live consumer harness — stateless inference under production load.',
+    caption: 'Pocket Analyst on the live harness — streaming inference before your audit.',
     aspectRatio: '16/9',
     objectPosition: 'center',
     objectFit: 'contain',
-    motion: 'digital-footprint',
+    motion: 'pocket-analyst-harness',
     plateSource: 'deck-reuse',
-    headlineAlign: 'slide-03 full — npm terminal + global footprint map',
+    headlineAlign: 'slide-03 → live Pocket Analyst demo (replaces static footprint map)',
   },
   pillars: {
     id: 'pillars',

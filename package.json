@@ -36,6 +36,7 @@
     "generate:open-landing-visuals": "node scripts/generate-open-landing-visuals.mjs",
     "sync:open-web-plates": "node scripts/sync-open-web-plates.mjs",
     "verify:open-web-sota": "node scripts/verify-open-web-sota-parity.mjs",
+    "verify:open-bridge-harness": "node scripts/verify-open-bridge-harness-video.mjs",
     "build:open-web-landing": "npm run sync:open-web-plates && npm run verify:open-web-sota",
     "sync:pocket-web-plates": "node scripts/sync-pocket-web-plates.mjs",
     "verify:pocket-web-sota": "node scripts/verify-pocket-web-sota-parity.mjs",

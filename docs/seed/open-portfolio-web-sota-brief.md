@@ -54,7 +54,7 @@ Extends `docs/seed/design-plates/GATE-REVIEW.md`.
 | `hero` | Hero | `hero-sovereign-layer` (flat shield) | `web-hero-glass-vault.png` | 3.1 — net-new |
 | `subHero` | Privacy architecture | `privacy-architecture` (flat vault/cloud) | `web-boundary-split-brain.png` | 2.2 — reuse `slide-02-split-brain.png` |
 | `threat` | Regulatory stakes | `regulatory-stakes` (€20M+ neon box) | `web-boundary-frontier.png` | 2.2 — reuse `slide-01-frontier.png` |
-| `bridge` | Pocket proof bridge | `live-proof-bridge` | `web-traction-dual-pane.png` | 2.2 — reuse `slide-03-traction.png` |
+| `bridge` | Pocket proof bridge | `pocket-analyst-harness` | `web-traction-dual-pane.png` (plate unused at runtime) | Live Pocket Analyst video — replaces static footprint map |
 | `pillars` | Substrate pillars | `substrate-pillars` | `web-split-brain-pillars.png` | 2.2 — crop/variant of `slide-02-split-brain.png` or 3.2 derivative |
 | `tracks` | Partner tracks | `partner-tracks` (hub-spoke) | `web-substrate-matrix.png` | 3.2 — net-new (shared with packages) |
 | `packages` | NPM packages | `open-packages` (hexagon) | `web-substrate-matrix.png` | 3.2 — net-new |
