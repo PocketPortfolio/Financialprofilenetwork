@@ -25,21 +25,6 @@ const FOOTPRINT_NODES_DUAL: { id: string; x: number; y: number }[] = [
   { id: 'lag', x: 45, y: 50 },
 ];
 
-/** Right-half crop (tracks) — Africa / Indian Ocean / Australia hemisphere. */
-const FOOTPRINT_NODES_FULL: { id: string; x: number; y: number }[] = [
-  { id: 'lon', x: 58, y: 26 },
-  { id: 'fra', x: 62, y: 28 },
-  { id: 'jnb', x: 48, y: 56 },
-  { id: 'lag', x: 40, y: 44 },
-  { id: 'cai', x: 54, y: 36 },
-  { id: 'dxb', x: 64, y: 34 },
-  { id: 'mum', x: 72, y: 40 },
-  { id: 'sgp', x: 78, y: 44 },
-  { id: 'syd', x: 84, y: 60 },
-  { id: 'nbo', x: 56, y: 48 },
-  { id: 'sao', x: 8, y: 52 },
-];
-
 function FireflyNode({
   x,
   y,
@@ -92,12 +77,12 @@ function FireflyNode({
 export default function OpenLandingDigitalFootprintMap({
   placement = 'dual-pane',
 }: {
-  /** dual-pane: npm terminal left + map right (bridge). full: map fills frame (tracks). */
-  placement?: 'dual-pane' | 'full';
+  /** dual-pane: map pane on right half of plate. global: full-world plate (tracks). */
+  placement?: 'dual-pane' | 'global';
 }) {
   const reduceMotion = useReducedMotion();
-  const isFull = placement === 'full';
-  const nodes = isFull ? FOOTPRINT_NODES_FULL : FOOTPRINT_NODES_DUAL;
+  const isGlobal = placement === 'global';
+  const nodes = FOOTPRINT_NODES_DUAL;
 
   return (
     <div
@@ -107,8 +92,8 @@ export default function OpenLandingDigitalFootprintMap({
         inset: 0,
         zIndex: 3,
         pointerEvents: 'none',
-        background: isFull
-          ? 'linear-gradient(180deg, transparent 0%, rgba(9,9,11,0.2) 100%)'
+        background: isGlobal
+          ? 'linear-gradient(180deg, transparent 0%, rgba(9,9,11,0.25) 100%)'
           : 'linear-gradient(90deg, rgba(9,9,11,0.72) 0%, rgba(9,9,11,0.12) 38%, transparent 52%)',
       }}
     >
@@ -116,12 +101,12 @@ export default function OpenLandingDigitalFootprintMap({
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid meet"
         style={
-          isFull
+          isGlobal
             ? {
                 position: 'absolute',
-                inset: '4% 3%',
-                width: '94%',
-                height: '92%',
+                inset: '5% 4%',
+                width: '92%',
+                height: '90%',
               }
             : {
                 /* Map pane in slide-03 — right ~76% of plate after contain fit */
@@ -147,7 +132,7 @@ export default function OpenLandingDigitalFootprintMap({
         style={{
           position: 'absolute',
           bottom: '8%',
-          ...(isFull ? { left: '4%' } : { right: '4%' }),
+          ...(isGlobal ? { left: '4%' } : { right: '4%' }),
           fontSize: '9px',
           letterSpacing: '0.14em',
           textTransform: 'uppercase',

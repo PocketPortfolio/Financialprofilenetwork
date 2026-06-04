@@ -92,7 +92,7 @@ export default function OpenLandingVisual({
         {visual.motion === 'sovereign-grid' && <OpenLandingSovereignGrid />}
         {visual.motion === 'digital-footprint' && (
           <OpenLandingDigitalFootprintMap
-            placement={visual.id === 'tracks' ? 'full' : 'dual-pane'}
+            placement={visual.id === 'tracks' ? 'global' : 'dual-pane'}
           />
         )}
         {visual.motion === 'pocket-analyst-harness' && <OpenLandingPocketAnalystHarness />}

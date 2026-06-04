@@ -101,14 +101,15 @@ export const OPEN_LANDING_VISUALS: Record<OpenLandingVisualId, OpenLandingVisual
   },
   tracks: {
     id: 'tracks',
-    src: plateSrc('web-traction-heatmap.png'),
-    alt: 'Global MAU heatmap — four partner mandate paths stress-tested in production.',
+    src: plateSrc('web-traction-dual-pane.png'),
+    alt: 'Global night-lights footprint — mandate paths stress-tested across production harness.',
     caption: 'Pick the door that matches your mandate.',
     aspectRatio: '16/9',
     objectPosition: 'center',
+    objectFit: 'contain',
     motion: 'digital-footprint',
     plateSource: 'deck-reuse',
-    headlineAlign: 'slide-03 right — MAU heatmap / mandate paths + firefly overlay',
+    headlineAlign: 'slide-03 full — global footprint map + firefly overlay',
   },
   packages: {
     id: 'packages',
