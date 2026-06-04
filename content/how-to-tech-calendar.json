@@ -2497,7 +2497,7 @@
     "scheduledTime": "14:00",
     "title": "Building a REST API with Fastify",
     "slug": "building-a-rest-api-with-fastify",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2505,7 +2505,8 @@
       "rest",
       "fastify",
       "building"
-    ]
+    ],
+    "publishedAt": "2026-06-04T14:00:53.332Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-logging-jun-5",
