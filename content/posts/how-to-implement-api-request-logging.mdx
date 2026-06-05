@@ -1,0 +1,75 @@
+---
+title: How to Implement API Request Logging
+date: '2026-06-05'
+description: >-
+  Learn how to implement API request logging to track and analyze requests in
+  your applications.
+tags:
+  - api
+  - logging
+  - implementation
+  - request
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-api-request-logging.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+In modern web applications, APIs serve as the backbone for data exchange between clients and servers. Monitoring and logging these API requests is crucial for debugging, performance analysis, and security audits. Without proper logging, it's challenging to trace the origin of errors or to understand the usage patterns of your API.
+
+## Solution
+
+Implementing API request logging involves capturing and storing details of each API request, such as the endpoint, HTTP method, request headers, payload, and response status. Below is a step-by-step guide using Node.js and Express, a popular framework for building APIs.
+
+### Step-by-step Implementation
+
+First, ensure you have Node.js and npm installed. Initialize a new Node.js project and install Express:
+
+```bash
+npm init -y
+npm install express morgan
+```
+
+The `morgan` package is a middleware for logging HTTP requests in Node.js. It simplifies the task of logging by providing pre-defined formats and customization options.
+
+Create a file named `server.js` and add the following code:
+
+```javascript
+const express = require('express');
+const morgan = require('morgan');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+
+// Create a write stream for logging to a file
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+
+// Setup the logger
+app.use(morgan('combined', { stream: accessLogStream }));
+
+// Sample route
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+```
+
+### Key Concepts
+
+1. **Middleware**: In Express, middleware functions are used to handle requests. Morgan acts as middleware to log requests.
+
+2. **Logging Formats**: Morgan provides several logging formats such as `combined`, `common`, `dev`, `short`, and `tiny`. Each format offers different levels of detail.
+
+3. **Log Storage**: Logs can be stored in different ways, such as in files or databases. In the example above, logs are written to `access.log` using a writable stream.
+
+4. **Customization**: Morgan allows for custom logging formats and can be extended to log additional request/response details.
+
+By implementing this setup, you create a robust system for tracking all incoming API requests. This not only aids in monitoring and debugging but also provides valuable insights into how your API is being used.
