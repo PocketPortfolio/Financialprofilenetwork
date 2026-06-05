@@ -2520,7 +2520,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Search Engine Scalability - Elasticsearch Cluster Performance",
     "slug": "research-search-engine-scalability-elasticsearch-cluster-performance-2026-06-05",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2529,7 +2529,8 @@
       "elasticsearch",
       "search",
       "engine"
-    ]
+    ],
+    "publishedAt": "2026-06-05T18:00:55.980Z"
   },
   {
     "id": "research-cdn-cache-hit-rates-optimization-strategies-2026-06-06",
