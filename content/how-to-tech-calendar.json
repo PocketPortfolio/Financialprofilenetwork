@@ -2514,7 +2514,7 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Logging",
     "slug": "how-to-implement-api-request-logging",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2522,7 +2522,8 @@
       "logging",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-06-05T14:01:10.359Z"
   },
   {
     "id": "how-to-the-guide-to-api-design-principles-jun-6",
