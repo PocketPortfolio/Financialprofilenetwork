@@ -2538,7 +2538,7 @@
     "scheduledTime": "18:00",
     "title": "Research: CDN Cache Hit Rates - Optimization Strategies",
     "slug": "research-cdn-cache-hit-rates-optimization-strategies-2026-06-06",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2546,7 +2546,8 @@
       "cdn",
       "cache",
       "hit"
-    ]
+    ],
+    "publishedAt": "2026-06-06T18:00:45.804Z"
   },
   {
     "id": "research-database-connection-pooling-performance-impact-analysis-2026-06-07",
