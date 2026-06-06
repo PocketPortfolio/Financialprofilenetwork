@@ -2531,14 +2531,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Design Principles",
     "slug": "the-guide-to-api-design-principles",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "design"
-    ]
+    ],
+    "publishedAt": "2026-06-06T14:00:33.768Z"
   },
   {
     "id": "how-to-how-to-use-mongodb-with-mongoose-jun-7",
