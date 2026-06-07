@@ -1,0 +1,104 @@
+---
+title: How to Use MongoDB with Mongoose
+date: '2026-06-07'
+description: >-
+  Learn how to effectively use MongoDB with Mongoose for seamless database
+  operations.
+tags:
+  - mongodb
+  - mongoose
+  - database
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-mongodb-with-mongoose.png
+pillar: Tech
+category: how-to-in-tech
+---
+
+## Problem
+
+Integrating MongoDB, a NoSQL database, with your Node.js application can be challenging due to the complexity of managing schemas and ensuring data consistency. Mongoose, an Object Data Modeling (ODM) library for MongoDB and Node.js, simplifies this process by providing a schema-based solution to model your application data.
+
+## Solution with Code
+
+To use MongoDB with Mongoose, follow these steps:
+
+1. **Install Mongoose**: First, ensure you have MongoDB set up. Then, install Mongoose in your Node.js project:
+
+   ```bash
+   npm install mongoose
+   ```
+
+2. **Connect to MongoDB**: Use Mongoose to establish a connection to your MongoDB database:
+
+   ```javascript
+   const mongoose = require('mongoose');
+
+   mongoose.connect('mongodb://localhost:27017/mydatabase', {
+     useNewUrlParser: true,
+     useUnifiedTopology: true,
+   })
+   .then(() => console.log('MongoDB connected'))
+   .catch(err => console.error('Connection error', err));
+   ```
+
+3. **Define a Schema**: Use Mongoose to define a schema for your data:
+
+   ```javascript
+   const { Schema } = mongoose;
+
+   const userSchema = new Schema({
+     name: String,
+     email: String,
+     age: Number,
+   });
+   ```
+
+4. **Create a Model**: Compile the schema into a model, which is a class that constructs documents:
+
+   ```javascript
+   const User = mongoose.model('User', userSchema);
+   ```
+
+5. **Perform CRUD Operations**:
+
+   - **Create**: Add a new document to your collection:
+
+     ```javascript
+     const newUser = new User({ name: 'Alice', email: 'alice@example.com', age: 25 });
+     newUser.save()
+       .then(() => console.log('User saved'))
+       .catch(err => console.error('Save error', err));
+     ```
+
+   - **Read**: Retrieve documents from the collection:
+
+     ```javascript
+     User.find({ age: { $gt: 20 } })
+       .then(users => console.log(users))
+       .catch(err => console.error('Find error', err));
+     ```
+
+   - **Update**: Modify existing documents:
+
+     ```javascript
+     User.updateOne({ name: 'Alice' }, { age: 26 })
+       .then(() => console.log('User updated'))
+       .catch(err => console.error('Update error', err));
+     ```
+
+   - **Delete**: Remove documents from the collection:
+
+     ```javascript
+     User.deleteOne({ name: 'Alice' })
+       .then(() => console.log('User deleted'))
+       .catch(err => console.error('Delete error', err));
+     ```
+
+## Key Concepts
+
+- **Connection Management**: Mongoose handles connection pooling and error handling, making it easier to manage database connections.
+- **Schema Definition**: Mongoose provides a flexible schema definition that maps directly to a MongoDB collection.
+- **Data Validation and Casting**: Mongoose offers built-in data validation and type casting, ensuring data integrity.
+- **Middleware Support**: The middleware system in Mongoose allows you to intercept and modify requests at various stages of the document lifecycle.
+
+By using Mongoose, you can streamline your MongoDB operations, ensuring efficient and error-free database interactions.
