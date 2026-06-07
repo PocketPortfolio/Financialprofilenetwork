@@ -124,6 +124,8 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Menu Button */}
           <button
+            type="button"
+            data-tour="nav-menu-toggle"
             onClick={() => {
               if (usePersistentDesktopNav && desktopNav) {
                 desktopNav.toggle();

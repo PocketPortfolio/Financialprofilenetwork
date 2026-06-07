@@ -156,6 +156,20 @@ export default function DesktopNav() {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [tourExpandGeneration, setTourExpandGeneration] = useState(0);
+
+  useEffect(() => {
+    const onTourOpen = () => {
+      for (const section of DASHBOARD_NAV_SECTIONS) {
+        if (!section.adminOnly) {
+          writeSectionOpen(section.id, true);
+        }
+      }
+      setTourExpandGeneration((n) => n + 1);
+    };
+    window.addEventListener('pp-desktop-nav-tour-open', onTourOpen);
+    return () => window.removeEventListener('pp-desktop-nav-tour-open', onTourOpen);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -195,6 +209,7 @@ export default function DesktopNav() {
   return (
     <>
       <aside
+        data-tour="desktop-nav-rail"
         aria-label="Desktop navigation"
         aria-hidden={!isOpen}
         className={`pp-desktop-nav-rail ${styles.rail} ${isOpen ? styles.railOpen : styles.railClosed}`}
@@ -218,7 +233,7 @@ export default function DesktopNav() {
 
             {DASHBOARD_NAV_SECTIONS.filter((section) => !section.adminOnly || isAdmin).map((section) => (
               <NavSection
-                key={section.id}
+                key={`${section.id}-${tourExpandGeneration}`}
                 section={section}
                 pathname={pathname}
                 isAdmin={isAdmin}

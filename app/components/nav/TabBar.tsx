@@ -121,6 +121,7 @@ export default function TabBar({ className = '' }: { className?: string }) {
     <nav
       role="navigation"
       aria-label="App quick navigation"
+      data-tour="mobile-tab-bar"
       className={`mobile-tab-bar pp-tab-bar ${className}`}
     >
       {tabs.map((tab) => {

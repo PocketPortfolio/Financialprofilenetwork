@@ -760,7 +760,7 @@ export default function Dashboard() {
           return;
         }
         
-        const hasSeenTour = localStorage.getItem('pocket_onboarding_seen');
+        const hasSeenTour = localStorage.getItem('pocket_onboarding_v2_seen');
         
         if (hasSeenTour === 'true') {
           // Onboarding tour is complete, stop checking and show modal after a short delay
@@ -1897,6 +1897,7 @@ export default function Dashboard() {
             )}
           {/* Directive B — direct-entry affordance: search + import before deep terminal chrome */}
           <div
+            data-tour="dashboard-next-action"
             id="dashboard-quick-search"
             className="dashboard-card"
             style={{
@@ -2689,6 +2690,7 @@ export default function Dashboard() {
         {/* Empty State: Mobile handoff (Mandate 3) vs Desktop 3-step CSV onboarding */}
         {trades.length === 0 && isMobile && (
           <div
+            data-tour="dashboard-mobile-handoff"
             style={{
               padding: '32px 24px',
               background: 'var(--surface-hover, hsl(var(--muted) / 0.3))',
@@ -2782,7 +2784,9 @@ export default function Dashboard() {
           </div>
         )}
         {trades.length === 0 && !isMobile && (
-          <div style={{ 
+          <div
+            data-tour="dashboard-get-started"
+            style={{ 
             textAlign: 'center', 
             padding: '48px 24px',
             color: 'var(--dashboard-muted-foreground)',

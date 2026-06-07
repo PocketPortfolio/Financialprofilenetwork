@@ -101,6 +101,13 @@ describe('dashboardNavConfig — org SSOT & production routing', () => {
     expect(source).toContain('dashboardNavConfig');
     expect(source).toContain('DASHBOARD_NAV_PRIMARY');
     expect(source).toContain('DASHBOARD_NAV_SECTIONS');
+    expect(source).toContain('data-tour="desktop-nav-rail"');
+  });
+
+  it('OnboardingTour uses dashboardTourConfig SSOT', () => {
+    const source = readFileSync(join(APP_ROOT, 'components', 'OnboardingTour.tsx'), 'utf8');
+    expect(source).toContain('dashboardTourConfig');
+    expect(source).toContain('ONBOARDING_TOUR_STORAGE_KEY');
   });
 
   it('live route uses dashboard shell layout (SovereignHeader + DesktopNav)', () => {
