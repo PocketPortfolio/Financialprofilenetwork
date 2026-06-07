@@ -2555,7 +2555,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Connection Pooling - Performance Impact Analysis",
     "slug": "research-database-connection-pooling-performance-impact-analysis-2026-06-07",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2563,7 +2563,8 @@
       "database",
       "connection",
       "pooling"
-    ]
+    ],
+    "publishedAt": "2026-06-07T18:01:07.678Z"
   },
   {
     "id": "research-graphql-query-complexity-performance-vs-flexibility-2026-06-08",
