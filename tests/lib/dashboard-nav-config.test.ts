@@ -102,4 +102,9 @@ describe('dashboardNavConfig — org SSOT & production routing', () => {
     expect(source).toContain('DASHBOARD_NAV_PRIMARY');
     expect(source).toContain('DASHBOARD_NAV_SECTIONS');
   });
+
+  it('live route uses dashboard shell layout (SovereignHeader + DesktopNav)', () => {
+    const source = readFileSync(join(APP_ROOT, 'live', 'layout.tsx'), 'utf8');
+    expect(source).toContain('DashboardClientLayout');
+  });
 });
