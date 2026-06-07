@@ -11,6 +11,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { UserAvatarDropdown } from './UserAvatarDropdown';
 import { SupportFormModal } from './SupportFormModal';
 import { useStickyHeader } from '../../hooks/useStickyHeader';
+import { useDesktopNavOptional } from '../../hooks/useDesktopNav';
 
 interface SovereignHeaderProps {
   syncState?: 'idle' | 'syncing' | 'error';
@@ -31,6 +32,8 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
   const { signInWithGoogle, loading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const desktopNav = useDesktopNavOptional();
+  const usePersistentDesktopNav = isDesktop && desktopNav !== null;
   
   // 🟢 LOGIC: Check if user has premium sync access
   const isPremium = tier === 'corporateSponsor' || tier === 'foundersClub';
@@ -121,7 +124,13 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Menu Button */}
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={() => {
+              if (usePersistentDesktopNav && desktopNav) {
+                desktopNav.toggle();
+                return;
+              }
+              setIsMenuOpen(!isMenuOpen);
+            }}
             style={{
               background: 'transparent',
               border: `1px solid color-mix(in srgb, var(--dashboard-chrome-border) 30%, transparent)`,
@@ -142,7 +151,10 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
               e.currentTarget.style.color = 'var(--dashboard-muted-foreground)';
               e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--dashboard-chrome-border) 30%, transparent)';
             }}
-            aria-label="Open menu"
+            aria-label={
+              usePersistentDesktopNav && desktopNav?.isOpen ? 'Close navigation menu' : 'Open navigation menu'
+            }
+            aria-expanded={usePersistentDesktopNav ? desktopNav?.isOpen : isMenuOpen}
           >
             <Menu style={{ width: '20px', height: '20px' }} />
           </button>
@@ -340,8 +352,8 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
         {/* Close max-width container */}
       </header>
       
-      {/* 🟢 RESTORED: Mobile Navigation Menu */}
-      {isMenuOpen && (
+      {/* Mobile overlay drawer — desktop uses persistent push rail via DesktopNav */}
+      {isMenuOpen && !usePersistentDesktopNav && (
         <div
             style={{
               position: 'fixed',
@@ -502,6 +514,28 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
               >
                 Import CSV
               </Link>
+
+              <Link
+                href="/import"
+                onClick={() => setIsMenuOpen(false)}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  color: 'hsl(var(--foreground))',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Import
+              </Link>
               
               <Link 
                 href="/settings"
@@ -591,6 +625,28 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
               >
                 Support
               </button>
+
+              <Link
+                href="/sponsor"
+                onClick={() => setIsMenuOpen(false)}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '6px',
+                  color: 'hsl(var(--foreground))',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  background: 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+              >
+                Developer Utility
+              </Link>
               
               {/* Admin Links - Only show if user is admin */}
               {isAdmin && (

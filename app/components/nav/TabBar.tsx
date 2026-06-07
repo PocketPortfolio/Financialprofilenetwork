@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/app/hooks/useAuth';
 import {
   LayoutDashboard,
   LineChart,
@@ -90,7 +89,6 @@ function isTabActive(tabId: string, pathname: string | null): boolean {
 
 export default function TabBar({ className = '' }: { className?: string }) {
   const pathname = usePathname();
-  const { isAuthenticated, loading } = useAuth();
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [onOpenSurface, setOnOpenSurface] = useState(false);
 
@@ -114,10 +112,9 @@ export default function TabBar({ className = '' }: { className?: string }) {
     return null;
   }
 
-  // Mobile (≤768px): always show. Desktop: only when signed in (after auth resolves).
+  // Mobile (≤768px): always show.
   if (!isMobile) {
-    if (loading) return null;
-    if (!isAuthenticated) return null;
+    return null;
   }
 
   return (

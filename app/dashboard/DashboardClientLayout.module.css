@@ -1,0 +1,51 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .shell {
+    min-height: 100vh;
+  }
+}
+
+.shellRow {
+  display: flex;
+  min-height: 0;
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.mainViewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px));
+  transition: width 0.3s ease-in-out;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .shell {
+    min-height: 0;
+  }
+
+  .mainViewport {
+    padding-bottom: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .mainViewport {
+    scroll-behavior: auto;
+  }
+}

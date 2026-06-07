@@ -1,0 +1,181 @@
+/* Desktop persistent nav rail — CSS Module (Tailwind disabled in globals.css) */
+
+.rail {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .rail {
+    display: block;
+    flex: 0 0 0;
+    flex-shrink: 0;
+    align-self: stretch;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+    transition:
+      flex-basis 0.3s ease-in-out,
+      width 0.3s ease-in-out,
+      opacity 0.3s ease-in-out,
+      border-color 0.3s ease-in-out;
+    border-right: 1px solid transparent;
+  }
+
+  .railOpen {
+    flex: 0 0 256px;
+    width: 256px;
+    opacity: 1;
+    border-right-color: var(--dashboard-chrome-border);
+  }
+
+  .railClosed {
+    flex: 0 0 0;
+    width: 0;
+    opacity: 0;
+    border-right-color: transparent;
+  }
+
+  .inner {
+    display: flex;
+    flex-direction: column;
+    width: 256px;
+    height: 100%;
+    max-height: 100%;
+    background: hsl(var(--background));
+    border-right: 1px solid var(--dashboard-chrome-border);
+  }
+
+  .navScroll {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: hidden;
+    overscroll-behavior: none;
+    padding: 12px 8px 16px;
+  }
+
+  .navItem,
+  .navButton {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: hsl(var(--foreground));
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .navItem:hover,
+  .navButton:hover {
+    background: var(--dashboard-surface-hover);
+  }
+
+  .navItemActive {
+    background: color-mix(in srgb, var(--accent-warm) 16%, hsl(var(--card)));
+    border-color: color-mix(in srgb, var(--accent-warm) 35%, transparent);
+    color: hsl(var(--foreground));
+    font-weight: 600;
+  }
+
+  .navIcon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--dashboard-muted-foreground);
+  }
+
+  .navItemActive .navIcon {
+    color: var(--accent-warm);
+  }
+
+  .section {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--dashboard-chrome-border-subtle);
+  }
+
+  .sectionToggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    color: var(--dashboard-muted-foreground);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .sectionToggle:hover {
+    color: hsl(var(--foreground));
+  }
+
+  .sectionChevron {
+    transition: transform 0.2s ease;
+  }
+
+  .sectionChevronOpen {
+    transform: rotate(180deg);
+  }
+
+  .sectionItems {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 4px;
+  }
+
+  .sectionItem,
+  .sectionButton {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 8px 12px 8px 28px;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: hsl(var(--foreground));
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .sectionItem:hover,
+  .sectionButton:hover {
+    background: var(--dashboard-surface-hover);
+  }
+
+  .sectionItemActive {
+    background: color-mix(in srgb, var(--accent-warm) 14%, hsl(var(--card)));
+    border-color: color-mix(in srgb, var(--accent-warm) 30%, transparent);
+    font-weight: 600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail {
+    transition: none;
+  }
+}

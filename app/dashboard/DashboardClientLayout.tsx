@@ -4,12 +4,16 @@ import React, { useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { DesktopNavProvider } from '../hooks/useDesktopNav';
 import { SovereignHeader } from '../components/dashboard/SovereignHeader';
+import DesktopNav from '../components/nav/DesktopNav';
+import layoutStyles from './DashboardClientLayout.module.css';
 
 export default function DashboardClientLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { tier } = usePremiumTheme();
   const { syncState } = useGoogleDrive();
+
   useEffect(() => {
     try {
       sessionStorage.setItem('pp-post-auth-redirect-done', '1');
@@ -23,28 +27,31 @@ export default function DashboardClientLayout({ children }: { children: React.Re
   };
 
   return (
-    <div
-      data-tier={getTierForDataAttribute(tier)}
-      className="sovereign-dashboard min-h-screen bg-background text-foreground font-sans transition-colors duration-300"
-      style={{
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-      }}
-    >
-      <SovereignHeader
-        syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
-        lastSyncTime={syncState.lastSyncTime}
-        user={user}
-      />
-
-      <main
-        className="mx-auto w-full max-w-[1600px] space-y-6 px-4 pb-[calc(96px+env(safe-area-inset-bottom,0px))] md:px-6 md:pb-8"
-        data-dashboard-content
+    <DesktopNavProvider>
+      <div
+        data-tier={getTierForDataAttribute(tier)}
+        className={`sovereign-dashboard pp-dashboard-shell ${layoutStyles.shell}`}
         style={{
-          minHeight: 'calc(100vh - 80px)',
+          background: 'hsl(var(--background))',
+          color: 'hsl(var(--foreground))',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          transition: 'background-color 0.3s ease, color 0.3s ease',
         }}
       >
-        {children}
-      </main>
-    </div>
+        <SovereignHeader
+          syncState={syncState.isSyncing ? 'syncing' : syncState.isConnected ? 'idle' : 'error'}
+          lastSyncTime={syncState.lastSyncTime}
+          user={user}
+        />
+
+        <div className={`pp-dashboard-shell-row ${layoutStyles.shellRow}`}>
+          <DesktopNav />
+
+          <main data-dashboard-content className={`pp-dashboard-main ${layoutStyles.mainViewport}`}>
+            <div className={layoutStyles.mainContent}>{children}</div>
+          </main>
+        </div>
+      </div>
+    </DesktopNavProvider>
   );
 }

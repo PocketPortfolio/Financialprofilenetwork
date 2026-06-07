@@ -11,6 +11,7 @@ import {
   TIER1_DESIGN_PARTNER,
 } from '@/lib/canonical-claims';
 import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
+import { isDashboardShellPath } from '@/lib/dashboard-shell';
 
 interface TrendingAsset {
   symbol: string;
@@ -24,6 +25,7 @@ export default function GlobalFooter() {
   const footerRef = useRef<HTMLElement | null>(null);
   const [onOpenSurface, setOnOpenSurface] = useState(false);
   const [crossLinkHref, setCrossLinkHref] = useState<string>(SURFACE_CROSS_LINKS.pocket.href);
+  const [hideOnDesktopShell, setHideOnDesktopShell] = useState(false);
 
   useEffect(() => {
     const host = window.location.hostname;
@@ -33,6 +35,16 @@ export default function GlobalFooter() {
       open ? pocketSurfaceBaseUrl(host) : openSurfaceBaseUrl(host),
     );
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const apply = () => {
+      setHideOnDesktopShell(mq.matches && isDashboardShellPath(pathname));
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [pathname]);
 
   // Determine footer variant based on pathname
   const isLiteFooter = pathname?.startsWith('/login') || 
@@ -95,6 +107,11 @@ export default function GlobalFooter() {
 
   // Pocket footer is not shown on the B2B surface (OpenNavbar + page footers only).
   if (onOpenSurface) {
+    return null;
+  }
+
+  // Desktop dashboard shell uses its own scroll region; footer causes double page scroll.
+  if (hideOnDesktopShell) {
     return null;
   }
 
