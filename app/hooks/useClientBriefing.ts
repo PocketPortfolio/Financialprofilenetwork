@@ -22,7 +22,7 @@ function hashContext(ctx: string): string {
   return String(h);
 }
 
-const SESSION_PREFIX = 'pp_client_brief_v1_';
+const SESSION_PREFIX = 'pp_client_brief_v2_';
 const LOAD_TIMEOUT_MS = 22_000;
 
 function bulletsEqual(a: string[], b: string[]): boolean {
