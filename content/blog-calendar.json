@@ -958,7 +958,7 @@
     "date": "2026-06-07",
     "title": "International Diversification: The Numbers Behind the Strategy",
     "slug": "international-diversification-the-numbers-behind-the-strateg",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -968,7 +968,8 @@
       "international"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-07T09:00:42.097Z"
   },
   {
     "id": "week-23-post-2",
