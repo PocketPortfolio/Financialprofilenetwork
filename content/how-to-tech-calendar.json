@@ -2563,14 +2563,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Gateway vs Service Mesh",
     "slug": "understanding-api-gateway-vs-service-mesh",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "understanding",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-06-08T14:01:44.366Z"
   },
   {
     "id": "how-to-how-to-implement-api-health-checks-jun-9",
