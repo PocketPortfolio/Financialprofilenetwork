@@ -2572,7 +2572,7 @@
     "scheduledTime": "18:00",
     "title": "Research: GraphQL Query Complexity - Performance vs Flexibility",
     "slug": "research-graphql-query-complexity-performance-vs-flexibility-2026-06-08",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2581,7 +2581,8 @@
       "graphql",
       "query",
       "complexity"
-    ]
+    ],
+    "publishedAt": "2026-06-08T18:00:48.556Z"
   },
   {
     "id": "research-serverless-function-cold-starts-mitigation-strategies-2026-06-09",
