@@ -1,0 +1,78 @@
+---
+title: Understanding API Gateway vs Service Mesh
+date: '2026-06-08'
+description: >-
+  Explore the differences between API Gateway and Service Mesh, and understand
+  when to use each.
+tags:
+  - api
+  - understanding
+  - gateway
+  - service mesh
+author: Pocket Portfolio Team
+image: /images/blog/understanding-api-gateway-vs-service-mesh.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+As modern applications evolve, they often transition to microservices architectures, which can introduce complexity in managing service-to-service communication and external client interactions. Two primary solutions to these challenges are API Gateways and Service Meshes. Understanding the differences between the two is crucial for implementing the right architecture for your application.
+
+## Solution with Code
+
+### API Gateway
+
+An API Gateway acts as a single entry point for all clients, routing requests to the appropriate microservices. It handles tasks such as authentication, rate limiting, and SSL termination.
+
+**Example using Express.js and `http-proxy-middleware`:**
+
+```javascript
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+const app = express();
+
+app.use('/service1', createProxyMiddleware({ target: 'http://localhost:3001', changeOrigin: true }));
+app.use('/service2', createProxyMiddleware({ target: 'http://localhost:3002', changeOrigin: true }));
+
+app.listen(3000, () => {
+  console.log('API Gateway listening on port 3000');
+});
+```
+
+### Service Mesh
+
+A Service Mesh manages internal service-to-service communication. It provides features like load balancing, service discovery, and traffic management without changing application code.
+
+**Example using Istio:**
+
+1. **Install Istio:**
+
+   ```bash
+   curl -L https://istio.io/downloadIstio | sh -
+   cd istio-<version>
+   export PATH=$PWD/bin:$PATH
+   istioctl install --set profile=demo
+   ```
+
+2. **Deploy a sample application:**
+
+   ```bash
+   kubectl create namespace demo
+   kubectl label namespace demo istio-injection=enabled
+   kubectl apply -n demo -f samples/bookinfo/platform/kube/bookinfo.yaml
+   ```
+
+3. **Verify the deployment:**
+
+   ```bash
+   kubectl get pods -n demo
+   ```
+
+## Key Concepts
+
+- **API Gateway**: Best suited for handling external client requests. It simplifies client interactions by providing a single entry point to access multiple services.
+- **Service Mesh**: Ideal for managing internal microservice communication. It enhances reliability and observability within a microservices architecture without altering application logic.
+
+In summary, use an API Gateway when your primary concern is managing client-to-service interactions efficiently. Opt for a Service Mesh when your focus is on optimizing and controlling service-to-service communication within your application infrastructure. Understanding these distinctions will help ensure your architecture is both robust and scalable.
