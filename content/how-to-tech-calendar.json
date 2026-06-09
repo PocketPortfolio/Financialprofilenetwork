@@ -2579,14 +2579,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Health Checks",
     "slug": "how-to-implement-api-health-checks",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "health"
-    ]
+    ],
+    "publishedAt": "2026-06-09T14:00:55.304Z"
   },
   {
     "id": "how-to-building-a-graphql-federation-server-jun-10",
