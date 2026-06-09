@@ -18,23 +18,25 @@ const OUT_DIR = path.join(ROOT, 'public/pocket/landing/plates');
 const CACHE_FILE = path.join(ROOT, 'lib/pocket-landing-plate-cache.ts');
 
 const PLATE_MAP = [
+  // CMD-UI-ASSET-2026-06-09 — purpose-built portal plates (full-frame, no crop).
+  // Replaces generic deck crops with high-signal product visuals per CEO mandate.
   {
     dest: 'web-portal-terminal.png',
-    src: 'slide-03-traction.png',
-    region: { left: 0, top: 0.08, width: 0.48, height: 0.84 },
-    label: 'portalTerminal — amber data-matrix crop',
+    src: 'pocket-portal-terminal-v2.png',
+    full: true,
+    label: 'portalTerminal — dashboard chart + portfolio matrix + analyst console',
   },
   {
     dest: 'web-portal-storage.png',
-    src: 'slide-01-frontier.png',
-    region: { left: 0.5, top: 0.06, width: 0.48, height: 0.88 },
-    label: 'portalStorage — glass vault crop',
+    src: 'pocket-portal-storage-v2.png',
+    full: true,
+    label: 'portalStorage — encrypted vault + local-first → drive pipeline',
   },
   {
     dest: 'web-portal-founders.png',
-    src: 'slide-05-control-panel.png',
-    region: { left: 0.08, top: 0.1, width: 0.84, height: 0.8 },
-    label: 'portalFounders — command insignia crop',
+    src: 'pocket-portal-founders-v2.png',
+    full: true,
+    label: 'portalFounders — hex insignia + roadmap blueprint + access key',
   },
   {
     dest: 'web-why-choose.png',
