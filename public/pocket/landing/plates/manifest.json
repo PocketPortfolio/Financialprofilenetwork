@@ -1,41 +1,26 @@
 {
-  "syncedAt": "2026-05-28T20:42:37.833Z",
+  "syncedAt": "2026-06-09T12:09:40.626Z",
   "plates": [
     {
       "dest": "web-portal-terminal.png",
-      "src": "slide-03-traction.png",
-      "hash": "5b2a3be17e0a",
-      "label": "portalTerminal — amber data-matrix crop",
-      "region": {
-        "left": 0,
-        "top": 0.08,
-        "width": 0.48,
-        "height": 0.84
-      }
+      "src": "pocket-portal-terminal-v2.png",
+      "hash": "6ded4d6b0d84",
+      "label": "portalTerminal — dashboard chart + portfolio matrix + analyst console",
+      "region": "full"
     },
     {
       "dest": "web-portal-storage.png",
-      "src": "slide-01-frontier.png",
-      "hash": "c18f3a0b7b06",
-      "label": "portalStorage — glass vault crop",
-      "region": {
-        "left": 0.5,
-        "top": 0.06,
-        "width": 0.48,
-        "height": 0.88
-      }
+      "src": "pocket-portal-storage-v2.png",
+      "hash": "1497a99b1eb3",
+      "label": "portalStorage — encrypted vault + local-first → drive pipeline",
+      "region": "full"
     },
     {
       "dest": "web-portal-founders.png",
-      "src": "slide-05-control-panel.png",
-      "hash": "9d4749f3ce63",
-      "label": "portalFounders — command insignia crop",
-      "region": {
-        "left": 0.08,
-        "top": 0.1,
-        "width": 0.84,
-        "height": 0.8
-      }
+      "src": "pocket-portal-founders-v2.png",
+      "hash": "861475a13b6e",
+      "label": "portalFounders — hex insignia + roadmap blueprint + access key",
+      "region": "full"
     },
     {
       "dest": "web-why-choose.png",
