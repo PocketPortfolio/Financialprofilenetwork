@@ -306,6 +306,10 @@ const nextConfig = {
         source: '/pocketanalyst.mp4',
         headers: [{ key: 'Accept-Ranges', value: 'bytes' }],
       },
+      {
+        source: '/marketing/:path*.mp4',
+        headers: [{ key: 'Accept-Ranges', value: 'bytes' }],
+      },
     ];
 
     // Skip security headers in development to avoid CSP issues with Next.js dev server

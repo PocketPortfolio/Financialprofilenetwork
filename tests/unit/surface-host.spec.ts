@@ -19,6 +19,11 @@ describe('isOpenStaticAssetPath', () => {
     expect(isOpenStaticAssetPath('/open/landing/plates/web-boundary-frontier.png')).toBe(true);
     expect(isOpenStaticAssetPath('/open/landing/svg/privacy-architecture.svg')).toBe(true);
   });
+
+  it('includes marketing media under /marketing/ (Split-Brain video on O. landing)', () => {
+    expect(isOpenStaticAssetPath('/marketing/corporate-split-brain-linkedin-4k.mp4')).toBe(true);
+    expect(isOpenStaticAssetPath('/marketing/corporate-split-brain-linkedin-poster.jpg')).toBe(true);
+  });
 });
 
 describe('isOpenSurfaceRoute', () => {

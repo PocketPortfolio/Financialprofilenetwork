@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
-import { SURFACE_CROSS_LINKS } from '@/lib/canonical-claims';
+import { OPEN_LANDING_FOOTER_PATHWAYS, SURFACE_CROSS_LINKS } from '@/lib/canonical-claims';
 import { pocketSurfaceBaseUrl } from '@/lib/surface-host';
 
 /**
@@ -45,10 +45,28 @@ export default async function OpenFooter() {
           <Link href="/architecture" style={{ color: 'inherit', textDecoration: 'none' }}>
             Architecture
           </Link>
-          <Link href="/learn/sovereign-stack" style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link href="/blog" style={{ color: 'inherit', textDecoration: 'none' }}>
+            Blog
+          </Link>
+          {OPEN_LANDING_FOOTER_PATHWAYS.map((pathway) => (
+            <Link
+              key={pathway.href}
+              href={pathway.href}
+              style={{ color: 'inherit', textDecoration: 'none', opacity: 0.72 }}
+            >
+              {pathway.label}
+            </Link>
+          ))}
+          <Link
+            href="/learn/sovereign-stack"
+            style={{ color: 'inherit', textDecoration: 'none', opacity: 0.72 }}
+          >
             Sovereign Stack
           </Link>
-          <Link href="/learn/local-first" style={{ color: 'inherit', textDecoration: 'none' }}>
+          <Link
+            href="/learn/local-first"
+            style={{ color: 'inherit', textDecoration: 'none', opacity: 0.72 }}
+          >
             Local-First
           </Link>
           <a href={pocketHref} style={{ color: 'inherit', textDecoration: 'none' }}>

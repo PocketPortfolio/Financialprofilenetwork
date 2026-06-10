@@ -719,11 +719,12 @@ export interface SurfaceNavItem {
   external?: boolean;
 }
 
+/**
+ * Sparse header nav — technical/educational destinations only.
+ * Institutional tracks (Design Challenge, Tier 1, BIP) live in footer pathways.
+ */
 export const OPEN_NAV: ReadonlyArray<SurfaceNavItem> = [
   { label: 'Architecture', href: '/architecture' },
-  { label: 'Design Challenge', href: '/designchallenge' },
-  { label: 'Tier 1', href: '/tier1designpartner' },
-  { label: 'BIP', href: '/board-of-investors' },
   { label: 'Blog', href: '/blog' },
   { label: 'Sovereign Stack', href: '/learn/sovereign-stack' },
 ] as const;
@@ -816,97 +817,98 @@ export const OPEN_PRIMARY_CTA = {
 // Surface landing copy — narrative SSOT for app/open/page.tsx
 // ──────────────────────────────────────────────────────────────────────────────
 //
-// The O. landing runs a "scare-then-savior" arc:
-//   1. Eyebrow + hero — the substrate positioning.
-//   2. AI + privacy sub-hero — the architectural commitment.
-//   3. Threat surface — regulatory fines + breach cost, sourced from
-//      NUMBERS_SNAPSHOT rows REG-01 / REG-03 / CODB-01.
-//   4. Pocket Portfolio as live proof — the adversarial test harness.
-//   5. Substrate pillars + tracks + SDK packages.
+// The O. landing runs a linear 5-phase executive journey (CEO mandate 2026-06):
+//   1. Hook — enterprise problem + single discovery-call CTA.
+//   2. Proof — Split-Brain architecture video (sanitization by construction).
+//   3. Integration — developer experience (adapters, SDK, time-to-ship).
+//   4. Board moat — regulatory liability + design-partnership credibility.
+//   5. Snare — native contact form → Firestore → /admin/analytics.
 //
-// Numbers are NEVER hardcoded here — every figure shown on the page is
-// pulled from NUMBERS_SNAPSHOT at render time so Sovereign Threshold #3
-// catches drift before deploy.
+// Regulatory fine figures in Phase 4 are NEVER hardcoded — pulled from
+// NUMBERS_SNAPSHOT at render time (REG-01 / REG-03 / CODB-01).
+
+/** Split-Brain architecture video — Phase 2 proof block on the O. landing. */
+export const OPEN_LANDING_VIDEO = {
+  src: '/marketing/corporate-split-brain-linkedin-4k.mp4',
+  srcMobile: '/marketing/corporate-split-brain-linkedin-1080.mp4',
+  /** 4K upscale of the video outro title card (“Explore the architecture”). Regenerate: `node scripts/generate-corporate-split-brain-linkedin-video.mjs --poster-only` */
+  poster: '/marketing/corporate-split-brain-linkedin-poster.jpg',
+  alt:
+    'Split-brain architecture: broker ledger parsed in browser memory, bounded aggregate context sent to stateless AI inference, streaming response returned without warehousing raw data.',
+} as const;
+
+/**
+ * Founder prior-role credential for O. landing social proof — NOT an Open Portfolio product claim.
+ * SSOT: FOUNDER_CREDENTIALS_ABBA.highlights (National Grid Ventures portfolio platform).
+ */
+export const FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL = FOUNDER_CREDENTIALS_ABBA.highlights[4];
+
+/** De-emphasized institutional pathways — footer only (not header or index CTAs). */
+export const OPEN_LANDING_FOOTER_PATHWAYS = [
+  { label: 'Tier 1 Design Partnership', href: '/tier1designpartner' },
+  { label: 'Design Challenge', href: '/designchallenge' },
+  { label: 'Board of Investors (BIP)', href: '/board-of-investors' },
+  { label: 'Sovereign AI Grant', href: '/sovereign-ai-grant' },
+] as const;
 
 export const OPEN_LANDING_COPY = {
   eyebrow: 'Open Portfolio — wealth-tech proven · regulated verticals forward',
-  heroTitle: 'Sovereign Infrastructure for Regulated AI.',
+  heroTitle: 'Secure AI wealth analytics without warehousing client ledgers.',
   heroBody:
-    'Open Portfolio is the privacy layer for deploying AI in regulated environments: import broker data on the device, reason with AI that forgets every session, and prove the model in production before procurement asks the hard questions.',
-  subHero: {
-    eyebrow: 'Trust by design',
-    title: 'Privacy is built in — not bolted on in a policy PDF.',
-    body: 'We designed AI that does not hoard conversations, embeddings, or training files. Reasoning happens where the citizen already holds their records; regulators get architectural answers, not marketing promises.',
-    tags: [
-      'No chat-history warehouse',
-      'No embedding store',
-      'Session-forgetful AI',
-      'Data stays on device',
-    ],
+    'Give your users powerful financial intelligence. Keep their raw data entirely on the edge.',
+  heroCta: 'Book a Design Partner Call',
+  proof: {
+    eyebrow: 'Sanitization by construction',
+    title: 'The architectural boundary, visualized.',
+    body:
+      'Raw ledgers stay in browser memory. Only a bounded aggregate context crosses the wire for stateless inference — inspectable, auditable, and mathematically bounded.',
+    architectureLinkLabel: 'Full technical brief →',
   },
-  threat: {
-    eyebrow: 'Why boards are paying attention',
-    title: 'Three numbers that changed the conversation.',
-    body: 'Legacy vendors treated personal finance data like oil in a tank. Regulators and insurers now price that risk in the open — fines, breach costs, and reputational drag show up on every quarterly review.',
-    bridgeEyebrow: 'Proof, not promises',
-    bridgeTitle: 'Pocket Portfolio: the live demonstration.',
-    bridgeBody:
-      'Thousands of people already run their wealth on our consumer terminal — real statements, messy CSVs, everyday edge cases — with nothing sensitive parked on our servers. What breaks in the open makes the enterprise substrate stronger before your audit.',
+  integration: {
+    eyebrow: 'Developer experience',
+    title: 'Days to integrate, not months.',
+    body:
+      'Drop in the sovereign SDK, connect broker adapters, and ship client-edge ingestion without refactoring your data warehouse.',
+    points: [
+      '{adapterCount}+ verified broker adapters',
+      'Open-source sovereign SDK (MIT)',
+      'Stateful product UX · stateless AI boundary',
+    ] as const,
   },
-  pillarsTitle: 'Three guarantees your board can name.',
-  pillarsIntro:
-    'We proved the stack in wealth tech and finance — the same substrate is built for regulated verticals where trust and perimeter matter most.',
-  tracksTitle: 'Pick the door that matches your mandate.',
-  tracksIntro:
-    'Engineers, institutions, investors, and grant teams each get a clear path — without wading through a technical library.',
-  pillars: [
-    {
-      title: 'Sovereign ingestion',
-      body: 'Broker statements are read on the device — 19+ verified adapters, no raw rows through your servers, no surprise data lake for the DPO to discover.',
-      href: '/openbrokercsv',
-    },
-    {
-      title: 'Stateless inference',
-      body: 'AI answers questions and moves on. No memory warehouse, no shadow training set — the scope of processing is visible in the architecture.',
-      href: '/architecture',
-    },
-    {
-      title: 'A smaller audit perimeter',
-      body: 'Partnership programmes and metering designed so commercial proof does not require shipping identifiers back to a vendor cloud.',
-      href: '/tier1designpartner',
-    },
-  ],
-  tracks: [
-    {
-      eyebrow: 'For engineers',
-      title: 'Design Challenge',
-      body: 'Extend the substrate into Healthcare, Defense, Finance, or Energy. Fork the boilerplate, ship a prototype, earn Design Partner status.',
-      href: '/designchallenge',
-    },
-    {
-      eyebrow: 'For institutions',
-      title: 'Tier 1 Design Partnership',
-      body: 'A clean-room partnership for Finance, Defense, and Healthcare. Reduce audit perimeter; prove value via stateless metering.',
-      href: '/tier1designpartner',
-    },
-    {
-      eyebrow: 'For investors',
-      title: 'Board of Investors (BIP)',
-      body: 'A five-seat governance board for aligned seed investors backing an open-source core, human-centered UX, and real-time distributed data engineering.',
-      href: '/board-of-investors',
-    },
-    {
-      eyebrow: 'For grant teams',
-      title: 'Sovereign AI Grant',
-      body: 'A grant programme for research teams building sovereign AI in regulated environments.',
-      href: '/sovereign-ai-grant',
-    },
-  ],
+  moat: {
+    eyebrow: 'Board-level outcomes',
+    title: 'Why enterprise teams buy the boundary.',
+    body:
+      'The warehouse-to-infer pipeline expands your subprocessor footprint, your DPA scope, and your cloud storage bill. Split-brain architecture removes what you never needed to warehouse.',
+    threatEyebrow: 'Regulatory exposure',
+    threatTitle: 'Three numbers your DPO already weighs.',
+    outcomes: [
+      {
+        title: 'SOC 2 compliance acceleration',
+        body: 'A smaller data perimeter means fewer controls to evidence. Architecture answers replace policy PDF promises in vendor assessments.',
+      },
+      {
+        title: 'Reduced cloud storage costs',
+        body: 'Stop paying to warehouse raw ledgers you only needed for a single inference call. Move compute to the edge, not the ledger to the cloud.',
+      },
+      {
+        title: 'DPA scope reduction',
+        body: 'When raw financial data never crosses your network perimeter, your subprocessors list stays short and your legal review stays fast.',
+      },
+    ] as const,
+    socialProofEyebrow: 'Design partnerships',
+    socialProofTitle: 'Tier 1 design partnerships · founder-built enterprise track record.',
+    socialProofBody: `Proven in wealth tech with live production traffic. ${PERSON_ABBA.name} — ${FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL} (National Grid Ventures, 2023–2025). Open Portfolio applies those decision-platform patterns for regulated verticals where trust and perimeter matter most.`,
+    midCta: 'Book a Design Partner Call',
+  },
   contact: {
-    eyebrow: 'Start a conversation',
-    title: 'Bring your mandate. We will meet it with architecture.',
-    body: 'Policy, procurement, or engineering — tell us what success looks like. We reply within one working day and route serious institutional conversations to the right track.',
-    submitLabel: 'Request a briefing',
+    eyebrow: 'Speak with our command team',
+    title: 'Book a Design Partner Call.',
+    body: 'Policy, procurement, or engineering — tell us what success looks like. We reply within one working day.',
+    submitLabel: 'Book a Design Partner Call',
+    successTitle: 'Briefing request received.',
+    successBody:
+      'We reply within one working day. Your submission is routed to the command team and visible in /admin/analytics.',
   },
 } as const;
 

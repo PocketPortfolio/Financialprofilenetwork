@@ -81,6 +81,7 @@ export function isPocketOnlyMarketingPath(pathname: string): boolean {
 
 /** Static public assets must not be rewritten to /open/* on the O. host. */
 export const OPEN_STATIC_ASSET_PREFIXES = [
+  '/marketing/',
   '/book-assets/',
   '/images/',
   '/brand/',

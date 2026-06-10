@@ -131,11 +131,10 @@ export default function OpenContactForm() {
               ✓
             </div>
             <h3 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 8px 0' }}>
-              Briefing request received.
+              {OPEN_LANDING_COPY.contact.successTitle}
             </h3>
             <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '15px' }}>
-              We reply within one working day. Routed to the Tier 1 funnel and visible to the
-              substrate team via <code style={{ fontFamily: 'ui-monospace', fontSize: '13px' }}>/admin/analytics</code>.
+              {OPEN_LANDING_COPY.contact.successBody}
             </p>
           </motion.div>
         ) : (

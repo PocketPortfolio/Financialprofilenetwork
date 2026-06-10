@@ -4,50 +4,25 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import OpenContactForm from './OpenContactForm';
-import OpenLiveNpmStat from './OpenLiveNpmStat';
+import OpenLandingProofVideo from './OpenLandingProofVideo';
 import OpenLandingVisual from './OpenLandingVisual';
-import OpenStorySection from './OpenStorySection';
 import { OPEN_LANDING_COPY } from '../../../lib/canonical-claims';
 import { OPEN_LANDING_VISUALS } from '../../../lib/open-landing-visuals';
 
-interface Receipt {
-  value: string;
-  label: string;
-  citation: string;
-}
 interface Threat {
   headline: string;
   value: string;
   citation: string;
   context: string;
 }
-interface PackageSummary {
-  name: string;
-  description: string;
-  category: 'core' | 'adapter';
-}
-interface SdkSummary {
-  name: string;
-  license: string;
-  brokerAdapterCount: number;
-}
 
 export default function OpenLandingClient({
   copy,
   sdk,
-  packages,
-  receipts,
   threats,
 }: {
   copy: typeof OPEN_LANDING_COPY;
-  sdk: SdkSummary;
-  packages: PackageSummary[];
-  receipts: {
-    mau: Receipt;
-    allTimeDownloads: Receipt;
-    scImpressions: Receipt;
-    adapterFloor: Receipt;
-  };
+  sdk: { brokerAdapterCount: number };
   threats: { gdpr: Threat; euAiAct: Threat; breach: Threat };
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,12 +39,9 @@ export default function OpenLandingClient({
       }}
     >
       <Hero copy={copy} />
-      <SubHero copy={copy} adapterCount={sdk.brokerAdapterCount} />
-      <ThreatSection threats={threats} copy={copy} />
-      <BridgeSection copy={copy} receipts={receipts} />
-      <PillarsSection copy={copy} sdk={sdk} />
-      <TracksSection copy={copy} />
-      <PackagesSection sdk={sdk} packages={packages} />
+      <VideoProofSection copy={copy} />
+      <IntegrationSection copy={copy} adapterCount={sdk.brokerAdapterCount} />
+      <BoardMoatSection copy={copy} threats={threats} />
       <ContactSection copy={copy} />
     </main>
   );
@@ -119,7 +91,19 @@ const eyebrowStyle: React.CSSProperties = {
   fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
 };
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
+const primaryCtaStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '14px 24px',
+  background: 'var(--accent-warm)',
+  color: '#0b0d10',
+  textDecoration: 'none',
+  fontWeight: 700,
+  borderRadius: '6px',
+  fontSize: '15px',
+  letterSpacing: '0.01em',
+};
+
+// ─── Phase 1: Hook ────────────────────────────────────────────────────────────
 
 function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
@@ -134,80 +118,53 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
         }}
       >
         <motion.div style={{ minWidth: 0 }}>
-        <motion.span
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          style={eyebrowStyle}
-        >
-          {copy.eyebrow}
-        </motion.span>
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.05 }}
-          style={{
-            fontSize: 'clamp(40px, 6vw, 72px)',
-            fontWeight: 800,
-            lineHeight: 1.02,
-            letterSpacing: '-0.03em',
-            margin: '0 0 24px 0',
-          }}
-        >
-          {copy.heroTitle}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          style={{
-            fontSize: 'clamp(18px, 1.6vw, 22px)',
-            lineHeight: 1.55,
-            color: 'var(--text-secondary)',
-            margin: '0 0 32px 0',
-            maxWidth: '720px',
-          }}
-        >
-          {copy.heroBody}
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}
-        >
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            <Link
-              href="/architecture"
-              style={{
-                display: 'inline-block',
-                padding: '14px 24px',
-                background: 'var(--accent-warm)',
-                color: '#0b0d10',
-                textDecoration: 'none',
-                fontWeight: 700,
-                borderRadius: '6px',
-                fontSize: '15px',
-                letterSpacing: '0.01em',
-              }}
-            >
-              See how it works
-            </Link>
-          </motion.div>
-          <Link
-            href="#contact"
-            scroll
-            className="open-btn-secondary"
+          <motion.span
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            style={eyebrowStyle}
+          >
+            {copy.eyebrow}
+          </motion.span>
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
             style={{
-              display: 'inline-block',
-              padding: '14px 24px',
-              fontWeight: 600,
-              fontSize: '15px',
+              fontSize: 'clamp(36px, 5.5vw, 64px)',
+              fontWeight: 800,
+              lineHeight: 1.05,
+              letterSpacing: '-0.03em',
+              margin: '0 0 24px 0',
             }}
           >
-            Request a briefing
-          </Link>
-        </motion.div>
+            {copy.heroTitle}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            style={{
+              fontSize: 'clamp(18px, 1.6vw, 22px)',
+              lineHeight: 1.55,
+              color: 'var(--text-secondary)',
+              margin: '0 0 32px 0',
+              maxWidth: '640px',
+            }}
+          >
+            {copy.heroBody}
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+          >
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Link href="#contact" scroll style={primaryCtaStyle}>
+                {copy.heroCta}
+              </Link>
+            </motion.div>
+          </motion.div>
         </motion.div>
         <OpenLandingVisual visual={OPEN_LANDING_VISUALS.hero} priority />
       </motion.div>
@@ -215,81 +172,239 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   );
 }
 
-// ─── Sub-hero: AI + privacy ───────────────────────────────────────────────────
+// ─── Phase 2: Proof (video) ───────────────────────────────────────────────────
 
-function SubHero({ copy, adapterCount }: { copy: typeof OPEN_LANDING_COPY; adapterCount: number }) {
+function VideoProofSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
-    <OpenStorySection
-      visual={OPEN_LANDING_VISUALS.subHero}
-      visualPosition="left"
-      band
-      adapterCount={adapterCount}
+    <section
+      style={{
+        ...sectionStyle,
+        paddingTop: 'clamp(32px, 4vw, 48px)',
+        paddingBottom: 'clamp(48px, 6vw, 80px)',
+      }}
     >
-      <span style={eyebrowStyle}>{copy.subHero.eyebrow}</span>
-      <h2
-        style={{
-          fontSize: 'clamp(28px, 3.5vw, 40px)',
-          fontWeight: 800,
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
-          margin: '0 0 20px 0',
-        }}
-      >
-        {copy.subHero.title}
-      </h2>
-      <p
-        style={{
-          fontSize: '17px',
-          lineHeight: 1.65,
-          color: 'var(--text-secondary)',
-          margin: '0 0 24px 0',
-        }}
-      >
-        {copy.subHero.body}
-      </p>
-      <motion.div
-        {...stagger}
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '8px',
-        }}
-      >
-        {copy.subHero.tags.map((tag) => (
-          <motion.span
-            key={tag}
-            variants={child}
-            className="open-tag"
+      <motion.div {...fadeUp}>
+        <span style={eyebrowStyle}>{copy.proof.eyebrow}</span>
+        <h2
+          style={{
+            fontSize: 'clamp(26px, 3.2vw, 38px)',
+            fontWeight: 800,
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+            margin: '0 0 16px 0',
+            maxWidth: '720px',
+          }}
+        >
+          {copy.proof.title}
+        </h2>
+        <p
+          style={{
+            fontSize: '17px',
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+            margin: '0 0 32px 0',
+            maxWidth: '640px',
+          }}
+        >
+          {copy.proof.body}
+        </p>
+
+        <div
+          style={{
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            background: 'var(--surface)',
+            boxShadow: '0 24px 64px rgba(0, 0, 0, 0.25)',
+          }}
+        >
+          <OpenLandingProofVideo />
+        </div>
+
+        <motion.div
+          {...fadeUp}
+          style={{ marginTop: '20px' }}
+        >
+          <Link
+            href="/architecture"
             style={{
-              padding: '6px 12px',
-              borderRadius: '999px',
-              fontSize: '12px',
-              color: 'var(--text)',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              color: 'var(--accent-warm)',
+              textDecoration: 'none',
+              fontWeight: 600,
+              fontSize: '15px',
             }}
           >
-            {tag}
-          </motion.span>
-        ))}
+            {copy.proof.architectureLinkLabel}
+          </Link>
+        </motion.div>
       </motion.div>
-    </OpenStorySection>
+    </section>
   );
 }
 
-// ─── Threat scares ────────────────────────────────────────────────────────────
+// ─── Phase 3: Integration path ────────────────────────────────────────────────
 
-function ThreatSection({
-  threats,
+function IntegrationSection({
   copy,
+  adapterCount,
 }: {
-  threats: { gdpr: Threat; euAiAct: Threat; breach: Threat };
   copy: typeof OPEN_LANDING_COPY;
+  adapterCount: number;
 }) {
-  const cards: Threat[] = [threats.gdpr, threats.euAiAct, threats.breach];
+  const points = copy.integration.points.map((point) =>
+    point.replace('{adapterCount}', String(adapterCount)),
+  );
+
+  return (
+    <section
+      style={{
+        background: 'var(--surface)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
+    >
+      <div style={sectionStyle}>
+        <motion.div {...fadeUp}>
+          <span style={eyebrowStyle}>{copy.integration.eyebrow}</span>
+          <h2
+            style={{
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              margin: '0 0 16px 0',
+            }}
+          >
+            {copy.integration.title}
+          </h2>
+          <p
+            style={{
+              fontSize: '17px',
+              lineHeight: 1.6,
+              color: 'var(--text-secondary)',
+              margin: '0 0 32px 0',
+              maxWidth: '640px',
+            }}
+          >
+            {copy.integration.body}
+          </p>
+          <motion.ul
+            {...stagger}
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            {points.map((point) => (
+              <motion.li
+                key={point}
+                variants={child}
+                style={{
+                  padding: '20px 24px',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '10px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  lineHeight: 1.45,
+                }}
+              >
+                <span style={{ color: 'var(--accent-warm)', marginRight: '8px' }} aria-hidden>
+                  →
+                </span>
+                {point}
+              </motion.li>
+            ))}
+          </motion.ul>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Phase 4: Board moat ──────────────────────────────────────────────────────
+
+function ThreatCard({ threat }: { threat: Threat }) {
+  return (
+    <motion.article
+      variants={child}
+      whileHover={{ y: -4, borderColor: 'var(--accent-warm)' }}
+      transition={{ duration: 0.2 }}
+      style={{
+        padding: '24px',
+        background: 'var(--surface)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '10px',
+      }}
+    >
+      <div
+        style={{
+          fontSize: '11px',
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          color: 'var(--text-secondary)',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          marginBottom: '12px',
+        }}
+      >
+        {threat.headline}
+      </div>
+      <div
+        style={{
+          fontSize: 'clamp(24px, 2.8vw, 32px)',
+          fontWeight: 800,
+          color: 'var(--accent-warm)',
+          lineHeight: 1.1,
+          letterSpacing: '-0.02em',
+          marginBottom: '10px',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {threat.value}
+      </div>
+      <p
+        style={{
+          fontSize: '13px',
+          lineHeight: 1.55,
+          color: 'var(--text-secondary)',
+          margin: '0 0 12px 0',
+        }}
+      >
+        {threat.context}
+      </p>
+      <div
+        style={{
+          fontSize: '10px',
+          letterSpacing: '0.06em',
+          color: 'var(--text-secondary)',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          paddingTop: '10px',
+          borderTop: '1px solid var(--border-subtle)',
+        }}
+      >
+        {threat.citation}
+      </div>
+    </motion.article>
+  );
+}
+
+function BoardMoatSection({
+  copy,
+  threats,
+}: {
+  copy: typeof OPEN_LANDING_COPY;
+  threats: { gdpr: Threat; euAiAct: Threat; breach: Threat };
+}) {
+  const threatCards: Threat[] = [threats.gdpr, threats.euAiAct, threats.breach];
+
   return (
     <section style={sectionStyle}>
-      <motion.div {...fadeUp} style={{ maxWidth: '760px', marginBottom: '40px' }}>
-        <span style={eyebrowStyle}>{copy.threat.eyebrow}</span>
+      <motion.div {...fadeUp} style={{ maxWidth: '760px', marginBottom: '48px' }}>
+        <span style={eyebrowStyle}>{copy.moat.eyebrow}</span>
         <h2
           style={{
             fontSize: 'clamp(28px, 3.5vw, 44px)',
@@ -299,7 +414,7 @@ function ThreatSection({
             margin: '0 0 16px 0',
           }}
         >
-          {copy.threat.title}
+          {copy.moat.title}
         </h2>
         <p
           style={{
@@ -310,563 +425,119 @@ function ThreatSection({
             maxWidth: '640px',
           }}
         >
-          {copy.threat.body}
+          {copy.moat.body}
         </p>
-      </motion.div>
-
-      <motion.div {...fadeUp} style={{ marginBottom: '40px' }}>
-        <OpenLandingVisual visual={OPEN_LANDING_VISUALS.threat} />
       </motion.div>
 
       <motion.div
         {...stagger}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '16px',
+          marginBottom: '56px',
         }}
       >
-        {cards.map((threat) => (
+        {copy.moat.outcomes.map((outcome) => (
           <motion.article
-            key={threat.citation}
+            key={outcome.title}
             variants={child}
-            whileHover={{ y: -4, borderColor: 'var(--accent-warm)' }}
-            transition={{ duration: 0.2 }}
             style={{
-              padding: '28px',
+              padding: '24px',
               background: 'var(--surface)',
               border: '1px solid var(--border-subtle)',
               borderRadius: '10px',
-              position: 'relative',
-              overflow: 'hidden',
             }}
           >
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                width: '120px',
-                height: '120px',
-                background:
-                  'radial-gradient(circle at top right, rgba(245,158,11,0.18) 0%, transparent 70%)',
-                pointerEvents: 'none',
-              }}
-            />
-            <div
-              style={{
-                fontSize: '11px',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                marginBottom: '14px',
-              }}
-            >
-              {threat.headline}
-            </div>
-            <div
-              style={{
-                fontSize: 'clamp(28px, 3vw, 36px)',
-                fontWeight: 800,
-                color: 'var(--accent-warm)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-                marginBottom: '12px',
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {threat.value}
-            </div>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 10px 0' }}>
+              {outcome.title}
+            </h3>
             <p
               style={{
-                fontSize: '13px',
-                lineHeight: 1.55,
+                fontSize: '14px',
+                lineHeight: 1.6,
                 color: 'var(--text-secondary)',
-                margin: '0 0 16px 0',
+                margin: 0,
               }}
             >
-              {threat.context}
+              {outcome.body}
             </p>
-            <div
-              style={{
-                fontSize: '10px',
-                letterSpacing: '0.06em',
-                color: 'var(--text-secondary)',
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                paddingTop: '12px',
-                borderTop: '1px solid var(--border-subtle)',
-              }}
-            >
-              {threat.citation}
-            </div>
           </motion.article>
         ))}
+      </motion.div>
+
+      <motion.div {...fadeUp} style={{ marginBottom: '40px' }}>
+        <span style={{ ...eyebrowStyle, marginBottom: '16px' }}>{copy.moat.threatEyebrow}</span>
+        <h3
+          style={{
+            fontSize: 'clamp(22px, 2.8vw, 30px)',
+            fontWeight: 800,
+            lineHeight: 1.15,
+            letterSpacing: '-0.02em',
+            margin: '0 0 24px 0',
+          }}
+        >
+          {copy.moat.threatTitle}
+        </h3>
+        <motion.div
+          {...stagger}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+          }}
+        >
+          {threatCards.map((threat) => (
+            <ThreatCard key={threat.citation} threat={threat} />
+          ))}
+        </motion.div>
+      </motion.div>
+
+      <motion.div
+        {...fadeUp}
+        style={{
+          padding: '32px',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '12px',
+          borderLeft: '3px solid var(--accent-warm)',
+        }}
+      >
+        <span style={{ ...eyebrowStyle, marginBottom: '16px' }}>
+          {copy.moat.socialProofEyebrow}
+        </span>
+        <h3
+          style={{
+            fontSize: 'clamp(20px, 2.4vw, 26px)',
+            fontWeight: 800,
+            lineHeight: 1.2,
+            margin: '0 0 12px 0',
+          }}
+        >
+          {copy.moat.socialProofTitle}
+        </h3>
+        <p
+          style={{
+            fontSize: '15px',
+            lineHeight: 1.6,
+            color: 'var(--text-secondary)',
+            margin: '0 0 24px 0',
+            maxWidth: '720px',
+          }}
+        >
+          {copy.moat.socialProofBody}
+        </p>
+        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <Link href="#contact" scroll style={primaryCtaStyle}>
+            {copy.moat.midCta}
+          </Link>
+        </motion.div>
       </motion.div>
     </section>
   );
 }
 
-// ─── Bridge: Pocket Portfolio as the savior ───────────────────────────────────
-
-function ReceiptCard({ r }: { r: Receipt }) {
-  return (
-    <motion.div
-      variants={child}
-      whileHover={{ scale: 1.02, borderColor: 'var(--accent-warm)' }}
-      style={{
-        padding: '20px',
-        background: 'var(--bg)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: '8px',
-      }}
-    >
-      {r.citation === 'TRAC-01' ? (
-        <OpenLiveNpmStat fallback={r.value} citation={r.citation} />
-      ) : (
-        <>
-          <div
-            style={{
-              fontSize: 'clamp(22px, 2.6vw, 30px)',
-              fontWeight: 800,
-              color: 'var(--accent-warm)',
-              fontVariantNumeric: 'tabular-nums',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            {r.value}
-          </div>
-          <div style={{ fontSize: '13px', color: 'var(--text)', marginTop: '4px' }}>{r.label}</div>
-          <div
-            style={{
-              fontSize: '10px',
-              color: 'var(--text-secondary)',
-              marginTop: '6px',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-            }}
-          >
-            {r.citation}
-          </div>
-        </>
-      )}
-    </motion.div>
-  );
-}
-
-function BridgeSection({
-  copy,
-  receipts,
-}: {
-  copy: typeof OPEN_LANDING_COPY;
-  receipts: {
-    mau: Receipt;
-    allTimeDownloads: Receipt;
-    scImpressions: Receipt;
-    adapterFloor: Receipt;
-  };
-}) {
-  return (
-    <OpenStorySection visual={OPEN_LANDING_VISUALS.bridge} visualPosition="right" band>
-      <span style={{ ...eyebrowStyle, marginBottom: '20px' }}>
-        {copy.threat.bridgeEyebrow}
-      </span>
-      <h2
-        style={{
-          fontSize: 'clamp(28px, 3.5vw, 40px)',
-          fontWeight: 800,
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
-          margin: '0 0 16px 0',
-        }}
-      >
-        {copy.threat.bridgeTitle}
-      </h2>
-      <p
-        style={{
-          fontSize: '17px',
-          lineHeight: 1.6,
-          color: 'var(--text-secondary)',
-          margin: '0 0 20px 0',
-        }}
-      >
-        {copy.threat.bridgeBody}
-      </p>
-      <motion.a
-        href="https://www.pocketportfolio.app/dashboard"
-        target="_blank"
-        rel="noopener noreferrer"
-        whileHover={{ x: 4 }}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          color: 'var(--accent-warm)',
-          textDecoration: 'none',
-          fontWeight: 600,
-          fontSize: '15px',
-          marginBottom: '28px',
-        }}
-      >
-        See the consumer terminal in production
-        <span aria-hidden>→</span>
-      </motion.a>
-      <motion.div
-        {...stagger}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px',
-        }}
-      >
-        {[receipts.mau, receipts.allTimeDownloads, receipts.scImpressions, receipts.adapterFloor].map(
-          (r) => <ReceiptCard key={r.citation} r={r} />,
-        )}
-      </motion.div>
-    </OpenStorySection>
-  );
-}
-
-// ─── Pillars ──────────────────────────────────────────────────────────────────
-
-function PillarsSection({
-  copy,
-  sdk,
-}: {
-  copy: typeof OPEN_LANDING_COPY;
-  sdk: SdkSummary;
-}) {
-  return (
-    <>
-      <OpenStorySection visual={OPEN_LANDING_VISUALS.pillars} visualPosition="left">
-        <h2
-          style={{
-            fontSize: 'clamp(28px, 3.5vw, 40px)',
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            margin: 0,
-          }}
-        >
-          {copy.pillarsTitle}
-        </h2>
-        <p
-          style={{
-            fontSize: '17px',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: '16px 0 0 0',
-          }}
-        >
-          {copy.pillarsIntro}
-        </p>
-      </OpenStorySection>
-      <section style={{ ...sectionStyle, paddingTop: 0 }}>
-        <motion.div
-          {...stagger}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '20px',
-          }}
-        >
-          {copy.pillars.map((pillar) => (
-            <motion.div key={pillar.title} variants={child}>
-              <PillarCard
-                title={pillar.title}
-                body={pillar.body.replace('19+', String(sdk.brokerAdapterCount) + '+')}
-                href={pillar.href}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-    </>
-  );
-}
-
-function PillarCard({ title, body, href }: { title: string; body: string; href: string }) {
-  return (
-    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.2 }} style={{ height: '100%' }}>
-      <Link
-        href={href}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          padding: '28px',
-          background: 'var(--surface)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: '10px',
-          textDecoration: 'none',
-          color: 'inherit',
-          transition: 'border-color 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'var(--accent-warm)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'var(--border-subtle)';
-        }}
-      >
-        <h3
-          style={{
-            fontSize: '20px',
-            fontWeight: 700,
-            margin: '0 0 12px 0',
-            color: 'var(--text)',
-          }}
-        >
-          {title}
-        </h3>
-        <p
-          style={{
-            fontSize: '14px',
-            lineHeight: 1.65,
-            color: 'var(--text-secondary)',
-            margin: 0,
-            flex: 1,
-          }}
-        >
-          {body}
-        </p>
-        <motion.div
-          style={{
-            marginTop: '20px',
-            fontSize: '12px',
-            color: 'var(--accent-warm)',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          }}
-        >
-          Read more →
-        </motion.div>
-      </Link>
-    </motion.div>
-  );
-}
-
-// ─── Tracks ───────────────────────────────────────────────────────────────────
-
-function TracksSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
-  return (
-    <>
-      <OpenStorySection visual={OPEN_LANDING_VISUALS.tracks} visualPosition="right" band>
-        <h2
-          style={{
-            fontSize: 'clamp(28px, 3.5vw, 40px)',
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            margin: 0,
-          }}
-        >
-          {copy.tracksTitle}
-        </h2>
-        <p
-          style={{
-            fontSize: '17px',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: '16px 0 0 0',
-          }}
-        >
-          {copy.tracksIntro}
-        </p>
-      </OpenStorySection>
-      <section
-        style={{
-          background: 'var(--surface)',
-          borderTop: '1px solid var(--border-subtle)',
-        }}
-      >
-        <div style={{ ...sectionStyle, paddingTop: 0 }}>
-          <motion.div
-            {...stagger}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '16px',
-            }}
-          >
-            {copy.tracks.map((t) => (
-              <motion.div key={t.href} variants={child}>
-                <TrackCard {...t} />
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function TrackCard({
-  eyebrow,
-  title,
-  body,
-  href,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  href: string;
-}) {
-  return (
-    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.2 }} style={{ height: '100%' }}>
-      <Link
-        href={href}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          padding: '24px',
-          background: 'var(--bg)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: '10px',
-          textDecoration: 'none',
-          color: 'inherit',
-          transition: 'border-color 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'var(--accent-warm)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = 'var(--border-subtle)';
-        }}
-      >
-        <div
-          style={{
-            fontSize: '10px',
-            fontWeight: 600,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: 'var(--accent-warm)',
-            marginBottom: '10px',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          }}
-        >
-          {eyebrow}
-        </div>
-        <h3
-          style={{
-            fontSize: '17px',
-            fontWeight: 700,
-            margin: '0 0 10px 0',
-            color: 'var(--text)',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {title}
-        </h3>
-        <p
-          style={{
-            fontSize: '13px',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: 0,
-            flex: 1,
-          }}
-        >
-          {body}
-        </p>
-      </Link>
-    </motion.div>
-  );
-}
-
-// ─── Packages ─────────────────────────────────────────────────────────────────
-
-function PackagesSection({
-  sdk,
-  packages,
-}: {
-  sdk: SdkSummary;
-  packages: PackageSummary[];
-}) {
-  return (
-    <OpenStorySection visual={OPEN_LANDING_VISUALS.packages} visualPosition="left">
-      <h2
-        style={{
-          fontSize: 'clamp(28px, 3.5vw, 40px)',
-          fontWeight: 800,
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
-          margin: '0 0 12px 0',
-        }}
-      >
-        The substrate, in {packages.length} packages.
-      </h2>
-      <p
-        style={{
-          fontSize: '15px',
-          color: 'var(--text-secondary)',
-          margin: '0 0 24px 0',
-          maxWidth: '640px',
-          lineHeight: 1.55,
-        }}
-      >
-        One core SDK ({sdk.name}, {sdk.license}) plus broker-discovery adapter aliases that
-        re-export the core for npm search engines.
-      </p>
-      <motion.ul
-        {...stagger}
-        style={{
-          listStyle: 'none',
-          padding: 0,
-          margin: 0,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '8px',
-        }}
-      >
-        {packages.map((pkg) => (
-          <motion.li
-            key={pkg.name}
-            variants={child}
-            whileHover={{ borderColor: 'var(--accent-warm)' }}
-            transition={{ duration: 0.15 }}
-            style={{
-              padding: '14px 16px',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '8px',
-              background: 'var(--surface)',
-            }}
-          >
-            <a
-              href={'https://www.npmjs.com/package/' + pkg.name}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: pkg.category === 'core' ? 'var(--accent-warm)' : 'var(--text)',
-                textDecoration: 'none',
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                fontSize: '13px',
-                fontWeight: pkg.category === 'core' ? 700 : 500,
-              }}
-            >
-              {pkg.name}
-            </a>
-            <p
-              style={{
-                fontSize: '12px',
-                color: 'var(--text-secondary)',
-                margin: '4px 0 0 0',
-                lineHeight: 1.45,
-              }}
-            >
-              {pkg.description}
-            </p>
-          </motion.li>
-        ))}
-      </motion.ul>
-    </OpenStorySection>
-  );
-}
-
-// ─── Contact ──────────────────────────────────────────────────────────────────
+// ─── Phase 5: Contact snare ───────────────────────────────────────────────────
 
 function ContactSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
@@ -875,35 +546,36 @@ function ContactSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
       style={{
         background: 'var(--surface)',
         borderTop: '1px solid var(--border-subtle)',
-        borderBottom: '1px solid var(--border-subtle)',
         scrollMarginTop: '80px',
       }}
     >
-      <OpenStorySection visual={OPEN_LANDING_VISUALS.contact} visualPosition="left">
-        <span style={eyebrowStyle}>{copy.contact.eyebrow}</span>
-        <h2
-          style={{
-            fontSize: 'clamp(28px, 3.5vw, 40px)',
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            margin: '0 0 12px 0',
-          }}
-        >
-          {copy.contact.title}
-        </h2>
-        <p
-          style={{
-            fontSize: '17px',
-            lineHeight: 1.55,
-            color: 'var(--text-secondary)',
-            margin: '0 0 28px 0',
-          }}
-        >
-          {copy.contact.body}
-        </p>
-        <OpenContactForm />
-      </OpenStorySection>
+      <div style={sectionStyle}>
+        <motion.div {...fadeUp} style={{ maxWidth: '720px', margin: '0 auto' }}>
+          <span style={eyebrowStyle}>{copy.contact.eyebrow}</span>
+          <h2
+            style={{
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              margin: '0 0 12px 0',
+            }}
+          >
+            {copy.contact.title}
+          </h2>
+          <p
+            style={{
+              fontSize: '17px',
+              lineHeight: 1.55,
+              color: 'var(--text-secondary)',
+              margin: '0 0 28px 0',
+            }}
+          >
+            {copy.contact.body}
+          </p>
+          <OpenContactForm />
+        </motion.div>
+      </div>
     </section>
   );
 }
