@@ -7,6 +7,16 @@ import Link from 'next/link';
 import { SovereignHeader } from '@/app/components/dashboard/SovereignHeader';
 import { useGoogleDrive } from '@/app/hooks/useGoogleDrive';
 
+type LandingAbCohortRowView = {
+  variant: 'control' | 'retail';
+  pageViews: number;
+  bounces: number;
+  bounceRatePercent: number | null;
+  csvAhaCount: number;
+  heroDropzoneCheckoutStarts: number;
+  conversionRatePercent: number | null;
+};
+
 interface AnalyticsData {
   monetization: {
     totalMRR: number;
@@ -192,6 +202,15 @@ interface AnalyticsData {
     paidFoundersActive: number;
     paywallToCheckoutPercent: number | null;
     checkoutToPaidDropoffPercent: number | null;
+  };
+  /** Retail landing A/B — control vs educational IA cohorts */
+  landingAbCohort?: {
+    testId: string;
+    control: LandingAbCohortRowView;
+    retail: LandingAbCohortRowView;
+    degraded?: boolean;
+    degradedReason?: string;
+    firestoreScan?: { docsRead: number; maxDocs: number };
   };
   timeRange: '7d' | '30d' | '90d' | 'all';
   lastUpdated?: string;
@@ -504,6 +523,119 @@ export default function AdminAnalyticsPage() {
       {/* Analytics Data */}
       {analyticsData && !loadingData && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {analyticsData.landingAbCohort && (
+            <section
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: 'var(--space-6)',
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  marginBottom: 'var(--space-2)',
+                  color: 'var(--text)',
+                }}
+              >
+                A/B Test Cohort Performance — Landing IA
+              </h2>
+              <p
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  marginBottom: 'var(--space-4)',
+                  lineHeight: 1.5,
+                }}
+              >
+                Test <code style={{ fontSize: '12px' }}>{analyticsData.landingAbCohort.testId}</code> — 50/50
+                cookie split on <code style={{ fontSize: '12px' }}>/</code>. Canonical remains{' '}
+                <code style={{ fontSize: '12px' }}>https://www.pocketportfolio.app/</code>. Checkout counts
+                filter <code style={{ fontSize: '12px' }}>utm_source=landing</code> +{' '}
+                <code style={{ fontSize: '12px' }}>utm_medium=hero_dropzone</code>.
+                {analyticsData.landingAbCohort.degraded && (
+                  <span style={{ display: 'block', marginTop: '8px', color: '#f59e0b' }}>
+                    Degraded: {analyticsData.landingAbCohort.degradedReason || 'Firestore unavailable'}
+                  </span>
+                )}
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: 'var(--space-4)',
+                }}
+              >
+                {(['control', 'retail'] as const).map((key) => {
+                  const row = analyticsData.landingAbCohort![key];
+                  return (
+                    <div
+                      key={key}
+                      style={{
+                        padding: 'var(--space-4)',
+                        background: 'var(--surface-elevated)',
+                        border: '1px solid var(--border-warm)',
+                        borderRadius: '10px',
+                      }}
+                    >
+                      <h3
+                        style={{
+                          fontSize: '15px',
+                          fontWeight: 700,
+                          marginBottom: 'var(--space-3)',
+                          color: 'var(--accent-warm)',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {key === 'control' ? 'Control (Sovereign IA)' : 'Retail (Educational IA)'}
+                      </h3>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: 'var(--space-3)',
+                        }}
+                      >
+                        <MetricCard
+                          label="Page views"
+                          value={row.pageViews.toLocaleString()}
+                          subtitle="Top-of-funnel exposures"
+                        />
+                        <MetricCard
+                          label="Bounce rate"
+                          value={row.bounceRatePercent != null ? `${row.bounceRatePercent}%` : '—'}
+                          subtitle={'Left <12s without engagement'}
+                        />
+                        <MetricCard
+                          label="CSV aha"
+                          value={row.csvAhaCount.toLocaleString()}
+                          subtitle="sanitization_complete"
+                        />
+                        <MetricCard
+                          label="Hero checkout starts"
+                          value={row.heroDropzoneCheckoutStarts.toLocaleString()}
+                          subtitle="utm hero_dropzone"
+                        />
+                        <div style={{ gridColumn: '1 / -1' }}>
+                          <MetricCard
+                            label="Primary conversion rate"
+                            value={
+                              row.conversionRatePercent != null
+                                ? `${row.conversionRatePercent}%`
+                                : '—'
+                            }
+                            subtitle="Checkout starts ÷ page views"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
           {analyticsData.monetizationFunnelBoard && (
             <section
               style={{

@@ -282,7 +282,7 @@ function getMonetizationSessionId(): string {
   return created;
 }
 
-function getCurrentUtm() {
+export function getCurrentUtm() {
   if (typeof window === 'undefined') return { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null };
   const qs = new URLSearchParams(window.location.search);
   const fromSession = (k: string) => sessionStorage.getItem(k);
@@ -315,12 +315,19 @@ async function syncMonetizationIntentToFirestore(
   }
 }
 
+function readLandingVariantCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|; )pp_landing_variant=([^;]*)/);
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
 function logMonetizationFunnelEvent(
   eventType: 'paywall_impression' | 'checkout_start',
   triggerSource: string,
   pagePath?: string
 ) {
   if (typeof window === 'undefined') return;
+  const utm = getCurrentUtm();
   void fetch('/api/analytics/monetization-event', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -329,6 +336,10 @@ function logMonetizationFunnelEvent(
       trigger_source: triggerSource,
       page_path: pagePath || window.location.pathname,
       session_id: getMonetizationSessionId(),
+      utm_source: utm.utm_source,
+      utm_medium: utm.utm_medium,
+      utm_campaign: utm.utm_campaign,
+      landing_variant: readLandingVariantCookie(),
     }),
   });
 }

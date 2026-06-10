@@ -10,6 +10,7 @@ import {
   pocketLandingHeadingStyle,
   pocketPlateHud,
 } from '@/lib/pocket-landing-theme';
+import type { LandingPageVariant } from '@/lib/landing-retail-variant';
 
 const CARD_SHELL: React.CSSProperties = {
   ...pocketLandingCardStyle,
@@ -91,7 +92,14 @@ const PORTAL_CARDS = [
   },
 ];
 
-export default function ProductPortalSection() {
+type ProductPortalSectionProps = {
+  variant?: LandingPageVariant;
+};
+
+export default function ProductPortalSection({ variant = 'control' }: ProductPortalSectionProps) {
+  const isRetail = variant === 'retail';
+  const cards = isRetail ? PORTAL_CARDS.filter((c) => c.visualId === 'portalTerminal') : PORTAL_CARDS;
+
   return (
     <ScrollReveal>
       <section
@@ -115,7 +123,7 @@ export default function ProductPortalSection() {
             letterSpacing: '-0.02em',
           }}
         >
-          The Product Portal
+          {isRetail ? 'Your wealth terminal' : 'The Product Portal'}
         </h2>
         <p
           style={{
@@ -128,19 +136,21 @@ export default function ProductPortalSection() {
             marginRight: 'auto',
           }}
         >
-          Three pillars of the Sovereign Financial Stack.
+          {isRetail
+            ? 'Track performance, spot concentration risk, and ask Pocket Analyst about your strategy.'
+            : 'Three pillars of the Sovereign Financial Stack.'}
         </p>
 
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gridTemplateColumns: isRetail ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: 'clamp(24px, 5vw, 32px)',
-            maxWidth: '1200px',
+            maxWidth: isRetail ? '480px' : '1200px',
             margin: '0 auto',
           }}
         >
-          {PORTAL_CARDS.map((card, i) => (
+          {cards.map((card, i) => (
             <div
               key={card.visualId}
               style={CARD_SHELL}
