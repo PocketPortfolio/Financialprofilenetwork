@@ -6,7 +6,7 @@ import DashboardLaunchLink from '../nav/DashboardLaunchLink';
 import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
 import ProductionNavbar from './ProductionNavbar';
-import { retailPrimaryNav } from '@/app/lib/nav/retailMarketingNav';
+import { retailPrimaryNav, isMarketingLandingPath } from '@/app/lib/nav/retailMarketingNav';
 import { isHashOnlyHref } from '@/app/lib/nav/sovereignMarketingNav';
 import type { LandingPageVariant } from '@/lib/landing-retail-variant';
 
@@ -27,6 +27,13 @@ export default function LandingProductionNavbar({ variant }: RetailProductionNav
 function RetailProductionNavbarInner() {
   const pathname = usePathname() ?? '/';
   const nav = retailPrimaryNav(pathname, 'landing');
+  const isMarketingHome = isMarketingLandingPath(pathname);
+
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isMarketingHome) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <header
@@ -53,7 +60,13 @@ function RetailProductionNavbarInner() {
           gap: '16px',
         }}
       >
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <Link
+          href="/"
+          scroll={!isMarketingHome}
+          onClick={handleLogoClick}
+          style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', cursor: 'pointer' }}
+          aria-label={isMarketingHome ? 'Back to top' : 'Pocket Portfolio home'}
+        >
           <Logo size="medium" showWordmark />
         </Link>
 
