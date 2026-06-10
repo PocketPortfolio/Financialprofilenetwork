@@ -2,103 +2,101 @@
 title: Building a GraphQL Federation Server
 date: '2026-06-10'
 description: >-
-  Learn how to build a GraphQL Federation Server to unify your microservices
-  into a single GraphQL API.
+  A comprehensive guide to building a GraphQL Federation Server for seamless
+  data integration.
 tags:
   - graphql
   - federation
-  - microservices
+  - server
   - api
 author: Pocket Portfolio Team
 image: /images/blog/building-a-graphql-federation-server.png
-pillar: technology
+pillar: Technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-As applications grow, they often evolve into microservices, each exposing its own GraphQL API. While this provides modularity, it also introduces complexity when combining multiple APIs into a single, cohesive API. Clients must query multiple endpoints, which complicates the client-side code and increases network overhead.
+As applications grow, their data sources proliferate, often becoming siloed. A monolithic GraphQL server can become a bottleneck, making it challenging to scale and maintain. GraphQL Federation offers a solution by allowing multiple GraphQL services to act as a unified data graph. However, setting up a federation server can be daunting without clear guidance.
 
 ## Solution
 
-GraphQL Federation solves this problem by allowing you to create a single, unified API from multiple GraphQL services. Here's a step-by-step guide to building a GraphQL Federation server using Apollo Server.
+To tackle this, we will set up a GraphQL Federation server using Apollo Federation. This involves creating multiple subgraphs, each representing a distinct service, and then stitching them together using a gateway.
 
 ### Key Concepts
 
-1. **Federation**: A method for composing multiple GraphQL services into a single, unified graph.
-2. **Gateway**: Acts as a unified entry point for executing queries across federated services.
-3. **Subgraphs**: Individual GraphQL services that together form the federated graph.
+- **Subgraphs:** Independent services with their own GraphQL schemas.
+- **Gateway:** A central server that composes and serves the unified graph to clients.
+- **Federation Directives:** Annotations that enable inter-service communication and data sharing.
 
-### Step-by-Step Implementation
+### Step-by-Step Guide
 
-First, ensure that each of your services is a federated service. This requires them to define a schema with `_Entity` and `_Service` types, typically using Apollo's Federation library.
+1. **Set Up Subgraphs**
 
-#### Define a Federated Service
+   Each subgraph is a standalone GraphQL server. Let's start by creating a basic `products` subgraph:
 
-```javascript
-// user-service.js
-const { ApolloServer, gql } = require('apollo-server');
-const { buildFederatedSchema } = require('@apollo/federation');
+   ```javascript
+   const { ApolloServer } = require('@apollo/server');
+   const { buildSubgraphSchema } = require('@apollo/subgraph');
+   const gql = require('graphql-tag');
 
-const typeDefs = gql`
-  type User @key(fields: "id") {
-    id: ID!
-    name: String
-  }
+   const typeDefs = gql`
+     type Product @key(fields: "id") {
+       id: ID!
+       name: String
+     }
+   `;
 
-  extend type Query {
-    user(id: ID!): User
-  }
-`;
+   const resolvers = {
+     Product: {
+       __resolveReference(product) {
+         return products.find(p => p.id === product.id);
+       },
+     },
+   };
 
-const resolvers = {
-  User: {
-    __resolveReference(user, { fetchUserById }) {
-      return fetchUserById(user.id);
-    },
-  },
-  Query: {
-    user(_, { id }, { dataSources }) {
-      return dataSources.userAPI.getUserById(id);
-    },
-  },
-};
+   const server = new ApolloServer({
+     schema: buildSubgraphSchema({ typeDefs, resolvers }),
+   });
 
-const server = new ApolloServer({
-  schema: buildFederatedSchema([{ typeDefs, resolvers }]),
-});
+   server.listen({ port: 4001 }).then(({ url }) => {
+     console.log(`Products service ready at ${url}`);
+   });
+   ```
 
-server.listen({ port: 4001 }).then(({ url }) => {
-  console.log(`User service ready at ${url}`);
-});
-```
+2. **Create Additional Subgraphs**
 
-#### Create the Gateway
+   Similarly, create more subgraphs for other services, such as `users`, ensuring each subgraph has its own schema and resolver logic.
 
-Now, set up the Apollo Gateway to unify the federated services.
+3. **Set Up the Gateway**
 
-```javascript
-// gateway.js
-const { ApolloServer } = require('apollo-server');
-const { ApolloGateway } = require('@apollo/gateway');
+   The gateway will unify these subgraphs into a single graph:
 
-const gateway = new ApolloGateway({
-  serviceList: [
-    { name: 'user', url: 'http://localhost:4001/graphql' },
-    // Add more services as needed
-  ],
-});
+   ```javascript
+   const { ApolloServer } = require('@apollo/server');
+   const { ApolloGateway } = require('@apollo/gateway');
 
-const server = new ApolloServer({
-  gateway,
-  subscriptions: false,
-});
+   const gateway = new ApolloGateway({
+     serviceList: [
+       { name: 'products', url: 'http://localhost:4001' },
+       { name: 'users', url: 'http://localhost:4002' },
+     ],
+   });
 
-server.listen({ port: 4000 }).then(({ url }) => {
-  console.log(`Gateway ready at ${url}`);
-});
-```
+   const server = new ApolloServer({
+     gateway,
+     subscriptions: false,
+   });
 
-### Conclusion
+   server.listen({ port: 4000 }).then(({ url }) => {
+     console.log(`Gateway ready at ${url}`);
+   });
+   ```
 
-By composing multiple GraphQL services into a single federated schema using Apollo Federation, you simplify client interaction and reduce network overhead. This approach allows for a scalable and maintainable system architecture, ensuring that as your application grows, your GraphQL API remains performant and easy to use.
+4. **Run and Test**
+
+   Start each subgraph server and then the gateway. Verify that the unified graph operates correctly by querying combined data through the gateway endpoint.
+
+## Conclusion
+
+By implementing a GraphQL Federation server, you can efficiently integrate and scale multiple services. This approach not only enhances maintainability but also optimizes the performance by distributing workloads across independent subgraphs.
