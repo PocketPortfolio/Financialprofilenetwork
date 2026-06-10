@@ -1,10 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import {
+  LANDING_VARIANT_TEST_ID,
+  type LandingPageVariant,
+  parseLandingVariantParam,
+} from '@/lib/landing-retail-variant';
 
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const revalidate = 0;
+
+const ALLOWED_EVENT_TYPES = [
+  'exposure',
+  'bounce',
+  'csv_aha',
+  'checkout_start',
+] as const;
+
+type LandingAbEventType = (typeof ALLOWED_EVENT_TYPES)[number];
 
 function getDb() {
   if (!getApps().length) {
@@ -20,41 +34,44 @@ function getDb() {
 }
 
 /**
- * POST /api/analytics/monetization-event
- * Fire-and-forget funnel logging for admin dashboard (Ticket E).
+ * POST /api/analytics/landing-ab-event
+ * Cohort telemetry for retail landing A/B (admin dashboard).
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const eventType = body.eventType === 'checkout_start' ? 'checkout_start' : 'paywall_impression';
-    const triggerSource =
-      typeof body.trigger_source === 'string' ? body.trigger_source.trim().slice(0, 200) : 'unknown';
-    const pagePath =
-      typeof body.page_path === 'string' ? body.page_path.trim().slice(0, 500) : '';
-    const sessionId =
-      typeof body.session_id === 'string' ? body.session_id.trim().slice(0, 120) : '';
+    const eventType = body.eventType as LandingAbEventType;
+    const landingVariant = parseLandingVariantParam(body.landingVariant) as LandingPageVariant | null;
+
+    if (!eventType || !ALLOWED_EVENT_TYPES.includes(eventType)) {
+      return NextResponse.json({ error: 'invalid eventType' }, { status: 400 });
+    }
+    if (!landingVariant) {
+      return NextResponse.json({ error: 'landingVariant required' }, { status: 400 });
+    }
+
+    const path = typeof body.path === 'string' ? body.path.trim().slice(0, 200) : '/';
+    const sessionId = typeof body.sessionId === 'string' ? body.sessionId.trim().slice(0, 120) : null;
     const utmSource = typeof body.utm_source === 'string' ? body.utm_source.slice(0, 120) : null;
     const utmMedium = typeof body.utm_medium === 'string' ? body.utm_medium.slice(0, 120) : null;
     const utmCampaign = typeof body.utm_campaign === 'string' ? body.utm_campaign.slice(0, 120) : null;
-    const landingVariant =
-      typeof body.landing_variant === 'string' ? body.landing_variant.trim().slice(0, 32) : null;
 
     const db = getDb();
-    await db.collection('monetizationFunnelEvents').add({
+    await db.collection('landingAbEvents').add({
+      testId: LANDING_VARIANT_TEST_ID,
       eventType,
-      trigger_source: triggerSource,
-      page_path: pagePath || null,
-      session_id: sessionId || null,
+      landingVariant,
+      path,
+      sessionId,
       utm_source: utmSource,
       utm_medium: utmMedium,
       utm_campaign: utmCampaign,
-      landing_variant: landingVariant,
       timestamp: Timestamp.now(),
     });
 
     return NextResponse.json({ ok: true });
   } catch (e: unknown) {
-    console.error('[monetization-event]', e);
+    console.error('[landing-ab-event]', e);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

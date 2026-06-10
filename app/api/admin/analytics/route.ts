@@ -14,6 +14,7 @@ import {
   markFirestoreReadsDegraded,
   shouldDegradeFirestoreReads,
 } from '@/app/lib/server/firestore-quota-circuit';
+import { getLandingAbCohortPerformance } from '@/lib/admin/landing-ab-cohort';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -423,6 +424,67 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    let landingAbCohort: Awaited<ReturnType<typeof getLandingAbCohortPerformance>>;
+    if (firestoreDegraded) {
+      landingAbCohort = {
+        testId: 'landing_retail_ia_2026',
+        control: {
+          variant: 'control',
+          pageViews: 0,
+          bounces: 0,
+          bounceRatePercent: null,
+          csvAhaCount: 0,
+          heroDropzoneCheckoutStarts: 0,
+          conversionRatePercent: null,
+        },
+        retail: {
+          variant: 'retail',
+          pageViews: 0,
+          bounces: 0,
+          bounceRatePercent: null,
+          csvAhaCount: 0,
+          heroDropzoneCheckoutStarts: 0,
+          conversionRatePercent: null,
+        },
+        degraded: true,
+        degradedReason: 'skipped_firestore_degraded',
+      };
+    } else {
+      try {
+        const db = getDb();
+        landingAbCohort = await getLandingAbCohortPerformance(
+          db,
+          startDate,
+          adminAnalyticsFirestoreScanLimit()
+        );
+      } catch (e: any) {
+        console.error('[Analytics API] Landing A/B cohort failed:', e?.message);
+        landingAbCohort = {
+          testId: 'landing_retail_ia_2026',
+          control: {
+            variant: 'control',
+            pageViews: 0,
+            bounces: 0,
+            bounceRatePercent: null,
+            csvAhaCount: 0,
+            heroDropzoneCheckoutStarts: 0,
+            conversionRatePercent: null,
+          },
+          retail: {
+            variant: 'retail',
+            pageViews: 0,
+            bounces: 0,
+            bounceRatePercent: null,
+            csvAhaCount: 0,
+            heroDropzoneCheckoutStarts: 0,
+            conversionRatePercent: null,
+          },
+          degraded: true,
+          degradedReason: e?.message,
+        };
+      }
+    }
+
     const body = {
       monetization,
       toolUsage,
@@ -435,6 +497,7 @@ export async function GET(request: NextRequest) {
       viralMomentEmailBlast,
       conversionFunnel,
       monetizationFunnelBoard,
+      landingAbCohort,
       architectureChallengeLeads,
       openPortfolioContactLeads,
       timeRange: range,

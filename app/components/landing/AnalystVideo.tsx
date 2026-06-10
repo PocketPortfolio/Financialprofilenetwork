@@ -10,8 +10,16 @@ import {
   pocketAnalystLocalSrc,
   pocketAnalystPosterSrc,
 } from '../../../lib/landing-product-video';
+import { RETAIL_LANDING_COPY } from '@/lib/landing-retail-copy';
+import type { LandingPageVariant } from '@/lib/landing-retail-variant';
 
-export function AnalystVideo() {
+type AnalystVideoProps = {
+  variant?: LandingPageVariant;
+};
+
+export function AnalystVideo({ variant = 'control' }: AnalystVideoProps) {
+  const isRetail = variant === 'retail';
+  const retail = RETAIL_LANDING_COPY.analyst;
   const videoRef = useRef<HTMLDivElement>(null);
   const videoSrc = getPocketAnalystVideoSrc();
 
@@ -77,7 +85,7 @@ export function AnalystVideo() {
                   }}
                 />
               </span>
-              New: Pocket Analyst
+              {isRetail ? retail.eyebrow : 'New: Pocket Analyst'}
             </div>
 
             <h2
@@ -90,7 +98,7 @@ export function AnalystVideo() {
                 color: 'var(--text, hsl(var(--foreground)))',
               }}
             >
-              Your Personal Quantitative Analyst.
+              {isRetail ? retail.headline : 'Your Personal Quantitative Analyst.'}
             </h2>
 
             <p
@@ -101,13 +109,32 @@ export function AnalystVideo() {
                 maxWidth: '28rem',
               }}
             >
-              Ask complex financial questions. Get instant answers. Your data never leaves the secure enclave.
+              {isRetail
+                ? retail.body
+                : 'Ask complex financial questions. Get instant answers. Insights are built from a bounded portfolio summary — not your raw statements.'}
             </p>
 
-            <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, color: 'var(--text-secondary)', maxWidth: '28rem' }}>
-              Pocket Analyst combines <strong style={{ color: 'var(--text)' }}>local-first</strong> privacy with{' '}
-              <strong style={{ color: 'var(--text)' }}>Gemini &amp; OpenAI</strong> to answer questions about your portfolio, risks, and returns.
-            </p>
+            {!isRetail && (
+              <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, color: 'var(--text-secondary)', maxWidth: '28rem' }}>
+                Pocket Analyst combines <strong style={{ color: 'var(--text)' }}>local-first</strong> privacy with{' '}
+                <strong style={{ color: 'var(--text)' }}>Gemini &amp; OpenAI</strong> to answer questions about your
+                portfolio, risks, and returns.
+              </p>
+            )}
+
+            {isRetail && (
+              <p
+                style={{
+                  fontSize: '0.9375rem',
+                  lineHeight: 1.6,
+                  color: 'var(--text-secondary)',
+                  maxWidth: '28rem',
+                  fontWeight: 500,
+                }}
+              >
+                {retail.privacy}
+              </p>
+            )}
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
               <Link
@@ -131,7 +158,7 @@ export function AnalystVideo() {
                   e.currentTarget.style.transform = '';
                 }}
               >
-                Try Ask AI
+                {isRetail ? retail.tryCta : 'Try Ask AI'}
               </Link>
               <button
                 type="button"
@@ -156,7 +183,7 @@ export function AnalystVideo() {
                   e.currentTarget.style.borderColor = 'var(--border-warm)';
                 }}
               >
-                Watch Demo
+                {isRetail ? retail.watchCta : 'Watch Demo'}
               </button>
             </div>
           </motion.div>

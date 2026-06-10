@@ -8,6 +8,17 @@ import {
   isPocketOnlyMarketingPath,
   pocketSurfaceBaseUrl,
 } from '@/lib/surface-host';
+import {
+  LANDING_AB_IS_ACTIVE,
+  LANDING_AB_TRAFFIC_SPLIT_PERCENT,
+  LANDING_VARIANT_COOKIE,
+  LANDING_VARIANT_COOKIE_MAX_AGE,
+  LANDING_VISITOR_COOKIE,
+  assignLandingVariantFromSeed,
+  isLandingAbPath,
+  landingAbEnrollmentBucket,
+  parseLandingVariantParam,
+} from '@/lib/landing-retail-variant';
 
 // Open Portfolio (B2B) host gate — see lib/canonical-claims.ts (OPEN_HOSTS, OPEN_CANONICAL_HOST).
 // Inlined here so middleware stays in Edge runtime with zero module-graph overhead.
@@ -201,13 +212,71 @@ export function middleware(request: NextRequest) {
   }
   
   const res = NextResponse.next();
-  
+  applyLandingAbAssignment(request, res);
+  return applySecurityHeaders(request, res);
+}
+
+/** 50/50 cohort cookie on `/` — canonical URL unchanged (no ?variant= in HTML). */
+function applyLandingAbAssignment(request: NextRequest, response: NextResponse): void {
+  const pathname = request.nextUrl.pathname;
+  if (!isLandingAbPath(pathname)) return;
+
+  const variantParam = parseLandingVariantParam(request.nextUrl.searchParams.get('variant'));
+  const cookieOpts = {
+    maxAge: LANDING_VARIANT_COOKIE_MAX_AGE,
+    path: '/',
+    sameSite: 'lax' as const,
+  };
+
+  if (variantParam) {
+    response.cookies.set(LANDING_VARIANT_COOKIE, variantParam, cookieOpts);
+    return;
+  }
+
+  const existing = parseLandingVariantParam(request.cookies.get(LANDING_VARIANT_COOKIE)?.value);
+  if (existing) return;
+
+  if (!LANDING_AB_IS_ACTIVE) return;
+
+  let visitorId = request.cookies.get(LANDING_VISITOR_COOKIE)?.value;
+  const mintVisitor = !visitorId;
+  if (!visitorId) {
+    visitorId = crypto.randomUUID();
+  }
+
+  if (LANDING_AB_TRAFFIC_SPLIT_PERCENT < 100) {
+    const enrollBucket = landingAbEnrollmentBucket(`${visitorId}:enroll`);
+    // When not enrolled, leave un-cookied → control (default IA).
+    if (enrollBucket >= LANDING_AB_TRAFFIC_SPLIT_PERCENT) {
+      if (mintVisitor) {
+        response.cookies.set(LANDING_VISITOR_COOKIE, visitorId, {
+          maxAge: 60 * 60 * 24 * 365,
+          path: '/',
+          sameSite: 'lax',
+        });
+      }
+      return;
+    }
+  }
+
+  const assigned = assignLandingVariantFromSeed(visitorId);
+  response.cookies.set(LANDING_VARIANT_COOKIE, assigned, cookieOpts);
+  if (mintVisitor) {
+    response.cookies.set(LANDING_VISITOR_COOKIE, visitorId, {
+      maxAge: 60 * 60 * 24 * 365,
+      path: '/',
+      sameSite: 'lax',
+    });
+  }
+}
+
+function applySecurityHeaders(request: NextRequest, res: NextResponse): NextResponse {
   // Skip security headers in development to avoid CSP issues with Next.js dev server
   // Also skip for _next routes which need unsafe-eval for React refresh
   if (process.env.NODE_ENV === 'development' || request.nextUrl.pathname.startsWith('/_next/')) {
     return res;
   }
-  
+
   res.headers.set(
     'Content-Security-Policy',
     [
@@ -227,9 +296,11 @@ export function middleware(request: NextRequest) {
   res.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   res.headers.set('X-Content-Type-Options', 'nosniff');
   res.headers.set('X-Frame-Options', 'DENY');
-  
+
   return res;
 }
+
+// Note: early returns above (sitemaps, OG, Open host) bypass applySecurityHeaders intentionally.
 
 export const config = {
   matcher: [
