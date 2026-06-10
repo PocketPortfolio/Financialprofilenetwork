@@ -726,7 +726,6 @@ export interface SurfaceNavItem {
 export const OPEN_NAV: ReadonlyArray<SurfaceNavItem> = [
   { label: 'Architecture', href: '/architecture' },
   { label: 'Blog', href: '/blog' },
-  { label: 'Sovereign Stack', href: '/learn/sovereign-stack' },
 ] as const;
 
 /** Cross-surface footer / switcher copy (CEO mandate 2026-05-15). */

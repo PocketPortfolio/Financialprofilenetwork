@@ -1,6 +1,6 @@
 /**
  * OPERATION VELOCITY: Broker Configuration
- * Top 50 brokers for programmatic SEO expansion
+ * 57 brokers for programmatic SEO expansion (SUPPORTED_BROKERS)
  */
 
 export interface BrokerConfig {

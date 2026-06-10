@@ -65,8 +65,8 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   
   if (!metadata) {
     return {
-      title: `${symbol} Sovereign Infrastructure Analysis (No Login) | Pocket Portfolio`,
-      description: `Local-first ${symbol} analysis: import broker CSVs in-browser, export JSON, keep your ledger private. Sovereign portfolio infrastructure — no signup wall.`,
+      title: `Track ${symbol} Risk & Volatility (No Login) | Pocket Portfolio`,
+      description: `Track ${symbol} in your portfolio. Import broker CSVs in your browser, export data, and keep your statements on your device — no signup wall.`,
     };
   }
   

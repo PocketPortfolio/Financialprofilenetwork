@@ -35,7 +35,7 @@ export default async function sitemapImports(): Promise<MetadataRoute.Sitemap> {
       },
     ];
     
-    // All broker-specific import pages (50 brokers)
+    // All broker-specific import pages (57 brokers — SUPPORTED_BROKERS)
     SUPPORTED_BROKERS.forEach((broker) => {
       importPages.push({
         url: `${baseUrl}/import/${broker.toLowerCase()}`,

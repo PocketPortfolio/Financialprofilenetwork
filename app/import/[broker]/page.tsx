@@ -35,14 +35,14 @@ function getUsBrokerExportStep1Text(broker: string, displayName: string): string
   }
 }
 
-// Generate static params for supported brokers (50 brokers for Operation Velocity)
+// Generate static params for supported brokers (57 — SUPPORTED_BROKERS)
 export async function generateStaticParams() {
   return SUPPORTED_BROKERS.map((broker) => ({
     broker: broker.toLowerCase(),
   }));
 }
 
-// Broker configuration is now imported from centralized config (50 brokers)
+// Broker configuration is now imported from centralized config (57 brokers)
 
 // Generate metadata for each broker page
 export async function generateMetadata({ params }: { params: Promise<{ broker: string }> }): Promise<Metadata> {
@@ -128,14 +128,14 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     };
   }
 
-  // High-impression developer/ops intent: Interactive Brokers (Flex Queries, exports, schema)
+  // High-impression IBKR intent: Flex Queries, activity statements, CSV export
   if (broker === 'interactive-brokers') {
     const title = inMetaTest
-      ? 'Interactive Brokers CSV Import (Flex Query) | Verified Schema, Local-First'
-      : 'Interactive Brokers CSV Export → Local-First Import | Verified Ingestion Schema';
+      ? 'Interactive Brokers CSV Import (Flex Query) | Step-by-Step Guide'
+      : 'Interactive Brokers CSV Export → Portfolio Import | Free Import Guide';
     const description = inMetaTest
-      ? 'Parse Interactive Brokers CSV/Flex Query exports in-browser (no uploads). Verified ingestion schema + local-first parsing for portfolio tracking.'
-      : 'Export Interactive Brokers activity (Flex Query / statements) to CSV, then import locally. Verified ingestion schema, no uploads, your ledger stays on-device.';
+      ? 'Parse Interactive Brokers CSV/Flex Query exports in your browser (no uploads). Import trades and track your portfolio — your data stays on your device.'
+      : 'Export Interactive Brokers activity (Flex Query / statements) to CSV, then import in your browser. No uploads — your ledger stays on your device.';
     return {
       title,
       description,
@@ -145,16 +145,16 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         'IBKR CSV import',
         'Interactive Brokers trade history CSV',
         'Interactive Brokers activity statement CSV',
-        'local-first CSV parser',
-        'verified ingestion schema',
+        'IBKR CSV import guide',
+        'Interactive Brokers portfolio import',
       ],
       openGraph: {
         title,
         description,
         images: [
           {
-            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=6`,
-            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=6`,
+            url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Step-by-Step CSV Guide')}&v=6`,
+            secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Step-by-Step CSV Guide')}&v=6`,
             width: 1200,
             height: 630,
             alt: 'Interactive Brokers CSV Import - Pocket Portfolio',
@@ -167,7 +167,7 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
         title,
         description,
         images: [
-          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Verified Schema, Local-First')}&v=6`,
+          `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent('Interactive Brokers CSV Import')}&description=${encodeURIComponent('Step-by-Step CSV Guide')}&v=6`,
         ],
       },
       alternates: {
@@ -227,7 +227,7 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     : `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`;
   const description = inMetaTest
     ? `Import your ${config.displayName} CSV in-browser and analyze locally. No uploads. Your financial history stays on your device.`
-    : `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads. Your financial history never leaves your device.`;
+    : `Looking to track your ${config.displayName} portfolio? Import your ${config.displayName} CSV export in your browser. No uploads — your financial history stays on your device.`;
 
   return {
     title,
@@ -247,7 +247,7 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       title,
       description: inMetaTest
         ? `Import your ${config.displayName} CSV in-browser. No uploads. Local-first analysis.`
-        : `Looking to track your ${config.displayName} portfolio? Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
+        : `Looking to track your ${config.displayName} portfolio? Import your ${config.displayName} CSV export in your browser. No uploads.`,
       images: [
         {
           url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
@@ -264,7 +264,7 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
       title,
       description: inMetaTest
         ? `Import your ${config.displayName} CSV in-browser. No uploads. Your data stays on your device.`
-        : `Instantly parse your ${config.displayName} CSV export with our local-first engine. Zero data uploads.`,
+        : `Import your ${config.displayName} CSV export in your browser. No uploads.`,
       images: [
         `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
       ],
@@ -412,7 +412,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
             lineHeight: '1.6'
           }}>
             {isIbkr
-              ? 'Export an Interactive Brokers Flex Query or activity statement as CSV, then parse locally. Verified ingestion schema, local-first parsing, and zero uploads.'
+              ? 'Export an Interactive Brokers Flex Query or activity statement as CSV, then import in your browser. Step-by-step guide — no uploads.'
               : isUsRetailSeo
               ? `Export your ${config.displayName} transaction history to CSV, then import in seconds. Everything runs in your browser — your data stays on your device.`
               : `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.`}
@@ -475,7 +475,7 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
               margin: '0'
             }}>
               {isIbkr
-                ? 'Interactive Brokers exports are powerful but inconsistent across report types. Pocket Portfolio treats IBKR as a verified ingestion route: parse CSV locally, normalize trades, and keep your ledger off servers.'
+                ? 'Interactive Brokers exports vary by report type. Import your IBKR CSV in your browser, normalize trades, and keep your ledger on your device — no server uploads.'
                 : config.description}
             </p>
           </div>

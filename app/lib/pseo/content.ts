@@ -18,13 +18,13 @@ export async function generateTickerContent(
   const exchange = metadata.exchange || 'NYSE';
   const sector = metadata.sector || 'General';
 
-  // Generate title and description (sovereign / infrastructure framing for SERP + hub)
-  const title = `${symbol} Sovereign Infrastructure & Portfolio Analysis | Pocket Portfolio`;
+  // Retail-friendly SERP framing — aligned with landing_retail_ia_2026 (CMD-B2C-GROWTH-2026-06-10-R1)
+  const title = `Track ${symbol} Risk & Volatility — Portfolio Analysis | Pocket Portfolio`;
   const description = metadata.description || 
-    `Local-first ${symbol} (${name}) analysis: import broker CSVs in the browser, export JSON/CSV, and keep your ledger off vendor warehouses. Privacy-first portfolio infrastructure.`;
+    `Track ${symbol} (${name}) risk and volatility in your portfolio. Import broker CSVs in your browser, export JSON/CSV, and keep your statements on your device.`;
 
   // Generate H1
-  const h1 = `${symbol} Sovereign Infrastructure & Portfolio Tracker`;
+  const h1 = `Track ${symbol} Risk & Volatility`;
 
   // Generate H2 sections based on template
   const h2Sections: string[] = [];
