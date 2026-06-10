@@ -2606,14 +2606,15 @@
     "scheduledTime": "18:00",
     "title": "Research: WebSocket Connection Scaling - Load Testing Results",
     "slug": "research-websocket-connection-scaling-load-testing-results-2026-06-10",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "websocket",
       "connection",
       "scaling"
-    ]
+    ],
+    "publishedAt": "2026-06-10T18:00:53.567Z"
   },
   {
     "id": "research-encryption-algorithm-performance-aes-vs-chacha20-2026-06-11",
