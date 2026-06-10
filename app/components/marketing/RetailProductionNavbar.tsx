@@ -99,7 +99,7 @@ function RetailProductionNavbarInner() {
       <header
         className="brand-header brand-spine"
         style={{
-          padding: isMobile ? '10px 16px' : '12px 24px',
+          padding: isMobile ? '12px 16px' : '12px 24px',
           position: 'sticky',
           top: 0,
           zIndex: 1000,
@@ -110,77 +110,116 @@ function RetailProductionNavbarInner() {
           width: '100%',
         }}
       >
-        <div
-          style={{
-            maxWidth: '1280px',
-            margin: '0 auto',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <Link
-            href="/"
-            scroll={!isMarketingHome}
-            onClick={handleLogoClick}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              textDecoration: 'none',
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-            aria-label={isMarketingHome ? 'Back to top' : 'Pocket Portfolio home'}
-          >
-            <Logo size="medium" showWordmark={!isMobile} />
-          </Link>
-
-          {!isMobile ? (
-            <nav className="landing-nav desktop-nav mobile-hidden" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              {nav.map((item) => renderNavLink(item, linkStyle))}
-              <DashboardLaunchLink style={launchCtaStyle}>Launch App</DashboardLaunchLink>
-              <ThemeSwitcher />
-            </nav>
-          ) : (
-            <button
-              type="button"
-              className="hamburger-btn mobile-only"
-              aria-expanded={menuOpen}
-              aria-controls="retail-mobile-nav"
-              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-              onClick={() => setMenuOpen((v) => !v)}
-              style={{
-                padding: '10px 14px',
-                background: 'var(--surface)',
-                border: '1px solid var(--border-warm)',
-                borderRadius: '8px',
-                color: 'var(--text)',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                flexShrink: 0,
-              }}
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Link
+              href="/"
+              scroll={!isMarketingHome}
+              onClick={handleLogoClick}
+              style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}
+              aria-label={isMarketingHome ? 'Back to top' : 'Pocket Portfolio home'}
             >
-              {menuOpen ? 'Close' : 'Menu'}
-            </button>
-          )}
+              <Logo size="medium" showWordmark={!isMobile} />
+            </Link>
+
+            {/* Match ProductionNavbar: landing-nav wrapper + icon hamburger (not text "Menu") */}
+            <div className="landing-nav" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <nav
+                className="desktop-nav mobile-hidden"
+                style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
+              >
+                {nav.map((item) => renderNavLink(item, linkStyle))}
+                <DashboardLaunchLink style={launchCtaStyle}>Launch App</DashboardLaunchLink>
+                <ThemeSwitcher />
+              </nav>
+
+              {isMobile && (
+                <button
+                  type="button"
+                  id="retail-mobile-nav-trigger"
+                  className="hamburger-btn mobile-only"
+                  aria-expanded={menuOpen}
+                  aria-controls="retail-mobile-nav"
+                  aria-label="Toggle mobile menu"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  style={{
+                    background: 'var(--accent-warm)',
+                    border: '2px solid var(--border-warm)',
+                    cursor: 'pointer',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    minWidth: '48px',
+                    minHeight: '48px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                      width: '24px',
+                      height: '18px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '24px',
+                        height: '3px',
+                        background: 'var(--text)',
+                        borderRadius: '2px',
+                        transition: 'all 0.3s ease',
+                        transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none',
+                      }}
+                    />
+                    <span
+                      style={{
+                        width: '24px',
+                        height: '3px',
+                        background: 'var(--text)',
+                        borderRadius: '2px',
+                        transition: 'all 0.3s ease',
+                        opacity: menuOpen ? 0 : 1,
+                      }}
+                    />
+                    <span
+                      style={{
+                        width: '24px',
+                        height: '3px',
+                        background: 'var(--text)',
+                        borderRadius: '2px',
+                        transition: 'all 0.3s ease',
+                        transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none',
+                      }}
+                    />
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </header>
 
       {isMobile && menuOpen && (
         <div
           id="retail-mobile-nav"
-          className="mobile-menu-overlay mobile-only"
+          className="mobile-menu-overlay mobile-only brand-surface brand-grid"
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
           style={{
+            display: 'block',
             position: 'fixed',
             inset: 0,
-            zIndex: 999,
+            zIndex: 1000,
             background: 'rgba(0, 0, 0, 0.5)',
-            padding: '72px 16px 24px',
+            padding: '80px 24px 24px',
             overflowY: 'auto',
           }}
           onClick={closeMenu}
