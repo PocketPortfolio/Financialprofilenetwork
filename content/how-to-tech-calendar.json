@@ -2611,7 +2611,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use PostgreSQL Full-Text Search",
     "slug": "how-to-use-postgresql-full-text-search",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2620,7 +2620,8 @@
       "postgres",
       "use",
       "full"
-    ]
+    ],
+    "publishedAt": "2026-06-11T14:01:35.669Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-pagination-strategies-jun-12",
