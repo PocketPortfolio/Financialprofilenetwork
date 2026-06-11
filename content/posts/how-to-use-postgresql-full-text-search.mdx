@@ -1,0 +1,79 @@
+---
+title: How to Use PostgreSQL Full-Text Search
+date: '2026-06-11'
+description: >-
+  Learn how to implement full-text search in PostgreSQL to efficiently search
+  textual data.
+tags:
+  - sql
+  - postgresql
+  - postgres
+  - full-text search
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-postgresql-full-text-search.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+### Problem
+
+When working with large datasets containing textual data, implementing efficient search functionality can be challenging. Standard SQL LIKE queries can be inefficient for complex searches across large text fields. PostgreSQL offers a robust solution through its full-text search capabilities, allowing for fast and comprehensive text searching.
+
+### Solution with Code
+
+PostgreSQL's full-text search allows you to search large volumes of text quickly and efficiently. Here's how you can implement it:
+
+1. **Create a Table with Text Data**
+
+   First, let's create a sample table with text data:
+
+   ```sql
+   CREATE TABLE documents (
+     id SERIAL PRIMARY KEY,
+     title TEXT,
+     body TEXT
+   );
+   ```
+
+2. **Insert Sample Data**
+
+   Populate the table with sample data:
+
+   ```sql
+   INSERT INTO documents (title, body)
+   VALUES
+     ('Intro to PostgreSQL', 'PostgreSQL is a powerful, open source object-relational database system.'),
+     ('Full-Text Search', 'Full-text search in PostgreSQL lets you quickly find documents based on their text content.');
+   ```
+
+3. **Create a Full-Text Index**
+
+   Create an index to enable full-text search on the `body` column:
+
+   ```sql
+   CREATE INDEX idx_fts_body ON documents USING GIN (to_tsvector('english', body));
+   ```
+
+4. **Perform a Full-Text Search Query**
+
+   Use the `to_tsvector` and `to_tsquery` functions to perform a full-text search:
+
+   ```sql
+   SELECT title, body
+   FROM documents
+   WHERE to_tsvector('english', body) @@ to_tsquery('english', 'PostgreSQL & search');
+   ```
+
+   This query searches for documents containing both "PostgreSQL" and "search".
+
+### Key Concepts
+
+- **to_tsvector**: Converts a text document into a `tsvector` type suitable for searching. This function tokenizes the text and removes stop words (common words like "the", "is").
+
+- **to_tsquery**: Converts a query text into a `tsquery` type, allowing you to perform complex searches using operators such as `&` (AND), `|` (OR), and `!` (NOT).
+
+- **GIN Index**: A Generalized Inverted Index (GIN) is particularly useful for speeding up full-text search queries.
+
+- **Lexemes**: PostgreSQL breaks down the text into lexemes (basic units of words), which are used in full-text searches.
+
+By utilizing PostgreSQL's full-text search, you can significantly enhance performance and accuracy when searching through large text datasets. This solution is ideal for applications requiring advanced search capabilities, such as content management systems or e-commerce platforms.
