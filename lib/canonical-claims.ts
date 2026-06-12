@@ -827,9 +827,12 @@ export const OPEN_PRIMARY_CTA = {
 // NUMBERS_SNAPSHOT at render time (REG-01 / REG-03 / CODB-01).
 
 /** Split-Brain architecture video — Phase 2 proof block on the O. landing. */
+/** Bump `?v=` after re-encoding landing proof video (jump-cut past thinking dead air). */
+export const OPEN_LANDING_VIDEO_CACHE_BUST = '20260612';
+
 export const OPEN_LANDING_VIDEO = {
-  src: '/marketing/corporate-split-brain-linkedin-4k.mp4',
-  srcMobile: '/marketing/corporate-split-brain-linkedin-1080.mp4',
+  src: `/marketing/corporate-split-brain-linkedin-4k.mp4?v=${OPEN_LANDING_VIDEO_CACHE_BUST}`,
+  srcMobile: `/marketing/corporate-split-brain-linkedin-1080.mp4?v=${OPEN_LANDING_VIDEO_CACHE_BUST}`,
   /** 4K upscale of the video outro title card (“Explore the architecture”). Regenerate: `node scripts/generate-corporate-split-brain-linkedin-video.mjs --poster-only` */
   poster: '/marketing/corporate-split-brain-linkedin-poster.jpg',
   alt:

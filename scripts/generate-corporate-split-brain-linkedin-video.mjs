@@ -9,7 +9,10 @@
  * Usage: node scripts/generate-corporate-split-brain-linkedin-video.mjs [demo.mp4]
  *
  * Env overrides:
- *   DEMO_START=20  DEMO_DURATION=14  DIAGRAM_SECONDS=6  INTRO_SECONDS=2.5
+ *   DEMO_JUMP_CUT=1 (default) — skip "Pocket Analyst is thinking…" dead air
+ *   DEMO_PRE_START=22  DEMO_PRE_DURATION=1.2  (user message sent)
+ *   DEMO_START=38  DEMO_DURATION=10  (streaming response, no thinking indicator)
+ *   DIAGRAM_SECONDS=6  INTRO_SECONDS=2.5
  */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -45,8 +48,11 @@ const DEMO_CANDIDATES = [
 const INTRO_SEC = Number(process.env.INTRO_SECONDS ?? 2.5);
 const OUTRO_SEC = 2.5;
 const DIAGRAM_SEC = Number(process.env.DIAGRAM_SECONDS ?? 6);
-const DEMO_START = Number(process.env.DEMO_START ?? 20);
-const DEMO_DURATION = Number(process.env.DEMO_DURATION ?? 14);
+const DEMO_JUMP_CUT = process.env.DEMO_JUMP_CUT !== '0';
+const DEMO_PRE_START = Number(process.env.DEMO_PRE_START ?? 22);
+const DEMO_PRE_DURATION = Number(process.env.DEMO_PRE_DURATION ?? 0);
+const DEMO_START = Number(process.env.DEMO_START ?? 38);
+const DEMO_DURATION = Number(process.env.DEMO_DURATION ?? 10);
 
 function esc(s) {
   return String(s)
@@ -243,7 +249,13 @@ function main() {
   const outGif = path.join(outDir, 'corporate-split-brain-linkedin.gif');
   const outPoster = path.join(outDir, 'corporate-split-brain-linkedin-poster.jpg');
 
-  console.log('V2 build — demo', demoIn, `start=${DEMO_START}s duration=${DEMO_DURATION}s`);
+  console.log(
+    'V2 build — demo',
+    demoIn,
+    DEMO_JUMP_CUT
+      ? `jump-cut pre=${DEMO_PRE_START}s+${DEMO_PRE_DURATION}s → response=${DEMO_START}s+${DEMO_DURATION}s`
+      : `start=${DEMO_START}s duration=${DEMO_DURATION}s`,
+  );
 
   const introPng = path.join(tmpDir, 'intro.png');
   const introMp4 = path.join(tmpDir, 'intro.mp4');
@@ -258,17 +270,55 @@ function main() {
   pngToMp4(introPng, introMp4, INTRO_SEC);
 
   const demoMp4 = path.join(tmpDir, 'demo.mp4');
-  run(
-    [
-      'ffmpeg -y',
-      `-ss ${DEMO_START} -i ${q(demoIn)}`,
-      `-t ${DEMO_DURATION}`,
-      `-vf "scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2:${obsidian},format=yuv420p"`,
-      `-r ${FPS}`,
-      '-c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -an',
-      q(demoMp4),
-    ].join(' '),
-  );
+  const demoVf = `scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2:${obsidian},format=yuv420p`;
+  const demoEncode = `-r ${FPS} -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -an`;
+
+  if (DEMO_JUMP_CUT) {
+    const demoMainMp4 = path.join(tmpDir, 'demo-main.mp4');
+    run(
+      [
+        'ffmpeg -y',
+        `-ss ${DEMO_START} -i ${q(demoIn)}`,
+        `-t ${DEMO_DURATION}`,
+        `-vf "${demoVf}"`,
+        demoEncode,
+        q(demoMainMp4),
+      ].join(' '),
+    );
+    if (DEMO_PRE_DURATION > 0) {
+      const demoPreMp4 = path.join(tmpDir, 'demo-pre.mp4');
+      const demoConcatList = path.join(tmpDir, 'demo-concat.txt');
+      run(
+        [
+          'ffmpeg -y',
+          `-ss ${DEMO_PRE_START} -i ${q(demoIn)}`,
+          `-t ${DEMO_PRE_DURATION}`,
+          `-vf "${demoVf}"`,
+          demoEncode,
+          q(demoPreMp4),
+        ].join(' '),
+      );
+      fs.writeFileSync(
+        demoConcatList,
+        [demoPreMp4, demoMainMp4].map((f) => `file '${f.replace(/\\/g, '/')}'`).join('\n'),
+        'utf8',
+      );
+      run(['ffmpeg -y', `-f concat -safe 0 -i ${q(demoConcatList)}`, '-c copy -an', q(demoMp4)].join(' '));
+    } else {
+      fs.copyFileSync(demoMainMp4, demoMp4);
+    }
+  } else {
+    run(
+      [
+        'ffmpeg -y',
+        `-ss ${DEMO_START} -i ${q(demoIn)}`,
+        `-t ${DEMO_DURATION}`,
+        `-vf "${demoVf}"`,
+        demoEncode,
+        q(demoMp4),
+      ].join(' '),
+    );
+  }
 
   const framesDir = path.join(tmpDir, 'flow-frames');
   fs.mkdirSync(framesDir, { recursive: true });
