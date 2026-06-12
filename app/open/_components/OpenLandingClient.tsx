@@ -39,6 +39,7 @@ export default function OpenLandingClient({
       }}
     >
       <Hero copy={copy} />
+      <ByocSection copy={copy} />
       <VideoProofSection copy={copy} />
       <IntegrationSection copy={copy} adapterCount={sdk.brokerAdapterCount} />
       <BoardMoatSection copy={copy} threats={threats} />
@@ -172,7 +173,121 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   );
 }
 
-// ─── Phase 2: Proof (video) ───────────────────────────────────────────────────
+// ─── Phase 2: BYOC procurement block ──────────────────────────────────────────
+
+function ByocSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+  return (
+    <section
+      style={{
+        background: 'var(--surface)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
+    >
+      <div style={sectionStyle}>
+        <motion.div {...fadeUp}>
+          <span style={eyebrowStyle}>{copy.byoc.eyebrow}</span>
+          <h2
+            style={{
+              fontSize: 'clamp(28px, 3.5vw, 40px)',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              margin: '0 0 16px 0',
+              maxWidth: '720px',
+            }}
+          >
+            {copy.byoc.title}
+          </h2>
+          <p
+            style={{
+              fontSize: '17px',
+              lineHeight: 1.6,
+              color: 'var(--text-secondary)',
+              margin: '0 0 32px 0',
+              maxWidth: '720px',
+            }}
+          >
+            {copy.byoc.body}
+          </p>
+          <motion.ol
+            {...stagger}
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: '0 0 28px 0',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '16px',
+              counterReset: 'byoc-step',
+            }}
+          >
+            {copy.byoc.points.map((point, index) => (
+              <motion.li
+                key={point.title}
+                variants={child}
+                style={{
+                  padding: '24px',
+                  background: 'var(--bg)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '10px',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: 'var(--accent-warm)',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                    marginBottom: '10px',
+                  }}
+                >
+                  {String(index + 1).padStart(2, '0')} · {point.title}
+                </div>
+                <p
+                  style={{
+                    fontSize: '15px',
+                    lineHeight: 1.55,
+                    color: 'var(--text-secondary)',
+                    margin: 0,
+                  }}
+                >
+                  {point.body}
+                </p>
+              </motion.li>
+            ))}
+          </motion.ol>
+          <p
+            style={{
+              fontSize: '14px',
+              lineHeight: 1.6,
+              color: 'var(--text-secondary)',
+              margin: '0 0 16px 0',
+              maxWidth: '720px',
+            }}
+          >
+            {copy.byoc.footnote}
+          </p>
+          <Link
+            href={copy.byoc.architectureHref}
+            style={{
+              color: 'var(--accent-warm)',
+              textDecoration: 'none',
+              fontWeight: 600,
+              fontSize: '15px',
+            }}
+          >
+            {copy.byoc.architectureLinkLabel}
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Phase 3: Proof (video) ───────────────────────────────────────────────────
 
 function VideoProofSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (

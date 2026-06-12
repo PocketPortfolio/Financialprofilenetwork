@@ -851,11 +851,35 @@ export const OPEN_LANDING_FOOTER_PATHWAYS = [
 ] as const;
 
 export const OPEN_LANDING_COPY = {
-  eyebrow: 'Open Portfolio — wealth-tech proven · regulated verticals forward',
-  heroTitle: 'Secure AI wealth analytics without warehousing client ledgers.',
+  eyebrow: 'Open Portfolio — BYOC boundary infrastructure · regulated verticals forward',
+  heroTitle: 'The BYOC inference boundary for regulated finance.',
   heroBody:
-    'Give your users powerful financial intelligence. Keep their raw data entirely on the edge.',
+    'Keep your IdP. Keep your approved storage. We supply the stateless edge plumbing so procurement can sign off on frontier AI — without another vendor-hosted ledger warehouse.',
   heroCta: 'Book a Design Partner Call',
+  byoc: {
+    eyebrow: 'Bring Your Own Cloud',
+    title: 'Plumbing fitting, not another vault.',
+    body:
+      'Most vendors force regulated platforms to duplicate client ledgers inside a third-party SaaS cloud. Open Portfolio deploys inside your perimeter — an inspectable boundary SKU, not a hosted data lake.',
+    points: [
+      {
+        title: 'You keep the vault keys',
+        body: 'Your identity providers and approved regulated storage stay uncompromised. We supply the boundary layer inside your perimeter.',
+      },
+      {
+        title: 'Edge ingestion',
+        body: 'MIT open-source adapters (@pocket-portfolio/importer) normalize broker data client-side. Raw ledger rows are not on the designed inference path.',
+      },
+      {
+        title: 'Stateless inference perimeter',
+        body: 'Deterministic context engine → bounded aggregates → /api/ai/chat. No portfolio payload persistence on the inference path.',
+      },
+    ] as const,
+    footnote:
+      'Pocket Portfolio is the live consumer harness on the same substrate. Enterprise BYOC pilots scope your stores — reference: tier-1-wealth-byoc-sandbox-pattern.',
+    architectureLinkLabel: 'BYOC reference architecture →',
+    architectureHref: '/blog/tier-1-wealth-byoc-sandbox-pattern',
+  },
   proof: {
     eyebrow: 'Sanitization by construction',
     title: 'The architectural boundary, visualized.',
@@ -896,7 +920,7 @@ export const OPEN_LANDING_COPY = {
       },
     ] as const,
     socialProofEyebrow: 'Design partnerships',
-    socialProofTitle: 'Tier 1 design partnerships · founder-built enterprise track record.',
+    socialProofTitle: 'Regulated design partnerships · founder-built enterprise track record.',
     socialProofBody: `Proven in wealth tech with live production traffic. ${PERSON_ABBA.name} — ${FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL} (National Grid Ventures, 2023–2025). Open Portfolio applies those decision-platform patterns for regulated verticals where trust and perimeter matter most.`,
     midCta: 'Book a Design Partner Call',
   },

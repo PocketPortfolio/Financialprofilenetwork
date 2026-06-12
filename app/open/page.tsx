@@ -24,11 +24,11 @@ import {
  */
 
 export const metadata: Metadata = {
-  title: 'Secure AI Wealth Analytics Without Warehousing Client Ledgers',
+  title: 'The BYOC Inference Boundary for Regulated Finance',
   description: OPEN_LANDING_COPY.heroBody,
   alternates: { canonical: OPEN_URLS.home },
   openGraph: {
-    title: 'Open Portfolio — Secure AI Wealth Analytics Without Warehousing Client Ledgers',
+    title: 'Open Portfolio — The BYOC Inference Boundary for Regulated Finance',
     description: OPEN_LANDING_COPY.heroBody,
     url: OPEN_URLS.home,
     siteName: SURFACE_ORG.open.name,
