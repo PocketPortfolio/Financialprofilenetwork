@@ -924,7 +924,7 @@ export const OPEN_LANDING_COPY = {
     ] as const,
     socialProofEyebrow: 'Design partnerships',
     socialProofTitle: 'Regulated design partnerships · founder-built enterprise track record.',
-    socialProofBody: `Proven in wealth tech with live production traffic. ${PERSON_ABBA.name} — ${FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL} (National Grid Ventures, 2023–2025). Open Portfolio applies those decision-platform patterns for regulated verticals where trust and perimeter matter most.`,
+    socialProofBody: `Proven in wealth tech with live production traffic. Track record: ${FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL} (National Grid Ventures, 2023–2025). Open Portfolio applies those decision-platform patterns for regulated verticals where trust and perimeter matter most.`,
     midCta: 'Book a Design Partner Call',
   },
   contact: {

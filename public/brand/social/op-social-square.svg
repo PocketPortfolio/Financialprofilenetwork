@@ -1,0 +1,21 @@
+<svg width="1024" height="1024" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Open Portfolio: SOCIAL ONLY square monogram.
+
+    Full-bleed dark surface with NO rounded corners so platforms that
+    apply a circular avatar mask (LinkedIn, X, Meta) trim the corners
+    cleanly instead of revealing dark cutouts at the inscribed circle.
+
+    Do not reference this asset from product UI. Use
+    /brand/op-monogram-amber.svg or /brand/op-icon.png there.
+
+    Safe-zone: monogram occupies ~60 percent of the canvas, well inside
+    the inscribed circle (r=128), so the mark survives any platform's
+    circular crop without clipping.
+  -->
+  <rect width="256" height="256" fill="#0b0d10"/>
+  <g fill="#f59e0b">
+    <path d="M62 138a40 40 0 1 1 80 0 40 40 0 0 1-80 0zm20 0a20 20 0 1 0 40 0 20 20 0 0 0-40 0z"/>
+    <rect x="160" y="138" width="36" height="36" rx="8" opacity=".9"/>
+  </g>
+</svg>
