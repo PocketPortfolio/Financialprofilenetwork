@@ -2645,14 +2645,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Validation",
     "slug": "how-to-implement-api-request-validation",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-06-13T14:00:54.039Z"
   },
   {
     "id": "how-to-understanding-api-gateway-authentication-jun-14",
