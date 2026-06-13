@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "papaparse": "^5.4.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "npm:@stackline/xlsx@^1.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

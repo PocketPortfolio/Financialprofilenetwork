@@ -8,6 +8,11 @@ export default defineConfig({
     setupFiles: ['./tests/setup/vitest.setup.ts'],
     include: ['tests/**/*.test.ts', 'tests/**/*.spec.ts'],
     exclude: ['**/node_modules/**', '**/e2e/**', '**/tests_backup/**', '**/tests/e2e/**'],
+    // Defense-in-depth: never allow remote UI write/exec (GHSA-5xrq-8626-4rwp)
+    api: {
+      allowWrite: false,
+      allowExec: false,
+    },
     coverage: {
       provider: 'v8',
       all: true,
