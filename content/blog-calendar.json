@@ -994,7 +994,7 @@
     "date": "2026-06-14",
     "title": "What Makes Pocket Portfolio Different: The Sovereign Advantage",
     "slug": "what-makes-pocket-portfolio-different-the-sovereign-advantag",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1004,7 +1004,8 @@
       "makes"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-14T09:00:51.729Z"
   },
   {
     "id": "week-24-post-2",
