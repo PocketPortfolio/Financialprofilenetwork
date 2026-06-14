@@ -2661,7 +2661,7 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Gateway Authentication",
     "slug": "understanding-api-gateway-authentication",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2669,7 +2669,8 @@
       "authentication",
       "understanding",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-06-14T14:00:26.488Z"
   },
   {
     "id": "how-to-how-to-build-a-microservices-communication-layer-jun-15",
