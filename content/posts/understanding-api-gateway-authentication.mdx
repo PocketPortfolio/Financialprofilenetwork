@@ -1,14 +1,12 @@
 ---
 title: Understanding API Gateway Authentication
 date: '2026-06-14'
-description: >-
-  A technical guide on implementing authentication in API Gateways using code
-  examples and key concepts.
+description: Learn how to implement and manage authentication in API gateways efficiently.
 tags:
-  - api
-  - authentication
-  - gateway
-  - security
+  - API
+  - Authentication
+  - API Gateway
+  - Security
 author: Pocket Portfolio Team
 image: /images/blog/understanding-api-gateway-authentication.png
 pillar: Technology
@@ -17,60 +15,80 @@ category: how-to-in-tech
 
 ## Problem
 
-APIs are a critical component of modern applications, enabling different services to communicate. However, securing these APIs is essential to prevent unauthorized access. API Gateways often act as the entry point and can manage authentication efficiently. Understanding how to implement authentication in API Gateways is crucial for maintaining secure communications between clients and backend services.
+Modern applications often rely on APIs to expose functionality and data. However, securing these APIs is crucial to prevent unauthorized access. One common solution is using an API Gateway to manage authentication and other cross-cutting concerns. Without proper authentication, APIs are vulnerable to attacks, resulting in data breaches and other security issues.
 
-## Solution with Code
+## Solution
 
-To implement authentication in an API Gateway, you can use a variety of methods such as API keys, OAuth tokens, or JWT (JSON Web Tokens). Here, we'll focus on using JWT for authentication due to its stateless nature and ease of use.
+API Gateway authentication can be implemented using various methods such as API keys, OAuth 2.0, or JWT (JSON Web Tokens). Here, we'll focus on using JWT for authentication, a popular choice due to its stateless nature and ease of use.
 
-### Example: AWS API Gateway with JWT
+### Step-by-Step Implementation
 
-1. **Create a Lambda Authorizer**
+1. **Generate a JWT**
 
-   This Lambda function will validate the JWT token.
+   Use a library like `jsonwebtoken` in Node.js to generate a JWT. This JWT will be issued to clients after they successfully authenticate.
 
    ```javascript
-   exports.handler = async (event) => {
-       const token = event.headers.Authorization;
-       if (!token) {
-           throw new Error("Unauthorized");
-       }
-       
-       // Decode and verify JWT (using a library like jsonwebtoken)
-       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+   const jwt = require('jsonwebtoken');
 
-       return {
-           principalId: decoded.sub,
-           policyDocument: {
-               Version: '2012-10-17',
-               Statement: [{
-                   Action: 'execute-api:Invoke',
-                   Effect: 'Allow',
-                   Resource: event.methodArn
-               }]
-           }
-       };
-   };
+   function generateToken(user) {
+     const payload = { userId: user.id, role: user.role };
+     const secret = 'your-secret-key';
+     const options = { expiresIn: '1h' };
+     return jwt.sign(payload, secret, options);
+   }
    ```
 
-2. **Configure API Gateway**
+2. **Configure the API Gateway**
 
-   - Create a new API or select an existing one.
-   - Go to the "Authorizers" section and add a new authorizer.
-   - Choose "Lambda" and attach the Lambda function created above.
-   - Set the token source as the `Authorization` header.
+   Depending on your API Gateway solution (e.g., AWS API Gateway, Kong, or Apigee), configure it to accept JWTs. For AWS API Gateway, you can use a Lambda function as a custom authorizer.
 
-3. **Apply the Authorizer to API Methods**
+   ```javascript
+   const jwt = require('jsonwebtoken');
 
-   - Navigate to the API method (e.g., GET, POST) you want to protect.
-   - Edit the method request settings and enable the authorizer.
+   exports.handler = async (event) => {
+     const token = event.authorizationToken.replace('Bearer ', '');
+     const secret = 'your-secret-key';
+
+     try {
+       const decoded = jwt.verify(token, secret);
+       return generatePolicy(decoded.userId, 'Allow', event.methodArn);
+     } catch (error) {
+       return generatePolicy('user', 'Deny', event.methodArn);
+     }
+   };
+
+   function generatePolicy(principalId, effect, resource) {
+     const authResponse = {};
+     authResponse.principalId = principalId;
+     if (effect && resource) {
+       const policyDocument = {
+         Version: '2012-10-17',
+         Statement: [
+           {
+             Action: 'execute-api:Invoke',
+             Effect: effect,
+             Resource: resource,
+           },
+         ],
+       };
+       authResponse.policyDocument = policyDocument;
+     }
+     return authResponse;
+   }
+   ```
+
+3. **Client Request Flow**
+
+   Clients must include the JWT in the `Authorization` header as a Bearer token for each API request.
+
+   ```bash
+   curl -H "Authorization: Bearer your-jwt-token" https://your-api-endpoint.com/resource
+   ```
 
 ## Key Concepts
 
-- **JWT (JSON Web Token):** A compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and/or encrypted.
+- **JWT**: A compact, URL-safe means of representing claims to be transferred between two parties. It's used for authentication and information exchange.
+- **Bearer Token**: A type of token that a client must include in requests to authenticate.
+- **Custom Authorizer**: A mechanism to control access to your API based on custom logic, such as verifying a JWT.
 
-- **API Gateway:** It acts as a reverse proxy to accept all application programming interface (API) calls, aggregate the various services required to fulfill them, and return the appropriate result.
-
-- **Lambda Authorizer:** A Lambda function that controls access to your API methods by validating tokens or request parameters and using this information to return an IAM policy.
-
-Implementing authentication in API Gateways protects your services from unauthorized access and ensures that data is exchanged securely. By using JWT, you can achieve a stateless and scalable authentication mechanism.
+By implementing JWT authentication in your API Gateway, you ensure that only authenticated requests reach your services, enhancing security and control over API access.
