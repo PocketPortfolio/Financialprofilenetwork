@@ -2678,14 +2678,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a Microservices Communication Layer",
     "slug": "how-to-build-a-microservices-communication-layer",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "microservices",
       "build",
       "communication"
-    ]
+    ],
+    "publishedAt": "2026-06-15T14:01:03.948Z"
   },
   {
     "id": "how-to-the-developer-s-guide-to-api-mocking-jun-16",
