@@ -219,7 +219,7 @@
     "twitter-api-v2": "^1.28.0",
     "xlsx": "npm:@stackline/xlsx@^1.0.2",
     "yahoo-finance2": "^3.11.2",
-    "zod": "^3.23.8",
+    "zod": "^4.4.3",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
