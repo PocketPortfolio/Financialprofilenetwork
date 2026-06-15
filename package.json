@@ -214,7 +214,7 @@
     "recharts": "^3.5.1",
     "remark-gfm": "^4.0.0",
     "resend": "^3.2.0",
-    "stripe": "^20.0.0",
+    "stripe": "^22.2.1",
     "tailwindcss": "^4.1.14",
     "twitter-api-v2": "^1.28.0",
     "xlsx": "npm:@stackline/xlsx@^1.0.2",
