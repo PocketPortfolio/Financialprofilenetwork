@@ -2694,14 +2694,15 @@
     "scheduledTime": "14:00",
     "title": "The Developer's Guide to API Mocking",
     "slug": "the-developer-s-guide-to-api-mocking",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "developer",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-06-16T14:00:45.631Z"
   },
   {
     "id": "how-to-how-to-use-redis-pub-sub-for-real-time-updates-jun-17",
