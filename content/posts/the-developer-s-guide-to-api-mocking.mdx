@@ -2,78 +2,77 @@
 title: The Developer's Guide to API Mocking
 date: '2026-06-16'
 description: >-
-  Master the art of API mocking to enhance your development workflow and speed
-  up your testing processes.
+  Learn how to effectively implement API mocking in your development process to
+  streamline testing and development.
 tags:
   - api
   - developer
-  - guide
   - mocking
-  - testing
+  - guide
 author: Pocket Portfolio Team
 image: /images/blog/the-developer-s-guide-to-api-mocking.png
-pillar: development
+pillar: Technology
 category: how-to-in-tech
 ---
 
-# Problem
+## Problem
 
-Developers frequently face challenges when integrating with APIs during the software development process. These challenges include unreliable API responses, slow server speeds, rate limits, or APIs still in development. Such issues can lead to inefficient testing and prolonged development cycles.
+Developers often face challenges when working with APIs that are still in development or when services are unreliable. This can lead to delays and increased testing complexity. Mocking APIs allows developers to simulate API behavior, enabling them to continue development and testing independently of the actual API availability.
 
-# Solution with Code
+## Solution
 
-API mocking provides a solution by simulating API responses, enabling developers to work with predictable and controllable response data. This guide provides a practical approach to implement API mocking using the `nock` library in Node.js.
+API mocking provides a way to create a fake version of the API that mimics the expected behavior and responses. This can be implemented easily using various libraries and tools. Here, we will demonstrate how to use `json-server`, a popular tool for mocking REST APIs.
 
-First, install `nock`:
+### Step-by-Step Implementation
 
-```bash
-npm install nock --save-dev
-```
+1. **Install json-server**
 
-Next, set up a mock server in your test file:
+   First, ensure you have Node.js installed. Then, you can install `json-server` using npm:
 
-```javascript
-const nock = require('nock');
+   ```bash
+   npm install -g json-server
+   ```
 
-// Define the base URL of the API to mock
-const apiBase = 'https://api.example.com';
+2. **Create a Mock Data File**
 
-// Set up the interceptor for a GET request
-nock(apiBase)
-  .get('/users/1')
-  .reply(200, {
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  });
+   Create a `db.json` file in your project's root directory. This file will contain the mock data you want your API to return. Example structure:
 
-// Example function to fetch user data
-async function fetchUser(userId) {
-  const response = await fetch(`${apiBase}/users/${userId}`);
-  return response.json();
-}
+   ```json
+   {
+     "posts": [
+       { "id": 1, "title": "Mocking APIs", "author": "John Doe" },
+       { "id": 2, "title": "Understanding JSON Server", "author": "Jane Smith" }
+     ],
+     "comments": [
+       { "id": 1, "postId": 1, "body": "Great article!" }
+     ]
+   }
+   ```
 
-// Example test case using Jest
-test('fetches user data successfully', async () => {
-  const data = await fetchUser(1);
-  expect(data).toEqual({
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  });
-});
-```
+3. **Start the Mock Server**
 
-In the example above, `nock` intercepts HTTP requests to `https://api.example.com/users/1`, and returns a predefined response. This setup allows you to test without requiring the actual API to be available or stable.
+   Run the following command to start the server:
 
-# Key Concepts
+   ```bash
+   json-server --watch db.json
+   ```
 
-- **Interception**: The process by which `nock` captures outgoing HTTP requests and provides a predefined response.
-  
-- **Deterministic Responses**: Mocking APIs ensures consistent responses, making it easier to write reliable tests.
+   By default, this will start a server at `http://localhost:3000`. You can now make HTTP requests to this server, and it will respond with the data from your `db.json`.
 
-- **Isolation**: By mocking APIs, tests are not dependent on external services, leading to faster and more reliable test execution.
+4. **Integrate with Your Application**
 
-- **Flexibility**: Easily simulate various scenarios such as error responses, delays, or specific data conditions without altering the actual API.
+   In your application, replace actual API endpoints with the mocked endpoints. This allows you to test your application without depending on the real API.
 
-API mocking is a powerful technique that enhances the development workflow by providing a reliable and controlled environment for testing. By integrating tools like `nock`, developers can mitigate the uncertainties and delays associated with external APIs, ultimately leading to more robust applications and efficient development cycles.
+   ```javascript
+   fetch('http://localhost:3000/posts')
+     .then((response) => response.json())
+     .then((data) => console.log(data));
+   ```
+
+## Key Concepts
+
+- **Mock Data**: Fake data returned by the mocked API, allowing for consistent testing scenarios.
+- **Endpoint Simulation**: Using tools like `json-server` to create endpoints that mimic the expected behavior of real APIs.
+- **Decoupling**: Reducing dependencies on external services by using mocks, thereby enabling continuous development and testing.
+
+API mocking is a critical practice in modern software development, improving efficiency and reliability. By incorporating tools like `json-server`, developers can simulate APIs, streamline workflows, and minimize disruptions caused by third-party service downtime or ongoing API development.
