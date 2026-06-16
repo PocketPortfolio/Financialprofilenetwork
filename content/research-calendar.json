@@ -2704,7 +2704,7 @@
     "scheduledTime": "18:00",
     "title": "Research: API Rate Limiting Algorithms - Token Bucket vs Sliding Window",
     "slug": "research-api-rate-limiting-algorithms-token-bucket-vs-sliding-window-2026-06-16",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2713,7 +2713,8 @@
       "api",
       "rate",
       "limiting"
-    ]
+    ],
+    "publishedAt": "2026-06-16T18:00:58.475Z"
   },
   {
     "id": "research-monitoring-agent-overhead-data-collection-impact-2026-06-17",
