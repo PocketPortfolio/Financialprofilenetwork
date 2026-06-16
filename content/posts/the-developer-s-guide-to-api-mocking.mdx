@@ -1,0 +1,79 @@
+---
+title: The Developer's Guide to API Mocking
+date: '2026-06-16'
+description: >-
+  Master the art of API mocking to enhance your development workflow and speed
+  up your testing processes.
+tags:
+  - api
+  - developer
+  - guide
+  - mocking
+  - testing
+author: Pocket Portfolio Team
+image: /images/blog/the-developer-s-guide-to-api-mocking.png
+pillar: development
+category: how-to-in-tech
+---
+
+# Problem
+
+Developers frequently face challenges when integrating with APIs during the software development process. These challenges include unreliable API responses, slow server speeds, rate limits, or APIs still in development. Such issues can lead to inefficient testing and prolonged development cycles.
+
+# Solution with Code
+
+API mocking provides a solution by simulating API responses, enabling developers to work with predictable and controllable response data. This guide provides a practical approach to implement API mocking using the `nock` library in Node.js.
+
+First, install `nock`:
+
+```bash
+npm install nock --save-dev
+```
+
+Next, set up a mock server in your test file:
+
+```javascript
+const nock = require('nock');
+
+// Define the base URL of the API to mock
+const apiBase = 'https://api.example.com';
+
+// Set up the interceptor for a GET request
+nock(apiBase)
+  .get('/users/1')
+  .reply(200, {
+    id: 1,
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+  });
+
+// Example function to fetch user data
+async function fetchUser(userId) {
+  const response = await fetch(`${apiBase}/users/${userId}`);
+  return response.json();
+}
+
+// Example test case using Jest
+test('fetches user data successfully', async () => {
+  const data = await fetchUser(1);
+  expect(data).toEqual({
+    id: 1,
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+  });
+});
+```
+
+In the example above, `nock` intercepts HTTP requests to `https://api.example.com/users/1`, and returns a predefined response. This setup allows you to test without requiring the actual API to be available or stable.
+
+# Key Concepts
+
+- **Interception**: The process by which `nock` captures outgoing HTTP requests and provides a predefined response.
+  
+- **Deterministic Responses**: Mocking APIs ensures consistent responses, making it easier to write reliable tests.
+
+- **Isolation**: By mocking APIs, tests are not dependent on external services, leading to faster and more reliable test execution.
+
+- **Flexibility**: Easily simulate various scenarios such as error responses, delays, or specific data conditions without altering the actual API.
+
+API mocking is a powerful technique that enhances the development workflow by providing a reliable and controlled environment for testing. By integrating tools like `nock`, developers can mitigate the uncertainties and delays associated with external APIs, ultimately leading to more robust applications and efficient development cycles.
