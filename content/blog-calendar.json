@@ -1012,7 +1012,7 @@
     "date": "2026-06-17",
     "title": "JSON Compression: Reducing File Sizes Without Losing Data",
     "slug": "json-compression-reducing-file-sizes-without-losing-data",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1022,7 +1022,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-17T09:00:42.502Z"
   },
   {
     "id": "week-25-post-1",
