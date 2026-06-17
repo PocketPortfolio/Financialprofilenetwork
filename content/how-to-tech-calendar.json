@@ -2710,14 +2710,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Redis Pub/Sub for Real-Time Updates",
     "slug": "how-to-use-redis-pub-sub-for-real-time-updates",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "redis",
       "use",
       "pub"
-    ]
+    ],
+    "publishedAt": "2026-06-17T14:01:20.499Z"
   },
   {
     "id": "how-to-building-an-api-gateway-with-express-jun-18",
