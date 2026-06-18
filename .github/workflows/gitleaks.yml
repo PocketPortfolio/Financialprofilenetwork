@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0   # scan full history on PRs; set to 1 to scan only HEAD
       - name: Run Gitleaks
-        uses: zricethezav/gitleaks-action@v1.6.0
+        uses: zricethezav/gitleaks-action@v3.0.0
         with:
           config-path: .gitleaks.toml
           args: --no-git --redact
