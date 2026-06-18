@@ -2,85 +2,100 @@
 title: Building an API Gateway with Express
 date: '2026-06-18'
 description: >-
-  Learn how to build a simple API Gateway using Express.js to manage and route
-  requests to multiple backend services.
+  Learn how to build an API Gateway using Express.js to streamline your
+  microservices architecture.
 tags:
   - api
   - express
   - gateway
   - nodejs
+  - microservices
 author: Pocket Portfolio Team
 image: /images/blog/building-an-api-gateway-with-express.png
-pillar: Tech
+pillar: Technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-In a microservices architecture, managing requests to various services can become complex. Each service may have its own API, leading to potential issues with authentication, routing, and monitoring. An API Gateway serves as a single entry point for client requests, simplifying the management of these interactions and providing a centralized point for implementing cross-cutting concerns like authentication, logging, and rate limiting.
+In a microservices architecture, managing communication between numerous services can become complex and unwieldy. As services multiply, they require effective routing, centralized authentication, rate limiting, and load balancing. Without a proper gateway, each service may need to independently handle these concerns, leading to repeated code and increased maintenance overhead.
 
 ## Solution
 
-Building an API Gateway with Express.js, a minimal and flexible Node.js web application framework, allows us to handle routing and middleware efficiently. Below is a step-by-step guide to creating a simple API Gateway.
+An API Gateway can serve as a single entry point for all client requests, simplifying communication and centralizing cross-cutting concerns. Express.js, a minimalist web framework for Node.js, can be employed to build a robust API Gateway.
 
 ### Key Concepts
 
-- **Routing**: Directing incoming requests to the appropriate backend services.
-- **Middleware**: Functions that execute during the lifecycle of a request to the server. Useful for logging, authentication, etc.
-- **Proxy**: Forwarding requests to other servers.
+1. **Routing**: Direct requests to the appropriate service.
+2. **Authentication**: Validate client requests centrally.
+3. **Rate Limiting**: Protect services from being overwhelmed by requests.
+4. **Load Balancing**: Distribute client requests evenly across services.
 
 ### Implementation
 
-First, ensure you have Node.js and npm installed. Initialize a new Node.js project and install Express and http-proxy-middleware:
+Follow these steps to build an API Gateway with Express:
 
-```bash
-npm init -y
-npm install express http-proxy-middleware
-```
+1. **Setup Express Application**
 
-Create an `index.js` file for your API Gateway:
+   First, set up a basic Express app.
 
-```javascript
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+   ```javascript
+   const express = require('express');
+   const app = express();
+   const port = 3000;
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+   app.listen(port, () => {
+     console.log(`API Gateway running on port ${port}`);
+   });
+   ```
 
-// Middleware for logging requests
-app.use((req, res, next) => {
-  console.log(`Request URL: ${req.url}`);
-  next();
-});
+2. **Add Routing Logic**
 
-// Proxy configuration
-app.use('/service1', createProxyMiddleware({
-  target: 'http://localhost:4001',
-  changeOrigin: true,
-  pathRewrite: {
-    '^/service1': '', // remove base path
-  },
-}));
+   Define routes to forward requests to the corresponding microservices.
 
-app.use('/service2', createProxyMiddleware({
-  target: 'http://localhost:4002',
-  changeOrigin: true,
-  pathRewrite: {
-    '^/service2': '', // remove base path
-  },
-}));
+   ```javascript
+   const proxy = require('http-proxy-middleware');
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`API Gateway running at http://localhost:${PORT}`);
-});
-```
+   app.use('/service1', proxy({ target: 'http://localhost:4000', changeOrigin: true }));
+   app.use('/service2', proxy({ target: 'http://localhost:5000', changeOrigin: true }));
+   ```
 
-### Explanation
+3. **Implement Authentication**
 
-- **Logging Middleware**: Logs each request to the console, helpful for monitoring requests.
-- **Proxy Middleware**: Routes requests to different services based on the URL path. `createProxyMiddleware` is used to define the target service and any path rewriting needed.
+   Use middleware to authenticate requests.
 
-### Conclusion
+   ```javascript
+   const authenticate = (req, res, next) => {
+     const token = req.headers['authorization'];
+     if (token === 'valid-token') {
+       next();
+     } else {
+       res.status(401).send('Unauthorized');
+     }
+   };
 
-This setup provides a basic structure for an API Gateway using Express.js. It routes incoming requests to designated backend services and logs each request. This architecture can be extended to include additional features like authentication, caching, and rate limiting to meet specific needs. By centralizing request management, an API Gateway simplifies client interactions with multiple services, enhancing both security and scalability.
+   app.use(authenticate);
+   ```
+
+4. **Add Rate Limiting**
+
+   Use a package like `express-rate-limit` to throttle requests.
+
+   ```javascript
+   const rateLimit = require('express-rate-limit');
+
+   const limiter = rateLimit({
+     windowMs: 15 * 60 * 1000, // 15 minutes
+     max: 100 // limit each IP to 100 requests per windowMs
+   });
+
+   app.use(limiter);
+   ```
+
+5. **Enable Load Balancing**
+
+   Implementing load balancing might require more configuration, often handled by the infrastructure or cloud provider. However, you can start with simple round-robin logic in the gateway if necessary.
+
+## Conclusion
+
+By using Express.js as an API Gateway, you can simplify the management of microservices, centralize key functions like routing, authentication, and rate limiting, and improve the scalability of your application. This setup not only reduces redundancy but also enhances security and performance.
