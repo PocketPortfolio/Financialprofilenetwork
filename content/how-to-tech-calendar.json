@@ -2726,7 +2726,7 @@
     "scheduledTime": "14:00",
     "title": "Building an API Gateway with Express",
     "slug": "building-an-api-gateway-with-express",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2734,7 +2734,8 @@
       "express",
       "building",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-06-18T14:00:50.106Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-batching-jun-19",
