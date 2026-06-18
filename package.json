@@ -248,7 +248,7 @@
     "eslint-plugin-security": "^3.0.1",
     "gray-matter": "^4.0.3",
     "jsdom": "^25.0.0",
-    "marked": "^17.0.5",
+    "marked": "^18.0.5",
     "next-mdx-remote": "^6.0.0",
     "openai": "^6.15.0",
     "pngjs": "^7.0.0",
