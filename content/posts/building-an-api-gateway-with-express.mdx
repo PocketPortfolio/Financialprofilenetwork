@@ -1,0 +1,86 @@
+---
+title: Building an API Gateway with Express
+date: '2026-06-18'
+description: >-
+  Learn how to build a simple API Gateway using Express.js to manage and route
+  requests to multiple backend services.
+tags:
+  - api
+  - express
+  - gateway
+  - nodejs
+author: Pocket Portfolio Team
+image: /images/blog/building-an-api-gateway-with-express.png
+pillar: Tech
+category: how-to-in-tech
+---
+
+## Problem
+
+In a microservices architecture, managing requests to various services can become complex. Each service may have its own API, leading to potential issues with authentication, routing, and monitoring. An API Gateway serves as a single entry point for client requests, simplifying the management of these interactions and providing a centralized point for implementing cross-cutting concerns like authentication, logging, and rate limiting.
+
+## Solution
+
+Building an API Gateway with Express.js, a minimal and flexible Node.js web application framework, allows us to handle routing and middleware efficiently. Below is a step-by-step guide to creating a simple API Gateway.
+
+### Key Concepts
+
+- **Routing**: Directing incoming requests to the appropriate backend services.
+- **Middleware**: Functions that execute during the lifecycle of a request to the server. Useful for logging, authentication, etc.
+- **Proxy**: Forwarding requests to other servers.
+
+### Implementation
+
+First, ensure you have Node.js and npm installed. Initialize a new Node.js project and install Express and http-proxy-middleware:
+
+```bash
+npm init -y
+npm install express http-proxy-middleware
+```
+
+Create an `index.js` file for your API Gateway:
+
+```javascript
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware for logging requests
+app.use((req, res, next) => {
+  console.log(`Request URL: ${req.url}`);
+  next();
+});
+
+// Proxy configuration
+app.use('/service1', createProxyMiddleware({
+  target: 'http://localhost:4001',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/service1': '', // remove base path
+  },
+}));
+
+app.use('/service2', createProxyMiddleware({
+  target: 'http://localhost:4002',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/service2': '', // remove base path
+  },
+}));
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`API Gateway running at http://localhost:${PORT}`);
+});
+```
+
+### Explanation
+
+- **Logging Middleware**: Logs each request to the console, helpful for monitoring requests.
+- **Proxy Middleware**: Routes requests to different services based on the URL path. `createProxyMiddleware` is used to define the target service and any path rewriting needed.
+
+### Conclusion
+
+This setup provides a basic structure for an API Gateway using Express.js. It routes incoming requests to designated backend services and logs each request. This architecture can be extended to include additional features like authentication, caching, and rate limiting to meet specific needs. By centralizing request management, an API Gateway simplifies client interactions with multiple services, enhancing both security and scalability.
