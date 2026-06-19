@@ -2743,14 +2743,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Batching",
     "slug": "how-to-implement-api-request-batching",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-06-19T14:00:37.243Z"
   },
   {
     "id": "how-to-understanding-api-circuit-breaker-pattern-jun-20",
