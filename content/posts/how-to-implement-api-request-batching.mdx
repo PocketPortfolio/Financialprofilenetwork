@@ -2,93 +2,95 @@
 title: How to Implement API Request Batching
 date: '2026-06-19'
 description: >-
-  Learn how to implement API request batching to improve efficiency and reduce
-  server load.
+  Learn how to implement API request batching to enhance performance and
+  efficiency.
 tags:
   - api
-  - request batching
-  - optimization
+  - implement
+  - request
+  - batching
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-api-request-batching.png
-pillar: Engineering
+pillar: technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-With the increase in client-server interactions, APIs often face the challenge of handling numerous individual requests. This can lead to increased server load, degraded performance, and a slower user experience. A common solution to this problem is API request batching, which allows multiple API calls to be combined into a single request, reducing overhead and improving efficiency.
+APIs often face performance bottlenecks due to high volumes of individual requests. Each request carries overhead, such as connection setup and teardown, latency, and processing time. These factors can degrade performance, especially when an application needs to call the API multiple times within a short period. Request batching is a technique to mitigate this issue by combining multiple API requests into a single request, reducing overhead and improving efficiency.
 
 ## Solution with Code
 
-To implement API request batching, you can follow these steps:
+To implement API request batching, you need a server-side endpoint that can handle batch requests and a client-side mechanism to aggregate requests.
 
-1. **Batching Endpoint**: Create a server endpoint that can handle batch requests.
-2. **Client-side Batching**: Modify the client to batch requests and send them to the batching endpoint.
-3. **Processing Batches**: On the server, process each request within the batch and return the results.
+### Server-Side: Node.js Example
 
-### Step-by-Step Implementation
-
-**Server-Side:**
-
-Assuming a Node.js environment with Express:
+Set up an endpoint to handle batch requests. This endpoint will receive an array of API requests, process each one, and return the results in a single response.
 
 ```javascript
 const express = require('express');
 const app = express();
-
 app.use(express.json());
 
-app.post('/batch', (req, res) => {
-  const requests = req.body.requests;
-  const results = requests.map(handleRequest);
-  Promise.all(results)
-    .then(responses => res.json(responses))
-    .catch(error => res.status(500).json({ error: error.message }));
+app.post('/batch', async (req, res) => {
+  const requests = req.body; // Array of request objects
+  const results = await Promise.all(requests.map(async request => {
+    try {
+      // Simulate individual request processing
+      const result = await processRequest(request);
+      return { success: true, data: result };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }));
+
+  res.json(results);
 });
 
-function handleRequest(request) {
-  switch (request.endpoint) {
-    case '/api/data':
-      return fetchData(request.params);
-    // Add more cases as needed
-    default:
-      return Promise.reject(new Error('Unsupported request type'));
-  }
-}
+const processRequest = async (request) => {
+  // Simulate request processing logic
+  return `Processed ${request.endpoint}`;
+};
 
-function fetchData(params) {
-  // Simulate fetching data
-  return Promise.resolve({ data: `Fetched data for ${params.id}` });
-}
-
-app.listen(3000, () => console.log('Server listening on port 3000'));
+app.listen(3000, () => {
+  console.log('Batch API server running on port 3000');
+});
 ```
 
-**Client-Side:**
+### Client-Side: JavaScript Example
 
-Batch requests before sending to the server:
+On the client side, gather requests and send them in a single batch.
 
 ```javascript
-async function batchRequests(requests) {
-  const response = await fetch('/batch', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ requests })
-  });
-  return response.json();
-}
+const batchRequests = async (requests) => {
+  try {
+    const response = await fetch('/batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requests),
+    });
+    const results = await response.json();
+    console.log('Batch results:', results);
+  } catch (error) {
+    console.error('Batch request failed:', error);
+  }
+};
 
-// Usage
-batchRequests([
-  { endpoint: '/api/data', params: { id: 1 } },
-  { endpoint: '/api/data', params: { id: 2 } }
-]).then(console.log);
+// Example usage
+const requests = [
+  { endpoint: '/api/resource1', method: 'GET' },
+  { endpoint: '/api/resource2', method: 'POST', data: { key: 'value' } },
+];
+
+batchRequests(requests);
 ```
 
 ## Key Concepts
 
-- **Batching Endpoint**: A dedicated endpoint to handle batch API calls, reducing the number of requests made to the server.
-- **Client-Side Batching**: Aggregating multiple requests on the client-side to send as a single batch to the server.
-- **Processing Batches**: Efficiently handling each request in the batch on the server and returning consolidated results.
+1. **Batch Endpoint**: This is a dedicated endpoint designed to accept multiple requests in a single call, process them individually, and return their results collectively.
 
-Implementing API request batching can significantly enhance performance, especially in environments where network latency is a concern or when the server is handling high traffic. This approach not only optimizes server load but also improves user experience by reducing the time taken for multiple requests.
+2. **Request Aggregation**: On the client side, gather multiple requests to be sent together. This minimizes the number of HTTP connections and overall latency.
+
+3. **Response Handling**: The server must handle both successful and failed requests within the batch, allowing the client to process results accordingly.
+
+Implementing request batching can significantly improve the performance of API interactions by reducing overhead and latency, especially in environments with high-frequency request patterns.
