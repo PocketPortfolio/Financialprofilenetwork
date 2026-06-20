@@ -2759,14 +2759,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Circuit Breaker Pattern",
     "slug": "understanding-api-circuit-breaker-pattern",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "understanding",
       "circuit"
-    ]
+    ],
+    "publishedAt": "2026-06-20T14:00:57.962Z"
   },
   {
     "id": "how-to-how-to-use-docker-networking-jun-21",
