@@ -1,0 +1,91 @@
+---
+title: Understanding API Circuit Breaker Pattern
+date: '2026-06-20'
+description: >-
+  Learn how to implement the API Circuit Breaker pattern to manage API failures
+  effectively.
+tags:
+  - api
+  - circuit breaker
+  - resilience
+  - pattern
+author: Pocket Portfolio Team
+image: /images/blog/understanding-api-circuit-breaker-pattern.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+### Problem
+
+When dealing with distributed systems, especially those involving multiple API calls, a single point of failure can cause cascading failures, leading to system-wide outages. This is particularly problematic when an external API service is down or under heavy load, causing slow responses or timeouts. Without a mechanism to handle these failures gracefully, your application might repeatedly attempt to call the failing service, exacerbating the problem.
+
+### Solution
+
+The Circuit Breaker pattern is a design pattern used to detect failures and encapsulate the logic of preventing a failure from constantly recurring during maintenance, temporary external system failure, or unexpected system difficulties.
+
+Here's a basic example of how you can implement a Circuit Breaker pattern in JavaScript:
+
+```javascript
+class CircuitBreaker {
+  constructor(request, failureThreshold = 5, successThreshold = 2, timeout = 5000) {
+    this.request = request;
+    this.failureThreshold = failureThreshold;
+    this.successThreshold = successThreshold;
+    this.timeout = timeout;
+    this.state = "CLOSED";
+    this.failureCount = 0;
+    this.successCount = 0;
+    this.nextAttempt = Date.now();
+  }
+
+  async call(...args) {
+    if (this.state === "OPEN") {
+      if (this.nextAttempt <= Date.now()) {
+        this.state = "HALF";
+      } else {
+        throw new Error("Circuit is currently open. Please try again later.");
+      }
+    }
+
+    try {
+      const response = await this.request(...args);
+      this.successCount++;
+      if (this.state === "HALF" && this.successCount >= this.successThreshold) {
+        this.state = "CLOSED";
+        this.failureCount = 0;
+      }
+      return response;
+    } catch (err) {
+      this.failureCount++;
+      if (this.failureCount >= this.failureThreshold) {
+        this.state = "OPEN";
+        this.nextAttempt = Date.now() + this.timeout;
+      }
+      throw err;
+    }
+  }
+}
+
+// Usage Example
+const apiRequest = async () => {
+  // Simulate API request
+  if (Math.random() < 0.7) {
+    throw new Error("API request failed");
+  }
+  return "API request succeeded";
+};
+
+const breaker = new CircuitBreaker(apiRequest);
+
+breaker.call()
+  .then(response => console.log(response))
+  .catch(error => console.error(error.message));
+```
+
+### Key Concepts
+
+- **Closed State**: The circuit breaker allows requests to pass through. If the requests are successful, the system remains in this state.
+- **Open State**: The circuit breaker stops requests from passing through. It enters this state when the failure threshold is reached. It helps prevent the system from making requests that are likely to fail.
+- **Half-Open State**: After a timeout period, the circuit breaker allows a limited number of requests to test if the underlying issue is resolved. If these requests succeed, the system returns to the closed state; otherwise, it switches back to the open state.
+
+By implementing the Circuit Breaker pattern, you can make your systems more resilient and prevent small issues from causing widespread outages.
