@@ -2771,7 +2771,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Replication Lag - Consistency vs Performance",
     "slug": "research-database-replication-lag-consistency-vs-performance-2026-06-20",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2780,7 +2780,8 @@
       "database",
       "replication",
       "lag"
-    ]
+    ],
+    "publishedAt": "2026-06-20T18:00:38.924Z"
   },
   {
     "id": "research-cache-invalidation-strategies-performance-analysis-2026-06-21",
