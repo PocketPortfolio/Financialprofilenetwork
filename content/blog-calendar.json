@@ -1030,7 +1030,7 @@
     "date": "2026-06-21",
     "title": "JSON vs. Proprietary: The Format War for Your Data",
     "slug": "json-vs-proprietary-the-format-war-for-your-data",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1040,7 +1040,8 @@
       "proprietary:"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-21T09:01:16.567Z"
   },
   {
     "id": "week-25-post-2",
