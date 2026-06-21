@@ -1,0 +1,71 @@
+---
+title: How to Use Docker Networking
+date: '2026-06-21'
+description: >-
+  Learn how to effectively use Docker networking for seamless container
+  communication.
+tags:
+  - docker
+  - networking
+  - containers
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-docker-networking.png
+pillar: Infrastructure
+category: how-to-in-tech
+---
+
+## Problem
+
+When working with Docker, one common challenge is enabling seamless communication between containers. Without proper networking, containers may not be able to communicate effectively, leading to integration difficulties and application failures. Understanding Docker networking is crucial for setting up isolated environments and ensuring that containers can talk to each other as required.
+
+## Solution with Code
+
+Docker provides several networking models to facilitate container communication. Below is a basic guide to using Docker's default bridge network and creating a custom bridge network for more control.
+
+### Using the Default Bridge Network
+
+By default, Docker creates a bridge network called `bridge`. Containers launched without specifying a network are connected to this default network.
+
+```bash
+# Run a container using the default bridge network
+docker run -d --name container1 alpine sleep 1000
+docker run -d --name container2 alpine sleep 1000
+
+# Verify connectivity using ping
+docker exec container1 ping -c 2 container2
+```
+
+### Creating a Custom Bridge Network
+
+For more control over network configurations, create a custom bridge network.
+
+```bash
+# Create a custom bridge network
+docker network create my-bridge-network
+
+# Run containers on the custom network
+docker run -d --name custom_container1 --network my-bridge-network alpine sleep 1000
+docker run -d --name custom_container2 --network my-bridge-network alpine sleep 1000
+
+# Verify connectivity within the custom network
+docker exec custom_container1 ping -c 2 custom_container2
+```
+
+### Inspecting Networks
+
+To get details about your networks, use the `docker network inspect` command.
+
+```bash
+# Inspect the custom network
+docker network inspect my-bridge-network
+```
+
+This command provides information about the network including its IP address range, connected containers, and more.
+
+## Key Concepts
+
+- **Bridge Network**: Default network type that allows containers to communicate on a single host.
+- **Custom Bridge Network**: User-defined network that provides more isolation and configurability than the default bridge network.
+- **Container Communication**: Achieved through network connections, enabling data exchange between containers.
+
+Understanding these key Docker networking concepts ensures that your applications are deployed in isolated and secure environments while maintaining the necessary communication channels for functionality. Use these tools to enhance your Docker deployment's networking capabilities.
