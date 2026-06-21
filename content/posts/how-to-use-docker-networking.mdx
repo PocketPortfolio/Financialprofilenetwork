@@ -2,70 +2,88 @@
 title: How to Use Docker Networking
 date: '2026-06-21'
 description: >-
-  Learn how to effectively use Docker networking for seamless container
-  communication.
+  Learn how to effectively use Docker networking to manage communication between
+  containers.
 tags:
   - docker
   - networking
   - containers
+  - how-to
 author: Pocket Portfolio Team
 image: /images/blog/how-to-use-docker-networking.png
-pillar: Infrastructure
+pillar: Tech
 category: how-to-in-tech
 ---
 
+Docker networking is essential for enabling communication between containers, as well as between containers and the host system. Understanding how to use Docker's networking capabilities can help ensure that your containerized applications function efficiently and securely.
+
 ## Problem
 
-When working with Docker, one common challenge is enabling seamless communication between containers. Without proper networking, containers may not be able to communicate effectively, leading to integration difficulties and application failures. Understanding Docker networking is crucial for setting up isolated environments and ensuring that containers can talk to each other as required.
+When deploying containerized applications, managing how these applications communicate within a Docker environment is critical. Without proper networking, containers may not be able to interact with each other or with external resources, leading to failures in distributed systems.
 
-## Solution with Code
+## Solution
 
-Docker provides several networking models to facilitate container communication. Below is a basic guide to using Docker's default bridge network and creating a custom bridge network for more control.
+Docker provides several networking drivers to address these challenges. Here’s a step-by-step guide on using Docker networking effectively.
 
-### Using the Default Bridge Network
+### Step 1: Understanding Docker's Default Network
 
-By default, Docker creates a bridge network called `bridge`. Containers launched without specifying a network are connected to this default network.
+By default, Docker creates a bridge network named `bridge` when it is installed. Containers connected to this network can communicate with each other using IP addresses.
 
 ```bash
-# Run a container using the default bridge network
-docker run -d --name container1 alpine sleep 1000
-docker run -d --name container2 alpine sleep 1000
-
-# Verify connectivity using ping
-docker exec container1 ping -c 2 container2
+# List all Docker networks
+docker network ls
 ```
 
-### Creating a Custom Bridge Network
+### Step 2: Creating a Custom Bridge Network
 
-For more control over network configurations, create a custom bridge network.
+For better isolation and control, you might want to create a custom network.
 
 ```bash
 # Create a custom bridge network
-docker network create my-bridge-network
-
-# Run containers on the custom network
-docker run -d --name custom_container1 --network my-bridge-network alpine sleep 1000
-docker run -d --name custom_container2 --network my-bridge-network alpine sleep 1000
-
-# Verify connectivity within the custom network
-docker exec custom_container1 ping -c 2 custom_container2
+docker network create my_custom_network
 ```
 
-### Inspecting Networks
-
-To get details about your networks, use the `docker network inspect` command.
+Connect containers to this network when running them:
 
 ```bash
-# Inspect the custom network
-docker network inspect my-bridge-network
+# Run a container on the custom network
+docker run -d --name web_container --network my_custom_network nginx
 ```
 
-This command provides information about the network including its IP address range, connected containers, and more.
+### Step 3: Verify Network Connectivity
+
+Use `docker exec` to test communication between containers on the same network.
+
+```bash
+# Connect to the running container
+docker exec -it web_container /bin/bash
+
+# Inside the container, ping another container by its name
+ping another_container
+```
+
+### Step 4: Using the Host Network
+
+For scenarios needing high performance or when you want the container to share the host’s network stack, use the host network driver.
+
+```bash
+# Run a container using the host network
+docker run -d --network host nginx
+```
+
+### Step 5: Isolating Containers with the None Network
+
+To completely isolate a container from any network, use the `none` network driver.
+
+```bash
+# Run a container with no network
+docker run -d --network none nginx
+```
 
 ## Key Concepts
 
-- **Bridge Network**: Default network type that allows containers to communicate on a single host.
-- **Custom Bridge Network**: User-defined network that provides more isolation and configurability than the default bridge network.
-- **Container Communication**: Achieved through network connections, enabling data exchange between containers.
+- **Bridge Network**: Allows containers to communicate on a private subnet.
+- **Host Network**: Shares the host's network stack, suitable for performance-intensive tasks.
+- **None Network**: Completely isolates a container from the network.
 
-Understanding these key Docker networking concepts ensures that your applications are deployed in isolated and secure environments while maintaining the necessary communication channels for functionality. Use these tools to enhance your Docker deployment's networking capabilities.
+Understanding and leveraging these networking drivers allows you to create flexible, secure configurations for your applications. This ensures that your containerized applications can communicate as needed, whether internally within a Docker environment or externally with other systems.
