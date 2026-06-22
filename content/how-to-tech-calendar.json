@@ -2791,14 +2791,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Response Compression",
     "slug": "the-guide-to-api-response-compression",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "response"
-    ]
+    ],
+    "publishedAt": "2026-06-22T14:02:20.133Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-queuing-jun-23",
