@@ -39,7 +39,7 @@
     "xlsx": "npm:@stackline/xlsx@^1.0.2"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^26.0.0",
     "@types/papaparse": "^5.3.14",
     "typescript": "^5.5.4"
   },
