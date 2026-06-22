@@ -2806,7 +2806,7 @@
     "scheduledTime": "18:00",
     "title": "Research: API Gateway Routing Performance - Path Matching Overhead",
     "slug": "research-api-gateway-routing-performance-path-matching-overhead-2026-06-22",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2815,7 +2815,8 @@
       "api",
       "gateway",
       "routing"
-    ]
+    ],
+    "publishedAt": "2026-06-22T18:00:34.283Z"
   },
   {
     "id": "research-websocket-frame-compression-bandwidth-savings-2026-06-23",
