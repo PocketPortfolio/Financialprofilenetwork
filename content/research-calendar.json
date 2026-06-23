@@ -2824,14 +2824,15 @@
     "scheduledTime": "18:00",
     "title": "Research: WebSocket Frame Compression - Bandwidth Savings",
     "slug": "research-websocket-frame-compression-bandwidth-savings-2026-06-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "websocket",
       "frame",
       "compression"
-    ]
+    ],
+    "publishedAt": "2026-06-23T18:00:55.418Z"
   },
   {
     "id": "research-database-index-maintenance-performance-impact-2026-06-24",
