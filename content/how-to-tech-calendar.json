@@ -2807,14 +2807,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Queuing",
     "slug": "how-to-implement-api-request-queuing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-06-23T14:00:46.381Z"
   },
   {
     "id": "how-to-building-a-graphql-api-with-apollo-server-jun-24",
