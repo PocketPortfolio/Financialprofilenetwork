@@ -1048,7 +1048,7 @@
     "date": "2026-06-24",
     "title": "The Weekend Effect: Trading Patterns Revealed",
     "slug": "the-weekend-effect-trading-patterns-revealed",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1058,7 +1058,8 @@
       "weekend"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-24T09:00:49.793Z"
   },
   {
     "id": "week-26-post-1",
