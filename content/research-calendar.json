@@ -2840,7 +2840,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Database Index Maintenance - Performance Impact",
     "slug": "research-database-index-maintenance-performance-impact-2026-06-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2849,7 +2849,8 @@
       "AI",
       "index",
       "maintenance"
-    ]
+    ],
+    "publishedAt": "2026-06-24T18:01:49.000Z"
   },
   {
     "id": "research-message-serialization-performance-json-vs-protobuf-vs-avro-2026-06-25",
