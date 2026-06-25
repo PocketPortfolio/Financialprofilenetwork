@@ -2840,7 +2840,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use PostgreSQL JSONB for Flexible Data",
     "slug": "how-to-use-postgresql-jsonb-for-flexible-data",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2849,7 +2849,8 @@
       "postgresql",
       "postgres",
       "use"
-    ]
+    ],
+    "publishedAt": "2026-06-25T14:00:41.443Z"
   },
   {
     "id": "how-to-understanding-api-load-balancing-jun-26",
