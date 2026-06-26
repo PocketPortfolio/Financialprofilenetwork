@@ -2874,7 +2874,7 @@
     "scheduledTime": "18:00",
     "title": "Research: API Authentication Overhead - OAuth 2.0 vs API Keys",
     "slug": "research-api-authentication-overhead-oauth-2-0-vs-api-keys-2026-06-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2883,7 +2883,8 @@
       "OAuth",
       "api",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-06-26T18:00:46.576Z"
   },
   {
     "id": "research-container-networking-performance-bridge-vs-host-mode-2026-06-27",
