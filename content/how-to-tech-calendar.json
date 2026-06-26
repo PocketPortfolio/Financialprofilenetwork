@@ -2858,14 +2858,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Load Balancing",
     "slug": "understanding-api-load-balancing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "understanding",
       "load"
-    ]
+    ],
+    "publishedAt": "2026-06-26T14:00:57.089Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-deduplication-jun-27",
