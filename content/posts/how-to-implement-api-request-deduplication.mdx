@@ -1,0 +1,85 @@
+---
+title: How to Implement API Request Deduplication
+date: '2026-06-27'
+description: >-
+  Learn how to efficiently handle duplicate API requests to optimize performance
+  and resource utilization.
+tags:
+  - api
+  - request
+  - deduplication
+  - performance
+author: Pocket Portfolio Team
+image: /images/blog/how-to-implement-api-request-deduplication.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+# Problem
+
+In high-traffic applications, duplicate API requests can lead to unnecessary processing, increased server load, and potential data inconsistencies. This can happen due to retries by clients in case of timeouts or network issues, or when multiple clients send identical requests. Deduplicating these requests can significantly improve application performance and reduce resource consumption.
+
+# Solution
+
+To implement API request deduplication, we can use a combination of request hashing and in-memory or distributed caching systems. The idea is to generate a unique hash for each request and store it in a cache. If a request with the same hash is received while the previous one is still being processed, it can be ignored or queued.
+
+## Key Concepts
+
+- **Request Hashing**: Create a unique identifier for each API request based on its parameters and endpoint.
+- **Caching**: Use a cache to store request hashes and their processing states.
+- **Idempotency**: Ensure that processing a request multiple times has the same effect as processing it once.
+
+## Code Implementation
+
+Here's a basic implementation using Node.js and Redis for caching:
+
+```javascript
+const express = require('express');
+const crypto = require('crypto');
+const Redis = require('ioredis');
+
+const app = express();
+const redis = new Redis();
+
+// Middleware to deduplicate requests
+async function deduplicate(req, res, next) {
+  const requestHash = crypto.createHash('sha256').update(req.originalUrl + JSON.stringify(req.body)).digest('hex');
+  const cacheKey = `request:${requestHash}`;
+
+  try {
+    const isDuplicate = await redis.get(cacheKey);
+
+    if (isDuplicate) {
+      return res.status(429).send('Duplicate request detected.');
+    }
+
+    await redis.set(cacheKey, 'processing', 'EX', 60); // Cache for 60 seconds
+    res.on('finish', () => redis.del(cacheKey)); // Remove from cache after response is sent
+
+    next();
+  } catch (error) {
+    console.error('Error processing request deduplication:', error);
+    next();
+  }
+}
+
+app.use(express.json());
+app.use(deduplicate);
+
+app.post('/api/data', async (req, res) => {
+  // Process the request
+  res.send('Request processed successfully');
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+### Explanation
+
+1. **Hash Generation**: We use SHA-256 to generate a hash based on the request URL and body.
+2. **Redis Caching**: The hash is stored in Redis with a short TTL (Time to Live) to prevent immediate duplicates.
+3. **Middleware Logic**: The middleware checks if the request hash exists in Redis. If it does, the request is considered a duplicate. Otherwise, it proceeds with processing.
+
+This approach ensures that only unique requests are processed, reducing unnecessary server load and improving overall efficiency. Adjust the TTL based on expected request processing time and collision likelihood.
