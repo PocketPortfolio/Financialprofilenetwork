@@ -2,84 +2,95 @@
 title: How to Implement API Request Deduplication
 date: '2026-06-27'
 description: >-
-  Learn how to efficiently handle duplicate API requests to optimize performance
-  and resource utilization.
+  Learn to implement API request deduplication to optimize and streamline your
+  backend processes.
 tags:
   - api
   - request
   - deduplication
-  - performance
+  - backend
+  - optimization
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-api-request-deduplication.png
-pillar: Engineering
+pillar: Development
 category: how-to-in-tech
 ---
 
-# Problem
+## Understanding the Problem
 
-In high-traffic applications, duplicate API requests can lead to unnecessary processing, increased server load, and potential data inconsistencies. This can happen due to retries by clients in case of timeouts or network issues, or when multiple clients send identical requests. Deduplicating these requests can significantly improve application performance and reduce resource consumption.
+When building an API, handling duplicate requests efficiently is crucial. Duplicate requests can arise due to network retries, client-side errors, or intentional abuse. These can lead to resource exhaustion, inconsistent data states, and degraded performance. To mitigate these issues, implementing request deduplication is essential.
 
-# Solution
+## Solution with Code
 
-To implement API request deduplication, we can use a combination of request hashing and in-memory or distributed caching systems. The idea is to generate a unique hash for each request and store it in a cache. If a request with the same hash is received while the previous one is still being processed, it can be ignored or queued.
+The solution involves maintaining an idempotency key for each request. This key helps identify and filter out duplicate requests, ensuring each unique request is processed only once.
 
-## Key Concepts
+### Step-by-Step Implementation
 
-- **Request Hashing**: Create a unique identifier for each API request based on its parameters and endpoint.
-- **Caching**: Use a cache to store request hashes and their processing states.
-- **Idempotency**: Ensure that processing a request multiple times has the same effect as processing it once.
+1. **Client-Side Setup**: Ensure each API request includes a unique `idempotency-key` in the headers.
 
-## Code Implementation
+```javascript
+function generateIdempotencyKey() {
+  return `${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}`;
+}
 
-Here's a basic implementation using Node.js and Redis for caching:
+async function makeApiRequest(endpoint, data) {
+  const idempotencyKey = generateIdempotencyKey();
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Idempotency-Key': idempotencyKey
+    },
+    body: JSON.stringify(data)
+  });
+  return response.json();
+}
+```
+
+2. **Server-Side Setup**: Implement a middleware to check and store idempotency keys.
 
 ```javascript
 const express = require('express');
-const crypto = require('crypto');
-const Redis = require('ioredis');
-
 const app = express();
-const redis = new Redis();
+const bodyParser = require('body-parser');
+const deduplicationCache = new Map();
 
-// Middleware to deduplicate requests
-async function deduplicate(req, res, next) {
-  const requestHash = crypto.createHash('sha256').update(req.originalUrl + JSON.stringify(req.body)).digest('hex');
-  const cacheKey = `request:${requestHash}`;
+app.use(bodyParser.json());
 
-  try {
-    const isDuplicate = await redis.get(cacheKey);
-
-    if (isDuplicate) {
-      return res.status(429).send('Duplicate request detected.');
-    }
-
-    await redis.set(cacheKey, 'processing', 'EX', 60); // Cache for 60 seconds
-    res.on('finish', () => redis.del(cacheKey)); // Remove from cache after response is sent
-
-    next();
-  } catch (error) {
-    console.error('Error processing request deduplication:', error);
-    next();
+function deduplicationMiddleware(req, res, next) {
+  const idempotencyKey = req.headers['idempotency-key'];
+  if (!idempotencyKey) {
+    return res.status(400).send('Idempotency key is required.');
   }
+
+  if (deduplicationCache.has(idempotencyKey)) {
+    return res.status(200).send(deduplicationCache.get(idempotencyKey));
+  }
+
+  res.on('finish', () => {
+    if (res.statusCode < 400) {
+      deduplicationCache.set(idempotencyKey, res.locals.responseData);
+      setTimeout(() => deduplicationCache.delete(idempotencyKey), 60000); // Cache expiration
+    }
+  });
+
+  next();
 }
 
-app.use(express.json());
-app.use(deduplicate);
-
-app.post('/api/data', async (req, res) => {
-  // Process the request
-  res.send('Request processed successfully');
+app.post('/api/resource', deduplicationMiddleware, (req, res) => {
+  // Processing the request
+  const responseData = { success: true, message: 'Resource created' };
+  res.locals.responseData = responseData;
+  res.status(201).send(responseData);
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
+app.listen(3000, () => console.log('Server running on port 3000'));
 ```
 
-### Explanation
+## Key Concepts
 
-1. **Hash Generation**: We use SHA-256 to generate a hash based on the request URL and body.
-2. **Redis Caching**: The hash is stored in Redis with a short TTL (Time to Live) to prevent immediate duplicates.
-3. **Middleware Logic**: The middleware checks if the request hash exists in Redis. If it does, the request is considered a duplicate. Otherwise, it proceeds with processing.
+- **Idempotency Key**: A unique identifier for requests to ensure that the same operation is not performed multiple times.
+- **Cache**: A temporary store to keep track of processed keys and responses.
+- **Middleware**: A function that intercepts and processes requests before reaching the endpoint logic.
 
-This approach ensures that only unique requests are processed, reducing unnecessary server load and improving overall efficiency. Adjust the TTL based on expected request processing time and collision likelihood.
+By implementing the above deduplication strategy, you can ensure that your API processes each request only once, improving efficiency and resource management.
