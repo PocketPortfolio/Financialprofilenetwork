@@ -2874,14 +2874,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Deduplication",
     "slug": "how-to-implement-api-request-deduplication",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-06-27T14:00:51.464Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-monitoring-jun-28",
