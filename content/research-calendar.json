@@ -2909,7 +2909,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Data Sovereignty in Finance - 2026 Trends and Benchmarks",
     "slug": "research-data-sovereignty-in-finance-2026-trends-and-benchmarks-2026-06-28",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -2918,7 +2918,8 @@
       "data",
       "sovereignty",
       "finance"
-    ]
+    ],
+    "publishedAt": "2026-06-28T18:00:42.560Z"
   },
   {
     "id": "research-the-true-cost-of-vendor-lock-in-in-financial-technology-2026-06-29",
