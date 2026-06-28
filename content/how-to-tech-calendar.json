@@ -2890,7 +2890,7 @@
     "scheduledTime": "14:00",
     "title": "The Complete Guide to API Monitoring",
     "slug": "the-complete-guide-to-api-monitoring",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2898,7 +2898,8 @@
       "monitoring",
       "complete",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-06-28T14:00:42.705Z"
   },
   {
     "id": "how-to-how-to-build-a-microservices-registry-jun-29",
