@@ -1066,7 +1066,7 @@
     "date": "2026-06-28",
     "title": "The Developer Experience of JSON Finance",
     "slug": "the-developer-experience-of-json-finance",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1076,7 +1076,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-06-28T09:00:58.335Z"
   },
   {
     "id": "week-26-post-2",
