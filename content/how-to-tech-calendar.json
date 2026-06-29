@@ -2907,14 +2907,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a Microservices Registry",
     "slug": "how-to-build-a-microservices-registry",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "microservices",
       "build",
       "registry"
-    ]
+    ],
+    "publishedAt": "2026-06-29T14:00:42.385Z"
   },
   {
     "id": "how-to-june-retro-scaling-apis-for-growth-jun-30",
