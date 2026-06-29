@@ -1,0 +1,82 @@
+---
+title: How to Build a Microservices Registry
+date: '2026-06-29'
+description: >-
+  Learn how to build a microservices registry to keep track of services in a
+  distributed system.
+tags:
+  - microservices
+  - registry
+  - distributed systems
+  - service discovery
+author: Pocket Portfolio Team
+image: /images/blog/how-to-build-a-microservices-registry.png
+pillar: technology
+category: how-to-in-tech
+---
+
+In a microservices architecture, managing and discovering services can become complex as the number of services grows. A microservices registry is crucial for maintaining a list of available services and their instances, facilitating service discovery and load balancing. This guide will walk you through building a basic microservices registry using Node.js and a simple in-memory storage.
+
+### Problem
+
+In a distributed system, services need to discover each other to communicate. Manually configuring service endpoints is error-prone and not scalable. A registry automates this discovery process, allowing services to register themselves and query available services dynamically.
+
+### Solution with Code
+
+We'll implement a simple service registry using a Node.js server. The registry will allow services to register themselves with metadata, such as their address and port. Other services can query this registry to retrieve a list of active services.
+
+```javascript
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+let registry = {};
+
+// Register a service
+app.post('/register', (req, res) => {
+  const { serviceName, serviceAddress } = req.body;
+  if (!serviceName || !serviceAddress) {
+    return res.status(400).send('Invalid request data');
+  }
+  if (!registry[serviceName]) {
+    registry[serviceName] = [];
+  }
+  registry[serviceName].push(serviceAddress);
+  return res.status(200).send(`Service ${serviceName} registered.`);
+});
+
+// Deregister a service
+app.post('/deregister', (req, res) => {
+  const { serviceName, serviceAddress } = req.body;
+  if (!serviceName || !serviceAddress) {
+    return res.status(400).send('Invalid request data');
+  }
+  const addresses = registry[serviceName];
+  if (addresses) {
+    registry[serviceName] = addresses.filter(addr => addr !== serviceAddress);
+    if (registry[serviceName].length === 0) {
+      delete registry[serviceName];
+    }
+  }
+  return res.status(200).send(`Service ${serviceName} deregistered.`);
+});
+
+// Retrieve services
+app.get('/services', (req, res) => {
+  return res.status(200).json(registry);
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Service registry running on port ${PORT}`);
+});
+```
+
+### Key Concepts
+
+- **Service Registration**: Services register themselves with the registry by providing a unique name and address.
+- **Service Discovery**: Clients can query the registry to get the list of active service instances.
+- **In-memory Storage**: This example uses simple in-memory storage for demonstration purposes. For production, consider using a more robust storage solution like a database.
+- **Health Checks**: Implement periodic health checks to ensure services are still active, removing stale entries from the registry.
+
+This basic setup provides a foundational microservices registry that can be expanded with additional features like health checks, security measures, and persistent storage to handle real-world demands.
