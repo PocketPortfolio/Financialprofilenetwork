@@ -2,8 +2,8 @@
 title: 'June Retro: Scaling APIs for Growth'
 date: '2026-06-30'
 description: >-
-  Explore strategies and code examples to efficiently scale your APIs to handle
-  increased traffic and ensure stable performance.
+  Learn how to effectively scale your APIs to handle increased demand while
+  ensuring performance and reliability.
 tags:
   - api
   - june
@@ -11,73 +11,78 @@ tags:
   - scaling
 author: Pocket Portfolio Team
 image: /images/blog/june-retro-scaling-apis-for-growth.png
-pillar: Technology
+pillar: Engineering
 category: how-to-in-tech
 ---
 
 ## Problem
 
-As your application grows, so does the demand on your APIs. High traffic can lead to performance bottlenecks, slow response times, and even downtime. It's crucial to scale your APIs effectively to maintain service quality and user satisfaction. Let's explore a strategy to scale APIs efficiently.
+As your application grows, your APIs need to handle an increasing number of requests without compromising on performance. A failure to scale effectively can lead to slow response times, server crashes, and a poor user experience. In June's retro, we faced a similar challenge when our API usage doubled overnight due to a successful marketing campaign. To address this, we focused on scaling our APIs to sustain growth efficiently.
 
 ## Solution with Code
 
-One effective way to scale APIs is by implementing load balancing with a reverse proxy like NGINX. Load balancing helps distribute incoming requests across multiple servers, ensuring no single server becomes a bottleneck.
+### Load Balancing
 
-### Step 1: Setting Up NGINX as a Load Balancer
+One of the first steps in scaling is distributing traffic across multiple servers to prevent any single server from becoming a bottleneck.
 
-Firstly, install NGINX on your server. On a Linux system, this can be done using:
+```javascript
+const http = require('http');
+const { createProxyServer } = require('http-proxy');
 
-```bash
-sudo apt-get update
-sudo apt-get install nginx
+const proxy = createProxyServer({});
+const serverList = ['http://server1.example.com', 'http://server2.example.com'];
+let currentIndex = 0;
+
+http.createServer((req, res) => {
+  proxy.web(req, res, { target: serverList[currentIndex] });
+  currentIndex = (currentIndex + 1) % serverList.length;
+}).listen(8080);
 ```
 
-### Step 2: Configure NGINX for Load Balancing
+### Caching
 
-Edit the NGINX configuration file, typically located at `/etc/nginx/nginx.conf`. Add an upstream block to define the backend servers:
+Implement caching to reduce the load on your servers by storing frequently requested data.
 
-```nginx
-http {
-    upstream api_servers {
-        server api-server1.example.com;
-        server api-server2.example.com;
-        server api-server3.example.com;
-    }
+```javascript
+const express = require('express');
+const apicache = require('apicache');
 
-    server {
-        listen 80;
+const app = express();
+const cache = apicache.middleware;
 
-        location / {
-            proxy_pass http://api_servers;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
-}
+app.use(cache('5 minutes'));
+
+app.get('/data', (req, res) => {
+  // Fetch data from database
+  res.json({ data: 'This is cached data' });
+});
+
+app.listen(3000);
 ```
 
-This configuration will distribute incoming requests to `api-server1`, `api-server2`, and `api-server3` in a round-robin fashion.
+### Rate Limiting
 
-### Step 3: Test and Deploy
+Protect your API from abuse by limiting the number of requests a user can make.
 
-After configuring, test the NGINX setup for syntax errors:
+```javascript
+const rateLimit = require('express-rate-limit');
 
-```bash
-sudo nginx -t
-```
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
 
-If there are no errors, restart NGINX to apply the changes:
-
-```bash
-sudo systemctl restart nginx
+app.use(limiter);
 ```
 
 ## Key Concepts
 
-- **Load Balancing**: Distributes network or application traffic across a number of servers to ensure no single server is overwhelmed, enhancing performance and reliability.
-- **Reverse Proxy**: Acts as an intermediary for requests from clients seeking resources from servers, providing load balancing, SSL termination, and more.
-- **Scalability**: The capability of a system to handle a growing amount of work by adding resources to the system.
+1. **Horizontal Scaling**: Involves adding more servers to handle increased traffic. This is achieved with load balancers that distribute requests evenly.
+   
+2. **Caching**: Temporarily stores data to reduce server load and improve response times. Common caching strategies include in-memory caching and distributed caching systems like Redis.
 
-By implementing load balancing with NGINX, you can effectively manage increased API traffic, ensuring your application scales to meet higher demands while maintaining performance and reliability. This approach is crucial for sustaining growth and ensuring a seamless user experience.
+3. **Rate Limiting**: Prevents abuse by limiting the number of requests a user can make in a given time period. This protects your API from being overwhelmed by excessive traffic.
+
+4. **Monitoring and Alerts**: Continuously monitor your API performance using tools like Prometheus or Grafana to get real-time alerts on traffic spikes or server issues.
+
+By implementing these strategies, you can ensure your APIs are well-prepared to handle increased demand, providing a seamless experience for your users as your application grows.
