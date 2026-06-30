@@ -2944,7 +2944,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Local-First Architecture - Performance vs Control Trade-offs",
     "slug": "research-local-first-architecture-performance-vs-control-trade-offs-2026-06-30",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "philosophy",
     "keywords": [
@@ -2954,7 +2954,8 @@
       "local-first",
       "local",
       "first"
-    ]
+    ],
+    "publishedAt": "2026-06-30T18:01:07.765Z"
   },
   {
     "id": "research-gdpr-compliance-overhead-performance-impact-analysis-2026-07-01",
