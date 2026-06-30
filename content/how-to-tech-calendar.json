@@ -2923,7 +2923,7 @@
     "scheduledTime": "14:00",
     "title": "June Retro: Scaling APIs for Growth",
     "slug": "june-retro-scaling-apis-for-growth",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2931,7 +2931,8 @@
       "june",
       "retro",
       "scaling"
-    ]
+    ],
+    "publishedAt": "2026-06-30T14:00:52.635Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-transformation-jul-1",
