@@ -2963,7 +2963,7 @@
     "scheduledTime": "18:00",
     "title": "Research: GDPR Compliance Overhead - Performance Impact Analysis",
     "slug": "research-gdpr-compliance-overhead-performance-impact-analysis-2026-07-01",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -2972,7 +2972,8 @@
       "compliance",
       "gdpr",
       "overhead"
-    ]
+    ],
+    "publishedAt": "2026-07-01T18:01:17.501Z"
   },
   {
     "id": "research-encryption-at-rest-vs-transit-performance-comparison-2026-07-02",
