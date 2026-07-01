@@ -2940,14 +2940,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Transformation",
     "slug": "how-to-implement-api-request-transformation",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-07-01T14:00:42.158Z"
   },
   {
     "id": "how-to-understanding-api-gateway-routing-jul-2",
