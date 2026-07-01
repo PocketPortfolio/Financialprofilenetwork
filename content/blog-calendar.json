@@ -1084,7 +1084,7 @@
     "date": "2026-07-01",
     "title": "The Future of Financial Data: Predictions and Trends",
     "slug": "the-future-of-financial-data-predictions-and-trends",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1094,7 +1094,8 @@
       "future"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-01T09:00:36.161Z"
   },
   {
     "id": "week-27-post-1",
