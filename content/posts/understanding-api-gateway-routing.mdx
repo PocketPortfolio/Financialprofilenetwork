@@ -1,15 +1,12 @@
 ---
 title: Understanding API Gateway Routing
 date: '2026-07-02'
-description: >-
-  Learn how to effectively route requests through an API Gateway to improve your
-  application's scalability and reliability.
+description: A technical guide to mastering API Gateway routing with examples.
 tags:
   - api
   - gateway
   - routing
-  - scalability
-  - reliability
+  - technical guide
 author: Pocket Portfolio Team
 image: /images/blog/understanding-api-gateway-routing.png
 pillar: Technology
@@ -18,64 +15,65 @@ category: how-to-in-tech
 
 ## Problem
 
-As applications grow and incorporate multiple services, managing how client requests are routed to the correct service becomes increasingly complex. An API Gateway serves as a crucial component in handling these requests, acting as a single entry point to manage routing, authentication, rate limiting, and more. Without proper routing mechanisms in place, an application can suffer from inefficiencies, reduced performance, and increased maintenance overhead.
+When developing complex applications, managing how requests are routed to various backend services is critical. API Gateways serve as the entry point for client requests but configuring routing rules can be challenging, especially when dealing with multiple services and endpoints.
 
 ## Solution with Code
 
-API Gateway routing can be efficiently managed using configuration files. Let's explore a basic example using the AWS API Gateway with AWS Lambda as the backend service.
+API Gateways like AWS API Gateway or Kong can simplify the routing process, allowing you to define rules that match incoming requests to the appropriate backend service. Below is an example using AWS API Gateway with AWS Lambda as the backend service.
 
 ### Step 1: Define the API Gateway
 
-You can define an API Gateway in AWS using the AWS Management Console, AWS CLI, or AWS CloudFormation. Here, we focus on using a simple AWS CloudFormation template to create an API Gateway with routing logic.
+First, create an API in AWS API Gateway:
 
-```yaml
-Resources:
-  MyApiGateway:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: "MyApiGateway"
-  
-  MyApiGatewayResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      ParentId: !GetAtt 
-        - MyApiGateway
-        - RootResourceId
-      PathPart: "service"
-      RestApiId: !Ref MyApiGateway
-  
-  MyApiGatewayMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      AuthorizationType: "NONE"
-      HttpMethod: "GET"
-      ResourceId: !Ref MyApiGatewayResource
-      RestApiId: !Ref MyApiGateway
-      Integration:
-        Type: "AWS_PROXY"
-        IntegrationHttpMethod: "POST"
-        Uri: !Sub
-          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
+```json
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Sample API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "x-amazon-apigateway-integration": {
+          "uri": "arn:aws:apigateway:region:lambda:path/2015-03-31/functions/arn:aws:lambda:region:account-id:function:UserFunction/invocations",
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      }
+    }
+  }
+}
 ```
 
-### Step 2: Deploy the Lambda Function
+### Step 2: Deploy the API
 
-Ensure your Lambda function is deployed and associated with the API Gateway. The Lambda function handles the business logic and returns the response to the API Gateway, which in turn sends it back to the client.
-
-### Step 3: Test the API Gateway
-
-Once deployed, test the API Gateway by sending HTTP requests to the endpoint. Use tools like `curl` or Postman to verify that requests are correctly routed to your Lambda function.
+Deploy the API to a stage:
 
 ```bash
-curl -X GET https://<api-id>.execute-api.<region>.amazonaws.com/prod/service
+aws apigateway create-deployment --rest-api-id abcdef123 --stage-name prod
+```
+
+### Step 3: Define Routing Rules
+
+In the API Gateway console, you can define routing rules based on HTTP methods and paths. For example, you can route `GET /users` to `UserFunction` and `POST /orders` to `OrderFunction`.
+
+### Step 4: Test the Configuration
+
+Use tools like Postman or curl to test your routes:
+
+```bash
+curl -X GET https://api-id.execute-api.region.amazonaws.com/prod/users
 ```
 
 ## Key Concepts
 
 - **API Gateway**: Acts as a reverse proxy to accept all application programming interface (API) calls, aggregate the various services required to fulfill them, and return the appropriate result.
   
-- **Routing**: The process of defining how requests are directed to various services based on the request path, headers, or other criteria.
+- **Routing**: The process of selecting a path for traffic in a network, or between or across multiple networks. In API Gateways, routing refers to directing requests to the appropriate backend service based on defined rules.
 
-- **AWS Lambda**: A serverless compute service that lets you run code without provisioning or managing servers. Lambda runs your code on a highly available compute infrastructure.
+- **Lambda Integration**: AWS API Gateway can integrate with AWS Lambda, allowing you to run backend services without managing servers.
 
-Understanding and implementing effective API Gateway routing ensures that services are scalable, maintainable, and efficient, thus enhancing the overall application's performance.
+- **Stages and Deployments**: API Gateway allows deploying APIs to different stages (e.g., dev, test, prod), facilitating environment-specific configurations.
+
+By understanding and utilizing these components, you can effectively manage and route traffic in your applications using an API Gateway. This setup not only simplifies the architecture but also enhances scalability and maintainability.
