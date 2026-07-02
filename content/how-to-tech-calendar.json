@@ -2956,14 +2956,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Gateway Routing",
     "slug": "understanding-api-gateway-routing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "understanding",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-07-02T14:01:08.018Z"
   },
   {
     "id": "how-to-how-to-use-docker-volumes-for-data-persistence-jul-3",
