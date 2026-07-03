@@ -1,0 +1,74 @@
+---
+title: How to Use Docker Volumes for Data Persistence
+date: '2026-07-03'
+description: >-
+  Learn how to use Docker volumes to ensure data persistence in your
+  containerized applications.
+tags:
+  - docker
+  - volumes
+  - data persistence
+  - containers
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-docker-volumes-for-data-persistence.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+In containerized environments, ensuring data persistence beyond the lifecycle of containers is crucial. Docker volumes provide a reliable solution for managing persistent data in Docker containers. This guide illustrates how to use Docker volumes effectively to maintain data integrity and persistence.
+
+### Problem
+
+Containers are ephemeral by default, meaning any data stored inside them is lost once the container is stopped or removed. This poses a challenge for applications that require persistent data storage, such as databases or applications with user-generated content.
+
+### Solution with Code
+
+Docker volumes allow data to persist independently of the container's lifecycle. They can be shared among containers and are managed by Docker, simplifying data backup and management.
+
+Here's how you can use Docker volumes:
+
+1. **Create a Docker Volume**: Use the following command to create a new volume named `my-data`:
+
+   ```bash
+   docker volume create my-data
+   ```
+
+2. **Attach the Volume to a Container**: When starting a new container, you can attach the volume using the `-v` or `--mount` flag. Here's an example where `my-data` is mounted to `/app/data` in the container:
+
+   ```bash
+   docker run -d \
+     --name my-container \
+     -v my-data:/app/data \
+     my-image
+   ```
+
+   Alternatively, using the `--mount` flag:
+
+   ```bash
+   docker run -d \
+     --name my-container \
+     --mount source=my-data,target=/app/data \
+     my-image
+   ```
+
+3. **Verify Volume Usage**: To list all your volumes and verify `my-data` is used:
+
+   ```bash
+   docker volume ls
+   ```
+
+   To inspect the specific volume:
+
+   ```bash
+   docker volume inspect my-data
+   ```
+
+### Key Concepts
+
+- **Docker Volumes**: A volume is a preferred mechanism for persisting data generated and used by Docker containers. Volumes are stored outside the container filesystem and on the host machine, making them persistent across container restarts and removals.
+
+- **Data Sharing**: Volumes facilitate data sharing between multiple containers. This is useful for architectures where multiple services need access to the same data.
+
+- **Volume Management**: Docker manages volumes, ensuring they are stored efficiently and securely on the host system. The `docker volume` commands provide a simple interface for creation, inspection, and removal of volumes.
+
+Using Docker volumes is a robust approach to ensure data persistence in your containerized applications, allowing for efficient data management and application scaling.
