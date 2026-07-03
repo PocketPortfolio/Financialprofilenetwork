@@ -2972,14 +2972,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Docker Volumes for Data Persistence",
     "slug": "how-to-use-docker-volumes-for-data-persistence",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "use",
       "volumes"
-    ]
+    ],
+    "publishedAt": "2026-07-03T14:00:39.226Z"
   },
   {
     "id": "how-to-building-a-rest-api-with-koa-js-jul-4",
