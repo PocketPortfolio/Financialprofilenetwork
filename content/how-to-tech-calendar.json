@@ -2988,7 +2988,7 @@
     "scheduledTime": "14:00",
     "title": "Building a REST API with Koa.js",
     "slug": "building-a-rest-api-with-koa-js",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -2996,7 +2996,8 @@
       "rest",
       "koa",
       "building"
-    ]
+    ],
+    "publishedAt": "2026-07-04T14:00:59.756Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-enrichment-jul-5",
