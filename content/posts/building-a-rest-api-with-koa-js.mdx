@@ -1,0 +1,129 @@
+---
+title: Building a REST API with Koa.js
+date: '2026-07-04'
+description: >-
+  Learn how to build a RESTful API using Koa.js, a lightweight and efficient
+  Node.js framework.
+tags:
+  - api
+  - rest
+  - koa
+  - nodejs
+  - javascript
+author: Pocket Portfolio Team
+image: /images/blog/building-a-rest-api-with-koa-js.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Building a REST API is a common requirement for modern web applications. Developers often seek lightweight and efficient frameworks to create APIs that are easy to maintain and extend. Koa.js, developed by the team behind Express.js, offers a minimalist approach with middleware that can enhance API performance and readability.
+
+## Solution
+
+In this guide, we'll walk through the process of building a simple REST API using Koa.js. This API will handle basic CRUD operations for a resource, such as "users".
+
+### Step 1: Initialize Your Project
+
+Begin by setting up a new Node.js project and installing Koa.js:
+
+```bash
+mkdir koa-rest-api
+cd koa-rest-api
+npm init -y
+npm install koa koa-router
+```
+
+### Step 2: Set Up a Basic Koa Server
+
+Create a file named `server.js` and set up the Koa app:
+
+```javascript
+const Koa = require('koa');
+const Router = require('@koa/router');
+
+const app = new Koa();
+const router = new Router();
+
+// Middleware
+app.use(async (ctx, next) => {
+  try {
+    await next();
+  } catch (err) {
+    ctx.status = err.status || 500;
+    ctx.body = err.message;
+  }
+});
+
+// Routes
+router.get('/', (ctx) => {
+  ctx.body = 'Welcome to the Koa REST API!';
+});
+
+app.use(router.routes()).use(router.allowedMethods());
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+### Step 3: Define RESTful Routes
+
+Add CRUD operations for the "users" resource:
+
+```javascript
+const users = [];
+
+router.get('/users', (ctx) => {
+  ctx.body = users;
+});
+
+router.post('/users', (ctx) => {
+  const user = ctx.request.body;
+  users.push(user);
+  ctx.status = 201;
+  ctx.body = user;
+});
+
+router.get('/users/:id', (ctx) => {
+  const user = users.find((u) => u.id === parseInt(ctx.params.id));
+  if (!user) {
+    ctx.throw(404, 'User not found');
+  }
+  ctx.body = user;
+});
+
+router.put('/users/:id', (ctx) => {
+  const id = parseInt(ctx.params.id);
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) {
+    ctx.throw(404, 'User not found');
+  }
+  users[index] = ctx.request.body;
+  ctx.body = users[index];
+});
+
+router.delete('/users/:id', (ctx) => {
+  const id = parseInt(ctx.params.id);
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) {
+    ctx.throw(404, 'User not found');
+  }
+  users.splice(index, 1);
+  ctx.status = 204;
+});
+```
+
+### Step 4: Test the API
+
+Start the server and test the API endpoints using a tool like Postman or cURL.
+
+## Key Concepts
+
+- **Middleware**: Koa.js uses async functions for middleware, providing a more streamlined approach to error handling and request processing.
+- **Routing**: With `koa-router`, defining RESTful routes is straightforward, allowing for clean URL definitions.
+- **Error Handling**: Centralized error handling ensures robust and maintainable code.
+
+By following this guide, you can create a REST API using Koa.js that is simple, efficient, and easily extensible for future features.
