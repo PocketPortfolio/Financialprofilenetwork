@@ -3005,14 +3005,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Enrichment",
     "slug": "how-to-implement-api-request-enrichment",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-07-05T14:00:52.350Z"
   },
   {
     "id": "how-to-the-guide-to-api-response-transformation-jul-6",
