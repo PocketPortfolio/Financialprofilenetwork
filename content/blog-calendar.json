@@ -1102,7 +1102,7 @@
     "date": "2026-07-05",
     "title": "The Psychology of Panic Selling: What Data Reveals",
     "slug": "the-psychology-of-panic-selling-what-data-reveals",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1112,7 +1112,8 @@
       "psychology"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-05T09:00:45.117Z"
   },
   {
     "id": "week-27-post-2",
