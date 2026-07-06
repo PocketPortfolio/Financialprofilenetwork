@@ -3021,14 +3021,15 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Response Transformation",
     "slug": "the-guide-to-api-response-transformation",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "guide",
       "response"
-    ]
+    ],
+    "publishedAt": "2026-07-06T14:01:09.447Z"
   },
   {
     "id": "how-to-how-to-use-postgresql-views-for-complex-queries-jul-7",
