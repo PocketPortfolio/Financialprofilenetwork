@@ -3067,7 +3067,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Homomorphic Encryption - Practical Performance Analysis",
     "slug": "research-homomorphic-encryption-practical-performance-analysis-2026-07-07",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3075,7 +3075,8 @@
       "encryption",
       "homomorphic",
       "practical"
-    ]
+    ],
+    "publishedAt": "2026-07-07T18:00:43.479Z"
   },
   {
     "id": "research-real-time-trading-system-latency-microsecond-analysis-2026-07-08",
