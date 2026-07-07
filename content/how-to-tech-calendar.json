@@ -3037,7 +3037,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use PostgreSQL Views for Complex Queries",
     "slug": "how-to-use-postgresql-views-for-complex-queries",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -3046,7 +3046,8 @@
       "postgres",
       "ws",
       "use"
-    ]
+    ],
+    "publishedAt": "2026-07-07T14:00:53.081Z"
   },
   {
     "id": "how-to-understanding-api-gateway-rate-limiting-jul-8",
