@@ -2,59 +2,62 @@
 title: Understanding API Gateway Rate Limiting
 date: '2026-07-08'
 description: >-
-  Learn how to implement rate limiting in your API Gateway to manage traffic and
-  enhance security.
+  Explore how to implement and understand rate limiting in API gateways to
+  protect your services from being overwhelmed by excessive requests.
 tags:
   - api
   - gateway
   - rate limiting
-  - traffic management
-  - security
+  - tech guide
 author: Pocket Portfolio Team
 image: /images/blog/understanding-api-gateway-rate-limiting.png
 pillar: Technology
 category: how-to-in-tech
 ---
 
-### Problem
+## Problem
 
-In today's digital landscape, APIs serve as the backbone of modern applications, enabling seamless communication between different software systems. However, without proper management, APIs can become overwhelmed, leading to degraded performance, security vulnerabilities, and potential service outages. One critical aspect of managing APIs effectively is implementing rate limiting in the API Gateway. Rate limiting helps control the number of requests a client can make to the API within a specified timeframe, ensuring fair usage and protecting against abuse.
+As APIs become integral to applications, controlling the flow and rate at which requests are processed is crucial. Without effective rate limiting, an API can be overwhelmed by too many requests, leading to degraded performance, downtime, or even denial-of-service attacks. Implementing rate limiting ensures that your API remains responsive and available to legitimate users by capping the number of requests a client can make in a specific timeframe.
 
-### Solution with Code
+## Solution with Code
 
-To implement rate limiting, we will use AWS API Gateway as an example, though the concept applies to most API management platforms. AWS API Gateway allows you to define a usage plan that associates a rate limit with an API.
+API Gateway services, like AWS API Gateway or others, provide built-in support for rate limiting. Here’s how you can configure rate limiting using AWS API Gateway with a simple example.
 
-```json
-{
-  "swagger": "2.0",
-  "info": {
-    "title": "Sample API",
-    "version": "1.0"
-  },
-  "x-amazon-apigateway-throttle": {
-    "burstLimit": 100,
-    "rateLimit": 50
-  }
-}
+### Step-by-Step Configuration in AWS API Gateway
+
+1. **Create an API**: Set up a new API or use an existing one in AWS API Gateway.
+
+2. **Define a Usage Plan**: Navigate to the Usage Plans section and create a new usage plan. Specify the rate limit and burst capacity:
+   - **Rate Limit**: The steady-state number of requests per second.
+   - **Burst Capacity**: The maximum number of requests allowed in a short period.
+
+3. **Attach to an API Stage**: Link the usage plan to a specific API stage.
+
+4. **Create an API Key**: Generate an API key and associate it with the usage plan. This key will be required by clients to access the API at the specified rate limits.
+
+5. **Deploy the API**: Ensure the API is deployed to make the changes effective.
+
+### Example: AWS CLI Commands
+
+Below is an example of how to implement rate limiting using AWS CLI:
+
+```bash
+# Create a usage plan
+aws apigateway create-usage-plan --name "MyUsagePlan" --throttle burstLimit=200,rateLimit=100
+
+# Create an API key
+aws apigateway create-api-key --name "MyAPIKey" --enabled
+
+# Associate the API key with the usage plan
+aws apigateway create-usage-plan-key --usage-plan-id <plan-id> --key-type "API_KEY" --key-id <api-key-id>
 ```
 
-In this configuration:
+## Key Concepts
 
-- `burstLimit`: The maximum number of requests that can be made in a short period (a burst) without being throttled.
-- `rateLimit`: The steady-state rate of requests per second allowed.
+- **Rate Limiting**: Controls the number of requests a client can make in a given period. Helps prevent abuse and ensures fair usage of resources.
+  
+- **Burst Capacity**: Allows temporary spikes in request rate beyond the regular limit, accommodating sudden surges in demand without compromising service stability.
+  
+- **Usage Plan**: Defines how API consumers can access the API. It specifies rate limits and quotas, ensuring that resources are used efficiently and predictably.
 
-For example, if you set a `burstLimit` of 100 and a `rateLimit` of 50, the client can initially make up to 100 requests in a burst, but subsequent requests will be throttled to 50 requests per second.
-
-### Key Concepts
-
-1. **Rate Limit**: This defines the maximum number of requests allowed per second. It ensures the API can handle consistent traffic without overwhelming the backend services.
-
-2. **Burst Limit**: This allows temporary traffic spikes to exceed the rate limit, providing flexibility in handling sudden request surges. However, once the burst limit is reached, throttling occurs.
-
-3. **Throttling**: This is a mechanism to limit the rate of requests. Once the rate or burst limit is exceeded, additional requests are either delayed or rejected.
-
-4. **Usage Plans**: These are configurations in API management platforms that define the rate and burst limits and are associated with API keys to enforce limits on individual users or applications.
-
-5. **Security**: Rate limiting acts as a security layer, preventing abuse and potential denial-of-service attacks by limiting the number of requests a client can make.
-
-By understanding and implementing rate limiting, you can ensure your API remains performant, secure, and fair for all users. This not only improves the user experience but also protects your backend infrastructure from potential overload and attacks.
+Implementing rate limiting is essential in maintaining the health and reliability of your APIs. By leveraging API Gateway features, you can protect your services effectively while still providing a seamless experience for your users.
