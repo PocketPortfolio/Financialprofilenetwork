@@ -3055,14 +3055,15 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Gateway Rate Limiting",
     "slug": "understanding-api-gateway-rate-limiting",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "understanding",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-07-08T14:00:58.712Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-aggregation-jul-9",
