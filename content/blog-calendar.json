@@ -1120,7 +1120,7 @@
     "date": "2026-07-08",
     "title": "The Case for Local-First Finance: Your Data, Your Rules",
     "slug": "the-case-for-local-first-finance-your-data-your-rules",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1130,7 +1130,8 @@
       "local-first"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-08T09:00:58.392Z"
   },
   {
     "id": "week-28-post-1",
