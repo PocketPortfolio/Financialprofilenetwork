@@ -3071,14 +3071,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Aggregation",
     "slug": "how-to-implement-api-request-aggregation",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-07-09T14:00:46.833Z"
   },
   {
     "id": "how-to-building-a-graphql-api-with-graphql-yoga-jul-10",
