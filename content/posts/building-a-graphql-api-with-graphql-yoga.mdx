@@ -1,9 +1,7 @@
 ---
 title: Building a GraphQL API with GraphQL Yoga
 date: '2026-07-10'
-description: >-
-  Learn how to build a GraphQL API using GraphQL Yoga, an efficient and flexible
-  tool for API development.
+description: Learn how to build a GraphQL API using GraphQL Yoga efficiently.
 tags:
   - api
   - graphql
@@ -14,32 +12,34 @@ pillar: Technology
 category: how-to-in-tech
 ---
 
-# Problem
+## Problem
 
-Developers often need to create efficient and flexible APIs that can handle complex data structures and relationships. Traditional REST APIs can become cumbersome when dealing with nested or related data, leading to multiple endpoints and over-fetching or under-fetching of data. GraphQL, on the other hand, allows clients to request only the data they need, making it a powerful solution for modern applications.
+Building APIs efficiently is crucial for modern applications. REST APIs often require multiple endpoints for different queries, leading to over-fetching or under-fetching of data. GraphQL addresses these problems by allowing clients to request only the data they need. However, setting up a GraphQL server can be complex and time-consuming if you are not familiar with the right tools.
 
-# Solution with Code
+## Solution with Code
 
-GraphQL Yoga is a fully-featured GraphQL server that integrates easily with any Node.js project. By using GraphQL Yoga, you can quickly set up a GraphQL API with minimal configuration and benefit from features like subscriptions and real-time capabilities.
+GraphQL Yoga simplifies the process of setting up a GraphQL server. It is built on top of `apollo-server` and `graphql-js`, providing a flexible and easy-to-use API. Here's how you can create a basic GraphQL API using GraphQL Yoga.
 
-## Step 1: Setup Your Node.js Environment
-
-First, initialize a new Node.js project and install GraphQL Yoga:
+First, ensure you have Node.js installed, then initialize a new Node.js project:
 
 ```bash
 mkdir graphql-yoga-api
 cd graphql-yoga-api
 npm init -y
-npm install @graphql-yoga/node
 ```
 
-## Step 2: Define Your GraphQL Schema
+Install GraphQL Yoga and its dependencies:
 
-Create a new file `schema.js` to define your GraphQL schema. This schema will define the types and queries available in your API.
+```bash
+npm install @graphql-yoga/node graphql
+```
+
+Create a file named `server.js`. This file will set up your GraphQL server:
 
 ```javascript
-const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { createServer } = require('@graphql-yoga/node');
 
+// Define your types and resolvers
 const typeDefs = `
   type Query {
     hello: String
@@ -52,38 +52,40 @@ const resolvers = {
   },
 };
 
-module.exports = makeExecutableSchema({ typeDefs, resolvers });
-```
-
-## Step 3: Create and Start Your GraphQL Server
-
-In the main file `index.js`, use GraphQL Yoga to create and start your server:
-
-```javascript
-const { createServer } = require('@graphql-yoga/node');
-const schema = require('./schema');
-
+// Create a GraphQL Yoga server
 const server = createServer({
-  schema,
+  schema: {
+    typeDefs,
+    resolvers,
+  },
 });
 
+// Start the server
 server.start(() => {
-  console.log('GraphQL Server is running at http://localhost:4000');
+  console.log('Server is running at http://localhost:4000');
 });
 ```
 
-Now, run your server with:
+Run your server by executing:
 
 ```bash
-node index.js
+node server.js
 ```
 
-# Key Concepts
+Visit `http://localhost:4000` in your browser. You should see the GraphQL Playground where you can test queries. Try running:
 
-1. **GraphQL Schema**: Defines the structure of your API, including the types of data that can be queried or mutated and the relationships between them.
+```graphql
+{
+  hello
+}
+```
 
-2. **Resolvers**: Functions that resolve the values for the types defined in the schema. They define how the data is fetched and returned to the client.
+## Key Concepts
 
-3. **GraphQL Yoga**: A flexible GraphQL server that simplifies the process of setting up a GraphQL API, offering built-in features like subscriptions, error handling, and more.
+- **GraphQL Schema**: Defines the types and structure of data that can be queried or mutated. In this example, we defined a simple schema with a `Query` type that includes a `hello` field.
 
-By following these steps, you can build a GraphQL API using GraphQL Yoga that is both powerful and easy to extend. This setup forms a solid foundation for building scalable and efficient APIs that can meet the demands of modern applications.
+- **Resolvers**: Functions that provide the response for a query or mutation. Our `hello` resolver returns a static string.
+
+- **GraphQL Yoga**: A flexible and extensible GraphQL server that simplifies the setup process. It provides a built-in Playground for testing queries.
+
+By using GraphQL Yoga, you can quickly set up a GraphQL server that allows clients to fetch only the data they need, reducing over-fetching and under-fetching issues common in REST APIs. This setup provides a starting point to expand and integrate more complex queries and mutations.
