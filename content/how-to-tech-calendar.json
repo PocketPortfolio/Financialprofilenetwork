@@ -3087,14 +3087,15 @@
     "scheduledTime": "14:00",
     "title": "Building a GraphQL API with GraphQL Yoga",
     "slug": "building-a-graphql-api-with-graphql-yoga",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "graphql",
       "building"
-    ]
+    ],
+    "publishedAt": "2026-07-10T14:00:32.396Z"
   },
   {
     "id": "how-to-how-to-use-redis-for-session-management-jul-11",
