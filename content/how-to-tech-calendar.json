@@ -3103,7 +3103,7 @@
     "scheduledTime": "14:00",
     "title": "How to Use Redis for Session Management",
     "slug": "how-to-use-redis-for-session-management",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -3111,7 +3111,8 @@
       "ses",
       "use",
       "session"
-    ]
+    ],
+    "publishedAt": "2026-07-11T14:00:29.583Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-security-headers-jul-12",
