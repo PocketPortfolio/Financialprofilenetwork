@@ -3134,7 +3134,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Market Data Processing - Throughput Benchmarks",
     "slug": "research-market-data-processing-throughput-benchmarks-2026-07-11",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "market",
     "keywords": [
@@ -3142,7 +3142,8 @@
       "market",
       "data",
       "processing"
-    ]
+    ],
+    "publishedAt": "2026-07-11T18:00:43.014Z"
   },
   {
     "id": "research-order-matching-engine-performance-exchange-comparison-2026-07-12",
