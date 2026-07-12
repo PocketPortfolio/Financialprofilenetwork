@@ -3151,7 +3151,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Order Matching Engine Performance - Exchange Comparison",
     "slug": "research-order-matching-engine-performance-exchange-comparison-2026-07-12",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3159,7 +3159,8 @@
       "order",
       "matching",
       "engine"
-    ]
+    ],
+    "publishedAt": "2026-07-12T18:00:58.101Z"
   },
   {
     "id": "research-blockchain-transaction-throughput-layer-2-solutions-2026-07-13",
