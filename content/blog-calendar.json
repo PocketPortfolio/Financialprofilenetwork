@@ -1138,7 +1138,7 @@
     "date": "2026-07-12",
     "title": "Why We Built Sovereign Sync: The Story Behind the Feature",
     "slug": "why-we-built-sovereign-sync-the-story-behind-the-feature",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1148,7 +1148,8 @@
       "built"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-12T09:01:10.572Z"
   },
   {
     "id": "week-28-post-2",
