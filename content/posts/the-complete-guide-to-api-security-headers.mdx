@@ -1,0 +1,101 @@
+---
+title: The Complete Guide to API Security Headers
+date: '2026-07-12'
+description: >-
+  Learn how to secure your API with essential security headers to protect
+  against various threats.
+tags:
+  - api
+  - security
+  - headers
+  - guide
+author: Pocket Portfolio Team
+image: /images/blog/the-complete-guide-to-api-security-headers.png
+pillar: Security
+category: how-to-in-tech
+---
+
+## Problem
+
+APIs serve as the backbone of modern web applications, facilitating communication between clients and servers. However, without proper security measures, APIs become vulnerable to a plethora of attacks such as cross-site scripting (XSS), man-in-the-middle (MITM) attacks, and data breaches. Security headers are a critical line of defense that help protect APIs by enforcing security policies at the HTTP level.
+
+## Solution with Code
+
+Implementing security headers in your API is a straightforward process that involves configuring your server to include specific headers in HTTP responses. Below are some key security headers and examples of how to implement them in a Node.js application using Express.
+
+### Setting Security Headers with Helmet
+
+Helmet is a middleware package for Express apps that simplifies the process of setting various HTTP headers for security.
+
+First, install Helmet:
+
+```bash
+npm install helmet
+```
+
+Then, configure it in your Express app:
+
+```javascript
+const express = require('express');
+const helmet = require('helmet');
+
+const app = express();
+
+// Use Helmet to set security headers
+app.use(helmet());
+
+// Additional specific headers can be configured as needed
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'trusted-scripts.example.com'"],
+  },
+}));
+
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```
+
+### Key Security Headers
+
+1. **Content Security Policy (CSP):** Mitigates XSS attacks by allowing developers to specify the sources from which content can be loaded.
+
+2. **Strict-Transport-Security (HSTS):** Enforces secure (HTTPS) connections to the server, preventing MITM attacks. Example:
+
+   ```javascript
+   app.use(helmet.hsts({
+     maxAge: 31536000, // 1 year in seconds
+     includeSubDomains: true,
+   }));
+   ```
+
+3. **X-Content-Type-Options:** Prevents MIME type sniffing, reducing the risk of executing malicious files. Set it like this:
+
+   ```javascript
+   app.use(helmet.noSniff());
+   ```
+
+4. **X-Frame-Options:** Protects against clickjacking by controlling whether a browser should be allowed to render a page in a frame. Example:
+
+   ```javascript
+   app.use(helmet.frameguard({ action: 'deny' }));
+   ```
+
+5. **Referrer-Policy:** Controls the amount of referrer information sent with requests. This can be set to 'no-referrer' to improve privacy:
+
+   ```javascript
+   app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
+   ```
+
+## Key Concepts
+
+- **Security Headers:** HTTP headers that help protect applications from common vulnerabilities.
+- **Helmet Middleware:** A Node.js package that simplifies the process of setting security headers.
+- **CSP, HSTS, X-Content-Type-Options, X-Frame-Options, and Referrer-Policy:** Key headers that enhance API security.
+
+By implementing these security headers, you can significantly enhance the security posture of your API, protecting it against various types of attacks. Always keep your security practices up-to-date and regularly review them to adapt to new threats.
