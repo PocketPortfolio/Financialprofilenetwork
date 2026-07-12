@@ -2,38 +2,26 @@
 title: The Complete Guide to API Security Headers
 date: '2026-07-12'
 description: >-
-  Learn how to secure your API with essential security headers to protect
-  against various threats.
+  Learn how to implement essential security headers to protect your APIs from
+  common vulnerabilities.
 tags:
   - api
   - security
-  - headers
   - guide
+  - headers
 author: Pocket Portfolio Team
 image: /images/blog/the-complete-guide-to-api-security-headers.png
-pillar: Security
+pillar: engineering
 category: how-to-in-tech
 ---
 
 ## Problem
 
-APIs serve as the backbone of modern web applications, facilitating communication between clients and servers. However, without proper security measures, APIs become vulnerable to a plethora of attacks such as cross-site scripting (XSS), man-in-the-middle (MITM) attacks, and data breaches. Security headers are a critical line of defense that help protect APIs by enforcing security policies at the HTTP level.
+APIs are crucial for modern applications, enabling communication between different systems. However, they are also prime targets for attackers. Without proper security measures, APIs can expose sensitive data and become entry points for attacks such as cross-site scripting (XSS), data injection, and man-in-the-middle attacks. Implementing security headers is a fundamental approach to protect APIs from these vulnerabilities.
 
 ## Solution with Code
 
-Implementing security headers in your API is a straightforward process that involves configuring your server to include specific headers in HTTP responses. Below are some key security headers and examples of how to implement them in a Node.js application using Express.
-
-### Setting Security Headers with Helmet
-
-Helmet is a middleware package for Express apps that simplifies the process of setting various HTTP headers for security.
-
-First, install Helmet:
-
-```bash
-npm install helmet
-```
-
-Then, configure it in your Express app:
+Implementing security headers enhances the security posture of your API. Here’s how you can apply key headers in a Node.js application using Express:
 
 ```javascript
 const express = require('express');
@@ -41,61 +29,46 @@ const helmet = require('helmet');
 
 const app = express();
 
-// Use Helmet to set security headers
+// Use Helmet to set default security headers
 app.use(helmet());
 
-// Additional specific headers can be configured as needed
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'trusted-scripts.example.com'"],
-  },
-}));
+// Custom Security Headers
+app.use((req, res, next) => {
+  // Prevent Clickjacking
+  res.setHeader('X-Frame-Options', 'DENY');
+
+  // Enable XSS Protection
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+
+  // Prevent MIME Sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  // Content Security Policy
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
+
+  // Referrer Policy
+  res.setHeader('Referrer-Policy', 'no-referrer');
+
+  next();
+});
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello, your API is secure!');
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
 ```
-
-### Key Security Headers
-
-1. **Content Security Policy (CSP):** Mitigates XSS attacks by allowing developers to specify the sources from which content can be loaded.
-
-2. **Strict-Transport-Security (HSTS):** Enforces secure (HTTPS) connections to the server, preventing MITM attacks. Example:
-
-   ```javascript
-   app.use(helmet.hsts({
-     maxAge: 31536000, // 1 year in seconds
-     includeSubDomains: true,
-   }));
-   ```
-
-3. **X-Content-Type-Options:** Prevents MIME type sniffing, reducing the risk of executing malicious files. Set it like this:
-
-   ```javascript
-   app.use(helmet.noSniff());
-   ```
-
-4. **X-Frame-Options:** Protects against clickjacking by controlling whether a browser should be allowed to render a page in a frame. Example:
-
-   ```javascript
-   app.use(helmet.frameguard({ action: 'deny' }));
-   ```
-
-5. **Referrer-Policy:** Controls the amount of referrer information sent with requests. This can be set to 'no-referrer' to improve privacy:
-
-   ```javascript
-   app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
-   ```
 
 ## Key Concepts
 
-- **Security Headers:** HTTP headers that help protect applications from common vulnerabilities.
-- **Helmet Middleware:** A Node.js package that simplifies the process of setting security headers.
-- **CSP, HSTS, X-Content-Type-Options, X-Frame-Options, and Referrer-Policy:** Key headers that enhance API security.
+1. **X-Frame-Options**: Protects against clickjacking attacks by controlling whether the browser can display the page in a frame or iframe. Options include `DENY`, `SAMEORIGIN`, or `ALLOW-FROM uri`.
 
-By implementing these security headers, you can significantly enhance the security posture of your API, protecting it against various types of attacks. Always keep your security practices up-to-date and regularly review them to adapt to new threats.
+2. **X-XSS-Protection**: Enables cross-site scripting filters built into most browsers, preventing pages from loading when XSS attacks are detected.
+
+3. **X-Content-Type-Options**: Prevents browsers from MIME-sniffing a response away from the declared content-type, reducing the risk of drive-by downloads.
+
+4. **Content-Security-Policy (CSP)**: Helps prevent various attacks like XSS by specifying which dynamic resources are allowed to load. Adjust the `default-src` directive as necessary for your application needs.
+
+5. **Referrer-Policy**: Controls the amount of referrer information that is passed with requests. The `no-referrer` policy provides the most privacy by not sending any referrer information.
+
+Implementing these headers is a simple yet effective step in hardening your API against common security threats. Adjust and expand the policies to fit the specific security requirements of your application.
