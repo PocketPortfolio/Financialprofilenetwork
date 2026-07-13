@@ -3137,14 +3137,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Filtering",
     "slug": "how-to-implement-api-request-filtering",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-07-13T14:00:51.679Z"
   },
   {
     "id": "how-to-understanding-api-gateway-caching-jul-14",
