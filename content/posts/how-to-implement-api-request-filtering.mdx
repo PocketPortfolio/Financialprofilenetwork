@@ -2,88 +2,88 @@
 title: How to Implement API Request Filtering
 date: '2026-07-13'
 description: >-
-  Learn how to efficiently implement API request filtering to optimize data
-  retrieval and enhance performance.
+  Learn how to implement API request filtering to enhance data retrieval
+  efficiency.
 tags:
   - api
-  - request
-  - filtering
-  - implementation
+  - request filtering
+  - backend development
 author: Pocket Portfolio Team
 image: /images/blog/how-to-implement-api-request-filtering.png
-pillar: technology
+pillar: Development
 category: how-to-in-tech
 ---
 
-APIs are a crucial part of modern software development, enabling communication between different systems. However, retrieving unnecessary data can lead to performance bottlenecks. To address this, implementing request filtering in your APIs is essential. This guide outlines the problem, solution, and key concepts for effective API request filtering.
-
 ## Problem
 
-When APIs return large datasets without any filtering mechanism, it can result in increased bandwidth usage, slower response times, and higher processing loads on both the server and client sides. This inefficiency can degrade the user experience and strain resources.
+APIs often return large datasets that may overwhelm clients with unnecessary data. This can lead to inefficiencies in data processing and increased bandwidth consumption. To mitigate these issues, implementing request filtering in your API can allow clients to specify which data they need, thereby optimizing the data retrieval process.
 
-## Solution with Code
+## Solution
 
-Implementing request filtering involves allowing clients to specify query parameters that control what data is returned. Below is a basic example using Node.js with Express to demonstrate filtering API requests based on query parameters.
+Implementing API request filtering involves allowing clients to pass query parameters that dictate which fields or records they wish to retrieve. Below is a basic implementation using Node.js with Express and a MongoDB database.
 
-### Step 1: Set up your Node.js environment
+### Code Example
 
-First, ensure you have Node.js and Express installed:
+First, ensure your environment is set up with Express and Mongoose:
 
 ```bash
-npm init -y
-npm install express
+npm install express mongoose
 ```
 
-### Step 2: Create a basic Express server with filtering
+Create your Express app and define a route that supports query parameters for filtering:
 
 ```javascript
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
-const port = 3000;
 
-// Sample data
-const data = [
-  { id: 1, name: 'Alice', role: 'developer' },
-  { id: 2, name: 'Bob', role: 'designer' },
-  { id: 3, name: 'Charlie', role: 'manager' },
-];
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/mydatabase', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-// API endpoint with filtering capability
-app.get('/users', (req, res) => {
-  const { role } = req.query;
-  let filteredData = data;
+// Define a sample schema and model
+const itemSchema = new mongoose.Schema({
+  name: String,
+  category: String,
+  price: Number,
+});
 
-  if (role) {
-    filteredData = data.filter(user => user.role === role);
+const Item = mongoose.model('Item', itemSchema);
+
+// API endpoint with filtering
+app.get('/api/items', async (req, res) => {
+  try {
+    const { category, minPrice, maxPrice } = req.query;
+
+    // Build a filter object based on query parameters
+    let filter = {};
+    if (category) filter.category = category;
+    if (minPrice) filter.price = { ...filter.price, $gte: Number(minPrice) };
+    if (maxPrice) filter.price = { ...filter.price, $lte: Number(maxPrice) };
+
+    const items = await Item.find(filter);
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  res.json(filteredData);
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// Start the server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });
 ```
 
-### Step 3: Test your API
+### Key Concepts
 
-Start your server:
+1. **Query Parameters**: These are appended to the URL and extracted using `req.query`. They enable clients to specify their filtering criteria.
 
-```bash
-node server.js
-```
+2. **Dynamic Filtering**: The filter object is constructed dynamically based on the provided query parameters. This allows flexibility in how clients can interact with your API.
 
-You can test the filtering by accessing:
+3. **Database Queries**: Use database query capabilities to filter the data server-side. In this example, MongoDB's query operators like `$gte` (greater than or equal) and `$lte` (less than or equal) are used to filter based on price.
 
-- `http://localhost:3000/users` — returns all users
-- `http://localhost:3000/users?role=developer` — filters users where role is "developer"
+4. **Error Handling**: Proper error handling ensures that clients receive meaningful error messages and your API remains robust.
 
-## Key Concepts
-
-1. **Query Parameters**: These are part of the URL used to pass additional information to the API. In the example, `role` is used as a query parameter to filter data.
-
-2. **Data Filtering**: The process of selectively retrieving data based on certain criteria to reduce the dataset size and improve efficiency.
-
-3. **Performance Optimization**: Filtering data at the API level can significantly reduce the amount of data transferred over the network, leading to faster response times and improved application performance.
-
-By implementing API request filtering, you can enhance the effectiveness of your APIs, providing a more responsive and resource-efficient system. This approach not only improves the user experience but also optimizes server resources.
+By implementing request filtering in your API, you can significantly improve the client-side experience by delivering only the necessary data, thus reducing bandwidth usage and processing time.
