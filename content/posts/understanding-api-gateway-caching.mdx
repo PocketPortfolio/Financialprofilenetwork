@@ -2,8 +2,8 @@
 title: Understanding API Gateway Caching
 date: '2026-07-14'
 description: >-
-  Learn how to implement and optimize caching in an API Gateway to enhance
-  performance and reduce costs.
+  Learn how to implement and understand caching in API Gateways for improved
+  performance and reduced latency.
 tags:
   - api
   - caching
@@ -11,59 +11,67 @@ tags:
   - performance
 author: Pocket Portfolio Team
 image: /images/blog/understanding-api-gateway-caching.png
-pillar: Technology
+pillar: Tech Architecture
 category: how-to-in-tech
 ---
 
 ## Problem
 
-API Gateways often serve as the entry point for client requests in microservices architectures. Without caching, every request may result in a call to the backend service, leading to increased latency and higher costs. For frequently accessed data that does not change often, this can be inefficient.
+In the modern digital landscape, APIs are crucial for enabling communication between different software systems. However, as API usage scales, so do the demands on server resources, leading to increased latency and degraded performance. One common challenge is ensuring that APIs remain responsive under high load, which can be a critical bottleneck in system performance.
 
 ## Solution
 
-Implementing caching at the API Gateway level can significantly reduce the number of requests that reach your backend services, improving response times for end users and reducing operational costs.
+To address performance issues, implementing caching in your API Gateway can be an effective solution. Caching reduces the need to recompute responses for repeated requests, thus decreasing latency and server load. Below, we provide a code-first approach to setting up caching with an API Gateway.
 
-### Code Example: AWS API Gateway Caching
+### Step-by-Step Implementation
 
-To enable caching in AWS API Gateway, follow these steps:
+1. **Configure API Gateway for Caching**
 
-1. **Enable Caching on a Stage:**
+   Assuming you are using AWS API Gateway, follow these steps to enable caching:
 
-   Navigate to your API in the AWS Management Console. Under the "Stages" section, select the desired stage and enable caching.
+   - Navigate to the AWS Management Console and open the API Gateway service.
+   - Select your API and choose the "Stages" section.
+   - Select the stage you wish to enable caching for.
+   - Under the "Cache Settings", enable "Enable API Gateway Caching".
+   - Set the "Cache Size" according to your anticipated load.
 
    ```json
    {
+     "stageName": "prod",
      "cacheClusterEnabled": true,
-     "cacheClusterSize": "0.5"
+     "cacheClusterSize": "0.5" // Cache size in GB
    }
    ```
 
-2. **Configure Method Caching:**
+2. **Define Cache Key Parameters**
 
-   For each API method that requires caching, configure caching settings. For example, to enable caching on a GET method:
+   Customize cache key parameters to ensure that the cache differentiates requests appropriately. This is done by specifying query strings, headers, and request paths that should be considered part of the cache key.
 
    ```json
    {
-     "httpMethod": "GET",
-     "resourceId": "{resource_id}",
-     "restApiId": "{rest_api_id}",
-     "stageName": "{stage_name}",
-     "cacheDataEncrypted": false,
-     "cacheTtlInSeconds": 300,
-     "cachingEnabled": true
+     "methodSettings": {
+       "*/*": {
+         "cachingEnabled": true,
+         "cacheKeyParameters": [
+           "method.request.querystring.page",
+           "method.request.querystring.size"
+         ],
+         "cacheTtlInSeconds": 300
+       }
+     }
    }
    ```
 
-   Set `cacheTtlInSeconds` to define how long the cache should persist data. In this example, it is set to 300 seconds (5 minutes).
+3. **Testing and Verification**
+
+   After configuring the cache, it's crucial to test and verify its effectiveness. Use tools like Postman or curl to make repeated API requests and observe performance improvements.
 
 ## Key Concepts
 
-- **Cache Cluster**: A cache cluster is a memory space where cached data is stored. It can be enabled per stage and configured in terms of size. Larger cache clusters can store more data.
+- **Cache TTL (Time to Live):** This defines how long a cached response remains valid. Setting an appropriate TTL is crucial for balancing between fresh data and reduced latency.
+  
+- **Cache Key:** A unique identifier for a cached response. Properly configuring cache keys ensures that different requests are accurately cached without overwriting each other.
 
-- **TTL (Time to Live)**: TTL is the duration for which a cached response is considered valid. After the TTL expires, the cache is invalidated, and a fresh response is fetched from the backend.
+- **Performance Monitoring:** Regularly monitor the cache hit rate and latency metrics to ensure optimal performance. Adjust cache settings based on usage patterns and performance data.
 
-- **Data Encryption**: Caching can safely store sensitive data by enabling encryption, ensuring that data is encrypted at rest.
-
-- **Cache Invalidation**: It's crucial to manage cache invalidation strategies to ensure that stale data is not served. This can be managed by setting appropriate TTL values and invalidating cache entries explicitly when data changes.
-
-By understanding and implementing caching in your API Gateway, you can greatly enhance the responsiveness of your applications and reduce unnecessary load on backend services.
+By understanding and implementing caching in your API Gateway, you can significantly enhance the performance and reliability of your APIs under high traffic conditions. This approach not only improves responsiveness but also reduces the operational load on your backend systems.
