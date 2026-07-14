@@ -1,0 +1,69 @@
+---
+title: Understanding API Gateway Caching
+date: '2026-07-14'
+description: >-
+  Learn how to implement and optimize caching in an API Gateway to enhance
+  performance and reduce costs.
+tags:
+  - api
+  - caching
+  - gateway
+  - performance
+author: Pocket Portfolio Team
+image: /images/blog/understanding-api-gateway-caching.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+API Gateways often serve as the entry point for client requests in microservices architectures. Without caching, every request may result in a call to the backend service, leading to increased latency and higher costs. For frequently accessed data that does not change often, this can be inefficient.
+
+## Solution
+
+Implementing caching at the API Gateway level can significantly reduce the number of requests that reach your backend services, improving response times for end users and reducing operational costs.
+
+### Code Example: AWS API Gateway Caching
+
+To enable caching in AWS API Gateway, follow these steps:
+
+1. **Enable Caching on a Stage:**
+
+   Navigate to your API in the AWS Management Console. Under the "Stages" section, select the desired stage and enable caching.
+
+   ```json
+   {
+     "cacheClusterEnabled": true,
+     "cacheClusterSize": "0.5"
+   }
+   ```
+
+2. **Configure Method Caching:**
+
+   For each API method that requires caching, configure caching settings. For example, to enable caching on a GET method:
+
+   ```json
+   {
+     "httpMethod": "GET",
+     "resourceId": "{resource_id}",
+     "restApiId": "{rest_api_id}",
+     "stageName": "{stage_name}",
+     "cacheDataEncrypted": false,
+     "cacheTtlInSeconds": 300,
+     "cachingEnabled": true
+   }
+   ```
+
+   Set `cacheTtlInSeconds` to define how long the cache should persist data. In this example, it is set to 300 seconds (5 minutes).
+
+## Key Concepts
+
+- **Cache Cluster**: A cache cluster is a memory space where cached data is stored. It can be enabled per stage and configured in terms of size. Larger cache clusters can store more data.
+
+- **TTL (Time to Live)**: TTL is the duration for which a cached response is considered valid. After the TTL expires, the cache is invalidated, and a fresh response is fetched from the backend.
+
+- **Data Encryption**: Caching can safely store sensitive data by enabling encryption, ensuring that data is encrypted at rest.
+
+- **Cache Invalidation**: It's crucial to manage cache invalidation strategies to ensure that stale data is not served. This can be managed by setting appropriate TTL values and invalidating cache entries explicitly when data changes.
+
+By understanding and implementing caching in your API Gateway, you can greatly enhance the responsiveness of your applications and reduce unnecessary load on backend services.
