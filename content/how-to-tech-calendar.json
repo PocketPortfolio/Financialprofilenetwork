@@ -3153,7 +3153,7 @@
     "scheduledTime": "14:00",
     "title": "Understanding API Gateway Caching",
     "slug": "understanding-api-gateway-caching",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -3161,7 +3161,8 @@
       "caching",
       "understanding",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-07-14T14:00:41.075Z"
   },
   {
     "id": "how-to-how-to-build-a-microservices-discovery-service-jul-15",
