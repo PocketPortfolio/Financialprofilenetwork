@@ -3170,14 +3170,15 @@
     "scheduledTime": "14:00",
     "title": "How to Build a Microservices Discovery Service",
     "slug": "how-to-build-a-microservices-discovery-service",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "microservices",
       "build",
       "discovery"
-    ]
+    ],
+    "publishedAt": "2026-07-15T14:00:34.531Z"
   },
   {
     "id": "how-to-the-developer-s-guide-to-api-contract-testing-jul-16",
