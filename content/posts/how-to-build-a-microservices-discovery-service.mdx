@@ -1,0 +1,88 @@
+---
+title: How to Build a Microservices Discovery Service
+date: '2026-07-15'
+description: >-
+  Learn how to build a microservices discovery service to efficiently manage and
+  locate services in a microservices architecture.
+tags:
+  - microservices
+  - discovery
+  - architecture
+author: Pocket Portfolio Team
+image: /images/blog/how-to-build-a-microservices-discovery-service.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+In a microservices architecture, managing the communication between services can be challenging. As the number of services grows, so does the complexity of ensuring that each service can find and communicate with others. This is where a discovery service becomes essential. It allows services to register and discover each other dynamically, enabling efficient and flexible communication paths.
+
+## Problem
+
+Microservices architectures face the issue of service discovery. Without a discovery service, every service needs to know the location of every other service it communicates with. This leads to hard-coded configurations and makes the system inflexible and difficult to scale. Additionally, changes in service locations (e.g., due to scaling or failures) require updating configurations across multiple services.
+
+## Solution with Code
+
+To tackle this problem, we can build a simple service discovery mechanism using an open-source tool like Consul. Consul provides service discovery, health checks, and a distributed key-value store.
+
+### Setting Up Consul
+
+1. **Install Consul**: Follow the [Consul installation guide](https://www.consul.io/docs/install) for your operating system.
+
+2. **Run Consul Agent**: Start a Consul agent in development mode:
+
+   ```bash
+   consul agent -dev
+   ```
+
+3. **Register a Service**: Create a JSON file to define your service. For example, `service.json`:
+
+   ```json
+   {
+     "service": {
+       "name": "web",
+       "tags": ["rails"],
+       "port": 80
+     }
+   }
+   ```
+
+   Register this service with Consul:
+
+   ```bash
+   curl --request PUT --data @service.json http://localhost:8500/v1/agent/service/register
+   ```
+
+4. **Discover Services**: Use the Consul HTTP API to discover services. For instance, to find all services:
+
+   ```bash
+   curl http://localhost:8500/v1/catalog/services
+   ```
+
+   This will return a list of all registered services.
+
+### Implementing Service Discovery in Code
+
+Here's a basic Node.js example to query Consul for service discovery:
+
+```javascript
+const axios = require('axios');
+
+async function discoverService(serviceName) {
+  const response = await axios.get(`http://localhost:8500/v1/catalog/service/${serviceName}`);
+  return response.data;
+}
+
+discoverService('web').then(services => {
+  console.log('Discovered services:', services);
+}).catch(error => {
+  console.error('Error discovering services:', error);
+});
+```
+
+## Key Concepts
+
+- **Service Registration**: Services register themselves with the discovery service, providing details like name, address, and port.
+- **Service Discovery**: Services query the discovery service to find other services' locations dynamically.
+- **Health Checks**: Consul can perform health checks to ensure that services are available before directing traffic to them.
+
+By implementing a service discovery mechanism, you create a more resilient and scalable system. This approach reduces the need for manual configuration updates and allows your microservices architecture to adapt to changes dynamically.
