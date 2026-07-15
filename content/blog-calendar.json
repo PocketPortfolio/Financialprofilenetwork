@@ -1156,7 +1156,7 @@
     "date": "2026-07-15",
     "title": "Version Control for Portfolios: Git as a Financial Tool",
     "slug": "version-control-for-portfolios-git-as-a-financial-tool",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1166,7 +1166,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-15T09:01:27.605Z"
   },
   {
     "id": "week-29-post-1",
