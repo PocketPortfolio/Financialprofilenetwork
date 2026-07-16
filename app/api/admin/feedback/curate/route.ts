@@ -22,6 +22,7 @@ function getDb() {
 }
 
 async function requireAdmin(request: NextRequest): Promise<{ uid: string; email?: string }> {
+  getDb(); // must init Admin SDK before getAuth()
   const authHeader = request.headers.get('authorization');
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
   if (!token) throw Object.assign(new Error('Unauthorized'), { status: 401 });

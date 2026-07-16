@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+    getDb(); // must init Admin SDK before getAuth()
     const decoded = await getAuth().verifyIdToken(token);
     const uid = decoded.uid;
     const email = (decoded as { email?: string }).email ?? null;
