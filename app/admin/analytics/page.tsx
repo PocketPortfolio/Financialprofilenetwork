@@ -228,6 +228,15 @@ export default function AdminAnalyticsPage() {
   const [checkingAdmin, setCheckingAdmin] = useState(true);
   const [manualRefresh, setManualRefresh] = useState(0);
 
+  // Feedback substrate (Phase 1) — fetched from dedicated admin routes (Bearer token).
+  const [feedbackSubmissions, setFeedbackSubmissions] = useState<any[]>([]);
+  const [feedbackAlerts, setFeedbackAlerts] = useState<any[]>([]);
+  const [featuredPocket, setFeaturedPocket] = useState<any[]>([]);
+  const [featuredOpen, setFeaturedOpen] = useState<any[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+  const [curateBusyId, setCurateBusyId] = useState<string | null>(null);
+
   // Check admin status
   useEffect(() => {
     const checkAdmin = async () => {
@@ -288,6 +297,85 @@ export default function AdminAnalyticsPage() {
     }
   }, [isAdmin, checkingAdmin, timeRange]);
 
+  const fetchFeedbackData = useCallback(async () => {
+    if (!isAdmin || checkingAdmin || !user) return;
+    try {
+      setFeedbackLoading(true);
+      setFeedbackError(null);
+      const token = await user.getIdToken(true);
+
+      const [subsRes, alertsRes, pocketRes, openRes] = await Promise.all([
+        fetch(`/api/admin/feedback/submissions?limit=200&_=${Date.now()}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+        }),
+        fetch(`/api/admin/feedback/alerts?limit=200&_=${Date.now()}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+        }),
+        fetch(`/api/feedback/featured?surface=pocket&_=${Date.now()}`, { cache: 'no-store' }),
+        fetch(`/api/feedback/featured?surface=open&_=${Date.now()}`, { cache: 'no-store' }),
+      ]);
+
+      const subsJson = await subsRes.json().catch(() => ({}));
+      const alertsJson = await alertsRes.json().catch(() => ({}));
+      const pocketJson = await pocketRes.json().catch(() => ({}));
+      const openJson = await openRes.json().catch(() => ({}));
+
+      const errors: string[] = [];
+      if (!subsRes.ok) errors.push(subsJson?.error ?? 'Failed to load feedback submissions');
+      else setFeedbackSubmissions(Array.isArray(subsJson?.submissions) ? subsJson.submissions : []);
+
+      if (!alertsRes.ok) errors.push(alertsJson?.error ?? 'Failed to load feedback alerts');
+      else setFeedbackAlerts(Array.isArray(alertsJson?.alerts) ? alertsJson.alerts : []);
+
+      if (!pocketRes.ok) errors.push(pocketJson?.error ?? 'Failed to load featured receipts (pocket)');
+      else setFeaturedPocket(Array.isArray(pocketJson?.receipts) ? pocketJson.receipts : []);
+
+      if (!openRes.ok) errors.push(openJson?.error ?? 'Failed to load featured receipts (open)');
+      else setFeaturedOpen(Array.isArray(openJson?.receipts) ? openJson.receipts : []);
+
+      setFeedbackError(errors.length ? errors.join(' · ') : null);
+    } catch (e: any) {
+      setFeedbackError(e?.message ?? 'Failed to load feedback');
+    } finally {
+      setFeedbackLoading(false);
+    }
+  }, [isAdmin, checkingAdmin, user]);
+
+  async function curateReceipt(params: {
+    action: 'create' | 'update' | 'unfeature';
+    surface: 'pocket' | 'open';
+    receiptId?: string;
+    submissionId?: string;
+    quote?: string;
+    tagline?: string | null;
+    rating?: number | null;
+    expiresAt?: string | null;
+  }) {
+    if (!user) return;
+    try {
+      setFeedbackError(null);
+      setCurateBusyId(params.receiptId ?? 'new');
+      const token = await user.getIdToken(true);
+      const res = await fetch('/api/admin/feedback/curate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(params),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error ?? 'Failed to curate');
+      await fetchFeedbackData();
+    } catch (e: any) {
+      setFeedbackError(e?.message ?? 'Failed to curate');
+    } finally {
+      setCurateBusyId(null);
+    }
+  }
+
   // Fetch analytics data — near–real-time poll + manual refresh
   useEffect(() => {
     if (!isAdmin || checkingAdmin) {
@@ -295,6 +383,7 @@ export default function AdminAnalyticsPage() {
     }
 
     void fetchAnalyticsData();
+    void fetchFeedbackData();
 
     // Long interval: admin dashboard previously polled every 45s and contributed to Firestore read spikes.
     const intervalMs = 10 * 60 * 1000;
@@ -302,7 +391,7 @@ export default function AdminAnalyticsPage() {
       void fetchAnalyticsData();
     }, intervalMs);
     return () => clearInterval(interval);
-  }, [isAdmin, checkingAdmin, timeRange, manualRefresh, fetchAnalyticsData]);
+  }, [isAdmin, checkingAdmin, timeRange, manualRefresh, fetchAnalyticsData, fetchFeedbackData]);
 
   // Show loading while checking auth
   if (loading || checkingAdmin) {
@@ -923,6 +1012,440 @@ export default function AdminAnalyticsPage() {
                     : 0
                 }
               />
+            </div>
+          </section>
+
+          {/* Feedback Substrate (Phase 1) */}
+          <section
+            style={{
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '12px',
+              padding: 'var(--space-6)',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                marginBottom: 'var(--space-2)',
+                color: 'var(--text)',
+              }}
+            >
+              🧪 Feedback Substrate
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>
+              Power-user signal intake (scrubbed) → P0 router (write-path) → CMS receipts → public landings.
+              Promoting copies a curated excerpt to the public index; the scrubbed vault record stays for audit.
+            </p>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                gap: 'var(--space-3)',
+                marginBottom: 'var(--space-4)',
+              }}
+            >
+              <MetricCard
+                label="Submissions"
+                value={String(feedbackSubmissions.length)}
+                subtitle="feedbackSubmissions vault"
+              />
+              <MetricCard
+                label="P0 alerts"
+                value={String(feedbackAlerts.length)}
+                subtitle="feedbackAlertDeliveries"
+              />
+              <MetricCard
+                label="Featured (Pocket)"
+                value={String(featuredPocket.length)}
+                subtitle="public /landing"
+              />
+              <MetricCard
+                label="Featured (Open)"
+                value={String(featuredOpen.length)}
+                subtitle="public /open"
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
+              <button
+                onClick={() => void fetchFeedbackData()}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)',
+                  background: 'transparent',
+                  color: 'var(--text)',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                Refresh feedback
+              </button>
+              {feedbackLoading && <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Loading…</span>}
+              {feedbackError && <span style={{ fontSize: '12px', color: 'var(--danger)' }}>{feedbackError}</span>}
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                gap: 'var(--space-4)',
+                alignItems: 'start',
+              }}
+            >
+              <div style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>
+                  Submissions (latest)
+                </div>
+                <div style={{ maxHeight: '420px', overflow: 'auto' }}>
+                  {(() => {
+                    const awaiting = feedbackSubmissions.filter(
+                      (s) => !s?.featuredReceiptIds?.pocket && !s?.featuredReceiptIds?.open
+                    );
+                    const curated = feedbackSubmissions.filter(
+                      (s) => s?.featuredReceiptIds?.pocket || s?.featuredReceiptIds?.open
+                    );
+
+                    const renderSubmissionCard = (
+                      s: any,
+                      opts: { curated: boolean }
+                    ) => {
+                      const onPocket = !!s?.featuredReceiptIds?.pocket;
+                      const onOpen = !!s?.featuredReceiptIds?.open;
+                      return (
+                        <div
+                          key={s.id}
+                          style={{
+                            padding: '12px 14px',
+                            borderBottom: '1px solid var(--border)',
+                            background: opts.curated
+                              ? 'color-mix(in srgb, var(--surface) 82%, black)'
+                              : 'color-mix(in srgb, var(--surface) 92%, black)',
+                            opacity: opts.curated ? 0.88 : 1,
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 700 }}>
+                              {s.category ?? '—'} · {s.rating ?? '—'}/5 · {s.friction ?? '—'}
+                            </div>
+                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                              {s.createdAt ? new Date(s.createdAt).toLocaleString('en-GB') : '—'}
+                            </div>
+                          </div>
+                          <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            anon: <code>{String(s.anonUserHash ?? '').slice(0, 14)}…</code> · tier: {s.tierBand ?? '—'}
+                          </div>
+                          {(onPocket || onOpen) && (
+                            <div style={{ marginTop: '8px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                              {onPocket && (
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    padding: '3px 8px',
+                                    borderRadius: '999px',
+                                    border: '1px solid var(--accent-warm)',
+                                    color: 'var(--accent-warm)',
+                                  }}
+                                >
+                                  Featured on Pocket
+                                </span>
+                              )}
+                              {onOpen && (
+                                <span
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 700,
+                                    padding: '3px 8px',
+                                    borderRadius: '999px',
+                                    border: '1px solid var(--border)',
+                                    color: 'var(--text-secondary)',
+                                  }}
+                                >
+                                  Featured on Open
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          <div style={{ marginTop: '8px', fontSize: '13px', lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
+                            {(s.commentScrubbed ?? '').slice(0, 240)}
+                            {(s.commentScrubbed ?? '').length > 240 ? '…' : ''}
+                          </div>
+                          {(!onPocket || !onOpen) && (
+                            <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                              {!onPocket && (
+                                <button
+                                  onClick={() =>
+                                    void curateReceipt({
+                                      action: 'create',
+                                      surface: 'pocket',
+                                      submissionId: s.id,
+                                      quote: String(s.commentScrubbed ?? '').slice(0, 320),
+                                      tagline: String(s.category ?? '').slice(0, 120) || null,
+                                      rating: typeof s.rating === 'number' ? s.rating : null,
+                                      expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+                                    })
+                                  }
+                                  disabled={curateBusyId === 'new'}
+                                  style={{
+                                    padding: '8px 10px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--accent-warm)',
+                                    background: 'var(--accent-warm)',
+                                    color: '#0f1216',
+                                    cursor: 'pointer',
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  Promote → Pocket
+                                </button>
+                              )}
+                              {!onOpen && (
+                                <button
+                                  onClick={() =>
+                                    void curateReceipt({
+                                      action: 'create',
+                                      surface: 'open',
+                                      submissionId: s.id,
+                                      quote: String(s.commentScrubbed ?? '').slice(0, 320),
+                                      tagline: String(s.category ?? '').slice(0, 120) || null,
+                                      rating: typeof s.rating === 'number' ? s.rating : null,
+                                      expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+                                    })
+                                  }
+                                  disabled={curateBusyId === 'new'}
+                                  style={{
+                                    padding: '8px 10px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border)',
+                                    background: 'transparent',
+                                    color: 'var(--text)',
+                                    cursor: 'pointer',
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  Promote → Open
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    };
+
+                    return (
+                      <>
+                        {awaiting.length > 0 && (
+                          <div
+                            style={{
+                              padding: '8px 14px',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              letterSpacing: '0.04em',
+                              textTransform: 'uppercase',
+                              color: 'var(--text-secondary)',
+                              borderBottom: '1px solid var(--border)',
+                              background: 'color-mix(in srgb, var(--surface) 96%, black)',
+                            }}
+                          >
+                            Awaiting curation ({awaiting.length})
+                          </div>
+                        )}
+                        {awaiting.map((s) => renderSubmissionCard(s, { curated: false }))}
+                        {curated.length > 0 && (
+                          <div
+                            style={{
+                              padding: '8px 14px',
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              letterSpacing: '0.04em',
+                              textTransform: 'uppercase',
+                              color: 'var(--text-secondary)',
+                              borderBottom: '1px solid var(--border)',
+                              borderTop: awaiting.length > 0 ? '1px solid var(--border)' : undefined,
+                              background: 'color-mix(in srgb, var(--surface) 96%, black)',
+                            }}
+                          >
+                            Curated — vault copy retained ({curated.length})
+                          </div>
+                        )}
+                        {curated.map((s) => renderSubmissionCard(s, { curated: true }))}
+                      </>
+                    );
+                  })()}
+                  {feedbackSubmissions.length === 0 && (
+                    <div style={{ padding: '12px 14px', color: 'var(--text-secondary)' }}>No submissions yet.</div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+                <div style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>
+                    Featured receipts — Pocket (public)
+                  </div>
+                  <div style={{ maxHeight: '220px', overflow: 'auto' }}>
+                    {featuredPocket.map((r) => (
+                      <div key={r.id} style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                          {r.tagline ?? '—'} {typeof r.rating === 'number' ? `· ${r.rating}/5` : ''}
+                        </div>
+                        <div style={{ marginTop: '6px', fontSize: '13px', whiteSpace: 'pre-wrap' }}>
+                          {String(r.quote ?? '').slice(0, 220)}
+                          {String(r.quote ?? '').length > 220 ? '…' : ''}
+                        </div>
+                        <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => {
+                              const nextQuote = window.prompt('Edit quote', String(r.quote ?? '')) ?? '';
+                              if (!nextQuote.trim()) return;
+                              const nextTagline = window.prompt('Edit tagline (optional)', String(r.tagline ?? '')) ?? '';
+                              const nextExpires = window.prompt('Edit expiresAt ISO (optional)', String(r.expiresAt ?? '')) ?? '';
+                              void curateReceipt({
+                                action: 'update',
+                                surface: 'pocket',
+                                receiptId: r.id,
+                                quote: nextQuote,
+                                tagline: nextTagline.trim() ? nextTagline.trim() : null,
+                                rating: typeof r.rating === 'number' ? r.rating : null,
+                                expiresAt: nextExpires.trim() ? nextExpires.trim() : null,
+                              });
+                            }}
+                            disabled={curateBusyId === r.id}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              border: '1px solid var(--border)',
+                              background: 'transparent',
+                              color: 'var(--text)',
+                              cursor: 'pointer',
+                              fontWeight: 700,
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => void curateReceipt({ action: 'unfeature', surface: 'pocket', receiptId: r.id })}
+                            disabled={curateBusyId === r.id}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              border: '1px solid color-mix(in srgb, var(--danger) 55%, var(--border))',
+                              background: 'transparent',
+                              color: 'var(--danger)',
+                              cursor: 'pointer',
+                              fontWeight: 800,
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {featuredPocket.length === 0 && (
+                      <div style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>No featured receipts.</div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>
+                    Featured receipts — Open (public)
+                  </div>
+                  <div style={{ maxHeight: '220px', overflow: 'auto' }}>
+                    {featuredOpen.map((r) => (
+                      <div key={r.id} style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                          {r.tagline ?? '—'} {typeof r.rating === 'number' ? `· ${r.rating}/5` : ''}
+                        </div>
+                        <div style={{ marginTop: '6px', fontSize: '13px', whiteSpace: 'pre-wrap' }}>
+                          {String(r.quote ?? '').slice(0, 220)}
+                          {String(r.quote ?? '').length > 220 ? '…' : ''}
+                        </div>
+                        <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => {
+                              const nextQuote = window.prompt('Edit quote', String(r.quote ?? '')) ?? '';
+                              if (!nextQuote.trim()) return;
+                              const nextTagline = window.prompt('Edit tagline (optional)', String(r.tagline ?? '')) ?? '';
+                              const nextExpires = window.prompt('Edit expiresAt ISO (optional)', String(r.expiresAt ?? '')) ?? '';
+                              void curateReceipt({
+                                action: 'update',
+                                surface: 'open',
+                                receiptId: r.id,
+                                quote: nextQuote,
+                                tagline: nextTagline.trim() ? nextTagline.trim() : null,
+                                rating: typeof r.rating === 'number' ? r.rating : null,
+                                expiresAt: nextExpires.trim() ? nextExpires.trim() : null,
+                              });
+                            }}
+                            disabled={curateBusyId === r.id}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              border: '1px solid var(--border)',
+                              background: 'transparent',
+                              color: 'var(--text)',
+                              cursor: 'pointer',
+                              fontWeight: 700,
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => void curateReceipt({ action: 'unfeature', surface: 'open', receiptId: r.id })}
+                            disabled={curateBusyId === r.id}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              border: '1px solid color-mix(in srgb, var(--danger) 55%, var(--border))',
+                              background: 'transparent',
+                              color: 'var(--danger)',
+                              cursor: 'pointer',
+                              fontWeight: 800,
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {featuredOpen.length === 0 && (
+                      <div style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>No featured receipts.</div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ border: '1px solid var(--border)', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>
+                    P0 alert deliveries (latest)
+                  </div>
+                  <div style={{ maxHeight: '240px', overflow: 'auto' }}>
+                    {feedbackAlerts.slice(0, 80).map((a) => (
+                      <div key={a.id} style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 700 }}>
+                            {a.category ?? '—'} · {a.surface ?? '—'}
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            {a.createdAt ? new Date(a.createdAt).toLocaleString('en-GB') : '—'}
+                          </div>
+                        </div>
+                        <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                          email: {a.email?.ok ? 'ok' : 'fail'} · webhook: {a.webhook?.ok ? 'ok' : 'fail'} · sub:{' '}
+                          <code>{String(a.submissionId ?? '').slice(0, 10)}…</code>
+                        </div>
+                      </div>
+                    ))}
+                    {feedbackAlerts.length === 0 && (
+                      <div style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>No alerts yet.</div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 

@@ -14,7 +14,7 @@ export default function RetailTrustSection() {
         background: 'linear-gradient(135deg, var(--surface) 0%, var(--warm-bg) 100%)',
         borderTop: '1px solid var(--border-warm)',
         borderBottom: '1px solid var(--border-warm)',
-        marginBottom: 'clamp(60px, 10vw, 120px)',
+        marginBottom: 'clamp(32px, 6vw, 56px)',
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>

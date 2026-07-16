@@ -123,6 +123,26 @@ export async function sendSupportEmail(
   return { id: data?.id };
 }
 
+/** Feedback P0 alerts: send to engineering inbox with scrubbed excerpt. */
+export async function sendFeedbackP0AlertEmail(params: {
+  to: string | string[];
+  subject: string;
+  html: string;
+  replyTo?: string;
+}): Promise<{ id?: string; error?: string }> {
+  const payload: Record<string, unknown> = {
+    from: process.env.FEEDBACK_ALERT_FROM?.trim() || 'Pocket Portfolio Alerts <ai@pocketportfolio.app>',
+    to: params.to,
+    subject: params.subject,
+    html: params.html,
+    tags: [{ name: 'campaign', value: 'feedback_p0' }],
+  };
+  if (params.replyTo) payload.replyTo = params.replyTo;
+  const { data, error } = await getStackRevealResend().emails.send(payload as any);
+  if (error) return { error: error.message };
+  return { id: data?.id };
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')

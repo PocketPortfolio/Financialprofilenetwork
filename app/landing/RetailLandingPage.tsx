@@ -8,6 +8,7 @@ import LandingProductionNavbar from '../components/marketing/RetailProductionNav
 import RetailLandingHero from '../components/landing/RetailLandingHero';
 import { AnalystVideo } from '../components/landing/AnalystVideo';
 import RetailTrustSection from '../components/landing/RetailTrustSection';
+import { VerifiedReceiptsSection } from '../components/landing/VerifiedReceiptsSection';
 import ProductPortalSection from '../components/pocket-landing/ProductPortalSection';
 import RetailLandingFaq from '../components/landing/RetailLandingFaq';
 import { useAuth } from '../hooks/useAuth';
@@ -69,6 +70,8 @@ export default function RetailLandingPage() {
       </div>
 
       <RetailTrustSection />
+
+      <VerifiedReceiptsSection surface="pocket" />
 
       <main className="brand-surface brand-grid mobile-container">
         <ProductPortalSection variant="retail" />
