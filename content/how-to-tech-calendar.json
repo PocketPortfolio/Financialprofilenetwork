@@ -3186,7 +3186,7 @@
     "scheduledTime": "14:00",
     "title": "The Developer's Guide to API Contract Testing",
     "slug": "the-developer-s-guide-to-api-contract-testing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -3194,7 +3194,8 @@
       "testing",
       "developer",
       "guide"
-    ]
+    ],
+    "publishedAt": "2026-07-16T14:01:33.272Z"
   },
   {
     "id": "how-to-how-to-use-docker-compose-for-multi-container-apps-jul-17",
