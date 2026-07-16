@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import Logo from '../components/Logo';
 import ThemeSwitcher from '../components/ThemeSwitcher';
 import CommunityContent from '../components/CommunityContent';
+import { VerifiedReceiptsSection } from '../components/landing/VerifiedReceiptsSection';
 import SocialShare from '../components/viral/SocialShare';
 import FunnelTracker from '../components/analytics/FunnelTracker';
 import { LocalProcessingTerminal } from '../components/LocalProcessingTerminal';
@@ -2316,6 +2317,8 @@ $ npx pocket-init --sovereign
 
       {/* News Room — institutional briefings (static local-first grid) */}
       <CommunityContent />
+
+      <VerifiedReceiptsSection surface="pocket" />
 
       {/* Share Section */}
       <section style={{ 

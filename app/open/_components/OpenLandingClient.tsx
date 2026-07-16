@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
+import { VerifiedReceiptsSection } from '@/app/components/landing/VerifiedReceiptsSection';
 import OpenContactForm from './OpenContactForm';
 import OpenLandingProofVideo from './OpenLandingProofVideo';
 import OpenLandingVisual from './OpenLandingVisual';
@@ -648,6 +649,12 @@ function BoardMoatSection({
           </Link>
         </motion.div>
       </motion.div>
+
+      <VerifiedReceiptsSection
+        surface="open"
+        title="Verified receipts (operator-grade)"
+        subtitle="Curated feedback from the live harness — focused on compliance, procurement velocity, and boundary clarity."
+      />
     </section>
   );
 }

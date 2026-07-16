@@ -73,6 +73,13 @@ import {
 import { Trade } from '../services/tradeService';
 import { buildPortfolioContext } from '../lib/ai/contextBuilder';
 import { usePocketAnalyst } from '../components/ai/PocketAnalystProvider';
+import { FeedbackModal } from '@/app/components/feedback/FeedbackModal';
+import {
+  recordDashboardVisit,
+  snoozeFeedbackPrompt,
+  shouldPromptForFeedback,
+} from '@/app/lib/feedback/eligibility';
+import { isFeedbackDevForceEmail } from '@/app/lib/feedback/devForce';
 
 // Extend Window interface for portfolio summary logging
 declare global {
@@ -322,6 +329,9 @@ export default function Dashboard() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showFeatureAnnouncement, setShowFeatureAnnouncement] = useState(false);
   const modalScheduledRef = useRef(false); // Persist across re-renders
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackDashboardVisitCount, setFeedbackDashboardVisitCount] = useState<number | null>(null);
+  const feedbackScheduledRef = useRef(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showPostImportUpsell, setShowPostImportUpsell] = useState(false);
   const [importModalFile, setImportModalFile] = useState<File | null>(null);
@@ -359,6 +369,69 @@ export default function Dashboard() {
       }
     }
   }, [showDeleteModal, showAlertModal, alertModalData, isDeleting]);
+
+  // Feedback eligibility: count dashboard visits locally (no server tracing).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    recordDashboardVisit();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!user || !isAuthenticated) return;
+
+    // Allow forcing via URL parameter for testing.
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('showFeedbackModal') === 'true') {
+      setFeedbackDashboardVisitCount(null);
+      setShowFeedbackModal(true);
+      return;
+    }
+
+    // Local dev: force prompt for configured test accounts (see NEXT_PUBLIC_FEEDBACK_DEV_FORCE_EMAILS).
+    if (isFeedbackDevForceEmail(user.email)) {
+      setFeedbackDashboardVisitCount(5);
+      if (!feedbackScheduledRef.current) {
+        feedbackScheduledRef.current = true;
+        const t = setTimeout(() => setShowFeedbackModal(true), 500);
+        return () => clearTimeout(t);
+      }
+      return;
+    }
+
+    if (feedbackScheduledRef.current) return;
+
+    // Don't compete with onboarding or feature announcement.
+    const hasSeenTour = localStorage.getItem('pocket_onboarding_v2_seen') === 'true';
+    const hasSeenAnnouncement = Boolean(localStorage.getItem('pocket-portfolio-feature-announcement-seen'));
+    if (!hasSeenTour) return;
+    if (!hasSeenAnnouncement) return;
+    if (showFeatureAnnouncement) return;
+
+    // Don't show while other blocking modals are open.
+    if (showImportModal) return;
+    if (showDeleteModal || showAlertModal) return;
+
+    const elig = shouldPromptForFeedback({
+      isAuthenticated: true,
+      surface: 'pocket',
+      minDashboardVisitsInWindow: 5,
+      windowDays: 7,
+    });
+    setFeedbackDashboardVisitCount(elig.visitCount);
+    if (!elig.eligible) return;
+
+    feedbackScheduledRef.current = true;
+    const t = setTimeout(() => setShowFeedbackModal(true), 900);
+    return () => clearTimeout(t);
+  }, [
+    user,
+    isAuthenticated,
+    showFeatureAnnouncement,
+    showImportModal,
+    showDeleteModal,
+    showAlertModal,
+  ]);
 
   // Portfolio store integration
   const {
@@ -3360,6 +3433,21 @@ export default function Dashboard() {
         isOpen={showFeatureAnnouncement}
         onClose={handleCloseAnnouncement}
       />
+
+      {/* Feedback Modal (power-user trigger; write-path P0 router) */}
+      {user && (
+        <FeedbackModal
+          open={showFeedbackModal}
+          onClose={() => {
+            // Default posture: snooze for 7 days when user closes without submitting.
+            snoozeFeedbackPrompt(7);
+            setShowFeedbackModal(false);
+          }}
+          user={user}
+          surface="pocket"
+          dashboardVisitCount={feedbackDashboardVisitCount ?? undefined}
+        />
+      )}
 
       {/* Weekly Portfolio Snapshot toast (7-day return, local-only P&L) */}
       <WeeklySnapshotToast
