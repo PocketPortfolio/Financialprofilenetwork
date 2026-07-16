@@ -1,0 +1,96 @@
+---
+title: The Developer's Guide to API Contract Testing
+date: '2026-07-16'
+description: >-
+  Learn how to implement API contract testing to ensure your services
+  communicate effectively.
+tags:
+  - api
+  - testing
+  - developer
+  - guide
+author: Pocket Portfolio Team
+image: /images/blog/the-developer-s-guide-to-api-contract-testing.png
+pillar: tech
+category: how-to-in-tech
+---
+
+## Problem
+
+In a microservices architecture, services often rely on APIs to communicate. Changes in an API can lead to unexpected failures if consumers are not informed, resulting in downtime or unexpected behavior. Traditional testing methods can miss these issues, leading to costly errors in production. API contract testing provides a solution by ensuring that the API provider and consumer agree on the format and content of the requests and responses.
+
+## Solution with Code
+
+API contract testing involves creating tests that validate the interactions between API consumers and providers. One popular tool for this is **Pact**, which helps ensure that changes in the API do not break existing consumers.
+
+### Step 1: Set Up Pact
+
+Begin by installing Pact in your project. For a Node.js environment, you can add Pact as a development dependency:
+
+```bash
+npm install @pact-foundation/pact --save-dev
+```
+
+### Step 2: Write a Consumer Test
+
+Consumer tests define the expected interactions from the consumer's perspective.
+
+```javascript
+const { Pact } = require('@pact-foundation/pact');
+const path = require('path');
+const { getUser } = require('../apiClient'); // Your API client function
+
+const provider = new Pact({
+  consumer: 'UserApp',
+  provider: 'UserService',
+  port: 1234,
+  log: path.resolve(process.cwd(), 'logs', 'pact.log'),
+  dir: path.resolve(process.cwd(), 'pacts'),
+  logLevel: 'INFO',
+});
+
+describe('User Service API', () => {
+  before(() => provider.setup());
+
+  after(() => provider.finalize());
+
+  describe('when a request to get a user is made', () => {
+    before(() =>
+      provider.addInteraction({
+        uponReceiving: 'a request for user details',
+        withRequest: {
+          method: 'GET',
+          path: '/user/1',
+          headers: { Accept: 'application/json' },
+        },
+        willRespondWith: {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: { id: 1, name: 'John Doe' },
+        },
+      })
+    );
+
+    it('should return user details', async () => {
+      const user = await getUser(1);
+      expect(user).toEqual({ id: 1, name: 'John Doe' });
+    });
+  });
+});
+```
+
+### Step 3: Verify Provider
+
+After the consumer contracts are created, the provider must verify them to ensure compatibility. This involves running the provider verification against the saved pact files.
+
+```bash
+pact-provider-verifier --provider-base-url=http://localhost:8080 --pact-urls=path/to/pacts
+```
+
+## Key Concepts
+
+- **Contract Testing**: Ensures that the API interactions between services are maintained even when changes occur.
+- **Consumer-Driven Contracts**: The consumer defines the expected API interactions, promoting proactive communication between teams.
+- **Provider Verification**: Confirms that the API provider meets the expectations outlined by the consumer.
+
+Implementing API contract testing with tools like Pact guarantees that service communication remains robust and reliable, significantly reducing the risk of integration issues in production.
