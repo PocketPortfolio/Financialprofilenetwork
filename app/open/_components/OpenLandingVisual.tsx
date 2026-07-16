@@ -31,9 +31,15 @@ export default function OpenLandingVisual({
   adapterCount?: number;
 }) {
   const reduceMotion = useReducedMotion();
-  const kenBurns = visual.id === 'hero' && !reduceMotion;
+  // Hero plate stays optically still — no Ken Burns (baked glass highlights looked like a scanning beam).
+  const kenBurns = false;
   const objectFit = visual.objectFit ?? 'cover';
   const isHarnessVideo = visual.motion === 'pocket-analyst-harness';
+  const showAmberSheen =
+    !reduceMotion &&
+    visual.id !== 'hero' &&
+    visual.motion !== 'briefing-console' &&
+    visual.motion !== 'pocket-analyst-harness';
 
   return (
     <motion.figure
@@ -103,9 +109,7 @@ export default function OpenLandingVisual({
           <OpenLandingPlateOverlay variant={visual.overlay} adapterCount={adapterCount} />
         )}
 
-        {!reduceMotion &&
-          visual.motion !== 'briefing-console' &&
-          visual.motion !== 'pocket-analyst-harness' && (
+        {!reduceMotion && showAmberSheen && (
           <motion.div
             aria-hidden
             animate={{ opacity: [0.08, 0.2, 0.08] }}

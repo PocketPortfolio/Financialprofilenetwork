@@ -103,7 +103,7 @@ export default function OpenLandingSovereignGrid() {
       }}
     >
       <svg viewBox="0 0 100 56" preserveAspectRatio="xMidYMid slice" style={{ width: '100%', height: '100%' }}>
-        {/* Amber alignment rails */}
+        {/* Amber alignment rails — static; no scanning beam */}
         <g stroke={ACCENT} strokeOpacity={0.2} strokeWidth={0.2}>
           <line x1={68} y1={16} x2={68} y2={60} />
           <line x1={78} y1={16} x2={78} y2={60} />
@@ -112,18 +112,6 @@ export default function OpenLandingSovereignGrid() {
           <line x1={66} y1={28} x2={100} y2={28} />
           <line x1={66} y1={44} x2={100} y2={44} />
         </g>
-        {!reduceMotion && (
-          <motion.path
-            d="M 66 36 H 100"
-            fill="none"
-            stroke={ACCENT}
-            strokeWidth={0.35}
-            strokeDasharray="2 3"
-            initial={{ pathLength: 0, opacity: 0.3 }}
-            animate={{ pathLength: [0, 1, 1], opacity: [0.2, 0.7, 0.35] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
         {GRID_SLOTS.map((slot, i) => (
           <GlassCube key={slot.label} x={slot.x} y={slot.y} delay={0.08 * i} reduced={!!reduceMotion} />
         ))}
