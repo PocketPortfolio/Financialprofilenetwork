@@ -3203,14 +3203,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Docker Compose for Multi-Container Apps",
     "slug": "how-to-use-docker-compose-for-multi-container-apps",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "docker",
       "use",
       "compose"
-    ]
+    ],
+    "publishedAt": "2026-07-17T14:01:34.416Z"
   },
   {
     "id": "how-to-building-an-api-gateway-with-kong-jul-18",
