@@ -1,0 +1,98 @@
+---
+title: Building an API Gateway with Kong
+date: '2026-07-18'
+description: Learn how to build a scalable API gateway using Kong.
+tags:
+  - api
+  - gateway
+  - kong
+  - microservices
+author: Pocket Portfolio Team
+image: /images/blog/building-an-api-gateway-with-kong.png
+pillar: Engineering
+category: how-to-in-tech
+---
+
+Building a scalable and secure API gateway is essential for modern microservices architectures. Kong, an open-source API gateway, is designed to manage, secure, and extend APIs with ease. This guide will walk you through setting up an API gateway using Kong.
+
+### Problem
+
+As microservices grow, managing APIs becomes complex. Issues like authentication, rate limiting, and load balancing must be addressed to ensure API reliability and security. Without a centralized API gateway, each service would need to handle these concerns independently, leading to redundancy and increased maintenance overhead.
+
+### Solution with Code
+
+Kong provides a centralized gateway solution to efficiently manage APIs. We'll set up Kong, configure it to route requests, and add basic authentication.
+
+#### Step 1: Install Kong
+
+First, ensure you have Docker installed. Then, start a PostgreSQL container (Kong's default database):
+
+```bash
+docker run -d --name kong-database \
+  -p 5432:5432 \
+  -e "POSTGRES_USER=kong" \
+  -e "POSTGRES_DB=kong" \
+  postgres:13
+```
+
+Run the Kong container linked to the database:
+
+```bash
+docker run -d --name kong \
+  --link kong-database:kong-database \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=kong-database" \
+  -e "KONG_CASSANDRA_CONTACT_POINTS=kong-database" \
+  -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_LISTEN=0.0.0.0:8001" \
+  -p 8000:8000 \
+  -p 8443:8443 \
+  -p 8001:8001 \
+  -p 8444:8444 \
+  kong:3.0
+```
+
+#### Step 2: Configure a Service and Route
+
+Add a service and route to Kong:
+
+```bash
+curl -i -X POST http://localhost:8001/services/ \
+  --data "name=example-service" \
+  --data "url=http://mockbin.org"
+
+curl -i -X POST http://localhost:8001/services/example-service/routes \
+  --data "paths[]=/mock"
+```
+
+#### Step 3: Add Authentication
+
+Enable basic authentication on the route:
+
+```bash
+curl -i -X POST http://localhost:8001/services/example-service/plugins \
+  --data "name=basic-auth"
+```
+
+Create a consumer and associate credentials:
+
+```bash
+curl -i -X POST http://localhost:8001/consumers/ \
+  --data "username=example-consumer"
+
+curl -i -X POST http://localhost:8001/consumers/example-consumer/basic-auth \
+  --data "username=exampleuser" \
+  --data "password=examplepass"
+```
+
+### Key Concepts
+
+- **Service**: Represents an upstream API or microservice.
+- **Route**: Defines rules to match client requests to services.
+- **Plugin**: Extends functionality, like adding authentication or rate limiting.
+- **Consumer**: Represents a user or an application using the API.
+
+By following these steps, you have set up a basic API gateway using Kong. This setup can be extended with additional plugins for enhanced security, logging, and analytics. Kong's flexibility allows it to grow with your microservices architecture, providing a robust solution for API management.
