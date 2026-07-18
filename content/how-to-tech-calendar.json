@@ -3219,14 +3219,15 @@
     "scheduledTime": "14:00",
     "title": "Building an API Gateway with Kong",
     "slug": "building-an-api-gateway-with-kong",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "building",
       "gateway"
-    ]
+    ],
+    "publishedAt": "2026-07-18T14:01:04.543Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-routing-jul-19",
