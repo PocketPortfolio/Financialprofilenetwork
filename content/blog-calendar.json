@@ -1174,7 +1174,7 @@
     "date": "2026-07-19",
     "title": "The Psychology of Vendor Lock-in: Why We Accept Digital Serfdom",
     "slug": "the-psychology-of-vendor-lock-in-why-we-accept-digital-serfd",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1184,7 +1184,8 @@
       "psychology"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-19T09:00:36.022Z"
   },
   {
     "id": "week-29-post-2",
