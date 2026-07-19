@@ -3235,14 +3235,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Routing",
     "slug": "how-to-implement-api-request-routing",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-07-19T14:00:52.698Z"
   },
   {
     "id": "how-to-understanding-api-gateway-load-balancing-jul-20",
