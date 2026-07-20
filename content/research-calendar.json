@@ -3284,7 +3284,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Container Registry Performance - Docker Hub vs GHCR vs ECR",
     "slug": "research-container-registry-performance-docker-hub-vs-ghcr-vs-ecr-2026-07-20",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3293,7 +3293,8 @@
       "AI",
       "container",
       "registry"
-    ]
+    ],
+    "publishedAt": "2026-07-20T18:00:49.897Z"
   },
   {
     "id": "research-infrastructure-as-code-terraform-vs-pulumi-performance-2026-07-21",
