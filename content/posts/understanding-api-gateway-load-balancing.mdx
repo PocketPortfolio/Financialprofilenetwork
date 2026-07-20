@@ -2,69 +2,58 @@
 title: Understanding API Gateway Load Balancing
 date: '2026-07-20'
 description: >-
-  A comprehensive guide to understanding and implementing load balancing with
-  API gateways.
+  A technical guide to understanding and implementing load balancing in API
+  Gateways.
 tags:
   - api
   - gateway
   - load balancing
-  - networking
+  - technical guide
 author: Pocket Portfolio Team
 image: /images/blog/understanding-api-gateway-load-balancing.png
-pillar: Technology
+pillar: Tech
 category: how-to-in-tech
 ---
 
-## Problem
+### Problem
 
-As your application scales, ensuring efficient distribution of incoming requests among multiple servers becomes critical. Without proper load balancing, your application may face bottlenecks, leading to degraded performance and outages. API Gateways play a crucial role in managing traffic effectively, but understanding how to implement load balancing within this context is essential to maintain service reliability and performance.
+As modern applications scale, the demand for efficient traffic management and distribution to backend services increases. API Gateways serve as the entry point for clients to access different services in a microservices architecture. However, without proper load balancing, certain services can become bottlenecks, leading to performance issues and potential downtime.
 
-## Solution
+### Solution with Code
 
-To implement load balancing in an API Gateway, you can use the following example with AWS API Gateway and AWS Lambda, integrated with an Application Load Balancer (ALB). This setup ensures that requests are distributed efficiently across multiple instances of your application.
+To effectively manage traffic and ensure high availability, API Gateways can implement load balancing strategies. Here’s a concise implementation using AWS API Gateway with Lambda functions as backend services:
 
-### Step-by-Step Implementation
+1. **Create a Load Balancer**: Use AWS Elastic Load Balancing (ELB) to distribute incoming traffic across multiple targets.
 
-1. **Create an Application Load Balancer (ALB):**
+2. **Set Up API Gateway**: Create an API Gateway and configure it to integrate with the Lambda functions. 
 
-   ```bash
-   aws elbv2 create-load-balancer --name my-load-balancer \
-     --subnets subnet-0123456789abcdef0 subnet-0123456789abcdef1 \
-     --security-groups sg-0123456789abcdef0
-   ```
+3. **Lambda Function Setup**: Deploy multiple versions of your Lambda function to handle incoming requests.
 
-2. **Create Target Groups for Your Lambda Functions:**
+4. **API Gateway Integration**: Configure the API Gateway to route traffic to the ELB. This can be done via the AWS Management Console or using AWS CLI.
 
    ```bash
-   aws elbv2 create-target-group --name my-target-group \
-     --protocol HTTP --port 80 --vpc-id vpc-0123456789abcdef0 \
-     --target-type lambda
+   aws apigateway create-rest-api --name 'MyAPI' --region us-east-1
+
+   # Retrieve the API ID
+   API_ID=$(aws apigateway get-rest-apis --query 'items[?name==`MyAPI`].id' --output text)
+
+   # Create a resource
+   aws apigateway create-resource --rest-api-id $API_ID --parent-id $(aws apigateway get-resources --rest-api-id $API_ID --query 'items[0].id' --output text) --path-part 'myresource'
+
+   # Deploy the API
+   aws apigateway create-deployment --rest-api-id $API_ID --stage-name prod
    ```
 
-3. **Register Lambda Functions with the Target Group:**
+5. **Route Configuration**: Configure route settings to integrate with the ELB target group.
 
-   ```bash
-   aws elbv2 register-targets --target-group-arn arn:aws:elasticloadbalancing:region:account-id:targetgroup/my-target-group/0123456789abcdef \
-     --targets Id=arn:aws:lambda:region:account-id:function:my-function
-   ```
+### Key Concepts
 
-4. **Create Listener for the Load Balancer:**
+- **Load Balancer**: A tool that distributes incoming network or application traffic across multiple servers to ensure no single server becomes overwhelmed, enhancing the availability and reliability of applications.
 
-   ```bash
-   aws elbv2 create-listener --load-balancer-arn arn:aws:elasticloadbalancing:region:account-id:loadbalancer/app/my-load-balancer/0123456789abcdef \
-     --protocol HTTP --port 80 \
-     --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:region:account-id:targetgroup/my-target-group/0123456789abcdef
-   ```
+- **API Gateway**: Acts as a “front door” for applications to access data, business logic, or functionality from backend services.
 
-5. **Integrate the Load Balancer with the API Gateway:**
+- **Elastic Load Balancing (ELB)**: Automatically distributes incoming application traffic across multiple targets, such as EC2 instances, containers, and IP addresses, in one or more Availability Zones.
 
-   In the API Gateway console, create a new API and configure the integration type as HTTP. Use the ALB's DNS name as the endpoint URL.
+- **Target Group**: A group of resources that receive traffic. AWS ELB routes traffic to target groups based on the load balancing algorithm and health checks.
 
-## Key Concepts
-
-- **Load Balancer:** A device that acts as a reverse proxy and distributes network or application traffic across multiple servers.
-- **API Gateway:** A tool that sits between a client and a collection of backend services, managing traffic, authentication, and other services.
-- **Target Group:** A group of resources registered with a load balancer, which can include EC2 instances, IP addresses, or Lambda functions.
-- **Listener:** A process that checks for connection requests using the protocol and port specified.
-
-By following these steps, you can effectively distribute traffic across your backend services using an API Gateway and ALB, ensuring scalability and reliability in your applications.
+By implementing these practices, you can achieve a scalable and resilient architecture that effectively manages traffic and balances load across multiple backend services, ensuring optimal performance and high availability.
