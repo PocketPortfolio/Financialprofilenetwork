@@ -3302,7 +3302,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Infrastructure as Code - Terraform vs Pulumi Performance",
     "slug": "research-infrastructure-as-code-terraform-vs-pulumi-performance-2026-07-21",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3310,7 +3310,8 @@
       "infrastructure",
       "code",
       "terraform"
-    ]
+    ],
+    "publishedAt": "2026-07-21T18:00:37.167Z"
   },
   {
     "id": "research-secret-management-performance-vault-vs-aws-secrets-manager-2026-07-22",
