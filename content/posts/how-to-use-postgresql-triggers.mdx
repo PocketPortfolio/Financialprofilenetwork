@@ -2,8 +2,8 @@
 title: How to Use PostgreSQL Triggers
 date: '2026-07-21'
 description: >-
-  Learn how to effectively use PostgreSQL triggers to automate database tasks
-  and enforce data integrity.
+  Learn how to use PostgreSQL triggers to automate database tasks and enforce
+  business rules.
 tags:
   - sql
   - postgresql
@@ -11,59 +11,55 @@ tags:
   - triggers
 author: Pocket Portfolio Team
 image: /images/blog/how-to-use-postgresql-triggers.png
-pillar: Engineering
+pillar: Technology
 category: how-to-in-tech
 ---
 
 ## Problem
 
-In complex database systems, maintaining data integrity and automating repetitive tasks can be challenging. For instance, ensuring that changes in one table automatically reflect in another related table or logging modifications for audit purposes requires additional logic. This is where PostgreSQL triggers come into play, providing a mechanism to automatically execute predefined actions in response to certain events on a table.
+Managing complex database operations and maintaining data integrity often requires automated actions that respond to changes within your database. PostgreSQL offers triggers as a solution to automate tasks such as logging changes, enforcing business rules, or synchronizing data across tables. However, setting up and using triggers effectively can be challenging for those unfamiliar with them.
 
-## Solution
+## Solution with Code
 
-PostgreSQL triggers can help automate tasks such as:
+Triggers in PostgreSQL allow you to automatically execute a specified function in response to certain events on a table. These events can include `INSERT`, `UPDATE`, or `DELETE` operations. Below is a step-by-step guide to creating and using a basic trigger.
 
-- Validating data changes before they are committed.
-- Synchronizing tables by automatically updating related tables.
-- Logging changes to tables for auditing purposes.
+### Step 1: Create a Trigger Function
 
-### Code Implementation
-
-Here is a step-by-step guide to using PostgreSQL triggers:
-
-1. **Create a Function**: Triggers execute a function. This function contains the logic to be performed when the trigger fires.
+A trigger function is a special function designed to be invoked by a trigger. Here’s an example of a simple trigger function in PL/pgSQL:
 
 ```sql
-CREATE OR REPLACE FUNCTION audit_log()
+CREATE OR REPLACE FUNCTION log_changes()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO audit_table (user_id, action, changed_at)
-    VALUES (NEW.user_id, TG_OP, NOW());
-    RETURN NEW;
+  INSERT INTO audit_log (table_name, operation, changed_data, change_time)
+  VALUES (TG_TABLE_NAME, TG_OP, row_to_json(NEW), NOW());
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 ```
 
-2. **Create the Trigger**: Attach the trigger to a table. Define when it should fire (BEFORE or AFTER the event) and what event (INSERT, UPDATE, DELETE) should cause it to fire.
+### Step 2: Create a Trigger
+
+Once you have a trigger function, you can create a trigger that uses this function. Assume you want to log changes to a `users` table:
 
 ```sql
-CREATE TRIGGER user_audit_trigger
-AFTER INSERT OR UPDATE ON users
-FOR EACH ROW EXECUTE FUNCTION audit_log();
+CREATE TRIGGER user_changes
+AFTER INSERT OR UPDATE
+ON users
+FOR EACH ROW
+EXECUTE FUNCTION log_changes();
 ```
 
-### Key Concepts
+With this trigger, every `INSERT` or `UPDATE` operation on the `users` table will invoke the `log_changes` function, logging the changes to the `audit_log` table.
 
-- **Triggers**: Special procedures that automatically execute in response to certain events on a table or view.
+## Key Concepts
+
+- **Trigger Function**: A function written in PL/pgSQL or another supported language, designed to be executed by a trigger. It contains the logic for what should happen when the trigger is fired.
   
-- **BEFORE vs AFTER Triggers**: 
-  - **BEFORE** triggers are fired before the operation and can modify the operation's outcome.
-  - **AFTER** triggers are fired after the operation completes, useful for actions like logging.
+- **Trigger**: A database object that is set up to automatically invoke a trigger function in response to specified events (`INSERT`, `UPDATE`, `DELETE`) on a table.
 
-- **FOR EACH ROW vs FOR EACH STATEMENT**: 
-  - **FOR EACH ROW** triggers apply the function for every row affected by the operation.
-  - **FOR EACH STATEMENT** triggers apply once for the entire operation, regardless of the number of rows affected.
+- **Event Timing**: Triggers can be set to fire `BEFORE` or `AFTER` the triggering event. The timing determines when the trigger function is executed in relation to the event.
 
-- **Trigger Function**: Written in a procedural language such as PL/pgSQL, this function encapsulates the logic to be executed when the trigger fires.
+- **Row-Level vs. Statement-Level**: Triggers can be defined to execute once per affected row (`FOR EACH ROW`) or once per SQL statement (`FOR EACH STATEMENT`).
 
-By utilizing triggers effectively, you can ensure data consistency and automate repetitive tasks, reducing the potential for errors and improving database performance.
+By understanding and implementing PostgreSQL triggers, you can automate critical database operations, ensuring consistency and integrity across your application.
