@@ -1192,7 +1192,7 @@
     "date": "2026-07-22",
     "title": "The Rebalancing Myth: When to Actually Adjust Your Portfolio",
     "slug": "the-rebalancing-myth-when-to-actually-adjust-your-portfolio",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1202,7 +1202,8 @@
       "rebalancing"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-22T09:00:56.484Z"
   },
   {
     "id": "week-30-post-1",
