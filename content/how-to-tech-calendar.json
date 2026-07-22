@@ -3285,7 +3285,7 @@
     "scheduledTime": "14:00",
     "title": "The Guide to API Response Caching",
     "slug": "the-guide-to-api-response-caching",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
@@ -3293,7 +3293,8 @@
       "caching",
       "guide",
       "response"
-    ]
+    ],
+    "publishedAt": "2026-07-22T14:01:03.637Z"
   },
   {
     "id": "how-to-building-a-graphql-api-with-graphql-tools-jul-24",
