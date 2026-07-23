@@ -3335,14 +3335,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Configuration Management - Performance Overhead Analysis",
     "slug": "research-configuration-management-performance-overhead-analysis-2026-07-23",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "configuration",
       "management"
-    ]
+    ],
+    "publishedAt": "2026-07-23T18:00:48.750Z"
   },
   {
     "id": "research-disaster-recovery-strategies-rto-vs-rpo-trade-offs-2026-07-24",
