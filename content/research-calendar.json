@@ -3351,7 +3351,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Disaster Recovery Strategies - RTO vs RPO Trade-offs",
     "slug": "research-disaster-recovery-strategies-rto-vs-rpo-trade-offs-2026-07-24",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3359,7 +3359,8 @@
       "disaster",
       "recovery",
       "strategies"
-    ]
+    ],
+    "publishedAt": "2026-07-24T18:01:09.774Z"
   },
   {
     "id": "research-multi-region-deployment-latency-vs-cost-analysis-2026-07-25",
