@@ -3302,14 +3302,15 @@
     "scheduledTime": "14:00",
     "title": "Building a GraphQL API with GraphQL Tools",
     "slug": "building-a-graphql-api-with-graphql-tools",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "graphql",
       "building"
-    ]
+    ],
+    "publishedAt": "2026-07-24T14:00:56.188Z"
   },
   {
     "id": "how-to-how-to-use-redis-for-distributed-locking-jul-25",
