@@ -1,0 +1,102 @@
+---
+title: Building a GraphQL API with GraphQL Tools
+date: '2026-07-24'
+description: >-
+  Learn how to build a GraphQL API using GraphQL Tools, with a focus on
+  code-first approach and essential concepts.
+tags:
+  - api
+  - graphql
+  - development
+  - programming
+author: Pocket Portfolio Team
+image: /images/blog/building-a-graphql-api-with-graphql-tools.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+## Problem
+
+Creating a GraphQL API can be complex due to the need to define a schema, resolve queries, and integrate with existing data sources. Developers often face challenges in maintaining a clean architecture and managing schema evolution over time. The use of GraphQL Tools simplifies these tasks by providing a set of utilities that streamline schema definition, resolver composition, and server setup.
+
+## Solution with Code
+
+GraphQL Tools is a library that assists in building GraphQL APIs with a schema-first approach, separating type definitions and resolvers for clear structure.
+
+### Step 1: Install Dependencies
+
+First, ensure you have Node.js installed, then set up a new project with the necessary packages:
+
+```bash
+npm init -y
+npm install graphql graphql-tools express express-graphql
+```
+
+### Step 2: Define Your Schema
+
+Using GraphQL Tools, start by defining your type definitions in SDL (Schema Definition Language):
+
+```javascript
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+
+const typeDefs = `
+  type Query {
+    hello: String
+  }
+`;
+```
+
+### Step 3: Implement Resolvers
+
+Resolvers provide the instructions for turning a GraphQL operation into data. Define them to match your schema:
+
+```javascript
+const resolvers = {
+  Query: {
+    hello: () => 'Hello world!',
+  },
+};
+```
+
+### Step 4: Create the Executable Schema
+
+Combine type definitions and resolvers to create an executable schema:
+
+```javascript
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+});
+```
+
+### Step 5: Set Up Express Server
+
+Integrate your schema into an Express server using `express-graphql`:
+
+```javascript
+const express = require('express');
+const { graphqlHTTP } = require('express-graphql');
+
+const app = express();
+
+app.use('/graphql', graphqlHTTP({
+  schema,
+  graphiql: true, // Enable GraphiQL UI for testing
+}));
+
+app.listen(4000, () => {
+  console.log('Server is running on http://localhost:4000/graphql');
+});
+```
+
+## Key Concepts
+
+- **Type Definitions**: Define the shape of your data and operations in SDL. This acts as a contract between the client and server.
+  
+- **Resolvers**: Functions that resolve a specific query or mutation. They fetch or compute the data requested in a query.
+
+- **Executable Schema**: Combines type definitions and resolvers to form a working GraphQL schema that can be queried.
+
+- **GraphiQL**: An in-browser IDE for exploring GraphQL, useful for testing queries and mutations.
+
+This setup provides a basic yet powerful foundation for building a scalable GraphQL API. As your application grows, GraphQL Tools offers features like schema stitching and directive support to extend functionality.
