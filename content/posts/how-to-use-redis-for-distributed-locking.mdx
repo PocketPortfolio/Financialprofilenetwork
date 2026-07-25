@@ -1,0 +1,89 @@
+---
+title: How to Use Redis for Distributed Locking
+date: '2026-07-25'
+description: >-
+  Learn how to implement distributed locking using Redis to manage concurrency
+  in distributed systems.
+tags:
+  - redis
+  - distributed systems
+  - locking
+  - concurrency
+author: Pocket Portfolio Team
+image: /images/blog/how-to-use-redis-for-distributed-locking.png
+pillar: Technology
+category: how-to-in-tech
+---
+
+Distributed systems often require a mechanism to ensure that only one process can access a shared resource at a time—this is where distributed locking comes into play. Redis, an in-memory data structure store, can be effectively used to implement distributed locks due to its speed and atomic operations.
+
+### Problem
+
+In distributed systems, resources like databases or files may need to be accessed by multiple processes. Without proper concurrency control, this can lead to race conditions, data corruption, or inconsistency. A distributed lock ensures that only one process can perform a critical section of code at any given time, maintaining data integrity.
+
+### Solution with Code
+
+Redis can serve as a distributed lock manager. Below is an implementation using Redis commands to create a simple distributed lock.
+
+```javascript
+const redis = require("redis");
+const { promisify } = require("util");
+
+const client = redis.createClient();
+const setAsync = promisify(client.set).bind(client);
+const delAsync = promisify(client.del).bind(client);
+
+const acquireLock = async (lockName, timeout) => {
+  const lockValue = Date.now() + timeout + 1;
+  const result = await setAsync(lockName, lockValue, "NX", "PX", timeout);
+
+  if (result === "OK") {
+    return lockValue;
+  }
+
+  const currentValue = await promisify(client.get).bind(client)(lockName);
+  if (currentValue && parseInt(currentValue) < Date.now()) {
+    const oldValue = await promisify(client.getset).bind(client)(lockName, lockValue);
+    if (oldValue && oldValue === currentValue) {
+      return lockValue;
+    }
+  }
+
+  return null;
+};
+
+const releaseLock = async (lockName, lockValue) => {
+  const currentValue = await promisify(client.get).bind(client)(lockName);
+  if (currentValue && currentValue === lockValue.toString()) {
+    await delAsync(lockName);
+  }
+};
+
+// Usage Example
+(async () => {
+  const lockName = "resource_lock";
+  const timeout = 5000; // 5 seconds
+
+  const lockValue = await acquireLock(lockName, timeout);
+  if (lockValue) {
+    console.log("Lock acquired!");
+
+    // Perform operations on the shared resource
+
+    await releaseLock(lockName, lockValue);
+    console.log("Lock released!");
+  } else {
+    console.log("Failed to acquire lock.");
+  }
+})();
+```
+
+### Key Concepts
+
+1. **Atomic Operations**: Redis `SET` command with `NX` and `PX` options ensures that the lock is set only if it does not exist (non-existent), and it automatically expires after a specified time to prevent deadlocks.
+
+2. **Timeouts**: Timeouts are crucial in preventing deadlocks. They ensure that locks are released even if a process crashes or fails to release the lock.
+
+3. **Lock Value**: A unique identifier (usually a timestamp) is used to ensure that a process can only release a lock that it has acquired, preventing accidental unlocks by other processes.
+
+By leveraging Redis for distributed locking, developers can manage concurrent access to shared resources effectively, ensuring system stability and data consistency.
