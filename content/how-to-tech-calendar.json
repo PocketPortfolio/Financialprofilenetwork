@@ -3318,14 +3318,15 @@
     "scheduledTime": "14:00",
     "title": "How to Use Redis for Distributed Locking",
     "slug": "how-to-use-redis-for-distributed-locking",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "redis",
       "use",
       "distributed"
-    ]
+    ],
+    "publishedAt": "2026-07-25T14:01:06.140Z"
   },
   {
     "id": "how-to-how-to-implement-api-request-validation-middleware-jul-27",
