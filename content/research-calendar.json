@@ -3368,7 +3368,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Multi-Region Deployment - Latency vs Cost Analysis",
     "slug": "research-multi-region-deployment-latency-vs-cost-analysis-2026-07-25",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3376,7 +3376,8 @@
       "deployment",
       "multi",
       "region"
-    ]
+    ],
+    "publishedAt": "2026-07-25T18:00:39.433Z"
   },
   {
     "id": "research-blue-green-deployment-overhead-performance-impact-2026-07-26",
