@@ -3385,7 +3385,7 @@
     "scheduledTime": "18:00",
     "title": "Research: Blue-Green Deployment Overhead - Performance Impact",
     "slug": "research-blue-green-deployment-overhead-performance-impact-2026-07-26",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
@@ -3393,7 +3393,8 @@
       "deployment",
       "blue",
       "green"
-    ]
+    ],
+    "publishedAt": "2026-07-26T18:00:53.457Z"
   },
   {
     "id": "research-canary-release-performance-traffic-splitting-analysis-2026-07-27",
