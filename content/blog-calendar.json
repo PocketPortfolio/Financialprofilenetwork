@@ -1210,7 +1210,7 @@
     "date": "2026-07-26",
     "title": "Handling Large Datasets: Streaming JSON Parsing Strategies",
     "slug": "handling-large-datasets-streaming-json-parsing-strategies",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1220,7 +1220,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-26T09:01:00.381Z"
   },
   {
     "id": "week-30-post-2",
