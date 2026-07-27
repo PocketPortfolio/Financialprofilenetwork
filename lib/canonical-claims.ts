@@ -784,9 +784,15 @@ export function isOpenBlogCategory(category: string | undefined): boolean {
  * Wave 1 content doctrine: generic how-to / research farm posts stay crawlable for links
  * but must not compete for index slots. Sovereign engineering stays indexable.
  */
-export function shouldNoindexOpenBlogFarm(category: string | undefined): boolean {
+export function shouldNoindexOpenBlogFarm(
+  category: string | undefined,
+  slug?: string,
+): boolean {
   const c = category ?? '';
-  return c === 'how-to-in-tech' || c === 'research';
+  if (c === 'how-to-in-tech' || c === 'research') return true;
+  // Belt: farm slugs even if category frontmatter drifted
+  const s = (slug ?? '').toLowerCase();
+  return s.startsWith('research-') || s.startsWith('how-to-');
 }
 
 /** First-party MDX on Pocket (B2C) — excludes Open-only categories. */

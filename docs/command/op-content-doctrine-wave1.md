@@ -1,7 +1,7 @@
 # Open Portfolio Content Doctrine — Wave 1
 
 **Owners:** Head of Marketing · Head of AI & Community · Eng  
-**Status:** Farm prune LIVE in code · Four pillars shipped
+**Status:** Farm prune LIVE (noindex hotfix 2026-07-27) · Four pillars shipped · Farm URLs removed from Open sitemap
 
 ## Doctrine
 

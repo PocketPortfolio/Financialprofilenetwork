@@ -6,7 +6,11 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { isOpenBlogCategory, isPocketBlogCategory } from './canonical-claims';
+import {
+  isOpenBlogCategory,
+  isPocketBlogCategory,
+  shouldNoindexOpenBlogFarm,
+} from './canonical-claims';
 
 export interface BlogPostSitemapEntry {
   slug: string;
@@ -47,6 +51,11 @@ export function partitionBlogPostsForSitemap(entries: BlogPostSitemapEntry[]): {
 } {
   return {
     pocket: entries.filter((e) => isPocketBlogCategory(e.category)),
-    open: entries.filter((e) => isOpenBlogCategory(e.category)),
+    // Wave 1: keep how-to/research crawlable via links but out of sitemap index slots
+    open: entries.filter(
+      (e) =>
+        isOpenBlogCategory(e.category) &&
+        !shouldNoindexOpenBlogFarm(e.category, e.slug),
+    ),
   };
 }

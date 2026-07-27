@@ -12,14 +12,14 @@ const base = (overrides: Partial<BlogPostSitemapEntry>): BlogPostSitemapEntry =>
 });
 
 describe('partitionBlogPostsForSitemap', () => {
-  it('sends Open categories to open only', () => {
+  it('sends indexable Open categories to open only (farm how-to/research excluded)', () => {
     const { pocket, open } = partitionBlogPostsForSitemap([
       base({ slug: 'a', category: 'research' }),
       base({ slug: 'b', category: 'how-to-in-tech' }),
       base({ slug: 'c', category: 'sovereign-engineering' }),
     ]);
     expect(pocket).toHaveLength(0);
-    expect(open.map((e) => e.slug).sort()).toEqual(['a', 'b', 'c']);
+    expect(open.map((e) => e.slug)).toEqual(['c']);
   });
 
   it('treats missing category as Pocket (deep-dive default)', () => {

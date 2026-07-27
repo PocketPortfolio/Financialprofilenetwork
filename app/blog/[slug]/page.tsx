@@ -65,7 +65,13 @@ function normalizeFrontmatter(raw: Record<string, unknown>): BlogPostFrontmatter
     tags,
     videoId: toSerializableString(raw.videoId),
     dateModified: toSerializableString(raw.dateModified),
-    noindex: raw.noindex === true || raw.noindex === 'true',
+    // Preserve unset so Wave 1 farm doctrine can apply by category
+    noindex:
+      raw.noindex === true || raw.noindex === 'true'
+        ? true
+        : raw.noindex === false || raw.noindex === 'false'
+          ? false
+          : undefined,
   };
 }
 
@@ -144,7 +150,8 @@ export async function generateMetadata({
   const published = data.date ?? undefined;
   const farmNoindex =
     data.noindex === true ||
-    (typeof data.noindex === 'undefined' && shouldNoindexOpenBlogFarm(data.category));
+    (data.noindex !== false &&
+      shouldNoindexOpenBlogFarm(data.category, slug));
 
   return {
     title: `${data.title} | ${brand} Blog`,

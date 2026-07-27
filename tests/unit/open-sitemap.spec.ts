@@ -4,7 +4,7 @@ import { loadBlogPostSitemapEntries, partitionBlogPostsForSitemap } from '@/lib/
 import { OPEN_URLS } from '@/lib/canonical-claims';
 
 describe('openSitemapStatic', () => {
-  it('includes hub, alias routes, and every Open-category blog slug', async () => {
+  it('includes hub, alias routes, and indexable Open blog slugs (not farm)', async () => {
     const entries = await openSitemapStatic();
     const urls = entries.map((e) => e.url);
 
@@ -17,5 +17,7 @@ describe('openSitemapStatic', () => {
       expect(urls).toContain(`${OPEN_URLS.home}/blog/${post.slug}`);
     }
     expect(urls.filter((u) => u.includes('/blog/')).length).toBe(open.length);
+    // Wave 1: research farm must not occupy sitemap slots
+    expect(urls.some((u) => u.includes('/blog/research-'))).toBe(false);
   });
 });
