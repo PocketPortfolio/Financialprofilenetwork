@@ -239,8 +239,8 @@ describe('Dual-Surface Bifurcation SSOT (CEO mandate 2026-05-15)', () => {
     }
   });
 
-  test('OPEN_ALIAS_ROUTES lists exactly the 21 B2B surfaces (CEO mandate + performance dossier)', () => {
-    expect(OPEN_ALIAS_ROUTES).toHaveLength(21);
+  test('OPEN_ALIAS_ROUTES lists B2B surfaces (CEO mandate + Wave 1 Sovereign pillars)', () => {
+    expect(OPEN_ALIAS_ROUTES).toHaveLength(25);
     const paths = OPEN_ALIAS_ROUTES.map((r) => r.path);
     expect(new Set(paths).size).toBe(paths.length);
   });
@@ -258,6 +258,8 @@ describe('Dual-Surface Bifurcation SSOT (CEO mandate 2026-05-15)', () => {
     expect(paths).toContain('/designchallenge');
     expect(paths).toContain('/tier1designpartner');
     expect(paths).toContain('/board-of-investors');
+    expect(paths).toContain('/learn/sovereign-ai-architecture');
+    expect(paths).toContain('/learn/enterprise-design-partnership');
   });
 
   test('helpers return the correct surface block', () => {

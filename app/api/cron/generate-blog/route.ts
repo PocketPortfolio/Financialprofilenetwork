@@ -118,13 +118,25 @@ export async function GET(request: Request) {
 
     const calendar = await fetchCalendarsFromGitHub();
     const now = new Date();
-    const duePosts = getDuePosts(calendar, now);
+    // Wave 1: pause how-to / research farm generation (set OP_BLOG_FARM_PAUSED=false to resume)
+    const farmPaused = process.env.OP_BLOG_FARM_PAUSED !== 'false';
+    const duePosts = getDuePosts(calendar, now).filter((p) => {
+      if (!farmPaused) return true;
+      const cat = p.category || '';
+      if (cat === 'how-to-in-tech' || cat === 'research') {
+        return false;
+      }
+      return true;
+    });
 
     if (duePosts.length === 0) {
       return NextResponse.json({
         success: true,
         generated: 0,
-        message: 'No posts due for generation',
+        message: farmPaused
+          ? 'No posts due (Open Portfolio blog farm pause active for how-to/research)'
+          : 'No posts due for generation',
+        farmPaused,
         timestamp: now.toISOString(),
       });
     }

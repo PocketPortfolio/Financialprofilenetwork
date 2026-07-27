@@ -3,6 +3,67 @@
  * Provides structured data for search engines
  */
 
+import { siteConfig } from './meta';
+
+export interface HomePageSchemaGraph {
+  '@context': string;
+  '@graph': Array<Record<string, unknown>>;
+}
+
+/**
+ * Generate structured data for the home page — Organization + SoftwareApplication
+ * with brand alternateName for pocket folio / pocketfolio SERP reclaim.
+ */
+export function getHomePageSchema(): HomePageSchemaGraph {
+  const orgId = `${siteConfig.url}/#organization`;
+  const appId = `${siteConfig.url}/#software`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': orgId,
+        name: siteConfig.name,
+        alternateName: [...siteConfig.alternateNames],
+        url: siteConfig.url,
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png',
+        },
+        sameAs: [
+          'https://github.com/PocketPortfolio/Financialprofilenetwork',
+          'https://twitter.com/pocketportfolio',
+          'https://discord.gg/Ch9PpjRzwe',
+          'https://dev.to/pocketportfolioapp',
+        ],
+      },
+      {
+        '@type': 'SoftwareApplication',
+        '@id': appId,
+        name: siteConfig.name,
+        alternateName: [...siteConfig.alternateNames],
+        applicationCategory: 'FinanceApplication',
+        operatingSystem: 'Web Browser',
+        url: siteConfig.url,
+        description: siteConfig.description,
+        publisher: { '@id': orgId },
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'GBP',
+        },
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://www.pocketportfolio.app/search?q={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    ],
+  };
+}
+
+/** @deprecated Use getHomePageSchema graph; kept for callers expecting WebApplication shape */
 export interface HomePageSchema {
   '@context': string;
   '@type': string;
@@ -22,40 +83,13 @@ export interface HomePageSchema {
 }
 
 /**
- * Generate structured data for the home page
- */
-export function getHomePageSchema(): HomePageSchema {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'Pocket Portfolio',
-    description: 'Pocket Portfolio is a sovereign, local-first wealth tracker. Your raw ledger stays on your device; only a sanitized snapshot ever reaches the cloud. Privacy by architecture.',
-    url: 'https://www.pocketportfolio.app',
-    logo: {
-      '@type': 'ImageObject',
-      url: 'https://www.pocketportfolio.app/brand/pp-monogram-amber.png'
-    },
-    sameAs: [
-      'https://github.com/PocketPortfolio/Financialprofilenetwork',
-      'https://twitter.com/pocketportfolio',
-      'https://discord.gg/Ch9PpjRzwe',
-      'https://dev.to/pocketportfolioapp',
-      'https://coderlegion.com/5738/welcome-to-coderlegion-22s'
-    ],
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: 'https://www.pocketportfolio.app/search?q={search_term_string}',
-      'query-input': 'required name=search_term_string'
-    }
-  };
-}
-
-/**
  * Render JSON-LD structured data
  */
-export function renderJsonLd(schema: HomePageSchema): { __html: string } {
+export function renderJsonLd(schema: HomePageSchemaGraph | HomePageSchema | Record<string, unknown>): {
+  __html: string;
+} {
   return {
-    __html: JSON.stringify(schema, null, 2)
+    __html: JSON.stringify(schema, null, 2),
   };
 }
 
@@ -72,8 +106,8 @@ export function getTickerSchema(symbol: string, name: string, description?: stri
     category: 'Financial Product',
     provider: {
       '@type': 'Organization',
-      name: 'Pocket Portfolio'
-    }
+      name: 'Pocket Portfolio',
+    },
   };
 }
 
@@ -91,8 +125,8 @@ export function getBrokerSchema(brokerName: string, description?: string) {
     offers: {
       '@type': 'Offer',
       price: '0',
-      priceCurrency: 'USD'
-    }
+      priceCurrency: 'USD',
+    },
   };
 }
 
@@ -100,14 +134,10 @@ export function getBrokerSchema(brokerName: string, description?: string) {
  * Generate Dataset schema for JSON API pages
  * This helps AI agents and search engines recognize our data as a public dataset
  */
-export function getDatasetSchema(
-  symbol: string,
-  name?: string,
-  exchange?: string
-) {
+export function getDatasetSchema(symbol: string, name?: string, exchange?: string) {
   const normalizedSymbol = symbol.toUpperCase();
   const symbolLower = normalizedSymbol.toLowerCase();
-  
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
@@ -125,37 +155,37 @@ export function getDatasetSchema(
       'historical price data',
       'JSON financial data',
       'CSV stock data download',
-      'download stock data CSV'
+      'download stock data CSV',
     ],
     license: 'https://www.pocketportfolio.app',
     creator: {
       '@type': 'Organization',
       name: 'Pocket Portfolio',
-      url: 'https://www.pocketportfolio.app'
+      url: 'https://www.pocketportfolio.app',
     },
     distribution: [
       {
         '@type': 'DataDownload',
         encodingFormat: 'application/json',
         contentUrl: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/json`,
-        description: `JSON endpoint for ${normalizedSymbol} historical data`
+        description: `JSON endpoint for ${normalizedSymbol} historical data`,
       },
       {
         '@type': 'DataDownload',
         encodingFormat: 'text/csv',
         contentUrl: `https://www.pocketportfolio.app/api/tickers/${normalizedSymbol}/csv`,
-        description: `CSV download for ${normalizedSymbol} historical data`
-      }
+        description: `CSV download for ${normalizedSymbol} historical data`,
+      },
     ],
     temporalCoverage: '2000-01-01/..',
     spatialCoverage: {
       '@type': 'Place',
-      name: exchange || 'Global'
+      name: exchange || 'Global',
     },
     about: {
       '@type': 'FinancialProduct',
       name: name || normalizedSymbol,
-      tickerSymbol: normalizedSymbol
-    }
+      tickerSymbol: normalizedSymbol,
+    },
   };
 }

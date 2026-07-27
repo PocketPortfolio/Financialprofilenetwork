@@ -5,14 +5,21 @@
 
 export const siteConfig = {
   name: 'Pocket Portfolio',
-  title: 'Pocket Portfolio | Sovereign Local-First Wealth Tracker',
+  /** Brand SERP reclaim — navigational queries: pocket folio / pocketfolio / pocket portfolio */
+  title: 'Pocket Portfolio | Local-First Portfolio Tracker (100% Private)',
   description:
-    'Private investment analysis and portfolio tracking. Local-first portfolio terminal: hybrid-sync architecture, no central warehousing of your raw ledger, bounded AI, optional Google Drive sync you control.',
+    'Pocket Portfolio (PocketFolio / Pocket Folio) — private, local-first portfolio tracker. Import broker CSVs in-browser. No central warehouse of your raw ledger. Optional Google Drive sync you control.',
   url: 'https://www.pocketportfolio.app',
   ogImage:
-    'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Sovereign%20Local-First%20Wealth%20Tracker&v=6',
+    'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Local-First%20Portfolio%20Tracker%20(100%25%20Private)&v=7',
   twitter: '@PocketPortApp',
+  /** Brand name collisions for SERP / AEO disambiguation */
+  alternateNames: ['PocketFolio', 'Pocket Folio', 'Pocket Portfolio App'] as const,
   keywords: [
+    'pocket portfolio',
+    'pocket folio',
+    'pocketfolio',
+    'pocket portfolio login',
     'local-first portfolio tracker',
     'sovereign wealth management',
     'private stock tracker',

@@ -1,0 +1,61 @@
+name: Ops upsert Vercel env
+
+on:
+  workflow_dispatch:
+    inputs:
+      keys:
+        description: 'Comma list: GA4_MEASUREMENT_PROTOCOL_SECRET,NEXT_PUBLIC_GA_MEASUREMENT_ID,PP_FIRST_PARTY_FETCH_SECRET'
+        required: false
+        default: 'GA4_MEASUREMENT_PROTOCOL_SECRET,NEXT_PUBLIC_GA_MEASUREMENT_ID,PP_FIRST_PARTY_FETCH_SECRET'
+
+permissions:
+  contents: read
+
+jobs:
+  upsert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build upsert JSON from repo secrets
+        id: build
+        env:
+          GA4_MEASUREMENT_PROTOCOL_SECRET: ${{ secrets.GA4_MEASUREMENT_PROTOCOL_SECRET }}
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+          PP_FIRST_PARTY_FETCH_SECRET: ${{ secrets.PP_FIRST_PARTY_FETCH_SECRET }}
+          KEYS: ${{ github.event.inputs.keys }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const keys = (process.env.KEYS || '').split(',').map((s) => s.trim()).filter(Boolean);
+          const map = {};
+          for (const k of keys) {
+            const v = process.env[k];
+            if (v) map[k] = v;
+            else console.error('missing secret for', k);
+          }
+          if (!Object.keys(map).length) {
+            console.error('No secrets resolved');
+            process.exit(2);
+          }
+          const json = JSON.stringify(map);
+          fs.appendFileSync(process.env.GITHUB_ENV, `VERCEL_ENV_UPSERTS<<EOF\n${json}\nEOF\n`);
+          console.log('upsert keys:', Object.keys(map).join(', '));
+          NODE
+      - name: Upsert on Vercel Preview+Production+Development
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ENV_UPSERTS: ${{ env.VERCEL_ENV_UPSERTS }}
+        run: node scripts/ops-upsert-vercel-env-gha.mjs
+      - name: Trigger production redeploy (deploy hook)
+        env:
+          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK_URL" ]; then
+            echo "No VERCEL_DEPLOY_HOOK_URL secret — skip hook (GitHub→Vercel deploy still applies after merge)."
+            exit 0
+          fi
+          curl -fsS -X POST "$VERCEL_DEPLOY_HOOK_URL"
+          echo "Deploy hook fired."

@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG, shouldNoindexOpenBlogFarm } from '@/lib/canonical-claims';
 import { isNextNavigationError } from '@/lib/next-navigation-errors';
 import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
@@ -37,6 +37,8 @@ type BlogPostFrontmatter = {
   tags?: string[];
   videoId?: string;
   dateModified?: string;
+  /** Explicit Wave 1 prune override; farm categories also noindex by doctrine */
+  noindex?: boolean;
 };
 
 function toSerializableString(value: unknown): string | undefined {
@@ -63,6 +65,7 @@ function normalizeFrontmatter(raw: Record<string, unknown>): BlogPostFrontmatter
     tags,
     videoId: toSerializableString(raw.videoId),
     dateModified: toSerializableString(raw.dateModified),
+    noindex: raw.noindex === true || raw.noindex === 'true',
   };
 }
 
@@ -139,11 +142,17 @@ export async function generateMetadata({
   const brand = onOpen ? SURFACE_ORG.open.name : 'Pocket Portfolio';
   const fallbackOgImage = `${siteBase}/api/og?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
   const published = data.date ?? undefined;
+  const farmNoindex =
+    data.noindex === true ||
+    (typeof data.noindex === 'undefined' && shouldNoindexOpenBlogFarm(data.category));
 
   return {
     title: `${data.title} | ${brand} Blog`,
     description: data.description,
     keywords: data.tags,
+    robots: farmNoindex
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
     openGraph: {
       title: data.title,
       description: data.description,
