@@ -13,6 +13,7 @@ import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import TickerCsvDownload from '@/app/components/TickerCsvDownload';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 import { jsonApiBridgeCopy } from '@/app/lib/seo/jsonApiInternalLinks';
+import { getFirstPartyFetchHeaders } from '@/app/lib/server/ticker-api-gate';
 import Link from 'next/link';
 
 
@@ -182,9 +183,7 @@ async function fetchTickerData(symbol: string) {
     
     const response = await fetch(`${baseUrl}/api/tickers/${symbol}/json?range=max`, {
       next: { revalidate: 3600 }, // Cache for 1 hour
-      headers: {
-        'Accept': 'application/json',
-      }
+      headers: getFirstPartyFetchHeaders(),
     });
     
     if (response.ok) {

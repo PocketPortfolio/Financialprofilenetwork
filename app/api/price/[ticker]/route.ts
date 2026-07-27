@@ -45,7 +45,9 @@ export async function GET(
         if (limit.count >= FREE_TIER_LIMIT) {
           return NextResponse.json(
             { 
-              error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
+              error: 'Too Many Requests',
+              message: 'Rate limit exceeded. Upgrade to Developer Utility for unlimited API access.',
+              checkout_url: 'https://www.pocketportfolio.app/sponsor?tier=developer-utility&utm_source=api_rate_limit&utm_medium=429&utm_campaign=price_api',
               limit: FREE_TIER_LIMIT,
               window: '1 hour'
             },

@@ -1,16 +1,27 @@
 /**
- * Ticker Historical Data JSON API
- * GET /api/tickers/{ticker}/json
- * Returns historical stock data in JSON format
- * Free, no API key required
- * 
- * Uses catch-all route [...ticker] to work around Next.js 15 nested dynamic route bug
- * Matches: /api/tickers/AAPL/json -> ticker = ["AAPL", "json"]
+ * Ticker Historical Data JSON/CSV API
+ * GET /api/tickers/{ticker}/json|csv
+ *
+ * First-party HTML UI is free (same-origin / SSR secret).
+ * External unauthenticated traffic is KV-metered; automated clients require a paid API key.
+ * Upsell: Developer Utility Stripe deep-link.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTickerMetadata } from '@/app/lib/pseo/data';
 import { kv } from '@vercel/kv';
+import {
+  DEVELOPER_UTILITY_CHECKOUT_URL,
+  isFirstPartyTickerRequest,
+  isLikelyAutomatedClient,
+  isLikelyDatacenterRequest,
+  rateLimitExceededCsvBody,
+  rateLimitExceededJsonBody,
+  resolveTickerClientIp,
+  tickerApiBaseHeaders,
+  unauthorizedCsvBody,
+  unauthorizedJsonBody,
+} from '@/app/lib/server/ticker-api-gate';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -23,9 +34,11 @@ export const maxDuration = 60;
 /** Upstream Yahoo chart/quote fetches — fail fast before serverless wall clock kills the invocation */
 const YAHOO_FETCH_TIMEOUT_MS = 14_000;
 
-// Free tier: 50 calls per hour per IP (more generous than price API since this is historical data)
+// Free tier: 50 calls per hour per IP for unauthenticated external traffic
 const FREE_TIER_LIMIT = 50;
 const FREE_TIER_WINDOW_SECONDS = 3600; // 1 hour in seconds (for KV TTL)
+/** Datacenter ASN clients get a tighter free bucket (challenge posture, not hard ban). */
+const DATACENTER_FREE_TIER_LIMIT = 15;
 
 // Cache for historical data (1 hour TTL)
 // Limit cache size to prevent memory leaks in serverless functions
@@ -98,7 +111,17 @@ function convertToCSV(data: HistoricalDataPoint[], ticker: string): string {
     ];
   });
 
-  const footerRow = ['DATA END', 'For automated updates', 'upgrade at:', 'pocketportfolio.app/sponsor', '', '', ''].map(escapeCsvCell).join(',');
+  const footerRow = [
+    'DATA END',
+    'For automated updates',
+    'upgrade at:',
+    DEVELOPER_UTILITY_CHECKOUT_URL,
+    '',
+    '',
+    '',
+  ]
+    .map(escapeCsvCell)
+    .join(',');
 
   const csvContent = [
     headers.join(','),
@@ -298,56 +321,59 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
 
 /**
  * Distributed rate limiting using Vercel KV (Upstash Redis)
- * Returns: { allowed: boolean, remaining: number, resetTime: number }
+ * Returns: { allowed: boolean, remaining: number, resetTime: number, limit: number }
  */
-async function checkRateLimit(ip: string): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
-  const key = `ratelimit:tickers:free:${ip}`;
-  const now = Math.floor(Date.now() / 1000); // Current time in seconds
+async function checkRateLimit(
+  ip: string,
+  limit: number = FREE_TIER_LIMIT
+): Promise<{ allowed: boolean; remaining: number; resetTime: number; limit: number }> {
+  const key = `ratelimit:tickers:free:${ip}:${limit}`;
+  const now = Math.floor(Date.now() / 1000);
   const resetTime = now + FREE_TIER_WINDOW_SECONDS;
 
   try {
-    // Get current count
-    const currentCount = await kv.get<number>(key) || 0;
-    
-    // Check if limit exceeded
-    if (currentCount >= FREE_TIER_LIMIT) {
-      // Get TTL to calculate actual reset time
+    const currentCount = (await kv.get<number>(key)) || 0;
+
+    if (currentCount >= limit) {
       const ttl = await kv.ttl(key);
       const actualResetTime = ttl > 0 ? now + ttl : resetTime;
-      
       return {
         allowed: false,
         remaining: 0,
-        resetTime: actualResetTime
+        resetTime: actualResetTime,
+        limit,
       };
     }
 
-    // Increment counter
     const newCount = currentCount + 1;
-    
+
     if (currentCount === 0) {
-      // First request - set with expiration
       await kv.set(key, newCount, { ex: FREE_TIER_WINDOW_SECONDS });
     } else {
-      // Update existing counter (TTL is preserved)
       await kv.set(key, newCount);
     }
 
     return {
       allowed: true,
-      remaining: FREE_TIER_LIMIT - newCount,
-      resetTime: resetTime
+      remaining: limit - newCount,
+      resetTime,
+      limit,
     };
   } catch (error) {
-    // If KV fails, fail open (allow request) but log error
-    // In production, you might want to fail closed instead
     console.error('[RATE_LIMIT_ERROR] KV operation failed:', error);
     return {
-      allowed: true, // Fail open to avoid blocking legitimate users
-      remaining: FREE_TIER_LIMIT - 1,
-      resetTime: resetTime
+      allowed: true,
+      remaining: limit - 1,
+      resetTime,
+      limit,
     };
   }
+}
+
+function withTickerHeaders(
+  headers: Record<string, string> = {}
+): Record<string, string> {
+  return { ...tickerApiBaseHeaders(), ...headers };
 }
 
 export async function GET(
@@ -405,10 +431,10 @@ export async function GET(
       },
       { 
         status: 400,
-        headers: {
+        headers: withTickerHeaders({
           'X-Tickers-Route': 'called',
           'X-Tickers-Error': 'invalid-format'
-        }
+        })
       }
     );
   }
@@ -425,10 +451,10 @@ export async function GET(
       },
       { 
         status: 400,
-        headers: {
+        headers: withTickerHeaders({
           'X-Tickers-Route': 'called',
           'X-Tickers-Error': 'missing-ticker'
-        }
+        })
       }
     );
   }
@@ -448,42 +474,36 @@ export async function GET(
       },
       { 
         status: 400,
-        headers: {
+        headers: withTickerHeaders({
           'X-Tickers-Route': 'called',
           'X-Tickers-Error': 'invalid-ticker-format'
-        }
+        })
       }
     );
   }
   
-  // Get API key from query parameter (optional)
-  const apiKey = request.nextUrl.searchParams.get('key');
+  // API key: ?key=... or Authorization: Bearer ...
+  const authHeader = request.headers.get('authorization') || '';
+  const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/i);
+  const apiKey =
+    request.nextUrl.searchParams.get('key') ||
+    (bearerMatch?.[1]?.trim() || null);
   const DEMO_KEY = 'demo_key';
-  
-  // Get client IP for rate limiting with improved detection
-  // Try multiple headers to get real client IP (prevents "unknown" fallback issue)
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const cfConnectingIp = request.headers.get('cf-connecting-ip'); // Cloudflare
-  const realIp = request.headers.get('x-real-ip');
-  const userAgent = request.headers.get('user-agent') || 'unknown';
-  
-  // Use first IP from x-forwarded-for, or Cloudflare IP, or real IP
-  // Fallback to a unique identifier based on user agent + timestamp to prevent shared rate limits
-  const ip = forwardedFor?.split(',')[0]?.trim() || 
-             cfConnectingIp || 
-             realIp || 
-             // Fallback: Create unique identifier to prevent all users from sharing same rate limit
-             // This ensures each user gets their own rate limit even if IP detection fails
-             `user-${userAgent.slice(0, 20).replace(/[^a-zA-Z0-9]/g, '')}-${Date.now().toString().slice(-8)}`;
-  
+
+  const ip = resolveTickerClientIp(request);
+  const isFirstParty = isFirstPartyTickerRequest(request);
+  const isAutomated = isLikelyAutomatedClient(request);
+  const isDatacenter = isLikelyDatacenterRequest(request);
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
   // Check if user has a valid paid API key (bypasses rate limiting)
+  // Developer Utility / Founders Club / Corporate keys live in apiKeysByEmail
   let hasValidApiKey = false;
   if (apiKey && apiKey !== DEMO_KEY) {
     try {
       const { getFirestore } = await import('firebase-admin/firestore');
       const { initializeApp, getApps, cert } = await import('firebase-admin/app');
-      
-      // Initialize Firebase Admin if not already done
+
       if (!getApps().length) {
         try {
           initializeApp({
@@ -497,76 +517,98 @@ export async function GET(
           console.error('Firebase Admin initialization error:', error);
         }
       }
-      
+
       const db = getFirestore();
-      const apiKeySnapshot = await db.collection('apiKeysByEmail')
+      const apiKeySnapshot = await db
+        .collection('apiKeysByEmail')
         .where('apiKey', '==', apiKey)
         .limit(1)
         .get();
-      
+
       hasValidApiKey = !apiKeySnapshot.empty;
     } catch (error) {
       console.error('API key validation error:', error);
-      // Fallback: check if key format is valid (pp_ prefix)
-      hasValidApiKey = apiKey.startsWith('pp_');
+      // Do NOT fail-open on pp_ prefix — treat as unauthenticated + meter
+      hasValidApiKey = false;
     }
   }
-  
-  // Only apply rate limiting for free tier (no API key or demo key)
-  // Skip rate limiting in development mode for testing
-  // CRITICAL FIX: Disable rate limiting for CSV downloads to unblock users
-  // CRITICAL FIX: Disable rate limiting for desktop view requests (ticker page features must always render)
-  // CSV downloads and desktop view requests are less frequent and should not be rate limited
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  const isCsvDownload = format === 'csv';
-  const isDesktopView = searchParams.get('desktop') === 'true'; // Desktop view requests from ticker pages
-  const isDashboardAnalytics = searchParams.get('source') === 'dashboard-analytics';
-  
-  let rateLimitResult: { allowed: boolean; remaining: number; resetTime: number } | null = null;
-  // Only apply rate limiting to external JSON API calls, not CSV downloads or desktop view requests
-  // Desktop view requests are exempt because Risk Metrics and Historical Data Table must always render
-  if (!hasValidApiKey && !isDevelopment && !isCsvDownload && !isDesktopView && !isDashboardAnalytics) {
-    rateLimitResult = await checkRateLimit(ip);
-    
+
+  let rateLimitResult: {
+    allowed: boolean;
+    remaining: number;
+    resetTime: number;
+    limit: number;
+  } | null = null;
+
+  // Phase 2: automated external clients without a key → hard 401 (no free firehose)
+  if (!hasValidApiKey && !isFirstParty && !isDevelopment && isAutomated) {
+    if (format === 'csv') {
+      return new NextResponse(unauthorizedCsvBody(), {
+        status: 401,
+        headers: withTickerHeaders({
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${ticker}-api-key-required.csv"`,
+        }),
+      });
+    }
+    return NextResponse.json(unauthorizedJsonBody(), {
+      status: 401,
+      headers: withTickerHeaders(),
+    });
+  }
+
+  // Soft meter: all external unauthenticated formats (JSON + CSV). No desktop/csv/source bypasses.
+  // First-party UI (dashboard, symbol pages, SSR with secret) is exempt.
+  if (!hasValidApiKey && !isFirstParty && !isDevelopment) {
+    const limit = isDatacenter ? DATACENTER_FREE_TIER_LIMIT : FREE_TIER_LIMIT;
+    rateLimitResult = await checkRateLimit(ip, limit);
+
     if (!rateLimitResult.allowed) {
-      const retryAfter = Math.max(0, rateLimitResult.resetTime - Math.floor(Date.now() / 1000));
-      
-      // Return format-appropriate error response
+      const retryAfter = Math.max(
+        0,
+        rateLimitResult.resetTime - Math.floor(Date.now() / 1000)
+      );
+      // Phase 2 end-state on breach: 401 for machines; keep 429 body shape with checkout for clarity
+      const status = isAutomated ? 401 : 429;
+      const jsonBody = isAutomated
+        ? unauthorizedJsonBody()
+        : {
+            ...rateLimitExceededJsonBody(),
+            limit: rateLimitResult.limit,
+            window: '1 hour',
+            retryAfter,
+          };
+      const csvBody = isAutomated
+        ? unauthorizedCsvBody()
+        : rateLimitExceededCsvBody(retryAfter);
+
       if (format === 'csv') {
-        // Return CSV error response for CSV requests
-        const minutes = Math.ceil(retryAfter / 60);
-        const errorCsv = `Date,Error,RetryAfter\n${new Date().toISOString().split('T')[0]},Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor,${minutes} minute${minutes !== 1 ? 's' : ''}`;
-        return new NextResponse(errorCsv, {
-          status: 429,
-          headers: {
+        return new NextResponse(csvBody, {
+          status,
+          headers: withTickerHeaders({
             'Content-Type': 'text/csv; charset=utf-8',
             'Content-Disposition': `attachment; filename="${ticker}-rate-limit-error.csv"`,
-            'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
+            'X-RateLimit-Limit': String(rateLimitResult.limit),
             'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
-            'Retry-After': String(retryAfter)
-          }
+            'X-RateLimit-Reset': new Date(
+              rateLimitResult.resetTime * 1000
+            ).toISOString(),
+            'Retry-After': String(retryAfter),
+          }),
         });
       }
-      
-      // JSON error response for JSON requests
-      return NextResponse.json(
-        { 
-          error: 'Rate Limit Exceeded. Get Unlimited Key: pocketportfolio.app/sponsor',
-          limit: FREE_TIER_LIMIT,
-          window: '1 hour',
-          retryAfter: retryAfter
-        },
-        { 
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': String(FREE_TIER_LIMIT),
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime * 1000).toISOString(),
-            'Retry-After': String(retryAfter)
-          }
-        }
-      );
+
+      return NextResponse.json(jsonBody, {
+        status,
+        headers: withTickerHeaders({
+          'X-RateLimit-Limit': String(rateLimitResult.limit),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': new Date(
+            rateLimitResult.resetTime * 1000
+          ).toISOString(),
+          'Retry-After': String(retryAfter),
+        }),
+      });
     }
   }
 
@@ -591,17 +633,17 @@ export async function GET(
         const note = `No historical data available for ${ticker} (e.g. mutual funds may have limited data).`;
         const noteRow = [new Date().toISOString().split('T')[0], '', '', '', '', '0', note].map(escapeCsvCell).join(',');
         const csvContent = '\uFEFFDate,Open,High,Low,Close,Volume,SOURCE: Pocket Portfolio API\n' + noteRow + '\n';
-        const headers: Record<string, string> = {
+        const headers: Record<string, string> = withTickerHeaders({
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': `attachment; filename="${ticker}-historical-data.csv"`,
           'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
           'X-Data-Status': 'no-data',
-        };
+        });
         if (hasValidApiKey) {
           headers['X-RateLimit-Limit'] = 'unlimited';
           headers['X-RateLimit-Remaining'] = 'unlimited';
         } else if (rateLimitResult) {
-          headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+          headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
           headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
           headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
         }
@@ -621,16 +663,16 @@ export async function GET(
           message: 'No historical data available for this symbol (e.g. mutual funds may have limited data).',
         },
       };
-      const headers: Record<string, string> = {
+      const headers: Record<string, string> = withTickerHeaders({
         'Content-Type': 'application/json',
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
         'X-Data-Status': 'no-data',
-      };
+      });
       if (hasValidApiKey) {
         headers['X-RateLimit-Limit'] = 'unlimited';
         headers['X-RateLimit-Remaining'] = 'unlimited';
       } else if (rateLimitResult) {
-        headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+        headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
         headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
         headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
       }
@@ -643,17 +685,17 @@ export async function GET(
     // Handle CSV format
     if (format === 'csv') {
       const csv = convertToCSV(historicalData, ticker);
-      const headers: Record<string, string> = {
+      const headers: Record<string, string> = withTickerHeaders({
         'Content-Type': 'text/csv; charset=utf-8',
         'Content-Disposition': `attachment; filename="${ticker}-historical-data.csv"`,
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
-      };
+      });
       
       if (hasValidApiKey) {
         headers['X-RateLimit-Limit'] = 'unlimited';
         headers['X-RateLimit-Remaining'] = 'unlimited';
       } else if (rateLimitResult) {
-        headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+        headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
         headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
         headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
       }
@@ -675,16 +717,16 @@ export async function GET(
     };
 
     // Set rate limit headers (unlimited for paid users)
-    const headers: Record<string, string> = {
+    const headers: Record<string, string> = withTickerHeaders({
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200', // Cache for 1 hour, stale for 2 hours
-    };
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+    });
     
     if (hasValidApiKey) {
       headers['X-RateLimit-Limit'] = 'unlimited';
       headers['X-RateLimit-Remaining'] = 'unlimited';
     } else if (rateLimitResult) {
-      headers['X-RateLimit-Limit'] = String(FREE_TIER_LIMIT);
+      headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
       headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
       headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
     }
@@ -701,10 +743,10 @@ export async function GET(
       },
       {
         status: 503,
-        headers: {
+        headers: withTickerHeaders({
           'Retry-After': '120',
           'Cache-Control': 'no-store',
-        },
+        }),
       }
     );
   }
@@ -722,10 +764,10 @@ export async function GET(
       },
       {
         status: 503,
-        headers: {
+        headers: withTickerHeaders({
           'Retry-After': '120',
           'Cache-Control': 'no-store',
-        },
+        }),
       }
     );
   }

@@ -1,25 +1,49 @@
 /**
- * GitHub Actions variant: uses VERCEL_TOKEN + org/project from env.
- * Sets PP_FIRST_PARTY_FETCH_SECRET from SECRET env (or CRON_SECRET).
+ * Run AFTER `npx vercel login` (or with valid CLI auth.json token).
+ * Sets PP_FIRST_PARTY_FETCH_SECRET = CRON_SECRET on production/preview/development.
  *
- *   SECRET=... VERCEL_TOKEN=... VERCEL_ORG_ID=... VERCEL_PROJECT_ID=... node scripts/ops-set-pp-first-party-env-gha.mjs
+ *   node scripts/ops-set-pp-first-party-env.mjs
  */
-const token = process.env.VERCEL_TOKEN?.trim();
-const teamId = process.env.VERCEL_ORG_ID?.trim();
-const projectId = process.env.VERCEL_PROJECT_ID?.trim();
-const secret =
-  process.env.SECRET?.trim() ||
-  process.env.PP_FIRST_PARTY_FETCH_SECRET?.trim() ||
-  process.env.CRON_SECRET?.trim();
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
-if (!token || !teamId || !projectId || !secret) {
-  console.error('Need VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, and SECRET');
+const authPath = path.join(
+  os.homedir(),
+  'AppData',
+  'Roaming',
+  'com.vercel.cli',
+  'Data',
+  'auth.json'
+);
+const envLocal = fs.readFileSync('.env.local', 'utf8');
+const secret =
+  envLocal.match(/^PP_FIRST_PARTY_FETCH_SECRET=(.*)$/m)?.[1]?.replace(/^["']|["']$/g, '').trim() ||
+  envLocal.match(/^CRON_SECRET=(.*)$/m)?.[1]?.replace(/^["']|["']$/g, '').trim();
+
+if (!secret) {
+  console.error('Need PP_FIRST_PARTY_FETCH_SECRET or CRON_SECRET in .env.local');
   process.exit(2);
 }
 
+if (!fs.existsSync(authPath)) {
+  console.error('Missing Vercel CLI auth. Run: npx vercel login');
+  process.exit(2);
+}
+
+const auth = JSON.parse(fs.readFileSync(authPath, 'utf8'));
+const token = auth.token || auth.accessToken;
+if (!token) {
+  console.error('Vercel auth.json has no token. Run: npx vercel login');
+  process.exit(2);
+}
+
+const project = JSON.parse(fs.readFileSync('.vercel/project.json', 'utf8'));
+const { projectId, orgId: teamId } = project;
+
 async function vercel(apiPath, opts = {}) {
   const url = new URL(`https://api.vercel.com${apiPath}`);
-  url.searchParams.set('teamId', teamId);
+  if (teamId) url.searchParams.set('teamId', teamId);
   const res = await fetch(url, {
     ...opts,
     headers: {
@@ -34,12 +58,9 @@ async function vercel(apiPath, opts = {}) {
 
 const list = await vercel(`/v9/projects/${projectId}/env`);
 if (list.status !== 200) {
-  console.error('env list failed', list.status, JSON.stringify(list.json));
+  console.error('env list failed', list.status, list.json);
   process.exit(2);
 }
-
-const hasCron = (list.json.envs || []).some((e) => e.key === 'CRON_SECRET');
-console.log('CRON_SECRET present on project:', hasCron);
 
 for (const target of ['production', 'preview', 'development']) {
   const existing = (list.json.envs || []).find(
@@ -61,7 +82,7 @@ for (const target of ['production', 'preview', 'development']) {
         target: [target],
       }),
     });
-    console.log('created', target, cre.status, cre.json?.error || 'ok');
+    console.log('created', target, cre.status);
   }
 }
 
