@@ -3402,14 +3402,15 @@
     "scheduledTime": "18:00",
     "title": "Research: Canary Release Performance - Traffic Splitting Analysis",
     "slug": "research-canary-release-performance-traffic-splitting-analysis-2026-07-27",
-    "status": "pending",
+    "status": "published",
     "category": "research",
     "pillar": "technical",
     "keywords": [
       "performance",
       "canary",
       "release"
-    ]
+    ],
+    "publishedAt": "2026-07-27T18:01:32.619Z"
   },
   {
     "id": "research-time-series-database-performance-influxdb-vs-timescaledb-2026-07-28",
