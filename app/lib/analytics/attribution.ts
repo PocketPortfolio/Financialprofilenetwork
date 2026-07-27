@@ -1,3 +1,5 @@
+import { isInternalAcquisitionUtm } from './clean-tracker';
+
 export type FirstTouchAttribution = {
   utm_source: string | null;
   utm_medium: string | null;
@@ -69,6 +71,11 @@ export function captureFirstTouchAttribution() {
   if (existing) return;
 
   const utm = readUtmFromUrl();
+  // Do not let self-referred json_api / UI UTM loops become first-touch acquisition
+  if (isInternalAcquisitionUtm(utm.utm_source, utm.utm_medium)) {
+    return;
+  }
+
   const now = new Date();
   const value: FirstTouchAttribution = {
     v: 1,

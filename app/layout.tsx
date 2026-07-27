@@ -184,11 +184,25 @@ export default async function RootLayout({
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${getCleanGAId()}', {
-                  page_path: window.location.pathname,
-                  send_page_view: true,
-                  cookie_flags: 'SameSite=Lax;Secure',
-                });
+                (function(){
+                  var qs = new URLSearchParams(window.location.search);
+                  var src = (qs.get('utm_source') || '').toLowerCase();
+                  var med = (qs.get('utm_medium') || '').toLowerCase();
+                  var selfMediums = ['semantic_footer','sticky_prompt','live_preview_lead','bridge_cta','json_export_cta','sovereign_cta','footer'];
+                  var selfSources = ['json_api','symbol_layout','symbol_hub','dividend_page'];
+                  var isInternal = selfMediums.indexOf(med) !== -1 || selfSources.indexOf(src) !== -1;
+                  var cfg = {
+                    page_path: window.location.pathname,
+                    send_page_view: true,
+                    cookie_flags: 'SameSite=Lax;Secure'
+                  };
+                  if (isInternal) {
+                    cfg.traffic_type = 'internal';
+                    cfg.campaign_source = 'internal';
+                    cfg.campaign_medium = 'self_nav';
+                  }
+                  gtag('config', '${getCleanGAId()}', cfg);
+                })();
               `}
             </Script>
           </>

@@ -310,6 +310,10 @@ const nextConfig = {
         source: '/marketing/:path*.mp4',
         headers: [{ key: 'Accept-Ranges', value: 'bytes' }],
       },
+      {
+        source: '/api/tickers/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
     ];
 
     // Skip security headers in development to avoid CSP issues with Next.js dev server

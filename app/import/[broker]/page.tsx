@@ -7,8 +7,8 @@ import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 /** US retail CSV-export intent pages — dedicated title/meta/H1 + export copy */
 const US_RETAIL_SEO_BROKERS = new Set(['robinhood', 'schwab', 'fidelity', 'vanguard']);
 const META_VARIANT = process.env.NEXT_PUBLIC_GSC_META_VARIANT === 'B' ? 'B' : 'A';
+/** High-impression import landers from GSC — CTR-focused titles/descriptions */
 const META_TEST_BROKERS = new Set([
-  // High-impression import landers seen in GSC exports
   'trade-republic',
   'ghostfolio',
   'degiro',
@@ -18,7 +18,93 @@ const META_TEST_BROKERS = new Set([
   'webull',
   'saxo',
   'moomoo',
+  'wealthsimple',
+  'revolut',
+  'ig',
+  'public',
+  'crypto-com',
+  'm1-finance',
+  'robinhood',
+  'coinbase',
 ]);
+
+const HIGH_CTR_IMPORT_TITLES: Record<string, { title: string; description: string }> = {
+  'trade-republic': {
+    title: 'Trade Republic CSV Export → Import | Local-First Portfolio Tracker',
+    description:
+      'Export Trade Republic transactions as CSV and import in-browser. No uploads. Track P&L locally with Pocket Portfolio.',
+  },
+  'interactive-brokers': {
+    title: 'Interactive Brokers CSV / Flex Import | Local-First Tracker',
+    description:
+      'Import IBKR Flex or CSV exports in your browser. No server uploads. Local-first portfolio tracking for Interactive Brokers.',
+  },
+  trading212: {
+    title: 'Trading 212 CSV Export Import | Free Local Portfolio Tracker',
+    description:
+      'Download your Trading 212 CSV and import locally. Privacy-first portfolio tracking — your trades never leave your device.',
+  },
+  wealthsimple: {
+    title: 'Wealthsimple CSV Export Import | Local-First Portfolio App',
+    description:
+      'Import Wealthsimple CSV exports in-browser. No uploads. See performance and holdings with Pocket Portfolio.',
+  },
+  etoro: {
+    title: 'eToro Account Statement CSV Import | Local-First Tracker',
+    description:
+      'Convert eToro account statement CSV into a local portfolio view. No uploads. Free local-first tracking.',
+  },
+  webull: {
+    title: 'Webull Trade History CSV Import | Local Portfolio Tracker',
+    description:
+      'Export Webull trade history as CSV and import in your browser. No cloud upload. Local-first analysis.',
+  },
+  degiro: {
+    title: 'DEGIRO CSV Export Import | Local-First Portfolio Tracker',
+    description:
+      'Import DEGIRO CSV transaction exports locally. No uploads. Track your DEGIRO portfolio in Pocket Portfolio.',
+  },
+  revolut: {
+    title: 'Revolut Stocks CSV Export Import | Local-First Tracker',
+    description:
+      'Import Revolut investment CSV exports in-browser. Privacy-first — your data stays on your device.',
+  },
+  moomoo: {
+    title: 'Moomoo CSV Export Import | Free Local Portfolio Tracker',
+    description:
+      'Import Moomoo CSV trade history locally. No uploads. Local-first portfolio tracking with Pocket Portfolio.',
+  },
+  saxo: {
+    title: 'Saxo Bank CSV Export Import | Local-First Portfolio App',
+    description:
+      'Import Saxo CSV statements in your browser. No server uploads. Local-first multi-broker tracking.',
+  },
+  ig: {
+    title: 'IG Markets CSV Export Import | Local Portfolio Tracker',
+    description:
+      'Import IG CSV activity exports locally. No uploads. Track IG positions with Pocket Portfolio.',
+  },
+  public: {
+    title: 'Public.com CSV Export Import | Local-First Tracker',
+    description:
+      'Import Public.com CSV exports in-browser. No uploads. Free local-first portfolio tracking.',
+  },
+  'crypto-com': {
+    title: 'Crypto.com Transaction CSV Import | Local Portfolio Tracker',
+    description:
+      'Import Crypto.com transaction CSVs locally. No uploads. Track crypto + stocks in one local-first app.',
+  },
+  'm1-finance': {
+    title: 'M1 Finance CSV Export Import | Local-First Portfolio Tracker',
+    description:
+      'Import M1 Finance CSV exports in your browser. No uploads. Local-first portfolio analysis.',
+  },
+  coinbase: {
+    title: 'Coinbase Transaction CSV Import | Local Portfolio Tracker',
+    description:
+      'Import Coinbase transaction history CSV locally. No uploads. Local-first crypto portfolio tracking.',
+  },
+};
 
 function getUsBrokerExportStep1Text(broker: string, displayName: string): string {
   switch (broker) {
@@ -222,12 +308,17 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     };
   }
 
-  const title = inMetaTest
-    ? `${config.displayName} CSV Import | Local-First, No Uploads`
-    : `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`;
-  const description = inMetaTest
-    ? `Import your ${config.displayName} CSV in-browser and analyze locally. No uploads. Your financial history stays on your device.`
-    : `Looking to track your ${config.displayName} portfolio? Import your ${config.displayName} CSV export in your browser. No uploads — your financial history stays on your device.`;
+  const highCtr = HIGH_CTR_IMPORT_TITLES[broker];
+  const title = highCtr
+    ? highCtr.title
+    : inMetaTest
+      ? `${config.displayName} CSV Import | Local-First, No Uploads`
+      : `${config.displayName} CSV Export & Portfolio Import | Free Local-First Tracker`;
+  const description = highCtr
+    ? highCtr.description
+    : inMetaTest
+      ? `Import your ${config.displayName} CSV in-browser and analyze locally. No uploads. Your financial history stays on your device.`
+      : `Looking to track your ${config.displayName} portfolio? Import your ${config.displayName} CSV export in your browser. No uploads — your financial history stays on your device.`;
 
   return {
     title,
@@ -245,13 +336,15 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     ],
     openGraph: {
       title,
-      description: inMetaTest
-        ? `Import your ${config.displayName} CSV in-browser. No uploads. Local-first analysis.`
-        : `Looking to track your ${config.displayName} portfolio? Import your ${config.displayName} CSV export in your browser. No uploads.`,
+      description: highCtr
+        ? highCtr.description
+        : inMetaTest
+          ? `Import your ${config.displayName} CSV in-browser. No uploads. Local-first analysis.`
+          : `Looking to track your ${config.displayName} portfolio? Import your ${config.displayName} CSV export in your browser. No uploads.`,
       images: [
         {
-          url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
-          secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
+          url: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=7`,
+          secureUrl: `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=7`,
           width: 1200,
           height: 630,
           alt: `${config.displayName} CSV Import - Pocket Portfolio`,
@@ -262,11 +355,13 @@ export async function generateMetadata({ params }: { params: Promise<{ broker: s
     twitter: {
       card: 'summary_large_image',
       title,
-      description: inMetaTest
-        ? `Import your ${config.displayName} CSV in-browser. No uploads. Your data stays on your device.`
-        : `Import your ${config.displayName} CSV export in your browser. No uploads.`,
+      description: highCtr
+        ? highCtr.description
+        : inMetaTest
+          ? `Import your ${config.displayName} CSV in-browser. No uploads. Your data stays on your device.`
+          : `Import your ${config.displayName} CSV export in your browser. No uploads.`,
       images: [
-        `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=6`,
+        `https://www.pocketportfolio.app/api/og?title=${encodeURIComponent(`${config.displayName} CSV Import`)}&description=${encodeURIComponent('Free Local-First Tracker')}&v=7`,
       ],
     },
     alternates: {
