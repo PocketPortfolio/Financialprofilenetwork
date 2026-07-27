@@ -263,7 +263,9 @@
     "fast-xml-parser": ">=5.3.5",
     "esbuild": ">=0.28.1",
     "undici": ">=6.24.0",
-    "glob": ">=10.4.6"
+    "glob": ">=10.4.6",
+    "websocket-driver": ">=0.7.5",
+    "tar": ">=7.5.19"
   },
   "engines": {
     "node": ">=20.0.0",
