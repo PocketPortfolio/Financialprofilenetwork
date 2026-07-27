@@ -8,19 +8,20 @@
 ## Top-10 broker URLs (GSC URL Inspection)
 
 Submit after production deploy of PR #90 meta + this sprint's dropzone.
+**Code ready 2026-07-27** — above-fold dropzone verified on Ghostfolio. Marketing: GSC URL Inspection each row.
 
 | # | Broker | URL | Submitted | Indexed? | Notes |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Ghostfolio | https://www.pocketportfolio.app/import/ghostfolio | | | |
-| 2 | Trade Republic | https://www.pocketportfolio.app/import/trade-republic | | | |
-| 3 | Interactive Brokers | https://www.pocketportfolio.app/import/interactive-brokers | | | |
-| 4 | Webull | https://www.pocketportfolio.app/import/webull | | | |
-| 5 | Trading 212 | https://www.pocketportfolio.app/import/trading212 | | | |
-| 6 | eToro | https://www.pocketportfolio.app/import/etoro | | | |
-| 7 | Wealthsimple | https://www.pocketportfolio.app/import/wealthsimple | | | |
-| 8 | DEGIRO | https://www.pocketportfolio.app/import/degiro | | | |
-| 9 | Revolut | https://www.pocketportfolio.app/import/revolut | | | |
-| 10 | Moomoo | https://www.pocketportfolio.app/import/moomoo | | | |
+| 1 | Ghostfolio | https://www.pocketportfolio.app/import/ghostfolio | Ready | | Dropzone live |
+| 2 | Trade Republic | https://www.pocketportfolio.app/import/trade-republic | Ready | | |
+| 3 | Interactive Brokers | https://www.pocketportfolio.app/import/interactive-brokers | Ready | | |
+| 4 | Webull | https://www.pocketportfolio.app/import/webull | Ready | | |
+| 5 | Trading 212 | https://www.pocketportfolio.app/import/trading212 | Ready | | |
+| 6 | eToro | https://www.pocketportfolio.app/import/etoro | Ready | | |
+| 7 | Wealthsimple | https://www.pocketportfolio.app/import/wealthsimple | Ready | | |
+| 8 | DEGIRO | https://www.pocketportfolio.app/import/degiro | Ready | | |
+| 9 | Revolut | https://www.pocketportfolio.app/import/revolut | Ready | | |
+| 10 | Moomoo | https://www.pocketportfolio.app/import/moomoo | Ready | | |
 
 ## 14-day CTR log (GSC Performance → Pages filter `/import/`)
 

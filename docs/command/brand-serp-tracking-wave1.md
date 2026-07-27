@@ -8,8 +8,8 @@
 
 | URL | Submitted (date) | Result |
 | --- | --- | --- |
-| `https://www.pocketportfolio.app/` | TBD | |
-| `https://www.pocketportfolio.app/login` | TBD | |
+| `https://www.pocketportfolio.app/` | Ready 2026-07-27 (Marketing GSC) | Live title/meta verified |
+| `https://www.pocketportfolio.app/login` | Ready 2026-07-27 (Marketing GSC) | Live 200 verified |
 
 ## Brand queries to watch
 

@@ -59,9 +59,10 @@ Doc: [op-content-doctrine-wave1.md](./op-content-doctrine-wave1.md)
 
 | Check | Status |
 | --- | --- |
-| `GA4_MEASUREMENT_PROTOCOL_SECRET` set in Vercel | |
-| `developer_utility_conversion` events visible | |
-| 401 → `/sponsor` → paid key path documented | |
+| `GA4_MEASUREMENT_PROTOCOL_SECRET` set in Vercel | Done 2026-07-27 (prod/preview/dev) |
+| Secret registered in GA4 Admin for `G-9FQ2NBHY7H` | Pending Marketing/Eng |
+| `developer_utility_conversion` events visible | Pending (after Admin secret) |
+| 401 → `/sponsor` → paid key path documented | Done (PR #90) |
 
 ---
 
