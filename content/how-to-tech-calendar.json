@@ -3334,14 +3334,15 @@
     "scheduledTime": "14:00",
     "title": "How to Implement API Request Validation Middleware",
     "slug": "how-to-implement-api-request-validation-middleware",
-    "status": "pending",
+    "status": "published",
     "category": "how-to-in-tech",
     "pillar": "technical",
     "keywords": [
       "api",
       "implement",
       "request"
-    ]
+    ],
+    "publishedAt": "2026-07-27T14:01:55.660Z"
   },
   {
     "id": "how-to-the-complete-guide-to-api-error-handling-jul-28",
