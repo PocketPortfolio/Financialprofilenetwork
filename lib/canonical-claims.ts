@@ -627,6 +627,10 @@ export const OPEN_URLS = {
   sovereignFinance: 'https://www.openportfolio.co.uk/learn/sovereign-finance',
   localFirst: 'https://www.openportfolio.co.uk/learn/local-first',
   vendorLockIn: 'https://www.openportfolio.co.uk/learn/vendor-lock-in',
+  sovereignAiArchitecture: 'https://www.openportfolio.co.uk/learn/sovereign-ai-architecture',
+  doraEuAiActWealth: 'https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth',
+  statelessEdgeIngestion: 'https://www.openportfolio.co.uk/learn/stateless-edge-ingestion',
+  enterpriseDesignPartnership: 'https://www.openportfolio.co.uk/learn/enterprise-design-partnership',
   sovereignStrike: 'https://www.openportfolio.co.uk/playbooks/sovereign-strike',
   openBrokerCsv: 'https://www.openportfolio.co.uk/openbrokercsv',
   etoroToOpenBrokerCsv: 'https://www.openportfolio.co.uk/static/csv-etoro-to-openbrokercsv',
@@ -658,6 +662,26 @@ export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; ope
   { path: '/learn/sovereign-finance', title: 'Sovereign Finance', openUrl: OPEN_URLS.sovereignFinance },
   { path: '/learn/local-first', title: 'Local-First', openUrl: OPEN_URLS.localFirst },
   { path: '/learn/vendor-lock-in', title: 'Vendor Lock-In', openUrl: OPEN_URLS.vendorLockIn },
+  {
+    path: '/learn/sovereign-ai-architecture',
+    title: 'Sovereign AI Architecture',
+    openUrl: OPEN_URLS.sovereignAiArchitecture,
+  },
+  {
+    path: '/learn/dora-eu-ai-act-wealth',
+    title: 'DORA & EU AI Act',
+    openUrl: OPEN_URLS.doraEuAiActWealth,
+  },
+  {
+    path: '/learn/stateless-edge-ingestion',
+    title: 'Stateless Edge Ingestion',
+    openUrl: OPEN_URLS.statelessEdgeIngestion,
+  },
+  {
+    path: '/learn/enterprise-design-partnership',
+    title: 'Enterprise Design Partnership',
+    openUrl: OPEN_URLS.enterpriseDesignPartnership,
+  },
   { path: '/playbooks/sovereign-strike', title: 'Sovereign Strike Playbook', openUrl: OPEN_URLS.sovereignStrike },
   { path: '/openbrokercsv', title: 'Sovereign Ingestion', openUrl: OPEN_URLS.openBrokerCsv },
   {
@@ -754,6 +778,15 @@ export type OpenBlogCategory = (typeof OPEN_BLOG_CATEGORIES)[number];
 
 export function isOpenBlogCategory(category: string | undefined): boolean {
   return (OPEN_BLOG_CATEGORIES as readonly string[]).includes(category ?? '');
+}
+
+/**
+ * Wave 1 content doctrine: generic how-to / research farm posts stay crawlable for links
+ * but must not compete for index slots. Sovereign engineering stays indexable.
+ */
+export function shouldNoindexOpenBlogFarm(category: string | undefined): boolean {
+  const c = category ?? '';
+  return c === 'how-to-in-tech' || c === 'research';
 }
 
 /** First-party MDX on Pocket (B2C) — excludes Open-only categories. */

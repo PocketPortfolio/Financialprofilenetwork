@@ -70,6 +70,10 @@ function priorityForRoute(path: string): number {
     case '/learn/sovereign-stack':
     case '/learn/sovereign-finance':
     case '/learn/local-first':
+    case '/learn/sovereign-ai-architecture':
+    case '/learn/dora-eu-ai-act-wealth':
+    case '/learn/stateless-edge-ingestion':
+    case '/learn/enterprise-design-partnership':
       return 0.85;
     case '/learn/vendor-lock-in':
     case '/playbooks/sovereign-strike':

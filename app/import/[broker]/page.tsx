@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 import SovereignSyncCTA from '@/app/components/SovereignSyncCTA';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
+import ImportLanderDropzone from '@/app/components/ImportLanderDropzone';
 
 /** US retail CSV-export intent pages — dedicated title/meta/H1 + export copy */
 const US_RETAIL_SEO_BROKERS = new Set(['robinhood', 'schwab', 'fidelity', 'vanguard']);
@@ -513,6 +514,8 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
               : `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.`}
           </p>
         </header>
+
+        <ImportLanderDropzone brokerSlug={broker} brokerDisplayName={config.displayName} />
 
         {(() => {
           const variant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';

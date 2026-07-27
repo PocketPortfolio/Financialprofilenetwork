@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getFirestore } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { generateApiKey } from '@/app/lib/utils/apiKey';
+import { sendGa4MeasurementProtocolEvent } from '@/app/lib/analytics/ga4-measurement-protocol';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -249,6 +250,32 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         licenseKey: apiKeyData.corporateLicense,
         email: customerEmail,
         createdAt: apiKeyData.createdAt,
+      });
+    }
+
+    // Board KPI: paid API / Developer Utility conversion (PR #90 scraper funnel)
+    const meta = (session.metadata || {}) as Record<string, string>;
+    const utmCampaign = meta.utm_campaign || meta.campaign || '';
+    const fromScraperGate =
+      utmCampaign === 'ticker_api' ||
+      meta.utm_source === 'api_rate_limit' ||
+      meta.source === 'api_rate_limit';
+
+    if (tierInfo.hasApiKey && (tierInfo.tier === 'featureVoter' || tierInfo.tier === 'foundersClub' || tierInfo.tier === 'corporateSponsor')) {
+      await sendGa4MeasurementProtocolEvent({
+        name: 'developer_utility_conversion',
+        clientId: `stripe.${session.id}`,
+        params: {
+          tier: tierInfo.tier,
+          value: typeof session.amount_total === 'number' ? session.amount_total / 100 : 0,
+          currency: (session.currency || 'gbp').toUpperCase(),
+          transaction_id: session.id,
+          has_api_key: true,
+          source: fromScraperGate ? '401_scraper_gate' : 'sponsor_checkout',
+          utm_campaign: utmCampaign || undefined,
+          utm_source: meta.utm_source || undefined,
+          utm_medium: meta.utm_medium || undefined,
+        },
       });
     }
   } catch (error) {
