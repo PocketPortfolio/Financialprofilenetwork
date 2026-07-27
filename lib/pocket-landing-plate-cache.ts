@@ -4,17 +4,17 @@
  */
 
 export const POCKET_LANDING_PLATE_CACHE: Record<string, string> = {
-  'web-portal-terminal.png': '6ded4d6b0d84',
-  'web-portal-storage.png': '1497a99b1eb3',
-  'web-portal-founders.png': '861475a13b6e',
-  'web-why-choose.png': '7df657ad3bdb',
-  'web-ad-free-invariant.png': 'ebd3d156eefe',
-  'web-fin-pillars.png': '8246a709780f',
-  'web-community-nodes.png': '476c62601a9c',
-  'web-news-regulatory.png': '2cbcf7373335',
-  'web-news-infra.png': 'b6da3bad6624',
-  'web-news-wealth-tech.png': 'a4a8b2a243de',
-  'web-news-market.png': '5c4ada3d3657',
+  'web-portal-terminal.png': 'b678aad96445',
+  'web-portal-storage.png': '0b443fdf4a64',
+  'web-portal-founders.png': '5946e7bf1683',
+  'web-why-choose.png': '2d30293746b3',
+  'web-ad-free-invariant.png': '265a048bcd23',
+  'web-fin-pillars.png': 'ca76ff14699a',
+  'web-community-nodes.png': '600f9b8ac611',
+  'web-news-regulatory.png': '6e6c38b8700b',
+  'web-news-infra.png': 'bd9956627516',
+  'web-news-wealth-tech.png': 'e42f979dcaa6',
+  'web-news-market.png': 'e521f3d4887e',
 };
 
 export function plateSrc(filename: string): string {

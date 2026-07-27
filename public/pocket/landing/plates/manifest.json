@@ -1,31 +1,31 @@
 {
-  "syncedAt": "2026-06-09T12:09:40.626Z",
+  "syncedAt": "2026-07-27T13:24:34.661Z",
   "plates": [
     {
       "dest": "web-portal-terminal.png",
       "src": "pocket-portal-terminal-v2.png",
-      "hash": "6ded4d6b0d84",
+      "hash": "b678aad96445",
       "label": "portalTerminal — dashboard chart + portfolio matrix + analyst console",
       "region": "full"
     },
     {
       "dest": "web-portal-storage.png",
       "src": "pocket-portal-storage-v2.png",
-      "hash": "1497a99b1eb3",
+      "hash": "0b443fdf4a64",
       "label": "portalStorage — encrypted vault + local-first → drive pipeline",
       "region": "full"
     },
     {
       "dest": "web-portal-founders.png",
       "src": "pocket-portal-founders-v2.png",
-      "hash": "861475a13b6e",
+      "hash": "5946e7bf1683",
       "label": "portalFounders — hex insignia + roadmap blueprint + access key",
       "region": "full"
     },
     {
       "dest": "web-why-choose.png",
       "src": "slide-04-receipts.png",
-      "hash": "7df657ad3bdb",
+      "hash": "2d30293746b3",
       "label": "whyChoose — obsidian micro-grid texture",
       "region": {
         "left": 0.05,
@@ -37,7 +37,7 @@
     {
       "dest": "web-ad-free-invariant.png",
       "src": "slide-05-control-panel.png",
-      "hash": "ebd3d156eefe",
+      "hash": "265a048bcd23",
       "label": "adFreeInvariant — invariant ledger crop",
       "region": {
         "left": 0.05,
@@ -49,7 +49,7 @@
     {
       "dest": "web-fin-pillars.png",
       "src": "slide-02-split-brain.png",
-      "hash": "8246a709780f",
+      "hash": "ca76ff14699a",
       "label": "finPillars — fiber pipeline crop",
       "region": {
         "left": 0.48,
@@ -61,7 +61,7 @@
     {
       "dest": "web-community-nodes.png",
       "src": "slide-01-frontier.png",
-      "hash": "476c62601a9c",
+      "hash": "600f9b8ac611",
       "label": "community — decentralized node mesh",
       "region": {
         "left": 0.02,
@@ -73,7 +73,7 @@
     {
       "dest": "web-news-regulatory.png",
       "src": "slide-02-split-brain.png",
-      "hash": "2cbcf7373335",
+      "hash": "6e6c38b8700b",
       "label": "newsRegulatory — abstract regulatory geometry",
       "region": {
         "left": 0,
@@ -85,7 +85,7 @@
     {
       "dest": "web-news-infra.png",
       "src": "slide-03-traction.png",
-      "hash": "b6da3bad6624",
+      "hash": "bd9956627516",
       "label": "newsInfra — abstract network sphere",
       "region": {
         "left": 0.52,
@@ -97,7 +97,7 @@
     {
       "dest": "web-news-wealth-tech.png",
       "src": "slide-05-control-panel.png",
-      "hash": "a4a8b2a243de",
+      "hash": "e42f979dcaa6",
       "label": "newsWealthTech — abstract scaling geometry",
       "region": {
         "left": 0.1,
@@ -109,7 +109,7 @@
     {
       "dest": "web-news-market.png",
       "src": "slide-04-receipts.png",
-      "hash": "5c4ada3d3657",
+      "hash": "e521f3d4887e",
       "label": "newsMarket — abstract market geometry",
       "region": {
         "left": 0.55,

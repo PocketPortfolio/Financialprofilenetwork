@@ -1,10 +1,10 @@
 {
-  "syncedAt": "2026-06-04T16:28:55.690Z",
+  "syncedAt": "2026-07-27T13:24:30.604Z",
   "plates": [
     {
       "dest": "web-hero-glass-vault.png",
       "src": "slide-01-frontier.png",
-      "hash": "1db1a7b11bc5",
+      "hash": "0b899db535d7",
       "label": "hero — client-edge glass cubes (sovereign perimeter)",
       "region": {
         "left": 0.52,
@@ -16,7 +16,7 @@
     {
       "dest": "web-boundary-split-brain.png",
       "src": "slide-02-split-brain.png",
-      "hash": "6899a78c914b",
+      "hash": "61d0790f1ef2",
       "label": "subHero — ingest + client node (architecture moat)",
       "region": {
         "left": 0,
@@ -28,7 +28,7 @@
     {
       "dest": "web-boundary-frontier.png",
       "src": "slide-01-frontier.png",
-      "hash": "5181509ba0a7",
+      "hash": "8c8111a9acbf",
       "label": "threat — legacy cloud monolith (regulatory exposure)",
       "region": {
         "left": 0,
@@ -40,14 +40,14 @@
     {
       "dest": "web-traction-dual-pane.png",
       "src": "slide-03-traction.png",
-      "hash": "ee258932a851",
+      "hash": "1d9777d4199c",
       "label": "bridge — full dual-pane (npm + global map, contain fit)",
       "region": "full"
     },
     {
       "dest": "web-traction-heatmap.png",
       "src": "slide-03-traction.png",
-      "hash": "8a4c27adbe46",
+      "hash": "37ea90ec7af2",
       "label": "tracks — global night-lights map only (no terminal column)",
       "region": {
         "left": 0.36,
@@ -59,7 +59,7 @@
     {
       "dest": "web-split-brain-pillars.png",
       "src": "slide-02-split-brain.png",
-      "hash": "4feb58258e91",
+      "hash": "1d8f7bcaa47f",
       "label": "pillars — stateless server + dissipation (three guarantees)",
       "region": {
         "left": 0.48,
@@ -71,7 +71,7 @@
     {
       "dest": "web-substrate-matrix.png",
       "src": "slide-05-control-panel.png",
-      "hash": "89d20f3eb903",
+      "hash": "ed4ad104e74c",
       "label": "packages — FIN control matrix grid (interim until 3.2 net-new wafer)",
       "region": {
         "left": 0.04,
@@ -83,7 +83,7 @@
     {
       "dest": "web-clean-room-console.png",
       "src": "slide-05-control-panel.png",
-      "hash": "8e7d994884a6",
+      "hash": "097589ae9e20",
       "label": "contact — FIN glass briefing console (executive perimeter)",
       "region": "full"
     }

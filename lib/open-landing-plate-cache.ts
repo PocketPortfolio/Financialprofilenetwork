@@ -3,14 +3,14 @@
  * Do not edit by hand.
  */
 export const OPEN_LANDING_PLATE_CACHE: Record<string, string> = {
-  'web-hero-glass-vault.png': '1db1a7b11bc5',
-  'web-boundary-split-brain.png': '6899a78c914b',
-  'web-boundary-frontier.png': '5181509ba0a7',
-  'web-traction-dual-pane.png': 'ee258932a851',
-  'web-traction-heatmap.png': '8a4c27adbe46',
-  'web-split-brain-pillars.png': '4feb58258e91',
-  'web-substrate-matrix.png': '89d20f3eb903',
-  'web-clean-room-console.png': '8e7d994884a6',
+  'web-hero-glass-vault.png': '0b899db535d7',
+  'web-boundary-split-brain.png': '61d0790f1ef2',
+  'web-boundary-frontier.png': '8c8111a9acbf',
+  'web-traction-dual-pane.png': '1d9777d4199c',
+  'web-traction-heatmap.png': '37ea90ec7af2',
+  'web-split-brain-pillars.png': '1d8f7bcaa47f',
+  'web-substrate-matrix.png': 'ed4ad104e74c',
+  'web-clean-room-console.png': '097589ae9e20',
 };
 
 /** Public plate URL with content hash — busts Next.js image optimizer cache after sync. */
