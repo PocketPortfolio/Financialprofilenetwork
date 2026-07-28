@@ -86,7 +86,7 @@ export const DASHBOARD_TOUR_STEP_DEFS: DashboardTourStepDef[] = [
     selector: 'mobileTabBar',
     title: '◈ Quick navigation',
     description:
-      'Thumb reach shortcuts: Home, Positions, Watchlist, Import, Settings, and Utility — same routes as the header menu.',
+      'Thumb reach shortcuts: Home, Positions, Watchlist, Import, Settings, and Pricing — same routes as the header menu.',
     side: 'top',
     align: 'center',
     platforms: ['mobile'],

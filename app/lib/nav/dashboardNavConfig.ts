@@ -10,7 +10,7 @@ import {
   BarChart3,
   ShoppingBag,
   LifeBuoy,
-  HeartHandshake,
+  Tags,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -130,9 +130,9 @@ export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
       },
       {
         id: 'utility',
-        label: 'Developer Utility',
+        label: 'Pricing',
         href: '/sponsor',
-        icon: HeartHandshake,
+        icon: Tags,
       },
     ],
   },
@@ -218,7 +218,7 @@ export const MOBILE_NAV_SSOT_LINKS: ReadonlyArray<{ label: string; href: string 
   { label: 'Live Market Data', href: '/live' },
   { label: 'Tax Converters', href: '/tools' },
   { label: 'JSON API Directory', href: '/s/directory' },
-  { label: 'Developer Utility', href: '/sponsor' },
+  { label: 'Pricing', href: '/sponsor' },
   { label: 'Analytics', href: '/admin/analytics' },
   { label: 'Sales', href: '/admin/sales' },
   { label: 'View support', href: '/admin/support' },

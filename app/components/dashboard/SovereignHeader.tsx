@@ -647,7 +647,7 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   e.currentTarget.style.background = 'transparent';
                 }}
               >
-                Developer Utility
+                Pricing
               </Link>
               
               {/* Admin Links - Only show if user is admin */}
