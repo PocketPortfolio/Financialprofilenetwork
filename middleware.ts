@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { applyBotGateMiddleware } from '@/lib/bot-gate-middleware';
+import { nextWithGeoCountry } from '@/lib/middleware/geo-country';
 import {
   isLocalOpenDevHost,
   isLocalPocketDevHost,
@@ -54,7 +55,6 @@ function openCanonicalHost(requestHost: string): string {
 }
 const OPEN_SPECIAL_FILES: ReadonlySet<string> = new Set([
   '/robots.txt',
-  '/llms.txt',
   '/sitemap.xml',
 ]);
 
@@ -62,6 +62,14 @@ const OPEN_SPECIAL_FILES: ReadonlySet<string> = new Set([
 const OPEN_NOT_FOUND_REWRITE = '/open/__not-a-b2b-route__';
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Wave 2: dynamic LLM feeds — serve from app routes on both Pocket and Open hosts
+  if (pathname === '/llms.txt' || pathname === '/llms-full.txt') {
+    const res = nextWithGeoCountry(request);
+    return applySecurityHeaders(request, res);
+  }
+
   // Canonical host: apex → www so referral sessionStorage + cookies stay on one origin (ref survives signup).
   // Lowercase: Host is case-insensitive; mismatched casing must not skip OPEN_HOSTS matching (would mis-route).
   const host = request.headers.get('host')?.split(':')[0]?.toLowerCase() ?? '';
@@ -214,16 +222,15 @@ export async function middleware(request: NextRequest) {
     return response;
   }
   
-  // Skip middleware for robots.txt and llms.txt (no cache headers needed)
+  // Skip middleware for robots.txt (no cache headers needed)
   if (
-    request.nextUrl.pathname === '/robots.txt' || 
-    request.nextUrl.pathname === '/llms.txt' ||
+    request.nextUrl.pathname === '/robots.txt' ||
     request.nextUrl.pathname.startsWith('/api/sitemap/')
   ) {
-    return NextResponse.next();
+    return nextWithGeoCountry(request);
   }
-  
-  const res = NextResponse.next();
+
+  const res = nextWithGeoCountry(request);
   applyLandingAbAssignment(request, res);
   return applySecurityHeaders(request, res);
 }

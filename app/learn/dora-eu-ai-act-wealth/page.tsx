@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 export default function DoraEuAiActWealthPage() {
   return (
     <SovereignPillarArticle
+      articleSlug="dora-eu-ai-act-wealth"
       breadcrumbLabel="DORA & EU AI Act"
       title="DORA & EU AI Act Compliance for Wealth Management"
       subtitle="Resilience and AI governance that follow the data perimeter — not a slide deck."

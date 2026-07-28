@@ -35,40 +35,50 @@ export default function robots(): MetadataRoute.Robots {
           '*.json',
         ],
       },
-      // AI crawlers: invite product surfaces; do NOT invite raw ticker firehose
+      // AI crawlers: invite docs & pillars; block raw API firehose (Wave 2)
+      {
+        userAgent: 'OAI-SearchBot',
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
+        disallow: ['/admin/', '/_next/', '/api/'],
+      },
       {
         userAgent: 'GPTBot',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'ChatGPT-User',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'CCBot',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'anthropic-ai',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
+        disallow: ['/admin/', '/_next/', '/api/'],
+      },
+      {
+        userAgent: 'ClaudeBot',
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'Claude-Web',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'Google-Extended',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
       {
         userAgent: 'PerplexityBot',
-        allow: ['/', '/blog/', '/book/', '/import/', '/s/'],
+        allow: ['/', '/learn/', '/blog/', '/book/', '/import/', '/s/', '/llms.txt', '/llms-full.txt', '/press/'],
         disallow: ['/admin/', '/_next/', '/api/'],
       },
     ],

@@ -6,6 +6,7 @@ import OpenSurfaceThemeLock from './_components/OpenSurfaceThemeLock';
 import OpenFaviconLock from './_components/OpenFaviconLock';
 import OpenNavbar from './_components/OpenNavbar';
 import OpenFooter from './_components/OpenFooter';
+import { ComplianceBannerServer } from '../components/compliance/ComplianceBanner';
 import { OPEN_URLS, SURFACE_ORG, SURFACE_POSITIONING } from '../../lib/canonical-claims';
 
 /**
@@ -119,6 +120,7 @@ export default function OpenSurfaceLayout({ children }: { children: React.ReactN
         }}
       >
         <OpenNavbar />
+        <ComplianceBannerServer />
         <div style={{ flex: '1 1 auto', minHeight: 0, width: '100%' }}>{children}</div>
         <OpenFooter />
       </div>

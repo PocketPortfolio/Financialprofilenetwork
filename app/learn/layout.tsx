@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
+import { ComplianceBannerServer } from '@/app/components/compliance/ComplianceBanner';
 import SEOPageTracker from '@/app/components/SEOPageTracker';
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export default function LearnLayout({
       }}
     >
       <ProductionNavbar />
+      <ComplianceBannerServer />
       <SEOPageTracker />
       <main
         style={{

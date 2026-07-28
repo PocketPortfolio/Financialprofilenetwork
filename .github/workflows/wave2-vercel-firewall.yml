@@ -1,0 +1,44 @@
+name: Wave 2 — Vercel Firewall cost gate
+
+# Publishes ASN Managed Challenge on metered APIs BEFORE serverless billing.
+# Required because prod DNS is Vercel-direct (no Cloudflare cf-ray).
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish rule (true) or insert draft only'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ops-deploy-vercel-firewall-wave2.mjs'
+      - '.github/workflows/wave2-vercel-firewall.yml'
+
+jobs:
+  deploy-firewall:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Deploy Vercel Firewall Wave2 ASN challenge
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret missing"
+            exit 1
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.publish }}" = "false" ]; then
+            node scripts/ops-deploy-vercel-firewall-wave2.mjs
+          else
+            node scripts/ops-deploy-vercel-firewall-wave2.mjs --publish
+          fi
