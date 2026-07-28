@@ -1,15 +1,64 @@
 # Open Portfolio (B2B) — robots policy
-# Served at https://www.openportfolio.co.uk/robots.txt via middleware rewrite.
+# Served at https://www.openportfolio.co.uk/robots.txt
 
 User-agent: *
 Allow: /
+Allow: /learn/
+Disallow: /api/
+Disallow: /admin/
 
-# B2B developer surface: crawl `/` and allow-listed routes; unknown paths 404 on Open chrome.
-# All other paths fall through to /open/* and 404 cleanly (no leakage to the
-# Pocket consumer surface).
+# LLM citation crawlers — invite institutional pillars; block raw API firehose
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+
+User-agent: Claude-Web
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /learn/
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /api/
 
 Sitemap: https://www.openportfolio.co.uk/sitemap.xml
 
-# AI-context file for answer engines (Perplexity, ChatGPT search, etc.)
-# Surfaces SDK package list, NUMBERS_SNAPSHOT receipts, and architecture URL.
-# See https://www.openportfolio.co.uk/llms.txt
+# AI-context feeds (Wave 2)
+# https://www.openportfolio.co.uk/llms.txt
+# https://www.openportfolio.co.uk/llms-full.txt

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recordOpenPortfolioContactLead } from '@/lib/open-portfolio/contact-leads-firestore';
+import { notifyEnterpriseLeadSlack } from '@/lib/open-portfolio/enterprise-lead-slack';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -59,20 +60,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Company or role too long.' }, { status: 400 });
   }
 
-  try {
-    await recordOpenPortfolioContactLead({
+  const leadPayload = {
       email,
       company: company || undefined,
       role: role || undefined,
       message,
       context: context as 'tier1' | 'design-challenge' | 'investor' | 'grant' | 'general',
       source,
-    });
+    };
+
+  try {
+    await recordOpenPortfolioContactLead(leadPayload);
   } catch (e: unknown) {
     const m = e instanceof Error ? e.message : String(e);
     console.error('[open-portfolio/contact] persist failed:', m);
     return NextResponse.json({ error: 'Persistence failed. Please retry shortly.' }, { status: 500 });
   }
+
+  // Wave 2 Pillar 3: best-effort Slack alert — never fail the HTTP response
+  notifyEnterpriseLeadSlack(leadPayload).then((result) => {
+    if (!result.ok) {
+      console.warn('[open-portfolio/contact] Slack notify skipped:', result.error);
+    }
+  });
 
   return NextResponse.json({ ok: true }, { status: 200 });
 }

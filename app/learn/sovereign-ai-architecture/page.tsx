@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 export default function SovereignAiArchitecturePage() {
   return (
     <SovereignPillarArticle
+      articleSlug="sovereign-ai-architecture"
       breadcrumbLabel="Sovereign AI Architecture"
       title="Sovereign AI Architecture & Data Perimeters"
       subtitle="Inference without a central warehouse. Ingestion without surrendering the ledger."

@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 export default function EnterpriseDesignPartnershipPage() {
   return (
     <SovereignPillarArticle
+      articleSlug="enterprise-design-partnership"
       breadcrumbLabel="Enterprise Design Partnership"
       title="Enterprise Design Partnership Program (5-Seat BIP Cap)"
       subtitle="Institutional access is scarce by design — not another open blog farm."

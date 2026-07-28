@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 export default function StatelessEdgeIngestionPage() {
   return (
     <SovereignPillarArticle
+      articleSlug="stateless-edge-ingestion"
       breadcrumbLabel="Stateless Edge Ingestion"
       title="Stateless Edge Ingestion vs Centralized Data Warehousing"
       subtitle="Stop paying warehouse rent for data you should never hold."
