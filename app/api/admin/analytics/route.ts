@@ -15,6 +15,10 @@ import {
   shouldDegradeFirestoreReads,
 } from '@/app/lib/server/firestore-quota-circuit';
 import { getLandingAbCohortPerformance } from '@/lib/admin/landing-ab-cohort';
+import {
+  isBlogFarmPaused,
+  isCronEligibleBlogCategory,
+} from '@/lib/blog-generator-cron';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -227,7 +231,15 @@ export async function GET(request: NextRequest) {
     // Fetch blog posts data
     console.log('[Analytics API] 📝 Fetching blog posts data...');
         const blogPosts = await getBlogPostsData();
-        console.log('[Analytics API] ✅ Blog posts fetched:', blogPosts.total, 'total posts,', blogPosts.posts.filter((p: any) => p.category === 'research').length, 'research posts');
+        console.log(
+          '[Analytics API] Blog posts fetched:',
+          blogPosts.total,
+          'allowed,',
+          'scope=',
+          blogPosts.scope,
+          'farmPaused=',
+          blogPosts.farmPaused,
+        );
     
     // Fetch leads data
     console.log('[Analytics API] 👥 Fetching leads data...');
@@ -1566,191 +1578,75 @@ async function getNPMData() {
 }
 
 async function getBlogPostsData() {
-  console.log('[getBlogPostsData] 🚀 Starting blog posts data fetch');
-  console.log('[getBlogPostsData] 📂 Current working directory:', process.cwd());
+  console.log('[getBlogPostsData] Starting blog posts data fetch (cron-eligible only)');
   try {
-    // ✅ Load main calendar (deep dives)
+    const farmPaused = isBlogFarmPaused();
     const mainCalendarPath = path.join(process.cwd(), 'content', 'blog-calendar.json');
-    console.log('[getBlogPostsData] 📂 Loading main calendar from:', mainCalendarPath);
-    console.log('[getBlogPostsData] 📂 Main calendar file exists?', fs.existsSync(mainCalendarPath));
+    const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
+    const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
+
     const mainCalendar = fs.existsSync(mainCalendarPath)
       ? JSON.parse(fs.readFileSync(mainCalendarPath, 'utf-8'))
       : [];
-    console.log('[getBlogPostsData] ✅ Loaded', mainCalendar.length, 'main calendar posts');
+    const howToCalendar =
+      !farmPaused && fs.existsSync(howToCalendarPath)
+        ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
+        : [];
+    const researchCalendar =
+      !farmPaused && fs.existsSync(researchCalendarPath)
+        ? JSON.parse(fs.readFileSync(researchCalendarPath, 'utf-8'))
+        : [];
 
-    // ✅ Load "How to in Tech" calendar (daily posts)
-    const howToCalendarPath = path.join(process.cwd(), 'content', 'how-to-tech-calendar.json');
-    console.log('[getBlogPostsData] 📂 Loading how-to calendar from:', howToCalendarPath);
-    console.log('[getBlogPostsData] 📂 How-to calendar file exists?', fs.existsSync(howToCalendarPath));
-    const howToCalendar = fs.existsSync(howToCalendarPath)
-      ? JSON.parse(fs.readFileSync(howToCalendarPath, 'utf-8'))
-      : [];
-    console.log('[getBlogPostsData] ✅ Loaded', howToCalendar.length, 'how-to calendar posts');
-
-    // ✅ Load "Research" calendar (research posts)
-    const researchCalendarPath = path.join(process.cwd(), 'content', 'research-calendar.json');
-    console.log('[getBlogPostsData] 📂 Loading research calendar from:', researchCalendarPath);
-    console.log('[getBlogPostsData] 📂 Research calendar file exists?', fs.existsSync(researchCalendarPath));
-    let researchCalendar: any[] = [];
-    if (fs.existsSync(researchCalendarPath)) {
-      try {
-        const researchCalendarContent = fs.readFileSync(researchCalendarPath, 'utf-8');
-        researchCalendar = JSON.parse(researchCalendarContent);
-        console.log(`[Analytics] ✅ Loaded ${researchCalendar.length} research posts from calendar`);
-      } catch (error: any) {
-        console.error('[Analytics] ❌ Error loading research calendar:', error.message);
-        console.error('[Analytics] ❌ Error stack:', error.stack);
-        researchCalendar = [];
-      }
-    } else {
-      console.warn('[Analytics] ⚠️ Research calendar file not found:', researchCalendarPath);
-      console.warn('[Analytics] ⚠️ Current working directory:', process.cwd());
-    }
-
-    // ✅ CRITICAL FIX: Filter out research posts from mainCalendar to prevent overwrites
-    // Research posts should ONLY come from research-calendar.json
+    // Deep-dives only while farm paused (matches /api/cron/generate-blog allowlist).
     const mainCalendarFiltered = mainCalendar.filter((p: any) => {
-      // Exclude posts that are explicitly marked as research OR have research slugs
-      const isResearch = p.category === 'research' || 
-                        (p.slug && p.slug.startsWith('research-')) ||
-                        (p.id && p.id.startsWith('research-'));
-      return !isResearch;
+      const isResearch =
+        p.category === 'research' ||
+        (p.slug && String(p.slug).startsWith('research-')) ||
+        (p.id && String(p.id).startsWith('research-'));
+      if (isResearch) return false;
+      return isCronEligibleBlogCategory(p.category || 'deep-dive');
     });
-    // ✅ Merge calendars (mark posts with category and source)
-    const calendar = [
-      ...mainCalendarFiltered.map((p: any) => ({ ...p, category: p.category || 'deep-dive', _source: 'main' })),
-      ...howToCalendar.map((p: any) => ({ ...p, category: 'how-to-in-tech', _source: 'how-to' })),
-      ...researchCalendar.map((p: any) => ({ ...p, category: 'research', _source: 'research-calendar' }))
-    ];
-    console.log(`[Analytics] 📊 Total posts after merge: ${calendar.length} (main: ${mainCalendarFiltered.length}, how-to: ${howToCalendar.length}, research: ${researchCalendar.length})`);
-    console.log(`[Analytics] 🔍 Filtered ${mainCalendar.length - mainCalendarFiltered.length} research posts from main calendar`);
 
-    // ✅ Deduplicate posts by ID (for research) or slug (for others)
-    // Research posts can have duplicate slugs (same topic, different dates), so use ID as key
-    // Other posts use slug as key (unique per post)
+    const calendar = [
+      ...mainCalendarFiltered.map((p: any) => ({
+        ...p,
+        category: p.category || 'deep-dive',
+        _source: 'main',
+      })),
+      ...howToCalendar.map((p: any) => ({
+        ...p,
+        category: 'how-to-in-tech',
+        _source: 'how-to',
+      })),
+      ...researchCalendar.map((p: any) => ({
+        ...p,
+        category: 'research',
+        _source: 'research-calendar',
+      })),
+    ].filter((p: any) => isCronEligibleBlogCategory(p.category));
+
     const postMap = new Map<string, any>();
-    let duplicateCount = 0;
-    let researchDuplicates = 0;
-    let researchReplaced = 0;
-    let researchSkipped = 0;
-    
-    // Helper function to get the deduplication key for a post
-    const getPostKey = (post: any): string => {
-      // Research posts use ID (unique, includes date) to handle duplicate slugs
-      if (post.category === 'research' && post.id) {
-        return post.id;
-      }
-      // Other posts use slug
-      return post.slug || post.id || `unknown-${Math.random()}`;
-    };
-    
-    // CRITICAL: Process research-calendar.json posts FIRST to ensure they always win
-    // Separate research posts from research-calendar.json and process them first
-    const researchCalendarPosts = calendar.filter((p: any) => p._source === 'research-calendar');
-    const otherPosts = calendar.filter((p: any) => p._source !== 'research-calendar');
-    
-    // First pass: Add all research-calendar.json posts to map (they win by default)
-    for (const post of researchCalendarPosts) {
-      const key = getPostKey(post);
+    for (const post of calendar) {
+      const key =
+        post.category === 'research' && post.id
+          ? post.id
+          : post.slug || post.id || `unknown-${Math.random()}`;
       const existing = postMap.get(key);
       if (!existing) {
         postMap.set(key, post);
-      } else {
-        // Shouldn't happen in first pass for research posts (IDs are unique), but handle it
-        duplicateCount++;
-        researchDuplicates++;
-        postMap.set(key, post);
-        researchReplaced++;
+        continue;
       }
-    }
-    
-    // Second pass: Process other posts, but never replace research-calendar posts
-    for (const post of otherPosts) {
-      const key = getPostKey(post);
-      const existing = postMap.get(key);
-      if (!existing) {
+      if (post.status === 'published' && existing.status !== 'published') {
         postMap.set(key, post);
-      } else {
-        duplicateCount++;
-        // CRITICAL: Never replace research posts from research-calendar.json
-        if (existing._source === 'research-calendar' && existing.category === 'research') {
-          // Existing is from research-calendar.json - keep it, skip this one
-          researchSkipped++;
-          continue;
-        } else if (post.category === 'research' && existing.category !== 'research') {
-          // New post is research (but not from research-calendar), existing is not - prefer research
-          postMap.set(key, post);
-          researchReplaced++;
-        } else if (post.category === 'research' && existing.category === 'research') {
-          // Both are research, but existing is from research-calendar.json (already processed) - keep existing
-          researchSkipped++;
-          continue;
-        } else {
-          // Prefer published over pending
-          if (post.status === 'published' && existing.status !== 'published') {
-            postMap.set(key, post);
-          } else if (post.status === existing.status) {
-            // If same status, prefer the one with files or newer date
-            const postSlug = post.slug || post.id;
-            const existingSlug = existing.slug || existing.id;
-            const postHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${postSlug}.mdx`));
-            const existingHasFiles = fs.existsSync(path.join(process.cwd(), 'content', 'posts', `${existingSlug}.mdx`));
-            if (postHasFiles && !existingHasFiles) {
-              postMap.set(key, post);
-            } else if (post.date > existing.date) {
-              postMap.set(key, post);
-            }
-          }
-        }
+      } else if (post.status === existing.status && post.date > existing.date) {
+        postMap.set(key, post);
       }
     }
     const deduplicatedCalendar = Array.from(postMap.values());
-    
-    // ✅ Comprehensive category and pillar tracking verification
-    const categoryBreakdown = {
-      'deep-dive': deduplicatedCalendar.filter((p: any) => p.category === 'deep-dive' || (!p.category && p._source === 'main')).length,
-      'how-to-in-tech': deduplicatedCalendar.filter((p: any) => p.category === 'how-to-in-tech').length,
-      'research': deduplicatedCalendar.filter((p: any) => p.category === 'research').length,
-    };
-    const pillarBreakdown = {
-      'philosophy': deduplicatedCalendar.filter((p: any) => p.pillar === 'philosophy').length,
-      'technical': deduplicatedCalendar.filter((p: any) => p.pillar === 'technical').length,
-      'market': deduplicatedCalendar.filter((p: any) => p.pillar === 'market').length,
-      'product': deduplicatedCalendar.filter((p: any) => p.pillar === 'product').length,
-      'unknown': deduplicatedCalendar.filter((p: any) => !p.pillar).length,
-    };
-    const sourceBreakdown = {
-      'main': deduplicatedCalendar.filter((p: any) => p._source === 'main').length,
-      'how-to': deduplicatedCalendar.filter((p: any) => p._source === 'how-to').length,
-      'research-calendar': deduplicatedCalendar.filter((p: any) => p._source === 'research-calendar').length,
-    };
-    
-    console.log(`[Analytics] 🔄 After deduplication: ${deduplicatedCalendar.length} posts (removed ${duplicateCount} duplicates)`);
-    console.log(`[Analytics] 📊 Category breakdown:`, categoryBreakdown);
-    console.log(`[Analytics] 🏛️ Pillar breakdown:`, pillarBreakdown);
-    console.log(`[Analytics] 📁 Source breakdown:`, sourceBreakdown);
-    
-    // Log research posts count
-    const researchPostsCount = deduplicatedCalendar.filter((p: any) => p.category === 'research').length;
-    console.log(`[Analytics] 🔬 Research posts in final calendar: ${researchPostsCount}`);
-    
-    // ✅ Log date range for diagnosis
-    const researchPosts = deduplicatedCalendar.filter((p: any) => p.category === 'research');
-    if (researchPosts.length > 0) {
-      const dates = researchPosts.map((p: any) => p.date).sort();
-      const earliestDate = dates[0];
-      const latestDate = dates[dates.length - 1];
-      const janCount = dates.filter((d: string) => d.startsWith('2026-01')).length;
-      const augCount = dates.filter((d: string) => d.startsWith('2026-08')).length;
-      console.log(`[Analytics] 📅 Research posts date range: ${earliestDate} to ${latestDate}`);
-      console.log(`[Analytics] 📊 Research posts by month: Jan=${janCount}, Aug=${augCount}, Total=${dates.length}`);
-    }
 
     const today = new Date().toISOString().split('T')[0];
     const todayDate = new Date(today);
     const isVercel = typeof process.env.VERCEL === 'string';
-
-    // Check which posts have actual files (only possible when filesystem is available, e.g. local/build)
     const postsDir = path.join(process.cwd(), 'content', 'posts');
     const imagesDir = path.join(process.cwd(), 'public', 'images', 'blog');
 
@@ -1758,38 +1654,22 @@ async function getBlogPostsData() {
       const mdxPath = path.join(postsDir, `${post.slug}.mdx`);
       const imagePath = path.join(imagesDir, `${post.slug}.png`);
 
-      // On Vercel serverless, content/posts and public/images/blog are not in the function bundle,
-      // so fs checks always fail. Infer from calendar: published + date <= today => assume files deployed.
       let hasFiles = false;
       if (isVercel) {
         hasFiles = post.status === 'published' && new Date(post.date) <= todayDate;
       } else {
         try {
-          const mdxExists = fs.existsSync(mdxPath);
-          const imageExists = fs.existsSync(imagePath);
-          hasFiles = mdxExists && imageExists;
-          if (!hasFiles && post.category === 'research' && post.status === 'published') {
-            console.warn(`[Analytics] Research post files missing: ${post.slug}`, {
-              mdxPath, imagePath, mdxExists, imageExists,
-              postsDirExists: fs.existsSync(postsDir),
-              imagesDirExists: fs.existsSync(imagesDir),
-              cwd: process.cwd(),
-            });
-          }
-        } catch (error: any) {
-          console.error(`[Analytics] Error checking files for ${post.slug}:`, error.message);
+          hasFiles = fs.existsSync(mdxPath) && fs.existsSync(imagePath);
+        } catch {
           hasFiles = false;
         }
       }
 
       const postDate = new Date(post.date);
-      // If we inferred hasFiles from calendar (Vercel), effectiveStatus is already post.status for published
-      const effectiveStatus = !isVercel && hasFiles && postDate <= todayDate
-        ? 'published'
-        : post.status;
+      const effectiveStatus =
+        !isVercel && hasFiles && postDate <= todayDate ? 'published' : post.status;
       const isOverdue = postDate < todayDate && effectiveStatus === 'pending';
 
-      // Published time: from calendar (publishedAt), file mtime (local), or scheduled time when published
       const scheduledDateTime = post.scheduledTime
         ? `${post.date}T${post.scheduledTime}:00Z`
         : `${post.date}T00:00:00Z`;
@@ -1808,7 +1688,7 @@ async function getBlogPostsData() {
           publishedTime = scheduledDateTime;
         }
       }
-      
+
       return {
         id: post.id,
         title: post.title,
@@ -1816,13 +1696,17 @@ async function getBlogPostsData() {
         date: post.date,
         scheduledDate: post.date,
         scheduledTime: post.scheduledTime || null,
-        status: effectiveStatus, // ✅ Use effective status instead of calendar status
+        status: effectiveStatus,
         pillar: post.pillar,
-        category: post.category ?? 'deep-dive', // ✅ Preserve category (research, how-to-in-tech, or deep-dive)
+        category: post.category ?? 'deep-dive',
         isOverdue,
         hasFiles,
         publishedTime,
-        daysOverdue: isOverdue ? Math.floor((todayDate.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24)) : 0
+        daysOverdue: isOverdue
+          ? Math.floor(
+              (todayDate.getTime() - postDate.getTime()) / (1000 * 60 * 60 * 24),
+            )
+          : 0,
       };
     });
 
@@ -1830,25 +1714,25 @@ async function getBlogPostsData() {
     const pending = posts.filter((p: any) => p.status === 'pending').length;
     const overdue = posts.filter((p: any) => p.isOverdue).length;
     const failed = posts.filter((p: any) => p.status === 'failed').length;
-    // Note: Status counts now use effectiveStatus (auto-detected from file existence)
-    const researchPostsInFinal = posts.filter((p: any) => p.category === 'research').length;
 
-    const result = {
+    return {
       total: posts.length,
       published,
       pending,
       overdue,
       failed,
+      farmPaused,
+      scope: farmPaused
+        ? 'deep-dive-only'
+        : 'all-calendars',
       posts: posts.sort((a: any, b: any) => {
-        // Sort by date, then by status (overdue first)
         const dateCompare = new Date(a.date).getTime() - new Date(b.date).getTime();
         if (dateCompare !== 0) return dateCompare;
         if (a.isOverdue && !b.isOverdue) return -1;
         if (!a.isOverdue && b.isOverdue) return 1;
         return 0;
-      })
+      }),
     };
-    return result;
   } catch (error: any) {
     console.error('Error reading blog calendar:', error);
     return {
@@ -1857,8 +1741,10 @@ async function getBlogPostsData() {
       pending: 0,
       overdue: 0,
       failed: 0,
+      farmPaused: isBlogFarmPaused(),
+      scope: 'error',
       posts: [],
-      error: error.message
+      error: error.message,
     };
   }
 }

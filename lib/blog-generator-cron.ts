@@ -45,6 +45,20 @@ export interface BlogPost {
   publishedAt?: string;
 }
 
+/** Wave 1 farm pause — unset means paused. Set OP_BLOG_FARM_PAUSED=false to resume how-to/research. */
+export function isBlogFarmPaused(): boolean {
+  return process.env.OP_BLOG_FARM_PAUSED !== 'false';
+}
+
+/** Categories the autonomous cron may generate under the current farm policy. */
+export function isCronEligibleBlogCategory(
+  category: string | undefined | null,
+): boolean {
+  if (!isBlogFarmPaused()) return true;
+  const cat = category || 'deep-dive';
+  return cat !== 'how-to-in-tech' && cat !== 'research';
+}
+
 function parseScheduledTime(scheduledTime: string | undefined): { hour: number; minute: number; valid: boolean } {
   if (!scheduledTime || typeof scheduledTime !== 'string') return { hour: 0, minute: 0, valid: false };
   const trimmed = scheduledTime.trim();
