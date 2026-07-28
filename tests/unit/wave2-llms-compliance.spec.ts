@@ -22,7 +22,7 @@ describe('llms-feed', () => {
     expect(open).toContain('sovereign-ai-architecture');
   });
 
-  it('includes Wave 1 pillars in pocket and full docs', () => {
+  it('includes institutional pillars in pocket and full docs', () => {
     expect(buildPocketLlmsSummary()).toContain('dora-eu-ai-act-wealth');
     expect(buildOpenLlmsSummary()).toContain('stateless-edge-ingestion');
     expect(buildLlmsFullDocumentation()).toContain('stateless-edge-ingestion');

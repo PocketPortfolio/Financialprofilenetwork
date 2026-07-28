@@ -4,13 +4,14 @@ import { OPEN_URLS, SURFACE_ORG } from '../../../../lib/canonical-claims';
 export { default } from '../../../learn/enterprise-design-partnership/page';
 
 export const metadata: Metadata = {
-  title: 'Enterprise Design Partnership Program (5-Seat BIP Cap)',
+  title: 'Enterprise Design Partnership Program',
   description:
-    'Capped institutional Design Partnership and Board of Investors access for sovereign AI architecture.',
+    'Architecture-level design partnership for sovereign ingestion and inference in regulated wealth-tech.',
   alternates: { canonical: OPEN_URLS.enterpriseDesignPartnership },
   openGraph: {
-    title: 'Enterprise Design Partnership | Open Portfolio',
-    description: '5-seat BIP cap — institutional partnership for sovereign wealth-tech stacks.',
+    title: 'Enterprise Design Partnership Program | Open Portfolio',
+    description:
+      'Limited-capacity design partnership for sovereign AI architecture in wealth-tech stacks.',
     url: OPEN_URLS.enterpriseDesignPartnership,
     siteName: SURFACE_ORG.open.name,
     type: 'article',
