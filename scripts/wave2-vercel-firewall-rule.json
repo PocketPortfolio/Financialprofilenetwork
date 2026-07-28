@@ -1,0 +1,36 @@
+{
+  "name": "Wave2 Challenge datacenter ASN metered APIs",
+  "active": true,
+  "conditionGroup": [
+    {
+      "conditions": [
+        {
+          "type": "path",
+          "op": "re",
+          "value": "^/api/(tickers/|quote|price/|dividend)"
+        },
+        {
+          "type": "geo_as_number",
+          "op": "inc",
+          "value": [
+            "16509",
+            "14618",
+            "15169",
+            "396982",
+            "8075",
+            "14061",
+            "20473",
+            "24940",
+            "16276",
+            "63949"
+          ]
+        }
+      ]
+    }
+  ],
+  "action": {
+    "mitigate": {
+      "action": "challenge"
+    }
+  }
+}

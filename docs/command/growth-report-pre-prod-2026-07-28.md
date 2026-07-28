@@ -164,7 +164,7 @@ Self-UTM loop  → clean-tracker retag               →  excluded from triad
 | M1 | Register MP secret in GA4 Admin | Marketing + Eng | wave1-ship-closure |
 | M2 | GSC URL Inspection: `/`, `/login`, top-10 `/import/*`, 4 pillars | Marketing | brand/import SERP sheets |
 | M3 | GA4 Explore: triad weekly sheet | Marketing | board-triad-dashboard-wave1 |
-| M4 | **SHIP GATE:** `node scripts/ops-deploy-vercel-firewall-wave2.mjs --publish` | Eng | Requires `VERCEL_TOKEN`; cuts bot billing before middleware |
+| M4 | **SHIP GATE GREEN:** Vercel Firewall ASN challenge live | Eng | Rule `Wave2 Challenge datacenter ASN metered APIs` Enabled (2026-07-28) |
 
 ### 5.4 Post-deploy smoke URLs
 
@@ -229,7 +229,7 @@ Self-UTM loop  → clean-tracker retag               →  excluded from triad
 | Item | Recommendation |
 | --- | --- |
 | **Merge Wave 2 PR** | ✅ Authorized — engineering gates green; aligns with Command Wave 2 mandate |
-| **Edge WAF (cost)** | **Same train as merge:** publish Vercel Firewall ASN challenge. Cloudflare WAF only after DNS orange-cloud (`cf-ray`). |
+| **Edge WAF (cost)** | **GREEN 2026-07-28:** Vercel Firewall ASN challenge live on metered APIs. Cloudflare WAF only after DNS orange-cloud (`cf-ray`). |
 | **GA4 Admin MP secret** | Marketing action — unblocks revenue event visibility |
 | **ICP geo ad spend** | Hold until Day-14 triad review (per board memo) |
 
