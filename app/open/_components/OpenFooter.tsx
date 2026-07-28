@@ -57,17 +57,8 @@ export default async function OpenFooter() {
               {pathway.label}
             </Link>
           ))}
-          <Link
-            href="/learn/sovereign-stack"
-            style={{ color: 'inherit', textDecoration: 'none', opacity: 0.72 }}
-          >
-            Sovereign Stack
-          </Link>
-          <Link
-            href="/learn/local-first"
-            style={{ color: 'inherit', textDecoration: 'none', opacity: 0.72 }}
-          >
-            Local-First
+          <Link href="/learn" style={{ color: 'inherit', textDecoration: 'none', opacity: 0.72 }}>
+            Architecture Briefs
           </Link>
           <a href={pocketHref} style={{ color: 'inherit', textDecoration: 'none' }}>
             {SURFACE_CROSS_LINKS.open.label}

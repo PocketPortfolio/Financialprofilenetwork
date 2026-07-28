@@ -647,6 +647,84 @@ export const OPEN_URLS = {
   sitemap: 'https://www.openportfolio.co.uk/sitemap.xml',
 } as const;
 
+/** Institutional architecture briefs — primary Open /learn hub (CTO/CISO-facing). */
+export const OPEN_INSTITUTIONAL_PILLARS = [
+  {
+    slug: 'sovereign-ai-architecture',
+    title: 'Sovereign AI Architecture & Data Perimeters',
+    summary:
+      'Local-first ingestion, stateless inference, and architectural data perimeters for wealth-tech platforms that cannot warehouse client ledgers.',
+    category: 'Architecture',
+    url: OPEN_URLS.sovereignAiArchitecture,
+  },
+  {
+    slug: 'dora-eu-ai-act-wealth',
+    title: 'DORA & EU AI Act for Wealth Management',
+    summary:
+      'Operational resilience and AI governance mapped to edge ingestion — reduce ICT blast radius without a central data lake.',
+    category: 'Compliance',
+    url: OPEN_URLS.doraEuAiActWealth,
+  },
+  {
+    slug: 'stateless-edge-ingestion',
+    title: 'Stateless Edge Ingestion vs Centralized Warehousing',
+    summary:
+      'Economics and liability of edge ingestion versus centralized wealth-tech data lakes.',
+    category: 'Economics',
+    url: OPEN_URLS.statelessEdgeIngestion,
+  },
+  {
+    slug: 'enterprise-design-partnership',
+    title: 'Enterprise Design Partnership Program',
+    summary:
+      'Limited-capacity design partnership for platforms building sovereign ingestion and inference into regulated stacks.',
+    category: 'Partnership',
+    url: OPEN_URLS.enterpriseDesignPartnership,
+  },
+] as const;
+
+/** Secondary philosophy briefs on Open /learn — not retail glossary entries. */
+export const OPEN_LEARN_PHILOSOPHY = [
+  {
+    slug: 'sovereign-stack',
+    title: 'The Sovereign Stack',
+    summary:
+      'Client-side analysis architecture where sensitive banking data never becomes a platform-hosted net-worth warehouse.',
+    category: 'Architecture',
+    url: OPEN_URLS.sovereignStack,
+  },
+  {
+    slug: 'local-first',
+    title: 'Local-First Architecture',
+    summary:
+      'Data stored and processed on the operator device first — privacy, offline resilience, and audit perimeter by design.',
+    category: 'Architecture',
+    url: OPEN_URLS.localFirst,
+  },
+  {
+    slug: 'vendor-lock-in',
+    title: 'Vendor Lock-In',
+    summary:
+      'Why proprietary formats expand switching cost — and how open ingestion boundaries prevent capture.',
+    category: 'Philosophy',
+    url: OPEN_URLS.vendorLockIn,
+  },
+] as const;
+
+export const OPEN_LEARN_HUB_COPY = {
+  title: 'Institutional Architecture Briefs',
+  subtitle:
+    'Published doctrine for CTOs, CISOs, and platform operators evaluating sovereign ingestion and stateless inference.',
+  philosophyHeading: 'Foundational concepts',
+  ctaTitle: 'Ready for a diligence conversation?',
+  ctaBody:
+    'Start with the Tier 1 design brief or contact the team with your audit-perimeter requirements.',
+  ctaPrimaryLabel: 'Explore Design Partnership',
+  ctaPrimaryHref: '/tier1designpartner',
+  ctaSecondaryLabel: 'Read full architecture',
+  ctaSecondaryHref: '/architecture',
+} as const;
+
 /**
  * Developer + institutional routes with thin-wrapper aliases on the O. surface.
  * Pocket→Open 301 matrix: `next.config.js` (`OPEN_ALIAS_POCKET_TO_OPEN_PATHS`) — same paths except `/press`
@@ -748,6 +826,7 @@ export interface SurfaceNavItem {
  * Institutional tracks (Design Challenge, Tier 1, BIP) live in footer pathways.
  */
 export const OPEN_NAV: ReadonlyArray<SurfaceNavItem> = [
+  { label: 'Learn', href: '/learn' },
   { label: 'Architecture', href: '/architecture' },
   { label: 'Blog', href: '/blog' },
 ] as const;

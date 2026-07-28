@@ -10,6 +10,7 @@ import {
   LAST_HUMAN_VERIFIED,
   NUMBERS_SNAPSHOT,
   OPEN_ALIAS_ROUTES,
+  OPEN_INSTITUTIONAL_PILLARS,
   OPEN_URLS,
   ORG,
   PACKAGES,
@@ -24,31 +25,12 @@ import {
 
 const generatedAt = `${LAST_HUMAN_VERIFIED}T00:00:00Z`;
 
-const INSTITUTIONAL_PILLARS = [
-  {
-    title: 'Sovereign AI Architecture & Data Perimeters',
-    url: OPEN_URLS.sovereignAiArchitecture,
-  },
-  {
-    title: 'DORA & EU AI Act for Wealth Management',
-    url: OPEN_URLS.doraEuAiActWealth,
-  },
-  {
-    title: 'Stateless Edge Ingestion',
-    url: OPEN_URLS.statelessEdgeIngestion,
-  },
-  {
-    title: 'Enterprise Design Partnership',
-    url: OPEN_URLS.enterpriseDesignPartnership,
-  },
-] as const;
-
 function packagesSection(): string {
   return PACKAGES.map((pkg) => `- ${pkg.name} — ${pkg.description}`).join('\n');
 }
 
 function institutionalPillarsSection(): string {
-  return INSTITUTIONAL_PILLARS.map((p) => `- [${p.title}](${p.url})`).join('\n');
+  return OPEN_INSTITUTIONAL_PILLARS.map((p) => `- [${p.title}](${p.url})`).join('\n');
 }
 
 /** Pocket Portfolio summary feed (consumer + developer context). */
