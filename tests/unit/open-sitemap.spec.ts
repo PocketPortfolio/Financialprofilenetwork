@@ -11,6 +11,15 @@ describe('openSitemapStatic', () => {
     expect(urls).toContain(OPEN_URLS.home);
     expect(urls).toContain(`${OPEN_URLS.home}/blog`);
     expect(urls).toContain(OPEN_URLS.architecture);
+    for (const pillar of [
+      OPEN_URLS.sovereignAiArchitecture,
+      OPEN_URLS.doraEuAiActWealth,
+      OPEN_URLS.statelessEdgeIngestion,
+      OPEN_URLS.enterpriseDesignPartnership,
+    ]) {
+      expect(urls).toContain(pillar);
+    }
+    expect(urls).toContain(OPEN_URLS.learnHub);
 
     const { open } = partitionBlogPostsForSitemap(loadBlogPostSitemapEntries());
     for (const post of open.slice(0, 5)) {
