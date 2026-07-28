@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
 import {
+  isAllowedSearchCrawler,
   isFirstPartyTickerRequest,
   isLikelyAutomatedClient,
   isSymbolFarmPath,
@@ -51,9 +52,68 @@ describe('bot-gate', () => {
     expect(isLikelyAutomatedClient(request)).toBe(true);
   });
 
-  it('allows verified search crawlers for HTML indexing', () => {
+  it('allows Googlebot for HTML indexing', () => {
     const request = req('https://www.pocketportfolio.app/s/spy', {
-      headers: { 'user-agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+      },
+    });
+    expect(isAllowedSearchCrawler(request)).toBe(true);
+    expect(isLikelyAutomatedClient(request)).toBe(false);
+  });
+
+  it('allows Bingbot for HTML indexing', () => {
+    const request = req('https://www.pocketportfolio.app/s/spy', {
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
+      },
+    });
+    expect(isAllowedSearchCrawler(request)).toBe(true);
+    expect(isLikelyAutomatedClient(request)).toBe(false);
+  });
+
+  it('blocks non-Google/Bing crawlers (enterprise allowlist)', () => {
+    for (const ua of [
+      'Mozilla/5.0 (compatible; DuckDuckBot/1.0)',
+      'Mozilla/5.0 (compatible; YandexBot/3.0)',
+      'Mozilla/5.0 Applebot/0.1',
+      'facebookexternalhit/1.1',
+      'GPTBot/1.0',
+      'ClaudeBot/1.0',
+      'PerplexityBot/1.0',
+      'Bytespider',
+    ]) {
+      const request = req('https://www.pocketportfolio.app/s/spy', {
+        headers: { 'user-agent': ua },
+      });
+      expect(isAllowedSearchCrawler(request)).toBe(false);
+      expect(isLikelyAutomatedClient(request)).toBe(true);
+    }
+  });
+
+  it('blocks spoofed Chrome UA without Sec-Fetch (Realtime farm gap)', () => {
+    const request = req('https://www.pocketportfolio.app/s/apacu/json-api', {
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
+        accept: 'text/html',
+      },
+    });
+    expect(isLikelyAutomatedClient(request)).toBe(true);
+  });
+
+  it('allows real browser navigations with Sec-Fetch', () => {
+    const request = req('https://www.pocketportfolio.app/s/spy', {
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        accept: 'text/html,application/xhtml+xml',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'none',
+        'sec-fetch-dest': 'document',
+      },
     });
     expect(isLikelyAutomatedClient(request)).toBe(false);
   });

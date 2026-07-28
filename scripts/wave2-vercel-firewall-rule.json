@@ -1,36 +1,207 @@
-{
-  "name": "Wave2 Challenge datacenter ASN metered APIs",
-  "active": true,
-  "conditionGroup": [
-    {
-      "conditions": [
-        {
-          "type": "path",
-          "op": "re",
-          "value": "^/api/(tickers/|quote|price/|dividend)"
-        },
-        {
-          "type": "geo_as_number",
-          "op": "inc",
-          "value": [
-            "16509",
-            "14618",
-            "15169",
-            "396982",
-            "8075",
-            "14061",
-            "20473",
-            "24940",
-            "16276",
-            "63949"
-          ]
-        }
-      ]
+[
+  {
+    "name": "Wave2 Challenge datacenter ASN metered APIs",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "path",
+            "op": "re",
+            "value": "^/api/(tickers/|quote|price/|dividend)"
+          },
+          {
+            "type": "geo_as_number",
+            "op": "inc",
+            "value": [
+              "16509",
+              "14618",
+              "15169",
+              "396982",
+              "8075",
+              "14061",
+              "20473",
+              "24940",
+              "16276",
+              "63949"
+            ]
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "Googlebot",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "Google-InspectionTool",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "AdsBot-Google",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "bingbot",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "BingPreview",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "msnbot",
+            "neg": true
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "challenge"
+      }
     }
-  ],
-  "action": {
-    "mitigate": {
-      "action": "challenge"
+  },
+  {
+    "name": "Wave2.1 Challenge datacenter ASN symbol farm",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "path",
+            "op": "re",
+            "value": "^/s(/|$)"
+          },
+          {
+            "type": "geo_as_number",
+            "op": "inc",
+            "value": [
+              "16509",
+              "14618",
+              "15169",
+              "396982",
+              "8075",
+              "14061",
+              "20473",
+              "24940",
+              "16276",
+              "63949"
+            ]
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "Googlebot",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "Google-InspectionTool",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "AdsBot-Google",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "bingbot",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "BingPreview",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "msnbot",
+            "neg": true
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "challenge"
+      }
+    }
+  },
+  {
+    "name": "Wave2.1 Deny automation UA on farm and APIs",
+    "active": true,
+    "conditionGroup": [
+      {
+        "conditions": [
+          {
+            "type": "path",
+            "op": "re",
+            "value": "^/(s(/|$)|api/(tickers/|quote|price/|dividend))"
+          },
+          {
+            "type": "user_agent",
+            "op": "re",
+            "value": "(python-requests|curl/|wget/|scrapy|HeadlessChrome|Playwright|puppeteer|GPTBot|ClaudeBot|Bytespider|SemrushBot|AhrefsBot|PetalBot|CCBot|PerplexityBot|DuckDuckBot|YandexBot|Applebot|facebookexternalhit)"
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "Googlebot",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "Google-InspectionTool",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "AdsBot-Google",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "bingbot",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "BingPreview",
+            "neg": true
+          },
+          {
+            "type": "user_agent",
+            "op": "sub",
+            "value": "msnbot",
+            "neg": true
+          }
+        ]
+      }
+    ],
+    "action": {
+      "mitigate": {
+        "action": "deny"
+      }
     }
   }
-}
+]

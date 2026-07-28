@@ -42,38 +42,30 @@ Verify: Vercel → pocket-portfolio-app → Firewall → Custom Rules → “Wav
 and ip.geoip.asnum in {16509 14618 15169 396982 8075 14061 20473 24940 16276 13335 63949}
 and not http.user_agent contains "Googlebot"
 and not http.user_agent contains "bingbot"
-and not http.user_agent contains "OAI-SearchBot"
-and not http.user_agent contains "ChatGPT-User"
 ```
 
 **Action:** `Managed Challenge` (Turnstile / JS challenge)
 
-**Rationale:** Drops AWS (16509), GCP (15169/396982), Azure (8075), DigitalOcean (14061), Hetzner (24940), OVH (16276), Vultr (20473), Cloudflare (13335), Linode/Akamai (63949) scrapers before Vercel serverless invocation. Search crawlers and LLM citation bots are exempt.
+**Rationale:** Drops AWS (16509), GCP (15169/396982), Azure (8075), DigitalOcean (14061), Hetzner (24940), OVH (16276), Vultr (20473), Cloudflare (13335), Linode/Akamai (63949) scrapers before Vercel serverless invocation. **Enterprise allowlist: Googlebot + Bingbot only.**
 
 ---
 
-## Rule 2 — Symbol farm HTML rate posture (optional)
+## Rule 2 — Symbol farm HTML (Wave 2.1 — required)
 
-**Name:** `Wave2 — Challenge automation UA on symbol farm`
+**Name:** `Wave2.1 — Challenge datacenter ASN on symbol farm`
 
 **Expression:**
 
 ```text
 (http.request.uri.path eq "/s" or http.request.uri.path contains "/s/")
-and (
-  http.user_agent contains "python-requests"
-  or http.user_agent contains "curl/"
-  or http.user_agent contains "wget/"
-  or http.user_agent contains "scrapy"
-  or http.user_agent contains "HeadlessChrome"
-  or http.user_agent contains "Playwright"
-)
+and ip.geoip.asnum in {16509 14618 15169 396982 8075 14061 20473 24940 16276 63949}
 and not http.user_agent contains "Googlebot"
+and not http.user_agent contains "bingbot"
 ```
 
 **Action:** `Managed Challenge`
 
-**Note:** App middleware (PR #93) already redirects/challenges these at Next.js edge. This rule saves origin compute when Cloudflare sits in front of Vercel.
+**Companion deny:** known automation UAs (`python-requests`, `curl/`, `GPTBot`, `Bytespider`, …) on `/s/*` and metered APIs → **Block**. App middleware (`lib/bot-gate.ts`) also 307/401 any non-Google/Bing crawler and any Mozilla spoof missing `Sec-Fetch-*`.
 
 ---
 

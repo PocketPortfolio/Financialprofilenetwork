@@ -25,16 +25,18 @@ const TRUSTED_APP_PATH_PREFIXES = [
   '/static',
 ] as const;
 
+/**
+ * Enterprise allowlist — ONLY Google + Bing may crawl gated surfaces.
+ * All other bots/crawlers (SEO farms, LLM scrapers, social previews, etc.) are blocked.
+ * Humans with real browser signals remain allowed.
+ */
 const SEARCH_CRAWLER_HINTS = [
   'googlebot',
+  'google-inspectiontool',
+  'adsbot-google',
   'bingbot',
-  'duckduckbot',
-  'yandexbot',
-  'applebot',
-  'facebookexternalhit',
-  'linkedinbot',
-  'twitterbot',
-  'slackbot',
+  'bingpreview',
+  'msnbot',
 ] as const;
 
 const AUTOMATION_UA_HINTS = [
@@ -68,10 +70,28 @@ const AUTOMATION_UA_HINTS = [
   'petalbot',
   'bytespider',
   'gptbot',
+  'chatgpt-user',
+  'oai-searchbot',
   'claudebot',
+  'claude-web',
   'anthropic-ai',
   'ccbot',
+  'perplexitybot',
+  'duckduckbot',
+  'yandexbot',
+  'applebot',
+  'facebookexternalhit',
+  'linkedinbot',
+  'twitterbot',
+  'slackbot',
+  'discordbot',
+  'whatsapp',
+  'telegrambot',
 ] as const;
+
+/** Generic crawler tokens — blocked unless on the Google/Bing allowlist. */
+const GENERIC_BOT_UA_RE =
+  /\b(bot|crawler|spider|slurp|scrapy|fetcher|monitor|checker|archive)\b/i;
 
 export function isSymbolFarmPath(pathname: string): boolean {
   return pathname === '/s' || pathname.startsWith('/s/');
@@ -189,21 +209,28 @@ export function isLikelyAutomatedClient(request: NextRequest): boolean {
   const ua = (request.headers.get('user-agent') || '').toLowerCase();
   if (!ua || ua === 'unknown') return true;
 
+  // Google + Bing only — every other crawler is treated as automation.
   if (isAllowedSearchCrawler(request)) return false;
 
   if (AUTOMATION_UA_HINTS.some((hint) => ua.includes(hint))) return true;
+  if (GENERIC_BOT_UA_RE.test(ua)) return true;
 
   const secFetchMode = (request.headers.get('sec-fetch-mode') || '').toLowerCase();
   const secFetchSite = (request.headers.get('sec-fetch-site') || '').toLowerCase();
-  if (!secFetchMode && !secFetchSite && !request.headers.get('origin')) {
-    const accept = (request.headers.get('accept') || '').toLowerCase();
-    if (
-      accept.includes('application/json') &&
-      !accept.includes('text/html') &&
-      !ua.includes('mozilla/')
-    ) {
-      return true;
-    }
+  const hasSecFetch = Boolean(secFetchMode || secFetchSite);
+
+  // Spoofed "Chrome" scrapers almost always omit Sec-Fetch-*. Real browsers send them.
+  if (!hasSecFetch) return true;
+
+  const accept = (request.headers.get('accept') || '').toLowerCase();
+  if (
+    accept.includes('application/json') &&
+    !accept.includes('text/html') &&
+    !request.headers.get('origin') &&
+    secFetchMode !== 'cors' &&
+    secFetchMode !== 'same-origin'
+  ) {
+    return true;
   }
 
   return false;

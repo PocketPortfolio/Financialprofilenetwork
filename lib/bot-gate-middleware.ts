@@ -36,7 +36,8 @@ async function withinSurfacePageBudget(ip: string): Promise<boolean> {
 
 /**
  * Edge paywall for symbol-farm HTML and automated clients on metered surfaces.
- * Search crawlers may index HTML; humans get a generous page budget before upsell.
+ * Enterprise: ONLY Googlebot + Bingbot may crawl; all other bots → 307/401.
+ * Humans (real Sec-Fetch browser signals) get a page budget before upsell.
  */
 export async function applyBotGateMiddleware(
   request: NextRequest,
