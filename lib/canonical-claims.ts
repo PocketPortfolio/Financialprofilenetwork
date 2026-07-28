@@ -844,8 +844,8 @@ export const SURFACE_CROSS_LINKS = {
 } as const;
 
 /**
- * Blog categories shown on Open Portfolio (B2B). Cron still writes all posts to
- * content/posts — filtering is presentation-only so autonomous generation is unchanged.
+ * Blog categories owned by Open Portfolio (B2B host). Includes farm categories for
+ * dual-surface routing of existing MDX; listing/sitemap use {@link isOpenBlogListingCategory}.
  */
 export const OPEN_BLOG_CATEGORIES = [
   'research',
@@ -861,7 +861,8 @@ export function isOpenBlogCategory(category: string | undefined): boolean {
 
 /**
  * Wave 1 content doctrine: generic how-to / research farm posts stay crawlable for links
- * but must not compete for index slots. Sovereign engineering stays indexable.
+ * but must not compete for index slots. Sovereign engineering stays indexable unless
+ * {@link isOpenInternalEngineeringDiary}.
  */
 export function shouldNoindexOpenBlogFarm(
   category: string | undefined,
@@ -874,51 +875,57 @@ export function shouldNoindexOpenBlogFarm(
   return s.startsWith('research-') || s.startsWith('how-to-');
 }
 
+/**
+ * Internal "Sovereign Engineering · Part N" build diaries (file paths, admin routes,
+ * roadmap stubs). Not buyer-facing — hide from Open hub/sitemap and noindex.
+ */
+export function isOpenInternalEngineeringDiary(slug?: string): boolean {
+  return (slug ?? '').toLowerCase().startsWith('sovereign-engineering-serial-');
+}
+
+/** Open post robots: farm + internal engineering diaries. */
+export function shouldNoindexOpenBlogPost(
+  category: string | undefined,
+  slug?: string,
+): boolean {
+  return (
+    shouldNoindexOpenBlogFarm(category, slug) || isOpenInternalEngineeringDiary(slug)
+  );
+}
+
+/** Open /blog hub + Open sitemap — institutional buyer briefs only. */
+export function isOpenBlogListingCategory(
+  category: string | undefined,
+  slug?: string,
+): boolean {
+  return (
+    isOpenBlogCategory(category) &&
+    !shouldNoindexOpenBlogFarm(category, slug) &&
+    !isOpenInternalEngineeringDiary(slug)
+  );
+}
+
 /** First-party MDX on Pocket (B2C) — excludes Open-only categories. */
 export function isPocketBlogCategory(category: string | undefined): boolean {
   const c = category ?? 'deep-dive';
   return !isOpenBlogCategory(c);
 }
 
-/** Blog hub filter chips — www.openportfolio.co.uk/blog (B2B substrate content). */
+/** Blog hub filter chips — www.openportfolio.co.uk/blog (allowed institutional only). */
 export const OPEN_BLOG_FILTER_CHIPS = [
-  { id: 'all' as const, label: 'All technical posts' },
+  { id: 'all' as const, label: 'All institutional posts' },
   { id: 'sovereign-engineering' as const, label: 'Sovereign Engineering' },
-  { id: 'how-to-in-tech' as const, label: 'How to in Tech' },
-  { id: 'research' as const, label: 'Research' },
 ] as const;
 
 export type OpenBlogFilterId = (typeof OPEN_BLOG_FILTER_CHIPS)[number]['id'];
 
 /**
  * Blog hub filter chips — www.pocketportfolio.app/blog (B2C building in public).
+ * First-party deep-dives only — no Dev.to / CoderLegion syndication on this hub.
  * No Sovereign Engineering / research / how-to pillars here — those live on Open.
  */
 export const POCKET_BLOG_FILTER_CHIPS = [
-  {
-    id: 'all' as const,
-    label: 'All Posts',
-    accent: 'var(--accent-warm)',
-    activeBg: 'rgba(245, 158, 11, 0.12)',
-  },
-  {
-    id: 'dev.to' as const,
-    label: 'Dev.to',
-    accent: 'rgb(59, 73, 223)',
-    activeBg: 'rgba(59, 73, 223, 0.12)',
-  },
-  {
-    id: 'coderlegion' as const,
-    label: 'CoderLegion',
-    accent: 'rgb(139, 92, 246)',
-    activeBg: 'rgba(139, 92, 246, 0.12)',
-  },
-  {
-    id: 'generated' as const,
-    label: 'Pocket Portfolio Posts',
-    accent: 'var(--accent-warm)',
-    activeBg: 'rgba(245, 158, 11, 0.12)',
-  },
+  { id: 'all' as const, label: 'All Posts' },
 ] as const;
 
 export type PocketBlogFilterId = (typeof POCKET_BLOG_FILTER_CHIPS)[number]['id'];

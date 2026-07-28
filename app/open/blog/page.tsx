@@ -3,9 +3,9 @@ import BlogPage from '../../blog/page';
 import { OPEN_URLS, SURFACE_ORG } from '../../../lib/canonical-claims';
 
 export const metadata: Metadata = {
-  title: 'Engineering & Research Blog',
+  title: 'Institutional Engineering Blog',
   description:
-    'Technical deep-dives on sovereign finance, local-first architecture, and stateless inference from Open Portfolio.',
+    'Sovereign engineering briefs on local-first architecture and stateless inference from Open Portfolio.',
   alternates: { canonical: `${OPEN_URLS.home}/blog` },
   openGraph: {
     title: 'Open Portfolio Blog',

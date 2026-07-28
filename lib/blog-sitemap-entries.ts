@@ -7,15 +7,16 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import {
-  isOpenBlogCategory,
+  isOpenBlogListingCategory,
   isPocketBlogCategory,
-  shouldNoindexOpenBlogFarm,
 } from './canonical-claims';
 
 export interface BlogPostSitemapEntry {
   slug: string;
   category: string | undefined;
   lastModified: Date;
+  excludeFromLanding?: boolean;
+  noindex?: boolean;
 }
 
 export function loadBlogPostSitemapEntries(): BlogPostSitemapEntry[] {
@@ -36,6 +37,8 @@ export function loadBlogPostSitemapEntries(): BlogPostSitemapEntry[] {
         slug,
         category: typeof data.category === 'string' ? data.category : undefined,
         lastModified: data.date ? new Date(data.date) : now,
+        excludeFromLanding: data.excludeFromLanding === true,
+        noindex: data.noindex === true,
       });
     } catch (err) {
       console.error(`[blog-sitemap-entries] Error processing ${file}:`, err);
@@ -51,11 +54,11 @@ export function partitionBlogPostsForSitemap(entries: BlogPostSitemapEntry[]): {
 } {
   return {
     pocket: entries.filter((e) => isPocketBlogCategory(e.category)),
-    // Wave 1: keep how-to/research crawlable via links but out of sitemap index slots
     open: entries.filter(
       (e) =>
-        isOpenBlogCategory(e.category) &&
-        !shouldNoindexOpenBlogFarm(e.category, e.slug),
+        isOpenBlogListingCategory(e.category, e.slug) &&
+        !e.excludeFromLanding &&
+        !e.noindex,
     ),
   };
 }

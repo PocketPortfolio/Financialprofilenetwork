@@ -13,8 +13,8 @@ Open Portfolio is the B2B developer and infrastructure gateway for the sovereign
 ## Institutional Architecture Briefs
 - [Sovereign AI Architecture & Data Perimeters](https://www.openportfolio.co.uk/learn/sovereign-ai-architecture)
 - [DORA & EU AI Act for Wealth Management](https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth)
-- [Stateless Edge Ingestion](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)
-- [Enterprise Design Partnership](https://www.openportfolio.co.uk/learn/enterprise-design-partnership)
+- [Stateless Edge Ingestion vs Centralized Warehousing](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)
+- [Enterprise Design Partnership Program](https://www.openportfolio.co.uk/learn/enterprise-design-partnership)
 
 ## Data Perimeter & Security
 Open Portfolio enforces a Split-Brain execution model. Frontier models operate as invited guests — never receiving raw data warehouses or PII.
