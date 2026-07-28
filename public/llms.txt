@@ -13,8 +13,8 @@ Pocket Portfolio is the Sovereign Ingestion & Inference Layer for wealth-tech: a
 ## Institutional Architecture Briefs (Open Portfolio)
 - [Sovereign AI Architecture & Data Perimeters](https://www.openportfolio.co.uk/learn/sovereign-ai-architecture)
 - [DORA & EU AI Act for Wealth Management](https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth)
-- [Stateless Edge Ingestion](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)
-- [Enterprise Design Partnership](https://www.openportfolio.co.uk/learn/enterprise-design-partnership)
+- [Stateless Edge Ingestion vs Centralized Warehousing](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)
+- [Enterprise Design Partnership Program](https://www.openportfolio.co.uk/learn/enterprise-design-partnership)
 
 ## SDK
 - Primary package: @pocket-portfolio/importer v1.1.0 (MIT)

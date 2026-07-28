@@ -63,6 +63,11 @@ describe('isOpenSurfaceRoute', () => {
     expect(isPocketOnlyMarketingPath('/tools')).toBe(true);
     expect(isOpenSurfaceRoute('/features/google-drive-sync')).toBe(false);
     expect(isPocketOnlyMarketingPath('/features/google-drive-sync')).toBe(true);
+    expect(isOpenSurfaceRoute('/book/sovereign-intelligence')).toBe(false);
+    expect(isPocketOnlyMarketingPath('/book')).toBe(true);
+    expect(isPocketOnlyMarketingPath('/book/sovereign-intelligence')).toBe(true);
+    // Static book assets stay on Open (figures) — not the HTML book routes
+    expect(isPocketOnlyMarketingPath('/book-assets/covers/x.svg')).toBe(false);
   });
 
   it('denies other consumer-only paths without B2B rewrite', () => {

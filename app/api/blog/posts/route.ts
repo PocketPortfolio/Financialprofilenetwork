@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { isOpenBlogCategory, isPocketBlogCategory } from '@/lib/canonical-claims';
+import { isOpenBlogListingCategory, isPocketBlogCategory } from '@/lib/canonical-claims';
 
 // Disable caching to ensure fresh posts are always returned
 export const dynamic = 'force-dynamic';
@@ -106,8 +106,12 @@ export async function GET(request: NextRequest) {
     );
 
     // Presentation-only filter: cron still writes all MDX to content/posts.
+    // Open hub: institutional buyer briefs only (farm + internal SE serials out).
     if (surface === 'open') {
-      posts = posts.filter((p) => isOpenBlogCategory(p.category));
+      posts = posts.filter(
+        (p) =>
+          isOpenBlogListingCategory(p.category, p.slug) && !p.excludeFromLanding,
+      );
     } else if (surface === 'pocket') {
       posts = posts.filter((p) => isPocketBlogCategory(p.category));
     }

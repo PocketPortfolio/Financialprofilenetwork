@@ -4,7 +4,12 @@ import { notFound, redirect } from 'next/navigation';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { isOpenBlogCategory, OPEN_URLS, SURFACE_ORG, shouldNoindexOpenBlogFarm } from '@/lib/canonical-claims';
+import {
+  isOpenBlogCategory,
+  OPEN_URLS,
+  SURFACE_ORG,
+  shouldNoindexOpenBlogPost,
+} from '@/lib/canonical-claims';
 import { isNextNavigationError } from '@/lib/next-navigation-errors';
 import { isOpenPortfolioHost, openSurfaceBaseUrl, pocketSurfaceBaseUrl } from '@/lib/surface-host';
 import { escapeAngleBracketsInProse } from '@/lib/mdx-escape';
@@ -148,16 +153,15 @@ export async function generateMetadata({
   const brand = onOpen ? SURFACE_ORG.open.name : 'Pocket Portfolio';
   const fallbackOgImage = `${siteBase}/api/og?title=${encodeURIComponent(data.title)}&description=${encodeURIComponent(data.description || 'Sovereign Local-First Wealth Tracker')}&v=6`;
   const published = data.date ?? undefined;
-  const farmNoindex =
+  const openNoindex =
     data.noindex === true ||
-    (data.noindex !== false &&
-      shouldNoindexOpenBlogFarm(data.category, slug));
+    (data.noindex !== false && shouldNoindexOpenBlogPost(data.category, slug));
 
   return {
     title: `${data.title} | ${brand} Blog`,
     description: data.description,
     keywords: data.tags,
-    robots: farmNoindex
+    robots: openNoindex
       ? { index: false, follow: true }
       : { index: true, follow: true },
     openGraph: {

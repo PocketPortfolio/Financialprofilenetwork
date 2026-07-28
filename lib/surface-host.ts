@@ -71,6 +71,8 @@ export const POCKET_ONLY_PATH_PREFIXES = [
   '/api-keys',
   '/privacy',
   '/terms',
+  /** Technical books live on Pocket (canonical pocketportfolio.app/book/…). */
+  '/book/',
 ] as const;
 
 export function isPocketOnlyMarketingPath(pathname: string): boolean {

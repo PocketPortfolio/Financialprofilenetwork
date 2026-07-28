@@ -17,6 +17,15 @@ describe('partitionBlogPostsForSitemap', () => {
       base({ slug: 'a', category: 'research' }),
       base({ slug: 'b', category: 'how-to-in-tech' }),
       base({ slug: 'c', category: 'sovereign-engineering' }),
+      base({
+        slug: 'sovereign-engineering-serial-09-admin-analytics',
+        category: 'sovereign-engineering',
+      }),
+      base({
+        slug: 'data-chasm-wealth-management-llms',
+        category: 'sovereign-engineering',
+        excludeFromLanding: true,
+      }),
     ]);
     expect(pocket).toHaveLength(0);
     expect(open.map((e) => e.slug)).toEqual(['c']);

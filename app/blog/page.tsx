@@ -3,16 +3,13 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { trackBlogPostClick, trackBlogPlatformView } from '../lib/analytics/events';
-import { featuredArticles, type Article } from '../lib/blog/articles';
+import { trackBlogPostClick } from '../lib/analytics/events';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import SEOPageTracker from '../components/SEOPageTracker';
 import { isOpenPortfolioHost } from '@/lib/surface-host';
 import {
   OPEN_BLOG_FILTER_CHIPS,
-  POCKET_BLOG_FILTER_CHIPS,
   type OpenBlogFilterId,
-  type PocketBlogFilterId,
 } from '@/lib/canonical-claims';
 
 const POSTS_PER_PAGE = 20;
@@ -27,14 +24,9 @@ const OPEN_BLOG_CARD_HOVER_BORDER = 'rgba(245, 158, 11, 0.4)';
 const OPEN_BLOG_CARD_HOVER_SHADOW = '0 8px 24px rgba(245, 158, 11, 0.15)';
 const OPEN_BLOG_CARD_REST_SHADOW = '0 4px 18px rgba(245, 158, 11, 0.06)';
 
-type BlogCardKind = 'regular' | 'research' | 'how-to' | 'external';
+type BlogCardKind = 'regular' | 'research' | 'how-to';
 
-function blogCardHover(
-  el: HTMLElement,
-  surface: 'open' | 'pocket',
-  kind: BlogCardKind,
-  platform?: string,
-) {
+function blogCardHover(el: HTMLElement, surface: 'open' | 'pocket', kind: BlogCardKind) {
   el.style.transform = 'translateY(-4px)';
   if (surface === 'open') {
     el.style.boxShadow = OPEN_BLOG_CARD_HOVER_SHADOW;
@@ -49,12 +41,6 @@ function blogCardHover(
   if (kind === 'how-to') {
     el.style.boxShadow = '0 8px 24px rgba(0, 255, 65, 0.15)';
     el.style.borderColor = 'rgba(0, 255, 65, 0.4)';
-    return;
-  }
-  if (kind === 'external') {
-    el.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.15)';
-    el.style.borderColor =
-      platform === 'dev.to' ? 'rgba(59, 73, 223, 0.4)' : 'rgba(139, 92, 246, 0.4)';
     return;
   }
   el.style.boxShadow = OPEN_BLOG_CARD_HOVER_SHADOW;
@@ -88,8 +74,7 @@ interface GeneratedPost {
 type GridItem =
   | { kind: 'regular'; post: GeneratedPost }
   | { kind: 'research'; post: GeneratedPost }
-  | { kind: 'how-to'; post: GeneratedPost }
-  | { kind: 'external'; article: Article };
+  | { kind: 'how-to'; post: GeneratedPost };
 
 function postKind(post: GeneratedPost): GridItem['kind'] {
   if (post.category === 'research') return 'research';
@@ -108,24 +93,8 @@ function buildOpenVisibleItems(filter: OpenBlogFilterId, posts: GeneratedPost[])
   });
 }
 
-function buildPocketVisibleItems(
-  filter: PocketBlogFilterId,
-  regularPosts: GeneratedPost[],
-  filteredArticles: Article[],
-): GridItem[] {
-  const items: GridItem[] = [];
-
-  if (filter === 'all' || filter === 'generated') {
-    regularPosts.forEach((post) => items.push({ kind: 'regular', post }));
-  }
-  if (filter === 'all' || filter === 'dev.to' || filter === 'coderlegion') {
-    const platform = filter === 'all' ? null : filter;
-    filteredArticles
-      .filter((a) => platform === null || a.platform === platform)
-      .forEach((article) => items.push({ kind: 'external', article }));
-  }
-
-  return items;
+function buildPocketVisibleItems(posts: GeneratedPost[]): GridItem[] {
+  return posts.map((post) => ({ kind: 'regular' as const, post }));
 }
 
 function BlogPageInner() {
@@ -133,7 +102,6 @@ function BlogPageInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [openFilter, setOpenFilter] = useState<OpenBlogFilterId>('all');
-  const [pocketFilter, setPocketFilter] = useState<PocketBlogFilterId>('all');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [blogSurface, setBlogSurface] = useState<'pocket' | 'open'>('pocket');
 
@@ -141,14 +109,13 @@ function BlogPageInner() {
     const surface = isOpenPortfolioHost(window.location.hostname) ? 'open' : 'pocket';
     setBlogSurface(surface);
     setOpenFilter('all');
-    setPocketFilter('all');
     fetch(`/api/blog/posts?surface=${surface}`)
       .then((res) => res.json())
       .then((data) => setGeneratedPosts(data || []))
       .catch(() => setGeneratedPosts([]));
   }, []);
 
-  const filter = blogSurface === 'open' ? openFilter : pocketFilter;
+  const filter = blogSurface === 'open' ? openFilter : 'all';
   const prevFilter = useRef(filter);
 
   useEffect(() => {
@@ -158,19 +125,10 @@ function BlogPageInner() {
     }
   }, [filter, pathname, router]);
 
-  const pocketRegularPosts = generatedPosts;
-
-  const pocketArticles =
-    pocketFilter === 'all'
-      ? featuredArticles
-      : pocketFilter === 'generated'
-        ? []
-        : featuredArticles.filter((article) => article.platform === pocketFilter);
-
   const visibleItems =
     blogSurface === 'open'
       ? buildOpenVisibleItems(openFilter, generatedPosts)
-      : buildPocketVisibleItems(pocketFilter, pocketRegularPosts, pocketArticles);
+      : buildPocketVisibleItems(generatedPosts);
 
   const cardBorder = blogSurface === 'open' ? OPEN_BLOG_CARD_BORDER : BLOG_CARD_BORDER;
   const cardBorderColor = blogSurface === 'open' ? OPEN_BLOG_CARD_BORDER_COLOR : BLOG_CARD_BORDER_COLOR;
@@ -231,10 +189,11 @@ function BlogPageInner() {
             }}
           >
             {blogSurface === 'open'
-              ? 'Research, sovereign engineering, and infrastructure deep-dives from the Open Portfolio substrate team.'
+              ? 'Sovereign engineering briefs on local-first architecture and stateless inference from the Open Portfolio team.'
               : 'Technical deep-dives, architecture decisions, and devlogs from the Pocket Portfolio team.'}
           </p>
 
+          {blogSurface === 'open' && (
           <div
             style={{
               display: 'flex',
@@ -244,26 +203,15 @@ function BlogPageInner() {
               marginBottom: '32px',
             }}
           >
-            {(blogSurface === 'open' ? OPEN_BLOG_FILTER_CHIPS : POCKET_BLOG_FILTER_CHIPS).map(
-              (chip) => {
-                const active = filter === chip.id;
-                const accent =
-                  blogSurface === 'open'
-                    ? 'var(--accent-warm)'
-                    : (chip as (typeof POCKET_BLOG_FILTER_CHIPS)[number]).accent;
-                const activeBg =
-                  blogSurface === 'open'
-                    ? 'rgba(245, 158, 11, 0.12)'
-                    : (chip as (typeof POCKET_BLOG_FILTER_CHIPS)[number]).activeBg;
-                const setChip =
-                  blogSurface === 'open'
-                    ? () => setOpenFilter(chip.id as OpenBlogFilterId)
-                    : () => setPocketFilter(chip.id as PocketBlogFilterId);
+            {OPEN_BLOG_FILTER_CHIPS.map((chip) => {
+                const active = openFilter === chip.id;
+                const accent = 'var(--accent-warm)';
+                const activeBg = 'rgba(245, 158, 11, 0.12)';
                 return (
                   <button
                     key={chip.id}
                     type="button"
-                    onClick={setChip}
+                    onClick={() => setOpenFilter(chip.id)}
                     style={{
                       padding: '8px 16px',
                       borderRadius: '8px',
@@ -279,9 +227,9 @@ function BlogPageInner() {
                     {chip.label}
                   </button>
                 );
-              },
-            )}
+              })}
           </div>
+          )}
         </header>
 
         {visibleItems.length > 0 && (
@@ -574,94 +522,7 @@ function BlogPageInner() {
               );
             }
 
-            const article = item.article;
-            return (
-              <a
-                key={`external-${article.url}`}
-                href={article.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackBlogPostClick(article.title, article.platform, article.url)}
-                style={{
-                  display: 'block',
-                  padding: '24px',
-                  background: 'hsl(var(--card))',
-                  border: cardBorder,
-                  borderRadius: '12px',
-                  transition: 'all 0.2s ease',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  cursor: 'pointer',
-                  boxShadow: cardRestShadow,
-                }}
-                onMouseEnter={(e) =>
-                  blogCardHover(e.currentTarget, blogSurface, 'external', article.platform)
-                }
-                onMouseLeave={(e) =>
-                  blogCardRest(e.currentTarget, blogSurface, cardBorderColor, cardRestShadow)
-                }
-              >
-                <div style={{ marginBottom: '12px' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      padding: '4px 12px',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      borderRadius: '6px',
-                      background:
-                        article.platform === 'dev.to' ? 'rgba(59, 73, 223, 0.1)' : 'rgba(139, 92, 246, 0.1)',
-                      color: article.platform === 'dev.to' ? 'rgb(59, 73, 223)' : 'rgb(139, 92, 246)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    {article.platform === 'dev.to' ? 'DEV.TO' : 'CODERLEGION'}
-                  </span>
-                </div>
-                <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', lineHeight: '1.4' }}>
-                  {article.title}
-                </h2>
-                <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '16px', lineHeight: '1.6' }}>
-                  {article.description}
-                </p>
-                <div
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--text-muted)',
-                    marginBottom: '12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
-                  }}
-                >
-                  <div>
-                    {new Date(article.date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </div>
-                  <div>By {article.author}</div>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {article.tags.map((tag, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        fontSize: '11px',
-                        padding: '2px 8px',
-                        background: 'var(--muted)',
-                        borderRadius: '4px',
-                        color: 'var(--text-muted)',
-                      }}
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </a>
-            );
+            return null;
           })}
         </div>
 
@@ -715,115 +576,6 @@ function BlogPageInner() {
               Next
             </button>
           </nav>
-        )}
-
-        {blogSurface === 'pocket' && (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '48px 24px',
-            background: 'hsl(var(--card))',
-            borderRadius: '12px',
-            border: BLOG_CARD_BORDER,
-            boxShadow: '0 4px 18px rgba(245, 158, 11, 0.06)',
-          }}
-        >
-          <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>Want More Content?</h2>
-          <p style={{ fontSize: '16px', color: 'var(--text-muted)', marginBottom: '24px' }}>
-            Follow us on dev.to and join discussions on CoderLegion
-          </p>
-          <div
-            style={{
-              display: 'inline-flex',
-              gap: '12px',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
-          >
-            <a
-              href="https://dev.to/pocketportfolioapp"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackBlogPlatformView('dev.to', 'view_all')}
-              style={{
-                padding: '12px 24px',
-                fontSize: '15px',
-                fontWeight: '600',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, rgba(59, 73, 223, 0.9) 0%, rgba(59, 73, 223, 1) 100%)',
-                color: 'white',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 73, 223, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              View All Dev.to Articles →
-            </a>
-            <Link
-              href="/blog?page=1"
-              onClick={() => {
-                setPocketFilter('generated');
-                trackBlogPlatformView('pocket-portfolio', 'view_all');
-              }}
-              style={{
-                padding: '12px 24px',
-                fontSize: '15px',
-                fontWeight: '600',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(245, 158, 11, 1) 100%)',
-                color: 'white',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              View Pocket Portfolio Posts →
-            </Link>
-            <a
-              href="https://coderlegion.com/5738/welcome-to-coderlegion-22s"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackBlogPlatformView('coderlegion', 'join_discussion')}
-              style={{
-                padding: '12px 24px',
-                fontSize: '15px',
-                fontWeight: '600',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(139, 92, 246, 1) 100%)',
-                color: 'white',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              Join CoderLegion Discussion →
-            </a>
-          </div>
-        </div>
         )}
       </div>
     </>
