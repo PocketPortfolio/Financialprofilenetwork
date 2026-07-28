@@ -4,6 +4,8 @@ import {
   getDuePosts,
   generatePostForCron,
   getCalendarFilePath,
+  isBlogFarmPaused,
+  isCronEligibleBlogCategory,
   type BlogPost,
 } from '@/lib/blog-generator-cron';
 
@@ -119,15 +121,10 @@ export async function GET(request: Request) {
     const calendar = await fetchCalendarsFromGitHub();
     const now = new Date();
     // Wave 1: pause how-to / research farm generation (set OP_BLOG_FARM_PAUSED=false to resume)
-    const farmPaused = process.env.OP_BLOG_FARM_PAUSED !== 'false';
-    const duePosts = getDuePosts(calendar, now).filter((p) => {
-      if (!farmPaused) return true;
-      const cat = p.category || '';
-      if (cat === 'how-to-in-tech' || cat === 'research') {
-        return false;
-      }
-      return true;
-    });
+    const farmPaused = isBlogFarmPaused();
+    const duePosts = getDuePosts(calendar, now).filter((p) =>
+      isCronEligibleBlogCategory(p.category),
+    );
 
     if (duePosts.length === 0) {
       return NextResponse.json({

@@ -93,6 +93,8 @@ interface AnalyticsData {
     pending: number;
     overdue: number;
     failed: number;
+    farmPaused?: boolean;
+    scope?: string;
     posts: Array<{
       id: string;
       title: string;
@@ -102,7 +104,7 @@ interface AnalyticsData {
       scheduledTime: string | null;
       status: 'pending' | 'published' | 'failed';
       pillar: string;
-      category?: string; // ✅ ADD CATEGORY
+      category?: string;
       isOverdue: boolean;
       hasFiles: boolean;
       publishedTime: string | null;
@@ -1845,11 +1847,21 @@ export default function AdminAnalyticsPage() {
             <h2 style={{
               fontSize: '20px',
               fontWeight: 'bold',
-              marginBottom: 'var(--space-4)',
+              marginBottom: 'var(--space-2)',
               color: 'var(--text)'
             }}>
-              📝 Blog Posts (Autonomous Engine)
+              Blog Posts (Allowed Autonomous Queue)
             </h2>
+            <p style={{
+              fontSize: '13px',
+              color: 'var(--text-secondary)',
+              marginBottom: 'var(--space-4)',
+              lineHeight: 1.5,
+            }}>
+              {analyticsData.blogPosts.farmPaused !== false
+                ? 'Wave 1 farm pause active — tracking deep-dive posts only (how-to / research calendars hidden until OP_BLOG_FARM_PAUSED=false).'
+                : 'Farm pause off — tracking all calendars eligible for the autonomous cron.'}
+            </p>
 
             {/* Summary Metrics */}
             <div style={{
@@ -1859,9 +1871,9 @@ export default function AdminAnalyticsPage() {
               marginBottom: 'var(--space-4)'
             }}>
               <MetricCard
-                label="Total Posts"
+                label="Total Allowed"
                 value={analyticsData.blogPosts.total.toString()}
-                subtitle="Scheduled"
+                subtitle={analyticsData.blogPosts.scope === 'deep-dive-only' ? 'Deep-dive queue' : 'Scheduled'}
               />
               <MetricCard
                 label="Published"
@@ -1871,12 +1883,12 @@ export default function AdminAnalyticsPage() {
               <MetricCard
                 label="Pending"
                 value={analyticsData.blogPosts.pending.toString()}
-                subtitle="Scheduled"
+                subtitle="In queue"
               />
               <MetricCard
                 label="Overdue"
                 value={analyticsData.blogPosts.overdue.toString()}
-                subtitle={analyticsData.blogPosts.overdue > 0 ? "⚠️ Action needed" : "All on track"}
+                subtitle={analyticsData.blogPosts.overdue > 0 ? "Action needed" : "All on track"}
               />
             </div>
 
@@ -1957,27 +1969,15 @@ export default function AdminAnalyticsPage() {
                           <span style={{
                             fontSize: '12px',
                             padding: '4px 8px',
-                            background: post.category === 'how-to-in-tech' 
-                              ? 'rgba(34, 197, 94, 0.1)' 
-                              : post.category === 'research'
-                              ? 'rgba(59, 130, 246, 0.1)'
-                              : 'var(--surface-elevated)',
-                            color: post.category === 'how-to-in-tech' 
-                              ? '#22c55e' 
-                              : post.category === 'research'
-                              ? '#3b82f6'
-                              : 'var(--text)',
+                            background: 'color-mix(in srgb, var(--accent-warm) 12%, transparent)',
+                            color: 'var(--accent-warm)',
                             borderRadius: '4px',
                             fontWeight: '600',
-                            border: post.category === 'how-to-in-tech' 
-                              ? '1px solid #22c55e' 
-                              : post.category === 'research'
-                              ? '1px solid #3b82f6'
-                              : '1px solid var(--border)'
+                            border: '1px solid color-mix(in srgb, var(--accent-warm) 35%, transparent)'
                           }}>
-                            {post.category === 'how-to-in-tech' ? '📝 How to' : 
-                             post.category === 'research' ? '🔬 Research' : 
-                             '📚 Deep Dive'}
+                            {post.category === 'how-to-in-tech' ? 'How to' :
+                             post.category === 'research' ? 'Research' :
+                             'Deep Dive'}
                           </span>
                         </td>
                         <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
@@ -2038,8 +2038,8 @@ export default function AdminAnalyticsPage() {
                 borderRadius: '8px',
                 color: '#f59e0b'
               }}>
-                <strong>⚠️ Warning:</strong> {analyticsData.blogPosts.overdue} post(s) are overdue. 
-                The health check workflow should auto-trigger generation. Check GitHub Actions if posts don't appear.
+                <strong>Warning:</strong> {analyticsData.blogPosts.overdue} allowed post(s) are overdue.
+                Check Vercel Cron for <code>/api/cron/generate-blog</code> if deep-dives do not publish.
               </div>
             )}
           </section>
