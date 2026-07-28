@@ -9,7 +9,7 @@ import {
   Bookmark,
   FileUp,
   Settings2,
-  HeartHandshake,
+  Tags,
   type LucideIcon,
 } from 'lucide-react';
 import { isOpenPortfolioHost } from '@/lib/surface-host';
@@ -60,10 +60,10 @@ const tabs: TabItem[] = [
   },
   {
     id: 'sponsor',
-    label: 'Utility',
+    label: 'Pricing',
     href: '/sponsor',
-    ariaLabel: 'Developer Utility — support Pocket Portfolio',
-    icon: HeartHandshake,
+    ariaLabel: 'Pricing and sponsorship plans',
+    icon: Tags,
   },
 ];
 
