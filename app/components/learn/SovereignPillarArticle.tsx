@@ -1,6 +1,6 @@
 /**
- * Shared institutional pillar page shell for Open Portfolio Wave 1 doctrine.
- * Wave 2: TechArticle JSON-LD for LLM citation.
+ * Shared institutional pillar page shell for Open Portfolio architecture briefs.
+ * TechArticle JSON-LD for search and citation agents.
  */
 import Link from 'next/link';
 import { OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';

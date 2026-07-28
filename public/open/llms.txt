@@ -10,7 +10,7 @@ Secondary phrasing: The sovereign financial data layer.
 ## What We Are
 Open Portfolio is the B2B developer and infrastructure gateway for the sovereign ingestion substrate that powers Pocket Portfolio. Local-first import SDK plus stateless AI reasoning — platforms reason over broker data without warehousing PII.
 
-## Primary System Architecture (Wave 1 pillars)
+## Institutional Architecture Briefs
 - [Sovereign AI Architecture & Data Perimeters](https://www.openportfolio.co.uk/learn/sovereign-ai-architecture)
 - [DORA & EU AI Act for Wealth Management](https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth)
 - [Stateless Edge Ingestion](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)

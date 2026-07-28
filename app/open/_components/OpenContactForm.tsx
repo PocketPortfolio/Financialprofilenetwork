@@ -16,7 +16,7 @@ import { OPEN_LANDING_COPY } from '../../../lib/canonical-claims';
 const CONTEXT_OPTIONS = [
   { value: 'tier1', label: 'Tier 1 / clean-room partnership' },
   { value: 'design-challenge', label: 'Design Challenge submission' },
-  { value: 'investor', label: 'Investor / BIP' },
+  { value: 'investor', label: 'Board of Investors (seed round)' },
   { value: 'grant', label: 'Sovereign AI Grant' },
   { value: 'general', label: 'General inquiry' },
 ] as const;
@@ -278,11 +278,8 @@ export default function OpenContactForm() {
                   maxWidth: '380px',
                 }}
               >
-                Submissions persist to a private Firestore collection and surface in
-                <code style={{ fontFamily: 'ui-monospace', fontSize: '12px', margin: '0 4px' }}>
-                  /admin/analytics
-                </code>
-                only. No third-party form provider.
+                Submissions are stored privately on our infrastructure. No third-party form
+                provider or marketing pixel.
               </p>
               <motion.button
                 type="submit"

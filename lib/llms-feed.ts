@@ -1,5 +1,5 @@
 /**
- * SSOT builders for /llms.txt and /llms-full.txt (Wave 2 Pillar 1).
+ * SSOT builders for /llms.txt and /llms-full.txt.
  * Consumed by edge routes and scripts/build-llms-txt.ts prebuild.
  */
 import {
@@ -24,7 +24,7 @@ import {
 
 const generatedAt = `${LAST_HUMAN_VERIFIED}T00:00:00Z`;
 
-const WAVE1_PILLARS = [
+const INSTITUTIONAL_PILLARS = [
   {
     title: 'Sovereign AI Architecture & Data Perimeters',
     url: OPEN_URLS.sovereignAiArchitecture,
@@ -47,8 +47,8 @@ function packagesSection(): string {
   return PACKAGES.map((pkg) => `- ${pkg.name} — ${pkg.description}`).join('\n');
 }
 
-function wave1PillarsSection(): string {
-  return WAVE1_PILLARS.map((p) => `- [${p.title}](${p.url})`).join('\n');
+function institutionalPillarsSection(): string {
+  return INSTITUTIONAL_PILLARS.map((p) => `- [${p.title}](${p.url})`).join('\n');
 }
 
 /** Pocket Portfolio summary feed (consumer + developer context). */
@@ -76,8 +76,8 @@ Secondary phrasing: ${POSITIONING.secondary}
 ## What We Are
 ${TAGLINE_LONG}
 
-## Wave 1 Institutional Pillars (Open Portfolio doctrine)
-${wave1PillarsSection()}
+## Institutional Architecture Briefs (Open Portfolio)
+${institutionalPillarsSection()}
 
 ## SDK
 - Primary package: ${SDK.name} v${SDK.version} (${SDK.license})
@@ -131,8 +131,8 @@ Secondary phrasing: ${SURFACE_POSITIONING.open.secondary}
 ## What We Are
 Open Portfolio is the B2B developer and infrastructure gateway for the sovereign ingestion substrate that powers Pocket Portfolio. Local-first import SDK plus stateless AI reasoning — platforms reason over broker data without warehousing PII.
 
-## Primary System Architecture (Wave 1 pillars)
-${wave1PillarsSection()}
+## Institutional Architecture Briefs
+${institutionalPillarsSection()}
 
 ## Data Perimeter & Security
 Open Portfolio enforces a Split-Brain execution model. Frontier models operate as invited guests — never receiving raw data warehouses or PII.
@@ -175,8 +175,8 @@ Open Portfolio provides sovereign financial data infrastructure. Raw enterprise 
 
 Pocket Portfolio is the live consumer reference terminal — every edge-case CSV upload hardens the enterprise adapter floor.
 
-## 2. Wave 1 Institutional Pillars
-${wave1PillarsSection()}
+## 2. Institutional Architecture Briefs
+${institutionalPillarsSection()}
 
 ## 3. Security Boundaries & Compliance
 - **DORA:** Eliminates single points of failure by storing data client-side (browser IndexedDB, operator-controlled Drive).

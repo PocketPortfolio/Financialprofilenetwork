@@ -23,9 +23,9 @@ export default function StatelessEdgeIngestionPage() {
       title="Stateless Edge Ingestion vs Centralized Data Warehousing"
       subtitle="Stop paying warehouse rent for data you should never hold."
       body={[
-        'Centralized warehousing promises “one source of truth.” In practice it creates a second source of liability: storage cost, scraper attack surface, and regulatory exposure that compounds with every broker integration.',
+        'Centralized warehousing promises “one source of truth.” In practice it creates a second source of liability: storage cost, elevated attack surface, and regulatory exposure that compounds with every broker integration.',
         'Edge ingestion flips the model. Broker exports parse where the operator already has the file. Normalized trades stay local-first. Inference receives a sanitized snapshot for the duration of the request — no permanent per-user ledger mirror required for core product value.',
-        'The commercial implication after PR #90: hosted raw ticker firehoses are a paid API product, not a free commons. Crawl budget and engineering time belong on institutional narratives and high-intent import conversion — not on feeding anonymous extractors.',
+        'Hosted market-data APIs are metered products for automated access — not an open data commons. Engineering investment concentrates on institutional architecture and operator import workflows, not on subsidizing anonymous bulk extraction.',
       ]}
       ctaHref="/learn/sovereign-finance"
       ctaLabel="Economics of Stateless Inference"

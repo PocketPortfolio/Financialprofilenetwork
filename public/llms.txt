@@ -10,7 +10,7 @@ Secondary phrasing: The sovereign financial data layer.
 ## What We Are
 Pocket Portfolio is the Sovereign Ingestion & Inference Layer for wealth-tech: a local-first import SDK plus stateless AI reasoning that lets platforms and operators reason over broker data without warehousing PII.
 
-## Wave 1 Institutional Pillars (Open Portfolio doctrine)
+## Institutional Architecture Briefs (Open Portfolio)
 - [Sovereign AI Architecture & Data Perimeters](https://www.openportfolio.co.uk/learn/sovereign-ai-architecture)
 - [DORA & EU AI Act for Wealth Management](https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth)
 - [Stateless Edge Ingestion](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)
