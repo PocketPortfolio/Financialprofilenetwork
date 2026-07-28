@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
 import { logDividendDebug, redactUrlForLog } from '@/app/lib/server/safe-log';
 
 // Module loaded - log only in development to avoid production issues
@@ -912,6 +913,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> }
 ) {
+  const gate = await enforceDataApiGate(request);
+  if (!gate.allowed) return gate.response;
+
   // Route handler entry - log immediately for production visibility
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;

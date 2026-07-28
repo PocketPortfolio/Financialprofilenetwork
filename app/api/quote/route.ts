@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
 // Rate limiting temporarily disabled for production compatibility
 // import { take } from '@/src/lib/ratelimit/memory';
 
@@ -223,10 +224,8 @@ async function stooqTwo(sym: string) {
 }
 
 export async function GET(request: NextRequest) {
-  // Rate limiting disabled for production compatibility
-  // const ip = request.headers.get('x-forwarded-for') ?? 'local';
-  // const { allowed, remaining, resetAt } = take(`quote:${ip}`, 100, 60_000);
-  // if (!allowed) { return 429 response }
+  const gate = await enforceDataApiGate(request);
+  if (!gate.allowed) return gate.response;
 
   try {
     const { searchParams } = new URL(request.url);

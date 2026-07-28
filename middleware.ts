@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { applyBotGateMiddleware } from '@/lib/bot-gate-middleware';
 import {
   isLocalOpenDevHost,
   isLocalPocketDevHost,
@@ -60,10 +61,21 @@ const OPEN_SPECIAL_FILES: ReadonlySet<string> = new Set([
 /** Middleware rewrite target — page calls notFound() → app/open/not-found.tsx. */
 const OPEN_NOT_FOUND_REWRITE = '/open/__not-a-b2b-route__';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Canonical host: apex → www so referral sessionStorage + cookies stay on one origin (ref survives signup).
   // Lowercase: Host is case-insensitive; mismatched casing must not skip OPEN_HOSTS matching (would mis-route).
   const host = request.headers.get('host')?.split(':')[0]?.toLowerCase() ?? '';
+
+  const isLocalDevPocketHostEarly = isLocalPocketDevHost(host);
+  if (
+    isLocalDevPocketHostEarly ||
+    host === 'www.pocketportfolio.app' ||
+    host === 'pocketportfolio.app'
+  ) {
+    const gateRes = await applyBotGateMiddleware(request);
+    if (gateRes) return gateRes;
+  }
+
   if (host === 'pocketportfolio.app') {
     const url = request.nextUrl.clone();
     url.hostname = 'www.pocketportfolio.app';

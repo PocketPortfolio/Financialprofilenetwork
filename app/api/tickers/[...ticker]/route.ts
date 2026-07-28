@@ -9,19 +9,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTickerMetadata } from '@/app/lib/pseo/data';
-import { kv } from '@vercel/kv';
 import {
   DEVELOPER_UTILITY_CHECKOUT_URL,
-  isFirstPartyTickerRequest,
-  isLikelyAutomatedClient,
-  isLikelyDatacenterRequest,
   rateLimitExceededCsvBody,
-  rateLimitExceededJsonBody,
-  resolveTickerClientIp,
   tickerApiBaseHeaders,
   unauthorizedCsvBody,
-  unauthorizedJsonBody,
 } from '@/app/lib/server/ticker-api-gate';
+import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
 
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
@@ -33,12 +27,6 @@ export const maxDuration = 60;
 
 /** Upstream Yahoo chart/quote fetches — fail fast before serverless wall clock kills the invocation */
 const YAHOO_FETCH_TIMEOUT_MS = 14_000;
-
-// Free tier: 50 calls per hour per IP for unauthenticated external traffic
-const FREE_TIER_LIMIT = 50;
-const FREE_TIER_WINDOW_SECONDS = 3600; // 1 hour in seconds (for KV TTL)
-/** Datacenter ASN clients get a tighter free bucket (challenge posture, not hard ban). */
-const DATACENTER_FREE_TIER_LIMIT = 15;
 
 // Cache for historical data (1 hour TTL)
 // Limit cache size to prevent memory leaks in serverless functions
@@ -319,57 +307,6 @@ async function fetchHistoricalData(ticker: string, range: string = '1y'): Promis
   }
 }
 
-/**
- * Distributed rate limiting using Vercel KV (Upstash Redis)
- * Returns: { allowed: boolean, remaining: number, resetTime: number, limit: number }
- */
-async function checkRateLimit(
-  ip: string,
-  limit: number = FREE_TIER_LIMIT
-): Promise<{ allowed: boolean; remaining: number; resetTime: number; limit: number }> {
-  const key = `ratelimit:tickers:free:${ip}:${limit}`;
-  const now = Math.floor(Date.now() / 1000);
-  const resetTime = now + FREE_TIER_WINDOW_SECONDS;
-
-  try {
-    const currentCount = (await kv.get<number>(key)) || 0;
-
-    if (currentCount >= limit) {
-      const ttl = await kv.ttl(key);
-      const actualResetTime = ttl > 0 ? now + ttl : resetTime;
-      return {
-        allowed: false,
-        remaining: 0,
-        resetTime: actualResetTime,
-        limit,
-      };
-    }
-
-    const newCount = currentCount + 1;
-
-    if (currentCount === 0) {
-      await kv.set(key, newCount, { ex: FREE_TIER_WINDOW_SECONDS });
-    } else {
-      await kv.set(key, newCount);
-    }
-
-    return {
-      allowed: true,
-      remaining: limit - newCount,
-      resetTime,
-      limit,
-    };
-  } catch (error) {
-    console.error('[RATE_LIMIT_ERROR] KV operation failed:', error);
-    return {
-      allowed: true,
-      remaining: limit - 1,
-      resetTime,
-      limit,
-    };
-  }
-}
-
 function withTickerHeaders(
   headers: Record<string, string> = {}
 ): Record<string, string> {
@@ -482,134 +419,24 @@ export async function GET(
     );
   }
   
-  // API key: ?key=... or Authorization: Bearer ...
-  const authHeader = request.headers.get('authorization') || '';
-  const bearerMatch = authHeader.match(/^Bearer\s+(.+)$/i);
-  const apiKey =
-    request.nextUrl.searchParams.get('key') ||
-    (bearerMatch?.[1]?.trim() || null);
-  const DEMO_KEY = 'demo_key';
-
-  const ip = resolveTickerClientIp(request);
-  const isFirstParty = isFirstPartyTickerRequest(request);
-  const isAutomated = isLikelyAutomatedClient(request);
-  const isDatacenter = isLikelyDatacenterRequest(request);
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  // Check if user has a valid paid API key (bypasses rate limiting)
-  // Developer Utility / Founders Club / Corporate keys live in apiKeysByEmail
-  let hasValidApiKey = false;
-  if (apiKey && apiKey !== DEMO_KEY) {
-    try {
-      const { getFirestore } = await import('firebase-admin/firestore');
-      const { initializeApp, getApps, cert } = await import('firebase-admin/app');
-
-      if (!getApps().length) {
-        try {
-          initializeApp({
-            credential: cert({
-              projectId: process.env.FIREBASE_PROJECT_ID,
-              clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-              privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-            }),
-          });
-        } catch (error) {
-          console.error('Firebase Admin initialization error:', error);
-        }
-      }
-
-      const db = getFirestore();
-      const apiKeySnapshot = await db
-        .collection('apiKeysByEmail')
-        .where('apiKey', '==', apiKey)
-        .limit(1)
-        .get();
-
-      hasValidApiKey = !apiKeySnapshot.empty;
-    } catch (error) {
-      console.error('API key validation error:', error);
-      // Do NOT fail-open on pp_ prefix — treat as unauthenticated + meter
-      hasValidApiKey = false;
-    }
-  }
-
-  let rateLimitResult: {
-    allowed: boolean;
-    remaining: number;
-    resetTime: number;
-    limit: number;
-  } | null = null;
-
-  // Phase 2: automated external clients without a key → hard 401 (no free firehose)
-  if (!hasValidApiKey && !isFirstParty && !isDevelopment && isAutomated) {
+  // Bot gate: automated → 401; symbol-farm referrers → tight KV bucket; trusted app UI exempt
+  const gate = await enforceDataApiGate(request);
+  if (!gate.allowed) {
+    const status = gate.response.status;
     if (format === 'csv') {
-      return new NextResponse(unauthorizedCsvBody(), {
-        status: 401,
-        headers: withTickerHeaders({
-          'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="${ticker}-api-key-required.csv"`,
-        }),
-      });
-    }
-    return NextResponse.json(unauthorizedJsonBody(), {
-      status: 401,
-      headers: withTickerHeaders(),
-    });
-  }
-
-  // Soft meter: all external unauthenticated formats (JSON + CSV). No desktop/csv/source bypasses.
-  // First-party UI (dashboard, symbol pages, SSR with secret) is exempt.
-  if (!hasValidApiKey && !isFirstParty && !isDevelopment) {
-    const limit = isDatacenter ? DATACENTER_FREE_TIER_LIMIT : FREE_TIER_LIMIT;
-    rateLimitResult = await checkRateLimit(ip, limit);
-
-    if (!rateLimitResult.allowed) {
-      const retryAfter = Math.max(
-        0,
-        rateLimitResult.resetTime - Math.floor(Date.now() / 1000)
-      );
-      // Phase 2 end-state on breach: 401 for machines; keep 429 body shape with checkout for clarity
-      const status = isAutomated ? 401 : 429;
-      const jsonBody = isAutomated
-        ? unauthorizedJsonBody()
-        : {
-            ...rateLimitExceededJsonBody(),
-            limit: rateLimitResult.limit,
-            window: '1 hour',
-            retryAfter,
-          };
-      const csvBody = isAutomated
-        ? unauthorizedCsvBody()
-        : rateLimitExceededCsvBody(retryAfter);
-
-      if (format === 'csv') {
-        return new NextResponse(csvBody, {
-          status,
-          headers: withTickerHeaders({
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${ticker}-rate-limit-error.csv"`,
-            'X-RateLimit-Limit': String(rateLimitResult.limit),
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': new Date(
-              rateLimitResult.resetTime * 1000
-            ).toISOString(),
-            'Retry-After': String(retryAfter),
-          }),
-        });
-      }
-
-      return NextResponse.json(jsonBody, {
+      const retryAfter = Number(gate.response.headers.get('Retry-After') || '3600');
+      const body =
+        status === 401 ? unauthorizedCsvBody() : rateLimitExceededCsvBody(retryAfter);
+      return new NextResponse(body, {
         status,
         headers: withTickerHeaders({
-          'X-RateLimit-Limit': String(rateLimitResult.limit),
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': new Date(
-            rateLimitResult.resetTime * 1000
-          ).toISOString(),
-          'Retry-After': String(retryAfter),
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${ticker}-api-gate.csv"`,
+          ...(status === 429 ? { 'Retry-After': String(retryAfter) } : {}),
         }),
       });
     }
+    return gate.response;
   }
 
   // Get optional query parameters (searchParams already defined above)
@@ -639,13 +466,9 @@ export async function GET(
           'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
           'X-Data-Status': 'no-data',
         });
-        if (hasValidApiKey) {
+        if (gate.hasValidApiKey) {
           headers['X-RateLimit-Limit'] = 'unlimited';
           headers['X-RateLimit-Remaining'] = 'unlimited';
-        } else if (rateLimitResult) {
-          headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
-          headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
-          headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
         }
         return new NextResponse(csvContent, { status: 200, headers });
       }
@@ -668,13 +491,9 @@ export async function GET(
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
         'X-Data-Status': 'no-data',
       });
-      if (hasValidApiKey) {
+      if (gate.hasValidApiKey) {
         headers['X-RateLimit-Limit'] = 'unlimited';
         headers['X-RateLimit-Remaining'] = 'unlimited';
-      } else if (rateLimitResult) {
-        headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
-        headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
-        headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
       }
       return NextResponse.json(emptyResponse, { status: 200, headers });
     }
@@ -691,13 +510,9 @@ export async function GET(
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
       });
       
-      if (hasValidApiKey) {
+      if (gate.hasValidApiKey) {
         headers['X-RateLimit-Limit'] = 'unlimited';
         headers['X-RateLimit-Remaining'] = 'unlimited';
-      } else if (rateLimitResult) {
-        headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
-        headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
-        headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
       }
       
       return new NextResponse(csv, { headers });
@@ -722,13 +537,9 @@ export async function GET(
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
     });
     
-    if (hasValidApiKey) {
+    if (gate.hasValidApiKey) {
       headers['X-RateLimit-Limit'] = 'unlimited';
       headers['X-RateLimit-Remaining'] = 'unlimited';
-    } else if (rateLimitResult) {
-      headers['X-RateLimit-Limit'] = String(rateLimitResult.limit);
-      headers['X-RateLimit-Remaining'] = String(rateLimitResult.remaining);
-      headers['X-RateLimit-Reset'] = new Date(rateLimitResult.resetTime * 1000).toISOString();
     }
     
     return NextResponse.json(response, { headers });

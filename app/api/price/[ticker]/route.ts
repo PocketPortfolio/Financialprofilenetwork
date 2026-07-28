@@ -1,76 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
 
 export const dynamic = 'force-dynamic';
-export const dynamicParams = true; // Explicitly allow dynamic params
-export const runtime = 'nodejs'; // Explicitly set runtime for Vercel
-export const revalidate = 0; // Force no caching - ensure fresh data
-
-// Rate limiting storage (in production, use Redis or Vercel KV)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-
-// Free tier: 20 calls per hour per IP
-const FREE_TIER_LIMIT = 20;
-const FREE_TIER_WINDOW = 60 * 60 * 1000; // 1 hour in milliseconds
-
-// Demo key (free community key)
-const DEMO_KEY = 'demo_key';
+export const dynamicParams = true;
+export const runtime = 'nodejs';
+export const revalidate = 0;
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ ticker: string }> }
+  { params }: { params: Promise<{ ticker: string }> },
 ) {
-  // Next.js 15: params is always a Promise
+  const gate = await enforceDataApiGate(request);
+  if (!gate.allowed) return gate.response;
+
   const resolvedParams = await params;
   const ticker = resolvedParams.ticker.toUpperCase();
-  const apiKey = request.nextUrl.searchParams.get('key') || DEMO_KEY;
-  
-  // Get client IP for rate limiting
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-             request.headers.get('x-real-ip') || 
-             'unknown';
-  
-  // Rate limiting for free tier
-  if (apiKey === DEMO_KEY) {
-    const now = Date.now();
-    const key = `free:${ip}`;
-    const limit = rateLimitMap.get(key);
-    
-    if (limit) {
-      // Check if window has expired
-      if (now > limit.resetTime) {
-        // Reset counter
-        rateLimitMap.set(key, { count: 1, resetTime: now + FREE_TIER_WINDOW });
-      } else {
-        // Check if limit exceeded
-        if (limit.count >= FREE_TIER_LIMIT) {
-          return NextResponse.json(
-            { 
-              error: 'Too Many Requests',
-              message: 'Rate limit exceeded. Upgrade to Developer Utility for unlimited API access.',
-              checkout_url: 'https://www.pocketportfolio.app/sponsor?tier=developer-utility&utm_source=api_rate_limit&utm_medium=429&utm_campaign=price_api',
-              limit: FREE_TIER_LIMIT,
-              window: '1 hour'
-            },
-            { status: 429 }
-          );
-        }
-        // Increment counter
-        limit.count++;
-        rateLimitMap.set(key, limit);
-      }
-    } else {
-      // First request from this IP
-      rateLimitMap.set(key, { count: 1, resetTime: now + FREE_TIER_WINDOW });
-    }
-  }
-  
-  // Validate paid API keys against database
-  if (apiKey !== DEMO_KEY) {
+  const apiKey = request.nextUrl.searchParams.get('key') || 'demo_key';
+
+  if (apiKey !== 'demo_key') {
     try {
       const { getFirestore } = await import('firebase-admin/firestore');
       const { initializeApp, getApps, cert } = await import('firebase-admin/app');
-      
-      // Initialize Firebase Admin if not already done
+
       if (!getApps().length) {
         try {
           initializeApp({
@@ -84,91 +35,66 @@ export async function GET(
           console.error('Firebase Admin initialization error:', error);
         }
       }
-      
+
       const db = getFirestore();
-      const apiKeySnapshot = await db.collection('apiKeysByEmail')
+      const apiKeySnapshot = await db
+        .collection('apiKeysByEmail')
         .where('apiKey', '==', apiKey)
         .limit(1)
         .get();
-      
+
       if (apiKeySnapshot.empty) {
-        return NextResponse.json(
-          { error: 'Invalid API key' },
-          { status: 401 }
-        );
+        return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
       }
-      
-      // Valid paid key - unlimited access
     } catch (error) {
       console.error('API key validation error:', error);
-      // Fallback: allow if key format is valid (pp_ prefix)
       if (!apiKey.startsWith('pp_')) {
-        return NextResponse.json(
-          { error: 'Invalid API key format' },
-          { status: 401 }
-        );
+        return NextResponse.json({ error: 'Invalid API key format' }, { status: 401 });
       }
     }
   }
-  
+
   try {
-    // Fetch price from a free stock API (Yahoo Finance, Alpha Vantage, etc.)
-    // For now, we'll use a mock response. In production, integrate with a real API.
     const price = await fetchStockPrice(ticker);
-    
+
     if (!price) {
       return NextResponse.json(
         { error: `Price not found for ticker: ${ticker}` },
-        { status: 404 }
+        { status: 404 },
       );
     }
-    
-    // Return CSV format for IMPORTDATA compatibility
+
     return new NextResponse(price.toString(), {
       status: 200,
       headers: {
         'Content-Type': 'text/plain',
-        'Cache-Control': 'public, max-age=60', // Cache for 1 minute
+        'Cache-Control': 'public, max-age=60',
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Price fetch error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch stock price' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch stock price' }, { status: 500 });
   }
 }
 
-/**
- * Fetch stock price from external API
- * TODO: Integrate with real stock price API (Yahoo Finance, Alpha Vantage, etc.)
- */
 async function fetchStockPrice(ticker: string): Promise<number | null> {
   try {
-    // Mock implementation - replace with real API call
-    // Example: Yahoo Finance API, Alpha Vantage, or your own data source
     const response = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0',
         },
-      }
+      },
     );
-    
-    if (!response.ok) {
-      return null;
-    }
-    
+
+    if (!response.ok) return null;
+
     const data = await response.json();
     const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-    
     return price || null;
   } catch (error) {
     console.error('Yahoo Finance API error:', error);
-    // Fallback: return null (will show error to user)
     return null;
   }
 }
-

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
 import { logDividendDebug, redactUrlForLog } from '@/app/lib/server/safe-log';
 import { sanitizeTickerForUrl } from '@/app/lib/utils/sanitizeTicker';
 
@@ -814,6 +815,9 @@ async function fetchFromYahooFinanceHTML(ticker: string): Promise<DividendData |
 }
 
 export async function GET(request: NextRequest) {
+  const gate = await enforceDataApiGate(request);
+  if (!gate.allowed) return gate.response;
+
   // Get ticker from query parameter instead of path segment
   const { searchParams } = new URL(request.url);
   const tickerParam = searchParams.get('ticker');
