@@ -246,6 +246,5 @@ export default async function DividendHistoryPage({ params }: { params: Promise<
   );
 }
 
-// Force dynamic rendering - client components fetch data at runtime
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// ISR — client components still fetch live data; avoid per-hit origin bills for scrapers
+export const revalidate = 3600;
