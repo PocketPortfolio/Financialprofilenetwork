@@ -26,8 +26,8 @@ export default function PocketLandingVisual({
 }: {
   visual: PocketLandingVisualMeta;
   priority?: boolean;
-  /** section = full card with border; news = flat hero fill for briefing cards */
-  variant?: 'section' | 'news';
+  /** section = card chrome; news = flat fill; retailHero = wide marketing surface (no cut-out stack) */
+  variant?: 'section' | 'news' | 'retailHero';
   className?: string;
   /** Optional HUD docked to plate bottom (e.g. FIN pillars carousel) */
   bottomDock?: React.ReactNode;
@@ -36,6 +36,8 @@ export default function PocketLandingVisual({
   const drift = visual.motion === 'drift' && !reduceMotion;
   const src = pocketPlateUrl(visual);
   const isNews = variant === 'news';
+  const isRetailHero = variant === 'retailHero';
+  const softEffects = !isNews && !isRetailHero;
 
   const shell = (
     <div
@@ -57,11 +59,13 @@ export default function PocketLandingVisual({
           alt={visual.alt}
           fill
           priority={priority || visual.priority}
-          quality={90}
+          quality={isRetailHero ? 95 : 90}
           sizes={
             isNews
               ? '(max-width: 768px) 100vw, 400px'
-              : '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, min(960px, 45vw)'
+              : isRetailHero
+                ? '(max-width: 768px) 100vw, min(1120px, 92vw)'
+                : '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, min(960px, 45vw)'
           }
           style={{
             objectFit: 'cover',
@@ -76,7 +80,7 @@ export default function PocketLandingVisual({
         </div>
       )}
 
-      {!reduceMotion && !isNews && (
+      {!reduceMotion && softEffects && (
         <motion.div
           aria-hidden
           animate={{ opacity: [0.06, 0.16, 0.06] }}
@@ -92,16 +96,18 @@ export default function PocketLandingVisual({
         />
       )}
 
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          boxShadow: 'inset 0 0 80px color-mix(in srgb, var(--bg) 35%, transparent)',
-          pointerEvents: 'none',
-          zIndex: 3,
-        }}
-      />
+      {softEffects && (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            boxShadow: 'inset 0 0 80px color-mix(in srgb, var(--bg) 35%, transparent)',
+            pointerEvents: 'none',
+            zIndex: 3,
+          }}
+        />
+      )}
 
       {bottomDock}
     </div>
@@ -109,6 +115,26 @@ export default function PocketLandingVisual({
 
   if (isNews) {
     return <div className={className}>{shell}</div>;
+  }
+
+  if (isRetailHero) {
+    return (
+      <motion.figure
+        {...fadeVisual}
+        className={className}
+        style={{
+          margin: 0,
+          position: 'relative',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          border: `1px solid color-mix(in srgb, var(--accent-warm) 22%, var(--border))`,
+          ...pocketPlateFrameStyle,
+          boxShadow: 'var(--shadow-md)',
+        }}
+      >
+        {shell}
+      </motion.figure>
+    );
   }
 
   return (

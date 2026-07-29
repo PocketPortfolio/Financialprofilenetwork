@@ -99,6 +99,7 @@ type ProductPortalSectionProps = {
 export default function ProductPortalSection({ variant = 'control' }: ProductPortalSectionProps) {
   const isRetail = variant === 'retail';
   const cards = isRetail ? PORTAL_CARDS.filter((c) => c.visualId === 'portalTerminal') : PORTAL_CARDS;
+  const terminal = cards[0];
 
   return (
     <ScrollReveal>
@@ -141,34 +142,32 @@ export default function ProductPortalSection({ variant = 'control' }: ProductPor
             : 'Three pillars of the Sovereign Financial Stack.'}
         </p>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: isRetail ? '1fr' : 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: 'clamp(24px, 5vw, 32px)',
-            maxWidth: isRetail ? '480px' : '1200px',
-            margin: '0 auto',
-          }}
-        >
-          {cards.map((card, i) => (
+        {isRetail && terminal ? (
+          <div
+            style={{
+              maxWidth: '1120px',
+              margin: '0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'clamp(20px, 3vw, 28px)',
+            }}
+          >
+            <PocketLandingVisual
+              visual={pocketVisual(terminal.visualId)}
+              priority
+              variant="retailHero"
+            />
             <div
-              key={card.visualId}
-              style={CARD_SHELL}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent-warm) 45%, var(--border))';
-                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = '';
-                e.currentTarget.style.boxShadow = 'none';
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+                textAlign: 'center',
+                maxWidth: '560px',
+                margin: '0 auto',
               }}
             >
-              <PocketLandingVisual
-                visual={pocketVisual(card.visualId)}
-                priority={i === 0}
-              />
               <h3
                 style={{
                   fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
@@ -177,7 +176,7 @@ export default function ProductPortalSection({ variant = 'control' }: ProductPor
                   color: 'var(--text-warm)',
                 }}
               >
-                {card.title}
+                {terminal.title}
               </h3>
               <p
                 style={{
@@ -185,15 +184,66 @@ export default function ProductPortalSection({ variant = 'control' }: ProductPor
                   lineHeight: '1.6',
                   fontSize: '15px',
                   margin: 0,
-                  flex: 1,
                 }}
               >
-                {card.body}
+                {terminal.body}
               </p>
-              {card.cta}
+              <div style={{ width: '100%', maxWidth: '280px', marginTop: '4px' }}>{terminal.cta}</div>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: 'clamp(24px, 5vw, 32px)',
+              maxWidth: '1200px',
+              margin: '0 auto',
+            }}
+          >
+            {cards.map((card, i) => (
+              <div
+                key={card.visualId}
+                style={CARD_SHELL}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.borderColor =
+                    'color-mix(in srgb, var(--accent-warm) 45%, var(--border))';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = '';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <PocketLandingVisual visual={pocketVisual(card.visualId)} priority={i === 0} />
+                <h3
+                  style={{
+                    fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
+                    fontWeight: 'bold',
+                    margin: 0,
+                    color: 'var(--text-warm)',
+                  }}
+                >
+                  {card.title}
+                </h3>
+                <p
+                  style={{
+                    color: 'var(--text-secondary)',
+                    lineHeight: '1.6',
+                    fontSize: '15px',
+                    margin: 0,
+                    flex: 1,
+                  }}
+                >
+                  {card.body}
+                </p>
+                {card.cta}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </ScrollReveal>
   );

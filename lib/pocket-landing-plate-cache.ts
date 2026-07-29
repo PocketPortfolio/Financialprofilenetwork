@@ -4,7 +4,7 @@
  */
 
 export const POCKET_LANDING_PLATE_CACHE: Record<string, string> = {
-  'web-portal-terminal.png': 'b678aad96445',
+  'web-portal-terminal.png': '0da69f58ced4',
   'web-portal-storage.png': '0b443fdf4a64',
   'web-portal-founders.png': '5946e7bf1683',
   'web-why-choose.png': '2d30293746b3',

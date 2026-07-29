@@ -1,11 +1,11 @@
 {
-  "syncedAt": "2026-07-27T13:24:34.661Z",
+  "syncedAt": "2026-07-29T13:21:13.125Z",
   "plates": [
     {
       "dest": "web-portal-terminal.png",
-      "src": "pocket-portal-terminal-v2.png",
-      "hash": "b678aad96445",
-      "label": "portalTerminal — dashboard chart + portfolio matrix + analyst console",
+      "src": "pocket-portal-terminal-retail-v3.png",
+      "hash": "0da69f58ced4",
+      "label": "portalTerminal — flat chart + portfolio + populated analyst console (retail grade)",
       "region": "full"
     },
     {

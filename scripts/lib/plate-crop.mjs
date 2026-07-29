@@ -36,11 +36,14 @@ export async function bakePlate16x9({ srcPath, destPath, region }) {
 /**
  * @param {string} srcPath
  * @param {string} destPath
+ * @param {{ fit?: 'cover' | 'contain'; background?: { r: number; g: number; b: number; alpha: number } }} [opts]
  */
-export async function bakeFullPlate16x9(srcPath, destPath) {
+export async function bakeFullPlate16x9(srcPath, destPath, opts = {}) {
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  const fit = opts.fit ?? 'cover';
+  const background = opts.background ?? { r: 9, g: 9, b: 11, alpha: 1 };
   await sharp(srcPath)
-    .resize(OUT_W, OUT_H, { fit: 'cover', position: 'centre' })
+    .resize(OUT_W, OUT_H, { fit, position: 'centre', background })
     .png({ compressionLevel: 6 })
     .toFile(destPath);
 }
