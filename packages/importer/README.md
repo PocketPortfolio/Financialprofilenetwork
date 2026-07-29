@@ -15,17 +15,18 @@
 
 ---
 
-# How to Parse Robinhood CSVs (and 14+ Other Brokers) in JavaScript
+# Universal Broker CSV Parser for JavaScript / TypeScript
 
 > **⚠️ Disclaimer:** Pocket Portfolio is a developer utility for data normalization. It is not a brokerage, financial advisor, or trading platform. Data stays local to your device.
 
-A universal, privacy-first CSV parser for 19+ brokers and exchanges. Parse any broker's transaction history into a normalized format with zero server dependencies.
+A universal, privacy-first CSV parser with **19 dedicated broker adapters** plus **Smart Import** for the long tail (Robinhood, eToro, Trade Republic, and any trade-like CSV). Parse transaction history into a normalized format with zero server dependencies for the parse itself.
 
 ## Features
 
-- **19+ Broker Support**: Robinhood, Fidelity, Schwab, eToro, Trading212, Koinly, TurboTax, Ghostfolio, Sharesight, and more
-- **Auto-Detection**: Automatically identifies the broker from CSV headers
-- **Privacy-First**: All parsing happens client-side - your data never leaves your device
+- **19 Verified Adapters**: Fidelity, Schwab, Trading212, Koinly, TurboTax, Ghostfolio, Sharesight, and more (see list below)
+- **Smart Import**: Unknown brokers (e.g. Robinhood, eToro, Trade Republic) via column mapping — still client-side
+- **Auto-Detection**: Automatically identifies known brokers from CSV headers (first 2KB)
+- **Privacy-First**: Full-file parsing happens client-side — your ledger never leaves your device
 - **TypeScript**: Full TypeScript support with comprehensive types
 - **Locale-Aware**: Handles different date/number formats (US, UK, EU)
 - **Excel Support**: Parses both CSV and Excel files (.xlsx, .xls)
@@ -37,9 +38,9 @@ npm install @pocket-portfolio/importer
 ```
 
 ```typescript
-import { parseCSV, detectBrokerFromSample } from '@pocket-portfolio/importer';
+import { parseCSV, detectBrokerFromSample, parseUniversal } from '@pocket-portfolio/importer';
 
-// Auto-detect broker
+// Auto-detect a known broker adapter
 const file = // ... File object from input
 const result = await parseCSV(file, 'en-US');
 
@@ -47,11 +48,14 @@ console.log(`Detected broker: ${result.broker}`);
 console.log(`Parsed ${result.trades.length} trades`);
 console.log(`Warnings: ${result.warnings.length}`);
 
-// Or manually specify broker
-const result = await parseCSV(file, 'en-US', 'robinhood');
+// Or manually specify a registered broker id
+const fidelity = await parseCSV(file, 'en-US', 'fidelity');
+
+// Unknown / custom CSV → Smart Import (universal path)
+const universal = await parseUniversal(file, 'en-US');
 ```
 
-## Supported Brokers
+## Supported Brokers (dedicated adapters)
 
 ### US Brokers
 - **Charles Schwab** - Date, Action, Symbol, Quantity, Price
@@ -82,11 +86,16 @@ const result = await parseCSV(file, 'en-US', 'robinhood');
 - **Ghostfolio** - date, symbol, type, quantity, unitPrice, currency
 - **Sharesight** - Trade Date, Instrument Code, Quantity, Price in Dollars, Transaction Type
 
-## Broker Comparison
+## Smart Import (no dedicated adapter yet)
+
+Brokers such as **eToro**, **Robinhood**, **Trade Republic**, and many others are supported via **Smart Import** (`parseUniversal` / column mapping) when no dedicated adapter is registered. Mapping uses heuristics (and, in the Pocket Portfolio app, an optional truncated LLM assist). The full CSV stays on device.
+
+See [SCHEMA.md](./SCHEMA.md) for OpenBrokerCSV interchange vs runtime `NormalizedTrade` field names.
+
+## Broker Comparison (dedicated adapters)
 
 | Broker | Auto-Detect | Locale Support | Excel Support | Notes |
 |--------|------------|----------------|---------------|-------|
-| Robinhood | ✅ | en-US | ✅ | Most popular US broker |
 | Fidelity | ✅ | en-US | ✅ | Large US broker |
 | Schwab | ✅ | en-US | ✅ | US broker |
 | Vanguard | ✅ | en-US | ✅ | US broker |
@@ -109,7 +118,7 @@ const result = await parseCSV(file, 'en-US', 'robinhood');
 
 ## Examples
 
-### Example 1: Parse Robinhood CSV
+### Example 1: Parse a known-broker CSV (Fidelity)
 
 ```typescript
 import { parseCSV } from '@pocket-portfolio/importer';
@@ -117,7 +126,7 @@ import { parseCSV } from '@pocket-portfolio/importer';
 const fileInput = document.querySelector('input[type="file"]');
 const file = fileInput.files[0];
 
-const result = await parseCSV(file, 'en-US');
+const result = await parseCSV(file, 'en-US', 'fidelity');
 
 result.trades.forEach(trade => {
   console.log(`${trade.date}: ${trade.type} ${trade.qty} ${trade.ticker} @ $${trade.price}`);
@@ -137,11 +146,25 @@ const sample = await file.slice(0, 2048).arrayBuffer()
 const broker = detectBrokerFromSample(sample);
 console.log(`Detected broker: ${broker}`);
 
-// Now parse with detected broker
-const result = await parseCSV(file, 'en-US', broker);
+if (broker !== 'unknown') {
+  const result = await parseCSV(file, 'en-US', broker);
+}
 ```
 
-### Example 3: Handle Warnings
+### Example 3: Smart Import (unknown broker)
+
+```typescript
+import { parseUniversal } from '@pocket-portfolio/importer';
+
+const outcome = await parseUniversal(file, 'en-US');
+if (outcome.type === 'REQUIRES_MAPPING') {
+  // Show ColumnMappingModal with outcome.proposedMapping, then re-parse
+} else {
+  console.log(outcome.trades);
+}
+```
+
+### Example 4: Handle Warnings
 
 ```typescript
 const result = await parseCSV(file, 'en-US');
@@ -153,19 +176,17 @@ if (result.warnings.length > 0) {
   });
 }
 
-// Filter out invalid trades if needed
-const validTrades = result.trades.filter(trade => 
+const validTrades = result.trades.filter(trade =>
   trade.qty > 0 && trade.price > 0
 );
 ```
 
-### Example 4: UK Locale (Trading212)
+### Example 5: UK Locale (Trading212)
 
 ```typescript
 // Trading212 uses UK date format (dd/mm/yyyy)
 const result = await parseCSV(file, 'en-GB');
 
-// Dates will be parsed correctly
 result.trades.forEach(trade => {
   console.log(trade.date); // ISO 8601 format
 });
@@ -180,7 +201,7 @@ Parse a CSV or Excel file and return normalized trades.
 **Parameters:**
 - `file: RawFile` - File object with `name`, `mime`, `size`, and `arrayBuffer()` method
 - `locale?: string` - Locale for date/number parsing (default: 'en-US')
-- `brokerId?: BrokerId` - Optional broker ID to skip auto-detection
+- `brokerId?: BrokerId` - Optional registered broker ID to skip auto-detection
 
 **Returns:** `Promise<ParseResult>`
 
@@ -188,10 +209,10 @@ Parse a CSV or Excel file and return normalized trades.
 ```typescript
 const result = await parseCSV(file, 'en-US');
 // {
-//   broker: 'robinhood',
+//   broker: 'fidelity',
 //   trades: [...],
 //   warnings: [...],
-//   meta: { rows: 100, invalid: 2, durationMs: 45, version: '1.0.0' }
+//   meta: { rows: 100, invalid: 2, durationMs: 45, version: '1.1.4' }
 // }
 ```
 
@@ -206,14 +227,18 @@ Detect the broker from a CSV header sample.
 
 **Example:**
 ```typescript
-const sample = "Date,Action,Symbol,Quantity,Price\n2024-01-01,BUY,AAPL,10,150.00";
+const sample = "Run Date,Action,Symbol,Quantity,Price\n01/01/2024,BUY,AAPL,10,150.00";
 const broker = detectBrokerFromSample(sample);
-// 'robinhood'
+// e.g. 'fidelity' or 'unknown' → use parseUniversal
 ```
+
+### `parseUniversal(file, locale?)`
+
+Smart Import path for unknown or custom CSVs. See `SCHEMA.md` and universal types.
 
 ## Normalized Trade Format
 
-All brokers are parsed into a unified format:
+All brokers are parsed into a unified runtime format (`NormalizedTrade`). Interchange field names (`action` / `quantity`) are documented in [SCHEMA.md](./SCHEMA.md).
 
 ```typescript
 interface NormalizedTrade {
@@ -226,7 +251,7 @@ interface NormalizedTrade {
   fees?: number;
   venue?: string;
   notes?: string;
-  source: BrokerId;       // Original broker
+  source: BrokerId;       // Original broker or 'generic'
   rawHash: string;        // SHA256 hash for deduplication
 }
 ```
@@ -237,7 +262,7 @@ interface NormalizedTrade {
 - **Medium files (1-10MB)**: 50-200ms
 - **Large files (10-50MB)**: 200-1000ms
 
-All parsing happens synchronously in the browser - no server round-trips.
+Full-file parsing happens in the browser - no server round-trips for the ledger.
 
 ## Locale Support
 
@@ -282,8 +307,8 @@ Every contribution helps us maintain and improve this tool for the community.
 Found a broker that's not supported? Want to improve detection accuracy?
 
 1. Fork the repository
-2. Create a new adapter in `src/adapters/`
-3. Add it to the registry
+2. Create a new adapter in `src/adapters/` **or** improve Smart Import synonyms
+3. Add dedicated adapters to the registry
 4. Submit a pull request
 
 See [CONTRIBUTING.md](https://github.com/PocketPortfolio/Financialprofilenetwork/blob/main/CONTRIBUTING.md) for details.
@@ -304,5 +329,3 @@ If this library helps you, please star us on GitHub: [github.com/PocketPortfolio
 ---
 
 **Built with privacy in mind. Your data never leaves your device.**
-
-

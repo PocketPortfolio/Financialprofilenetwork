@@ -5,6 +5,15 @@ All notable changes to `@pocket-portfolio/importer` will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-07-29
+
+### Added
+- **SCHEMA.md** — Package SSOT for OpenBrokerCSV interchange vs runtime `NormalizedTrade` (`action`/`quantity` ↔ `type`/`qty`).
+
+### Changed
+- **README / package metadata** — Document 19 dedicated adapters vs Smart Import for Robinhood, eToro, Trade Republic (no false dedicated-adapter claims).
+- **Public API docs** — `parseUniversal` / Smart Import examples; fidelity example replaces invalid `robinhood` brokerId.
+
 ## [1.0.6] - 2025-01-XX
 
 ### Fixed

@@ -68,7 +68,7 @@ Standardized format for portfolio transaction data. All broker CSVs are normaliz
 
 ## Implementation
 
-This schema is implemented in `@pocket-portfolio/importer` npm package. All broker-specific CSVs are parsed and normalized to this format.
+This schema is implemented in `@pocket-portfolio/importer`. **Package SSOT:** [`packages/importer/SCHEMA.md`](packages/importer/SCHEMA.md) (OpenBrokerCSV interchange + runtime `NormalizedTrade` field mapping).
 
 See: [npmjs.com/package/@pocket-portfolio/importer](https://www.npmjs.com/package/@pocket-portfolio/importer)
 

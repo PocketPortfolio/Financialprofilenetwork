@@ -1,14 +1,16 @@
 /**
  * @pocket-portfolio/importer
- * Universal CSV parser for 15+ brokers (Robinhood, Fidelity, eToro, etc.)
- * 
+ * Universal CSV parser: 19 dedicated broker adapters + Smart Import (parseUniversal)
+ * for unknown formats (e.g. Robinhood, eToro via column mapping — not dedicated adapters).
+ *
  * @example
  * ```typescript
- * import { parseCSV, detectBroker } from '@pocket-portfolio/importer';
- * 
+ * import { parseCSV, detectBroker, parseUniversal } from '@pocket-portfolio/importer';
+ *
  * const file = // ... File object
  * const broker = detectBroker(csvHeader);
  * const result = await parseCSV(file, 'en-US');
+ * // or: await parseUniversal(file, 'en-US') for unknown brokers
  * ```
  */
 
