@@ -138,6 +138,17 @@ describe('Design Partnership Challenge SSOT', () => {
     ).toBe(ADAPTERS.length);
   });
 
+  test('SDK.version stays pinned to packages/importer package.json (drift guard)', () => {
+    const { readFileSync } = require('node:fs') as typeof import('node:fs');
+    const { join } = require('node:path') as typeof import('node:path');
+    const pkgPath = join(__dirname, '../../packages/importer/package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as { version: string };
+    expect(
+      SDK.version,
+      `SDK.version (${SDK.version}) must equal packages/importer version (${pkg.version}). Update lib/canonical-claims.ts when the package is bumped.`,
+    ).toBe(pkg.version);
+  });
+
   test('DESIGN_CHALLENGE.url matches URLS.designChallenge', () => {
     expect(DESIGN_CHALLENGE.url).toBe(URLS.designChallenge);
   });

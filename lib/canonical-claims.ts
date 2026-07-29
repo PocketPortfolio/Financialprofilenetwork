@@ -183,7 +183,7 @@ export const FOUNDER_CREDENTIALS_ABBA = {
 
 export const SDK = {
   name: '@pocket-portfolio/importer', // SDK-01
-  version: '1.1.0', // SDK-02
+  version: '1.1.4', // SDK-02 — keep in sync with packages/importer/package.json
   license: 'MIT', // SDK-03
   /** SDK-04: 19+ broker adapters; floor anchored to in-repo registry test count. */
   brokerAdapterCount: 19,
