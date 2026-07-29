@@ -1228,7 +1228,7 @@
     "date": "2026-07-29",
     "title": "Building the Developer-First Portfolio Tool",
     "slug": "building-the-developer-first-portfolio-tool",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1238,7 +1238,8 @@
       "building"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-07-29T09:00:54.337Z"
   },
   {
     "id": "week-31-post-1",
