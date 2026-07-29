@@ -323,6 +323,8 @@
 html {
   font-size: var(--font-size-base);
   scroll-behavior: smooth;
+  /* Own horizontal clip here only — do not also set on body (double scrollport). */
+  overflow-x: hidden;
 }
 
 body {
@@ -338,7 +340,6 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  overflow-x: hidden;
   /* Instant transition for theme changes - no delay for immediate visual feedback */
   transition: background-color 0s ease, color 0s ease;
 }
@@ -695,7 +696,7 @@ textarea:focus-visible {
     padding-left: 12px !important;
     padding-right: 12px !important;
     max-width: 100vw !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
   }
   
   /* Ensure cards don't overflow */

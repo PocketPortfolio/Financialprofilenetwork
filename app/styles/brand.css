@@ -8,8 +8,15 @@
   box-sizing: border-box;
 }
 
-html, body {
+/* Single vertical scrollport on html — overflow-x:hidden on BOTH html+body
+   forces overflow-y:auto on each (CSS overflow pairing) → double scrollbars. */
+html {
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+body {
   width: 100%;
   max-width: 100vw;
 }
@@ -20,12 +27,15 @@ html, body {
   100% { transform: rotate(360deg); }
 }
 
-/* Prevent horizontal scroll on all containers */
+/* Prevent horizontal bleed without creating a vertical scrollport.
+   overflow-x:hidden + overflow-y:visible computes to overflow-y:auto (CSS pairing)
+   → nested scrollbars on every .mobile-container (body, main, #features).
+   overflow-x:clip does not force the other axis to auto. */
 .mobile-container {
   width: 100% !important;
   max-width: 100vw !important;
-  overflow-x: hidden !important;
-  overflow-y: visible !important; /* Prevent creating scrolling container for sticky positioning */
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   box-sizing: border-box !important;
 }
 

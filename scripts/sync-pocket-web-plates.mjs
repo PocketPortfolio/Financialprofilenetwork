@@ -22,9 +22,11 @@ const PLATE_MAP = [
   // Replaces generic deck crops with high-signal product visuals per CEO mandate.
   {
     dest: 'web-portal-terminal.png',
-    src: 'pocket-portal-terminal-v2.png',
+    // CMD-RETAIL-TERMINAL-PLATE-2026-07-29 — flat retail-grade UI (replaces tilted v2 CGI).
+    src: 'pocket-portal-terminal-retail-v3.png',
     full: true,
-    label: 'portalTerminal — dashboard chart + portfolio matrix + analyst console',
+    fit: 'contain',
+    label: 'portalTerminal — flat chart + portfolio + populated analyst console (retail grade)',
   },
   {
     dest: 'web-portal-storage.png',
@@ -119,7 +121,9 @@ async function main() {
       continue;
     }
     if (row.full) {
-      await bakeFullPlate16x9(srcPath, destPath);
+      await bakeFullPlate16x9(srcPath, destPath, {
+        fit: row.fit === 'contain' ? 'contain' : 'cover',
+      });
     } else {
       await bakePlate16x9({ srcPath, destPath, region: row.region });
     }

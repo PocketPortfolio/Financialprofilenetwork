@@ -13,8 +13,9 @@ section of the landing page, the three portal cards now consume net-new,
 purpose-built renders (deep black + amber, no baked typography — HTML overlay
 handles the kicker/title text):
 
-- `pocket-portal-terminal-v2.png` → `web-portal-terminal.png` — Pocket Analyst
-  dashboard (chart bounding box + portfolio matrix + analyst console).
+- `pocket-portal-terminal-retail-v3.png` → `web-portal-terminal.png` — flat retail-grade
+  wealth terminal (chart + portfolio + populated analyst). Replaces tilted v2 CGI
+  per CMD-RETAIL-TERMINAL-PLATE-2026-07-29. Archive: `pocket-portal-terminal-v2.png`.
 - `pocket-portal-storage-v2.png` → `web-portal-storage.png` — encrypted vault
   with local-first device and Drive folder-tree pipeline.
 - `pocket-portal-founders-v2.png` → `web-portal-founders.png` — hex insignia
