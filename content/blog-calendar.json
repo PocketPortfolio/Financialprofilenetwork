@@ -1246,7 +1246,7 @@
     "date": "2026-08-02",
     "title": "Market Volatility: Friend or Foe? The Numbers Tell the Story",
     "slug": "market-volatility-friend-or-foe-the-numbers-tell-the-story",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1256,7 +1256,8 @@
       "market"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-02T09:01:58.587Z"
   },
   {
     "id": "week-31-post-2",
