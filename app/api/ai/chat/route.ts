@@ -15,7 +15,7 @@ import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
 import { markFirestoreReadsDegraded, shouldDegradeFirestoreReads } from '@/app/lib/server/firestore-quota-circuit';
 import { resolvePaidTierFromStripeEmail } from '@/app/lib/server/stripe-paid-tier';
 import {
-  createOllamaPlainTextStream,
+  completeOllamaChat,
   getServerOllamaBaseUrl,
   isLocalProviderMode,
   LOCAL_ASK_AI_SYSTEM_PREAMBLE,
@@ -442,6 +442,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Hosted sovereign path (Aug 10 prod): Vercel → OLLAMA_BASE_URL (OP-controlled node).
+  // Non-stream completion: RunPod R1 puts tokens in `reasoning`; SSE through Vercel stalls.
   if (sovereignMode && isLocalProviderMode(sovereignMode)) {
     const baseUrl = getServerOllamaBaseUrl(sovereignMode);
     const model = modelIdForProviderMode(sovereignMode);
@@ -467,19 +468,38 @@ export async function POST(request: NextRequest) {
         provider: sovereignMode,
       }).catch(() => {});
     }
-    const stream = createOllamaPlainTextStream({
-      baseUrl,
-      model,
-      system,
-      user: message,
-    });
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      },
-    });
+    try {
+      const signal =
+        typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+          ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(280_000)
+          : undefined;
+      const text = await completeOllamaChat({
+        baseUrl,
+        model,
+        system,
+        user: message,
+        signal,
+        maxTokens: 1024,
+      });
+      return new Response(text, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+        },
+      });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Sovereign inference failed';
+      const timedOut = /aborted|timeout|TimeoutError/i.test(msg);
+      console.error('[Pocket Analyst] Sovereign inference error:', msg);
+      return NextResponse.json(
+        {
+          error: timedOut
+            ? 'Sovereign GPU cold-start timed out. Retry once, or switch to Cloud Auto.'
+            : `Sovereign node error: ${msg.slice(0, 280)}`,
+        },
+        { status: timedOut ? 504 : 502 }
+      );
+    }
   }
 
   const contextBlock = context

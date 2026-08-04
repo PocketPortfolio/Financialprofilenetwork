@@ -173,7 +173,7 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     expect(firestoreWrites.length).toBe(0);
   });
 
-  it('streams ollama_* via hosted sovereign node without persisting portfolio payload', async () => {
+  it('completes ollama_* via hosted sovereign node without persisting portfolio payload', async () => {
     process.env.OLLAMA_BASE_URL = 'http://sovereign-test/v1';
     const SENTINEL_CTX = `DILIGENCE_SOV_CTX_${crypto.randomUUID()}`;
     const SENTINEL_MSG = `DILIGENCE_SOV_MSG_${crypto.randomUUID()}`;
@@ -184,8 +184,10 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
       if (url.includes('sovereign-test') && url.includes('/chat/completions')) {
         ollamaBody = typeof init?.body === 'string' ? init.body : '';
         return new Response(
-          'data: {"choices":[{"delta":{"content":"sovereign-ok"}}]}\n\ndata: [DONE]\n\n',
-          { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+          JSON.stringify({
+            choices: [{ message: { content: null, reasoning: 'sovereign-ok' } }],
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
       }
       return new Response(JSON.stringify([]), { status: 200 });
@@ -210,6 +212,7 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     expect(text).toContain('sovereign-ok');
     expect(ollamaBody).toContain(SENTINEL_CTX);
     expect(ollamaBody).toContain(SENTINEL_MSG);
+    expect(ollamaBody).toContain('"stream":false');
     assertNoSentinels(firestoreWrites, SENTINEL_CTX, SENTINEL_MSG);
     delete process.env.OLLAMA_BASE_URL;
   });

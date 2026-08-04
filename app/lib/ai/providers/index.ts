@@ -17,6 +17,8 @@ export { truncatePortfolioContextForLocal } from './truncateContext';
 export {
   checkOllamaHealth,
   streamOllamaChat,
+  completeOllamaChat,
+  extractAssistantText,
   createOllamaPlainTextStream,
   LOCAL_ASK_AI_SYSTEM_PREAMBLE,
 } from './ollama';

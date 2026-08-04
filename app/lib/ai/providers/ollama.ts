@@ -1,5 +1,5 @@
 /**
- * Ollama OpenAI-compatible client (browser BYO + server hosted sovereign node).
+ * Ollama / OpenAI-compatible client (browser BYO + server hosted sovereign node).
  */
 
 function authHeaders(): Record<string, string> {
@@ -7,7 +7,6 @@ function authHeaders(): Record<string, string> {
     process.env.OLLAMA_API_KEY?.trim() ||
     process.env.SOVEREIGN_INFERENCE_API_KEY?.trim() ||
     '';
-  /** @type {Record<string, string>} */
   const headers: Record<string, string> = {
     // Free tunnel interstitials (Pinggy / localtunnel) — ignored by real nodes.
     'X-Pinggy-No-Screen': '1',
@@ -40,36 +39,86 @@ export type OllamaStreamParams = {
   system: string;
   user: string;
   signal?: AbortSignal;
+  /** Cap completion length (R1 burns tokens on reasoning). Default 1024. */
+  maxTokens?: number;
 };
+
+type ChatMessageShape = {
+  content?: string | null;
+  reasoning?: string | null;
+  reasoning_content?: string | null;
+};
+
+/** DeepSeek-R1 via vLLM often puts the usable text in reasoning* with content null. */
+export function extractAssistantText(message: ChatMessageShape | null | undefined): string {
+  if (!message) return '';
+  const content = typeof message.content === 'string' ? message.content.trim() : '';
+  const reasoning =
+    (typeof message.reasoning === 'string' && message.reasoning.trim()) ||
+    (typeof message.reasoning_content === 'string' && message.reasoning_content.trim()) ||
+    '';
+  if (content && reasoning) {
+    // Prefer the final answer when both exist; fall back to reasoning if content is tiny.
+    return content.length >= 8 ? content : `${reasoning}\n\n${content}`.trim();
+  }
+  return content || reasoning;
+}
 
 function parseSseDelta(payload: string): string {
   try {
     const obj = JSON.parse(payload) as {
       choices?: Array<{
-        delta?: { content?: string | null; reasoning?: string | null; reasoning_content?: string | null };
-        message?: { content?: string | null; reasoning?: string | null; reasoning_content?: string | null };
+        delta?: ChatMessageShape;
+        message?: ChatMessageShape;
       }>;
     };
     const choice = obj.choices?.[0];
-    const delta = choice?.delta;
-    const message = choice?.message;
-    // DeepSeek-R1 via vLLM reasoning_parser: answer often lands in reasoning* while content is null.
-    return (
-      delta?.content ||
-      delta?.reasoning ||
-      delta?.reasoning_content ||
-      message?.content ||
-      message?.reasoning ||
-      message?.reasoning_content ||
-      ''
-    );
+    return extractAssistantText(choice?.delta) || extractAssistantText(choice?.message);
   } catch {
     return '';
   }
 }
 
 /**
- * Stream assistant text deltas from Ollama /chat/completions (SSE).
+ * Non-stream completion — preferred for RunPod Serverless through Vercel
+ * (avoids SSE stall + empty content from R1 reasoning_parser).
+ */
+export async function completeOllamaChat(params: OllamaStreamParams): Promise<string> {
+  const base = params.baseUrl.replace(/\/$/, '');
+  const res = await fetch(`${base}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    signal: params.signal,
+    body: JSON.stringify({
+      model: params.model,
+      stream: false,
+      max_tokens: params.maxTokens ?? 1024,
+      messages: [
+        { role: 'system', content: params.system },
+        { role: 'user', content: params.user },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    throw new Error(
+      errText || `Sovereign inference failed (${res.status}). Node: ${base}`
+    );
+  }
+
+  const json = (await res.json()) as {
+    choices?: Array<{ message?: ChatMessageShape }>;
+  };
+  const text = extractAssistantText(json.choices?.[0]?.message);
+  if (!text) {
+    throw new Error('Sovereign node returned an empty completion (no content/reasoning).');
+  }
+  return text;
+}
+
+/**
+ * Stream assistant text deltas from /chat/completions (SSE). BYO / optional path.
  */
 export async function streamOllamaChat(
   params: OllamaStreamParams,
@@ -83,6 +132,7 @@ export async function streamOllamaChat(
     body: JSON.stringify({
       model: params.model,
       stream: true,
+      max_tokens: params.maxTokens ?? 1024,
       messages: [
         { role: 'system', content: params.system },
         { role: 'user', content: params.user },
@@ -93,8 +143,7 @@ export async function streamOllamaChat(
   if (!res.ok) {
     const errText = await res.text().catch(() => '');
     throw new Error(
-      errText ||
-        `Sovereign inference failed (${res.status}). Node: ${base}`
+      errText || `Sovereign inference failed (${res.status}). Node: ${base}`
     );
   }
 
@@ -121,15 +170,23 @@ export async function streamOllamaChat(
   }
 }
 
-/** Server-side: ReadableStream of plain text chunks for /api/ai/chat. */
+/**
+ * Server-side plain text response for /api/ai/chat.
+ * Uses non-stream completion for RunPod reliability, then emits as a single chunk stream
+ * so the existing Ask AI client reader still works.
+ */
 export function createOllamaPlainTextStream(params: OllamaStreamParams): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
   return new ReadableStream({
     async start(controller) {
       try {
-        await streamOllamaChat(params, (delta) => {
-          controller.enqueue(encoder.encode(delta));
-        });
+        const signal =
+          params.signal ??
+          (typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+            ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(280_000)
+            : undefined);
+        const text = await completeOllamaChat({ ...params, signal });
+        controller.enqueue(encoder.encode(text));
         controller.close();
       } catch (e) {
         controller.error(e);
@@ -142,4 +199,4 @@ export function createOllamaPlainTextStream(params: OllamaStreamParams): Readabl
 export const LOCAL_ASK_AI_SYSTEM_PREAMBLE = `You are Pocket Analyst, a helpful portfolio assistant.
 Use only the portfolio context provided. Do not invent holdings, account IDs, or PII.
 If the answer is not in the context, say so briefly.
-Be concise and practical.`;
+Be concise and practical (under 150 words). Put the user-facing answer last.`;

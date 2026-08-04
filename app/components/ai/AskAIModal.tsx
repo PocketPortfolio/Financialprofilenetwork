@@ -317,27 +317,32 @@ export function AskAIModal({
       }
 
       // Prod default: Cloud Auto + Sovereign modes via /api/ai/chat (hosted OLLAMA_BASE_URL).
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        signal:
-          typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
-            ? (AbortSignal as any).timeout(localModeActive ? 300000 : 20000)
-            : undefined,
-        body: JSON.stringify({
-          message: text,
-          context: localModeActive
-            ? truncatePortfolioContextForLocal(portfolioContext)
-            : portfolioContext,
-          provider: providerMode,
-          ...(isPaid && attachedContent && !localModeActive
-            ? { attachedContent }
-            : {}),
-        }),
-      });
+      const abort = new AbortController();
+      const timeoutMs = localModeActive ? 300_000 : 20_000;
+      const timeoutId = setTimeout(() => abort.abort(), timeoutMs);
+      let res: Response;
+      try {
+        res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          signal: abort.signal,
+          body: JSON.stringify({
+            message: text,
+            context: localModeActive
+              ? truncatePortfolioContextForLocal(portfolioContext)
+              : portfolioContext,
+            provider: providerMode,
+            ...(isPaid && attachedContent && !localModeActive
+              ? { attachedContent }
+              : {}),
+          }),
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

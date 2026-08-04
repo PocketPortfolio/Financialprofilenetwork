@@ -16,6 +16,16 @@ describe('sovereign AI provider helpers', () => {
     expect(modelIdForProviderMode('ollama_deepseek_r1')).toBe(OLLAMA_MODEL_DEEPSEEK_R1);
   });
 
+  it('extracts DeepSeek-R1 reasoning when content is null', async () => {
+    const { extractAssistantText } = await import('@/app/lib/ai/providers/ollama');
+    expect(extractAssistantText({ content: null, reasoning: 'Hold cash; skip crypto for now.' })).toBe(
+      'Hold cash; skip crypto for now.'
+    );
+    expect(extractAssistantText({ content: 'Final answer.', reasoning: 'long chain' })).toBe(
+      'Final answer.'
+    );
+  });
+
   it('flags local modes correctly', () => {
     expect(isLocalProviderMode('cloud_auto')).toBe(false);
     expect(isLocalProviderMode('ollama_llama31')).toBe(true);
