@@ -1,7 +1,7 @@
 ---
 id: OP-CMD-REPORT-SOVEREIGN-AI-HARNESS-EXECUTION-2026-08-04
 title: Command Team Report — Sovereign AI Adversarial Harness (Execution Plan)
-status: PAYG_LOCKED · QUOTA_10 · AWAITING_APP_RELEASE
+status: PAYG_LOCKED · QUOTA_10 · PHASE_F_SHIPPED_MAIN · SOFT_LAUNCH
 date: 2026-08-04
 owners: [CEO, Head of AI, CPO, Head of Product Engineering, CCO, Head of Marketing, Legal]
 architecture_ssot: docs/architecture/sovereign-ai-harness-plan-2026-08-04.md
@@ -26,7 +26,7 @@ governance_ssot: docs/command/claims-vs-codebase-calibration.md
 | **C — PAYG infra** | RunPod Serverless `workersMin=0`, terminate pods | **Done** (live) |
 | **D — Vercel envs** | `NEXT_PUBLIC_ENABLE_LOCAL_AI`, base URLs, `OLLAMA_API_KEY` | **Done** (Production) |
 | **E — Quota** | Free tier **20 → 10** | **Done** (in-tree; needs release) |
-| **F — App release** | Commit + push + prod deploy of harness + quota | **Pending** (no commit until ordered) |
+| **F — App release** | Commit + push + prod deploy of harness + quota | **Done** (`cdcaf5d0` on `main` · prod Ready · soft launch) |
 | **G — Dual distinct weights** | Separate Instruct vs R1 HF models | **Phase-1 deferred** — both UI modes hit proven R1 endpoint |
 | **H — GTM** | Tier-1 live-toggle demo once F green | **Queued** |
 
