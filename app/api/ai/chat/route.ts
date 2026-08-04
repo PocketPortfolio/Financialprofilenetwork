@@ -26,8 +26,8 @@ import {
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-/** 120s covers RunPod serverless cold start + DeepSeek-R1. */
-export const maxDuration = 120;
+/** Cold start can exceed 3–5 min (HF download + vLLM warmup); Pro plan allows 300s. */
+export const maxDuration = 300;
 
 // Pocket Analyst: Gemini tried first when GOOGLE_GENERATIVE_AI_API_KEY is set (gemini-1.5-flash free, gemini-1.5-pro paid); OpenAI fallback when key set or Gemini fails.
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';

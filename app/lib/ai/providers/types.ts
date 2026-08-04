@@ -8,9 +8,12 @@ export type AskAiProviderMode =
   | 'ollama_llama31'
   | 'ollama_deepseek_r1';
 
-export const OLLAMA_MODEL_LLAMA31 = 'llama3.1:8b-instruct-q4_K_M';
-export const OLLAMA_MODEL_DEEPSEEK_R1 = 'deepseek-r1:7b-qwen-distill-q4_K_M';
+/** Phase-1 RunPod vLLM served id (HF repo). Ollama GGUF tags only for BYO laptop. */
+export const OLLAMA_MODEL_LLAMA31 = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B';
+export const OLLAMA_MODEL_DEEPSEEK_R1 = 'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B';
 export const OLLAMA_MODEL_QWEN_CODER = 'qwen2.5-coder:7b-instruct-q4_K_M';
+/** Alias used in UI / docs for the hosted PAYG weight. */
+export const HOSTED_SOVEREIGN_MODEL_ID = OLLAMA_MODEL_DEEPSEEK_R1;
 
 /** Hard cap for local VRAM safety (~1.5–2k tokens of summary text). */
 export const LOCAL_CONTEXT_MAX_CHARS = 6000;

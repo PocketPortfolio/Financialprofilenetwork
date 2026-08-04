@@ -325,7 +325,7 @@ export function AskAIModal({
         },
         signal:
           typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
-            ? (AbortSignal as any).timeout(localModeActive ? 120000 : 20000)
+            ? (AbortSignal as any).timeout(localModeActive ? 300000 : 20000)
             : undefined,
         body: JSON.stringify({
           message: text,
@@ -380,7 +380,16 @@ export function AskAIModal({
       }
       // Keep attachment for follow-up messages until user removes it
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
+      const aborted =
+        err instanceof Error &&
+        (err.name === 'AbortError' || /aborted|timeout/i.test(err.message));
+      setError(
+        aborted && localModeActive
+          ? 'Sovereign node timed out (cold start can exceed 5 minutes). Retry once the GPU is warm, or use Cloud Auto.'
+          : err instanceof Error
+            ? err.message
+            : 'Something went wrong.'
+      );
       setMessages((prev) => prev.filter((m) => m.id !== assistantId));
     } finally {
       setIsLoading(false);
@@ -600,7 +609,9 @@ export function AskAIModal({
               {messages.length === 0 && (
                 <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>
                   {localModeActive
-                    ? 'Local model mode: bounded portfolio summary goes to your Ollama node only (not third-party cloud APIs). Attachments are disabled in Phase 1.'
+                    ? isOllamaClientDirectEnabled()
+                      ? 'BYO laptop Ollama: bounded summary goes to your local node (not third-party cloud APIs). Attachments disabled in Phase 1.'
+                      : 'OP-Hosted Sovereign: bounded portfolio summary goes to our PAYG inference node (not Gemini/OpenAI). First answer after idle can take several minutes while the GPU wakes. Attachments disabled in Phase 1.'
                     : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
                 </p>
               )}
@@ -613,7 +624,20 @@ export function AskAIModal({
                     letterSpacing: '0.04em',
                   }}
                 >
-                  ● Localhost endpoint · experimental node
+                  {isOllamaClientDirectEnabled()
+                    ? '● Localhost BYO · experimental'
+                    : '● OP-Hosted Sovereign · PAYG node'}
+                </p>
+              )}
+              {localModeActive && isLoading && !isOllamaClientDirectEnabled() && (
+                <p
+                  style={{
+                    fontSize: '12px',
+                    color: 'hsl(var(--muted-foreground))',
+                    margin: 0,
+                  }}
+                >
+                  Waking sovereign GPU if cold — wait up to ~5 minutes before retrying Cloud Auto.
                 </p>
               )}
               {messages.map((m) => {
