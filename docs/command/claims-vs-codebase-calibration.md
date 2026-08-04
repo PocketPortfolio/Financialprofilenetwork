@@ -3,7 +3,7 @@ id: OP-CLAIMS-CALIBRATION-2026-05-20
 title: Ecosystem Positioning & Codebase Reality Alignment Ledger
 status: EVALUATION_RECORD
 deployment: NOT_CLEARED_FOR_PRODUCTION
-last_updated: 2026-05-20
+last_updated: 2026-07-29
 roles: [Engineering, Growth, FounderOps, Procurement-facing copy]
 ---
 
@@ -47,6 +47,8 @@ Do **not** imply two separate production codebases. It is **one monorepo**, **on
 - **Client-side aggregation by construction** for LLM context (totals + top-N; no raw ledger in the inference payload).
 - **No PII and no account identifiers on the Pocket Analyst inference path** as designed in `app/lib/ai/contextBuilder.ts`.
 - **Stateless inference handler** for portfolio text: request payload used only to build the prompt and stream the response; see `app/api/ai/chat/route.ts` header comment and `docs/IP-TECHNICAL-MECHANISMS.md`.
+- **CSV-first codec** / format-agnostic semantic core (`NormalizedTrade` / OpenBroker Ledger) — CSV and Excel are the first wire formats, not the only ones. See `docs/command/format-agnostic-sovereign-ingestion-roadmap.md`.
+- **Normalize at the edge** (client or partner perimeter) for Tier 1 audit-perimeter reduction.
 
 ### Prohibited / red-team phrases (external)
 
@@ -60,6 +62,7 @@ Do **not** use without legal + engineering sign-off:
 | “No cloud” | Firebase, Vercel, LLM APIs, optional Redis/KV — all cloud-adjacent. |
 | “Bloomberg replacement” / “AI-native Bloomberg” | Competitor + capability implication; UX gravity not proven by infra alone. |
 | “Sovereign AI OS” / vague “sovereignty” without technical noun | Reads ideological; procurement red flag. |
+| “CSV-only platform” / “we only do CSV” | Contradicts format-agnostic roadmap; CSV is v1 codec, not the architecture. |
 
 ---
 
@@ -113,17 +116,31 @@ Prevent **strategic drift** into production: no campaign should hard-launch **ne
 | Stateless inference | Tied to **`/api/ai/chat`** portfolio payload non-retention — cite `IP-TECHNICAL-MECHANISMS.md`. |
 | Bounded portfolio context | Output of `buildPortfolioContext` only (totals + top N). |
 | Open Portfolio | **Host + route surface** + narrative; same deployment as Pocket. |
-| OpenBrokerCSV / importer | Concrete OSS artifact: `packages/importer`, `SCHEMA.md`. |
+| OpenBrokerCSV / importer | Concrete OSS artifact: `packages/importer`, `SCHEMA.md`. CSV view of the ledger—not the only future codec. |
+| OpenBroker Ledger | Format-agnostic interchange name for the same semantic row set. See `docs/command/format-agnostic-sovereign-ingestion-roadmap.md`. |
+| CSV-first codec | Approved: first wire format + Pocket harness. Not “CSV-only forever.” |
+| Process-local / Sovereign Local (Ask AI) | Allowed when describing **Ollama (or similar) host-node** inference on the user’s machine with the same `buildPortfolioContext` payload. Not WASM-in-browser. See `docs/architecture/sovereign-ai-harness-plan-2026-08-04.md`. |
 
 **Future formalisation:** consider splitting this section into `docs/command/approved-claims-dictionary.md` if marketing surface area grows; until then, **this file is the SSOT**.
 
 ---
+
+## 6b. Sovereign AI harness (Ask AI routing)
+
+**Architecture SSOT:** `docs/architecture/sovereign-ai-harness-plan-2026-08-04.md`
+
+| Allowed | Forbidden |
+|---------|-----------|
+| Model-agnostic routing of **bounded** context to cloud APIs or an **OP-hosted sovereign inference node** (`OLLAMA_BASE_URL`) | “In-browser WASM LLM” (unshipped) |
+| Sovereign mode keeps inference off Gemini/OpenAI for that request (still via OP `/api/ai/chat` → OP node) | “Zero bytes leave the device” while Cloud Auto **or hosted Sovereign** is active |
+| Adversarial harness compares sovereign vs cloud on the same edge payload | “Local 8B matches GPT-4”; claiming **all** prod users run process-local on their laptop |
 
 ## 7. Content pipeline handoff (Consultant 1 → Consultant 2)
 
 - **Investor / category narrative:** Use Consultant 1 *themes* only where each bullet maps to a **row in this ledger** or to `docs/IP-TECHNICAL-MECHANISMS.md`.
 - **Seed raise (Open Portfolio):** Teaser + CEO Q&A appendix — `docs/seed/open-portfolio-seed-investor-package.md` (calibrated 2026-05-25).
 - **Engineering / procurement / grant technical annex:** Lead with **this ledger + IP mechanisms**; avoid metaphor stack (Bloomberg, OS, “full sovereignty”) unless footnoted to behaviour.
+- **Format / partnership roadmap:** `docs/command/format-agnostic-sovereign-ingestion-roadmap.md` (CSV-first codec; format-agnostic core; Tier 1).
 
 ---
 
@@ -131,5 +148,7 @@ Prevent **strategic drift** into production: no campaign should hard-launch **ne
 
 | Date | Change |
 |------|--------|
+| 2026-08-04 | §6b: Aug 10 prod = OP-hosted sovereign node via `/api/ai/chat`; forbid device-local claims for all users. |
+| 2026-07-29 | Format-agnostic doctrine: approved “CSV-first codec”; prohibit “CSV-only platform”; link roadmap SSOT. |
 | 2026-05-25 | Linked calibrated Open Portfolio seed package (`docs/seed/open-portfolio-seed-investor-package.md`). |
 | 2026-05-20 | Initial ledger: dual-surface, persistence truth, inference boundary, prohibited phrases, deploy gate linkage. |

@@ -14,15 +14,25 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
 import { markFirestoreReadsDegraded, shouldDegradeFirestoreReads } from '@/app/lib/server/firestore-quota-circuit';
 import { resolvePaidTierFromStripeEmail } from '@/app/lib/server/stripe-paid-tier';
+import {
+  createOllamaPlainTextStream,
+  getServerOllamaBaseUrl,
+  isLocalProviderMode,
+  LOCAL_ASK_AI_SYSTEM_PREAMBLE,
+  modelIdForProviderMode,
+  truncatePortfolioContextForLocal,
+  type AskAiProviderMode,
+} from '@/app/lib/ai/providers';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 30;
+/** 120s covers RunPod serverless cold start + DeepSeek-R1. */
+export const maxDuration = 120;
 
 // Pocket Analyst: Gemini tried first when GOOGLE_GENERATIVE_AI_API_KEY is set (gemini-1.5-flash free, gemini-1.5-pro paid); OpenAI fallback when key set or Gemini fails.
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
-const FREE_TIER_MONTHLY_LIMIT = 20; // Free: quota enforced; paid (foundersClub/corporateSponsor): no quota, unlimited.
+const FREE_TIER_MONTHLY_LIMIT = 10; // Free: quota enforced; paid (foundersClub/corporateSponsor): no quota, unlimited.
 const PERIOD_DAYS = 30;
 const MAX_ATTACHED_CONTENT_LENGTH = 60_000; // Server-side cap for prod (frontend caps at 50k)
 
@@ -153,14 +163,23 @@ type ChatBody = {
   message?: string;
   context?: string;
   attachedContent?: string;
+  /** cloud_auto (default) or ollama_* (hosted sovereign node via OLLAMA_BASE_URL). */
+  provider?: string;
 };
 
 export async function POST(request: NextRequest) {
   const geminiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
-  if (!geminiKey && !openaiKey) {
+  const sovereignBaseConfigured =
+    !!getServerOllamaBaseUrl() ||
+    !!getServerOllamaBaseUrl('ollama_llama31') ||
+    !!getServerOllamaBaseUrl('ollama_deepseek_r1');
+  if (!geminiKey && !openaiKey && !sovereignBaseConfigured) {
     return NextResponse.json(
-      { error: 'AI service not configured. Set GOOGLE_GENERATIVE_AI_API_KEY or OPENAI_API_KEY in environment.' },
+      {
+        error:
+          'AI service not configured. Set GOOGLE_GENERATIVE_AI_API_KEY, OPENAI_API_KEY, or OLLAMA_BASE_URL.',
+      },
       { status: 503 }
     );
   }
@@ -189,6 +208,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
+  const requestedProvider =
+    typeof body.provider === 'string' ? body.provider.trim().toLowerCase() : 'cloud_auto';
+  const sovereignMode =
+    requestedProvider === 'ollama_llama31' || requestedProvider === 'ollama_deepseek_r1'
+      ? (requestedProvider as AskAiProviderMode)
+      : null;
+  if (requestedProvider.startsWith('ollama') && !sovereignMode) {
+    return NextResponse.json(
+      { error: `Unsupported sovereign provider: ${requestedProvider}.` },
+      { status: 400 }
+    );
+  }
+  if (!sovereignMode && requestedProvider && requestedProvider !== 'cloud_auto') {
+    return NextResponse.json(
+      { error: `Unsupported provider: ${requestedProvider}. Use cloud_auto or ollama_*.` },
+      { status: 400 }
+    );
+  }
+  if (sovereignMode && !getServerOllamaBaseUrl(sovereignMode)) {
+    return NextResponse.json(
+      {
+        error:
+          'Sovereign inference node not configured for production. Set OLLAMA_BASE_URL or per-mode OLLAMA_LLAMA_BASE_URL / OLLAMA_REASONING_BASE_URL (OpenAI-compat /v1).',
+      },
+      { status: 503 }
+    );
+  }
+
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   if (!message) {
     return NextResponse.json({ error: 'message is required' }, { status: 400 });
@@ -198,22 +245,24 @@ export async function POST(request: NextRequest) {
   const rawAttached = typeof body.attachedContent === 'string' ? body.attachedContent.trim() : '';
   const attachedContent = rawAttached.length > MAX_ATTACHED_CONTENT_LENGTH ? rawAttached.slice(0, MAX_ATTACHED_CONTENT_LENGTH) : rawAttached;
 
-  // Fetch live quotes for symbols mentioned in the message so the model can answer price questions
+  // Live quotes: Cloud Auto only (sovereign Phase 1 = bounded portfolio context, no quote enrichment).
   let quoteBlock = '';
-  const symbolHints = extractSymbolHints(message);
-  if (symbolHints.length > 0) {
-    try {
-      const origin = request.nextUrl?.origin ?? process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
-      const quoteRes = await fetch(`${origin}/api/quote?symbols=${symbolHints.join(',')}`, { cache: 'no-store' });
-      if (quoteRes.ok) {
-        const quotes = (await quoteRes.json()) as Array<{ symbol: string; name?: string; price: number | null; change?: number | null; changePct?: number | null; currency?: string }>;
-        const withPrice = quotes.filter((q) => q.price != null);
-        if (withPrice.length > 0) {
-          quoteBlock = '\n\nCurrent quote data (use this to answer price/quote questions):\n' + withPrice.map((q) => `${q.symbol}: ${q.currency || 'USD'} ${q.price}${q.changePct != null ? ` (${q.changePct >= 0 ? '+' : ''}${q.changePct.toFixed(2)}%)` : ''}`).join('\n');
+  if (!sovereignMode) {
+    const symbolHints = extractSymbolHints(message);
+    if (symbolHints.length > 0) {
+      try {
+        const origin = request.nextUrl?.origin ?? process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+        const quoteRes = await fetch(`${origin}/api/quote?symbols=${symbolHints.join(',')}`, { cache: 'no-store' });
+        if (quoteRes.ok) {
+          const quotes = (await quoteRes.json()) as Array<{ symbol: string; name?: string; price: number | null; change?: number | null; changePct?: number | null; currency?: string }>;
+          const withPrice = quotes.filter((q) => q.price != null);
+          if (withPrice.length > 0) {
+            quoteBlock = '\n\nCurrent quote data (use this to answer price/quote questions):\n' + withPrice.map((q) => `${q.symbol}: ${q.currency || 'USD'} ${q.price}${q.changePct != null ? ` (${q.changePct >= 0 ? '+' : ''}${q.changePct.toFixed(2)}%)` : ''}`).join('\n');
+          }
         }
+      } catch {
+        // ignore quote fetch errors; model will answer without live data
       }
-    } catch {
-      // ignore quote fetch errors; model will answer without live data
     }
   }
 
@@ -265,6 +314,28 @@ export async function POST(request: NextRequest) {
   }
 
   const ttlSeconds = PERIOD_DAYS * 24 * 60 * 60;
+
+  if (attachedContent && sovereignMode) {
+    if (db) {
+      await logPocketAnalystEvent(db, {
+        action: 'error',
+        uid,
+        tier,
+        isPaid,
+        hadAttachment: true,
+        status: 403,
+        errorCode: 'sovereign_attachment_forbidden',
+        provider: sovereignMode,
+      });
+    }
+    return NextResponse.json(
+      {
+        error:
+          'File attachments are not supported on Sovereign modes yet. Switch to Cloud Auto or remove the attachment.',
+      },
+      { status: 403 }
+    );
+  }
 
   if (attachedContent && !isPaid) {
     if (db) {
@@ -368,6 +439,47 @@ export async function POST(request: NextRequest) {
       }
       await kvSetJson(kvKey, { usageCount: usageCount + 1, periodStartMs }, ttlSeconds);
     }
+  }
+
+  // Hosted sovereign path (Aug 10 prod): Vercel → OLLAMA_BASE_URL (OP-controlled node).
+  if (sovereignMode && isLocalProviderMode(sovereignMode)) {
+    const baseUrl = getServerOllamaBaseUrl(sovereignMode);
+    const model = modelIdForProviderMode(sovereignMode);
+    if (!baseUrl || !model) {
+      return NextResponse.json(
+        { error: 'Sovereign inference node or model not configured.' },
+        { status: 503 }
+      );
+    }
+    const truncated = truncatePortfolioContextForLocal(context);
+    const system =
+      LOCAL_ASK_AI_SYSTEM_PREAMBLE +
+      (truncated
+        ? `\n\nPortfolio context:\n${truncated}`
+        : '\n\n(No portfolio context provided.)');
+    if (db) {
+      logPocketAnalystEvent(db, {
+        action: 'question',
+        uid,
+        tier,
+        isPaid,
+        hadAttachment: false,
+        provider: sovereignMode,
+      }).catch(() => {});
+    }
+    const stream = createOllamaPlainTextStream({
+      baseUrl,
+      model,
+      system,
+      user: message,
+    });
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+      },
+    });
   }
 
   const contextBlock = context

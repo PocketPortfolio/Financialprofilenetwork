@@ -12,6 +12,20 @@ import { trackEvent, trackPaywallImpression } from '@/app/lib/analytics/events';
 import { LocalProcessingTerminal } from '@/app/components/LocalProcessingTerminal';
 import Link from 'next/link';
 import { useAuth } from '@/app/hooks/useAuth';
+import {
+  type AskAiProviderMode,
+  PROVIDER_MODE_LABELS,
+  PROVIDER_MODE_BADGE,
+  isLocalAiUiEnabled,
+  isLocalProviderMode,
+  isOllamaClientDirectEnabled,
+  modelIdForProviderMode,
+  getOllamaBaseUrl,
+  truncatePortfolioContextForLocal,
+  checkOllamaHealth,
+  streamOllamaChat,
+  LOCAL_ASK_AI_SYSTEM_PREAMBLE,
+} from '@/app/lib/ai/providers';
 
 const ATTACHMENT_MAX_CHARS = 50000;
 
@@ -113,8 +127,12 @@ export function AskAIModal({
   const [attachmentProcessing, setAttachmentProcessing] = useState(false);
   const [attachmentTerminalActive, setAttachmentTerminalActive] = useState(false);
   const [attachmentUpsellRowCount, setAttachmentUpsellRowCount] = useState<number | null>(null);
+  const [providerMode, setProviderMode] = useState<AskAiProviderMode>('cloud_auto');
+  const [providerMenuOpen, setProviderMenuOpen] = useState(false);
   const pendingAttachRef = useRef<PendingAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const localAiEnabled = isLocalAiUiEnabled();
+  const localModeActive = localAiEnabled && isLocalProviderMode(providerMode);
 
   const launchCheckoutFromTrigger = async (
     triggerSource: 'ai_file_attachment_attempt' | 'sponsor_page_direct'
@@ -227,7 +245,7 @@ export function AskAIModal({
         .then((data) => {
           if (cancelled) return;
           if (data.unlimited) setUsage({ used: 0, limit: null });
-          else setUsage({ used: data.used ?? 0, limit: data.limit ?? 20 });
+          else setUsage({ used: data.used ?? 0, limit: data.limit ?? 10 });
         })
         .catch(() => {});
     });
@@ -261,18 +279,63 @@ export function AskAIModal({
     try {
       const token = await user.getIdToken();
 
+      // Optional BYO: browser → user laptop Ollama (dev / power users only).
+      if (localModeActive && isOllamaClientDirectEnabled()) {
+        const baseUrl = getOllamaBaseUrl();
+        const healthy = await checkOllamaHealth(baseUrl);
+        if (!healthy) {
+          throw new Error('Local Ollama node offline — revert to Cloud Auto or disable client-direct');
+        }
+        const model = modelIdForProviderMode(providerMode);
+        if (!model) throw new Error('No local model configured for this mode');
+        const truncated = truncatePortfolioContextForLocal(portfolioContext);
+        const system =
+          LOCAL_ASK_AI_SYSTEM_PREAMBLE +
+          (truncated
+            ? `\n\nPortfolio context:\n${truncated}`
+            : '\n\n(No portfolio context provided.)');
+        let full = '';
+        await streamOllamaChat(
+          {
+            baseUrl,
+            model,
+            system,
+            user: text,
+            signal:
+              typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+                ? (AbortSignal as any).timeout(120000)
+                : undefined,
+          },
+          (delta) => {
+            full += delta;
+            setMessages((prev) =>
+              prev.map((m) => (m.id === assistantId ? { ...m, content: full } : m))
+            );
+          }
+        );
+        return;
+      }
+
+      // Prod default: Cloud Auto + Sovereign modes via /api/ai/chat (hosted OLLAMA_BASE_URL).
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        // Prevent infinite "thinking..." when network hangs; surfaces a concrete error instead.
-        signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? (AbortSignal as any).timeout(20000) : undefined,
+        signal:
+          typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+            ? (AbortSignal as any).timeout(localModeActive ? 120000 : 20000)
+            : undefined,
         body: JSON.stringify({
           message: text,
-          context: portfolioContext,
-          ...(isPaid && attachedContent ? { attachedContent } : {}),
+          context: localModeActive
+            ? truncatePortfolioContextForLocal(portfolioContext)
+            : portfolioContext,
+          provider: providerMode,
+          ...(isPaid && attachedContent && !localModeActive
+            ? { attachedContent }
+            : {}),
         }),
       });
 
@@ -310,7 +373,7 @@ export function AskAIModal({
           fetch('/api/ai/usage', { headers: { Authorization: `Bearer ${t}` } })
             .then((r) => r.json())
             .then((d) => {
-              if (!d.unlimited) setUsage({ used: d.used ?? 0, limit: d.limit ?? 20 });
+              if (!d.unlimited) setUsage({ used: d.used ?? 0, limit: d.limit ?? 10 });
             })
             .catch(() => {});
         });
@@ -387,6 +450,111 @@ export function AskAIModal({
             </h2>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {localAiEnabled && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={providerMenuOpen}
+                  aria-label="Select Ask AI provider"
+                  onClick={() => setProviderMenuOpen((o) => !o)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '12px',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    border: '1px solid hsl(var(--border))',
+                    background: 'hsl(var(--muted))',
+                    color: 'hsl(var(--foreground))',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {localModeActive && (
+                    <span
+                      aria-hidden
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: '50%',
+                        background: 'var(--accent-warm, #f59e0b)',
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+                  <span style={{ fontWeight: 600 }}>Sovereign</span>
+                  <span style={{ opacity: 0.75 }}>·</span>
+                  {PROVIDER_MODE_BADGE[providerMode]}
+                  <span style={{ opacity: 0.6 }}>▼</span>
+                </button>
+                {providerMenuOpen && (
+                  <ul
+                    role="listbox"
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      top: 'calc(100% + 4px)',
+                      zIndex: 2,
+                      margin: 0,
+                      padding: '4px',
+                      listStyle: 'none',
+                      minWidth: 220,
+                      background: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                    }}
+                  >
+                    {(
+                      [
+                        'cloud_auto',
+                        'ollama_llama31',
+                        'ollama_deepseek_r1',
+                      ] as AskAiProviderMode[]
+                    ).map((mode) => (
+                      <li key={mode} role="option" aria-selected={providerMode === mode}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProviderMode(mode);
+                            setProviderMenuOpen(false);
+                            setError(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            textAlign: 'left',
+                            padding: '8px 10px',
+                            border: 'none',
+                            borderRadius: '6px',
+                            background:
+                              providerMode === mode ? 'hsl(var(--muted))' : 'transparent',
+                            color: 'hsl(var(--foreground))',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                          }}
+                        >
+                          {PROVIDER_MODE_LABELS[mode]}
+                          {mode === 'cloud_auto' ? ' · Default' : ' · Hosted'}
+                          {isLocalProviderMode(mode) && (
+                            <span
+                              style={{
+                                display: 'block',
+                                fontSize: '10px',
+                                opacity: 0.65,
+                                marginTop: 2,
+                              }}
+                            >
+                              {modelIdForProviderMode(mode)}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
             {usage !== null && usage.limit !== null && (
               <span
                 style={{
@@ -431,7 +599,21 @@ export function AskAIModal({
             >
               {messages.length === 0 && (
                 <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>
-                  Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.
+                  {localModeActive
+                    ? 'Local model mode: bounded portfolio summary goes to your Ollama node only (not third-party cloud APIs). Attachments are disabled in Phase 1.'
+                    : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
+                </p>
+              )}
+              {localModeActive && localAiEnabled && (
+                <p
+                  style={{
+                    fontSize: '11px',
+                    color: 'var(--accent-warm, #f59e0b)',
+                    margin: 0,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  ● Localhost endpoint · experimental node
                 </p>
               )}
               {messages.map((m) => {
@@ -691,7 +873,7 @@ export function AskAIModal({
                 Monthly limit reached
               </p>
               <p style={{ margin: '0 0 16px', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                You've used your 20 questions this month. Unlock unlimited Pocket Analyst with Founder's Club.
+                You've used your 10 questions this month. Unlock unlimited Pocket Analyst with Founder's Club.
               </p>
               <ul
                 style={{

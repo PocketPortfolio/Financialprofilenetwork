@@ -8,7 +8,7 @@ import { markFirestoreReadsDegraded } from '@/app/lib/server/firestore-quota-cir
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const FREE_TIER_MONTHLY_LIMIT = 20;
+const FREE_TIER_MONTHLY_LIMIT = 10;
 const PERIOD_DAYS = 30;
 
 function initializeFirebaseAdmin() {

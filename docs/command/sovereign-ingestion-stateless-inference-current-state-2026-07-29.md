@@ -22,25 +22,28 @@ p0_status: CLOSED
 
 **Governance SSOT:** `docs/command/claims-vs-codebase-calibration.md`  
 **Engineering record:** `docs/IP-TECHNICAL-MECHANISMS.md`  
-**Serial curriculum:** `docs/command/sovereign-ingestion-stateless-inference-12-part-blueprint.md`
+**Serial curriculum:** `docs/command/sovereign-ingestion-stateless-inference-12-part-blueprint.md`  
+**Long-term roadmap (format-agnostic):** `docs/command/format-agnostic-sovereign-ingestion-roadmap.md`
 
 ---
 
 ## 1. One-sentence architecture
 
-**Ingest locally → normalize to OpenBrokerCSV semantics → aggregate in the browser → send a bounded snapshot to a forgetful inference handler.**
+**Ingest at the edge (any codec) → normalize to OpenBroker Ledger / `NormalizedTrade` semantics → aggregate in the browser → send a bounded snapshot to a forgetful inference handler.**
+
+CSV/Excel is the **v1 wire codec** today—not the architectural lockdown. See the [format-agnostic roadmap](format-agnostic-sovereign-ingestion-roadmap.md).
 
 ```text
-Broker CSV/Excel (device)
+Wire codecs today: Broker CSV/Excel (device)
   → @pocket-portfolio/importer  [adapters | Smart Mapping]
-  → NormalizedTrade[] / OpenBrokerCSV-shaped rows
+  → NormalizedTrade[] / OpenBrokerCSV-shaped rows  (CSV view of OpenBroker Ledger)
   → Guest: localStorage | Auth: Firebase authority
   → buildPortfolioContext()     [totals + top-10]
   → POST /api/ai/chat           [stream; no portfolio payload store]
   → optional Firestore/KV       [quota + analytics metadata only]
 ```
 
-Do **not** claim: “AI never sees data,” “zero server footprint,” “IndexedDB is the database,” or two separate production apps.
+Do **not** claim: “AI never sees data,” “zero server footprint,” “IndexedDB is the database,” “CSV-only platform,” or two separate production apps.
 
 ---
 
@@ -172,12 +175,16 @@ Call sites: dashboard → `PocketAnalystProvider`; advisor briefing via `useClie
 6. **Unify Ask AI on Vercel AI SDK** end-to-end (Gemini + OpenAI) for one streaming/error/telemetry surface.
 7. **Hard context budget** (token or char cap + tests) before expanding context (recent trades, tax lots, etc.).
 8. **Open-facing SDK demos** that call the same `parseUniversal` path (procurement can run fixtures without Pocket UI).
+8b. **Phase B — JSON codec** (`parseOpenBrokerJson` + Pocket paste/upload) per format-agnostic roadmap.
 
-### P2 — Roadmap (books already set expectation)
+### P2 — Roadmap (books + format-agnostic lock-down)
 
 9. Safer agent loop (tool allowlists, human confirm) — SI Ch.10 / Pocket Analyst blueprint.
 10. Richer market grounding (beyond `/api/quote`) without widening the portfolio egress surface.
 11. Contributor adapter templates + fixture CI as the real “ecosystem” substitute for a marketplace.
+12. **Phase C — Partner API ingress** (Tier 1) and **Phase D — `/api/ai/map-schema`** when a second codec’s long-tail is real.
+
+See `docs/command/format-agnostic-sovereign-ingestion-roadmap.md`.
 
 ---
 
@@ -189,11 +196,12 @@ Call sites: dashboard → `PocketAnalystProvider`; advisor briefing via `useClie
 - No PII / account identifiers on the Pocket Analyst inference path **as designed** in `contextBuilder`.
 - Stateless inference **with respect to the portfolio payload**; quota/analytics metadata may persist.
 - MIT sovereign ingestion SDK: 19 verified adapters + Smart Mapping; truncated mapping samples only.
-- One deployment, two audiences (Pocket harness / Open procurement).
+- **CSV-first codec**; format-agnostic semantic core (`NormalizedTrade` / OpenBroker Ledger).
+- One deployment, two audiences (Pocket harness / Open procurement / Tier 1).
 
 **Avoid (without legal + engineering sign-off):**
 
-- “AI never sees your data,” “zero server footprint,” “fully local” for signed-in workflows, blanket “IndexedDB is our database,” “plugin marketplace,” unqualified “Bloomberg replacement.”
+- “AI never sees your data,” “zero server footprint,” “fully local” for signed-in workflows, blanket “IndexedDB is our database,” “plugin marketplace,” “CSV-only platform,” unqualified “Bloomberg replacement.”
 
 ---
 
@@ -204,13 +212,14 @@ Call sites: dashboard → `PocketAnalystProvider`; advisor briefing via `useClie
 | `packages/importer/src/index.ts` | Public SDK surface |
 | `packages/importer/src/registry.ts` | 19 adapters |
 | `packages/importer/src/universal/*` | Smart Mapping + optional map-csv client |
-| `app/components/CSVImporter.tsx` | Production ingestion harness |
+| `app/components/CSVImporter.tsx` | Production ingestion harness (CSV v1 codec) |
 | `app/api/ai/map-csv/route.ts` | Truncated mapping API (Gemini → OpenAI → heuristic) |
 | `app/lib/ai/contextBuilder.ts` | Sanitized snapshot |
 | `app/api/ai/chat/route.ts` | Stateless stream + quota |
 | `app/components/ai/AskAIModal.tsx` | Pocket Analyst client |
-| `lib/canonical-claims.ts` | Claim floors, Open copy, hosts (`SDK.version` 1.1.3) |
+| `lib/canonical-claims.ts` | Claim floors, Open copy, hosts, Tier 1 |
 | `packages/importer/SCHEMA.md` | Package OpenBrokerCSV + NormalizedTrade SSOT |
+| `docs/command/format-agnostic-sovereign-ingestion-roadmap.md` | Format-agnostic long-term roadmap |
 | `SCHEMA.md` | Root pointer to package SCHEMA |
 | `docs/book/UNIVERSAL-LLM-IMPORT-BOOK.md` | Ingestion book SSOT |
 | `docs/book/SOVEREIGN-INTELLIGENCE-BOOK.md` | Inference book SSOT |
@@ -219,6 +228,6 @@ Call sites: dashboard → `PocketAnalystProvider`; advisor briefing via `useClie
 
 ## 9. Bottom line
 
-**Shipped moat:** local-first MIT ingestion (19 adapters + universal mapping UX), truncated mapping egress with **real LLM assist when flagged**, deterministic top-N context builder, and an auth’d chat route that does not retain portfolio/message bodies. Schema honesty and adapter claims are aligned.
+**Shipped moat:** local-first MIT ingestion (19 adapters + universal mapping UX), truncated mapping egress with **real LLM assist when flagged**, deterministic top-N context builder, and an auth’d chat route that does not retain portfolio/message bodies. Schema honesty and adapter claims are aligned. **CSV is the first codec, not the architecture.**
 
-**Innovation frontier:** P1 — persisted Smart Mapping, Ask AI SDK unification, hard context budgets, Open SDK demos — then agents/grounding **without** widening the inference payload beyond the calibrated boundary.
+**Innovation frontier:** JSON codec + partner API ingress (Tier 1) on the same semantic core; then P1 UX/SDK depth and agents/grounding **without** widening the inference payload beyond the calibrated boundary.
