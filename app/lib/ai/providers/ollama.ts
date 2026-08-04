@@ -24,14 +24,67 @@ export async function checkOllamaHealth(baseUrl: string): Promise<boolean> {
       headers: authHeaders(),
       signal:
         typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
-          ? // Cold PAYG nodes hang here — fail fast so Ask AI can use Cloud Auto.
-            (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(3000)
+          ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(3000)
           : undefined,
     });
     return res.ok;
   } catch {
     return false;
   }
+}
+
+/** Default wake budget: poll until worker answers /models (idle $0 until ask). */
+export const SOVEREIGN_WAKE_BUDGET_MS = 180_000;
+export const SOVEREIGN_WAKE_PROBE_MS = 12_000;
+export const SOVEREIGN_WAKE_INTERVAL_MS = 2_000;
+
+export type WaitForOllamaWarmResult = {
+  warm: boolean;
+  waitedMs: number;
+  probes: number;
+};
+
+/**
+ * Wake-on-ask: keep hitting /models until the PAYG worker is up or budget expires.
+ * Short probes avoid Cloudflare 524; speculative UI wake starts this before Send.
+ */
+export async function waitForOllamaWarm(
+  baseUrl: string,
+  opts?: { budgetMs?: number; probeMs?: number; intervalMs?: number }
+): Promise<WaitForOllamaWarmResult> {
+  const budgetMs = opts?.budgetMs ?? SOVEREIGN_WAKE_BUDGET_MS;
+  const probeMs = opts?.probeMs ?? SOVEREIGN_WAKE_PROBE_MS;
+  const intervalMs = opts?.intervalMs ?? SOVEREIGN_WAKE_INTERVAL_MS;
+  const root = baseUrl.replace(/\/$/, '');
+  const t0 = Date.now();
+  let probes = 0;
+
+  while (Date.now() - t0 < budgetMs) {
+    const remaining = budgetMs - (Date.now() - t0);
+    if (remaining < 400) break;
+    const timeout = Math.min(probeMs, remaining);
+    probes += 1;
+    try {
+      const res = await fetch(`${root}/models`, {
+        method: 'GET',
+        headers: authHeaders(),
+        signal:
+          typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+            ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(timeout)
+            : undefined,
+      });
+      if (res.ok) {
+        return { warm: true, waitedMs: Date.now() - t0, probes };
+      }
+    } catch {
+      /* still cold / scaling */
+    }
+    const sleepFor = Math.min(intervalMs, budgetMs - (Date.now() - t0));
+    if (sleepFor > 0) {
+      await new Promise((r) => setTimeout(r, sleepFor));
+    }
+  }
+  return { warm: false, waitedMs: Date.now() - t0, probes };
 }
 
 export type OllamaStreamParams = {

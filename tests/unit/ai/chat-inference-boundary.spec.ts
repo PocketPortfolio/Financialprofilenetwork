@@ -83,6 +83,7 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     delete process.env.ADMIN_EMAIL_OVERRIDE;
     delete process.env.OLLAMA_BASE_URL;
     delete process.env.SOVEREIGN_INFERENCE_BASE_URL;
+    delete process.env.SOVEREIGN_WAKE_BUDGET_MS;
   });
 
   afterEach(() => {
@@ -224,8 +225,9 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     delete process.env.OLLAMA_BASE_URL;
   });
 
-  it('falls back to Cloud Auto instantly when sovereign node is cold', async () => {
+  it('falls back to Cloud Auto when sovereign wake budget is exhausted', async () => {
     process.env.OLLAMA_BASE_URL = 'http://sovereign-cold/v1';
+    process.env.SOVEREIGN_WAKE_BUDGET_MS = '50';
     const SENTINEL_CTX = `DILIGENCE_COLD_CTX_${crypto.randomUUID()}`;
     const SENTINEL_MSG = `DILIGENCE_COLD_MSG_${crypto.randomUUID()}`;
     let hitChatCompletions = false;
@@ -274,6 +276,7 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     expect(geminiBody).toContain(SENTINEL_CTX);
     assertNoSentinels(firestoreWrites, SENTINEL_CTX, SENTINEL_MSG);
     delete process.env.OLLAMA_BASE_URL;
+    delete process.env.SOVEREIGN_WAKE_BUDGET_MS;
   });
 
   it('free tier: aiUsage quota writes contain counters only, not portfolio payload', async () => {

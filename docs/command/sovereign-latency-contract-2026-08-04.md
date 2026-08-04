@@ -30,9 +30,11 @@ A 7B vLLM worker that re-pulls Hugging Face weights every scale-up **cannot** me
 | Cache env | `HF_HOME=/runpod-volume/huggingface` (+ hub/transformers) |
 | `workersMin` | **0** (idle free) |
 | `workersMax` | **1** |
-| `idleTimeout` | 120s (stay warm briefly after use) |
+| `idleTimeout` | 600s (stay warm briefly after use; still scales to $0) |
 | `flashboot` | true |
+| RunPod modelReferences | `deepseek-ai/DeepSeek-R1-Distill-Qwen-7B` (host cache) |
 | Served model id | `deepseek-r1:7b-qwen-distill-q4_K_M` |
+| HF cache env | `/runpod-volume/huggingface-cache` (+ hub/transformers) |
 
 First request after attaching the volume still populates the cache once. Later cold starts load from the volume (no HF re-download).
 
@@ -43,16 +45,17 @@ First request after attaching the volume still populates the cache once. Later c
 
 ## Soft-launch ops
 
-1. Seed volume once (one successful completion).
-2. Confirm second cold start ≪ first (no multi-minute HF download in logs).
-3. If cold path still > ~30–45s after volume warm, escalate: smaller quant **or** temporary `workersMin=1` for Tier-1 demos only — never accept 5‑minute UX.
+1. ~~Seed volume once~~ — Warm seed **PASS** (2026-08-04); cold boot #2 still **FAIL** (~305s).  
+2. Cold customer path = **Cloud Auto fallback** (shipped). Do not claim volume-cached cold for Aug 10.  
+3. Post–Aug 10 escalate: bake weights / model cache product / smaller quant / managed backend — or temporary `workersMin=1` for booked demos only.
 
 ## App contract (shipped)
 
 | Path | Behavior |
 |------|----------|
-| Sovereign selected + node **warm** (`GET /models` ≤3s) | Complete on-node (≤60s); `X-Pocket-Inference: ollama_*` |
-| Sovereign selected + node **cold**/error | **Immediate Cloud Auto** (Gemini→OpenAI); `X-Pocket-Inference: cloud_auto_fallback` |
-| Idle GPU | `workersMin=0` — **$0**; customers never wait for wake |
+| Sovereign selected | Speculative **wake-on-ask** (`POST /api/ai/sovereign/wake`) — still `workersMin=0` until then |
+| Sovereign Send + node warming | Poll `/models` up to ~180s; complete on-node; `X-Pocket-Sovereign-Wake-Ms` |
+| Wake budget exhausted / on-node error | Cloud Auto **safety net**; `X-Pocket-Inference: cloud_auto_fallback` |
+| Idle GPU | `workersMin=0` — **$0**; `idleTimeout=600s` after last use |
 
-Vercel `maxDuration` for `/api/ai/chat` is **90s** (warm path), not 300s cold waits.
+Vercel `maxDuration` for chat/wake is **200s**. Idle cost strategy unchanged.

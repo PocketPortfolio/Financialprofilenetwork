@@ -16,9 +16,14 @@ export {
 export { truncatePortfolioContextForLocal } from './truncateContext';
 export {
   checkOllamaHealth,
+  waitForOllamaWarm,
+  SOVEREIGN_WAKE_BUDGET_MS,
+  SOVEREIGN_WAKE_PROBE_MS,
+  SOVEREIGN_WAKE_INTERVAL_MS,
   streamOllamaChat,
   completeOllamaChat,
   extractAssistantText,
   createOllamaPlainTextStream,
   LOCAL_ASK_AI_SYSTEM_PREAMBLE,
 } from './ollama';
+export type { WaitForOllamaWarmResult } from './ollama';

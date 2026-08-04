@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   LOCAL_CONTEXT_MAX_CHARS,
   OLLAMA_MODEL_DEEPSEEK_R1,
@@ -24,6 +24,28 @@ describe('sovereign AI provider helpers', () => {
     expect(extractAssistantText({ content: 'Final answer.', reasoning: 'long chain' })).toBe(
       'Final answer.'
     );
+  });
+
+  it('waitForOllamaWarm resolves once /models becomes ok', async () => {
+    const { waitForOllamaWarm } = await import('@/app/lib/ai/providers/ollama');
+    let n = 0;
+    const original = global.fetch;
+    global.fetch = vi.fn(async () => {
+      n += 1;
+      if (n < 3) throw new Error('cold');
+      return new Response(JSON.stringify({ data: [] }), { status: 200 });
+    }) as typeof fetch;
+    try {
+      const r = await waitForOllamaWarm('http://wake-test/v1', {
+        budgetMs: 5_000,
+        probeMs: 200,
+        intervalMs: 10,
+      });
+      expect(r.warm).toBe(true);
+      expect(r.probes).toBeGreaterThanOrEqual(3);
+    } finally {
+      global.fetch = original;
+    }
   });
 
   it('flags local modes correctly', () => {

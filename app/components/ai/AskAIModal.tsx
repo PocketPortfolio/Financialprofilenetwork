@@ -25,6 +25,7 @@ import {
   checkOllamaHealth,
   streamOllamaChat,
   LOCAL_ASK_AI_SYSTEM_PREAMBLE,
+  SOVEREIGN_WAKE_BUDGET_MS,
 } from '@/app/lib/ai/providers';
 
 const ATTACHMENT_MAX_CHARS = 50000;
@@ -119,6 +120,8 @@ export function AskAIModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [infoNotice, setInfoNotice] = useState<string | null>(null);
+  const [wakingSovereign, setWakingSovereign] = useState(false);
+  const wakeInFlightRef = useRef<Promise<boolean> | null>(null);
   const [usage, setUsage] = useState<{ used: number; limit: number | null } | null>(null);
   const [attachedContent, setAttachedContent] = useState('');
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
@@ -259,6 +262,41 @@ export function AskAIModal({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  /** Speculative wake-on-ask: start PAYG worker when Sovereign is selected (idle stays $0 until then). */
+  const requestSovereignWake = useCallback(
+    async (mode: AskAiProviderMode, budgetMs = SOVEREIGN_WAKE_BUDGET_MS): Promise<boolean> => {
+      if (!user || !isLocalProviderMode(mode) || isOllamaClientDirectEnabled()) return false;
+      if (wakeInFlightRef.current) return wakeInFlightRef.current;
+      const run = (async () => {
+        try {
+          const token = await user.getIdToken();
+          const res = await fetch('/api/ai/sovereign/wake', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ provider: mode, budgetMs }),
+          });
+          const data = (await res.json().catch(() => ({}))) as { warm?: boolean };
+          return !!data.warm || res.ok;
+        } catch {
+          return false;
+        } finally {
+          wakeInFlightRef.current = null;
+        }
+      })();
+      wakeInFlightRef.current = run;
+      return run;
+    },
+    [user]
+  );
+
+  useEffect(() => {
+    if (!open || !user || !localModeActive || isOllamaClientDirectEnabled()) return;
+    void requestSovereignWake(providerMode);
+  }, [open, user, localModeActive, providerMode, requestSovereignWake]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const text = input.trim();
@@ -318,9 +356,25 @@ export function AskAIModal({
         return;
       }
 
-      // Prod default: Cloud Auto + Sovereign modes via /api/ai/chat (hosted OLLAMA_BASE_URL).
+      // Prod: wake-on-ask for hosted Sovereign (workersMin=0 until this moment), then /api/ai/chat.
+      if (localModeActive && !isOllamaClientDirectEnabled()) {
+        setWakingSovereign(true);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, content: 'Waking OP-Hosted Sovereign GPU (idle was $0)…' }
+              : m
+          )
+        );
+        await requestSovereignWake(providerMode);
+        setWakingSovereign(false);
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, content: '' } : m))
+        );
+      }
+
       const abort = new AbortController();
-      const timeoutMs = localModeActive ? 90_000 : 20_000;
+      const timeoutMs = localModeActive ? SOVEREIGN_WAKE_BUDGET_MS + 90_000 : 20_000;
       const timeoutId = setTimeout(() => abort.abort(), timeoutMs);
       let res: Response;
       try {
@@ -360,6 +414,7 @@ export function AskAIModal({
 
       const inference = res.headers.get('X-Pocket-Inference') || '';
       const usedCloudFallback = inference === 'cloud_auto_fallback';
+      const wakeMs = res.headers.get('X-Pocket-Sovereign-Wake-Ms');
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -378,10 +433,11 @@ export function AskAIModal({
       }
 
       if (usedCloudFallback && full.trim()) {
-        // Non-blocking: sovereign was cold; answer came from Cloud Auto at cloud speed.
         setInfoNotice(
-          'Answered via Cloud Auto (Sovereign GPU was idle). Next warm hits stay on-node.'
+          'Wake budget exhausted — answered via Cloud Auto safety net. Sovereign stays PAYG ($0 idle).'
         );
+      } else if (wakeMs && full.trim() && inference.startsWith('ollama_')) {
+        setInfoNotice(`Answered on Sovereign (woke in ${(Number(wakeMs) / 1000).toFixed(1)}s).`);
       }
 
       // Refresh usage after successful request (free tier)
@@ -397,12 +453,13 @@ export function AskAIModal({
       }
       // Keep attachment for follow-up messages until user removes it
     } catch (err) {
+      setWakingSovereign(false);
       const aborted =
         err instanceof Error &&
         (err.name === 'AbortError' || /aborted|timeout/i.test(err.message));
       setError(
         aborted && localModeActive
-          ? 'Request timed out. Try again, or switch to Cloud Auto.'
+          ? 'Sovereign wake/answer timed out. Try again, or switch to Cloud Auto.'
           : err instanceof Error
             ? err.message
             : 'Something went wrong.'
@@ -410,6 +467,7 @@ export function AskAIModal({
       setMessages((prev) => prev.filter((m) => m.id !== assistantId));
     } finally {
       setIsLoading(false);
+      setWakingSovereign(false);
     }
   };
 
@@ -546,6 +604,10 @@ export function AskAIModal({
                             setProviderMode(mode);
                             setProviderMenuOpen(false);
                             setError(null);
+                            setInfoNotice(null);
+                            if (isLocalProviderMode(mode) && user && !isOllamaClientDirectEnabled()) {
+                              void requestSovereignWake(mode);
+                            }
                           }}
                           style={{
                             width: '100%',
@@ -628,7 +690,7 @@ export function AskAIModal({
                   {localModeActive
                     ? isOllamaClientDirectEnabled()
                       ? 'BYO laptop Ollama: bounded summary goes to your local node (not third-party cloud APIs). Attachments disabled in Phase 1.'
-                      : 'OP-Hosted Sovereign when the PAYG GPU is warm (cloud-speed). If the node is idle/cold, we answer via Cloud Auto instantly — you never wait minutes for a wake.'
+                      : 'OP-Hosted Sovereign wake-on-ask: idle GPU is $0. Selecting Sovereign or sending a question wakes the PAYG node; answers stay on-node when wake succeeds.'
                     : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
                 </p>
               )}
@@ -643,7 +705,9 @@ export function AskAIModal({
                 >
                   {isOllamaClientDirectEnabled()
                     ? '● Localhost BYO · experimental'
-                    : '● OP-Hosted Sovereign · PAYG (warm path) · Cloud Auto if cold'}
+                    : wakingSovereign
+                      ? '● Waking Sovereign GPU…'
+                      : '● OP-Hosted Sovereign · wake-on-ask · $0 idle'}
                 </p>
               )}
               {messages.map((m) => {

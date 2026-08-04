@@ -22,13 +22,15 @@ import {
   LOCAL_ASK_AI_SYSTEM_PREAMBLE,
   modelIdForProviderMode,
   truncatePortfolioContextForLocal,
+  waitForOllamaWarm,
+  SOVEREIGN_WAKE_BUDGET_MS,
   type AskAiProviderMode,
 } from '@/app/lib/ai/providers';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-/** Warm Sovereign ≤60s; cold path fails fast to Cloud Auto (no multi‑minute waits). */
-export const maxDuration = 90;
+/** Wake-on-ask budget + warm completion (idle stays workersMin=0). */
+export const maxDuration = 200;
 
 // Pocket Analyst: Gemini tried first when GOOGLE_GENERATIVE_AI_API_KEY is set (gemini-1.5-flash free, gemini-1.5-pro paid); OpenAI fallback when key set or Gemini fails.
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -442,9 +444,9 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Hosted sovereign path: only when the PAYG node is already warm.
-  // Cold starts re-download/load multi‑GB weights (minutes) — never make customers wait.
-  // If the node is cold/unreachable within a few seconds, fall through to Cloud Auto.
+  // Hosted sovereign: wake-on-ask (idle $0 via workersMin=0).
+  // Quick probe → if cold, poll /models up to wake budget → on-node complete.
+  // Cloud Auto only if wake budget expires or on-node errors.
   let sovereignFellBackToCloud = false;
   if (sovereignMode && isLocalProviderMode(sovereignMode)) {
     const baseUrl = getServerOllamaBaseUrl(sovereignMode);
@@ -462,7 +464,21 @@ export async function POST(request: NextRequest) {
         ? `\n\nPortfolio context:\n${truncated}`
         : '\n\n(No portfolio context provided.)');
 
-    const warm = await checkOllamaHealth(baseUrl);
+    let warm = await checkOllamaHealth(baseUrl);
+    let wakeWaitedMs = 0;
+    if (!warm) {
+      const wakeBudget = Math.min(
+        SOVEREIGN_WAKE_BUDGET_MS,
+        Number(process.env.SOVEREIGN_WAKE_BUDGET_MS || SOVEREIGN_WAKE_BUDGET_MS) || SOVEREIGN_WAKE_BUDGET_MS
+      );
+      console.info(
+        `[Pocket Analyst] Sovereign cold — wake-on-ask (budget ${wakeBudget}ms, idle $0 until ask)`
+      );
+      const woke = await waitForOllamaWarm(baseUrl, { budgetMs: wakeBudget });
+      warm = woke.warm;
+      wakeWaitedMs = woke.waitedMs;
+    }
+
     if (warm) {
       if (db) {
         logPocketAnalystEvent(db, {
@@ -492,16 +508,19 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'text/plain; charset=utf-8',
             'Cache-Control': 'no-cache',
             'X-Pocket-Inference': sovereignMode,
+            ...(wakeWaitedMs > 0
+              ? { 'X-Pocket-Sovereign-Wake-Ms': String(wakeWaitedMs) }
+              : {}),
           },
         });
       } catch (e) {
         const msg = e instanceof Error ? e.message : 'Sovereign inference failed';
-        console.error('[Pocket Analyst] Sovereign warm-path error; falling back to Cloud Auto:', msg);
+        console.error('[Pocket Analyst] Sovereign on-node error; Cloud Auto safety net:', msg);
         sovereignFellBackToCloud = true;
       }
     } else {
       console.warn(
-        '[Pocket Analyst] Sovereign node cold/unreachable — Cloud Auto fallback (idle PAYG; no customer wait).'
+        `[Pocket Analyst] Sovereign wake budget exhausted (${wakeWaitedMs}ms) — Cloud Auto safety net`
       );
       sovereignFellBackToCloud = true;
       if (db) {
