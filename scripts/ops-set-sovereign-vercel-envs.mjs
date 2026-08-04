@@ -81,11 +81,11 @@ async function main() {
   const defaultModel =
     process.env.OLLAMA_DEFAULT_MODEL ||
     local.OLLAMA_DEFAULT_MODEL ||
-    'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B';
+    'deepseek-r1:7b-qwen-distill-q4_K_M';
   const reasoningModel =
     process.env.OLLAMA_REASONING_MODEL ||
     local.OLLAMA_REASONING_MODEL ||
-    'deepseek-ai/DeepSeek-R1-Distill-Qwen-7B';
+    'deepseek-r1:7b-qwen-distill-q4_K_M';
   const apiKey =
     args.apiKey ||
     process.env.OLLAMA_API_KEY ||

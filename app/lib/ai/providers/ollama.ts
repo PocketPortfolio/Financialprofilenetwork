@@ -45,9 +45,24 @@ export type OllamaStreamParams = {
 function parseSseDelta(payload: string): string {
   try {
     const obj = JSON.parse(payload) as {
-      choices?: Array<{ delta?: { content?: string }; message?: { content?: string } }>;
+      choices?: Array<{
+        delta?: { content?: string | null; reasoning?: string | null; reasoning_content?: string | null };
+        message?: { content?: string | null; reasoning?: string | null; reasoning_content?: string | null };
+      }>;
     };
-    return obj.choices?.[0]?.delta?.content ?? obj.choices?.[0]?.message?.content ?? '';
+    const choice = obj.choices?.[0];
+    const delta = choice?.delta;
+    const message = choice?.message;
+    // DeepSeek-R1 via vLLM reasoning_parser: answer often lands in reasoning* while content is null.
+    return (
+      delta?.content ||
+      delta?.reasoning ||
+      delta?.reasoning_content ||
+      message?.content ||
+      message?.reasoning ||
+      message?.reasoning_content ||
+      ''
+    );
   } catch {
     return '';
   }
