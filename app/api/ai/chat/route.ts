@@ -15,6 +15,7 @@ import { getEffectivePaidTier } from '@/app/lib/tier/effectivePaid';
 import { markFirestoreReadsDegraded, shouldDegradeFirestoreReads } from '@/app/lib/server/firestore-quota-circuit';
 import { resolvePaidTierFromStripeEmail } from '@/app/lib/server/stripe-paid-tier';
 import {
+  checkOllamaHealth,
   completeOllamaChat,
   getServerOllamaBaseUrl,
   isLocalProviderMode,
@@ -26,8 +27,8 @@ import {
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-/** Cold start can exceed 3–5 min (HF download + vLLM warmup); Pro plan allows 300s. */
-export const maxDuration = 300;
+/** Warm Sovereign ≤60s; cold path fails fast to Cloud Auto (no multi‑minute waits). */
+export const maxDuration = 90;
 
 // Pocket Analyst: Gemini tried first when GOOGLE_GENERATIVE_AI_API_KEY is set (gemini-1.5-flash free, gemini-1.5-pro paid); OpenAI fallback when key set or Gemini fails.
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -441,8 +442,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Hosted sovereign path (Aug 10 prod): Vercel → OLLAMA_BASE_URL (OP-controlled node).
-  // Non-stream completion: RunPod R1 puts tokens in `reasoning`; SSE through Vercel stalls.
+  // Hosted sovereign path: only when the PAYG node is already warm.
+  // Cold starts re-download/load multi‑GB weights (minutes) — never make customers wait.
+  // If the node is cold/unreachable within a few seconds, fall through to Cloud Auto.
+  let sovereignFellBackToCloud = false;
   if (sovereignMode && isLocalProviderMode(sovereignMode)) {
     const baseUrl = getServerOllamaBaseUrl(sovereignMode);
     const model = modelIdForProviderMode(sovereignMode);
@@ -458,49 +461,69 @@ export async function POST(request: NextRequest) {
       (truncated
         ? `\n\nPortfolio context:\n${truncated}`
         : '\n\n(No portfolio context provided.)');
-    if (db) {
-      logPocketAnalystEvent(db, {
-        action: 'question',
-        uid,
-        tier,
-        isPaid,
-        hadAttachment: false,
-        provider: sovereignMode,
-      }).catch(() => {});
-    }
-    try {
-      const signal =
-        typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
-          ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(280_000)
-          : undefined;
-      const text = await completeOllamaChat({
-        baseUrl,
-        model,
-        system,
-        user: message,
-        signal,
-        maxTokens: 1024,
-      });
-      return new Response(text, {
-        headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Cache-Control': 'no-cache',
-        },
-      });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Sovereign inference failed';
-      const timedOut = /aborted|timeout|TimeoutError/i.test(msg);
-      console.error('[Pocket Analyst] Sovereign inference error:', msg);
-      return NextResponse.json(
-        {
-          error: timedOut
-            ? 'Sovereign GPU cold-start timed out. Retry once, or switch to Cloud Auto.'
-            : `Sovereign node error: ${msg.slice(0, 280)}`,
-        },
-        { status: timedOut ? 504 : 502 }
+
+    const warm = await checkOllamaHealth(baseUrl);
+    if (warm) {
+      if (db) {
+        logPocketAnalystEvent(db, {
+          action: 'question',
+          uid,
+          tier,
+          isPaid,
+          hadAttachment: false,
+          provider: sovereignMode,
+        }).catch(() => {});
+      }
+      try {
+        const signal =
+          typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+            ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(60_000)
+            : undefined;
+        const text = await completeOllamaChat({
+          baseUrl,
+          model,
+          system,
+          user: message,
+          signal,
+          maxTokens: 1024,
+        });
+        return new Response(text, {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'no-cache',
+            'X-Pocket-Inference': sovereignMode,
+          },
+        });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Sovereign inference failed';
+        console.error('[Pocket Analyst] Sovereign warm-path error; falling back to Cloud Auto:', msg);
+        sovereignFellBackToCloud = true;
+      }
+    } else {
+      console.warn(
+        '[Pocket Analyst] Sovereign node cold/unreachable — Cloud Auto fallback (idle PAYG; no customer wait).'
       );
+      sovereignFellBackToCloud = true;
+      if (db) {
+        logPocketAnalystEvent(db, {
+          action: 'question',
+          uid,
+          tier,
+          isPaid,
+          hadAttachment: false,
+          provider: `${sovereignMode}_fallback_cloud`,
+        }).catch(() => {});
+      }
     }
   }
+
+  const cloudInferenceHeaders = (): Record<string, string> =>
+    sovereignFellBackToCloud
+      ? {
+          'X-Pocket-Inference': 'cloud_auto_fallback',
+          'X-Pocket-Sovereign-Fallback': '1',
+        }
+      : { 'X-Pocket-Inference': 'cloud_auto' };
 
   const contextBlock = context
     ? `\n\nPortfolio context:\n${context}`
@@ -576,6 +599,7 @@ export async function POST(request: NextRequest) {
             'Content-Type': 'text/plain; charset=utf-8',
             'Cache-Control': 'no-cache',
             Connection: 'keep-alive',
+            ...cloudInferenceHeaders(),
           },
         });
       }
@@ -605,7 +629,12 @@ export async function POST(request: NextRequest) {
         system: systemPrompt,
         prompt: userText,
       });
-      return result.toTextStreamResponse();
+      const res = result.toTextStreamResponse();
+      const headers = new Headers(res.headers);
+      for (const [k, v] of Object.entries(cloudInferenceHeaders())) {
+        headers.set(k, v);
+      }
+      return new Response(res.body, { status: res.status, headers });
     } catch (e) {
       console.error('[Pocket Analyst] OpenAI fallback error:', e);
     }

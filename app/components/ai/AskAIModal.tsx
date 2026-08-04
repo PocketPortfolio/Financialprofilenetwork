@@ -118,6 +118,7 @@ export function AskAIModal({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [infoNotice, setInfoNotice] = useState<string | null>(null);
   const [usage, setUsage] = useState<{ used: number; limit: number | null } | null>(null);
   const [attachedContent, setAttachedContent] = useState('');
   const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
@@ -264,6 +265,7 @@ export function AskAIModal({
     if (!text || !user || isLoading) return;
 
     setError(null);
+    setInfoNotice(null);
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
@@ -318,7 +320,7 @@ export function AskAIModal({
 
       // Prod default: Cloud Auto + Sovereign modes via /api/ai/chat (hosted OLLAMA_BASE_URL).
       const abort = new AbortController();
-      const timeoutMs = localModeActive ? 300_000 : 20_000;
+      const timeoutMs = localModeActive ? 90_000 : 20_000;
       const timeoutId = setTimeout(() => abort.abort(), timeoutMs);
       let res: Response;
       try {
@@ -356,6 +358,9 @@ export function AskAIModal({
         throw new Error(data.error || `Request failed (${res.status})`);
       }
 
+      const inference = res.headers.get('X-Pocket-Inference') || '';
+      const usedCloudFallback = inference === 'cloud_auto_fallback';
+
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       if (!reader) throw new Error('No response body');
@@ -369,6 +374,13 @@ export function AskAIModal({
           prev.map((m) =>
             m.id === assistantId ? { ...m, content: full } : m
           )
+        );
+      }
+
+      if (usedCloudFallback && full.trim()) {
+        // Non-blocking: sovereign was cold; answer came from Cloud Auto at cloud speed.
+        setInfoNotice(
+          'Answered via Cloud Auto (Sovereign GPU was idle). Next warm hits stay on-node.'
         );
       }
 
@@ -390,7 +402,7 @@ export function AskAIModal({
         (err.name === 'AbortError' || /aborted|timeout/i.test(err.message));
       setError(
         aborted && localModeActive
-          ? 'Sovereign node timed out (cold start can exceed 5 minutes). Retry once the GPU is warm, or use Cloud Auto.'
+          ? 'Request timed out. Try again, or switch to Cloud Auto.'
           : err instanceof Error
             ? err.message
             : 'Something went wrong.'
@@ -616,7 +628,7 @@ export function AskAIModal({
                   {localModeActive
                     ? isOllamaClientDirectEnabled()
                       ? 'BYO laptop Ollama: bounded summary goes to your local node (not third-party cloud APIs). Attachments disabled in Phase 1.'
-                      : 'OP-Hosted Sovereign: bounded portfolio summary goes to our PAYG inference node (not Gemini/OpenAI). First answer after idle can take several minutes while the GPU wakes. Attachments disabled in Phase 1.'
+                      : 'OP-Hosted Sovereign when the PAYG GPU is warm (cloud-speed). If the node is idle/cold, we answer via Cloud Auto instantly — you never wait minutes for a wake.'
                     : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
                 </p>
               )}
@@ -631,18 +643,7 @@ export function AskAIModal({
                 >
                   {isOllamaClientDirectEnabled()
                     ? '● Localhost BYO · experimental'
-                    : '● OP-Hosted Sovereign · PAYG node'}
-                </p>
-              )}
-              {localModeActive && isLoading && !isOllamaClientDirectEnabled() && (
-                <p
-                  style={{
-                    fontSize: '12px',
-                    color: 'hsl(var(--muted-foreground))',
-                    margin: 0,
-                  }}
-                >
-                  Waking sovereign GPU if cold — wait up to ~5 minutes before retrying Cloud Auto.
+                    : '● OP-Hosted Sovereign · PAYG (warm path) · Cloud Auto if cold'}
                 </p>
               )}
               {messages.map((m) => {
@@ -707,6 +708,11 @@ export function AskAIModal({
                 boxSizing: 'border-box',
               }}
             >
+              {infoNotice && (
+                <p style={{ margin: '0 0 8px', fontSize: '12px', color: 'var(--accent-warm, #f59e0b)' }}>
+                  {infoNotice}
+                </p>
+              )}
               {error && (
                 <p style={{ margin: '0 0 8px', fontSize: '13px', color: 'hsl(var(--destructive))' }}>
                   {error}

@@ -24,7 +24,8 @@ export async function checkOllamaHealth(baseUrl: string): Promise<boolean> {
       headers: authHeaders(),
       signal:
         typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
-          ? (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(2500)
+          ? // Cold PAYG nodes hang here — fail fast so Ask AI can use Cloud Auto.
+            (AbortSignal as unknown as { timeout: (ms: number) => AbortSignal }).timeout(3000)
           : undefined,
     });
     return res.ok;

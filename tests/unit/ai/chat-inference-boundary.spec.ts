@@ -181,6 +181,12 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
 
     global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.toString();
+      if (url.includes('sovereign-test') && url.includes('/models')) {
+        return new Response(JSON.stringify({ data: [{ id: 'deepseek-r1' }] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
       if (url.includes('sovereign-test') && url.includes('/chat/completions')) {
         ollamaBody = typeof init?.body === 'string' ? init.body : '';
         return new Response(
@@ -190,7 +196,7 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
       }
-      return new Response(JSON.stringify([]), { status: 200 });
+      throw new Error(`Unexpected fetch: ${url}`);
     });
 
     const { POST } = await import('@/app/api/ai/chat/route');
@@ -208,11 +214,64 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     });
     const res = await POST(req);
     expect(res.status).toBe(200);
+    expect(res.headers.get('X-Pocket-Inference')).toMatch(/ollama_/);
     const text = await res.text();
     expect(text).toContain('sovereign-ok');
     expect(ollamaBody).toContain(SENTINEL_CTX);
     expect(ollamaBody).toContain(SENTINEL_MSG);
     expect(ollamaBody).toContain('"stream":false');
+    assertNoSentinels(firestoreWrites, SENTINEL_CTX, SENTINEL_MSG);
+    delete process.env.OLLAMA_BASE_URL;
+  });
+
+  it('falls back to Cloud Auto instantly when sovereign node is cold', async () => {
+    process.env.OLLAMA_BASE_URL = 'http://sovereign-cold/v1';
+    const SENTINEL_CTX = `DILIGENCE_COLD_CTX_${crypto.randomUUID()}`;
+    const SENTINEL_MSG = `DILIGENCE_COLD_MSG_${crypto.randomUUID()}`;
+    let hitChatCompletions = false;
+    let geminiBody = '';
+
+    global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString();
+      if (url.includes('sovereign-cold') && url.includes('/models')) {
+        return new Response('timeout', { status: 504 });
+      }
+      if (url.includes('sovereign-cold') && url.includes('/chat/completions')) {
+        hitChatCompletions = true;
+        return new Response('should-not-run', { status: 500 });
+      }
+      if (url.includes('/api/quote')) {
+        return new Response(JSON.stringify([]), { status: 200 });
+      }
+      if (url.includes('generativelanguage.googleapis.com')) {
+        geminiBody = typeof init?.body === 'string' ? init.body : '';
+        return new Response(
+          'data: {"candidates":[{"content":{"parts":[{"text":"cloud-fallback-ok"}]}}]}\n\n',
+          { status: 200, headers: { 'Content-Type': 'text/event-stream' } },
+        );
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    }) as typeof fetch;
+
+    const { POST } = await import('@/app/api/ai/chat/route');
+    const req = new NextRequest('http://localhost:3001/api/ai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer mock-id-token',
+      },
+      body: JSON.stringify({
+        message: SENTINEL_MSG,
+        context: SENTINEL_CTX,
+        provider: 'ollama_deepseek_r1',
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    expect(hitChatCompletions).toBe(false);
+    expect(res.headers.get('X-Pocket-Inference')).toBe('cloud_auto_fallback');
+    expect(res.headers.get('X-Pocket-Sovereign-Fallback')).toBe('1');
+    expect(geminiBody).toContain(SENTINEL_CTX);
     assertNoSentinels(firestoreWrites, SENTINEL_CTX, SENTINEL_MSG);
     delete process.env.OLLAMA_BASE_URL;
   });
