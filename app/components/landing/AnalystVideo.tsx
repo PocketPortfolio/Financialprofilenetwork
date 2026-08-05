@@ -228,6 +228,7 @@ export function AnalystVideo({ variant = 'control' }: AnalystVideoProps) {
               aspectRatio={POCKET_ANALYST_ASPECT_RATIO}
               borderRadius={14}
               show4KBadge
+              variant="hero"
             />
           </motion.div>
         </div>

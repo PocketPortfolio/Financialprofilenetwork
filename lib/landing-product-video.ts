@@ -11,9 +11,9 @@ export const DASHBOARD_DEMO_ASPECT_RATIO = '3840 / 2098';
 
 export const POCKET_ANALYST_FALLBACK = '/pocket-analyst-demo.mp4';
 export const POCKET_ANALYST_POSTER = '/pocket-analyst-demo-poster.jpg';
-/** Sovereign routing GTM cut (~40s). Encoded 2026-08-05; Cloudinary v1785960387. */
-export const POCKET_ANALYST_BRANDED_VERSION = 'v1785960387';
-export const POCKET_ANALYST_CACHE_BUST = '1785960387';
+/** Sovereign routing GTM cut (~40s). Top capture fringe cropped; SAR=1. Cloudinary v1785961533. */
+export const POCKET_ANALYST_BRANDED_VERSION = 'v1785961533';
+export const POCKET_ANALYST_CACHE_BUST = '1785961533';
 export const POCKET_ANALYST_CDN_DEFAULT = `https://res.cloudinary.com/dknmhvm7a/video/upload/${POCKET_ANALYST_BRANDED_VERSION}/pocket-portfolio/pocket-analyst-demo.mp4`;
 /** 3840×2160 */
 export const POCKET_ANALYST_ASPECT_RATIO = '3840 / 2160';
