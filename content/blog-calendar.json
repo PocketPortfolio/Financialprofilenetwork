@@ -1264,7 +1264,7 @@
     "date": "2026-08-05",
     "title": "The Cloud is Someone Else's Computer: Why Finance Should Stay Local",
     "slug": "the-cloud-is-someone-else-s-computer-why-finance-should-stay",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1274,7 +1274,8 @@
       "cloud"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-05T09:01:09.553Z"
   },
   {
     "id": "week-32-post-1",
