@@ -129,9 +129,9 @@ export async function GET(request: NextRequest) {
   const maxSendsFromQuery = limitParam != null && limitParam !== '' ? Number(limitParam) : NaN;
   const maxSends = Number.isFinite(maxSendsFromQuery)
     ? Math.max(0, Math.floor(maxSendsFromQuery))
-    : Number(process.env.SOVEREIGN_AI_LAUNCH_MAX_SENDS || 50);
+    : Number(process.env.SOVEREIGN_AI_LAUNCH_MAX_SENDS || 500);
 
-  const batchSleepMs = Number(process.env.SOVEREIGN_AI_LAUNCH_BATCH_SLEEP_MS || 1000);
+  const batchSleepMs = Number(process.env.SOVEREIGN_AI_LAUNCH_BATCH_SLEEP_MS || 400);
 
   const db = getDb();
   const auth = getAuth();
