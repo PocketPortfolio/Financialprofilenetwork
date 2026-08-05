@@ -24,9 +24,9 @@
     "typecheck": "tsc --noEmit",
     "audit:open-404": "node scripts/audit-open-404.mjs",
     "audit:growth-b2c-pocket": "node scripts/growth-b2c-pocket-audit.mjs",
-  "audit:npm": "npm audit",
-  "sbom": "node scripts/generate-sbom.mjs",
-  "export:codeql-baseline": "node scripts/export-codeql-baseline.mjs",
+    "audit:npm": "npm audit",
+    "sbom": "node scripts/generate-sbom.mjs",
+    "export:codeql-baseline": "node scripts/export-codeql-baseline.mjs",
     "newsroom:ingest": "node -e \"fetch('http://localhost:3001/api/cron/newsroom-ingest',{headers:{Authorization:'Bearer '+process.env.CRON_SECRET}}).then(r=>r.json()).then(console.log).catch(console.error)\"",
     "audit:b2b-open": "node scripts/growth-b2b-open-audit.mjs",
     "generate:gocardless-plan": "node scripts/generate-gocardless-plan-pdf.mjs",
@@ -170,7 +170,8 @@
     "test-sales-setup": "ts-node --project scripts/tsconfig.json scripts/test-sales-setup.ts",
     "test-emergency-stop": "ts-node --project scripts/tsconfig.json scripts/test-emergency-stop.ts",
     "test-metronome": "ts-node --project scripts/tsconfig.json scripts/test-metronome.ts",
-    "test-metronome:post": "ts-node --project scripts/tsconfig.json scripts/test-metronome.ts --post"
+    "test-metronome:post": "ts-node --project scripts/tsconfig.json scripts/test-metronome.ts --post",
+    "sovereign-ai-launch:send-test": "ts-node --project scripts/tsconfig.json scripts/send-sovereign-ai-launch-test-email.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.0",
