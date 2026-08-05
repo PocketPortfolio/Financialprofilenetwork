@@ -11,12 +11,12 @@ export const DASHBOARD_DEMO_ASPECT_RATIO = '3840 / 2098';
 
 export const POCKET_ANALYST_FALLBACK = '/pocket-analyst-demo.mp4';
 export const POCKET_ANALYST_POSTER = '/pocket-analyst-demo-poster.jpg';
-/** Action-first trim (~28s). Re-encoded 2026-06-04; Cloudinary v1780578282. */
-export const POCKET_ANALYST_BRANDED_VERSION = 'v1780578282';
-export const POCKET_ANALYST_CACHE_BUST = '1780578282';
+/** Sovereign routing GTM cut (~40s). Encoded 2026-08-05; Cloudinary v1785960387. */
+export const POCKET_ANALYST_BRANDED_VERSION = 'v1785960387';
+export const POCKET_ANALYST_CACHE_BUST = '1785960387';
 export const POCKET_ANALYST_CDN_DEFAULT = `https://res.cloudinary.com/dknmhvm7a/video/upload/${POCKET_ANALYST_BRANDED_VERSION}/pocket-portfolio/pocket-analyst-demo.mp4`;
-/** 3840×2110 */
-export const POCKET_ANALYST_ASPECT_RATIO = '3840 / 2110';
+/** 3840×2160 */
+export const POCKET_ANALYST_ASPECT_RATIO = '3840 / 2160';
 
 /** Prefer env only when it matches the branded Cloudinary version stamp (avoids stale .env.*.local overrides). */
 export function resolveBrandedCloudinaryVideoSrc(

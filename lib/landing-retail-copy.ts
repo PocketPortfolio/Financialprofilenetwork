@@ -27,11 +27,11 @@ export const RETAIL_LANDING_COPY = {
       'Annualized return and volatility help you see whether your risk matches your goals.',
   },
   analyst: {
-    eyebrow: 'Pocket Analyst',
+    eyebrow: 'New: Sovereign routing',
     headline: 'Your intelligent portfolio sounding board.',
-    body: 'Ask questions about allocations, risk, and performance. Get clear answers grounded in your portfolio summary — not your raw statements.',
+    body: 'Ask questions about allocations, risk, and performance. Get clear answers grounded in your portfolio summary — not your raw statements. Switch Cloud Auto or OP-Hosted Sovereign in Ask AI.',
     privacy:
-      'Your statements stay on your device. We analyze the big picture. Your financial privacy is enforced by design.',
+      'Your statements stay on your device for ingestion. Ask AI uses a bounded summary for reasoning — you choose Cloud Auto or Sovereign.',
     tryCta: 'Try Ask AI',
     watchCta: 'Watch Demo',
   },

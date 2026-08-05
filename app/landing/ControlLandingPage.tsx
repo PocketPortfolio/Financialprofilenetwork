@@ -958,8 +958,8 @@ export default function ControlLandingPage() {
           }}>
             Aggregate {BROKER_ADAPTER_COUNT}+ brokers in seconds.{' '}
             <strong style={{ color: 'var(--text)' }}>Pocket Analyst</strong> delivers AI insights on your full
-            portfolio picture, while our edge architecture ensures your raw, itemized ledger is never warehoused for
-            AI inference.
+            portfolio picture — route Ask AI to Cloud Auto or OP-Hosted Sovereign — while our edge architecture ensures
+            your raw, itemized ledger is never warehoused for AI inference.
           </p>
 
           {/* Trust band — engineering signal in mono amber; pricing retained for annual conversion */}
