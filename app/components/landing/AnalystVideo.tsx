@@ -85,7 +85,7 @@ export function AnalystVideo({ variant = 'control' }: AnalystVideoProps) {
                   }}
                 />
               </span>
-              {isRetail ? retail.eyebrow : 'New: Pocket Analyst'}
+              {isRetail ? retail.eyebrow : 'New: Sovereign routing'}
             </div>
 
             <h2
@@ -111,14 +111,15 @@ export function AnalystVideo({ variant = 'control' }: AnalystVideoProps) {
             >
               {isRetail
                 ? retail.body
-                : 'Ask complex financial questions. Get instant answers. Insights are built from a bounded portfolio summary — not your raw statements.'}
+                : 'Ask complex financial questions. Get instant answers. Insights are built from a bounded portfolio summary — not your raw statements. Choose Cloud Auto or OP-Hosted Sovereign in Ask AI.'}
             </p>
 
             {!isRetail && (
               <p style={{ fontSize: '0.9375rem', lineHeight: 1.6, color: 'var(--text-secondary)', maxWidth: '28rem' }}>
-                Pocket Analyst combines <strong style={{ color: 'var(--text)' }}>local-first</strong> privacy with{' '}
-                <strong style={{ color: 'var(--text)' }}>Gemini &amp; OpenAI</strong> to answer questions about your
-                portfolio, risks, and returns.
+                Pocket Analyst combines <strong style={{ color: 'var(--text)' }}>local-first</strong> portfolio context
+                with <strong style={{ color: 'var(--text)' }}>Cloud Auto (Gemini / OpenAI)</strong> or{' '}
+                <strong style={{ color: 'var(--text)' }}>OP-Hosted Sovereign</strong> — you choose the intelligence
+                route.
               </p>
             )}
 
