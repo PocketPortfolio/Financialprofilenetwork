@@ -1,7 +1,7 @@
 /**
  * POST /api/ai/sovereign/wake — wake-on-ask for OP-Hosted Sovereign PAYG.
- * Idle soft-launch: workersMin=1 keeps one warm worker; still PAYG beyond that.
- * This only spins additional capacity when the user selects Sovereign or is about to send.
+ * Idle: workersMin=0 ($0). Speculative wake spins a worker when the user
+ * selects Sovereign or is about to send. Does not touch portfolio payload.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       waitedMs: result.waitedMs,
       probes: result.probes,
       provider,
-      idlePolicy: 'soft_launch_workersMin=1_workersMax=5',
+      idlePolicy: 'workersMin=0_workersMax=5',
     },
     {
       status: result.warm ? 200 : 503,
