@@ -10,16 +10,32 @@ import {
   resolveBotGateClientIp,
 } from '@/lib/bot-gate';
 import {
+  paymentRequiredCsvBody,
+  paymentRequiredHtmlBody,
+  paymentRequiredJsonBody,
+  prefersHtmlPaymentPage,
   rateLimitExceededJsonBody,
   tickerApiBaseHeaders,
+  unauthorizedCsvBody,
   unauthorizedJsonBody,
 } from '@/app/lib/server/ticker-api-gate';
 
 const DEMO_KEY = 'demo_key';
 const WINDOW_SECONDS = 3600;
+/** Soft meter for non-series surfaces (quote, dividend) — not full OHLCV vault. */
 const FREE_TIER_LIMIT = 50;
 const DATACENTER_LIMIT = 12;
 const SYMBOL_FARM_LIMIT = 6;
+
+export type DataApiGateSurface = 'series' | 'metered';
+
+export type DataApiGateOptions = {
+  /**
+   * `series` — /api/tickers/* + /api/price/* : zero free full payloads.
+   * `metered` — quote/dividend soft KV buckets (no bulk OHLCV dump).
+   */
+  surface?: DataApiGateSurface;
+};
 
 export type DataApiGateResult =
   | { allowed: true; hasValidApiKey: boolean }
@@ -64,7 +80,6 @@ async function checkKvRateLimit(
   limit: number,
 ): Promise<{ allowed: boolean; retryAfter: number }> {
   const key = `ratelimit:data-api:${bucket}:${ip}:${limit}`;
-  const now = Math.floor(Date.now() / 1000);
 
   try {
     const current = (await kv.get<number>(key)) || 0;
@@ -89,10 +104,52 @@ function gateHeaders(extra: Record<string, string> = {}): Record<string, string>
   return { ...tickerApiBaseHeaders(), ...extra };
 }
 
-function unauthorizedResponse(): NextResponse {
+function wantsCsv(request: NextRequest): boolean {
+  const path = request.nextUrl.pathname.toLowerCase();
+  if (path.endsWith('/csv') || path.includes('/csv')) return true;
+  const format = (request.nextUrl.searchParams.get('format') || '').toLowerCase();
+  return format === 'csv';
+}
+
+function unauthorizedResponse(request: NextRequest): NextResponse {
+  if (wantsCsv(request)) {
+    return new NextResponse(unauthorizedCsvBody(), {
+      status: 401,
+      headers: gateHeaders({
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Cache-Control': 'no-store',
+      }),
+    });
+  }
   return NextResponse.json(unauthorizedJsonBody(), {
     status: 401,
-    headers: gateHeaders(),
+    headers: gateHeaders({ 'Cache-Control': 'no-store' }),
+  });
+}
+
+function paymentRequiredResponse(request: NextRequest): NextResponse {
+  const symbol = extractTickerFromDataApiPath(request.nextUrl.pathname);
+  if (wantsCsv(request)) {
+    return new NextResponse(paymentRequiredCsvBody(symbol), {
+      status: 402,
+      headers: gateHeaders({
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Cache-Control': 'no-store',
+      }),
+    });
+  }
+  if (prefersHtmlPaymentPage(request)) {
+    return new NextResponse(paymentRequiredHtmlBody(symbol), {
+      status: 402,
+      headers: gateHeaders({
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+      }),
+    });
+  }
+  return NextResponse.json(paymentRequiredJsonBody(symbol), {
+    status: 402,
+    headers: gateHeaders({ 'Cache-Control': 'no-store' }),
   });
 }
 
@@ -106,20 +163,48 @@ function rateLimitedResponse(retryAfter: number): NextResponse {
       status: 429,
       headers: gateHeaders({
         'Retry-After': String(Math.max(1, retryAfter)),
+        'Cache-Control': 'no-store',
       }),
     },
   );
 }
 
+/** Pull symbol from /api/tickers/{SYM}/… or /api/price/{SYM}. */
+export function extractTickerFromDataApiPath(pathname: string): string | null {
+  const tickers = pathname.match(/^\/api\/tickers\/([^/]+)/i);
+  if (tickers?.[1]) {
+    try {
+      return decodeURIComponent(tickers[1]).toUpperCase();
+    } catch {
+      return tickers[1].toUpperCase();
+    }
+  }
+  const price = pathname.match(/^\/api\/price\/([^/]+)/i);
+  if (price?.[1]) {
+    try {
+      return decodeURIComponent(price[1]).toUpperCase();
+    } catch {
+      return price[1].toUpperCase();
+    }
+  }
+  return null;
+}
+
 /**
- * Enforce paid-key / rate-limit policy on market data APIs.
- * Automated clients always need a key. Symbol-farm referrers get a tight bucket.
+ * Enforce paid-key / first-party policy on market data APIs.
+ * `series` surfaces never emit full OHLCV without a key (human → 402 stub, bot → 401).
  */
 export async function enforceDataApiGate(
   request: NextRequest,
+  options: DataApiGateOptions = {},
 ): Promise<DataApiGateResult> {
+  const surface: DataApiGateSurface = options.surface ?? 'metered';
   const isDevelopment = process.env.NODE_ENV === 'development';
-  if (isDevelopment) return { allowed: true, hasValidApiKey: false };
+
+  // Soft surfaces keep local DX bypass; series vault is always locked (incl. localhost).
+  if (isDevelopment && surface === 'metered') {
+    return { allowed: true, hasValidApiKey: false };
+  }
 
   const apiKey = extractApiKeyFromRequest(request);
   const hasValidApiKey = apiKey ? await validatePaidApiKey(apiKey) : false;
@@ -129,11 +214,16 @@ export async function enforceDataApiGate(
   const isFirstParty = isFirstPartyTickerRequest(request);
 
   if (isAutomated) {
-    return { allowed: false, response: unauthorizedResponse() };
+    return { allowed: false, response: unauthorizedResponse(request) };
   }
 
   if (isFirstParty) {
     return { allowed: true, hasValidApiKey: false };
+  }
+
+  // Unpaid human on OHLCV/price vault → sales stub (never full series).
+  if (surface === 'series') {
+    return { allowed: false, response: paymentRequiredResponse(request) };
   }
 
   const ip = resolveBotGateClientIp(request);

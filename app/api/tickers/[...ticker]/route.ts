@@ -2,18 +2,15 @@
  * Ticker Historical Data JSON/CSV API
  * GET /api/tickers/{ticker}/json|csv
  *
- * First-party HTML UI is free (same-origin / SSR secret).
- * External unauthenticated traffic is KV-metered; automated clients require a paid API key.
- * Upsell: Developer Utility Stripe deep-link.
+ * Full series: paid `pp_` key or verified first-party (SSR secret / trusted app).
+ * Unpaid human browsers → 402 sales stub. Automated clients → 401. No free OHLCV.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getTickerMetadata } from '@/app/lib/pseo/data';
 import {
   DEVELOPER_UTILITY_CHECKOUT_URL,
-  rateLimitExceededCsvBody,
   tickerApiBaseHeaders,
-  unauthorizedCsvBody,
 } from '@/app/lib/server/ticker-api-gate';
 import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
 
@@ -419,23 +416,9 @@ export async function GET(
     );
   }
   
-  // Bot gate: automated → 401; symbol-farm referrers → tight KV bucket; trusted app UI exempt
-  const gate = await enforceDataApiGate(request);
+  // Series vault: paid key / first-party → 200; unpaid human → 402 stub; bot → 401
+  const gate = await enforceDataApiGate(request, { surface: 'series' });
   if (!gate.allowed) {
-    const status = gate.response.status;
-    if (format === 'csv') {
-      const retryAfter = Number(gate.response.headers.get('Retry-After') || '3600');
-      const body =
-        status === 401 ? unauthorizedCsvBody() : rateLimitExceededCsvBody(retryAfter);
-      return new NextResponse(body, {
-        status,
-        headers: withTickerHeaders({
-          'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="${ticker}-api-gate.csv"`,
-          ...(status === 429 ? { 'Retry-After': String(retryAfter) } : {}),
-        }),
-      });
-    }
     return gate.response;
   }
 
