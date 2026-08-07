@@ -1,7 +1,7 @@
 /**
  * POST /api/ai/sovereign/wake — wake-on-ask for OP-Hosted Sovereign PAYG.
- * Idle remains workersMin=0 ($0). This only spins a worker when the user
- * selects Sovereign or is about to send. Does not touch portfolio payload.
+ * Idle soft-launch: workersMin=1 keeps one warm worker; still PAYG beyond that.
+ * This only spins additional capacity when the user selects Sovereign or is about to send.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
@@ -16,8 +16,8 @@ import {
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-/** Allow wake budget + margin (Vercel Pro). */
-export const maxDuration = 200;
+/** Soft-launch: wake budget is short; Cloud Auto safety net is the UX contract. */
+export const maxDuration = 45;
 
 function initializeFirebaseAdmin() {
   if (!getApps().length) {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     if (body.provider && isLocalProviderMode(body.provider as AskAiProviderMode)) {
       provider = body.provider as AskAiProviderMode;
     }
-    if (typeof body.budgetMs === 'number' && body.budgetMs >= 5_000 && body.budgetMs <= 180_000) {
+    if (typeof body.budgetMs === 'number' && body.budgetMs >= 5_000 && body.budgetMs <= 60_000) {
       budgetMs = Math.floor(body.budgetMs);
     }
   } catch {
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       waitedMs: result.waitedMs,
       probes: result.probes,
       provider,
-      idlePolicy: 'workersMin=0',
+      idlePolicy: 'soft_launch_workersMin=1_workersMax=5',
     },
     {
       status: result.warm ? 200 : 503,

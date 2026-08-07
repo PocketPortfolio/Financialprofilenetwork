@@ -53,9 +53,10 @@ First request after attaching the volume still populates the cache once. Later c
 
 | Path | Behavior |
 |------|----------|
-| Sovereign selected | Speculative **wake-on-ask** (`POST /api/ai/sovereign/wake`) — still `workersMin=0` until then |
-| Sovereign Send + node warming | Poll `/models` up to ~180s; complete on-node; `X-Pocket-Sovereign-Wake-Ms` |
+| Sovereign selected | Speculative **wake-on-ask** (`POST /api/ai/sovereign/wake`) |
+| Sovereign Send + node warming | Poll `/models` up to **~25s** soft-launch; then Cloud Auto |
 | Wake budget exhausted / on-node error | Cloud Auto **safety net**; `X-Pocket-Inference: cloud_auto_fallback` |
-| Idle GPU | `workersMin=0` — **$0**; `idleTimeout=600s` after last use |
+| Soft-launch capacity (2026-08-07) | `workersMin=1`, `workersMax=5`, `idleTimeout=600` — see `sovereign-soft-launch-capacity-2026-08-07.md` |
+| Idle GPU (post soft-launch target) | `workersMin=0` — **$0** when traffic allows |
 
-Vercel `maxDuration` for chat/wake is **200s**. Idle cost strategy unchanged.
+Vercel wake route `maxDuration` is **45s**. Chat remains longer for on-node complete + cloud fallback.
