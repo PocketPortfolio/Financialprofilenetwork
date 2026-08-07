@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation';
 import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 import DividendHistory from '@/app/components/DividendHistory';
 import HistoricalDividends from '@/app/components/HistoricalDividends';
+import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
 
 // Generate static params for all tickers
 export async function generateStaticParams() {
@@ -56,11 +57,31 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   };
 }
 
-export default async function DividendHistoryPage({ params }: { params: Promise<{ symbol: string }> }) {
+export default async function DividendHistoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ symbol: string }>;
+  searchParams?: Promise<{ pp_rate_lock?: string }>;
+}) {
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const returnPath = `/s/${normalizedSymbol.toLowerCase()}/dividend-history`;
   const metadata = await getTickerMetadata(normalizedSymbol);
+
+  if (resolvedSearch.pp_rate_lock === '1') {
+    return (
+      <SymbolTeaserShell
+        symbol={normalizedSymbol}
+        name={metadata?.name || `${normalizedSymbol} dividends`}
+        returnPath={returnPath}
+        rateBudgetExhausted
+        variant="symbol"
+      />
+    );
+  }
   
   if (!metadata) {
     return (

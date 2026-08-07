@@ -8,6 +8,7 @@ import {
   isLikelyAutomatedClient,
   isMeteredDataApiPath,
   isSymbolFarmPath,
+  RATE_BUDGET_EXHAUSTED_HEADER,
   resolveBotGateClientIp,
   shouldApplyBotGate,
   wantsJsonResponse,
@@ -82,10 +83,15 @@ export async function applyBotGateMiddleware(
     const ip = resolveBotGateClientIp(request);
     const allowed = await withinSurfacePageBudget(ip);
     if (!allowed) {
-      return NextResponse.redirect(
-        botGatePaywallUrl(request, 'symbol_farm_rate'),
-        307,
-      );
+      // Humans: rewrite onto the same path with a lock flag (in-page teaser, not 307).
+      // Keeps ISR for under-budget visits; only exhausted IPs hit the dynamic teaser.
+      const url = request.nextUrl.clone();
+      url.searchParams.set('pp_rate_lock', '1');
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set(RATE_BUDGET_EXHAUSTED_HEADER, '1');
+      return NextResponse.rewrite(url, {
+        request: { headers: requestHeaders },
+      });
     }
   }
 

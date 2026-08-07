@@ -10,6 +10,7 @@ import { detectAssetType } from '@/app/lib/portfolio/sectorClassification';
 import { AssetType } from '@/app/lib/portfolio/sectorClassification';
 import { getInsiderData } from '@/app/lib/api/insider';
 import Link from 'next/link';
+import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
 
 
 // Generate static params for all tickers
@@ -59,11 +60,31 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
 // Note: fetchInsiderData is now handled by getInsiderData from @/app/lib/api/insider
 // This uses yahoo-finance2 library which properly handles session/crumb validation
 
-export default async function InsiderTradingPage({ params }: { params: Promise<{ symbol: string }> }) {
+export default async function InsiderTradingPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ symbol: string }>;
+  searchParams?: Promise<{ pp_rate_lock?: string }>;
+}) {
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const returnPath = `/s/${normalizedSymbol.toLowerCase()}/insider-trading`;
   const metadata = await getTickerMetadata(normalizedSymbol);
+
+  if (resolvedSearch.pp_rate_lock === '1') {
+    return (
+      <SymbolTeaserShell
+        symbol={normalizedSymbol}
+        name={metadata?.name || `${normalizedSymbol} insider activity`}
+        returnPath={returnPath}
+        rateBudgetExhausted
+        variant="symbol"
+      />
+    );
+  }
   
   // 🛑 ASSET TYPE GUARD: Check if asset supports insider trading
   const assetType = detectAssetType(normalizedSymbol);

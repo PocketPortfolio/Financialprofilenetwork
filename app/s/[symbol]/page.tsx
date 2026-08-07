@@ -4,6 +4,8 @@ import { generateTickerContent } from '@/app/lib/pseo/content';
 import { generateFAQStructuredData } from '@/app/lib/pseo/content';
 import StructuredData from '@/app/components/StructuredData';
 import TickerPageContent from '@/app/components/TickerPageContent';
+import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
+import { getFirstPartyFetchHeaders } from '@/app/lib/server/ticker-api-gate';
 
 
 // Server-side quote fetching for SEO (runs during ISR revalidation)
@@ -21,7 +23,8 @@ async function fetchQuoteData(symbol: string) {
     // Fetch from API during ISR revalidation
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.pocketportfolio.app';
     const response = await fetch(`${baseUrl}/api/quote?symbols=${symbol}`, {
-      next: { revalidate: 300 } // Cache for 5 minutes
+      next: { revalidate: 300 }, // Cache for 5 minutes
+      headers: getFirstPartyFetchHeaders(),
     });
     
     if (response.ok) {
@@ -94,15 +97,38 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
 }
 
 // Main component
-export default async function SymbolPage({ params }: { params: Promise<{ symbol: string }> }) {
+export default async function SymbolPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ symbol: string }>;
+  searchParams?: Promise<{ pp_rate_lock?: string }>;
+}) {
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
   // Normalize symbol (remove dashes, handle crypto pairs)
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const returnPath = `/s/${normalizedSymbol.toLowerCase()}`;
+  const rateBudgetExhausted = resolvedSearch.pp_rate_lock === '1';
   const metadata = await getTickerMetadata(normalizedSymbol);
   
-  // Fetch quote data server-side for SEO (only during ISR revalidation, not during build)
+  // Teaser mode: one cached quote max (first-party). No client bulk series / CSV.
   const initialQuoteData = await fetchQuoteData(normalizedSymbol);
+
+  if (rateBudgetExhausted) {
+    const name = metadata?.name || `${normalizedSymbol} Inc.`;
+    return (
+      <SymbolTeaserShell
+        symbol={normalizedSymbol}
+        name={name}
+        returnPath={returnPath}
+        quote={initialQuoteData}
+        rateBudgetExhausted
+        variant="symbol"
+      />
+    );
+  }
   
   // For generated tickers that don't have metadata, still generate a page
   // This allows all 10K+ pages to be accessible

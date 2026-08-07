@@ -117,4 +117,13 @@ describe('bot-gate', () => {
     });
     expect(isLikelyAutomatedClient(request)).toBe(false);
   });
+
+  it('builds Developer Utility checkout href with returnTo', async () => {
+    const { developerUtilityCheckoutHref } = await import('@/lib/bot-gate');
+    const href = developerUtilityCheckoutHref('/s/spy', 'symbol_farm_rate');
+    expect(href.startsWith('/sponsor?')).toBe(true);
+    expect(href).toContain('tier=developer-utility');
+    expect(href).toContain('returnTo=%2Fs%2Fspy');
+    expect(href).toContain('utm_campaign=symbol_farm_rate');
+  });
 });
