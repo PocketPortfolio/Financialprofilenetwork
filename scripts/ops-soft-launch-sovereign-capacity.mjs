@@ -32,7 +32,7 @@ if (!key) {
 }
 
 const body = {
-  workersMin: 1,
+  workersMin: 0,
   workersMax: 5,
   idleTimeout: 600,
 };

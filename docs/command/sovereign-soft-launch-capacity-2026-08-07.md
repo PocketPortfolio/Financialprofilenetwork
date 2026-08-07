@@ -1,30 +1,30 @@
 ---
 id: OP-CMD-SOVEREIGN-SOFT-LAUNCH-CAPACITY-2026-08-07
-title: Soft-launch Sovereign capacity — multi-user fix
-status: LIVE
+title: Soft-launch Sovereign capacity — multi-user + scale-to-zero
+status: LIVE · SCALE_TO_ZERO
 date: 2026-08-07
+rev: 2
 endpoint: sci7vw5ovb0xnd (op-sovereign-r1)
 ---
 
-# Soft-launch capacity fix (CEO)
+# Soft-launch capacity (CEO lock)
 
-## Why leadership’s 180s budget was wrong for brand UX
+## Mandate
 
-`SOVEREIGN_WAKE_BUDGET_MS = 180s` was a **safety ceiling** for a single cold PAYG boot under `workersMax: 1` — not an accepted wait for 100 concurrent users. With one worker, N Sovereign asks **serialize**; each client burns the wake budget in a queue. That is a capacity bug, not a product feature.
+**Idle GPU ≈ $0 always** (`workersMin: 0`). Launch copy says scale-to-zero — keep that promise.  
+**Do not waste user time:** short wake budget → **Cloud Auto safety net**. Capacity for concurrency when *on*, not always-on warm standby.
 
-**Accepted product rule (unchanged):** customers must not wait ~minutes. Warm Sovereign ≈ cloud. Idle cost savings ≠ user-facing cold-start theatre.
+## Live RunPod posture (rev 2)
 
-## Live RunPod posture (2026-08-07)
+| Setting | Value | Why |
+|---------|-------|-----|
+| `workersMin` | **0** | Scale to zero — matches GTM / PAYG |
+| `workersMax` | **5** | Multi-user when scaled; no single-GPU queue stampede |
+| `idleTimeout` | **600** | Stay warm briefly after last ask, then scale toward 0 |
+| App wake budget | **25s** | Then Cloud Auto — never strand users for ~3 min |
 
-| Setting | Was (mandate lock) | Soft launch now |
-|---------|-------------------|-----------------|
-| `workersMin` | 0 | **1** (one warm worker — first ask should not cold-boot) |
-| `workersMax` | 1 | **5** (concurrent Sovereign without single-GPU stampede) |
-| `idleTimeout` | 600 | **600** |
-| App wake budget | 180s | **25s** then **Cloud Auto safety net** |
+Script: `node scripts/ops-soft-launch-sovereign-capacity.mjs` (min=0, max=5).
 
-Script: `node scripts/ops-soft-launch-sovereign-capacity.mjs`
+## Rejected
 
-## Post soft-launch
-
-Revert `workersMin → 0` when traffic is quiet **only if** volume-cached cold is proven &lt; ~15s. Keep `workersMax ≥ 3` for multi-user. Do not restore `workersMax: 1`.
+- Soft-launch `workersMin: 1` (~$27/day always-on) — conflicts with marketing + CEO cost gate.

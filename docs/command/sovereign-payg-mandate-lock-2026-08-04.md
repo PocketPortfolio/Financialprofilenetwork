@@ -13,7 +13,7 @@ date: 2026-08-04
 
 | Allowed | Forbidden |
 |---------|-----------|
-| RunPod **Serverless** soft-launch: `workersMin: 1`, `workersMax: 5`, `idleTimeout: 600` | Always-on **Pods**; `workersMax: 1` (serializes all users) |
+| RunPod **Serverless** `workersMin: 0`, `workersMax: 5`, `idleTimeout: 600` | Always-on warm (`workersMin: 1`); `workersMax: 1` (serializes all users) |
 | Per-second GPU while serving | Idle GPU burn / Pinggy-as-prod |
 | Prepaid wallet | “Customers download local models” |
 
