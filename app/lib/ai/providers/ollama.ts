@@ -33,10 +33,10 @@ export async function checkOllamaHealth(baseUrl: string): Promise<boolean> {
   }
 }
 
-/** Default wake budget: poll until worker answers /models (idle $0 until ask). */
-export const SOVEREIGN_WAKE_BUDGET_MS = 180_000;
-export const SOVEREIGN_WAKE_PROBE_MS = 12_000;
-export const SOVEREIGN_WAKE_INTERVAL_MS = 2_000;
+/** Soft-launch wake budget: fail fast to Cloud Auto (do not strand users for 3 min). */
+export const SOVEREIGN_WAKE_BUDGET_MS = 25_000;
+export const SOVEREIGN_WAKE_PROBE_MS = 8_000;
+export const SOVEREIGN_WAKE_INTERVAL_MS = 1_500;
 
 export type WaitForOllamaWarmResult = {
   warm: boolean;

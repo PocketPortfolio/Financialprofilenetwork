@@ -362,7 +362,7 @@ export function AskAIModal({
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
-              ? { ...m, content: 'Waking OP-Hosted Sovereign GPU (idle was $0)…' }
+              ? { ...m, content: 'Waking OP-Hosted Sovereign…' }
               : m
           )
         );
@@ -374,7 +374,7 @@ export function AskAIModal({
       }
 
       const abort = new AbortController();
-      const timeoutMs = localModeActive ? SOVEREIGN_WAKE_BUDGET_MS + 90_000 : 20_000;
+      const timeoutMs = localModeActive ? SOVEREIGN_WAKE_BUDGET_MS + 95_000 : 20_000;
       const timeoutId = setTimeout(() => abort.abort(), timeoutMs);
       let res: Response;
       try {
@@ -690,7 +690,7 @@ export function AskAIModal({
                   {localModeActive
                     ? isOllamaClientDirectEnabled()
                       ? 'BYO laptop Ollama: bounded summary goes to your local node (not third-party cloud APIs). Attachments disabled in Phase 1.'
-                      : 'OP-Hosted Sovereign wake-on-ask: idle GPU is $0. Selecting Sovereign or sending a question wakes the PAYG node; answers stay on-node when wake succeeds.'
+                      : 'OP-Hosted Sovereign: soft-launch keeps a warm GPU ready. If wake is slow, Cloud Auto answers so you are never stranded.'
                     : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
                 </p>
               )}
@@ -707,7 +707,7 @@ export function AskAIModal({
                     ? '● Localhost BYO · experimental'
                     : wakingSovereign
                       ? '● Waking Sovereign GPU…'
-                      : '● OP-Hosted Sovereign · wake-on-ask · $0 idle'}
+                      : '● OP-Hosted Sovereign · soft-launch warm'}
                 </p>
               )}
               {messages.map((m) => {
