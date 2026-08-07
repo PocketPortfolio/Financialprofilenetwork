@@ -4,6 +4,9 @@ import type { NextRequest } from 'next/server';
 export const DEVELOPER_UTILITY_CHECKOUT_URL =
   'https://www.pocketportfolio.app/sponsor?tier=developer-utility&utm_source=bot_gate&utm_medium=401&utm_campaign=data_surface';
 
+/** Middleware → page signal: human exceeded 24 /s pages/hr (in-page lock, not 307). */
+export const RATE_BUDGET_EXHAUSTED_HEADER = 'x-pp-rate-budget-exhausted';
+
 export const FIRST_PARTY_HEADER = 'x-pp-first-party';
 
 const FIRST_PARTY_HOST_SUFFIXES = [
@@ -277,6 +280,19 @@ export function botGatePaywallUrl(request: NextRequest, campaign: string): strin
     url.searchParams.set('returnTo', returnTo);
   }
   return url.toString();
+}
+
+/** Relative checkout path for in-page CTAs (PLG teaser / rate-budget lock). */
+export function developerUtilityCheckoutHref(returnTo: string, campaign = 'symbol_teaser'): string {
+  const path = returnTo.startsWith('/') ? returnTo : `/${returnTo}`;
+  const params = new URLSearchParams({
+    tier: 'developer-utility',
+    utm_source: 'symbol_teaser',
+    utm_medium: 'in_page_lock',
+    utm_campaign: campaign,
+    returnTo: path,
+  });
+  return `/sponsor?${params.toString()}`;
 }
 
 export function wantsJsonResponse(request: NextRequest): boolean {

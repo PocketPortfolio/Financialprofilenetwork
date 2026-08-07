@@ -12,6 +12,7 @@ import JsonApiNpmSnippet from '@/app/components/JsonApiNpmSnippet';
 import JsonApiLivePreview from '@/app/components/JsonApiLivePreview';
 import TickerCsvDownload from '@/app/components/TickerCsvDownload';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
+import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
 import { jsonApiBridgeCopy } from '@/app/lib/seo/jsonApiInternalLinks';
 import { getFirstPartyFetchHeaders } from '@/app/lib/server/ticker-api-gate';
 import Link from 'next/link';
@@ -217,7 +218,7 @@ async function fetchQuoteData(symbol: string) {
     const response = await fetch(`${baseUrl}/api/quote?symbols=${symbol}`, {
       next: { revalidate: 300 }, // Cache for 5 minutes
       headers: {
-        'Accept': 'application/json',
+        ...getFirstPartyFetchHeaders(),
       }
     });
     
@@ -233,16 +234,48 @@ async function fetchQuoteData(symbol: string) {
   return null;
 }
 
-export default async function JsonApiPage({ params }: { params: Promise<{ symbol: string }> }) {
+export default async function JsonApiPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ symbol: string }>;
+  searchParams?: Promise<{ pp_rate_lock?: string }>;
+}) {
   // Next.js 15: params is always a Promise
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
   const normalizedSymbol = resolvedParams.symbol.toUpperCase().replace(/-/g, '');
+  const returnPath = `/s/${normalizedSymbol.toLowerCase()}/json-api`;
+  const rateBudgetExhausted = resolvedSearch.pp_rate_lock === '1';
   const ABS_BASE = 'https://www.pocketportfolio.app';
   const absJsonUrl = `${ABS_BASE}/api/tickers/${encodeURIComponent(normalizedSymbol)}/json?range=max`;
   const absCsvUrl = `${ABS_BASE}/api/tickers/${encodeURIComponent(normalizedSymbol)}/csv?range=max`;
   const bridgeVariant = process.env.NEXT_PUBLIC_BRIDGE_CTA_VARIANT === 'B' ? 'B' : 'A';
   const jsonApiBridge = jsonApiBridgeCopy(normalizedSymbol, bridgeVariant);
   const metadata = await getTickerMetadata(normalizedSymbol);
+
+  if (rateBudgetExhausted) {
+    const quoteData = await fetchQuoteData(normalizedSymbol);
+    return (
+      <SymbolTeaserShell
+        symbol={normalizedSymbol}
+        name={metadata?.name || `${normalizedSymbol} dataset`}
+        returnPath={returnPath}
+        quote={
+          quoteData
+            ? {
+                price: quoteData.price,
+                change: quoteData.change,
+                changePct: quoteData.changePct,
+                currency: quoteData.currency,
+              }
+            : null
+        }
+        rateBudgetExhausted
+        variant="json-api"
+      />
+    );
+  }
   
   // Fetch historical data and quote for unique content
   const tickerData = await fetchTickerData(normalizedSymbol);
