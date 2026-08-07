@@ -10,7 +10,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ ticker: string }> },
 ) {
-  const gate = await enforceDataApiGate(request);
+  const gate = await enforceDataApiGate(request, { surface: 'series' });
   if (!gate.allowed) return gate.response;
 
   const resolvedParams = await params;
