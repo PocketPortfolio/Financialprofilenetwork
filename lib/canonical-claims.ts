@@ -943,7 +943,7 @@ export const OPEN_PRIMARY_CTA = {
 //
 // The O. landing runs a linear 5-phase executive journey (CEO mandate 2026-06):
 //   1. Hook — enterprise problem + single discovery-call CTA.
-//   2. Proof — Split-Brain architecture video (sanitization by construction).
+//   2. Proof — Enterprise GTM composite: branded intro/exit + brief new product + Split-Brain diagram.
 //   3. Integration — developer experience (adapters, SDK, time-to-ship).
 //   4. Board moat — regulatory liability + design-partnership credibility.
 //   5. Snare — native contact form → Firestore → /admin/analytics.
@@ -951,17 +951,17 @@ export const OPEN_PRIMARY_CTA = {
 // Regulatory fine figures in Phase 4 are NEVER hardcoded — pulled from
 // NUMBERS_SNAPSHOT at render time (REG-01 / REG-03 / CODB-01).
 
-/** Split-Brain architecture video — Phase 2 proof block on the O. landing. */
-/** Bump `?v=` after re-encoding landing proof video (jump-cut past thinking dead air). */
-export const OPEN_LANDING_VIDEO_CACHE_BUST = '20260612';
+/** Enterprise GTM composite — Phase 2 proof on the O. landing (gateway, not retail tour). */
+/** Shape: v4 branded intro → brief NEW GTM product → Split-Brain diagram → v4 branded exit. Bump `?v=` after re-encode. */
+export const OPEN_LANDING_VIDEO_CACHE_BUST = '20260808op';
 
 export const OPEN_LANDING_VIDEO = {
-  src: `/marketing/corporate-split-brain-linkedin-4k.mp4?v=${OPEN_LANDING_VIDEO_CACHE_BUST}`,
-  srcMobile: `/marketing/corporate-split-brain-linkedin-1080.mp4?v=${OPEN_LANDING_VIDEO_CACHE_BUST}`,
-  /** 4K upscale of the video outro title card (“Explore the architecture”). Regenerate: `node scripts/generate-corporate-split-brain-linkedin-video.mjs --poster-only` */
-  poster: '/marketing/corporate-split-brain-linkedin-poster.jpg',
+  src: `/marketing/open-landing-enterprise-gtm-4k.mp4?v=${OPEN_LANDING_VIDEO_CACHE_BUST}`,
+  srcMobile: `/marketing/open-landing-enterprise-gtm-1080.mp4?v=${OPEN_LANDING_VIDEO_CACHE_BUST}`,
+  /** Open Portfolio O. monogram intro still. Regenerate: `npm run encode:open-landing-enterprise-gtm` */
+  poster: '/marketing/open-landing-enterprise-gtm-poster.jpg',
   alt:
-    'Split-brain architecture: broker ledger parsed in browser memory, bounded aggregate context sent to stateless AI inference, streaming response returned without warehousing raw data.',
+    'Open Portfolio branded intro, brief Sovereign AI harness product proof, Split-Brain architecture diagram showing bounded context crossing a stateless API, then branded exit with openportfolio.co.uk.',
 } as const;
 
 /**
