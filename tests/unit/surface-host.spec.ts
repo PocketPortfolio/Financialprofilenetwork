@@ -23,6 +23,10 @@ describe('isOpenStaticAssetPath', () => {
   it('includes marketing media under /marketing/ (Split-Brain video on O. landing)', () => {
     expect(isOpenStaticAssetPath('/marketing/corporate-split-brain-linkedin-4k.mp4')).toBe(true);
     expect(isOpenStaticAssetPath('/marketing/corporate-split-brain-linkedin-poster.jpg')).toBe(true);
+    expect(isOpenStaticAssetPath('/marketing/sovereign-ai-harness-gtm-v4-4k.mp4')).toBe(true);
+    expect(isOpenStaticAssetPath('/marketing/sovereign-ai-harness-gtm-v4-poster.jpg')).toBe(true);
+    expect(isOpenStaticAssetPath('/marketing/open-landing-enterprise-gtm-4k.mp4')).toBe(true);
+    expect(isOpenStaticAssetPath('/marketing/open-landing-enterprise-gtm-poster.jpg')).toBe(true);
   });
 });
 

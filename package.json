@@ -113,6 +113,7 @@
     "upload-gif": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-vercel-blob.ts",
     "encode:dashboard-hero-4k": "node scripts/encode-dashboard-hero-4k.mjs",
     "encode:pocket-analyst-landing": "node scripts/encode-pocket-analyst-landing-demo.mjs",
+    "encode:open-landing-enterprise-gtm": "node scripts/encode-open-landing-enterprise-gtm.mjs",
     "upload-gif-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-cloudinary.ts",
     "upload-pocket-analyst-cloudinary": "ts-node --project scripts/tsconfig.json scripts/upload-pocket-analyst-video-to-cloudinary.ts",
     "upload-gif-s3": "ts-node --project scripts/tsconfig.json scripts/upload-gif-to-s3.ts",

@@ -65,7 +65,7 @@ export default function OpenLandingProofVideo() {
         <motion.button
           type="button"
           onClick={() => void handlePlay()}
-          aria-label="Play Split-Brain architecture video"
+          aria-label="Play enterprise architecture and Sovereign AI proof video"
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           whileHover={{ scale: 1.04 }}
