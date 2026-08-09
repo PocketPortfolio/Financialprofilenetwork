@@ -1282,7 +1282,7 @@
     "date": "2026-08-09",
     "title": "Sovereign Sync: Early Adopter Stories",
     "slug": "sovereign-sync-early-adopter-stories",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1292,7 +1292,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-09T09:01:20.942Z"
   },
   {
     "id": "week-32-post-2",
