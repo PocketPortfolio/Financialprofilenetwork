@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { sanitizeSafeReturnTo } from '@/lib/safe-return-to';
 
 // Next.js route configuration for production
 export const dynamic = 'force-dynamic';
@@ -56,7 +57,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { priceId, tierName, email, utm_campaign, utm_source, utm_medium, utm_content, trigger_source, billing_interval, ab_test_variant } = body as {
+    const {
+      priceId,
+      tierName,
+      email,
+      utm_campaign,
+      utm_source,
+      utm_medium,
+      utm_content,
+      trigger_source,
+      billing_interval,
+      ab_test_variant,
+      returnTo,
+    } = body as {
       priceId?: string;
       tierName?: string;
       email?: string;
@@ -67,6 +80,7 @@ export async function POST(request: NextRequest) {
       trigger_source?: string;
       billing_interval?: 'monthly' | 'annual' | null;
       ab_test_variant?: string;
+      returnTo?: string;
     };
     const utmCampaignMeta =
       typeof utm_campaign === 'string' && utm_campaign.trim().length > 0
@@ -143,6 +157,13 @@ export async function POST(request: NextRequest) {
     }
 
     const baseUrl = getAppBaseUrl();
+    const safeReturnTo = sanitizeSafeReturnTo(returnTo);
+    const successUrl = safeReturnTo
+      ? `${baseUrl}/sponsor/success?session_id={CHECKOUT_SESSION_ID}&returnTo=${encodeURIComponent(safeReturnTo)}`
+      : `${baseUrl}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = safeReturnTo
+      ? `${baseUrl}/sponsor?tier=developer-utility&returnTo=${encodeURIComponent(safeReturnTo)}`
+      : `${baseUrl}/sponsor`;
 
     const session = await stripe.checkout.sessions.create({
       mode: isOneTime ? 'payment' : 'subscription',
@@ -153,8 +174,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${baseUrl}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/sponsor`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       customer_email: email || undefined,
       metadata: {
         tierName: tierName || 'Unknown',
@@ -166,6 +187,7 @@ export async function POST(request: NextRequest) {
         trigger_source: triggerSourceMeta,
         billing_interval: billingIntervalMeta,
         ab_test_variant: abTestMeta,
+        ...(safeReturnTo ? { returnTo: safeReturnTo } : {}),
       },
     });
 

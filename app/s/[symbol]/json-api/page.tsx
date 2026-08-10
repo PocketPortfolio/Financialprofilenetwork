@@ -15,6 +15,7 @@ import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
 import { jsonApiBridgeCopy } from '@/app/lib/seo/jsonApiInternalLinks';
 import { getFirstPartyFetchHeaders } from '@/app/lib/server/ticker-api-gate';
+import { symbolFarmRobots } from '@/lib/seo/symbol-index-allowlist';
 import Link from 'next/link';
 
 
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   const inRecovery = zeroClickRecoverySet.has(symbol.toLowerCase().replace(/-/g, ''));
   const metadata = await getTickerMetadata(symbol);
   const canonical = `https://www.pocketportfolio.app/s/${symbol.toLowerCase()}/json-api`;
+  const robots = symbolFarmRobots(symbol);
 
   if (symbol.replace(/-/g, '') === 'NSE') {
     if (inRecovery) {
@@ -52,6 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
         title: 'NSE JSON Endpoint (REST API) + CSV Export | Pocket Portfolio',
         description:
           'Free NSE JSON endpoint (REST API) + CSV export for historical data. Copy‑paste examples. No API key. No login. Stateless + local-first workflow.',
+        robots,
         openGraph: {
           title: 'NSE JSON Endpoint (REST API) + CSV Export | Pocket Portfolio',
           description:
@@ -68,6 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
       title: 'NSE Historical Data & CSV Export | Pocket Portfolio',
       description:
         'Download NSE historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint for National Stock Exchange tickers.',
+      robots,
       openGraph: {
         title: 'NSE Historical Data & CSV Export | Pocket Portfolio',
         description:
@@ -89,6 +93,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
       description: inRecovery
         ? `Institutional-grade ${symbol} JSON API (REST) + CSV export for historical data. No API key. No login. Instant endpoints + copy-paste examples.`
         : `Download ${symbol} historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
+      robots,
       alternates: { canonical },
       openGraph: {
         title: inRecovery
@@ -107,6 +112,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
     return {
       title: `${symbol} JSON API & CSV Export (REST) | No API Key | Pocket Portfolio`,
       description: `Institutional-grade ${symbol} JSON API (REST) + CSV export for historical data. No API key. No login. Examples for ${metadata.name} (${symbol}).`,
+      robots,
       keywords: [
         `${symbol} JSON endpoint`,
         `${symbol} REST API`,
@@ -135,6 +141,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
   return {
     title: `${symbol} Historical Data & CSV Export | Pocket Portfolio`,
     description: `Download ${metadata.name} (${symbol}) historical CSVs instantly. No login required. Parse normalized JSON data via our free local-first API endpoint.`,
+    robots,
     keywords: [
       `${symbol} historical data json format`,
       `${symbol} historical data csv`,

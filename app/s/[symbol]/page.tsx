@@ -6,6 +6,7 @@ import StructuredData from '@/app/components/StructuredData';
 import TickerPageContent from '@/app/components/TickerPageContent';
 import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
 import { getFirstPartyFetchHeaders } from '@/app/lib/server/ticker-api-gate';
+import { symbolFarmRobots } from '@/lib/seo/symbol-index-allowlist';
 
 
 // Server-side quote fetching for SEO (runs during ISR revalidation)
@@ -70,6 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
     return {
       title: `Track ${symbol} Risk & Volatility (No Login) | Pocket Portfolio`,
       description: `Track ${symbol} in your portfolio. Import broker CSVs in your browser, export data, and keep your statements on your device — no signup wall.`,
+      robots: symbolFarmRobots(symbol),
     };
   }
   
@@ -79,6 +81,7 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
     title: content.title,
     description: content.description,
     keywords: metadata.keywords.join(', '),
+    robots: symbolFarmRobots(symbol),
     openGraph: {
       title: content.title,
       description: content.description,
