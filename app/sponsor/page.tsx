@@ -70,6 +70,7 @@ function SponsorPageContent() {
   const searchParams = useSearchParams();
   const utmCampaign = searchParams?.get('utm_campaign') ?? null;
   const tierParam = searchParams?.get('tier') ?? null;
+  const returnToParam = searchParams?.get('returnTo') ?? null;
   const initialPersonaTab = resolveSponsorPersonaTab(tierParam) ?? 'investors';
   const [abVariant] = useState<'A' | 'B'>(getInitialSponsorAbVariant);
   const triggerSourceParam = ((searchParams?.get('trigger_source') ?? null) || 'sponsor_page_direct') as
@@ -198,9 +199,16 @@ function SponsorPageContent() {
       if (email) {
         localStorage.setItem('sponsor_email', email);
       }
+      if (returnToParam && returnToParam.startsWith('/')) {
+        try {
+          sessionStorage.setItem('pp_sponsor_return_to', returnToParam);
+        } catch {
+          /* ignore */
+        }
+      }
 
       // Create checkout session via API route
-      console.log('ðŸ”„ Creating checkout session for:', { priceId: finalPriceId, tierName: selectedTier.tierName });
+      console.log('Creating checkout session for:', { priceId: finalPriceId, tierName: selectedTier.tierName });
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -216,6 +224,7 @@ function SponsorPageContent() {
           utm_medium: searchParams?.get('utm_medium') || 'checkout',
           ...(utmCampaign ? { utm_campaign: utmCampaign } : {}),
           ...(searchParams?.get('utm_content') ? { utm_content: searchParams?.get('utm_content') } : {}),
+          ...(returnToParam ? { returnTo: returnToParam } : {}),
         }),
       });
 

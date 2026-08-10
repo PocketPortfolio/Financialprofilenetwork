@@ -9,6 +9,24 @@ import { trackStripeCheckoutCompleteAnalytics } from '../../lib/analytics/events
 function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams?.get('session_id') ?? null;
+  const returnToFromQuery = searchParams?.get('returnTo') ?? null;
+  const [returnTo, setReturnTo] = useState<string | null>(
+    returnToFromQuery && returnToFromQuery.startsWith('/') && !returnToFromQuery.startsWith('//')
+      ? returnToFromQuery
+      : null,
+  );
+
+  useEffect(() => {
+    if (returnTo) return;
+    try {
+      const stored = sessionStorage.getItem('pp_sponsor_return_to');
+      if (stored && stored.startsWith('/') && !stored.startsWith('//')) {
+        setReturnTo(stored);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [returnTo]);
   const [loading, setLoading] = useState(true);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
@@ -433,7 +451,7 @@ function SuccessContent() {
           flexWrap: 'wrap'
         }}>
           <Link
-            href="/"
+            href={returnTo || '/'}
             style={{
               padding: '12px 24px',
               background: 'var(--accent-warm)',
@@ -453,7 +471,7 @@ function SuccessContent() {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            Back to Home
+            {returnTo ? 'Return to your session →' : 'Back to Home'}
           </Link>
           <Link
             href="/dashboard"

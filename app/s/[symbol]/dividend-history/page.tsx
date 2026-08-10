@@ -9,6 +9,7 @@ import { getTickerMetadata, getAllTickers } from '@/app/lib/pseo/data';
 import DividendHistory from '@/app/components/DividendHistory';
 import HistoricalDividends from '@/app/components/HistoricalDividends';
 import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
+import { symbolFarmRobots } from '@/lib/seo/symbol-index-allowlist';
 
 // Generate static params for all tickers
 export async function generateStaticParams() {
@@ -28,12 +29,14 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
     return {
       title: `${symbol} Dividend History & JSON Export | Payout Dates & Yields | Pocket Portfolio`,
       description: `View ${symbol} dividend history and export to JSON format. Download ${symbol} dividend payout dates, amounts, and yields. Free API access.`,
+      robots: symbolFarmRobots(symbol),
     };
   }
 
   return {
     title: `${symbol} Dividend History & JSON Export | Payout Dates & Yields | Pocket Portfolio`,
     description: `View ${metadata.name} (${symbol}) dividend history and export to JSON format. Download ${symbol} dividend payout dates, amounts, yields, and ex-dividend dates. Free API access.`,
+    robots: symbolFarmRobots(symbol),
     keywords: [
       `${symbol} dividend history`,
       `${symbol} dividend JSON export`,

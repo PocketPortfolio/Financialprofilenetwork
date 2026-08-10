@@ -612,14 +612,16 @@ export default function SponsorDeck({
           style={{ width: '64px', height: '64px', objectFit: 'contain', marginBottom: '16px' }}
         />
         <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--text)' }}>
-          Universal Data Engine
+          Developer Utility
         </h3>
         <DualPriceHeadline
           monthly={<>$20<span style={{ fontSize: '0.55em' }}>/mo</span></>}
           annual={<>$200<span style={{ fontSize: '0.55em' }}>/yr</span></>}
         />
         <p style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-          Don&apos;t write parsers. Push any raw broker data to our endpoint, and let our engine normalize it for you.
+          Unlock the full OHLCV time-series (JSON) and bulk CSV exports blocked on free
+          preview — plus a paid <code style={{ fontSize: '12px' }}>pp_</code> API key for
+          programmatic access.
         </p>
         <div
           style={{
@@ -633,30 +635,23 @@ export default function SponsorDeck({
           $240/year if paid monthly
         </div>
 
-        <FeatureBlock title={<>⚡ <strong>Universal Data Engine:</strong></>}>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.8 }}>
-            Don&apos;t write parsers. Push any raw broker data to our endpoint, and let our engine normalize it for you.
-          </p>
-        </FeatureBlock>
-
-        <FeatureBlock title={<>🚀 <strong>Developer Benefits:</strong></>}>
+        <FeatureBlock title={<>Unlocks what the teaser / 402 wall denied:</>}>
           <FeatureBulletList
             items={[
-              'Priority access to the Roadmap & Insider Discord',
-              'Influence product development decisions',
-              'Early access to new features',
-              'Direct line to the development team',
+              'Full historical OHLCV JSON streams (?range=max and all ranges)',
+              'Bulk CSV downloads for ticker history',
+              'Paid API key (pp_) for scripts, sheets, and automation',
+              'No free-tier rate wall on Developer Utility paths',
             ]}
           />
         </FeatureBlock>
 
-        <FeatureBlock title={<>⚡ <strong>Unlimited API Access:</strong></>}>
+        <FeatureBlock title={<>Also included:</>}>
           <FeatureBulletList
             items={[
-              'Unlimited API calls (stock prices, market data)',
-              'Real-time quote data',
-              'Historical ticker data (JSON format)',
-              'No rate limits or throttling',
+              'Universal broker data normalization endpoint',
+              'Real-time quote access',
+              'Priority roadmap / Insider Discord access',
             ]}
           />
         </FeatureBlock>

@@ -11,6 +11,7 @@ import { AssetType } from '@/app/lib/portfolio/sectorClassification';
 import { getInsiderData } from '@/app/lib/api/insider';
 import Link from 'next/link';
 import SymbolTeaserShell from '@/app/components/SymbolTeaserShell';
+import { symbolFarmRobots } from '@/lib/seo/symbol-index-allowlist';
 
 
 // Generate static params for all tickers
@@ -31,12 +32,14 @@ export async function generateMetadata({ params }: { params: Promise<{ symbol: s
     return {
       title: `${symbol} Insider Trading - Form 4 Filings & Transactions | Pocket Portfolio`,
       description: `Track ${symbol} insider trading activity including Form 4 filings, executive transactions, and insider ownership changes.`,
+      robots: symbolFarmRobots(symbol),
     };
   }
 
   return {
     title: `${metadata.name} (${symbol}) Insider Trading - Form 4 Filings & Transactions | Pocket Portfolio`,
     description: `Track ${metadata.name} (${symbol}) insider trading activity including Form 4 filings, executive transactions, insider ownership changes, and transaction types.`,
+    robots: symbolFarmRobots(symbol),
     keywords: [
       `${symbol} insider trading`,
       `${symbol} Form 4`,
