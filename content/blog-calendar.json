@@ -1300,7 +1300,7 @@
     "date": "2026-08-12",
     "title": "Caching Strategies for Local-First Applications",
     "slug": "caching-strategies-for-local-first-applications",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1310,7 +1310,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-12T09:01:07.828Z"
   },
   {
     "id": "week-33-post-1",
