@@ -66,9 +66,9 @@ describe('blog surface pillars', () => {
     expect(isOpenBlogCategory('deep-dive')).toBe(false);
   });
 
-  test('pocket filter chips are first-party only', () => {
+  test('pocket filter chips map to MDX pillar frontmatter', () => {
     const pocketIds = POCKET_BLOG_FILTER_CHIPS.map((c) => c.id);
-    expect(pocketIds).toEqual(['all']);
+    expect(pocketIds).toEqual(['all', 'technical', 'product', 'philosophy', 'market']);
     expect(pocketIds).not.toContain('dev.to');
     expect(pocketIds).not.toContain('coderlegion');
     expect(pocketIds).not.toContain('generated');

@@ -9,7 +9,9 @@ import SEOPageTracker from '../components/SEOPageTracker';
 import { isOpenPortfolioHost } from '@/lib/surface-host';
 import {
   OPEN_BLOG_FILTER_CHIPS,
+  POCKET_BLOG_FILTER_CHIPS,
   type OpenBlogFilterId,
+  type PocketBlogFilterId,
 } from '@/lib/canonical-claims';
 
 const POSTS_PER_PAGE = 20;
@@ -93,8 +95,12 @@ function buildOpenVisibleItems(filter: OpenBlogFilterId, posts: GeneratedPost[])
   });
 }
 
-function buildPocketVisibleItems(posts: GeneratedPost[]): GridItem[] {
-  return posts.map((post) => ({ kind: 'regular' as const, post }));
+function buildPocketVisibleItems(filter: PocketBlogFilterId, posts: GeneratedPost[]): GridItem[] {
+  const filtered =
+    filter === 'all'
+      ? posts
+      : posts.filter((p) => (p.pillar ?? '').toLowerCase() === filter);
+  return filtered.map((post) => ({ kind: 'regular' as const, post }));
 }
 
 function BlogPageInner() {
@@ -102,6 +108,7 @@ function BlogPageInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [openFilter, setOpenFilter] = useState<OpenBlogFilterId>('all');
+  const [pocketFilter, setPocketFilter] = useState<PocketBlogFilterId>('all');
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
   const [blogSurface, setBlogSurface] = useState<'pocket' | 'open'>('pocket');
 
@@ -109,13 +116,14 @@ function BlogPageInner() {
     const surface = isOpenPortfolioHost(window.location.hostname) ? 'open' : 'pocket';
     setBlogSurface(surface);
     setOpenFilter('all');
+    setPocketFilter('all');
     fetch(`/api/blog/posts?surface=${surface}`)
       .then((res) => res.json())
       .then((data) => setGeneratedPosts(data || []))
       .catch(() => setGeneratedPosts([]));
   }, []);
 
-  const filter = blogSurface === 'open' ? openFilter : 'all';
+  const filter = blogSurface === 'open' ? openFilter : pocketFilter;
   const prevFilter = useRef(filter);
 
   useEffect(() => {
@@ -128,7 +136,7 @@ function BlogPageInner() {
   const visibleItems =
     blogSurface === 'open'
       ? buildOpenVisibleItems(openFilter, generatedPosts)
-      : buildPocketVisibleItems(generatedPosts);
+      : buildPocketVisibleItems(pocketFilter, generatedPosts);
 
   const cardBorder = blogSurface === 'open' ? OPEN_BLOG_CARD_BORDER : BLOG_CARD_BORDER;
   const cardBorderColor = blogSurface === 'open' ? OPEN_BLOG_CARD_BORDER_COLOR : BLOG_CARD_BORDER_COLOR;
@@ -193,7 +201,6 @@ function BlogPageInner() {
               : 'Technical deep-dives, architecture decisions, and devlogs from the Pocket Portfolio team.'}
           </p>
 
-          {blogSurface === 'open' && (
           <div
             style={{
               display: 'flex',
@@ -203,15 +210,21 @@ function BlogPageInner() {
               marginBottom: '32px',
             }}
           >
-            {OPEN_BLOG_FILTER_CHIPS.map((chip) => {
-                const active = openFilter === chip.id;
+            {(blogSurface === 'open' ? OPEN_BLOG_FILTER_CHIPS : POCKET_BLOG_FILTER_CHIPS).map(
+              (chip) => {
+                const active =
+                  blogSurface === 'open' ? openFilter === chip.id : pocketFilter === chip.id;
                 const accent = 'var(--accent-warm)';
                 const activeBg = 'rgba(245, 158, 11, 0.12)';
                 return (
                   <button
                     key={chip.id}
                     type="button"
-                    onClick={() => setOpenFilter(chip.id)}
+                    onClick={() =>
+                      blogSurface === 'open'
+                        ? setOpenFilter(chip.id as OpenBlogFilterId)
+                        : setPocketFilter(chip.id as PocketBlogFilterId)
+                    }
                     style={{
                       padding: '8px 16px',
                       borderRadius: '8px',
@@ -227,9 +240,9 @@ function BlogPageInner() {
                     {chip.label}
                   </button>
                 );
-              })}
+              },
+            )}
           </div>
-          )}
         </header>
 
         {visibleItems.length > 0 && (

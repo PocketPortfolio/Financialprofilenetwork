@@ -926,6 +926,10 @@ export type OpenBlogFilterId = (typeof OPEN_BLOG_FILTER_CHIPS)[number]['id'];
  */
 export const POCKET_BLOG_FILTER_CHIPS = [
   { id: 'all' as const, label: 'All Posts' },
+  { id: 'technical' as const, label: 'Technical' },
+  { id: 'product' as const, label: 'Product' },
+  { id: 'philosophy' as const, label: 'Philosophy' },
+  { id: 'market' as const, label: 'Market' },
 ] as const;
 
 export type PocketBlogFilterId = (typeof POCKET_BLOG_FILTER_CHIPS)[number]['id'];
