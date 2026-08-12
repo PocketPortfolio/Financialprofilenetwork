@@ -1,9 +1,8 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import NewsRoomBriefingCard from '../components/newsroom/NewsRoomBriefingCard';
+import NewsRoomConversionStrip from '../components/newsroom/NewsRoomConversionStrip';
 import { getNewsroomPayload } from '@/lib/newsroom/store';
-import { SURFACE_CROSS_LINKS } from '@/lib/canonical-claims';
 
 export const metadata: Metadata = {
   title: 'News Room — Wealth-Tech & Market Briefings | Pocket Portfolio',
@@ -19,7 +18,6 @@ export const revalidate = 1800;
 
 export default async function NewsroomPage() {
   const payload = await getNewsroomPayload();
-  const openLink = SURFACE_CROSS_LINKS.pocket;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--background)', color: 'var(--text)' }}>
@@ -101,72 +99,8 @@ export default async function NewsroomPage() {
           ))}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px',
-            justifyContent: 'center',
-          }}
-        >
-          <Link
-            href="/dashboard"
-            style={{
-              padding: '12px 24px',
-              background: 'var(--accent-warm)',
-              color: '#0f1216',
-              borderRadius: '8px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              fontFamily: 'ui-monospace, Menlo, monospace',
-            }}
-          >
-            Access Wealth Dashboard →
-          </Link>
-          <Link
-            href="/for/advisors"
-            style={{
-              padding: '12px 24px',
-              border: '1px solid var(--border-warm)',
-              borderRadius: '8px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              color: 'var(--text)',
-              fontFamily: 'ui-monospace, Menlo, monospace',
-            }}
-          >
-            Advisor tools →
-          </Link>
-          <a
-            href={openLink.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              padding: '12px 24px',
-              border: '1px solid var(--border-warm)',
-              borderRadius: '8px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              color: 'var(--text)',
-              fontFamily: 'ui-monospace, Menlo, monospace',
-            }}
-          >
-            {openLink.label}
-          </a>
-          <Link
-            href="/blog"
-            style={{
-              padding: '12px 24px',
-              border: '1px solid var(--border-warm)',
-              borderRadius: '8px',
-              fontWeight: 600,
-              textDecoration: 'none',
-              color: 'var(--text-secondary)',
-              fontFamily: 'ui-monospace, Menlo, monospace',
-            }}
-          >
-            Engineering blog →
-          </Link>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <NewsRoomConversionStrip surface="index" />
         </div>
       </main>
     </div>

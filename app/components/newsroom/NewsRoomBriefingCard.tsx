@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import type { NewsroomBriefing } from '@/lib/newsroom/types';
+import { wedgeLinksForCategory } from '@/lib/newsroom/conversion-wedges';
 import { plateUrlForBriefing } from '@/lib/pocket-landing/newsroom-plates';
-import { trackNewsroomBriefingClick } from '@/app/lib/analytics/events';
+import { trackNewsroomBriefingClick, trackNewsroomCtaClick } from '@/app/lib/analytics/events';
 
 const CARD_BORDER = '1px solid rgba(245, 158, 11, 0.42)';
 const CARD_BORDER_COLOR = 'rgba(245, 158, 11, 0.42)';
@@ -55,7 +57,6 @@ function MediaCanvas({ briefing }: { briefing: NewsroomBriefing }) {
         overflow: 'hidden',
       }}
     >
-      {/* Native img — RSS + local plates use query strings; next/image localPatterns is brittle in cards */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         key={`${briefing.id}-${heroMode}`}
@@ -120,14 +121,11 @@ function MediaCanvas({ briefing }: { briefing: NewsroomBriefing }) {
 
 export default function NewsRoomBriefingCard({ briefing }: { briefing: NewsroomBriefing }) {
   const isExternal = briefing.href.startsWith('http');
+  const wedgeLinks = wedgeLinksForCategory(briefing.category);
 
   return (
-    <a
-      href={briefing.href}
-      target={isExternal ? '_blank' : undefined}
-      rel={isExternal ? 'noopener noreferrer' : undefined}
+    <article
       className="newsroom-briefing-card"
-      onClick={() => trackNewsroomBriefingClick(briefing.title, briefing.category, briefing.href)}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -137,8 +135,6 @@ export default function NewsRoomBriefingCard({ briefing }: { briefing: NewsroomB
         overflow: 'hidden',
         boxShadow: CARD_SHADOW,
         transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-        textDecoration: 'none',
-        color: 'inherit',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-4px)';
@@ -151,77 +147,124 @@ export default function NewsRoomBriefingCard({ briefing }: { briefing: NewsroomB
         e.currentTarget.style.borderColor = CARD_BORDER_COLOR;
       }}
     >
-      <MediaCanvas briefing={briefing} />
-      <div style={{ padding: '20px 22px 22px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <span
-          style={{
-            display: 'inline-block',
-            marginBottom: '12px',
-            padding: '4px 10px',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            borderRadius: '4px',
-            border: '1px solid rgba(245, 158, 11, 0.35)',
-            background: 'rgba(245, 158, 11, 0.08)',
-            color: 'var(--accent-warm)',
-            ...MONO,
-          }}
-        >
-          {briefing.category}
-        </span>
-        <h3
-          style={{
-            fontSize: '18px',
-            fontWeight: 700,
-            margin: '0 0 8px',
-            lineHeight: 1.35,
-            color: 'var(--text-warm, var(--text))',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {briefing.title}
-        </h3>
-        <p
-          style={{
-            fontSize: '12px',
-            color: 'var(--accent-warm)',
-            margin: '0 0 8px',
-            ...MONO,
-          }}
-        >
-          {briefing.source}
-        </p>
-        <p
-          style={{
-            fontSize: '14px',
-            color: 'var(--text-secondary, var(--muted))',
-            lineHeight: 1.6,
-            margin: '0 0 16px',
-            flex: 1,
-          }}
-        >
-          {briefing.snippet}
-        </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-          {briefing.tags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                fontSize: '11px',
-                padding: '3px 8px',
-                borderRadius: '4px',
-                border: '1px solid rgba(245, 158, 11, 0.25)',
-                background: 'rgba(245, 158, 11, 0.06)',
-                color: 'var(--accent-warm)',
-                ...MONO,
-              }}
-            >
-              #{tag}
-            </span>
-          ))}
+      <a
+        href={briefing.href}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+        onClick={() => trackNewsroomBriefingClick(briefing.title, briefing.category, briefing.href)}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          textDecoration: 'none',
+          color: 'inherit',
+        }}
+      >
+        <MediaCanvas briefing={briefing} />
+        <div style={{ padding: '20px 22px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <span
+            style={{
+              display: 'inline-block',
+              marginBottom: '12px',
+              padding: '4px 10px',
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              borderRadius: '4px',
+              border: '1px solid rgba(245, 158, 11, 0.35)',
+              background: 'rgba(245, 158, 11, 0.08)',
+              color: 'var(--accent-warm)',
+              ...MONO,
+            }}
+          >
+            {briefing.category}
+          </span>
+          <h3
+            style={{
+              fontSize: '18px',
+              fontWeight: 700,
+              margin: '0 0 8px',
+              lineHeight: 1.35,
+              color: 'var(--text-warm, var(--text))',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {briefing.title}
+          </h3>
+          <p
+            style={{
+              fontSize: '12px',
+              color: 'var(--accent-warm)',
+              margin: '0 0 8px',
+              ...MONO,
+            }}
+          >
+            {briefing.source}
+          </p>
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary, var(--muted))',
+              lineHeight: 1.6,
+              margin: '0 0 16px',
+              flex: 1,
+            }}
+          >
+            {briefing.snippet}
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {briefing.tags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  fontSize: '11px',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  background: 'rgba(245, 158, 11, 0.06)',
+                  color: 'var(--accent-warm)',
+                  ...MONO,
+                }}
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
         </div>
+      </a>
+
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '8px',
+          padding: '0 22px 20px',
+          borderTop: '1px solid rgba(245, 158, 11, 0.15)',
+          paddingTop: '14px',
+          marginTop: 'auto',
+        }}
+      >
+        {wedgeLinks.map((wedge) => (
+          <Link
+            key={wedge.target}
+            href={wedge.href}
+            onClick={() => trackNewsroomCtaClick(`briefing_${wedge.target}`)}
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              padding: '6px 10px',
+              borderRadius: '6px',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              background: 'rgba(245, 158, 11, 0.08)',
+              color: 'var(--accent-warm)',
+              textDecoration: 'none',
+              ...MONO,
+            }}
+          >
+            {wedge.label} →
+          </Link>
+        ))}
       </div>
-    </a>
+    </article>
   );
 }

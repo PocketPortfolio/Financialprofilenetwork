@@ -1,19 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { SURFACE_CROSS_LINKS } from '@/lib/canonical-claims';
+import StructuredData from './StructuredData';
 import type { NewsroomPayload } from '@/lib/newsroom/types';
 import NewsRoomBriefingCard from './newsroom/NewsRoomBriefingCard';
-import StructuredData from './StructuredData';
-import { trackNewsroomCtaClick } from '@/app/lib/analytics/events';
+import NewsRoomConversionStrip from './newsroom/NewsRoomConversionStrip';
 
 const MONO: React.CSSProperties = {
   fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
 };
 
 export default function CommunityContent() {
-  const openLink = SURFACE_CROSS_LINKS.pocket;
   const [payload, setPayload] = useState<NewsroomPayload | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,37 +28,6 @@ export default function CommunityContent() {
 
   const briefings = payload?.briefings ?? [];
   const updatedAt = payload?.updatedAt ?? new Date().toISOString();
-  const isLiveFeed =
-    briefings.length > 0 &&
-    (payload?.source === 'google-news-rss' || payload?.source === 'kv-cache');
-
-  const primaryStyle: React.CSSProperties = {
-    padding: '12px 24px',
-    fontSize: '15px',
-    fontWeight: 600,
-    borderRadius: '8px',
-    background: 'var(--accent-warm)',
-    color: '#0f1216',
-    textDecoration: 'none',
-    display: 'inline-block',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-    border: '1px solid var(--accent-warm)',
-    ...MONO,
-  };
-
-  const secondaryStyle: React.CSSProperties = {
-    padding: '12px 24px',
-    fontSize: '15px',
-    fontWeight: 600,
-    borderRadius: '8px',
-    background: 'transparent',
-    color: 'var(--text-warm, var(--text))',
-    textDecoration: 'none',
-    display: 'inline-block',
-    transition: 'all 0.2s ease',
-    border: '1px solid var(--border-warm)',
-    ...MONO,
-  };
 
   return (
     <>
@@ -176,62 +142,7 @@ export default function CommunityContent() {
           </div>
 
           <div style={{ textAlign: 'center' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                gap: '12px',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-              }}
-            >
-              <Link
-                href="/dashboard"
-                style={primaryStyle}
-                onClick={() => trackNewsroomCtaClick('dashboard')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 14px rgba(245, 158, 11, 0.35)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                Access B2C Wealth Dashboard →
-              </Link>
-              <Link
-                href="/newsroom"
-                style={secondaryStyle}
-                onClick={() => trackNewsroomCtaClick('newsroom_index')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
-                  e.currentTarget.style.color = 'var(--accent-warm)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-warm)';
-                  e.currentTarget.style.color = 'var(--text-warm, var(--text))';
-                }}
-              >
-                View All Industry News →
-              </Link>
-              <a
-                href={openLink.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={secondaryStyle}
-                onClick={() => trackNewsroomCtaClick('open_surface')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--accent-warm)';
-                  e.currentTarget.style.color = 'var(--accent-warm)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-warm)';
-                  e.currentTarget.style.color = 'var(--text-warm, var(--text))';
-                }}
-              >
-                {openLink.label}
-              </a>
-            </div>
+            <NewsRoomConversionStrip surface="home" />
           </div>
         </div>
       </section>

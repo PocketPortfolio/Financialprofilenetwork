@@ -16,6 +16,7 @@
 1. GSC URL Inspection — request indexing for `/import/ghostfolio`, `/import/trading212`, `/import/interactive-brokers`, `/import/trade-republic`, `/import/moomoo`.
 2. GSC URL Inspection — sample farm URLs (`/s/xinxx`, `/s/xvlxx`) after deploy to accelerate `noindex` pickup.
 3. Confirm GA4 Admin MP secret for `G-9FQ2NBHY7H` matches Vercel `GA4_MEASUREMENT_PROTOCOL_SECRET` (local smoke already returns **204**).
+4. **News Room conversion circuit (augment):** Homepage + `/newsroom` now pair briefing cards with `/for/advisors` and `/import/*` wedge CTAs. Track GA4 `newsroom_cta_click` → `advisor_tool` / `csv_import_success` funnel.
 
 ## CCO (continuous → Day-28)
 
