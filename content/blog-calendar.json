@@ -1318,7 +1318,7 @@
     "date": "2026-08-16",
     "title": "Your Financial Data is Not a Product: The Ethics of Data Ownership",
     "slug": "your-financial-data-is-not-a-product-the-ethics-of-data-owne",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1328,7 +1328,8 @@
       "financial"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-16T09:03:12.033Z"
   },
   {
     "id": "week-33-post-2",
