@@ -126,4 +126,14 @@ describe('bot-gate', () => {
     expect(href).toContain('returnTo=%2Fs%2Fspy');
     expect(href).toContain('utm_campaign=symbol_farm_rate');
   });
+
+  it('builds post-import Developer Utility href, not Founders', async () => {
+    const { postImportDeveloperUtilityHref } = await import('@/lib/bot-gate');
+    const href = postImportDeveloperUtilityHref('/import/ghostfolio');
+    expect(href).toContain('tier=developer-utility');
+    expect(href).toContain('utm_source=post_import_upsell');
+    expect(href).toContain('trigger_source=csv_import_success');
+    expect(href).toContain('returnTo=%2Fimport%2Fghostfolio');
+    expect(href).not.toContain('founders');
+  });
 });

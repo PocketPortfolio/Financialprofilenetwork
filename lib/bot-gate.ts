@@ -295,6 +295,20 @@ export function developerUtilityCheckoutHref(returnTo: string, campaign = 'symbo
   return `/sponsor?${params.toString()}`;
 }
 
+/** Post-import paid-key prompt — Day-28 north star is Developer Utility, not Founders. */
+export function postImportDeveloperUtilityHref(returnTo = '/dashboard'): string {
+  const path = returnTo.startsWith('/') ? returnTo : `/${returnTo}`;
+  const params = new URLSearchParams({
+    tier: 'developer-utility',
+    utm_source: 'post_import_upsell',
+    utm_medium: 'csv_success',
+    utm_campaign: 'intent_trigger',
+    trigger_source: 'csv_import_success',
+    returnTo: path,
+  });
+  return `/sponsor?${params.toString()}`;
+}
+
 export function wantsJsonResponse(request: NextRequest): boolean {
   const accept = (request.headers.get('accept') || '').toLowerCase();
   if (accept.includes('application/json')) return true;

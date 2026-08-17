@@ -56,6 +56,7 @@ import FeatureAnnouncementModal from '../components/modals/FeatureAnnouncementMo
 import { getDeviceInfo } from '../lib/utils/device';
 import { initializeMobileAnalytics } from '../lib/analytics/device';
 import { trackEvent, trackPaywallCtaClick, trackPaywallImpression } from '../lib/analytics/events';
+import { postImportDeveloperUtilityHref } from '@/lib/bot-gate';
 import OnboardingTour from '../components/OnboardingTour';
 import { MorningBrief } from '../components/dashboard/MorningBrief';
 import { RiskMatrix } from '../components/dashboard/RiskMatrix';
@@ -2183,6 +2184,7 @@ export default function Dashboard() {
                 </div>
                 <CSVImporter
                   initialFile={importModalFile}
+                  skipIntentUpsell
                   onImport={(trades) => {
                     handleCSVImport(trades);
                     setShowImportModal(false);
@@ -2221,19 +2223,19 @@ export default function Dashboard() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <h3 style={{ margin: '0 0 8px', color: 'var(--text)', fontSize: '18px' }}>
-                  Import complete. Unlock institutional analytics.
+                  Import complete. Unlock the Developer Utility key.
                 </h3>
                 <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
-                  Your portfolio data is live. Upgrade to unlock annualized return, volatility,
-                  sector exposure, allocation recommendations, and premium AI analysis.
+                  Your trades stay local. One paid API key unlocks OHLCV JSON + CSV — the Day-28
+                  north star, not Founders Club.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   <a
-                    href="/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success"
+                    href={postImportDeveloperUtilityHref('/dashboard')}
                     onClick={() => {
                       trackPaywallCtaClick(
                         'csv_import_success',
-                        '/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success',
+                        postImportDeveloperUtilityHref('/dashboard'),
                         '/dashboard',
                         tier
                       );
@@ -2251,7 +2253,7 @@ export default function Dashboard() {
                       fontSize: '14px',
                     }}
                   >
-                    Unlock Founders Features
+                    Get Developer Utility key
                   </a>
                   <button
                     type="button"

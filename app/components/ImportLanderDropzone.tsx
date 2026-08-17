@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import CSVImporter from '@/app/components/CSVImporter';
 import { useTrades } from '@/app/hooks/useTrades';
+import { postImportDeveloperUtilityHref } from '@/lib/bot-gate';
 
 interface Trade {
   id: string;
@@ -76,7 +77,7 @@ export default function ImportLanderDropzone({ brokerSlug, brokerDisplayName }: 
         Parsed on-device. No server upload of your ledger. Sign-in optional for Drive sync later.
       </p>
 
-      <CSVImporter onImport={handleImport} />
+      <CSVImporter onImport={handleImport} upsellReturnTo={`/import/${brokerSlug}`} />
 
       {status !== 'idle' && (
         <p
@@ -89,12 +90,21 @@ export default function ImportLanderDropzone({ brokerSlug, brokerDisplayName }: 
         >
           {message}{' '}
           {status === 'ok' && (
-            <Link
-              href={`/dashboard?utm_source=import_page&utm_medium=dropzone&utm_campaign=activation&utm_content=${encodeURIComponent(brokerSlug)}`}
-              style={{ color: 'var(--accent-warm)', fontWeight: 600 }}
-            >
-              Open terminal →
-            </Link>
+            <>
+              <Link
+                href={`/dashboard?utm_source=import_page&utm_medium=dropzone&utm_campaign=activation&utm_content=${encodeURIComponent(brokerSlug)}`}
+                style={{ color: 'var(--accent-warm)', fontWeight: 600 }}
+              >
+                Open terminal →
+              </Link>
+              {' · '}
+              <Link
+                href={postImportDeveloperUtilityHref(`/import/${brokerSlug}`)}
+                style={{ color: 'var(--accent-warm)', fontWeight: 600 }}
+              >
+                Get Developer Utility key →
+              </Link>
+            </>
           )}
         </p>
       )}

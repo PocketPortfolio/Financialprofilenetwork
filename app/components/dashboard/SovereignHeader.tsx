@@ -705,6 +705,28 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                   >
                     Analytics
                   </Link>
+
+                  <Link
+                    href="/admin/telemetry"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '6px',
+                      color: 'hsl(var(--foreground))',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      background: 'transparent',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    Growth HUD
+                  </Link>
                   
                   <Link 
                     href="/admin/sales"

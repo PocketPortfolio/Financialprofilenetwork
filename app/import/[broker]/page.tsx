@@ -442,22 +442,16 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
       },
       {
         '@type': 'HowToStep',
-        name: 'Sign In to Pocket Portfolio',
-        text: 'Sign in to Pocket Portfolio using your Google account to access the CSV import feature.',
-        url: `https://www.pocketportfolio.app/import/${broker}#step3`
+        name: 'Drop the CSV on this page',
+        text: `Use the on-page dropzone for ${config.displayName} CSV. Parsing happens in your browser; the ledger is not uploaded to Pocket Portfolio servers.`,
+        url: `https://www.pocketportfolio.app/import/${broker}#import-now`
       },
       {
         '@type': 'HowToStep',
-        name: 'Upload Your CSV',
-        text: 'Navigate to the dashboard and use the CSV import feature to upload your exported data.',
-        url: `https://www.pocketportfolio.app/import/${broker}#step4`
+        name: 'Optional: Developer Utility API key',
+        text: 'After import, a Developer Utility API key unlocks first-party OHLCV JSON and CSV for programmatic quotes.',
+        url: `https://www.pocketportfolio.app/sponsor?tier=developer-utility`
       },
-      {
-        '@type': 'HowToStep',
-        name: 'Verify Import',
-        text: 'Review your imported trades and positions to ensure everything looks correct.',
-        url: `https://www.pocketportfolio.app/import/${broker}#step5`
-      }
     ]
   };
 

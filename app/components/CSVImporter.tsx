@@ -9,6 +9,7 @@ import {
   trackPaywallCtaClick,
   trackPaywallImpression,
 } from '../lib/analytics/events';
+import { postImportDeveloperUtilityHref } from '@/lib/bot-gate';
 import { prepareCsvForImport } from '../lib/csv/headerAliases';
 import { parseCSV as parseCSVAdapter, detectBrokerFromSample, genericParse, parseUniversal } from '@pocket-portfolio/importer';
 import { detectBroker } from '@pocket-portfolio/importer';
@@ -36,6 +37,10 @@ interface CSVImporterProps {
   onImport: (trades: Trade[]) => void;
   /** When set (e.g. from dashboard empty-state dropzone), process this file on mount */
   initialFile?: File | null;
+  /** Parent owns the post-import paywall (dashboard). Landers keep the in-importer modal. */
+  skipIntentUpsell?: boolean;
+  /** returnTo on Developer Utility checkout */
+  upsellReturnTo?: string;
 }
 
 function debugLog(step: string, data: Record<string, unknown>) {
@@ -44,7 +49,12 @@ function debugLog(step: string, data: Record<string, unknown>) {
   }
 }
 
-export default function CSVImporter({ onImport, initialFile }: CSVImporterProps) {
+export default function CSVImporter({
+  onImport,
+  initialFile,
+  skipIntentUpsell = false,
+  upsellReturnTo = '/dashboard',
+}: CSVImporterProps) {
   const [dragActive, setDragActive] = useState(false);
   const [processing, setProcessing] = useState(false);
   const initialFileProcessedRef = React.useRef(false);
@@ -2016,7 +2026,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         'success'
       );
       trackPaywallImpression('csv_import_success', '/dashboard');
-      setShowIntentUpsellModal(true);
+      if (!skipIntentUpsell) setShowIntentUpsellModal(true);
       
       
       
@@ -2126,7 +2136,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
         'success'
       );
       trackPaywallImpression('csv_import_success', '/dashboard');
-      setShowIntentUpsellModal(true);
+      if (!skipIntentUpsell) setShowIntentUpsellModal(true);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       showAlert('Import Error', `Failed to parse CSV: ${msg}`, 'error');
@@ -2157,7 +2167,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'}.`, 'success');
                 trackPaywallImpression('csv_import_success', '/dashboard');
-                setShowIntentUpsellModal(true);
+                if (!skipIntentUpsell) setShowIntentUpsellModal(true);
                 setSmartImportCompile({ status: 'idle' });
                 setUnknownFile(null);
               } catch (err) {
@@ -2221,7 +2231,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 onImport(trades);
                 showAlert('Import Successful', `Successfully imported ${trades.length} trade${trades.length === 1 ? '' : 's'} with Smart Import.`, 'success');
                 trackPaywallImpression('csv_import_success', '/dashboard');
-                setShowIntentUpsellModal(true);
+                if (!skipIntentUpsell) setShowIntentUpsellModal(true);
                 setUnknownFile(null);
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -2386,20 +2396,20 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
           }}
         >
           <h3 style={{ margin: '0 0 8px', fontSize: '18px', color: 'var(--text)' }}>
-            Import complete. Unlock institutional analytics.
+            Import complete. Unlock the Developer Utility key.
           </h3>
           <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.5 }}>
-            Your data is in. Upgrade to Founders Club to unlock annualized return, volatility, sector
-            exposure, allocation recommendations, and deeper AI analysis for this portfolio.
+            Your trades stay on this device. One paid API key unlocks OHLCV JSON + CSV for this
+            portfolio — the Day-28 north star, not Founders Club.
           </p>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <a
-              href="/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success"
+              href={postImportDeveloperUtilityHref(upsellReturnTo)}
               onClick={() =>
                 trackPaywallCtaClick(
                   'csv_import_success',
-                  '/sponsor?utm_source=dashboard&utm_medium=post_import_upsell&utm_campaign=intent_trigger&utm_content=csv_import_success&trigger_source=csv_import_success',
-                  '/dashboard'
+                  postImportDeveloperUtilityHref(upsellReturnTo),
+                  upsellReturnTo
                 )
               }
               style={{
@@ -2415,7 +2425,7 @@ export default function CSVImporter({ onImport, initialFile }: CSVImporterProps)
                 fontSize: '14px',
               }}
             >
-              Unlock Founders Features
+              Get Developer Utility key
             </a>
             <button
               type="button"
