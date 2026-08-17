@@ -7,6 +7,8 @@ import { ChevronDown } from 'lucide-react';
 import { useDesktopNav } from '@/app/hooks/useDesktopNav';
 import { useAuth } from '@/app/hooks/useAuth';
 import { SupportFormModal } from '@/app/components/dashboard/SupportFormModal';
+import { isBrewinPilotEmail } from '@/app/lib/demo/brewin-manchester-pilot';
+import { useBrewinPilot } from '@/app/components/demo/BrewinPilotProvider';
 import {
   DASHBOARD_NAV_PRIMARY,
   DASHBOARD_NAV_SECTIONS,
@@ -16,7 +18,7 @@ import {
 } from '@/app/lib/nav/dashboardNavConfig';
 import styles from './DesktopNav.module.css';
 
-const SECTION_STATE_PREFIX = 'pp-desktop-nav-section-';
+const SECTION_STATE_PREFIX = 'pp-desktop-nav-section-v2-';
 
 function readSectionOpen(sectionId: string, defaultOpen: boolean): boolean {
   if (typeof window === 'undefined') return defaultOpen;
@@ -90,16 +92,22 @@ function NavSection({
   section,
   pathname,
   isAdmin,
+  showBrewinReplica,
   onImport,
   onSupport,
 }: {
   section: DashboardNavSection;
   pathname: string;
   isAdmin: boolean;
+  showBrewinReplica: boolean;
   onImport: () => void;
   onSupport: () => void;
 }) {
-  const visibleItems = section.items.filter((item) => !item.adminOnly || isAdmin);
+  const visibleItems = section.items.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    if (item.id === 'admin-brewin-replica' && !showBrewinReplica) return false;
+    return true;
+  });
   if (visibleItems.length === 0) return null;
   if (section.adminOnly && !isAdmin) return null;
 
@@ -154,6 +162,7 @@ export default function DesktopNav() {
   const pathname = usePathname() ?? '';
   const router = useRouter();
   const { user } = useAuth();
+  const { active: brewinPilotActive } = useBrewinPilot();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [tourExpandGeneration, setTourExpandGeneration] = useState(0);
@@ -194,6 +203,7 @@ export default function DesktopNav() {
   }, [user]);
 
   const handleImport = useCallback(() => {
+    if (brewinPilotActive) return;
     try {
       sessionStorage.setItem('openImportModal', 'true');
     } catch {
@@ -204,7 +214,7 @@ export default function DesktopNav() {
     } else {
       window.dispatchEvent(new CustomEvent('openImportModal'));
     }
-  }, [pathname, router]);
+  }, [brewinPilotActive, pathname, router]);
 
   return (
     <>
@@ -237,6 +247,7 @@ export default function DesktopNav() {
                 section={section}
                 pathname={pathname}
                 isAdmin={isAdmin}
+                showBrewinReplica={isBrewinPilotEmail(user?.email)}
                 onImport={handleImport}
                 onSupport={() => setShowSupportModal(true)}
               />

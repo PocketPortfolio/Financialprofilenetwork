@@ -8,6 +8,7 @@ import Logo from '../Logo';
 import ThemeSwitcher from '../ThemeSwitcher';
 import { usePremiumTheme } from '../../hooks/usePremiumTheme';
 import { useAuth } from '../../hooks/useAuth';
+import { isBrewinPilotEmail } from '../../lib/demo/brewin-manchester-pilot';
 import { UserAvatarDropdown } from './UserAvatarDropdown';
 import { SupportFormModal } from './SupportFormModal';
 import { useStickyHeader } from '../../hooks/useStickyHeader';
@@ -659,6 +660,30 @@ export function SovereignHeader({ syncState = 'idle', lastSyncTime = null, user,
                     margin: '16px 0',
                   }} />
                   
+                  {isBrewinPilotEmail(user?.email) && (
+                  <Link 
+                    href="/demo/brewin"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '6px',
+                      color: 'hsl(var(--foreground))',
+                      textDecoration: 'none',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      background: 'transparent',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--dashboard-surface-hover)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    Brewin replica
+                  </Link>
+                  )}
+
                   <Link 
                     href="/admin/analytics"
                     onClick={() => setIsMenuOpen(false)}

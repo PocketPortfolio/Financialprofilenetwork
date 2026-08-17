@@ -33,6 +33,20 @@ export function formatCurrencyDetailed(value: number): string {
   }).format(value);
 }
 
+/** HUD / table money. Default USD so consumer surfaces stay unchanged. */
+export function formatHudMoney(
+  value: number,
+  currency: 'USD' | 'GBP' = 'USD',
+  fractionDigits = 2
+): string {
+  return new Intl.NumberFormat(currency === 'GBP' ? 'en-GB' : 'en-US', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value);
+}
+
 /**
  * Format currency for compact displays
  * Shows abbreviated format when appropriate

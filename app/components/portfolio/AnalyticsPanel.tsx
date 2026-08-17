@@ -3,11 +3,14 @@
 import React from 'react';
 import type { PortfolioAnalytics } from '@/app/lib/portfolio/types';
 import { trackPaywallCtaClick, trackPaywallImpression } from '@/app/lib/analytics/events';
+import { formatHudMoney } from '@/app/lib/utils/currencyFormatter';
 
 interface AnalyticsPanelProps {
   analytics: PortfolioAnalytics | null;
   loading?: boolean;
   isPremium?: boolean;
+  currency?: 'USD' | 'GBP';
+  hideHistoryMetrics?: boolean;
 }
 
 type MetricConfig = {
@@ -26,6 +29,8 @@ export default function AnalyticsPanel({
   analytics,
   loading = false,
   isPremium = false,
+  currency = 'USD',
+  hideHistoryMetrics = false,
 }: AnalyticsPanelProps) {
   if (loading) {
     return (
@@ -75,36 +80,36 @@ export default function AnalyticsPanel({
   const metrics: MetricConfig[] = [
     {
       label: 'Daily Change',
-      value: `${analytics.dailyChange >= 0 ? '+' : ''}$${analytics.dailyChange.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
-      })}`,
+      value: `${analytics.dailyChange >= 0 ? '+' : ''}${formatHudMoney(Math.abs(analytics.dailyChange), currency)}`,
       valuePercent: `${analytics.dailyChangePercent >= 0 ? '+' : ''}${analytics.dailyChangePercent.toFixed(2)}%`,
       color: analytics.dailyChange >= 0 ? 'var(--signal)' : 'var(--danger)',
       description: 'Change in portfolio value today',
     },
     {
       label: 'All-Time Return',
-      value: `${analytics.allTimeReturn >= 0 ? '+' : ''}$${analytics.allTimeReturn.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
-      })}`,
+      value: `${analytics.allTimeReturn >= 0 ? '+' : ''}${formatHudMoney(Math.abs(analytics.allTimeReturn), currency)}`,
       valuePercent: `${analytics.allTimeReturnPercent >= 0 ? '+' : ''}${analytics.allTimeReturnPercent.toFixed(2)}%`,
       color: analytics.allTimeReturn >= 0 ? 'var(--signal)' : 'var(--danger)',
       description: 'Total return since first investment',
     },
-    {
-      label: 'Annualized Return',
-      value: `${analytics.annualizedReturn >= 0 ? '+' : ''}${analytics.annualizedReturn.toFixed(2)}%`,
-      color: analytics.annualizedReturn >= 0 ? 'var(--signal)' : 'var(--danger)',
-      description: 'Average annual return',
-      premium: true,
-    },
-    {
-      label: 'Volatility',
-      value: `${analytics.volatility.toFixed(2)}%`,
-      color: 'hsl(var(--foreground))',
-      description: 'Standard deviation of returns',
-      premium: true,
-    },
+    ...(!hideHistoryMetrics
+      ? [
+          {
+            label: 'Annualized Return',
+            value: `${analytics.annualizedReturn >= 0 ? '+' : ''}${analytics.annualizedReturn.toFixed(2)}%`,
+            color: analytics.annualizedReturn >= 0 ? 'var(--signal)' : 'var(--danger)',
+            description: 'Average annual return',
+            premium: true,
+          },
+          {
+            label: 'Volatility',
+            value: `${analytics.volatility.toFixed(2)}%`,
+            color: 'hsl(var(--foreground))',
+            description: 'Standard deviation of returns',
+            premium: true,
+          },
+        ]
+      : []),
   ];
 
   const handleUpgradeClick = () => {

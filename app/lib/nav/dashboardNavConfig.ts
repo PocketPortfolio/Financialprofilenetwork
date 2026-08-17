@@ -11,6 +11,7 @@ import {
   ShoppingBag,
   LifeBuoy,
   Tags,
+  Building2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -139,9 +140,16 @@ export const DASHBOARD_NAV_SECTIONS: DashboardNavSection[] = [
   {
     id: 'admin',
     label: 'Admin',
-    defaultOpen: false,
+    defaultOpen: true,
     adminOnly: true,
     items: [
+      {
+        id: 'admin-brewin-replica',
+        label: 'Brewin replica',
+        href: '/demo/brewin',
+        icon: Building2,
+        adminOnly: true,
+      },
       {
         id: 'admin-analytics',
         label: 'Analytics',
@@ -171,7 +179,11 @@ export function isDashboardNavItemActive(item: DashboardNavItem, pathname: strin
   if (item.action) {
     return false;
   }
+  if (item.id === 'admin-brewin-replica') {
+    return pathname === '/demo/brewin' || pathname.startsWith('/demo/brewin/');
+  }
   if (item.id === 'dashboard') {
+    if (pathname === '/demo/brewin' || pathname.startsWith('/demo/brewin/')) return false;
     return pathname === '/dashboard' || pathname === '/';
   }
   if (item.href === '/dashboard') {
@@ -222,6 +234,7 @@ export const MOBILE_NAV_SSOT_LINKS: ReadonlyArray<{ label: string; href: string 
   { label: 'Analytics', href: '/admin/analytics' },
   { label: 'Sales', href: '/admin/sales' },
   { label: 'View support', href: '/admin/support' },
+  { label: 'Brewin replica', href: '/demo/brewin' },
 ];
 
 /** Modal actions that must exist in both desktop rail and SovereignHeader mobile menu. */

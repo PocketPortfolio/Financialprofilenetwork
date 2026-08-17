@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enforceDataApiGate } from '@/app/lib/server/data-api-gate';
+import { UK_STOCKS } from '@/app/lib/markets/ukListedTickers';
 // Rate limiting temporarily disabled for production compatibility
 // import { take } from '@/src/lib/ratelimit/memory';
 
@@ -70,9 +71,6 @@ const COMMODITY_TICKER_MAP: Record<string, string> = {
 
 // Common crypto symbols that need -USD suffix for Yahoo Finance
 const CRYPTO_SYMBOLS = new Set(['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'MATIC', 'AVAX', 'LINK', 'UNI', 'ATOM', 'ALGO', 'XRP', 'DOGE', 'LTC', 'BCH', 'ETC', 'XLM', 'TRX', 'EOS', 'AAVE', 'MKR', 'COMP', 'SNX', 'SUSHI', 'YFI', 'CRV', '1INCH', 'BAL', 'BAND', 'BAT', 'BNB', 'CEL', 'CELO', 'CHZ', 'COTI', 'ENJ', 'FIL', 'FLOW', 'GRT', 'ICP', 'KNC', 'MANA', 'NEAR', 'OMG', 'REN', 'SAND', 'SKL', 'SLP', 'STORJ', 'UMA', 'ZEC', 'ZRX']);
-
-// UK stock tickers that need .L suffix for London Stock Exchange
-const UK_STOCKS = new Set(['HSBA', 'ULVR', 'VOD', 'BP', 'RDS', 'RDS-A', 'RDS-B', 'GSK', 'AZN', 'BATS', 'BT', 'LLOY', 'BARC', 'RBS', 'TSCO', 'SBRY', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT', 'SBRY', 'TSCO', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT']);
 
 // Convert company names to ticker symbols
 function normalizeSymbols(symbols: string[]): { original: string; ticker: string }[] {

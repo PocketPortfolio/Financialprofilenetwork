@@ -6,6 +6,7 @@ const DASHBOARD_SHELL_PREFIXES = [
   '/settings',
   '/import',
   '/live',
+  '/demo/brewin',
 ] as const;
 
 export function isDashboardShellPath(pathname: string | null | undefined): boolean {

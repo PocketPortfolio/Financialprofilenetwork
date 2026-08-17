@@ -1,5 +1,7 @@
 'use client';
 
+import { formatHudMoney } from '@/app/lib/utils/currencyFormatter';
+
 interface TerminalSummaryProps {
   totalPortfolioValue: number;
   allTimeReturn: number;
@@ -10,6 +12,7 @@ interface TerminalSummaryProps {
   totalInvested?: number;
   loading?: boolean;
   returnLabel?: 'All-Time' | 'Unrealized';
+  currency?: 'USD' | 'GBP';
 }
 
 const MONO =
@@ -25,6 +28,7 @@ export function TerminalSummary({
   totalInvested,
   loading = false,
   returnLabel = 'All-Time',
+  currency = 'USD',
 }: TerminalSummaryProps) {
   const isPositiveReturn = allTimeReturn >= 0;
   const alpha =
@@ -105,11 +109,7 @@ export function TerminalSummary({
               letterSpacing: '-0.02em',
             }}
           >
-            $
-            {totalPortfolioValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatHudMoney(totalPortfolioValue, currency)}
           </div>
 
           <div
@@ -129,11 +129,8 @@ export function TerminalSummary({
                 fontWeight: 600,
               }}
             >
-              {returnLabel} {isPositiveReturn ? '+' : ''}$
-              {Math.abs(allTimeReturn).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{' '}
+              {returnLabel} {isPositiveReturn ? '+' : ''}
+              {formatHudMoney(Math.abs(allTimeReturn), currency)}{' '}
               ({isPositiveReturn ? '+' : ''}
               {allTimeReturnPercent.toFixed(2)}%)
             </span>
@@ -218,10 +215,7 @@ export function TerminalSummary({
                   color: 'hsl(var(--muted-foreground))',
                 }}
               >
-                $
-                {totalInvested.toLocaleString('en-US', {
-                  maximumFractionDigits: 0,
-                })}
+                {formatHudMoney(totalInvested, currency, 0)}
               </div>
             </div>
           )}

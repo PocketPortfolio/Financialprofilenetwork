@@ -22,6 +22,8 @@ import { PremiumTierProvider } from './contexts/PremiumTierContext';
 import PWAInstallPromptWrapper from './components/PWAInstallPromptWrapper';
 import GlobalFoundersClubBanner from './components/GlobalFoundersClubBanner';
 import { PocketAnalystProvider } from './components/ai/PocketAnalystProvider';
+import { BrewinPilotProvider } from './components/demo/BrewinPilotProvider';
+import './styles/brewin-pilot.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -220,6 +222,7 @@ export default async function RootLayout({
           <ErrorBoundary scope="app-root">
             <PremiumThemeProvider />
             <PocketAnalystProvider>
+            <BrewinPilotProvider>
             <GlobalFoundersClubBanner />
             <LandingPageTracker />
             <ReferralCapture />
@@ -245,6 +248,7 @@ export default async function RootLayout({
               </ErrorBoundary>
               <PWAInstallPromptWrapper />
             </div>
+            </BrewinPilotProvider>
             </PocketAnalystProvider>
           </ErrorBoundary>
           </PremiumTierProvider>

@@ -3,6 +3,7 @@
 import { TrendingUp, TrendingDown, Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import CompanyLogo from '@/app/components/CompanyLogo';
+import { formatHudMoney } from '@/app/lib/utils/currencyFormatter';
 
 interface Asset {
   symbol: string;
@@ -29,6 +30,7 @@ interface AssetTerminalProps {
   sortBy?: 'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty';
   sortOrder?: 'asc' | 'desc';
   setShowImportModal?: (show: boolean) => void;
+  currency?: 'USD' | 'GBP';
 }
 
 const MONO_FONT = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace';
@@ -42,7 +44,8 @@ export function AssetTerminal({
   onSort,
   sortBy = 'value',
   sortOrder = 'desc',
-  setShowImportModal
+  setShowImportModal,
+  currency = 'USD',
 }: AssetTerminalProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const LOGO_SIZE = 18;
@@ -453,12 +456,7 @@ export function AssetTerminal({
                           fontSize: '14px',
                           whiteSpace: 'nowrap'
                         }}>
-                          {asset.price ? new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                          }).format(asset.price) : '-'}
+                          {asset.price ? formatHudMoney(asset.price, currency) : '-'}
                         </td>
                         <td style={{ 
                           padding: '12px 16px', 
@@ -469,12 +467,7 @@ export function AssetTerminal({
                           fontSize: '14px',
                           whiteSpace: 'nowrap'
                         }}>
-                          {asset.value ? new Intl.NumberFormat('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                          }).format(asset.value) : '-'}
+                          {asset.value ? formatHudMoney(asset.value, currency) : '-'}
                         </td>
                         <td style={{ 
                           padding: '12px 16px', 
@@ -524,7 +517,7 @@ export function AssetTerminal({
                           color: 'hsl(var(--foreground))', 
                           fontFamily: MONO_FONT 
                         }}>
-                          ${asset.price.toFixed(2)}
+                          {formatHudMoney(asset.price, currency)}
                         </td>
                         <td style={{ 
                           padding: '12px 16px', 
@@ -562,7 +555,7 @@ export function AssetTerminal({
                           fontWeight: '700', 
                           fontFamily: MONO_FONT 
                         }}>
-                          ${asset.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {formatHudMoney(asset.value, currency)}
                         </td>
                         <td style={{ 
                           padding: '12px 16px',

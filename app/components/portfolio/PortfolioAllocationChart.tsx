@@ -274,7 +274,9 @@ export default function PortfolioAllocationChart({
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent }) =>
-                  isMobile ? `${(percent || 0).toFixed(0)}%` : `${name} ${(percent || 0).toFixed(1)}%`
+                  isMobile
+                    ? `${((percent || 0) * 100).toFixed(0)}%`
+                    : `${name} ${((percent || 0) * 100).toFixed(1)}%`
                 }
                 outerRadius={outerRadius}
                 innerRadius={innerRadius}

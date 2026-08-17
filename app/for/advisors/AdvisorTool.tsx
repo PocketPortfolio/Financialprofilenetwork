@@ -13,6 +13,7 @@ import {
 } from '@/app/lib/advisors/generate-portfolio-report-pdf';
 import { loadImageNaturalSize } from '@/app/lib/advisors/logo-fit';
 import { formatReportDate } from '@/app/lib/advisors/sovereign-report-theme';
+import { isUkListedTicker } from '@/app/lib/markets/ukListedTickers';
 import { 
   trackToolPageView, 
   trackToolInteraction, 
@@ -141,8 +142,7 @@ export default function AdvisorTool() {
     }
     
     // For UK stocks, add .L suffix for London Stock Exchange (must match quote API)
-    const UK_STOCKS = ['HSBA', 'ULVR', 'VOD', 'BP', 'RDS', 'RDS-A', 'RDS-B', 'GSK', 'AZN', 'BATS', 'BT', 'LLOY', 'BARC', 'RBS', 'TSCO', 'SBRY', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT'];
-    if (UK_STOCKS.includes(baseTicker)) {
+    if (isUkListedTicker(baseTicker)) {
       return `${baseTicker}.L`;
     }
     

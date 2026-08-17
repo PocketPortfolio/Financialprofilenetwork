@@ -74,6 +74,10 @@ import { Trade } from '../services/tradeService';
 import { buildPortfolioContext } from '../lib/ai/contextBuilder';
 import { usePocketAnalyst } from '../components/ai/PocketAnalystProvider';
 import { FeedbackModal } from '@/app/components/feedback/FeedbackModal';
+import { BrewinPilotBanner } from '@/app/components/demo/BrewinPilotBanner';
+import { useBrewinPilot } from '@/app/components/demo/BrewinPilotProvider';
+import { isBrewinPilotRequested } from '@/app/lib/demo/brewin-manchester-pilot';
+import { isUkListedTicker } from '@/app/lib/markets/ukListedTickers';
 import {
   recordDashboardVisit,
   snoozeFeedbackPrompt,
@@ -121,6 +125,7 @@ function buildDashboardDemoSeedTrades(): Omit<
 
 export default function Dashboard() {
   const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
+  const { active: brewinPilotActive, overlayTrades: brewinOverlayTrades } = useBrewinPilot();
   // const { selectedPortfolio, selectedPortfolioId } = usePortfolios();
   const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
   const portfolioNotes = usePortfolioNotes();
@@ -162,12 +167,14 @@ export default function Dashboard() {
   // One-shot cold-start demo: after hydration, if still empty and user has not dismissed demo before.
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (isBrewinPilotRequested(window.location.pathname, window.location.search)) return;
     if (autoDemoColdStartRef.current) return;
     if (sessionStorage.getItem('pp_dashboard_demo_dismissed')) return;
     if (sessionStorage.getItem('pp_dashboard_demo_auto_v1')) return;
 
     const timer = window.setTimeout(async () => {
       if (autoDemoColdStartRef.current) return;
+      if (isBrewinPilotRequested(window.location.pathname, window.location.search)) return;
       if (sessionStorage.getItem('pp_dashboard_demo_dismissed')) return;
       if (sessionStorage.getItem('pp_dashboard_demo_auto_v1')) return;
       if (tradesRef.current.length > 0) return;
@@ -211,10 +218,10 @@ export default function Dashboard() {
   // For display: Show all trades when only mock trades exist (demo mode), otherwise show only real trades
   // This allows users to test with demo data, but hides demo data when real CSV is imported
   const displayTrades = useMemo(() => {
+    if (brewinPilotActive) return brewinOverlayTrades;
     const hasRealTrades = realTrades.length > 0;
-    // If there are real trades, only show real trades. Otherwise, show all trades (including mock for demo)
     return hasRealTrades ? realTrades : trades;
-  }, [trades, realTrades]);
+  }, [brewinPilotActive, brewinOverlayTrades, trades, realTrades]);
   
   // Clean and filter valid tickers (memoized with stable key to prevent infinite loops)
   // Use displayTrades so demo data tickers are included when no real trades exist
@@ -241,8 +248,7 @@ export default function Dashboard() {
         baseTicker = trimmed.split('-')[0];
       }
       // For UK stocks, add .L suffix for London Stock Exchange (must match quote API)
-      const UK_STOCKS = ['HSBA', 'ULVR', 'VOD', 'BP', 'RDS', 'RDS-A', 'RDS-B', 'GSK', 'AZN', 'BATS', 'BT', 'LLOY', 'BARC', 'RBS', 'TSCO', 'SBRY', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT'];
-      if (UK_STOCKS.includes(baseTicker)) {
+      if (isUkListedTicker(baseTicker)) {
         return `${baseTicker}.L`;
       }
       return baseTicker;
@@ -273,7 +279,7 @@ export default function Dashboard() {
   //   console.log('🔍 Filtered valid tickers:', userTickers);
   // }
   
-  const quotesResponse = useQuotes(userTickers);
+  const quotesResponse = useQuotes(brewinPilotActive ? [] : userTickers);
   
   // Memoize news tickers to prevent new array reference on every render
   const defaultTickers = useMemo(() => ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'], []);
@@ -345,6 +351,12 @@ export default function Dashboard() {
     symbol: string;
     count: number;
   }>({ isOpen: false, symbol: '', count: 0 });
+
+  useEffect(() => {
+    if (brewinPilotActive && portfolioView === 'notes') {
+      setPortfolioView('positions');
+    }
+  }, [brewinPilotActive, portfolioView]);
 
   // Prevent dashboard repaints when modals are open
   React.useEffect(() => {
@@ -452,7 +464,7 @@ export default function Dashboard() {
   // Historical data
   const { data: historicalSnapshots, loading: historyLoading } = usePortfolioHistory({
     userId: user?.uid || null,
-    enabled: useNewDashboard && !!user?.uid,
+    enabled: useNewDashboard && !!user?.uid && !brewinPilotActive,
   });
 
   const [syntheticSnapshots, setSyntheticSnapshots] = useState<PortfolioSnapshot[]>([]);
@@ -467,6 +479,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!useNewDashboard) return;
+    if (brewinPilotActive) return;
     if (!displayTrades || displayTrades.length === 0) return;
 
     const shouldBuild = historicalSnapshots.length === 0;
@@ -719,7 +732,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [useNewDashboard, displayTrades, historicalSnapshots.length, user?.uid, syntheticSnapshots.length]);
+  }, [useNewDashboard, displayTrades, historicalSnapshots.length, user?.uid, syntheticSnapshots.length, brewinPilotActive]);
 
   // Portfolio news (commented out - positions calculated later)
   // const portfolioNews = usePortfolioNews(Object.values(positions), 5);
@@ -770,6 +783,7 @@ export default function Dashboard() {
   // Listen for custom event to open import modal (from navigation menu)
   useEffect(() => {
     const handleOpenImportModal = () => {
+      if (brewinPilotActive) return;
       setShowImportModal(true);
     };
 
@@ -777,14 +791,14 @@ export default function Dashboard() {
     const shouldOpenImport = sessionStorage.getItem('openImportModal');
     if (shouldOpenImport === 'true') {
       sessionStorage.removeItem('openImportModal');
-      setShowImportModal(true);
+      if (!brewinPilotActive) setShowImportModal(true);
     }
 
     window.addEventListener('openImportModal', handleOpenImportModal);
     return () => {
       window.removeEventListener('openImportModal', handleOpenImportModal);
     };
-  }, []);
+  }, [brewinPilotActive]);
 
   // Show feature announcement modal once per user
   // IMPORTANT: Wait for onboarding tour to complete first
@@ -896,6 +910,7 @@ export default function Dashboard() {
   // Listen for custom event to open import modal (from navigation menu)
   useEffect(() => {
     const handleOpenImportModal = () => {
+      if (brewinPilotActive) return;
       setShowImportModal(true);
     };
 
@@ -903,7 +918,7 @@ export default function Dashboard() {
     return () => {
       window.removeEventListener('openImportModal', handleOpenImportModal);
     };
-  }, []);
+  }, [brewinPilotActive]);
 
   const handleCloseAnnouncement = () => {
     setShowFeatureAnnouncement(false);
@@ -1011,6 +1026,15 @@ export default function Dashboard() {
 
     // Apply current prices and calculate P&L (moved inside useMemo to avoid side effects in render)
     Object.values(calculated).forEach(position => {
+      if (brewinPilotActive) {
+        position.currentPrice = position.avgCost;
+        position.currentValue = position.avgCost * position.shares;
+        position.unrealizedPL = 0;
+        position.unrealizedPLPercent = 0;
+        position.currency = 'GBP';
+        return;
+      }
+
       // Commodity ticker mapping (must match quote API mapping)
       const COMMODITY_TICKER_MAP: Record<string, string> = {
         'GOLD': 'GC=F',
@@ -1057,8 +1081,7 @@ export default function Dashboard() {
           baseTicker = trimmed.split('-')[0];
         }
         // For UK stocks, add .L suffix for London Stock Exchange (must match quote API)
-        const UK_STOCKS = ['HSBA', 'ULVR', 'VOD', 'BP', 'RDS', 'RDS-A', 'RDS-B', 'GSK', 'AZN', 'BATS', 'BT', 'LLOY', 'BARC', 'RBS', 'TSCO', 'SBRY', 'MKS', 'NXT', 'ASOS', 'JD', 'ITV', 'PSN', 'BA', 'RR', 'BDEV', 'TW', 'PURP', 'III', 'SMT', 'FGT'];
-        if (UK_STOCKS.includes(baseTicker)) {
+        if (isUkListedTicker(baseTicker)) {
           return `${baseTicker}.L`;
         }
         // For crypto, Yahoo Finance uses BTC-USD format
@@ -1101,7 +1124,7 @@ export default function Dashboard() {
     });
 
     return calculated;
-  }, [displayTrades, quotesDataKey]); // Use displayTrades (includes demo when no real trades) and stable key instead of quotesData object
+  }, [displayTrades, quotesDataKey, brewinPilotActive]);
 
   // Update portfolio store with positions (only when positions actually change)
   // Use a ref to track previous positions and prevent infinite loops
@@ -1129,6 +1152,7 @@ export default function Dashboard() {
   }, [positionsArray]);
   
   useEffect(() => {
+    if (brewinPilotActive) return;
     if (!useNewDashboard) return;
     
     // Only update if positions actually changed
@@ -1136,7 +1160,7 @@ export default function Dashboard() {
       prevPositionsKeyRef.current = positionsKey;
       setStorePositions(positionsArray);
     }
-  }, [positionsKey, positionsArray, useNewDashboard, setStorePositions]);
+  }, [positionsKey, positionsArray, useNewDashboard, setStorePositions, brewinPilotActive]);
 
   // Sync portfolio context and tier for Pocket Analyst (Ask AI)
   useEffect(() => {
@@ -1164,6 +1188,7 @@ export default function Dashboard() {
   const lastSnapshotDateRef = React.useRef<string>('');
 
   useEffect(() => {
+    if (brewinPilotActive) return;
     if (!user?.uid || Object.values(positions).length === 0 || !useNewDashboard) return;
     
     // Only save if positions actually changed
@@ -1200,10 +1225,30 @@ export default function Dashboard() {
           lastSnapshotDateRef.current = '';
         });
     }
-  }, [snapshotKey, user?.uid, useNewDashboard, positions]);
+  }, [snapshotKey, user?.uid, useNewDashboard, positions, brewinPilotActive]);
 
   // Calculate analytics (prefer real snapshots, else synthetic from trades, else current positions)
   const analytics = useMemo(() => {
+    if (brewinPilotActive) {
+      const positionsArray = Object.values(positions);
+      const totalValue = positionsArray.reduce(
+        (sum, pos) => sum + (pos.currentValue ?? pos.avgCost * pos.shares),
+        0
+      );
+      return {
+        totalValue,
+        dailyChange: 0,
+        dailyChangePercent: 0,
+        allTimeReturn: 0,
+        allTimeReturnPercent: 0,
+        annualizedReturn: 0,
+        volatility: 0,
+        sharpeRatio: 0,
+        beta: 0,
+        maxDrawdown: 0,
+      };
+    }
+
     const snapshotsForAnalytics =
       historicalSnapshots.length > 0
         ? historicalSnapshots
@@ -1262,7 +1307,7 @@ export default function Dashboard() {
     };
 
     return computed;
-  }, [historicalSnapshots, syntheticSnapshots, syntheticBenchmarkReturns, positions, quotesData]);
+  }, [brewinPilotActive, historicalSnapshots, syntheticSnapshots, syntheticBenchmarkReturns, positions, quotesData]);
 
   const chartSnapshots = useMemo(
     () => (historicalSnapshots.length > 0 ? historicalSnapshots : syntheticSnapshots),
@@ -1334,17 +1379,17 @@ export default function Dashboard() {
     if (!analytics) return '';
     const lines = [
       'Risk & performance snapshot:',
-      `Total value: $${analytics.totalValue.toFixed(2)}`,
+      `Total value: ${brewinPilotActive ? 'GBP' : 'USD'} ${analytics.totalValue.toFixed(2)}`,
       `All-time return: ${analytics.allTimeReturnPercent.toFixed(2)}%`,
       `Beta: ${analytics.beta.toFixed(2)}`,
       `Max drawdown: ${analytics.maxDrawdown.toFixed(2)}%`,
       `Sharpe: ${analytics.sharpeRatio.toFixed(2)}`,
     ];
-    if (benchmarkAlphaPercent != null) {
+    if (benchmarkAlphaPercent != null && !brewinPilotActive) {
       lines.push(`Alpha vs S&P 500 (period): ${benchmarkAlphaPercent.toFixed(2)}%`);
     }
     return lines.join('\n');
-  }, [analytics, benchmarkAlphaPercent]);
+  }, [analytics, benchmarkAlphaPercent, brewinPilotActive]);
 
   const briefingFallbackBullets = useCallback(() => {
     const top = Object.values(positions).sort(
@@ -1789,6 +1834,7 @@ export default function Dashboard() {
   };
 
   const handleClearAllTrades = async () => {
+    if (brewinPilotActive) return;
     if (!isAuthenticated || !user) {
       setAlertModalData({
         title: 'Sign In Required',
@@ -1803,7 +1849,11 @@ export default function Dashboard() {
   };
 
   const confirmDeleteAllTrades = async () => {
-    
+    if (brewinPilotActive) {
+      setShowDeleteModal(false);
+      return;
+    }
+
     // CRITICAL: Mark deletion in progress BEFORE deleting to prevent polling from pulling stale trades
     markDeletionStart();
     setIsDeleting(true);
@@ -1879,7 +1929,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <OnboardingTour />
+      {!brewinPilotActive && <OnboardingTour />}
       <SEOHead
         title="Portfolio Dashboard - Track Your Investments"
         description="Manage your investment portfolio with live P/L tracking, real-time prices, mock trading, and CSV import. Free portfolio management dashboard with advanced analytics and insights."
@@ -1896,6 +1946,7 @@ export default function Dashboard() {
           'investment tools'
         ]}
         canonical="https://www.pocketportfolio.app/dashboard"
+        noIndex={brewinPilotActive}
         ogImage="https://www.pocketportfolio.app/api/og?title=Dashboard&description=Your%20Portfolio%2C%20Local-First&v=6"
         ogType="website"
       />
@@ -1904,7 +1955,8 @@ export default function Dashboard() {
 
       {/* 🎨 CONTENT - Layout wrapper handles header/banner/tier injection */}
       <div>
-          {isAuthenticated && !tierLoading && !isPaidTier(tier) && (
+          {brewinPilotActive && <BrewinPilotBanner />}
+          {isAuthenticated && !tierLoading && !isPaidTier(tier) && !brewinPilotActive && (
             <div
               style={{
                 position: 'sticky',
@@ -1930,6 +1982,7 @@ export default function Dashboard() {
             </div>
           )}
           {showDemoTerminalBanner &&
+            !brewinPilotActive &&
             realTrades.length === 0 &&
             trades.length > 0 &&
             trades.every((t) => t.mock) && (
@@ -1969,7 +2022,7 @@ export default function Dashboard() {
               </div>
             )}
           {/* Directive B — direct-entry affordance: search + import before deep terminal chrome */}
-          <div
+          {!brewinPilotActive && <div
             data-tour="dashboard-next-action"
             id="dashboard-quick-search"
             className="dashboard-card"
@@ -2027,22 +2080,23 @@ export default function Dashboard() {
                 JSON API hub →
               </Link>
             </div>
-          </div>
+          </div>}
           {/* 🎨 INTELLIGENCE LAYER - Above everything */}
           {/* Hero HUD — mark-to-market value + benchmark alpha */}
           <TerminalSummary
             totalPortfolioValue={totalPortfolioValue}
             allTimeReturn={heroAllTimeReturn}
             allTimeReturnPercent={heroAllTimeReturnPercent}
-            benchmarkAlphaPercent={benchmarkAlphaPercent}
+            benchmarkAlphaPercent={brewinPilotActive ? null : benchmarkAlphaPercent}
             totalTrades={totalTrades}
             totalPositions={totalPositions}
             totalInvested={totalInvested}
             returnLabel={heroReturnLabel}
-            loading={!trades || trades.length === 0}
+            loading={displayTrades.length === 0}
+            currency={brewinPilotActive ? 'GBP' : 'USD'}
           />
 
-          {trades.length > 0 && analytics && (
+          {displayTrades.length > 0 && analytics && (
             <RiskMatrix
               analytics={analytics}
               loading={historyLoading || syntheticSnapshotsLoading || tierLoading}
@@ -2051,7 +2105,7 @@ export default function Dashboard() {
             />
           )}
 
-          {trades.length > 0 && (
+          {displayTrades.length > 0 && !brewinPilotActive && (
             <MorningBrief
               briefing={
                 clientBriefing.status === 'idle'
@@ -2062,11 +2116,12 @@ export default function Dashboard() {
           )}
 
           {/* Sync Upgrade CTA - Show for unauthenticated users with local trades */}
-          <SyncUpgradeCTA />
+          {!brewinPilotActive && <SyncUpgradeCTA />}
 
           {/* Account Management moved to UserAvatarDropdown */}
 
           {/* Data Input Deck - Unified Input Portal */}
+          {!brewinPilotActive && (
           <div id="add-trade">
             <DataInputDeck
               newTrade={newTrade}
@@ -2077,9 +2132,10 @@ export default function Dashboard() {
               onImport={() => setShowImportModal(true)}
             />
           </div>
+          )}
 
           {/* Import Modal */}
-          {showImportModal && (
+          {showImportModal && !brewinPilotActive && (
             <div 
               style={{
                 position: 'fixed',
@@ -2218,7 +2274,7 @@ export default function Dashboard() {
           )}
 
           {/* Portfolio Dashboard - New Enhanced Version */}
-          {trades.length > 0 && useNewDashboard && (
+          {displayTrades.length > 0 && useNewDashboard && (
             <>
               {/* Analytics Panel */}
               {analytics && (
@@ -2227,6 +2283,8 @@ export default function Dashboard() {
                     analytics={analytics}
                     loading={historyLoading || syntheticSnapshotsLoading || tierLoading}
                     isPremium={isPaidTier(tier)}
+                    currency={brewinPilotActive ? 'GBP' : 'USD'}
+                    hideHistoryMetrics={brewinPilotActive}
                   />
                 </div>
               )}
@@ -2452,7 +2510,7 @@ export default function Dashboard() {
         )}
 
         {/* Portfolio Holdings - Full Width Layout */}
-        {trades.length > 0 && (
+        {displayTrades.length > 0 && (
           <div id="positions" style={{ 
             marginTop: '32px',
             marginBottom: '32px',
@@ -2498,7 +2556,7 @@ export default function Dashboard() {
                 </div>
                 
                 {/* Clear All Trades - Subtle button when authenticated and has trades */}
-                {isAuthenticated && trades.length > 0 && (
+                {isAuthenticated && trades.length > 0 && !brewinPilotActive && (
                   <button
                     onClick={handleClearAllTrades}
                     style={{
@@ -2568,9 +2626,9 @@ export default function Dashboard() {
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    Trades ({trades.length})
+                    Trades ({brewinPilotActive ? displayTrades.length : trades.length})
                   </button>
-                  <button
+                  {!brewinPilotActive && <button
                     onClick={() => setPortfolioView('notes')}
                     style={{
                       padding: '6px 12px',
@@ -2586,7 +2644,7 @@ export default function Dashboard() {
                     }}
                   >
                     Notes
-                  </button>
+                  </button>}
                 </div>
               </div>
               {portfolioView === 'notes' ? (
@@ -2614,7 +2672,7 @@ export default function Dashboard() {
                 assets={(() => {
                   if (portfolioView === 'trades') {
                     // Transform trades to Asset format - use all trades (not displayTrades) to match positions page
-                    const tradeAssets = trades.map(trade => ({
+                    const tradeAssets = displayTrades.map(trade => ({
                       symbol: trade.ticker,
                       name: quotesData?.[trade.ticker]?.name || trade.ticker,
                       price: trade.price,
@@ -2704,22 +2762,30 @@ export default function Dashboard() {
                   }
                 })()}
                 totalPortfolioValue={totalPortfolioValue}
-                onEdit={(asset) => {
-                  // Scroll to add trade form
-                  const addTradeSection = document.getElementById('add-trade');
-                  if (addTradeSection) {
-                    addTradeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }}
-                onDelete={(symbol) => {
-                  const tradesToDelete = trades.filter(t => t.ticker === symbol);
-                  setDeleteConfirm({
-                    isOpen: true,
-                    symbol,
-                    count: tradesToDelete.length
-                  });
-                }}
-                setShowImportModal={setShowImportModal}
+                currency={brewinPilotActive ? 'GBP' : 'USD'}
+                onEdit={
+                  brewinPilotActive
+                    ? undefined
+                    : () => {
+                        const addTradeSection = document.getElementById('add-trade');
+                        if (addTradeSection) {
+                          addTradeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }
+                }
+                onDelete={
+                  brewinPilotActive
+                    ? undefined
+                    : (symbol) => {
+                        const tradesToDelete = trades.filter((t) => t.ticker === symbol);
+                        setDeleteConfirm({
+                          isOpen: true,
+                          symbol,
+                          count: tradesToDelete.length,
+                        });
+                      }
+                }
+                setShowImportModal={brewinPilotActive ? undefined : setShowImportModal}
                 onSort={(column: 'symbol' | 'price' | 'change' | 'value' | 'weight' | 'date' | 'type' | 'qty') => {
                   if (sortBy === column) {
                     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -2737,7 +2803,7 @@ export default function Dashboard() {
         )}
 
         {/* Operations footer — live data pipeline status (below holdings narrative) */}
-        {trades.length > 0 && (
+        {displayTrades.length > 0 && !brewinPilotActive && (
           <div
             className="dashboard-card"
             style={{ marginTop: '8px', marginBottom: '32px' }}
@@ -2761,7 +2827,7 @@ export default function Dashboard() {
         )}
 
         {/* Empty State: Mobile handoff (Mandate 3) vs Desktop 3-step CSV onboarding */}
-        {trades.length === 0 && isMobile && (
+        {displayTrades.length === 0 && isMobile && (
           <div
             data-tour="dashboard-mobile-handoff"
             style={{
@@ -2856,7 +2922,7 @@ export default function Dashboard() {
             )}
           </div>
         )}
-        {trades.length === 0 && !isMobile && (
+        {displayTrades.length === 0 && !isMobile && (
           <div
             data-tour="dashboard-get-started"
             style={{ 
@@ -3373,7 +3439,7 @@ export default function Dashboard() {
           </div>
 
           {/* Referral Program */}
-          {isAuthenticated && user && (
+          {isAuthenticated && user && !brewinPilotActive && (
             <div className="mobile-card brand-card" style={{ 
               marginBottom: '12px',
               padding: '0',
@@ -3390,7 +3456,7 @@ export default function Dashboard() {
 
       {/* Delete All Trades Confirmation Modal */}
       <ConfirmationModal
-        isOpen={showDeleteModal}
+        isOpen={showDeleteModal && !brewinPilotActive}
         title="Delete All Trades"
         message="Are you sure you want to delete ALL trades from your account? This action cannot be undone."
         confirmText="Delete All"
@@ -3403,7 +3469,7 @@ export default function Dashboard() {
 
       {/* Delete Individual Trades Confirmation Modal */}
       <ConfirmationModal
-        isOpen={deleteConfirm.isOpen}
+        isOpen={deleteConfirm.isOpen && !brewinPilotActive}
         title="Delete Trades"
         message={`Delete all ${deleteConfirm.count} trades for ${deleteConfirm.symbol}? This action cannot be undone.`}
         confirmText="Delete"
@@ -3430,12 +3496,12 @@ export default function Dashboard() {
 
       {/* Feature Announcement Modal */}
       <FeatureAnnouncementModal
-        isOpen={showFeatureAnnouncement}
+        isOpen={showFeatureAnnouncement && !brewinPilotActive}
         onClose={handleCloseAnnouncement}
       />
 
       {/* Feedback Modal (power-user trigger; write-path P0 router) */}
-      {user && (
+      {user && !brewinPilotActive && (
         <FeedbackModal
           open={showFeedbackModal}
           onClose={() => {
@@ -3451,7 +3517,7 @@ export default function Dashboard() {
 
       {/* Weekly Portfolio Snapshot toast (7-day return, local-only P&L) */}
       <WeeklySnapshotToast
-        show={showWeeklySnapshotToast}
+        show={showWeeklySnapshotToast && !brewinPilotActive}
         onDismiss={dismissWeeklySnapshotToast}
         summary={{ totalInvested, unrealizedPL: totalUnrealizedPL }}
       />

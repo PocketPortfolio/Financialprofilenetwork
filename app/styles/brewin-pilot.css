@@ -1,0 +1,14 @@
+/**
+ * Gated Manchester design-partner replica.
+ * Applies only when html[data-enterprise-pilot="brewin-mcr"].
+ * Does not override light/dark tokens — replica uses product theme (amber SSOT).
+ */
+
+html[data-enterprise-pilot='brewin-mcr'] .global-founders-banner {
+  display: none !important;
+}
+
+html[data-enterprise-pilot='brewin-mcr'] nav[aria-label='Mobile tab bar'],
+html[data-enterprise-pilot='brewin-mcr'] .mobile-tab-bar {
+  display: none !important;
+}

@@ -68,6 +68,22 @@ describe('dashboardNavConfig — org SSOT & production routing', () => {
     expect(admin?.items.every((i) => i.adminOnly)).toBe(true);
   });
 
+  it('admin leads with Brewin replica GTM CTA', () => {
+    const admin = DASHBOARD_NAV_SECTIONS.find((s) => s.id === 'admin');
+    expect(admin?.defaultOpen).toBe(true);
+    expect(admin?.items[0]?.id).toBe('admin-brewin-replica');
+    expect(admin?.items[0]?.href).toBe('/demo/brewin');
+    expect(admin?.items[0]?.label).toBe('Brewin replica');
+  });
+
+  it('Brewin replica active state does not steal Dashboard highlight', () => {
+    const brewin = DASHBOARD_NAV_SECTIONS.find((s) => s.id === 'admin')?.items[0];
+    expect(brewin).toBeTruthy();
+    expect(isDashboardNavItemActive(brewin!, '/demo/brewin')).toBe(true);
+    expect(isDashboardNavItemActive(DASHBOARD_NAV_PRIMARY[0], '/demo/brewin')).toBe(false);
+    expect(isDashboardNavItemActive(DASHBOARD_NAV_PRIMARY[0], '/dashboard')).toBe(true);
+  });
+
   it('active state highlights dashboard root only for Dashboard item', () => {
     expect(isDashboardNavItemActive(DASHBOARD_NAV_PRIMARY[0], '/dashboard')).toBe(true);
     expect(isDashboardNavItemActive(DASHBOARD_NAV_PRIMARY[0], '/')).toBe(true);
@@ -112,6 +128,11 @@ describe('dashboardNavConfig — org SSOT & production routing', () => {
 
   it('live route uses dashboard shell layout (SovereignHeader + DesktopNav)', () => {
     const source = readFileSync(join(APP_ROOT, 'live', 'layout.tsx'), 'utf8');
+    expect(source).toContain('DashboardClientLayout');
+  });
+
+  it('Brewin replica uses the same dashboard shell so Admin rail stays visible', () => {
+    const source = readFileSync(join(APP_ROOT, 'demo', 'brewin', 'layout.tsx'), 'utf8');
     expect(source).toContain('DashboardClientLayout');
   });
 });
