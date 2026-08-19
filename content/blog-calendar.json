@@ -1336,7 +1336,7 @@
     "date": "2026-08-19",
     "title": "The Psychology of FOMO: Data on Emotional Trading",
     "slug": "the-psychology-of-fomo-data-on-emotional-trading",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1346,7 +1346,8 @@
       "psychology"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-19T09:03:52.913Z"
   },
   {
     "id": "week-34-post-1",
