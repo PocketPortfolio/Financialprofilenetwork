@@ -27,6 +27,11 @@ import {
   LOCAL_ASK_AI_SYSTEM_PREAMBLE,
   SOVEREIGN_WAKE_BUDGET_MS,
 } from '@/app/lib/ai/providers';
+import {
+  getDeskActions,
+  type DeskAction,
+} from '@/app/lib/ai/deskActions';
+import { useBrewinPilot } from '@/app/components/demo/BrewinPilotProvider';
 
 const ATTACHMENT_MAX_CHARS = 50000;
 
@@ -114,6 +119,8 @@ export function AskAIModal({
   isPaid = false,
 }: AskAIModalProps) {
   const { signInWithGoogle, loading: authLoading } = useAuth();
+  const { active: brewinPilotActive } = useBrewinPilot();
+  const deskActions = getDeskActions({ brewinPilot: brewinPilotActive });
   const [signInBusy, setSignInBusy] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -297,17 +304,17 @@ export function AskAIModal({
     void requestSovereignWake(providerMode);
   }, [open, user, localModeActive, providerMode, requestSovereignWake]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const text = input.trim();
-    if (!text || !user || isLoading) return;
+  const sendMessage = async (opts: { displayText: string; apiMessage: string }) => {
+    const displayText = opts.displayText.trim();
+    const apiMessage = opts.apiMessage.trim();
+    if (!apiMessage || !user || isLoading) return;
 
     setError(null);
     setInfoNotice(null);
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: text,
+      content: displayText || apiMessage,
     };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
@@ -340,7 +347,7 @@ export function AskAIModal({
             baseUrl,
             model,
             system,
-            user: text,
+            user: apiMessage,
             signal:
               typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
                 ? (AbortSignal as any).timeout(120000)
@@ -386,7 +393,7 @@ export function AskAIModal({
           },
           signal: abort.signal,
           body: JSON.stringify({
-            message: text,
+            message: apiMessage,
             context: localModeActive
               ? truncatePortfolioContextForLocal(portfolioContext)
               : portfolioContext,
@@ -469,6 +476,22 @@ export function AskAIModal({
       setIsLoading(false);
       setWakingSovereign(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text) return;
+    await sendMessage({ displayText: text, apiMessage: text });
+  };
+
+  const runDeskAction = (action: DeskAction) => {
+    if (!user || isLoading || attachmentProcessing) return;
+    trackEvent('ai_desk_action_click', {
+      action_id: action.id,
+      brewin_pilot: brewinPilotActive,
+    });
+    void sendMessage({ displayText: action.label, apiMessage: action.prompt });
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -686,13 +709,68 @@ export function AskAIModal({
               }}
             >
               {messages.length === 0 && (
-                <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>
-                  {localModeActive
-                    ? isOllamaClientDirectEnabled()
-                      ? 'BYO laptop Ollama: bounded summary goes to your local node (not third-party cloud APIs). Attachments disabled in Phase 1.'
-                      : 'OP-Hosted Sovereign scales to zero when idle. Selecting Sovereign wakes a PAYG node; if wake is slow, Cloud Auto answers so you are never stranded.'
-                    : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
-                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>
+                    {localModeActive
+                      ? isOllamaClientDirectEnabled()
+                        ? 'BYO laptop Ollama: bounded summary goes to your local node (not third-party cloud APIs). Attachments disabled in Phase 1.'
+                        : 'OP-Hosted Sovereign scales to zero when idle. Selecting Sovereign wakes a PAYG node; if wake is slow, Cloud Auto answers so you are never stranded.'
+                      : 'Ask about your portfolio, markets, or investing. Your data stays local; only a summary is sent to the AI.'}
+                  </p>
+                  <div>
+                    <p
+                      style={{
+                        margin: '0 0 8px',
+                        fontSize: '11px',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: 'var(--accent-warm, #f59e0b)',
+                      }}
+                    >
+                      Desk actions
+                    </p>
+                    <p style={{ margin: '0 0 10px', fontSize: '13px', color: 'hsl(var(--muted-foreground))' }}>
+                      Guided asks for desk work — or type freely below.
+                    </p>
+                    <div
+                      role="group"
+                      aria-label="Desk actions"
+                      style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
+                    >
+                      {deskActions.map((action) => {
+                        const pinned =
+                          brewinPilotActive &&
+                          (action.id === 'concentration' || action.id === 'review_prep');
+                        return (
+                          <button
+                            key={action.id}
+                            type="button"
+                            title={action.shortHint}
+                            disabled={isLoading || attachmentProcessing}
+                            onClick={() => runDeskAction(action)}
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: '6px',
+                              border: pinned
+                                ? '1px solid var(--accent-warm, #f59e0b)'
+                                : '1px solid var(--border-subtle, hsl(var(--border)))',
+                              background: 'hsl(var(--background))',
+                              color: 'hsl(var(--foreground))',
+                              fontSize: '13px',
+                              fontWeight: pinned ? 600 : 500,
+                              cursor:
+                                isLoading || attachmentProcessing ? 'not-allowed' : 'pointer',
+                              opacity: isLoading || attachmentProcessing ? 0.6 : 1,
+                              textAlign: 'left',
+                            }}
+                          >
+                            {action.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               )}
               {localModeActive && localAiEnabled && (
                 <p
@@ -787,6 +865,63 @@ export function AskAIModal({
                 onSequenceComplete={finishAttachmentTheater}
                 style={{ marginBottom: '10px' }}
               />
+              {messages.length > 0 && (
+                <div
+                  style={{
+                    marginBottom: '10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: 'hsl(var(--muted-foreground))',
+                    }}
+                  >
+                    More desk actions
+                  </span>
+                  <div
+                    role="group"
+                    aria-label="More desk actions"
+                    style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}
+                  >
+                    {deskActions.map((action) => {
+                      const pinned =
+                        brewinPilotActive &&
+                        (action.id === 'concentration' || action.id === 'review_prep');
+                      return (
+                        <button
+                          key={action.id}
+                          type="button"
+                          title={action.shortHint}
+                          disabled={isLoading || attachmentProcessing}
+                          onClick={() => runDeskAction(action)}
+                          style={{
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            border: pinned
+                              ? '1px solid var(--accent-warm, #f59e0b)'
+                              : '1px solid var(--border-subtle, hsl(var(--border)))',
+                            background: 'transparent',
+                            color: 'hsl(var(--foreground))',
+                            fontSize: '12px',
+                            fontWeight: pinned ? 600 : 400,
+                            cursor:
+                              isLoading || attachmentProcessing ? 'not-allowed' : 'pointer',
+                            opacity: isLoading || attachmentProcessing ? 0.6 : 1,
+                          }}
+                        >
+                          {action.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <input
                   ref={fileInputRef}
@@ -845,7 +980,7 @@ export function AskAIModal({
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about your portfolio or markets..."
+                  placeholder="Or type freely…"
                   rows={1}
                   disabled={isLoading || attachmentProcessing}
                   style={{
