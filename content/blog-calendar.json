@@ -1372,7 +1372,7 @@
     "date": "2026-08-26",
     "title": "The Philosophy Behind Pocket Portfolio's Design",
     "slug": "the-philosophy-behind-pocket-portfolio-s-design",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1382,7 +1382,8 @@
       "philosophy"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-26T09:01:37.045Z"
   },
   {
     "id": "week-35-post-1",
