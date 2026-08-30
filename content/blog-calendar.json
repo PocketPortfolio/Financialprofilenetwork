@@ -1390,7 +1390,7 @@
     "date": "2026-08-30",
     "title": "Value vs. Growth: What 20 Years of Data Shows",
     "slug": "value-vs-growth-what-20-years-of-data-shows",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1400,7 +1400,8 @@
       "value"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-08-30T09:01:21.675Z"
   },
   {
     "id": "week-35-post-2",
