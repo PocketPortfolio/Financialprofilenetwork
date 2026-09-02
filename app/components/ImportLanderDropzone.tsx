@@ -1,10 +1,29 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import Link from 'next/link';
-import CSVImporter from '@/app/components/CSVImporter';
 import { useTrades } from '@/app/hooks/useTrades';
 import { postImportDeveloperUtilityHref } from '@/lib/bot-gate';
+
+/** Defer heavy importer chunk so SERP landers paint guide content first (IBKR P0 bounce fix). */
+const CSVImporter = dynamic(() => import('@/app/components/CSVImporter'), {
+  ssr: false,
+  loading: () => (
+    <div
+      role="status"
+      style={{
+        padding: 24,
+        border: '1px dashed var(--border-subtle, var(--border))',
+        color: 'var(--text-secondary)',
+        fontSize: 14,
+        textAlign: 'center',
+      }}
+    >
+      Loading local CSV importer…
+    </div>
+  ),
+});
 
 interface Trade {
   id: string;

@@ -4,6 +4,7 @@ import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 import SovereignSyncCTA from '@/app/components/SovereignSyncCTA';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 import ImportLanderDropzone from '@/app/components/ImportLanderDropzone';
+import IbkrFlexQuickStart from '@/app/components/IbkrFlexQuickStart';
 
 /** US retail CSV-export intent pages — dedicated title/meta/H1 + export copy */
 const US_RETAIL_SEO_BROKERS = new Set(['robinhood', 'schwab', 'fidelity', 'vanguard']);
@@ -36,9 +37,9 @@ const HIGH_CTR_IMPORT_TITLES: Record<string, { title: string; description: strin
       'Export Trade Republic transactions as CSV and import in-browser. No uploads. Track P&L locally with Pocket Portfolio.',
   },
   'interactive-brokers': {
-    title: 'Interactive Brokers CSV / Flex Import | Local-First Tracker',
+    title: 'Interactive Brokers CSV Import (Flex Query) — Not IBKR Login | Pocket Portfolio',
     description:
-      'Import IBKR Flex or CSV exports in your browser. No server uploads. Local-first portfolio tracking for Interactive Brokers.',
+      'Step-by-step IBKR Flex Query & activity statement CSV import in your browser. Not the IBKR login page — parse trades locally with Pocket Portfolio (PocketFolio).',
   },
   trading212: {
     title: 'Trading 212 CSV Export Import | Free Local Portfolio Tracker',
@@ -508,6 +509,8 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
               : `Learn how to import your ${config.displayName} trading data via CSV into Pocket Portfolio for seamless portfolio tracking.`}
           </p>
         </header>
+
+        {isIbkr ? <IbkrFlexQuickStart /> : null}
 
         <ImportLanderDropzone brokerSlug={broker} brokerDisplayName={config.displayName} />
 
