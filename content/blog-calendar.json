@@ -1408,7 +1408,7 @@
     "date": "2026-09-02",
     "title": "The Cloud Portfolio Scam: What They Don't Tell You",
     "slug": "the-cloud-portfolio-scam-what-they-don-t-tell-you",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1418,7 +1418,8 @@
       "cloud"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-02T09:01:54.204Z"
   },
   {
     "id": "week-36-post-1",
