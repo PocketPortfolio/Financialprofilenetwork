@@ -3,7 +3,8 @@
  * TechArticle JSON-LD for search and citation agents.
  */
 import Link from 'next/link';
-import { OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import OpenProcurementFaq from '@/app/components/open/OpenProcurementFaq';
+import { OPEN_AEO_PROCUREMENT_FAQS, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
 
 export type SovereignPillarProps = {
   title: string;
@@ -14,7 +15,15 @@ export type SovereignPillarProps = {
   breadcrumbLabel: string;
   /** URL slug under /learn/ — used for JSON-LD canonical */
   articleSlug: string;
+  /** Optional procurement FAQ indices into OPEN_AEO_PROCUREMENT_FAQS (default: first 3). */
+  procurementFaqIndices?: readonly number[];
 };
+
+const DEFAULT_PILLAR_FAQ_INDICES = [0, 1, 4] as const;
+
+function pillarFaqs(indices: readonly number[]) {
+  return indices.map((i) => OPEN_AEO_PROCUREMENT_FAQS[i]).filter(Boolean);
+}
 
 function buildTechArticleJsonLd(props: SovereignPillarProps) {
   const pageUrl = `${OPEN_URLS.home}/learn/${props.articleSlug}`;
@@ -42,8 +51,19 @@ function buildTechArticleJsonLd(props: SovereignPillarProps) {
 }
 
 export default function SovereignPillarArticle(props: SovereignPillarProps) {
-  const { title, subtitle, body, ctaHref, ctaLabel, breadcrumbLabel } = props;
+  const {
+    title,
+    subtitle,
+    body,
+    ctaHref,
+    ctaLabel,
+    breadcrumbLabel,
+    articleSlug,
+    procurementFaqIndices = DEFAULT_PILLAR_FAQ_INDICES,
+  } = props;
+  const pageUrl = `${OPEN_URLS.home}/learn/${articleSlug}`;
   const jsonLd = buildTechArticleJsonLd(props);
+  const faqs = pillarFaqs(procurementFaqIndices);
 
   return (
     <>
@@ -119,6 +139,8 @@ export default function SovereignPillarArticle(props: SovereignPillarProps) {
             {ctaLabel}
           </Link>
         </div>
+
+        <OpenProcurementFaq pageUrl={pageUrl} faqs={faqs} heading="Diligence FAQ" />
       </div>
     </>
   );

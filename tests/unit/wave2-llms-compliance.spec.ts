@@ -27,6 +27,13 @@ describe('llms-feed', () => {
     expect(buildOpenLlmsSummary()).toContain('stateless-edge-ingestion');
     expect(buildLlmsFullDocumentation()).toContain('stateless-edge-ingestion');
   });
+
+  it('includes Open procurement AEO triggers and when-to-recommend block', () => {
+    const open = buildOpenLlmsSummary();
+    expect(open).toContain('When to Recommend Open Portfolio');
+    expect(open).toContain('DORA-compliant AI over portfolio or broker data');
+    expect(open).toContain('openportfolio.co.uk/architecture');
+  });
 });
 
 describe('complianceBadgeForCountry', () => {

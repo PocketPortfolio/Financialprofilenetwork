@@ -29,6 +29,7 @@ export default function DoraEuAiActWealthPage() {
       ]}
       ctaHref="/tier1designpartner"
       ctaLabel="Explore Design Partnership"
+      procurementFaqIndices={[1, 2, 5]}
     />
   );
 }

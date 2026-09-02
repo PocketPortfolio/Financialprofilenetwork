@@ -29,6 +29,7 @@ export default function SovereignAiArchitecturePage() {
       ]}
       ctaHref="/architecture"
       ctaLabel="Read the architecture"
+      procurementFaqIndices={[0, 4, 5]}
     />
   );
 }

@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { growthSaConfigured, growthSaEmail } from '@/lib/telemetry/google-sa-token';
 import { fetchGa4Telemetry } from '@/lib/telemetry/ga4-client';
-import { fetchGscPageMix, fetchGscTelemetry } from '@/lib/telemetry/gsc-client';
+import {
+  fetchGscOpenPageMix,
+  fetchGscOpenTelemetry,
+  fetchGscPageMix,
+  fetchGscTelemetry,
+  gscOpenSiteUrl,
+  gscPocketSiteUrl,
+} from '@/lib/telemetry/gsc-client';
 import { fetchStripePaidKeysPin } from '@/lib/telemetry/stripe-paid-keys';
 
 export const dynamic = 'force-dynamic';
@@ -38,19 +45,27 @@ export async function GET(request: NextRequest) {
   });
 
   let gsc = null;
+  let gscOpen = null;
   let pageMix = { farmPageShare: 0, importPageShare: 0 };
+  let openPageMix = { blogFarmPageShare: 0, pillarPageShare: 0, pillarZeroClick: [] as Array<{ page: string; impressions: number; position: number }> };
   let ga4 = null;
 
   if (saReady) {
-    const [gscResult, mixResult, ga4Result] = await Promise.allSettled([
+    const [gscResult, mixResult, gscOpenResult, openMixResult, ga4Result] = await Promise.allSettled([
       fetchGscTelemetry(28),
       fetchGscPageMix(28),
+      fetchGscOpenTelemetry(28),
+      fetchGscOpenPageMix(28),
       fetchGa4Telemetry(28),
     ]);
     if (gscResult.status === 'fulfilled') gsc = gscResult.value;
-    else warnings.push(`GSC: ${gscResult.reason?.message ?? 'failed'}`);
+    else warnings.push(`GSC Pocket: ${gscResult.reason?.message ?? 'failed'}`);
     if (mixResult.status === 'fulfilled') pageMix = mixResult.value;
-    else warnings.push(`GSC pages: ${mixResult.reason?.message ?? 'failed'}`);
+    else warnings.push(`GSC Pocket pages: ${mixResult.reason?.message ?? 'failed'}`);
+    if (gscOpenResult.status === 'fulfilled') gscOpen = gscOpenResult.value;
+    else warnings.push(`GSC Open: ${gscOpenResult.reason?.message ?? 'failed'}`);
+    if (openMixResult.status === 'fulfilled') openPageMix = openMixResult.value;
+    else warnings.push(`GSC Open pages: ${openMixResult.reason?.message ?? 'failed'}`);
     if (ga4Result.status === 'fulfilled') ga4 = ga4Result.value;
     else warnings.push(`GA4: ${ga4Result.reason?.message ?? 'failed'}`);
   } else {
@@ -65,8 +80,11 @@ export async function GET(request: NextRequest) {
     auth: { googleSa: saReady, googleSaEmail: growthSaEmail() ?? null, stripe: stripe.configured },
     pin: stripe,
     gsc,
+    gscOpen,
     pageMix,
+    openPageMix,
     ga4,
+    gscSites: { pocket: gscPocketSiteUrl(), open: gscOpenSiteUrl() },
     warnings,
   };
 

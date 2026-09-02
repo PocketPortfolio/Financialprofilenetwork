@@ -1,4 +1,11 @@
-import { classifyGscPage, classifyGscQuery, clickShareByBucket, type GscQueryBucket } from './classify-gsc-query';
+import {
+  classifyGscPage,
+  classifyGscQuery,
+  classifyOpenGscPage,
+  clickShareByBucket,
+  openPageClickShare,
+  type GscQueryBucket,
+} from './classify-gsc-query';
 import { getGrowthGoogleAccessToken } from './google-sa-token';
 
 export interface GscQueryRow {
@@ -20,12 +27,30 @@ export interface GscTelemetry {
   clickShare: ReturnType<typeof clickShareByBucket>;
 }
 
+export interface GscOpenPageMix {
+  blogFarmPageShare: number;
+  pillarPageShare: number;
+  /** Pillar URLs with impressions > 0 and clicks === 0 (AEO CTR gap signal). */
+  pillarZeroClick: Array<{ page: string; impressions: number; position: number }>;
+}
+
 function ymd(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-function gscSiteUrl(): string {
+function dateWindow(days: number): { startDate: string; endDate: string } {
+  const end = new Date();
+  const start = new Date();
+  start.setUTCDate(start.getUTCDate() - days);
+  return { startDate: ymd(start), endDate: ymd(end) };
+}
+
+export function gscPocketSiteUrl(): string {
   return process.env.GSC_SITE_URL?.trim() || 'sc-domain:pocketportfolio.app';
+}
+
+export function gscOpenSiteUrl(): string {
+  return process.env.GSC_OPEN_SITE_URL?.trim() || 'sc-domain:openportfolio.co.uk';
 }
 
 async function listGscSiteEntries(token: string): Promise<{
@@ -41,44 +66,25 @@ async function listGscSiteEntries(token: string): Promise<{
   return { http: res.status, entries: json.siteEntry ?? [] };
 }
 
-export async function fetchGscTelemetry(days = 28): Promise<GscTelemetry> {
-  const token = await getGrowthGoogleAccessToken();
-  const siteUrl = gscSiteUrl();
-  const end = new Date();
-  const start = new Date();
-  start.setUTCDate(start.getUTCDate() - days);
-  const startDate = ymd(start);
-  const endDate = ymd(end);
-
+async function gscAnalyticsQuery(
+  token: string,
+  siteUrl: string,
+  body: Record<string, unknown>,
+): Promise<{ rows?: Array<{ keys?: string[]; clicks?: number; impressions?: number; ctr?: number; position?: number }>; error?: { message?: string } }> {
   const encodedSite = encodeURIComponent(siteUrl);
   const url = `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodedSite}/searchAnalytics/query`;
-
   const res = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      startDate,
-      endDate,
-      dimensions: ['query'],
-      rowLimit: 250,
-      dataState: 'all',
-    }),
+    body: JSON.stringify(body),
   });
-
   const json = (await res.json()) as {
-    rows?: Array<{
-      keys?: string[];
-      clicks?: number;
-      impressions?: number;
-      ctr?: number;
-      position?: number;
-    }>;
+    rows?: Array<{ keys?: string[]; clicks?: number; impressions?: number; ctr?: number; position?: number }>;
     error?: { message?: string };
   };
-
   if (!res.ok) {
     const sites = await listGscSiteEntries(token);
     const seen = sites.entries.length
@@ -86,11 +92,25 @@ export async function fetchGscTelemetry(days = 28): Promise<GscTelemetry> {
       : 'none';
     throw Object.assign(
       new Error(
-        `${json.error?.message || `GSC ${res.status}`} (this service account sees ${sites.entries.length} GSC properties: ${seen})`,
+        `[${siteUrl}] ${json.error?.message || `GSC ${res.status}`} (SA sees ${sites.entries.length} properties: ${seen})`,
       ),
-      { code: 'GSC_QUERY_FAILED', status: res.status },
+      { code: 'GSC_QUERY_FAILED', status: res.status, siteUrl },
     );
   }
+  return json;
+}
+
+export async function fetchGscTelemetryForSite(siteUrl: string, days = 28): Promise<GscTelemetry> {
+  const token = await getGrowthGoogleAccessToken();
+  const { startDate, endDate } = dateWindow(days);
+
+  const json = await gscAnalyticsQuery(token, siteUrl, {
+    startDate,
+    endDate,
+    dimensions: ['query'],
+    rowLimit: 250,
+    dataState: 'all',
+  });
 
   const classified = (json.rows ?? []).map((row) => {
     const query = row.keys?.[0] ?? '';
@@ -133,39 +153,28 @@ export async function fetchGscTelemetry(days = 28): Promise<GscTelemetry> {
   };
 }
 
+/** Pocket Portfolio GSC (default property). */
+export async function fetchGscTelemetry(days = 28): Promise<GscTelemetry> {
+  return fetchGscTelemetryForSite(gscPocketSiteUrl(), days);
+}
+
+/** Open Portfolio B2B GSC property. */
+export async function fetchGscOpenTelemetry(days = 28): Promise<GscTelemetry> {
+  return fetchGscTelemetryForSite(gscOpenSiteUrl(), days);
+}
+
 export async function fetchGscPageMix(days = 28): Promise<{ farmPageShare: number; importPageShare: number }> {
   const token = await getGrowthGoogleAccessToken();
-  const siteUrl = gscSiteUrl();
-  const end = new Date();
-  const start = new Date();
-  start.setUTCDate(start.getUTCDate() - days);
+  const siteUrl = gscPocketSiteUrl();
+  const { startDate, endDate } = dateWindow(days);
 
-  const encodedSite = encodeURIComponent(siteUrl);
-  const url = `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodedSite}/searchAnalytics/query`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      startDate: ymd(start),
-      endDate: ymd(end),
-      dimensions: ['page'],
-      rowLimit: 250,
-      dataState: 'all',
-    }),
+  const json = await gscAnalyticsQuery(token, siteUrl, {
+    startDate,
+    endDate,
+    dimensions: ['page'],
+    rowLimit: 250,
+    dataState: 'all',
   });
-  const json = (await res.json()) as {
-    rows?: Array<{ keys?: string[]; clicks?: number }>;
-    error?: { message?: string };
-  };
-  if (!res.ok) {
-    throw Object.assign(new Error(json.error?.message || `GSC pages ${res.status}`), {
-      code: 'GSC_PAGES_FAILED',
-      status: res.status,
-    });
-  }
 
   const rows = (json.rows ?? []).map((row) => ({
     clicks: row.clicks ?? 0,
@@ -174,4 +183,44 @@ export async function fetchGscPageMix(days = 28): Promise<{ farmPageShare: numbe
   }));
   const share = clickShareByBucket(rows);
   return { farmPageShare: share.farm.share, importPageShare: share.import.share };
+}
+
+export async function fetchGscOpenPageMix(days = 28): Promise<GscOpenPageMix> {
+  const token = await getGrowthGoogleAccessToken();
+  const siteUrl = gscOpenSiteUrl();
+  const { startDate, endDate } = dateWindow(days);
+
+  const json = await gscAnalyticsQuery(token, siteUrl, {
+    startDate,
+    endDate,
+    dimensions: ['page'],
+    rowLimit: 250,
+    dataState: 'all',
+  });
+
+  const rows = (json.rows ?? []).map((row) => ({
+    page: row.keys?.[0] ?? '',
+    clicks: row.clicks ?? 0,
+    impressions: row.impressions ?? 0,
+    position: row.position ?? 0,
+    bucket: classifyOpenGscPage(row.keys?.[0] ?? ''),
+  }));
+
+  const share = openPageClickShare(rows.map((r) => ({ clicks: r.clicks, bucket: r.bucket })));
+
+  const pillarZeroClick = rows
+    .filter((r) => r.bucket === 'pillar' && r.impressions > 0 && r.clicks === 0)
+    .sort((a, b) => b.impressions - a.impressions)
+    .slice(0, 8)
+    .map((r) => ({
+      page: r.page.replace(/^https?:\/\/[^/]+/, '') || r.page,
+      impressions: r.impressions,
+      position: r.position,
+    }));
+
+  return {
+    blogFarmPageShare: share.blog_farm.share,
+    pillarPageShare: share.pillar.share,
+    pillarZeroClick,
+  };
 }

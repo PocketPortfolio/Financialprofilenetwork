@@ -18,7 +18,7 @@ const IMPORT_RE =
   /\b(ghostfolio|trading\s*212|t212|interactive\s*brokers|ibkr|trade\s*republic|moomoo|etoro|e-?toro|revolut|freetrade|wealthsimple|openbrokercsv|import)\b/i;
 
 const BRAND_RE =
-  /\bpocket\s*(port?folio|folio)\b|\bpocketfolio\b|\bpocketportfolio\b/i;
+  /\bpocket\s*(port?folio|folio)\b|\bpocketfolio\b|\bpocketportfolio\b|\bopen\s*portfolio\b|\bopenportfolio\b/i;
 
 const ENTERPRISE_RE =
   /\b(sovereign\s*ai|design\s*partner|databricks|dora|eu ai act|wealth-?tech|local-first|stateless\s*(edge|inference)|open\s*portfolio)\b/i;
@@ -35,6 +35,42 @@ export function classifyGscQuery(query: string): GscQueryBucket {
   if (ENTERPRISE_RE.test(q)) return 'enterprise';
   if (WM_RE.test(q)) return 'wm_advisor';
   return 'other';
+}
+
+/** Open Portfolio page buckets for HUD blog-farm vs pillar mix. */
+export type OpenGscPageBucket = 'blog_farm' | 'pillar' | 'other';
+
+export function classifyOpenGscPage(pageUrl: string): OpenGscPageBucket {
+  const p = pageUrl.toLowerCase();
+  if (p.includes('/blog/how-to-') || p.includes('/blog/research-')) return 'blog_farm';
+  if (
+    p.includes('/architecture') ||
+    p.includes('/learn/') ||
+    p.includes('/tier1designpartner') ||
+    p.includes('/openbrokercsv') ||
+    p.includes('/designchallenge') ||
+    p.includes('/sovereign-ai-grant') ||
+    p.includes('/board-of-investors')
+  ) {
+    return 'pillar';
+  }
+  return 'other';
+}
+
+export function openPageClickShare(
+  rows: Array<{ clicks: number; bucket: OpenGscPageBucket }>,
+): Record<OpenGscPageBucket, { clicks: number; share: number }> {
+  const totals: Record<OpenGscPageBucket, number> = { blog_farm: 0, pillar: 0, other: 0 };
+  let all = 0;
+  for (const row of rows) {
+    totals[row.bucket] += row.clicks;
+    all += row.clicks;
+  }
+  const out = {} as Record<OpenGscPageBucket, { clicks: number; share: number }>;
+  (Object.keys(totals) as OpenGscPageBucket[]).forEach((bucket) => {
+    out[bucket] = { clicks: totals[bucket], share: all > 0 ? totals[bucket] / all : 0 };
+  });
+  return out;
 }
 
 export function classifyGscPage(pageUrl: string): GscQueryBucket {

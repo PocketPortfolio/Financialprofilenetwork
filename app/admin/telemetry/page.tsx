@@ -22,7 +22,14 @@ interface TelemetryPayload {
     signalQueries: Array<{ query: string; clicks: number; ctr: number; bucket: Bucket }>;
     clickShare: Record<Bucket, { clicks: number; share: number }>;
   } | null;
+  gscOpen: TelemetryPayload['gsc'];
   pageMix: { farmPageShare: number; importPageShare: number };
+  openPageMix: {
+    blogFarmPageShare: number;
+    pillarPageShare: number;
+    pillarZeroClick: Array<{ page: string; impressions: number; position: number }>;
+  };
+  gscSites?: { pocket: string; open: string };
   ga4: {
     propertyId: string;
     sources: Array<{ sourceMedium: string; sessions: number; engagedSessions: number; avgEngagementSec: number }>;
@@ -139,6 +146,8 @@ export default function AdminGrowthTelemetryPage() {
 
   const pin = data?.pin;
   const mix = data?.gsc?.clickShare;
+  const openMix = data?.openPageMix;
+  const openGsc = data?.gscOpen;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)', color: 'var(--text)' }}>
@@ -164,7 +173,7 @@ export default function AdminGrowthTelemetryPage() {
             </p>
             <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }}>Growth Telemetry</h1>
             <p style={{ color: 'var(--text-muted)', marginTop: 8, maxWidth: 640 }}>
-              Live GSC + GA4 overlay. North star remains Board Triad — paid Stripe keys, not waitlist volume.
+              Dual-surface GSC (Pocket + Open) + GA4 overlay. North star remains Board Triad — paid Stripe keys, not waitlist volume.
               Cached 2 minutes. Does not replace <Link href="/admin/analytics" style={{ color: 'var(--accent-warm)' }}>/admin/analytics</Link>.
             </p>
           </div>
@@ -231,15 +240,33 @@ export default function AdminGrowthTelemetryPage() {
             hint="Target toward 15%"
             pass={mix ? mix.import.share >= 0.1 : undefined}
           />
+          <PinCard
+            label="Open · blog farm page share"
+            value={openMix ? `${Math.round(openMix.blogFarmPageShare * 100)}%` : '—'}
+            hint="Lower is better — dev blog misallocation"
+            pass={openMix ? openMix.blogFarmPageShare < 0.5 : undefined}
+          />
+          <PinCard
+            label="Open · pillar page share"
+            value={openMix ? `${Math.round(openMix.pillarPageShare * 100)}%` : '—'}
+            hint="B2B architecture / learn / tier1"
+            pass={openMix ? openMix.pillarPageShare >= 0.05 : undefined}
+          />
         </section>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20 }}>
-          <HudPanel title="GSC · top queries by clicks (signal vs noise)">
+        <section style={{ marginBottom: 24 }}>
+          <h2 style={{ fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent-warm)', fontFamily: 'ui-monospace, monospace', marginBottom: 12 }}>
+            Pocket · {data?.gscSites?.pocket ?? 'sc-domain:pocketportfolio.app'}
+          </h2>
+        </section>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20, marginBottom: 32 }}>
+          <HudPanel title="GSC Pocket · top queries by clicks">
             {!data?.gsc ? (
               <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
                 {apiDisabledWarning(data?.warnings, 'GSC')
                   ? 'Search Console API is disabled on GCP project 862430760996. Enable it as the project owner, wait ~1 minute, then Refresh.'
-                  : `Add ${data?.auth?.googleSaEmail || 'the growth service account'} as a Search Console user on sc-domain:pocketportfolio.app (Restricted is enough). Then Refresh.`}
+                  : `Add ${data?.auth?.googleSaEmail || 'the growth service account'} as Restricted on ${data?.gscSites?.pocket ?? 'sc-domain:pocketportfolio.app'}. Then Refresh.`}
               </p>
             ) : (
               <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse', fontFamily: 'ui-monospace, monospace' }}>
@@ -342,11 +369,76 @@ export default function AdminGrowthTelemetryPage() {
           </HudPanel>
         </div>
 
+        <section style={{ marginBottom: 24 }}>
+          <h2 style={{ fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent-warm)', fontFamily: 'ui-monospace, monospace', marginBottom: 12 }}>
+            Open Portfolio · {data?.gscSites?.open ?? 'sc-domain:openportfolio.co.uk'}
+          </h2>
+        </section>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20 }}>
+          <HudPanel title="GSC Open · top queries (AEO perimeter)">
+            {!openGsc ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+                {data?.warnings?.some((w) => w.startsWith('GSC Open:') && /403|permission|denied/i.test(w))
+                  ? `Grant ${data?.auth?.googleSaEmail || 'the growth SA'} Restricted access on ${data?.gscSites?.open ?? 'sc-domain:openportfolio.co.uk'} in GSC → Settings → Users.`
+                  : `Open GSC unavailable. Add SA on ${data?.gscSites?.open ?? 'sc-domain:openportfolio.co.uk'} (Restricted).`}
+              </p>
+            ) : (
+              <>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 12px', fontFamily: 'ui-monospace, monospace' }}>
+                  {openGsc.totals.clicks} clicks · {openGsc.totals.impressions.toLocaleString()} imp · {(openGsc.totals.ctr * 100).toFixed(2)}% CTR · pos {openGsc.totals.position.toFixed(1)}
+                </p>
+                <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse', fontFamily: 'ui-monospace, monospace' }}>
+                  <thead>
+                    <tr style={{ color: 'var(--text-muted)', textAlign: 'left' }}>
+                      <th>Query</th>
+                      <th>Clk</th>
+                      <th>Imp</th>
+                      <th>Bucket</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {openGsc.topQueries.map((row) => (
+                      <tr key={row.query} style={{ background: BUCKET_COLOR[row.bucket] }}>
+                        <td style={{ padding: '6px 4px' }}>{row.query || '(empty)'}</td>
+                        <td>{row.clicks}</td>
+                        <td>{row.impressions}</td>
+                        <td>{row.bucket}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </HudPanel>
+
+          <HudPanel title="GSC Open · pillar CTR gap (imp, 0 clicks)">
+            {!openMix?.pillarZeroClick?.length ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+                {openGsc
+                  ? 'No pillar URLs with impressions and zero clicks in this window — or SA not granted yet.'
+                  : 'Requires Open GSC access. URL Inspection targets: /architecture, /learn/*, /tier1designpartner.'}
+              </p>
+            ) : (
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, fontFamily: 'ui-monospace, monospace' }}>
+                {openMix.pillarZeroClick.map((row) => (
+                  <li key={row.page}>
+                    {row.page} · {row.impressions} imp · pos {row.position.toFixed(1)}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </HudPanel>
+        </div>
+
         <p style={{ marginTop: 28, fontSize: 12, color: 'var(--text-muted)', fontFamily: 'ui-monospace, monospace' }}>
           {data?.generatedAt ? `Generated ${data.generatedAt}` : ''}
           {data?.gsc
-            ? ` · Page farm share ${Math.round((data.pageMix.farmPageShare ?? 0) * 100)}% · Import page share ${Math.round((data.pageMix.importPageShare ?? 0) * 100)}%`
-            : ' · Page mix waiting on GSC'}
+            ? ` · Pocket page farm ${Math.round((data.pageMix.farmPageShare ?? 0) * 100)}% · import ${Math.round((data.pageMix.importPageShare ?? 0) * 100)}%`
+            : ' · Pocket page mix waiting on GSC'}
+          {openMix
+            ? ` · Open blog farm ${Math.round(openMix.blogFarmPageShare * 100)}% · pillar ${Math.round(openMix.pillarPageShare * 100)}%`
+            : ' · Open page mix waiting on GSC'}
         </p>
       </main>
     </div>

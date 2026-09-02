@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   classifyGscPage,
   classifyGscQuery,
+  classifyOpenGscPage,
   clickShareByBucket,
+  openPageClickShare,
 } from '../../lib/telemetry/classify-gsc-query';
 
 describe('GSC signal vs noise classifier', () => {
@@ -36,5 +38,22 @@ describe('GSC signal vs noise classifier', () => {
     ]);
     expect(share.farm.share).toBe(0.9);
     expect(share.import.share).toBe(0.1);
+  });
+
+  it('classifies Open blog farm vs B2B pillar pages', () => {
+    expect(
+      classifyOpenGscPage('https://www.openportfolio.co.uk/blog/how-to-use-redis'),
+    ).toBe('blog_farm');
+    expect(classifyOpenGscPage('https://www.openportfolio.co.uk/architecture')).toBe('pillar');
+    expect(classifyOpenGscPage('https://www.openportfolio.co.uk/learn/local-first')).toBe('pillar');
+  });
+
+  it('computes Open blog vs pillar click share', () => {
+    const share = openPageClickShare([
+      { clicks: 45, bucket: 'blog_farm' },
+      { clicks: 6, bucket: 'pillar' },
+    ]);
+    expect(share.blog_farm.share).toBeCloseTo(0.882, 2);
+    expect(share.pillar.share).toBeCloseTo(0.118, 2);
   });
 });
