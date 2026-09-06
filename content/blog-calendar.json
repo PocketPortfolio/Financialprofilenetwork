@@ -1426,7 +1426,7 @@
     "date": "2026-09-06",
     "title": "Sovereign Sync: Performance and Reliability",
     "slug": "sovereign-sync-performance-and-reliability",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1436,7 +1436,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-06T09:00:49.733Z"
   },
   {
     "id": "week-36-post-2",
