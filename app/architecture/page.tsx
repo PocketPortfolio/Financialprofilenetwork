@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { generateMetadata as genMeta } from '@/app/lib/seo/meta';
 import OpenProcurementFaq from '@/app/components/open/OpenProcurementFaq';
+import ArchitectureBookingCta from '@/app/components/open/ArchitectureBookingCta';
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
 import {
   OPEN_INSTITUTIONAL_PILLARS,
@@ -94,6 +95,8 @@ export default function ArchitecturePage() {
           </p>
         </header>
 
+        <ArchitectureBookingCta />
+
         <div
           style={{
             border: '1px solid var(--border-warm)',
@@ -105,10 +108,9 @@ export default function ArchitecturePage() {
         >
           <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 10px' }}>What is sovereign intelligence?</h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '15px' }}>
-            <strong style={{ color: 'var(--text)' }}>Sovereign intelligence</strong> is a software paradigm where the
-            operator stays the landlord of financial data: portable artifacts (JSON, CSV, Drive files you own),
-            minimized silent extraction of raw ledgers, and cloud services as narrow, consent-shaped pipes — not a
-            warehouse.
+            <strong style={{ color: 'var(--text)' }}>Sovereign intelligence</strong> is a BYOC boundary pattern: the
+            enterprise keeps IdP and approved storage; inference runs over bounded aggregates assembled at the edge —
+            not a vendor-hosted ledger warehouse. Open Portfolio supplies the fitting; the buyer keeps the vault keys.
           </p>
           <p style={{ margin: '12px 0 0', fontSize: '14px' }}>
             <Link href="/openbrokercsv" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
@@ -123,11 +125,11 @@ export default function ArchitecturePage() {
 
         {section(
           <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Local-first foundation</h2>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>BYOC foundation (buyer keeps the store)</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Trade history and portfolio state are authored in the browser first (IndexedDB and structured in-app
-              state). Imports are parsed where the operator sits — not uploaded wholesale into an opaque analyst
-              database.
+              Open Portfolio does not ask regulated platforms to re-home client ledgers in our cloud. Broker exports are
+              normalized at the edge via <code style={{ fontSize: 13 }}>@pocket-portfolio/importer</code>; enterprise
+              pilots scope <strong style={{ color: 'var(--text)' }}>your</strong> approved stores and identity providers.
             </p>
             <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
               More vocabulary:{' '}
@@ -138,6 +140,10 @@ export default function ArchitecturePage() {
               <Link href="/learn/stateless-edge-ingestion" style={{ color: 'var(--accent-warm)' }}>
                 stateless edge ingestion
               </Link>
+              ,{' '}
+              <Link href="/blog/tier-1-wealth-byoc-sandbox-pattern" style={{ color: 'var(--accent-warm)' }}>
+                BYOC sandbox pattern
+              </Link>
               .
             </p>
           </>
@@ -145,11 +151,14 @@ export default function ArchitecturePage() {
 
         {section(
           <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Hybrid sovereignty (Firebase and sync)</h2>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>
+              Pocket Portfolio = live harness (not the Open store)
+            </h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Authenticated users may use Firebase for identity, tier limits, and multi-device coordination. Firestore
-              is not a silent data-mining lake: it carries what sync needs, not a shadow copy of every broker CSV.
-              Google Drive integration is <strong style={{ color: 'var(--text)' }}>user-owned storage</strong>.
+              Pocket Portfolio is the consumer reference terminal on the same substrate — browser-first state,
+              optional Firebase auth/tiers, optional operator-owned Drive sync. It exists to stress-test adapters under
+              real CSV chaos. Those Pocket implementation details are <strong style={{ color: 'var(--text)' }}>not</strong>{' '}
+              Open Portfolio&apos;s enterprise BYOC contract.
             </p>
             <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
               Compliance framing:{' '}
@@ -165,10 +174,9 @@ export default function ArchitecturePage() {
           <>
             <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Bounding the LLM (stateless AI)</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Portfolio-aware answers are built from a client-side context assembly layer (
-              <code style={{ fontSize: '13px', color: 'var(--text)' }}>app/lib/ai/contextBuilder.ts</code>
-              ), then sent to a stateless edge route. The model receives a bounded, user-approved aggregate — not raw
-              financial DNA for open-ended retention.
+              Inference receives a bounded, user- or operator-approved aggregate assembled at the edge (
+              <code style={{ fontSize: '13px', color: 'var(--text)' }}>contextBuilder</code>
+              ) — not raw financial DNA for open-ended retention on a vendor warehouse path.
             </p>
             <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
               Deep dive:{' '}
@@ -182,10 +190,10 @@ export default function ArchitecturePage() {
 
         {section(
           <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Open source versus sovereign product</h2>
+            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Open source versus BYOC product</h2>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Open source proves the pipes; sovereign product promises how those pipes are operated in production:
-              consent, sync boundaries, and inspectable architectural boundaries instead of an anonymous API wrapper.
+              Open source proves the pipes; Open Portfolio sells the operated boundary — consent, perimeter placement,
+              and inspectable architecture for procurement — not another hosted analytics vault.
             </p>
             <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
               Related:{' '}

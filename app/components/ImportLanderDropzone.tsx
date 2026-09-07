@@ -98,6 +98,20 @@ export default function ImportLanderDropzone({ brokerSlug, brokerDisplayName }: 
 
       <CSVImporter onImport={handleImport} upsellReturnTo={`/import/${brokerSlug}`} />
 
+      {brokerSlug === 'interactive-brokers' ? (
+        <p style={{ margin: '12px 0 0', fontSize: 13, color: 'var(--text-secondary)' }}>
+          No export yet?{' '}
+          <a
+            href="/samples/ibkr-flex-sample.csv"
+            download="ibkr-flex-sample.csv"
+            style={{ color: 'var(--accent-warm)', fontWeight: 600 }}
+          >
+            Download a sample IBKR Flex CSV
+          </a>{' '}
+          and drop it here to verify the importer.
+        </p>
+      ) : null}
+
       {status !== 'idle' && (
         <p
           role="status"

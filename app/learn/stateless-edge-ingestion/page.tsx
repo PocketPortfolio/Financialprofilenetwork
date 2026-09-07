@@ -24,7 +24,7 @@ export default function StatelessEdgeIngestionPage() {
       subtitle="Stop paying warehouse rent for data you should never hold."
       body={[
         'Centralized warehousing promises “one source of truth.” In practice it creates a second source of liability: storage cost, elevated attack surface, and regulatory exposure that compounds with every broker integration.',
-        'Edge ingestion flips the model. Broker exports parse where the operator already has the file. Normalized trades stay local-first. Inference receives a sanitized snapshot for the duration of the request — no permanent per-user ledger mirror required for core product value.',
+        'Edge ingestion flips the model. Broker exports parse where the operator already has the file. Enterprise BYOC pilots keep normalized state in buyer-approved stores. Inference receives a sanitized snapshot for the duration of the request — no permanent per-user ledger mirror required for core product value.',
         'Hosted market-data APIs are metered products for automated access — not an open data commons. Engineering investment concentrates on institutional architecture and operator import workflows, not on subsidizing anonymous bulk extraction.',
       ]}
       ctaHref="/learn/sovereign-finance"
