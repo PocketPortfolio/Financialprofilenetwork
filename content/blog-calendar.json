@@ -1444,7 +1444,7 @@
     "date": "2026-09-09",
     "title": "The Technical Debt of Cloud Portfolios",
     "slug": "the-technical-debt-of-cloud-portfolios",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1454,7 +1454,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-09T09:00:44.024Z"
   },
   {
     "id": "week-37-post-1",
