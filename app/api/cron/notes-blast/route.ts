@@ -4,6 +4,8 @@
  * Paid-tier users are included by default; set NOTES_BLAST_EXCLUDE_PAID=1 to mirror viral blast paid skip.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
+import { verifyCronTestMode } from '@/lib/cron/verify-cron-test-email';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
@@ -45,22 +47,9 @@ async function sendNotesLaunchEmail(opts: { resend: Resend; to: string; firstNam
 }
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const vercelCronHeader = request.headers.get('x-vercel-cron');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    console.error('[Notes Blast] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-
-  const isAuthorized =
-    authHeader === `Bearer ${cronSecret}` ||
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1';
-
-  if (!isAuthorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   const resendApiKey = process.env.RESEND_API_KEY;
@@ -69,8 +58,13 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = new URL(request.url).searchParams;
-  const testEmail = (searchParams.get('email') || '').trim();
-  const isTestRun = searchParams.get('test') === '1' && !!testEmail;
+  const testMode = verifyCronTestMode(searchParams);
+  if (!testMode.ok) {
+    return NextResponse.json({ error: testMode.error }, { status: testMode.status });
+  }
+
+  const testEmail = (testMode.testEmail || '').trim();
+  const isTestRun = testMode.isTestRun;
 
   const limitParam = searchParams.get('limit');
   const maxSendsFromQuery = limitParam != null && limitParam !== '' ? Number(limitParam) : NaN;
@@ -89,7 +83,7 @@ export async function GET(request: NextRequest) {
   const excludePaid = process.env.NOTES_BLAST_EXCLUDE_PAID === '1';
 
   const db = getDb();
-  const auth = getAuth();
+  const firebaseAuth = getAuth();
   const resend = new Resend(resendApiKey);
   const usersRef = db.collection('users');
 
@@ -108,7 +102,7 @@ export async function GET(request: NextRequest) {
       if (sent >= maxSends) break;
       if (totalEvaluated >= maxEvaluated) break;
 
-      const listResult = await auth.listUsers(1000, nextPageToken);
+      const listResult = await firebaseAuth.listUsers(1000, nextPageToken);
       nextPageToken = listResult.pageToken;
 
       for (const u of listResult.users) {

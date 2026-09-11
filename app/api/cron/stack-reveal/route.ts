@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
+import { verifyCronTestMode } from '@/lib/cron/verify-cron-test-email';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
@@ -26,28 +28,27 @@ function getDb() {
 }
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  const vercelCronHeader = request.headers.get('x-vercel-cron');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    console.error('[Stack Reveal Cron] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-  const isAuthorized =
-    authHeader === `Bearer ${cronSecret}` ||
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1';
-  if (!isAuthorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  const testEmail = process.env.STACK_REVEAL_TEST_EMAIL;
   const searchParams = new URL(request.url).searchParams;
-  const isTestRun = searchParams.get('test') === '1' || !!testEmail;
+  const envTestEmail = process.env.STACK_REVEAL_TEST_EMAIL;
+  const testMode = verifyCronTestMode(
+    searchParams,
+    searchParams.get('email') || envTestEmail || undefined,
+  );
+  if (!testMode.ok) {
+    return NextResponse.json({ error: testMode.error }, { status: testMode.status });
+  }
+
+  const testEmail = testMode.testEmail || envTestEmail;
+  const isTestRun = testMode.isTestRun || !!envTestEmail;
 
   try {
     const db = getDb();
-    const auth = getAuth();
+    const firebaseAuth = getAuth();
     const usersRef = db.collection('users');
 
     let nextPageToken: string | undefined;
@@ -61,7 +62,7 @@ export async function GET(request: Request) {
     }> = [];
 
     do {
-      const listResult = await auth.listUsers(1000, nextPageToken);
+      const listResult = await firebaseAuth.listUsers(1000, nextPageToken);
       nextPageToken = listResult.pageToken;
       for (const user of listResult.users) {
         const creationTime = user.metadata.creationTime ? new Date(user.metadata.creationTime) : null;

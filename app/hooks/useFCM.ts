@@ -2,8 +2,17 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
-import app from '../lib/firebase';
+import app, { auth } from '../lib/firebase';
 import { registerFirebaseMessagingSW } from '../lib/pwa/registerServiceWorker';
+import { bearerFetch } from '../lib/auth/bearerFetch';
+
+async function requireIdToken(): Promise<string> {
+  const user = auth?.currentUser;
+  if (!user) {
+    throw new Error('Sign in required to manage notification tokens');
+  }
+  return user.getIdToken();
+}
 
 interface UseFCMReturn {
   fcmToken: string | null;
@@ -99,15 +108,17 @@ export function useFCM(): UseFCMReturn {
         fcmTokenRef.current = token;
         setError(null);
         
-        // Send token to backend to save
+        // Send token to backend to save (auth required — M13)
         try {
-          const response = await fetch('/api/notifications/register', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
+          const response = await bearerFetch(
+            '/api/notifications/register',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fcmToken: token }),
             },
-            body: JSON.stringify({ fcmToken: token })
-          });
+            requireIdToken
+          );
 
           if (!response.ok) {
             console.error('Failed to register FCM token:', response.statusText);
@@ -198,14 +209,18 @@ export function useFCM(): UseFCMReturn {
       setFcmToken(null);
       fcmTokenRef.current = null;
       
-      // Delete token from backend if it exists
+      // Delete token from backend if it exists (auth required — M13)
       if (tokenToDelete) {
         try {
-          await fetch('/api/notifications/register', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fcmToken: tokenToDelete })
-          });
+          await bearerFetch(
+            '/api/notifications/register',
+            {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fcmToken: tokenToDelete }),
+            },
+            requireIdToken
+          );
         } catch (err) {
           console.error('Error unregistering FCM token:', err);
           // Continue even if API call fails

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
+import { verifyCronTestMode } from '@/lib/cron/verify-cron-test-email';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { sendStackRevealEmail } from '@/lib/stack-reveal/resend';
@@ -39,26 +41,19 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * Test: ?test=1 + MARKETING_DRIP_TEST_EMAIL set → send both emails to that address only.
  */
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  const vercelCronHeader = request.headers.get('x-vercel-cron');
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    console.error('[marketing-drip] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-  const isAuthorized =
-    authHeader === `Bearer ${cronSecret}` ||
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1';
-  if (!isAuthorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  const testEmail = process.env.MARKETING_DRIP_TEST_EMAIL?.trim();
   const searchParams = new URL(request.url).searchParams;
-  const isTest = searchParams.get('test') === '1';
+  const testEmail = process.env.MARKETING_DRIP_TEST_EMAIL?.trim();
+  const testMode = verifyCronTestMode(searchParams, testEmail);
+  if (!testMode.ok) {
+    return NextResponse.json({ error: testMode.error }, { status: testMode.status });
+  }
 
-  if (isTest && testEmail) {
+  if (testMode.isTestRun && testEmail) {
     const day2Result = await sendStackRevealEmail(testEmail, DAY2_SUBJECT, getDay2Html());
     await delay(600);
     const day4Result = await sendStackRevealEmail(testEmail, DAY4_SUBJECT, getDay4Html());

@@ -11,7 +11,7 @@ export const fetchCache = 'force-no-store';
  * Requires STRIPE_SECRET_KEY; session must be paid.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await context.params;
@@ -36,6 +36,13 @@ export async function GET(
         { error: 'not_paid', payment_status: session.payment_status },
         { status: 402 }
       );
+    }
+
+    // M14: limit exposure window — GA purchase events only need a short TTL.
+    const createdMs = (session.created || 0) * 1000;
+    const MAX_AGE_MS = 24 * 60 * 60 * 1000;
+    if (!createdMs || Date.now() - createdMs > MAX_AGE_MS) {
+      return NextResponse.json({ error: 'session_expired' }, { status: 410 });
     }
 
     const amountTotal = session.amount_total ?? 0;

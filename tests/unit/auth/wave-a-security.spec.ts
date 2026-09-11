@@ -2,6 +2,7 @@ import { createHmac } from 'crypto';
 import { afterEach, describe, expect, it } from 'vitest';
 import { verifyResendWebhookSignature } from '@/lib/auth/verify-resend-webhook';
 import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
+import { verifyCronTestMode } from '@/lib/cron/verify-cron-test-email';
 
 function signSvix(secret: string, id: string, timestamp: string, payload: string): string {
   const secretKey = secret.startsWith('whsec_') ? secret.slice(6) : secret;
@@ -87,5 +88,42 @@ describe('verifyVercelCron (Wave B target)', () => {
       headers: { 'x-vercel-cron': '1' },
     });
     expect(verifyVercelCron(req).ok).toBe(false);
+  });
+});
+
+describe('verifyCronTestMode (M9)', () => {
+  const originalAllow = process.env.ALLOW_CRON_TEST_EMAIL;
+  const originalList = process.env.CRON_TEST_EMAIL_ALLOWLIST;
+
+  afterEach(() => {
+    if (originalAllow === undefined) delete process.env.ALLOW_CRON_TEST_EMAIL;
+    else process.env.ALLOW_CRON_TEST_EMAIL = originalAllow;
+    if (originalList === undefined) delete process.env.CRON_TEST_EMAIL_ALLOWLIST;
+    else process.env.CRON_TEST_EMAIL_ALLOWLIST = originalList;
+  });
+
+  it('allows non-test runs', () => {
+    const params = new URLSearchParams();
+    expect(verifyCronTestMode(params).ok).toBe(true);
+  });
+
+  it('denies test mode without allowlist', () => {
+    delete process.env.ALLOW_CRON_TEST_EMAIL;
+    delete process.env.CRON_TEST_EMAIL_ALLOWLIST;
+    const params = new URLSearchParams('test=1&email=attacker@evil.com');
+    const result = verifyCronTestMode(params);
+    expect(result.ok).toBe(false);
+  });
+
+  it('allows allowlisted domains', () => {
+    delete process.env.ALLOW_CRON_TEST_EMAIL;
+    process.env.CRON_TEST_EMAIL_ALLOWLIST = 'pocketportfolio.app';
+    const params = new URLSearchParams('test=1&email=ops@pocketportfolio.app');
+    const result = verifyCronTestMode(params);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.isTestRun).toBe(true);
+      expect(result.testEmail).toBe('ops@pocketportfolio.app');
+    }
   });
 });
