@@ -15,7 +15,6 @@ export default defineConfig({
     },
     coverage: {
       provider: 'v8',
-      all: true,
       // Thresholds disabled so CI stays green; re-enable as test coverage grows
       // thresholds: { lines: 80, functions: 80, branches: 75, statements: 80 },
       exclude: [

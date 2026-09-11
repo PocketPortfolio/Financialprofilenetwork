@@ -280,7 +280,6 @@
     "qs": ">=6.16.0",
     "fflate": ">=0.8.3",
     "dompurify": ">=3.4.13",
-    "@ai-sdk/provider-utils": ">=4.0.33",
     "uuid": ">=11.1.1"
   },
   "engines": {
