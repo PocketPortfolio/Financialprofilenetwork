@@ -14,9 +14,9 @@ claim_gate: docs/command/claims-vs-codebase-calibration.md §6b
 
 # Platform security audit — 2026-09-11
 
-**Verdict:** **HOLD ship on security remediations until Wave A regression pack is green.**  
+**Verdict:** **CLEARED for app High perimeter (H1–H8) + Medium M2–M6/M9–M14** as of Wave C–F local clearance 2026-09-11. See `docs/command/platform-security-wave-ab-report-2026-09-11.md`.  
 **Scope:** Pocket + Open surfaces; auth/API/AI/agent/webhooks/cron/tier paths.  
-**Not in scope this pass:** npm Dependabot backlog (tracked separately), SOC2/ISO certification language.
+**Accepted residual:** M1/M8 (architecture), M7 (claims), unpatched transitive `extract-zip` / `image-size`.
 
 Diff-based Security Review subagent could not compute a usable diff (oversized dirty tree on `main`). This package is a **platform inventory audit** with verified file evidence.
 
@@ -176,8 +176,9 @@ Diff-based Security Review subagent could not compute a usable diff (oversized d
 | Package | Status |
 |---------|--------|
 | This audit | **AUDIT_LOCKED** — findings labeled; plan approved for implementation track |
-| Code remediations | **IMPLEMENTED 2026-09-11** — see `docs/command/platform-security-wave-ab-report-2026-09-11.md` (Wave A + Wave B; M1/M8 deferred) |
-| External security claims | **HARD PASS** until Wave A closed + live smoke green |
+| Code remediations | **MERGED PR #121** — Wave A H1–H6 CLOSED in prod; see re-audit in `platform-security-wave-ab-report-2026-09-11.md` |
+| External security claims | **HARD PASS** until H7/H8 closed + Actions billing restored |
+| Post-merge residuals | **H7** session key IDOR · **H8** cron spoof incomplete rollout · Medium M9–M14 |
 
 ---
 

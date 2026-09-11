@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
@@ -26,19 +27,9 @@ function getDb() {
 }
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  const vercelCronHeader = request.headers.get('x-vercel-cron');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-  const isAuthorized =
-    authHeader === `Bearer ${cronSecret}` ||
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1';
-  if (!isAuthorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   const db = getDb();

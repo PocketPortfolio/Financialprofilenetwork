@@ -36,6 +36,16 @@ const popularTickers = [
 
 const MARKETING_DIVIDER = '1px solid rgba(245, 158, 11, 0.28)';
 
+/** Allow only ticker-safe characters (CodeQL DOM/XSS hygiene). */
+function sanitizeSymbol(raw: string, opts?: { allowPartial?: boolean }): string {
+  const cleaned = String(raw || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9.\-=^]/g, '')
+    .slice(0, 24);
+  if (opts?.allowPartial) return cleaned;
+  return cleaned;
+}
+
 export default function TickerSearch({
   onTickerSelect,
   placeholder = 'Search stocks or crypto...',
@@ -138,25 +148,29 @@ export default function TickerSearch({
   }, [query]);
 
   const handleSelect = (ticker: TickerResult) => {
-    setQuery(ticker.symbol);
+    const symbol = sanitizeSymbol(ticker.symbol);
+    setQuery(symbol);
     setIsOpen(false);
     if (onTickerSelect) {
-      onTickerSelect(ticker.symbol);
+      onTickerSelect(symbol);
     }
   };
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-    setIsOpen(e.target.value.length > 0);
+    const next = sanitizeSymbol(e.target.value, { allowPartial: true });
+    setQuery(next);
+    setIsOpen(next.length > 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && query) {
+      const symbol = sanitizeSymbol(query);
+      if (!symbol) return;
       if (linkToTickerPage) {
-        window.location.href = `/s/${query.toUpperCase()}`;
+        window.location.href = `/s/${encodeURIComponent(symbol)}`;
       } else if (onTickerSelect) {
-        onTickerSelect(query.toUpperCase());
+        onTickerSelect(symbol);
       }
       setIsOpen(false);
     }
@@ -347,14 +361,15 @@ export default function TickerSearch({
                 );
 
                 if (linkToTickerPage) {
+                  const safeSymbol = sanitizeSymbol(result.symbol);
                   return (
                     <Link
                       key={index}
-                      href={`/s/${result.symbol.toLowerCase()}`}
+                      href={`/s/${safeSymbol.toLowerCase()}`}
                       onClick={() => {
                         setIsOpen(false);
                         if (onTickerSelect) {
-                          onTickerSelect(result.symbol);
+                          onTickerSelect(safeSymbol);
                         }
                       }}
                       style={commonStyle}

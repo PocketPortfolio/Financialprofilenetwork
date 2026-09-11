@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
 import { SocialScheduler } from '@/lib/social/scheduler';
 
 export const runtime = 'nodejs';
@@ -11,17 +12,9 @@ export const fetchCache = 'force-no-store';
  * Use this to fix the timing issue and post the correct current research
  */
 export async function GET(request: Request) {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    console.error('[CRON] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-
-  if (authHeader !== `Bearer ${cronSecret}`) {
-    console.warn('[CRON] Unauthorized access attempt to post-current-research endpoint.');
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   try {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
 import { SocialScheduler } from '@/lib/social/scheduler';
 
 // Next.js route configuration
@@ -21,31 +22,9 @@ export const fetchCache = 'force-no-store';
  * or use a timezone-aware scheduler.
  */
 export async function GET(request: Request) {
-  // Verify this is a Vercel Cron request
-  // Vercel sends: Authorization: Bearer ${CRON_SECRET}
-  // Also check for x-vercel-cron header as backup
-  const authHeader = request.headers.get('authorization');
-  const vercelCronHeader = request.headers.get('x-vercel-cron');
-  const cronSecret = process.env.CRON_SECRET;
-  
-  if (!cronSecret) {
-    console.error('[CRON] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-
-  // Verify authentication - Vercel sends Bearer token OR x-vercel-cron header
-  const isAuthorized = 
-    authHeader === `Bearer ${cronSecret}` || 
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1'; // Vercel sometimes sends '1' as a signal
-
-  if (!isAuthorized) {
-    console.warn('[CRON] Unauthorized request:', {
-      hasAuthHeader: !!authHeader,
-      hasVercelCron: !!vercelCronHeader,
-      userAgent: request.headers.get('user-agent'),
-    });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   try {

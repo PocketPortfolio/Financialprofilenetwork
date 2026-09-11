@@ -1,97 +1,106 @@
 ---
 id: OP-SEC-WAVE-AB-REPORT-2026-09-11
-title: Wave A + Wave B security implementation report
-status: IMPLEMENTED_TESTED
+title: Wave A–F security clearance (audit → remediations → re-audit)
+status: CLEARED_2026-09-11
 date: 2026-09-11
 parent: docs/command/platform-security-audit-2026-09-11.md
-mode: implement + regression (not yet production-claimed)
+merged_wave_ab: https://github.com/PocketPortfolio/Financialprofilenetwork/pull/121
+prod_deploy: Ready (www.pocketportfolio.app / www.openportfolio.co.uk)
 ---
 
-# Wave A + Wave B implementation report — 2026-09-11
+# Platform security — Wave A–F clearance
 
-**Verdict:** Wave A (High) and Wave B (Medium) **implemented and regression-tested**. No git commit/push in this session. Production claim freeze remains until deploy + smoke on live.
+**Verdict (2026-09-11):** App-perimeter Highs **H1–H8 CLOSED**. Mediums **M2/M3/M4/M5/M6/M9–M14 CLOSED**. **M1/M7/M8** remain accepted/deferred. Dependabot runtime Highs patched via npm overrides where a safe fix exists. App-path CodeQL hygiene addressed (EnvDebug, OG clamp, TickerSearch sanitize; Resend ReDoS #88 N/A — no regex on current route).
 
-**Regression:** **54 passed** / 16 skipped across auth, AI boundary, map-csv, data-api gate, bot gate, waitlist, import, symbol allowlist, llms compliance.
-
----
-
-## Wave A — High (done)
-
-| ID | Change | Business continuity |
-|----|--------|---------------------|
-| **H1** | `/api/api-keys` + `[email]` require owner/admin Bearer; guests no longer email-fetch secrets | Signed-in → `/api/api-keys/user`; sponsor success → session route only (5 retries); retrieve-api-key requires sign-in |
-| **H2** | `requireAdminRequest` on `/api/admin/analytics` | Admin UI sends Bearer |
-| **H3** | `requireAdminRequest` on `/api/metrics/export` | Partners must send admin Bearer |
-| **H4** | Admin auth on agent leads/metrics/send-email/kill-switch/audit/conversations; neurons fail-closed without key in prod | Sales admin uses `authFetch`; health stays public (no connection preview) |
-| **H5** | Resend webhook: raw body + Svix verify via `RESEND_WEBHOOK_SECRET` | Unsigned webhooks → 401; secret missing → 500 |
-| **H6** | Portfolio history binds to token `uid` | Hook sends Bearer; rejects other userIds |
-
-### Wave A caller updates
-- `PremiumTierContext` — no unauthenticated email key lookup
-- `retrieve-api-key` — Firebase + `/api/api-keys/user`
-- `sponsor/success` — session only
-- `admin/analytics`, `admin/sales`, `ActionFeed` — Bearer
-- `usePortfolioHistory` — auth-bound
-
-### New helpers
-- `lib/auth/require-user-request.ts`
-- `lib/auth/verify-resend-webhook.ts`
-- `app/lib/auth/bearerFetch.ts`
-- `adminUnauthorizedResponse` on `require-admin-request.ts`
-- `tests/unit/auth/wave-a-security.spec.ts`
+| Bucket | Count |
+|--------|-------|
+| High closed (H1–H8) | **8** |
+| Medium closed | **10** (M2–M6, M9–M14) |
+| Medium deferred / accepted | **3** (M1/M7/M8) |
+| Supply-chain High patched (overrides) | sharp, nanoid, fast-uri, browserslist, brace-expansion, js-yaml, ip-address, socket.io-parser |
+| Supply-chain deferred | `extract-zip` (no patch), `image-size` (no patch ≤2.0.2) |
 
 ---
 
-## Wave B — Medium (done / deferred)
+## 1. High — status
 
-| ID | Status | Change |
-|----|--------|--------|
-| **M4** | **Done** | Removed spoofable `x-vercel-cron: 1`; Bearer or header === `CRON_SECRET` only |
-| **M5** | **Done** | Free-tier AI fails closed with 503 when Firestore+KV unavailable |
-| **M3** | **Done** | `/api/ai/map-csv` IP rate limit (20/min); guest Smart Import preserved |
-| **M2** | **Done** | AI chat: string-only context, max message 8k / context 32k / attach 60k |
-| **M6** | **Done** | Plaid routes require Firebase auth; `access_token` never returned to browser; UI updated |
-| **M1** | **Deferred** | Page middleware auth not added (Edge Firebase cost). **API-layer locks from Wave A are the control** for `/admin` data |
-| **M7** | **Doc** | Claim hygiene: signed-in Firestore trades ≠ absolute local-first — keep §6b language |
-| **M8** | **Deferred** | CSP `unsafe-inline`/`unsafe-eval` left for follow-up report-only pass (risk of breaking Auth/Stripe/Drive) |
-
----
-
-## Business & operations regression matrix
-
-| Surface | Expected after harden | Test evidence |
-|---------|----------------------|---------------|
-| Market data / bot gate | Unchanged gate behavior | `data-api-gate`, `bot-gate` pass |
-| AI chat inference boundary | Sovereign cold → Cloud Auto; no portfolio persist | `chat-inference-boundary` pass |
-| Smart Import map-csv | Flag + heuristic/LLM; now rate-limited | `map-csv-route` pass |
-| Waitlist | Rate limit intact | waitlist tests pass |
-| Import contracts | Unchanged | import specs pass |
-| Checkout redirect safety | Unchanged | `safe-return-to` pass |
-| Cron | Spoof `1` denied; Bearer secret OK | `wave-a-security` cron cases |
-| Resend signature | Valid accept / forge reject | `wave-a-security` Svix cases |
-| Tier unlock | Session key + authenticated user endpoint | Caller wiring (manual smoke recommended on deploy) |
-| Admin analytics / sales | Bearer required | Caller wiring + route guards |
-| Plaid | Auth required; no access_token leak | Route + `PlaidLinkButton` updated |
+| ID | Finding | Status | Evidence |
+|----|---------|--------|----------|
+| **H1** | API keys by email without auth | **CLOSED** | `requireEmailOwnerOrAdmin`; prod 401 |
+| **H2** | Admin analytics open | **CLOSED** | `requireAdminRequest`; prod 401 |
+| **H3** | Metrics export open | **CLOSED** | `requireAdminRequest`; prod 401 |
+| **H4** | Agent leads / send-email / kill-switch | **CLOSED** | Admin / neuron fail-closed; prod 401 |
+| **H5** | Resend webhook no signature | **CLOSED** | Svix verify; prod 401 |
+| **H6** | Portfolio history IDOR | **CLOSED** | uid bind; prod 401 |
+| **H7** | Session key retrieval by sessionId | **CLOSED** | Paid-only, 24h window, IP rate limit, one-time Firestore redeem (`sessionKeyRedeems`); local invalid → 404 |
+| **H8** | Cron `x-vercel-cron: 1` spoof | **CLOSED** | All cron routes use `verifyVercelCron`; local spoof → **401** |
 
 ---
 
-## Deploy checklist (ops)
+## 2. Medium — status
 
-1. Confirm `RESEND_WEBHOOK_SECRET` set in Vercel (unsigned inbound will 401).
-2. Confirm Vercel Cron sends `Authorization: Bearer $CRON_SECRET` (not bare `x-vercel-cron: 1`).
-3. Confirm `NEURON_API_KEY` set in production (neurons otherwise 401).
-4. Smoke: sponsor checkout → success key via session; signed-in settings tier; admin analytics; sales kill-switch; retrieve-api-key after sign-in.
-5. Do **not** claim SOC2/ISO; perimeter packaging language only after live smoke.
+| ID | Finding | Status | Notes |
+|----|---------|--------|-------|
+| **M2** | AI context trust | **CLOSED** | Caps in `/api/ai/chat` |
+| **M3** | map-csv unauth LLM spend | **CLOSED** | IP rate limit |
+| **M4** | Cron accepts `x-vercel-cron: 1` | **CLOSED** (via H8) | Shared helper only |
+| **M5** | Quota fail-open | **CLOSED** | 503 when store down |
+| **M6** | Plaid unauth / access_token | **CLOSED** | Auth; no token leak |
+| **M9** | Cron `?test=1&email=` blast | **CLOSED** | `lib/cron/verify-cron-test-email.ts` allowlist / `ALLOW_CRON_TEST_EMAIL` |
+| **M10** | Price API key fail-open | **CLOSED** | Firestore error → 503; fake key local **401** |
+| **M11** | Dividend diagnostic / test-sources | **CLOSED** | Cron-gated; presence-only key flags |
+| **M12** | setup-link abuse | **CLOSED** | IP rate limit 5/hour |
+| **M13** | notifications/register unauth | **CLOSED** | Firebase Bearer + owner DELETE; `useFCM` uses `bearerFetch`; local POST → **401** |
+| **M14** | Stripe checkout-session IDOR window | **CLOSED** | 24h expiry → 410 |
+| **M1** | Client-only UI page gates | **OPEN (accepted)** | API locks are control |
+| **M7** | Claim hygiene | **OPEN (claim)** | Narrative, not exploit |
+| **M8** | CSP unsafe-inline/eval | **OPEN (accepted)** | Defer report-only pass |
 
 ---
 
-## Org-role close
+## 3. Local smoke (Wave C/D — 2026-09-11, `:3001`)
 
-| Role | Position |
-|------|----------|
-| **CISO** | Wave A P0 closed in code; M1/M8 residual accepted with API-first posture |
-| **Eng** | R complete for A+B implemented items |
-| **Platform** | Own deploy secrets + cron header verification |
-| **CEO / CMD2** | Claims still HOLD until production smoke |
+| Probe | Result |
+|-------|--------|
+| `GET /api/health` | **200** |
+| `GET /api/dividend/diagnostic` | **401** |
+| `GET /api/dividend/test-sources` | **401** |
+| `GET /api/cron/weekly-snapshot` | **401** |
+| `GET /api/cron/notes-blast?test=1&email=attacker@evil.com` | **401** |
+| `GET cron` + `x-vercel-cron: 1` | **401** |
+| `GET /api/price/AAPL?key=pp_fake_key` | **401** |
+| `POST /api/notifications/register` (no Bearer) | **401** |
+| `GET /api/stripe/checkout-session/cs_test_invalid` | **404** |
+| Unit: `tests/unit/auth/wave-a-security.spec.ts` | **9 passed** (Svix, cron helper, test-email gate) |
 
-**SEND_LOCKED for implementation package:** ready for review/deploy mandate — not auto-shipped.
+---
+
+## 4. GitHub Security dashboard
+
+### Dependabot
+- Runtime Highs closed via `package.json` **overrides** where patched releases exist.
+- Still open / no patch: **extract-zip**, **image-size** (≤2.0.2 has no fixed release on npm at clearance time).
+- Remaining Medium/Low: triage with Dependabot PRs / `npm audit` (dev tooling).
+
+### CodeQL (app-priority)
+| Item | Status |
+|------|--------|
+| EnvDebug clear-text | **CLOSED** — presence-only, localhost gate |
+| OG reflected XSS | **CLOSED** — stronger `clamp` strip |
+| TickerSearch DOM/XSS | **CLOSED** — `sanitizeSymbol` on input + links |
+| Resend ReDoS #88 | **N/A / stale** — current route has no regex; alert may clear on next analysis |
+| Scripts / URL-substring bulk | Backlog (non-runtime path) |
+
+---
+
+## 5. Production readiness snapshot
+
+| Check | Result |
+|-------|--------|
+| PR #121 (Wave A/B) | Merged `d3a0665b` |
+| Wave C–F clearance | Local verified; ship via `security/wave-cdef-clearance` |
+| Env: `RESEND_WEBHOOK_SECRET`, `CRON_SECRET`, `NEURON_API_KEY` | Present in prod |
+| Optional ops: `CRON_TEST_EMAIL_ALLOWLIST` / `ALLOW_CRON_TEST_EMAIL` | Needed for intentional cron test sends |
+| GitHub Actions CI | Billing lock may still block Actions green |
+
+**CISO vote:** App High perimeter **cleared**. Accepted residual: M1/M8 (architecture), M7 (claims), unpatched transitive extract-zip/image-size.

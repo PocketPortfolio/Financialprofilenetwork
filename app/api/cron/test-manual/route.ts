@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
 import { SocialScheduler } from '@/lib/social/scheduler';
 
 // Next.js route configuration
@@ -16,18 +17,9 @@ export const fetchCache = 'force-no-store';
  *   -H "Authorization: Bearer YOUR_CRON_SECRET"
  */
 export async function GET(request: Request) {
-  // Verify this is an authorized request
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  
-  if (!cronSecret) {
-    console.error('[CRON] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-
-  // Verify authentication
-  if (authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   try {

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getApps, initializeApp, cert } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
-// Initialize Firebase Admin if not already initialized
-if (!getApps().length) {
-  try {
+function ensureAdmin() {
+  if (!getApps().length) {
     initializeApp({
       credential: cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
@@ -12,70 +12,60 @@ if (!getApps().length) {
         privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       }),
     });
-  } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
   }
+}
+
+async function requireUid(request: NextRequest): Promise<string> {
+  const authHeader = request.headers.get('authorization');
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!token) {
+    throw Object.assign(new Error('Unauthorized'), { status: 401 });
+  }
+  ensureAdmin();
+  const decoded = await getAuth().verifyIdToken(token);
+  return decoded.uid;
 }
 
 /**
  * POST /api/notifications/register
- * Register FCM token for push notifications
+ * Register FCM token for push notifications (auth required — M13).
  */
 export async function POST(request: NextRequest) {
   try {
+    let uid: string;
+    try {
+      uid = await requireUid(request);
+    } catch (e: any) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: e?.status || 401 });
+    }
+
     const body = await request.json();
     const { fcmToken } = body;
 
-    if (!fcmToken || typeof fcmToken !== 'string') {
-      return NextResponse.json(
-        { error: 'FCM token is required' },
-        { status: 400 }
-      );
-    }
-
-    // Get user ID from Firebase Auth token
-    // Note: In a real implementation, you'd verify the auth token from the request
-    // For now, we'll store tokens anonymously and associate them later
-    const authHeader = request.headers.get('authorization');
-    let userId: string | null = null;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      try {
-        // Verify token and get user ID
-        // This would require Firebase Admin Auth verification
-        // For now, we'll store with a placeholder and update when user logs in
-      } catch (error) {
-        console.error('Auth token verification error:', error);
-      }
+    if (!fcmToken || typeof fcmToken !== 'string' || fcmToken.length > 4096) {
+      return NextResponse.json({ error: 'FCM token is required' }, { status: 400 });
     }
 
     const db = getFirestore();
-    
-    // Store FCM token
-    // If user is authenticated, associate with user ID
-    // Otherwise, store as anonymous (can be associated later)
-    const tokenData = {
-      fcmToken,
-      userId: userId || 'anonymous',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userAgent: request.headers.get('user-agent') || 'unknown',
-      ip: request.headers.get('x-forwarded-for')?.split(',')[0] || 
-          request.headers.get('x-real-ip') || 
-          'unknown',
-    };
+    await db.collection('fcmTokens').doc(fcmToken).set(
+      {
+        fcmToken,
+        userId: uid,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userAgent: (request.headers.get('user-agent') || 'unknown').slice(0, 500),
+      },
+      { merge: true }
+    );
 
-    // Use FCM token as document ID to prevent duplicates
-    await db.collection('fcmTokens').doc(fcmToken).set(tokenData, { merge: true });
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: 'FCM token registered successfully'
+      message: 'FCM token registered successfully',
     });
   } catch (error: any) {
     console.error('FCM token registration error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to register FCM token' },
+      { error: 'Failed to register FCM token' },
       { status: 500 }
     );
   }
@@ -83,33 +73,41 @@ export async function POST(request: NextRequest) {
 
 /**
  * DELETE /api/notifications/register
- * Unregister FCM token
+ * Unregister FCM token (auth required; owner only).
  */
 export async function DELETE(request: NextRequest) {
   try {
+    let uid: string;
+    try {
+      uid = await requireUid(request);
+    } catch (e: any) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: e?.status || 401 });
+    }
+
     const body = await request.json();
     const { fcmToken } = body;
 
     if (!fcmToken || typeof fcmToken !== 'string') {
-      return NextResponse.json(
-        { error: 'FCM token is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'FCM token is required' }, { status: 400 });
     }
 
     const db = getFirestore();
-    await db.collection('fcmTokens').doc(fcmToken).delete();
+    const ref = db.collection('fcmTokens').doc(fcmToken);
+    const snap = await ref.get();
+    if (snap.exists && snap.data()?.userId && snap.data()?.userId !== uid) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    await ref.delete();
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: 'FCM token unregistered successfully'
+      message: 'FCM token unregistered successfully',
     });
   } catch (error: any) {
     console.error('FCM token unregistration error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to unregister FCM token' },
+      { error: 'Failed to unregister FCM token' },
       { status: 500 }
     );
   }
 }
-

@@ -9,6 +9,9 @@ export const runtime = 'nodejs';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DASHBOARD_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.pocketportfolio.app';
 
+const setupLinkRateLimit = new Map<string, { count: number; resetTime: number }>();
+const SETUP_LINK_WINDOW_MS = 60 * 60 * 1000;
+const SETUP_LINK_MAX = 5;
 function getDb() {
   if (!getApps().length) {
     try {
@@ -33,8 +36,23 @@ function getDb() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
+    const now = Date.now();
+    const bucket = setupLinkRateLimit.get(ip);
+    if (bucket && now < bucket.resetTime) {
+      if (bucket.count >= SETUP_LINK_MAX) {
+        return NextResponse.json({ error: 'Too many requests. Try again later.' }, { status: 429 });
+      }
+      bucket.count += 1;
+    } else {
+      setupLinkRateLimit.set(ip, { count: 1, resetTime: now + SETUP_LINK_WINDOW_MS });
+    }
+
     const body = await request.json().catch(() => ({}));
-    const email = typeof body.email === 'string' ? body.email.trim() : '';
+    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
 
     if (!email) {
       return NextResponse.json(

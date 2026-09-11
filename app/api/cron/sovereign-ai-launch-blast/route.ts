@@ -8,6 +8,8 @@
  * Dry-run: ?dryRun=1 (no send; returns deduped count)
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyVercelCron } from '@/lib/cron/verify-vercel-cron';
+import { verifyCronTestMode } from '@/lib/cron/verify-cron-test-email';
 import { getFirestore, Timestamp, FieldValue, type Firestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
@@ -101,27 +103,19 @@ async function collectLeadEmails(
 }
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  const vercelCronHeader = request.headers.get('x-vercel-cron');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    console.error('[Sovereign AI Launch Blast] CRON_SECRET not configured');
-    return NextResponse.json({ error: 'Cron not configured' }, { status: 500 });
-  }
-
-  const isAuthorized =
-    authHeader === `Bearer ${cronSecret}` ||
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1';
-
-  if (!isAuthorized) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = verifyVercelCron(request);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
   const searchParams = new URL(request.url).searchParams;
-  const testEmail = (searchParams.get('email') || '').trim().toLowerCase();
-  const isTestRun = searchParams.get('test') === '1' && !!testEmail;
+  const testMode = verifyCronTestMode(searchParams);
+  if (!testMode.ok) {
+    return NextResponse.json({ error: testMode.error }, { status: testMode.status });
+  }
+
+  const testEmail = (testMode.testEmail || '').trim().toLowerCase();
+  const isTestRun = testMode.isTestRun;
   const dryRun = searchParams.get('dryRun') === '1';
   const includeMobile = searchParams.get('includeMobile') !== '0';
 
@@ -134,7 +128,7 @@ export async function GET(request: NextRequest) {
   const batchSleepMs = Number(process.env.SOVEREIGN_AI_LAUNCH_BATCH_SLEEP_MS || 400);
 
   const db = getDb();
-  const auth = getAuth();
+  const firebaseAuth = getAuth();
 
   // Campaign lock (skip for test / dry-run)
   // COMPLETED → abort. IN_PROGRESS → resume (batched maxSends across invocations).
@@ -180,7 +174,7 @@ export async function GET(request: NextRequest) {
     do {
       page++;
       if (page > 50) break;
-      const listResult = await auth.listUsers(1000, nextPageToken);
+      const listResult = await firebaseAuth.listUsers(1000, nextPageToken);
       nextPageToken = listResult.pageToken;
       for (const u of listResult.users) {
         const email = normalizeEmail(u.email);

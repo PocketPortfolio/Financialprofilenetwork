@@ -85,7 +85,12 @@ for (const surface of ['pocket', 'open'] as const) {
 
 function clamp(text: string, max: number): string {
   if (!text) return '';
-  const sanitized = text.replace(/[<>&"']/g, '').replace(/[\x00-\x1f\x7f]/g, '');
+  // Strip HTML/control chars and limit length (CodeQL reflected-xss / format hygiene).
+  const sanitized = String(text)
+    .replace(/[<>&"'`]/g, '')
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   return sanitized.length > max ? `${sanitized.slice(0, max - 1).trimEnd()}…` : sanitized;
 }
 

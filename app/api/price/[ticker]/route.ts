@@ -48,9 +48,11 @@ export async function GET(
       }
     } catch (error) {
       console.error('API key validation error:', error);
-      if (!apiKey.startsWith('pp_')) {
-        return NextResponse.json({ error: 'Invalid API key format' }, { status: 401 });
-      }
+      // Fail closed (M10): never accept keys when Firestore validation fails.
+      return NextResponse.json(
+        { error: 'API key validation unavailable', code: 'KEY_STORE_UNAVAILABLE' },
+        { status: 503 }
+      );
     }
   }
 
