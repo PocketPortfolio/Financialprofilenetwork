@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { leads, auditLogs, conversations } from '@/db/sales/schema';
 import { desc, eq, gte, and, or } from 'drizzle-orm';
@@ -17,6 +18,12 @@ export const fetchCache = 'force-no-store';
  * Get comprehensive sales metrics including revenue calculations
  */
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     // Fetch all leads
     const allLeads = await db

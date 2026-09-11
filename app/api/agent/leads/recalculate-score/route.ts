@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { recalculateLeadScore } from '@/app/agent/researcher';
 
 // Next.js route configuration for production
@@ -14,6 +15,12 @@ export const fetchCache = 'force-no-store';
  * Request body: { leadId: string }
  */
 export async function POST(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const { leadId } = await request.json();
     

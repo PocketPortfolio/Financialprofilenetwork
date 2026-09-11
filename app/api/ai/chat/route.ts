@@ -38,6 +38,9 @@ const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const FREE_TIER_MONTHLY_LIMIT = 10; // Free: quota enforced; paid (foundersClub/corporateSponsor): no quota, unlimited.
 const PERIOD_DAYS = 30;
 const MAX_ATTACHED_CONTENT_LENGTH = 60_000; // Server-side cap for prod (frontend caps at 50k)
+/** Bound client-supplied portfolio context (Wave B / M2). */
+const MAX_CONTEXT_LENGTH = 32_000;
+const MAX_MESSAGE_LENGTH = 8_000;
 
 const KV_REST_API_URL = process.env.KV_REST_API_URL;
 const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
@@ -243,8 +246,25 @@ export async function POST(request: NextRequest) {
   if (!message) {
     return NextResponse.json({ error: 'message is required' }, { status: 400 });
   }
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    return NextResponse.json(
+      { error: `message exceeds ${MAX_MESSAGE_LENGTH} characters`, code: 'MESSAGE_TOO_LONG' },
+      { status: 400 }
+    );
+  }
 
-  const context = typeof body.context === 'string' ? body.context : '';
+  // Wave B / M2: only accept string context; truncate oversized payloads (do not trust arbitrary objects).
+  if (body.context != null && typeof body.context !== 'string') {
+    return NextResponse.json(
+      { error: 'context must be a string', code: 'INVALID_CONTEXT' },
+      { status: 400 }
+    );
+  }
+  const rawContext = typeof body.context === 'string' ? body.context : '';
+  const context =
+    rawContext.length > MAX_CONTEXT_LENGTH
+      ? rawContext.slice(0, MAX_CONTEXT_LENGTH)
+      : rawContext;
   const rawAttached = typeof body.attachedContent === 'string' ? body.attachedContent.trim() : '';
   const attachedContent = rawAttached.length > MAX_ATTACHED_CONTENT_LENGTH ? rawAttached.slice(0, MAX_ATTACHED_CONTENT_LENGTH) : rawAttached;
 
@@ -441,6 +461,27 @@ export async function POST(request: NextRequest) {
         );
       }
       await kvSetJson(kvKey, { usageCount: usageCount + 1, periodStartMs }, ttlSeconds);
+    } else if (firestoreQuotaBlocked) {
+      // Fail closed for free tier when both Firestore and KV are unavailable (Wave B / M5).
+      if (db) {
+        await logPocketAnalystEvent(db, {
+          action: 'error',
+          uid,
+          tier,
+          isPaid: false,
+          hadAttachment: !!attachedContent,
+          status: 503,
+          errorCode: 'quota_store_unavailable',
+        });
+      }
+      return NextResponse.json(
+        {
+          error:
+            'AI quota service is temporarily unavailable. Please try again in a few minutes.',
+          code: 'QUOTA_STORE_UNAVAILABLE',
+        },
+        { status: 503 }
+      );
     }
   }
 

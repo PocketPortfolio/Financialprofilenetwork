@@ -5,9 +5,11 @@ import Link from 'next/link';
 import SEOHead from '../components/SEOHead';
 import ProductionNavbar from '../components/marketing/ProductionNavbar';
 import AlertModal from '../components/modals/AlertModal';
+import { useAuth } from '../hooks/useAuth';
+import { bearerFetch } from '../lib/auth/bearerFetch';
 
 export default function RetrieveApiKeyPage() {
-  const [email, setEmail] = useState('');
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
@@ -25,8 +27,9 @@ export default function RetrieveApiKeyPage() {
     type: 'info'
   });
 
-  const handleRetrieve = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRetrieve = async () => {
+    if (!user) return;
+
     setLoading(true);
     setError(null);
     setApiKey(null);
@@ -34,8 +37,12 @@ export default function RetrieveApiKeyPage() {
     setTier(null);
 
     try {
-      // Use query parameter route (more reliable than path parameter with @ symbol)
-      const response = await fetch(`/api/api-keys?email=${encodeURIComponent(email)}`);
+      const response = await bearerFetch(
+        '/api/api-keys/user',
+        { cache: 'no-store' },
+        () => user.getIdToken()
+      );
+
       if (response.ok) {
         const data = await response.json();
         if (data.apiKey || data.corporateLicense) {
@@ -43,16 +50,19 @@ export default function RetrieveApiKeyPage() {
           setCorporateLicense(data.corporateLicense);
           setTier(data.tier);
         } else {
-          setError('No API keys found for this email. Make sure you have completed a purchase.');
+          setError('No API keys found for your account. Make sure you have completed a purchase.');
         }
+      } else if (response.status === 401) {
+        setError('Your session has expired. Please sign in again using the Sign In button in the navbar.');
+      } else if (response.status === 403) {
+        setError('You do not have permission to retrieve API keys for this account.');
       } else if (response.status === 503) {
-        // Handle quota exceeded error
-        const errorData = await response.json().catch(() => ({}));
         setError('Service temporarily unavailable due to high demand. Please try again in a few minutes.');
       } else {
-        setError('Failed to retrieve API keys. Please check your email and try again.');
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.error || 'Failed to retrieve API keys. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again later.');
     } finally {
       setLoading(false);
@@ -93,7 +103,7 @@ export default function RetrieveApiKeyPage() {
             color: 'var(--muted)', 
             fontSize: '16px'
           }}>
-            Enter the email address you used when purchasing to retrieve your API key
+            Sign in to retrieve the API keys linked to your account
           </p>
         </div>
 
@@ -104,66 +114,73 @@ export default function RetrieveApiKeyPage() {
           padding: '32px',
           marginBottom: '24px'
         }}>
-          <form onSubmit={handleRetrieve}>
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ 
-                display: 'block', 
-                fontSize: '14px', 
-                fontWeight: '600',
-                marginBottom: '8px',
-                color: 'var(--text)'
+          {authLoading ? (
+            <p style={{ color: 'var(--muted)', textAlign: 'center' }}>Checking sign-in status...</p>
+          ) : !isAuthenticated ? (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{
+                color: 'var(--text-secondary)',
+                fontSize: '16px',
+                marginBottom: '16px',
+                lineHeight: '1.6'
               }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="your.email@example.com"
+                You must be signed in to retrieve your API keys. Use the <strong>Sign In</strong> button in the navbar, then return to this page.
+              </p>
+              <Link
+                href="/dashboard"
                 style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid var(--border-warm)',
-                  borderRadius: '6px',
-                  background: 'var(--bg)',
-                  color: 'var(--text)',
-                  fontSize: '16px'
+                  color: 'var(--accent-warm)',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '600'
                 }}
-              />
+              >
+                Go to Dashboard to sign in →
+              </Link>
             </div>
-            {error && (
-              <div style={{
-                padding: '12px',
-                background: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                borderRadius: '6px',
-                color: 'var(--danger)',
+          ) : (
+            <>
+              <p style={{
                 fontSize: '14px',
+                color: 'var(--text-secondary)',
                 marginBottom: '20px'
               }}>
-                {error}
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '12px 24px',
-                background: loading ? 'var(--muted)' : 'var(--accent-warm)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {loading ? 'Retrieving...' : 'Retrieve API Key'}
-            </button>
-          </form>
+                Signed in as <strong>{user?.email}</strong>
+              </p>
+              {error && (
+                <div style={{
+                  padding: '12px',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '6px',
+                  color: 'var(--danger)',
+                  fontSize: '14px',
+                  marginBottom: '20px'
+                }}>
+                  {error}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleRetrieve}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '12px 24px',
+                  background: loading ? 'var(--muted)' : 'var(--accent-warm)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {loading ? 'Retrieving...' : 'Retrieve API Key'}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Display API Keys */}
@@ -330,5 +347,3 @@ export default function RetrieveApiKeyPage() {
     </div>
   );
 }
-
-

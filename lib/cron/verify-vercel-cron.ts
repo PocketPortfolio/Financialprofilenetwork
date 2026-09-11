@@ -11,8 +11,7 @@ export function verifyVercelCron(request: Request): { ok: true } | { ok: false; 
 
   const isAuthorized =
     authHeader === `Bearer ${cronSecret}` ||
-    vercelCronHeader === cronSecret ||
-    vercelCronHeader === '1';
+    vercelCronHeader === cronSecret;
 
   if (!isAuthorized) {
     return { ok: false, status: 401, error: 'Unauthorized' };

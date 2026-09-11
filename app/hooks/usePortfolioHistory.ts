@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/app/hooks/useAuth';
 import type { PortfolioSnapshot } from '@/app/lib/portfolio/types';
 
 interface UsePortfolioHistoryOptions {
@@ -25,13 +26,21 @@ export function usePortfolioHistory({
   endDate,
   enabled = true,
 }: UsePortfolioHistoryOptions): UsePortfolioHistoryResult {
+  const { user, isAuthenticated } = useAuth();
   const [data, setData] = useState<PortfolioSnapshot[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
-    if (!userId || !enabled) {
+    if (!enabled || !isAuthenticated || !user) {
       setData([]);
+      return;
+    }
+
+    const authUid = user.uid;
+    if (userId && userId !== authUid) {
+      setData([]);
+      setError('Cannot fetch portfolio history for another user');
       return;
     }
 
@@ -40,12 +49,17 @@ export function usePortfolioHistory({
 
     try {
       const params = new URLSearchParams({
-        userId,
+        userId: authUid,
         ...(startDate && { startDate }),
         ...(endDate && { endDate }),
       });
 
-      const response = await fetch(`/api/portfolio/history?${params.toString()}`);
+      const token = await user.getIdToken();
+      const response = await fetch(`/api/portfolio/history?${params.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -64,7 +78,7 @@ export function usePortfolioHistory({
 
   useEffect(() => {
     fetchData();
-  }, [userId, startDate, endDate, enabled]);
+  }, [userId, startDate, endDate, enabled, isAuthenticated, user?.uid]);
 
   return {
     data,
@@ -73,14 +87,3 @@ export function usePortfolioHistory({
     refetch: fetchData,
   };
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -273,16 +273,21 @@ export default function AdminAnalyticsPage() {
   }, [user, loading]);
 
   const fetchAnalyticsData = useCallback(async () => {
-    if (!isAdmin || checkingAdmin) {
+    if (!isAdmin || checkingAdmin || !user) {
             return;
     }
     try {
       setLoadingData(true);
       setError(null);
-      
+
+      const token = await user.getIdToken(true);
             const response = await fetch(`/api/admin/analytics?range=${timeRange}&_=${Date.now()}`, {
         cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
       });
             if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Failed to fetch analytics data' }));
@@ -297,7 +302,7 @@ export default function AdminAnalyticsPage() {
           } finally {
       setLoadingData(false);
     }
-  }, [isAdmin, checkingAdmin, timeRange]);
+  }, [isAdmin, checkingAdmin, timeRange, user]);
 
   const fetchFeedbackData = useCallback(async () => {
     if (!isAdmin || checkingAdmin || !user) return;

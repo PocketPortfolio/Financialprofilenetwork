@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { bearerFetch } from '@/app/lib/auth/bearerFetch';
 
 interface AuditLog {
   id: string;
@@ -15,13 +16,19 @@ interface AuditLog {
   } | null;
 }
 
-export function ActionFeed() {
+interface ActionFeedProps {
+  getIdToken?: () => Promise<string>;
+}
+
+export function ActionFeed({ getIdToken }: ActionFeedProps) {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadFeed = async () => {
     try {
-      const response = await fetch('/api/agent/audit-feed?limit=20');
+      const response = getIdToken
+        ? await bearerFetch('/api/agent/audit-feed?limit=20', undefined, getIdToken)
+        : await fetch('/api/agent/audit-feed?limit=20');
       if (!response.ok) return;
       const data = await response.json();
       setLogs(data.logs || []);
@@ -36,7 +43,7 @@ export function ActionFeed() {
     loadFeed();
     const interval = setInterval(loadFeed, 10000); // Refresh every 10 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [getIdToken]);
 
   const formatAction = (action: string): string => {
     const actionMap: Record<string, string> = {
@@ -128,12 +135,3 @@ export function ActionFeed() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

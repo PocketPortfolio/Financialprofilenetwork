@@ -106,6 +106,13 @@ export default function AdminSalesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const leadsPerPage = 100;
 
+  const authFetch = async (url: string, init?: RequestInit) => {
+    const token = await user!.getIdToken(true);
+    const headers = new Headers(init?.headers);
+    headers.set('Authorization', `Bearer ${token}`);
+    return fetch(url, { ...init, headers });
+  };
+
   // Tab configuration
   const tabConfig = {
     fresh: {
@@ -205,7 +212,7 @@ export default function AdminSalesPage() {
       setLoading(true);
       setError(null); // Clear previous errors
       // Load all leads (higher limit) for accurate tab counts
-      const response = await fetch('/api/agent/leads?limit=1000');
+      const response = await authFetch('/api/agent/leads?limit=1000');
       
       if (!response.ok) {
         // Try to get error message from response
@@ -228,7 +235,7 @@ export default function AdminSalesPage() {
 
   const loadMetrics = async () => {
     try {
-      const response = await fetch('/api/agent/metrics');
+      const response = await authFetch('/api/agent/metrics');
       if (!response.ok) return;
       const data = await response.json();
       setMetrics(data);
@@ -239,7 +246,7 @@ export default function AdminSalesPage() {
 
   const checkEmergencyStop = async () => {
     try {
-      const response = await fetch('/api/agent/kill-switch');
+      const response = await authFetch('/api/agent/kill-switch');
       if (response.ok) {
         const data = await response.json();
         setEmergencyStop(data.active === true);
@@ -271,7 +278,7 @@ export default function AdminSalesPage() {
 
   const toggleEmergencyStop = async () => {
     try {
-      const response = await fetch('/api/agent/kill-switch', {
+      const response = await authFetch('/api/agent/kill-switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -298,7 +305,7 @@ export default function AdminSalesPage() {
   const handleViewLead = async (leadId: string) => {
     setLoadingLeadDetails(leadId);
     try {
-      const response = await fetch(`/api/agent/leads/${leadId}`);
+      const response = await authFetch(`/api/agent/leads/${leadId}`);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Failed to load lead details' }));
         throw new Error(errorData.error || `HTTP ${response.status}: Failed to load lead details`);
@@ -1104,7 +1111,7 @@ export default function AdminSalesPage() {
             )}
 
             {/* Action Feed */}
-            <ActionFeed />
+            <ActionFeed getIdToken={() => user!.getIdToken(true)} />
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import Stripe from 'stripe';
 import { getArchitectureChallengeLeadsAnalytics } from '@/lib/challenge/challenge-leads-firestore';
 import { getOpenPortfolioLeadsAnalytics } from '@/lib/open-portfolio/contact-leads-firestore';
@@ -156,6 +157,12 @@ const NPM_PACKAGES = [
 
 export async function GET(request: NextRequest) {
   console.log('[Analytics API] 🚀 GET request received');
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     // Get time range from query params
     const searchParams = request.nextUrl.searchParams;

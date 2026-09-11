@@ -36,3 +36,12 @@ export async function requireAdminRequest(request: NextRequest): Promise<{ email
   }
   return { email: tokenEmail };
 }
+
+/** Map requireAdminRequest failures to a JSON Response. */
+export function adminUnauthorizedResponse(error: unknown): Response {
+  const err = error as { status?: number; code?: string; message?: string };
+  return Response.json(
+    { error: err.message ?? 'Unauthorized', code: err.code },
+    { status: err.status ?? 401 }
+  );
+}

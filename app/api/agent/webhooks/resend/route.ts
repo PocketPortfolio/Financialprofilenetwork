@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyResendWebhookSignature } from '@/lib/auth/verify-resend-webhook';
 import { db } from '@/db/sales/client';
 import { conversations, leads, auditLogs } from '@/db/sales/schema';
 import { eq, and, or } from 'drizzle-orm';
@@ -16,14 +17,29 @@ export const fetchCache = 'force-no-store';
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { type, data } = body;
+    const payload = await request.text();
 
-    // Verify webhook signature (add Resend webhook secret verification)
-    // const signature = request.headers.get('resend-signature');
-    // if (!verifySignature(signature, body)) {
-    //   return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    // }
+    const secret = process.env.RESEND_WEBHOOK_SECRET;
+    if (!secret) {
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 500 }
+      );
+    }
+
+    const verified = verifyResendWebhookSignature({
+      payload,
+      svixId: request.headers.get('svix-id'),
+      svixTimestamp: request.headers.get('svix-timestamp'),
+      svixSignature: request.headers.get('svix-signature'),
+      secret,
+    });
+    if (!verified) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const body = JSON.parse(payload);
+    const { type, data } = body;
 
     // Handle email.sent event - update SCHEDULED → CONTACTED
     if (type === 'email.sent') {

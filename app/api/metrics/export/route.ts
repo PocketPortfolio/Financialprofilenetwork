@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import Stripe from 'stripe';
@@ -90,6 +91,12 @@ const NPM_PACKAGES = [
  * - Growth Metrics (trends, comparisons)
  */
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const range = searchParams.get('range') || '30d';

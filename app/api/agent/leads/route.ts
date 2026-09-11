@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { leads } from '@/db/sales/schema';
 import { eq, desc, inArray, sql, and, not, or, like } from 'drizzle-orm';
@@ -17,6 +18,12 @@ export const fetchCache = 'force-no-store';
  * List all leads with pagination
  */
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -161,6 +168,12 @@ export async function GET(request: NextRequest) {
  * Create a new lead
  */
 export async function POST(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const body = await request.json();
     const { email, companyName, firstName, lastName, jobTitle, linkedinUrl, dataSource } = body;

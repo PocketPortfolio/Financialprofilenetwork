@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { auditLogs } from '@/db/sales/schema';
 import { setEmergencyStop, clearEmergencyStopCache } from '@/lib/sales/emergency-stop';
@@ -15,13 +16,14 @@ export const fetchCache = 'force-no-store';
  * Requires admin authentication
  */
 export async function POST(request: NextRequest) {
+  let adminEmail: string | undefined;
   try {
-    // TODO: Add admin authentication check
-    // const isAdmin = await checkAdminAuth(request);
-    // if (!isAdmin) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    ({ email: adminEmail } = await requireAdminRequest(request));
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
 
+  try {
     const { action } = await request.json();
 
     if (action !== 'activate' && action !== 'deactivate') {
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const isActive = action === 'activate';
-    const updatedBy = 'admin_ui'; // TODO: Get from auth session
+    const updatedBy = adminEmail || 'admin_ui';
 
     // Update database
     await setEmergencyStop(isActive, updatedBy);
@@ -64,7 +66,13 @@ export async function POST(request: NextRequest) {
  * GET /api/agent/kill-switch
  * Get current emergency stop status
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const { isEmergencyStopActive } = await import('@/lib/sales/emergency-stop');
     const isActive = await isEmergencyStopActive();

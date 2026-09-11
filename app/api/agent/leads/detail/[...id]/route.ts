@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { leads, conversations, auditLogs } from '@/db/sales/schema';
 import { eq, desc } from 'drizzle-orm';
@@ -26,6 +27,12 @@ export async function GET(
 ) {
   // Add logging to verify route is being called
   console.log('[LEAD-DETAILS] Route handler invoked');
+
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
   
   const resolvedParams = await params;
   // Extract id from array (first element) - catch-all route workaround for Next.js 15

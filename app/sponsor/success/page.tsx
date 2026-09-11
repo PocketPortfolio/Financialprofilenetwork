@@ -31,7 +31,7 @@ function SuccessContent() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [corporateLicense, setCorporateLicense] = useState<string | null>(null);
   const [tier, setTier] = useState<string | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
+  const [keysFetchFailed, setKeysFetchFailed] = useState(false);
   const [alertModal, setAlertModal] = useState<{ isOpen: boolean; title: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>({
     isOpen: false,
     title: '',
@@ -92,81 +92,39 @@ function SuccessContent() {
     };
   }, [sessionId]);
 
+  const MAX_KEY_RETRIES = 5;
+
   const fetchApiKeys = async (retryCount = 0) => {
     try {
       if (!sessionId) return;
 
-      // Fetch API keys using Stripe session ID (more reliable than localStorage)
       const response = await fetch(`/api/api-keys/session/${encodeURIComponent(sessionId)}`);
       if (response.ok) {
         const data = await response.json();
         if (data.apiKey || data.corporateLicense) {
-          // API keys found - set them immediately
           setApiKey(data.apiKey);
           setCorporateLicense(data.corporateLicense);
           setTier(data.tier);
-          setEmail(data.email);
-        } else if (retryCount < 3) {
-          // Keys not found yet - webhook might still be processing
-          // Retry up to 3 times with 2 second delays
-          console.log(`API keys not found yet, retrying... (attempt ${retryCount + 1}/3)`);
+          setKeysFetchFailed(false);
+        } else if (retryCount < MAX_KEY_RETRIES) {
+          console.log(`API keys not found yet, retrying... (attempt ${retryCount + 1}/${MAX_KEY_RETRIES})`);
           setTimeout(() => fetchApiKeys(retryCount + 1), 2000);
         } else {
-          // After 3 retries, fallback to email lookup
-          console.log('API keys not found after retries, trying email fallback');
-          const storedEmail = localStorage.getItem('sponsor_email');
-          if (storedEmail) {
-            const fallbackResponse = await fetch(`/api/api-keys/${encodeURIComponent(storedEmail)}`);
-            if (fallbackResponse.ok) {
-              const fallbackData = await fallbackResponse.json();
-              setApiKey(fallbackData.apiKey);
-              setCorporateLicense(fallbackData.corporateLicense);
-              setTier(fallbackData.tier);
-              setEmail(storedEmail);
-            }
-          }
+          setKeysFetchFailed(true);
         }
-      } else if (retryCount < 3) {
-        // Error response - retry if we haven't exceeded retry limit
-        console.log(`Error fetching API keys, retrying... (attempt ${retryCount + 1}/3)`);
+      } else if (retryCount < MAX_KEY_RETRIES) {
+        console.log(`Error fetching API keys, retrying... (attempt ${retryCount + 1}/${MAX_KEY_RETRIES})`);
         setTimeout(() => fetchApiKeys(retryCount + 1), 2000);
       } else {
-        // After 3 retries, fallback to localStorage/email lookup
-        const storedEmail = localStorage.getItem('sponsor_email');
-        if (storedEmail) {
-          const fallbackResponse = await fetch(`/api/api-keys/${encodeURIComponent(storedEmail)}`);
-          if (fallbackResponse.ok) {
-            const fallbackData = await fallbackResponse.json();
-            setApiKey(fallbackData.apiKey);
-            setCorporateLicense(fallbackData.corporateLicense);
-            setTier(fallbackData.tier);
-            setEmail(storedEmail);
-          }
-        }
+        setKeysFetchFailed(true);
       }
     } catch (error) {
       console.error('Error fetching API keys:', error);
-      if (retryCount < 3) {
-        // Retry on error if we haven't exceeded retry limit
-        console.log(`Error occurred, retrying... (attempt ${retryCount + 1}/3)`);
+      if (retryCount < MAX_KEY_RETRIES) {
+        console.log(`Error occurred, retrying... (attempt ${retryCount + 1}/${MAX_KEY_RETRIES})`);
         setTimeout(() => fetchApiKeys(retryCount + 1), 2000);
       } else {
-        // After 3 retries, fallback to localStorage/email lookup
-        const storedEmail = localStorage.getItem('sponsor_email');
-        if (storedEmail) {
-          try {
-            const fallbackResponse = await fetch(`/api/api-keys/${encodeURIComponent(storedEmail)}`);
-            if (fallbackResponse.ok) {
-              const fallbackData = await fallbackResponse.json();
-              setApiKey(fallbackData.apiKey);
-              setCorporateLicense(fallbackData.corporateLicense);
-              setTier(fallbackData.tier);
-              setEmail(storedEmail);
-            }
-          } catch (fallbackError) {
-            console.error('Fallback fetch also failed:', fallbackError);
-          }
-        }
+        setKeysFetchFailed(true);
       }
     }
   };
@@ -426,22 +384,28 @@ function SuccessContent() {
               marginBottom: '16px',
               color: 'var(--text)'
             }}>
-              ⏳ API Key Processing
+              {keysFetchFailed ? '🔑 Retrieve Your API Key' : '⏳ API Key Processing'}
             </h2>
             <p style={{
               fontSize: '14px',
               color: 'var(--text-secondary)',
               marginBottom: '12px'
             }}>
-              Your API key is being generated. This usually takes just a few seconds.
+              {keysFetchFailed
+                ? 'Your purchase was successful, but your API key is not ready on this page yet. Sign in with the same account you used at checkout, then retrieve your key from Settings or the retrieve page.'
+                : 'Your API key is being generated. This usually takes just a few seconds.'}
             </p>
-            <p style={{
-              fontSize: '12px',
-              color: 'var(--muted)',
-              marginTop: '8px'
-            }}>
-              If your key doesn't appear, you can <Link href="/retrieve-api-key" style={{ color: 'var(--accent-warm)', textDecoration: 'none' }}>retrieve it here</Link> using your email address.
-            </p>
+            {keysFetchFailed && (
+              <p style={{
+                fontSize: '12px',
+                color: 'var(--muted)',
+                marginTop: '8px'
+              }}>
+                <Link href="/retrieve-api-key" style={{ color: 'var(--accent-warm)', textDecoration: 'none' }}>Retrieve API key</Link>
+                {' · '}
+                <Link href="/settings" style={{ color: 'var(--accent-warm)', textDecoration: 'none' }}>Settings</Link>
+              </p>
+            )}
           </div>
         )}
         <div style={{

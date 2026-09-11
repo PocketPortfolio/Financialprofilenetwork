@@ -7,6 +7,10 @@ import {
   shouldDegradeFirestoreReads,
 } from '@/app/lib/server/firestore-quota-circuit';
 import { resolvePaidTierFromStripeEmail } from '@/app/lib/server/stripe-paid-tier';
+import {
+  authErrorResponse,
+  requireEmailOwnerOrAdmin,
+} from '@/lib/auth/require-user-request';
 
 // Force dynamic rendering for API route
 export const dynamic = 'force-dynamic';
@@ -46,9 +50,8 @@ function getDb() {
 
 /**
  * GET /api/api-keys?email=user@example.com
- * Retrieve API key and corporate license for a customer email
- * Alternative to /api/api-keys/[email] that uses query parameters
- * This route is more reliable as it avoids Next.js routing issues with @ in path segments
+ * Retrieve API key and corporate license for the authenticated owner (or admin).
+ * Requires Authorization: Bearer <Firebase ID token> matching the email.
  */
 export async function GET(request: NextRequest) {
   let emailForDegraded: string | null = null;
@@ -66,6 +69,12 @@ export async function GET(request: NextRequest) {
     emailForDegraded = decodedEmail || null;
     if (!decodedEmail || !decodedEmail.includes('@')) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
+    try {
+      await requireEmailOwnerOrAdmin(request, decodedEmail);
+    } catch (authErr) {
+      return authErrorResponse(authErr) as NextResponse;
     }
 
     // In local dev, do not hit production Firestore for tiers by default.
