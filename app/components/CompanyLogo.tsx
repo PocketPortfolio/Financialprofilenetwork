@@ -89,15 +89,20 @@ export default function CompanyLogo({
     );
   }
   
-  // Only use crossOrigin for sources that support it (Clearbit, etc.)
+  // Only use crossOrigin for sources that support CORS (URL hostname allowlist — CodeQL #32).
   const useCrossOrigin = urlHostMatches(currentUrl, ['clearbit.com', 'logo.dev']);
-  
-  // Add cache-busting parameter to force browser to reload image when symbol changes
-  // Only add cache-bust on client-side (after mount) to avoid SSR hydration mismatch
-  // Use imgKey as cache-bust instead of Date.now() to ensure consistency
-  const imageUrlWithCacheBust = mounted && imgKey <= 1 
-    ? `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}t=${imgKey}`
-    : currentUrl;
+
+  // Cache-bust via URL API (avoid substring/includes hostname checks).
+  let imageUrlWithCacheBust = currentUrl;
+  if (mounted && imgKey <= 1) {
+    try {
+      const parsed = new URL(currentUrl);
+      parsed.searchParams.set('t', String(imgKey));
+      imageUrlWithCacheBust = parsed.toString();
+    } catch {
+      imageUrlWithCacheBust = currentUrl;
+    }
+  }
   
   return (
     <img

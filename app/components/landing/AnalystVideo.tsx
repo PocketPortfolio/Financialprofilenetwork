@@ -12,16 +12,26 @@ import {
 } from '../../../lib/landing-product-video';
 import { RETAIL_LANDING_COPY } from '@/lib/landing-retail-copy';
 import type { LandingPageVariant } from '@/lib/landing-retail-variant';
+import { safeExternalUrl } from '@/app/lib/safe-external-url';
 
 type AnalystVideoProps = {
   variant?: LandingPageVariant;
 };
 
+const CLOUDINARY_VIDEO_HOSTS = ['res.cloudinary.com'];
+
+/** Resolve video URL via URL parsing + host allowlist (CodeQL incomplete-url-substring #33). */
+function resolveSafeAnalystVideoSrc(): string {
+  const candidate = getPocketAnalystVideoSrc();
+  if (candidate.startsWith('/')) return candidate;
+  return safeExternalUrl(candidate, CLOUDINARY_VIDEO_HOSTS) ?? pocketAnalystLocalSrc();
+}
+
 export function AnalystVideo({ variant = 'control' }: AnalystVideoProps) {
   const isRetail = variant === 'retail';
   const retail = RETAIL_LANDING_COPY.analyst;
   const videoRef = useRef<HTMLDivElement>(null);
-  const videoSrc = getPocketAnalystVideoSrc();
+  const videoSrc = resolveSafeAnalystVideoSrc();
 
   const scrollToVideo = () => {
     videoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });

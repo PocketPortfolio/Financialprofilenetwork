@@ -72,14 +72,22 @@ if (PROXY_URL_RAW) {
 // Auto-detect placeholder proxies and disable them
 // Only disable if it's clearly a placeholder pattern, not a real proxy URL
 if (PROXY_URL_RAW) {
-  const isPlaceholder = 
-    PROXY_URL_RAW === 'user123' ||
-    PROXY_URL_RAW.includes('user123@proxy-pool.com') ||
-    PROXY_URL_RAW.includes('placeholder@example.com') ||
-    PROXY_URL_RAW.startsWith('http://user123:') ||
-    PROXY_URL_RAW.startsWith('http://placeholder:') ||
-    PROXY_URL_RAW.includes('proxy-pool.com') && PROXY_URL_RAW.includes('user123');
-  
+  let isPlaceholder = PROXY_URL_RAW === 'user123';
+  try {
+    const parsed = new URL(PROXY_URL_RAW);
+    const host = parsed.hostname.toLowerCase();
+    const user = decodeURIComponent(parsed.username || '').toLowerCase();
+    isPlaceholder =
+      isPlaceholder ||
+      host === 'proxy-pool.com' ||
+      host.endsWith('.proxy-pool.com') ||
+      host === 'example.com' ||
+      host.endsWith('.example.com') ||
+      user === 'user123' ||
+      user === 'placeholder';
+  } catch {
+    isPlaceholder = true;
+  }  
   if (isPlaceholder) {
     console.warn('   ⚠️  Placeholder proxy detected. Disabling proxy to prevent timeouts.');
     console.warn(`   Detected pattern: ${PROXY_URL_RAW.substring(0, 50)}...`);

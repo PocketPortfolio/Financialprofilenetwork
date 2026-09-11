@@ -154,7 +154,7 @@ function calculateDividendMetrics(
 
 // Fetch from EODHD API
 async function fetchFromEODHD(ticker: string): Promise<DividendData | null> {
-  logDividendDebug(` Source: EODHD | Status: ATTEMPTING | Ticker: ${ticker} | HasKey: ${!!EODHD_API_KEY} | KeyLength: ${EODHD_API_KEY?.length || 0}`);
+  logDividendDebug(` Source: EODHD | Status: ATTEMPTING | Ticker: ${ticker} | HasKey: ${Boolean(EODHD_API_KEY)}`);
   
   if (!EODHD_API_KEY) {
     logDividendDebug(' Source: EODHD | Status: SKIPPED | Reason: No API key');
@@ -174,19 +174,23 @@ async function fetchFromEODHD(ticker: string): Promise<DividendData | null> {
     fromDate.setFullYear(fromDate.getFullYear() - 2);
     
     // EODHD endpoint format: /api/splits-dividends/{symbol}?api_token={token}&from={date}&to={date}
-    // Try multiple endpoint formats as free tier may have limitations
-    const endpoints = [
-      `${EODHD_BASE_URL}/splits-dividends/${ticker}.US?api_token=${EODHD_API_KEY}&from=${fromDate.toISOString().split('T')[0]}&to=${toDate.toISOString().split('T')[0]}`,
-      `${EODHD_BASE_URL}/splits-dividends/${ticker}?api_token=${EODHD_API_KEY}&from=${fromDate.toISOString().split('T')[0]}&to=${toDate.toISOString().split('T')[0]}`,
-      `${EODHD_BASE_URL}/div/${ticker}.US?api_token=${EODHD_API_KEY}&from=${fromDate.toISOString().split('T')[0]}&to=${toDate.toISOString().split('T')[0]}`,
+    // Try multiple endpoint formats as free tier may have limitations.
+    // Log only path (never URL with api_token) — clears CodeQL clear-text-logging.
+    const from = fromDate.toISOString().split('T')[0];
+    const to = toDate.toISOString().split('T')[0];
+    const endpointPaths = [
+      `/splits-dividends/${ticker}.US`,
+      `/splits-dividends/${ticker}`,
+      `/div/${ticker}.US`,
     ];
     
     let response: Response | null = null;
     let lastError: string = '';
     
-    for (const url of endpoints) {
+    for (const path of endpointPaths) {
       try {
-        logDividendDebug(` Source: EODHD | Status: TRYING_ENDPOINT | URL: ${redactUrlForLog(url).substring(0, 80)}...`);
+        const url = `${EODHD_BASE_URL}${path}?api_token=${EODHD_API_KEY}&from=${from}&to=${to}`;
+        logDividendDebug(` Source: EODHD | Status: TRYING_ENDPOINT | Path: ${path}`);
         response = await fetch(url, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -196,10 +200,10 @@ async function fetchFromEODHD(ticker: string): Promise<DividendData | null> {
         });
 
         if (response.ok) {
-          console.log(`[Dividend API] ✅ Success with endpoint: ${redactUrlForLog(url).substring(0, 60)}...`);
+          console.log(`[Dividend API] Success with endpoint path: ${path}`);
           break; // Success, exit loop
         } else if (response.status === 404) {
-          lastError = `Endpoint not found (404): ${redactUrlForLog(url).substring(0, 60)}...`;
+          lastError = `Endpoint not found (404): ${path}`;
           console.warn(`[Dividend API] ${lastError}`);
           response = null; // Try next endpoint
           continue;
@@ -212,7 +216,7 @@ async function fetchFromEODHD(ticker: string): Promise<DividendData | null> {
           return null;
         } else {
           lastError = `HTTP ${response.status}`;
-          console.warn(`[Dividend API] ${lastError} for ${redactUrlForLog(url).substring(0, 60)}...`);
+          console.warn(`[Dividend API] ${lastError} for path ${path}`);
           response = null;
           continue;
         }
@@ -304,8 +308,9 @@ async function fetchFromAlphaVantage(ticker: string): Promise<DividendData | nul
   }
 
   try {
-    const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-    logDividendDebug(` Source: AlphaVantage | Status: ATTEMPTING | ApiKeyConfigured: true`);
+    // Never log this URL — it embeds apikey (CodeQL clear-text-logging).
+    const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${encodeURIComponent(ticker)}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+    logDividendDebug(` Source: AlphaVantage | Status: FETCHING | Symbol: ${ticker}`);
     const response = await fetch(url, {
       cache: 'no-store',
     });
@@ -965,8 +970,8 @@ export async function GET(
     }
 
   console.log(`[Dividend API] Request received for ${ticker}`);
-  console.log(`[Dividend API] EODHD_API_KEY configured: ${EODHD_API_KEY ? 'YES (' + EODHD_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
-  console.log(`[Dividend API] ALPHA_VANTAGE_API_KEY configured: ${ALPHA_VANTAGE_API_KEY ? 'YES (' + ALPHA_VANTAGE_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
+  console.log(`[Dividend API] EODHD_API_KEY configured: ${EODHD_API_KEY ? 'YES' : 'NO'}`);
+  console.log(`[Dividend API] ALPHA_VANTAGE_API_KEY configured: ${ALPHA_VANTAGE_API_KEY ? 'YES' : 'NO'}`);
   
   // Production-safe diagnostic header (survives removeConsole)
   const diagnosticHeaders = {

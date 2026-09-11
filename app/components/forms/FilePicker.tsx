@@ -59,9 +59,13 @@ export default function FilePicker({
         if (type.startsWith('.')) {
           return fileName.endsWith(type);
         }
+        // Avoid String.replace('*') sanitization pattern (CodeQL js/incomplete-sanitization).
+        if (type.endsWith('/*')) {
+          const mimePrefix = type.slice(0, -1); // e.g. "image/"
+          return mimePrefix.length > 0 && file.type.startsWith(mimePrefix);
+        }
         if (type.includes('/')) {
-          const mimeBase = type.replace('*', '');
-          return mimeBase.length === 0 || file.type.startsWith(mimeBase);
+          return file.type === type;
         }
         return file.type === type;
       });

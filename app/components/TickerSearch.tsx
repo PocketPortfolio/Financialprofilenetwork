@@ -111,28 +111,32 @@ export default function TickerSearch({
             if (response.ok) {
               const data = await response.json();
               const rawResults = Array.isArray(data.results) ? data.results : [];
-              const formattedResults = rawResults.map((result: any) => ({
-                symbol: result.symbol,
-                name: result.name,
-                type: result.type === 'crypto' ? 'Crypto' : 'Stock',
-                region: 'US',
-                currency: result.currency || 'USD',
-                matchScore: 0.9
-              }));
+              const formattedResults = rawResults
+                .map((result: any) => ({
+                  symbol: sanitizeSymbol(String(result.symbol || '')),
+                  name: String(result.name || '').slice(0, 120),
+                  type: result.type === 'crypto' ? 'Crypto' : 'Stock',
+                  region: 'US',
+                  currency: result.currency || 'USD',
+                  matchScore: 0.9
+                }))
+                .filter((r: TickerResult) => r.symbol.length > 0);
               setResults(formattedResults.slice(0, 8));
             } else {
               // Fallback to mock results
-              const mockResults = [
-                { symbol: query.toUpperCase(), name: `${query.toUpperCase()} Inc.`, type: 'Stock', region: 'US', currency: 'USD', matchScore: 0.8 },
-              ];
+              const safe = sanitizeSymbol(query);
+              const mockResults = safe
+                ? [{ symbol: safe, name: `${safe} Inc.`, type: 'Stock', region: 'US', currency: 'USD', matchScore: 0.8 }]
+                : [];
               setResults(mockResults);
             }
           } catch (error) {
             console.error('API search error:', error);
             // Fallback to mock results
-            const mockResults = [
-              { symbol: query.toUpperCase(), name: `${query.toUpperCase()} Inc.`, type: 'Stock', region: 'US', currency: 'USD', matchScore: 0.8 },
-            ];
+            const safe = sanitizeSymbol(query);
+            const mockResults = safe
+              ? [{ symbol: safe, name: `${safe} Inc.`, type: 'Stock', region: 'US', currency: 'USD', matchScore: 0.8 }]
+              : [];
             setResults(mockResults);
           }
         }
@@ -329,6 +333,7 @@ export default function TickerSearch({
                   textDecoration: 'none'
                 };
 
+                const safeSymbol = sanitizeSymbol(result.symbol);
                 const content = (
                   <>
                     <div style={{ flex: 1 }}>
@@ -338,7 +343,7 @@ export default function TickerSearch({
                         color: 'var(--text)',
                         marginBottom: '4px'
                       }}>
-                        {result.symbol}
+                        {safeSymbol}
                       </div>
                       <div style={{ 
                         fontSize: '14px', 
@@ -360,12 +365,13 @@ export default function TickerSearch({
                   </>
                 );
 
+                if (!safeSymbol) return null;
+
                 if (linkToTickerPage) {
-                  const safeSymbol = sanitizeSymbol(result.symbol);
                   return (
                     <Link
                       key={index}
-                      href={`/s/${safeSymbol.toLowerCase()}`}
+                      href={`/s/${encodeURIComponent(safeSymbol.toLowerCase())}`}
                       onClick={() => {
                         setIsOpen(false);
                         if (onTickerSelect) {
@@ -390,7 +396,7 @@ export default function TickerSearch({
                 return (
                   <button
                     key={index}
-                    onClick={() => handleSelect(result)}
+                    onClick={() => handleSelect({ ...result, symbol: safeSymbol })}
                     style={commonStyle}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = 'var(--warm-bg)';
