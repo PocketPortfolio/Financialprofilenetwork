@@ -132,7 +132,17 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('sponsor_email', user.email);
       }
     } else {
-      emailToCheck = localStorage.getItem('sponsor_email');
+      // Guests: never fetch secrets by email (H1). Rely on local cache only.
+      emailToCheck = null;
+      const sponsorEmail = localStorage.getItem('sponsor_email');
+      if (sponsorEmail && cachedTier) {
+        setIsLoading(false);
+        return;
+      }
+      setTier(null);
+      setUnlockedTheme(null);
+      setIsLoading(false);
+      return;
     }
 
     if (!emailToCheck) {
@@ -171,23 +181,23 @@ export function PremiumTierProvider({ children }: { children: ReactNode }) {
             });
           } catch (tokenError) {
             console.warn(
-              'Failed to get ID token, falling back to email lookup:',
+              'Failed to get ID token; using browser cache instead of email lookup:',
               tokenError
             );
-            response = await fetch(
-              `/api/api-keys?email=${encodeURIComponent(emailToCheck!)}`,
-              {
-                signal: abortController.signal,
-              }
-            );
+            const sponsorEmail = localStorage.getItem('sponsor_email');
+            const paid = readCachedPaidTier(true, user.email!, sponsorEmail);
+            if (paid) {
+              applyPaidTierFromBrowserCache(paid, setTier, setUnlockedTheme);
+            } else if (cachedTier || cachedTheme) {
+              if (cachedTier) setTier(cachedTier);
+              if (cachedTheme) setUnlockedTheme(cachedTheme);
+            }
+            setIsLoading(false);
+            return;
           }
         } else {
-          response = await fetch(
-            `/api/api-keys?email=${encodeURIComponent(emailToCheck)}`,
-            {
-              signal: abortController.signal,
-            }
-          );
+          setIsLoading(false);
+          return;
         }
 
         if (!response.ok) {

@@ -36,8 +36,7 @@ export async function GET(request: NextRequest) {
   // Test database connection
   try {
     console.log('[HEALTH] Testing database connection...');
-    console.log('[HEALTH] Connection string present:', !!process.env.SUPABASE_SALES_DATABASE_URL);
-    console.log('[HEALTH] Connection string preview:', process.env.SUPABASE_SALES_DATABASE_URL?.substring(0, 50) + '...');
+    console.log('[HEALTH] Connection string configured:', !!process.env.SUPABASE_SALES_DATABASE_URL);
     
     await db.select().from(leads).limit(1);
     checks.database = {

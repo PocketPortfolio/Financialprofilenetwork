@@ -17,11 +17,19 @@ export default function PlaidLinkButton({ onSuccess, onExit }: PlaidLinkButtonPr
 
   useEffect(() => {
     const createLinkToken = async () => {
+      if (!user) {
+        setError('Sign in to connect a brokerage');
+        return;
+      }
       try {
+        const token = await user.getIdToken();
         const response = await fetch('/api/plaid/create-link-token', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user?.uid || 'anonymous' }),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({}),
         });
         
         if (!response.ok) {
@@ -48,10 +56,17 @@ export default function PlaidLinkButton({ onSuccess, onExit }: PlaidLinkButtonPr
       setLoading(true);
       setError(null);
       try {
-        // Exchange public token for access token
+        if (!user) {
+          throw new Error('Sign in required');
+        }
+        const token = await user.getIdToken();
+        // Exchange public token server-side (access_token never returned to browser)
         const response = await fetch('/api/plaid/exchange-public-token', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ public_token: publicToken }),
         });
         
@@ -62,7 +77,7 @@ export default function PlaidLinkButton({ onSuccess, onExit }: PlaidLinkButtonPr
         const data = await response.json();
         
         if (onSuccess) {
-          onSuccess(publicToken, { ...metadata, access_token: data.access_token });
+          onSuccess(publicToken, { ...metadata, item_id: data.item_id });
         }
       } catch (error) {
         console.error('Failed to exchange token:', error);
@@ -71,7 +86,7 @@ export default function PlaidLinkButton({ onSuccess, onExit }: PlaidLinkButtonPr
         setLoading(false);
       }
     },
-    [onSuccess]
+    [onSuccess, user]
   );
 
   const config = {

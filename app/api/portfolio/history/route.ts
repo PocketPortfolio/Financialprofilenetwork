@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { authErrorResponse, requireUserRequest } from '@/lib/auth/require-user-request';
 import { getHistoricalData } from '@/app/lib/portfolio/snapshot';
 
 // Next.js route configuration for production
@@ -13,18 +14,27 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export async function GET(request: NextRequest) {
+  let uid: string;
+  try {
+    ({ uid } = await requireUserRequest(request));
+  } catch (e) {
+    return authErrorResponse(e);
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
+    const queryUserId = searchParams.get('userId');
     const startDate = searchParams.get('startDate') || undefined;
     const endDate = searchParams.get('endDate') || undefined;
 
-    if (!userId) {
+    if (queryUserId && queryUserId !== uid) {
       return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
+        { error: 'Forbidden', code: 'FORBIDDEN' },
+        { status: 403 }
       );
     }
+
+    const userId = uid;
 
     // Validate date format if provided
     if (startDate && !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {

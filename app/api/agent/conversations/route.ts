@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { conversations } from '@/db/sales/schema';
 import { eq, desc } from 'drizzle-orm';
@@ -14,6 +15,12 @@ export const fetchCache = 'force-no-store';
  * List conversations for a lead
  */
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const leadId = searchParams.get('leadId');

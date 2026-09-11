@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
+import {
+  authErrorResponse,
+  requireUserRequest,
+} from '@/lib/auth/require-user-request';
 
 const configuration = new Configuration({
-  basePath: process.env.PLAID_ENV === 'production' 
-    ? PlaidEnvironments.production 
+  basePath: process.env.PLAID_ENV === 'production'
+    ? PlaidEnvironments.production
     : PlaidEnvironments.sandbox,
   baseOptions: {
     headers: {
@@ -17,11 +21,16 @@ const client = new PlaidApi(configuration);
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await request.json();
+    let uid: string;
+    try {
+      ({ uid } = await requireUserRequest(request));
+    } catch (e) {
+      return authErrorResponse(e) as NextResponse;
+    }
 
     const response = await client.linkTokenCreate({
       user: {
-        client_user_id: userId || 'anonymous',
+        client_user_id: uid,
       },
       client_name: 'Pocket Portfolio',
       products: [Products.Investments],
@@ -38,4 +47,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

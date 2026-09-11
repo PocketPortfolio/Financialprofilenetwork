@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { leads, conversations, auditLogs } from '@/db/sales/schema';
 import { eq } from 'drizzle-orm';
@@ -18,6 +19,12 @@ export const fetchCache = 'force-no-store';
  * Send an AI-generated email to a lead
  */
 export async function POST(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const { leadId, emailType = 'initial' } = await request.json();
 

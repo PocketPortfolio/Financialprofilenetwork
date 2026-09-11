@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminUnauthorizedResponse, requireAdminRequest } from '@/lib/admin/require-admin-request';
 import { db } from '@/db/sales/client';
 import { auditLogs, leads } from '@/db/sales/schema';
 import { desc, inArray } from 'drizzle-orm';
@@ -15,6 +16,12 @@ export const fetchCache = 'force-no-store';
  * Get recent audit logs for the action feed
  */
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdminRequest(request);
+  } catch (e) {
+    return adminUnauthorizedResponse(e);
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const limit = parseInt(searchParams.get('limit') || '50', 10);

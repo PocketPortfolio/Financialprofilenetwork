@@ -49,20 +49,22 @@ interface NeuronLeadSubmission {
 /**
  * Verify neuron API key
  */
+function isProductionEnv(): boolean {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+}
+
 function verifyNeuronKey(authHeader: string | null): boolean {
+  const validKey = process.env.NEURON_API_KEY;
+
+  if (!validKey) {
+    return !isProductionEnv();
+  }
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return false;
   }
 
   const token = authHeader.substring(7);
-  const validKey = process.env.NEURON_API_KEY;
-
-  if (!validKey) {
-    // If no key set, allow all (development mode)
-    // In production, should require key
-    return true;
-  }
-
   return token === validKey;
 }
 

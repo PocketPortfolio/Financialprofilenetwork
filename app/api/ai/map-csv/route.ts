@@ -23,6 +23,11 @@ const ENABLE_LLM_IMPORT = process.env.ENABLE_LLM_IMPORT === 'true';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const GEMINI_MODEL = 'gemini-1.5-flash';
 
+/** In-memory rate limit for guest map-csv (resets on cold start). */
+const mapCsvRateLimit = new Map<string, { count: number; resetTime: number }>();
+const MAP_CSV_WINDOW_MS = 60_000;
+const MAP_CSV_MAX_PER_WINDOW = 20;
+
 const STANDARD_FIELDS = [
   'date',
   'ticker',
@@ -225,6 +230,25 @@ async function mapWithOpenAI(
 }
 
 export async function POST(req: Request) {
+  // Wave B / M3: light IP rate limit (guest Smart Import stays unauthenticated).
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown';
+  const now = Date.now();
+  const bucket = mapCsvRateLimit.get(ip);
+  if (bucket && now < bucket.resetTime) {
+    if (bucket.count >= MAP_CSV_MAX_PER_WINDOW) {
+      return NextResponse.json(
+        { error: 'Too many mapping requests. Please wait and try again.' },
+        { status: 429 }
+      );
+    }
+    bucket.count += 1;
+  } else {
+    mapCsvRateLimit.set(ip, { count: 1, resetTime: now + MAP_CSV_WINDOW_MS });
+  }
+
   if (!ENABLE_LLM_IMPORT) {
     return NextResponse.json({ error: 'LLM import disabled' }, { status: 403 });
   }
