@@ -30,7 +30,8 @@ export async function getSectorClassification(
         return apiResult;
       }
     } catch (error) {
-      console.error('API classification failed', { ticker: upperTicker, error });
+      // Constant format string only — never interpolate user ticker into printf/format (CodeQL #69).
+      console.error('API classification failed', error);
       // Fall through to database
     }
   }

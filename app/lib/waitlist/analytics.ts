@@ -13,14 +13,11 @@ export function emitWaitlistEvent(event: WaitlistAnalyticsEvent): void {
     }
     
     // Import Firebase Analytics dynamically to avoid SSR issues
-    import('firebase/analytics').then(({ logEvent }) => {
+    import('firebase/analytics').then(() => {
       const { eventType, ...eventData } = event;
-      
-      // Map our event types to Firebase Analytics event names
-      const analyticsEventName = eventType;
-      
-      // Skip analytics for now to prevent 500 errors
-      console.log('Analytics event (disabled):', analyticsEventName, eventData);
+
+      // Skip analytics for now to prevent 500 errors (use eventType directly — no identity replace)
+      console.log('Analytics event (disabled):', eventType, eventData);
     }).catch((error) => {
       console.warn('Failed to emit analytics event:', error);
     });

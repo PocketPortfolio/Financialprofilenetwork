@@ -85,12 +85,26 @@ for (const surface of ['pocket', 'open'] as const) {
 
 function clamp(text: string, max: number): string {
   if (!text) return '';
-  // Strip HTML/control chars and limit length (CodeQL reflected-xss / format hygiene).
-  const sanitized = String(text)
-    .replace(/[<>&"'`]/g, '')
-    .replace(/[\u0000-\u001f\u007f]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  // Strip HTML/control/special chars via allowlist walk (CodeQL reflected-xss #54).
+  // Prefer char filtering over regex replace so sanitization is complete and obvious.
+  let sanitized = '';
+  let prevSpace = false;
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    const ch = text.charAt(i);
+    if (code < 32 || code === 127) continue;
+    if (ch === '<' || ch === '>' || ch === '&' || ch === '"' || ch === "'" || ch === '`') continue;
+    if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') {
+      if (prevSpace || sanitized.length === 0) continue;
+      sanitized += ' ';
+      prevSpace = true;
+      continue;
+    }
+    sanitized += ch;
+    prevSpace = false;
+    if (sanitized.length >= max) break;
+  }
+  sanitized = sanitized.trim();
   return sanitized.length > max ? `${sanitized.slice(0, max - 1).trimEnd()}…` : sanitized;
 }
 
