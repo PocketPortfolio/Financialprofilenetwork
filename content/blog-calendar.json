@@ -1462,7 +1462,7 @@
     "date": "2026-09-13",
     "title": "Beyond the API: Why Direct File Access Matters",
     "slug": "beyond-the-api-why-direct-file-access-matters",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1472,7 +1472,8 @@
       "beyond"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-13T10:00:52.129Z"
   },
   {
     "id": "week-37-post-2",
