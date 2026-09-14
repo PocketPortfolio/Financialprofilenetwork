@@ -39,7 +39,7 @@ const HIGH_CTR_IMPORT_TITLES: Record<string, { title: string; description: strin
   'interactive-brokers': {
     title: 'Interactive Brokers CSV Import (Flex Query) — Not IBKR Login | Pocket Portfolio',
     description:
-      'Step-by-step IBKR Flex Query & activity statement CSV import in your browser. Not the IBKR login page — parse trades locally with Pocket Portfolio (PocketFolio).',
+      'Step-by-step IBKR Flex Query & activity statement CSV import in your browser. Not the IBKR login page — parse trades locally with Pocket Portfolio.',
   },
   trading212: {
     title: 'Trading 212 CSV Export Import | Free Local Portfolio Tracker',

@@ -195,7 +195,9 @@ export async function middleware(request: NextRequest) {
     // Rewrite to /tools/track/{ticker} (without -risk suffix)
     url.pathname = `/tools/track/${ticker}`;
 
-    return NextResponse.rewrite(url);
+    const response = NextResponse.rewrite(url);
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return response;
   }
 
   // Allow OG image route to be accessed by social media crawlers with CORS

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/app/hooks/useAuth';
 
 /**
- * Canonical navigational login URL for brand SERP ("pocket folio login").
+ * Canonical login URL for Pocket Portfolio. Not Pocketfolio.com and not PocketFolios.
  * Auth is Google popup; successful sessions continue to /dashboard.
  */
 export default function LoginPage() {
@@ -33,7 +33,7 @@ export default function LoginPage() {
             marginBottom: 12,
           }}
         >
-          Pocket Portfolio · PocketFolio · Pocket Folio
+          Pocket Portfolio
         </p>
         <h1
           style={{

@@ -68,6 +68,7 @@ export async function generateMetadata({ params }: { params: Promise<{ ticker: s
     return {
       title,
       description,
+      robots: { index: false, follow: false },
       keywords: `${ticker}, portfolio risk, beta calculator, volatility analysis, investment risk`,
       openGraph: {
         title,
@@ -89,6 +90,7 @@ export async function generateMetadata({ params }: { params: Promise<{ ticker: s
     return {
       title: 'Track Stock Risk - Free Risk Calculator | Pocket Portfolio',
       description: 'Calculate portfolio risk and Beta score instantly.',
+      robots: { index: false, follow: false },
     };
   }
 }

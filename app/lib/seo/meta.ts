@@ -5,23 +5,19 @@
 
 export const siteConfig = {
   name: 'Pocket Portfolio',
-  /** Brand SERP reclaim — navigational queries: pocket folio / pocketfolio / pocket portfolio login */
-  title: 'Pocket Portfolio (PocketFolio) | Local-First Tracker & Sign In',
+  /** Our brand only. Do not claim PocketFolio / Pocket Folio — those are other products. */
+  title: 'Pocket Portfolio | Local-First Tracker & Sign In',
   description:
-    'Pocket Portfolio — also searched as PocketFolio or Pocket Folio. Sign in, import broker CSVs (IBKR, Ghostfolio, Trading 212) in-browser. No central warehouse of your raw ledger. Optional Google Drive sync you control.',
+    'Sign in to Pocket Portfolio and import broker CSVs (IBKR, Ghostfolio, Trading 212) in-browser. Not Pocketfolio.com and not PocketFolios. No central warehouse of your raw ledger. Optional Google Drive sync you control.',
   url: 'https://www.pocketportfolio.app',
   ogImage:
     'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Local-First%20Portfolio%20Tracker%20(100%25%20Private)&v=7',
   twitter: '@PocketPortApp',
-  /** Brand name collisions for SERP / AEO disambiguation */
-  alternateNames: ['PocketFolio', 'Pocket Folio', 'Pocket Portfolio App'] as const,
+  /** Ours only. Do not add PocketFolio or Pocket Folio. */
+  alternateNames: ['Pocket Portfolio App'] as const,
   keywords: [
     'pocket portfolio',
-    'pocket folio',
-    'pocketfolio',
     'pocket portfolio login',
-    'pocket folio login',
-    'pocketfolio login',
     'local-first portfolio tracker',
     'sovereign wealth management',
     'private stock tracker',

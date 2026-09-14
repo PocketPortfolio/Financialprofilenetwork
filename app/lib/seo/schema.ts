@@ -12,7 +12,7 @@ export interface HomePageSchemaGraph {
 
 /**
  * Generate structured data for the home page — Organization + SoftwareApplication
- * with brand alternateName for pocket folio / pocketfolio SERP reclaim.
+ * Alternate names are ours only — do not attach competitor brands.
  */
 export function getHomePageSchema(): HomePageSchemaGraph {
   const orgId = `${siteConfig.url}/#organization`;

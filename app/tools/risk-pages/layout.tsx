@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.pocketportfolio.app/tools/risk-pages',
   },
+  robots: { index: false, follow: false },
 };
 
 export default function RiskPagesLayout({
