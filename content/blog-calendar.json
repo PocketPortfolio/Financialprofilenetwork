@@ -1480,7 +1480,7 @@
     "date": "2026-09-16",
     "title": "Market Sentiment Indicators: What Actually Works",
     "slug": "market-sentiment-indicators-what-actually-works",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1490,7 +1490,8 @@
       "market"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-16T09:00:54.219Z"
   },
   {
     "id": "week-38-post-1",
