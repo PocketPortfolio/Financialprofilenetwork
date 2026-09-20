@@ -1498,7 +1498,7 @@
     "date": "2026-09-20",
     "title": "The Performance Cost of Cloud APIs",
     "slug": "the-performance-cost-of-cloud-apis",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1508,7 +1508,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-20T09:00:36.144Z"
   },
   {
     "id": "week-38-post-2",
