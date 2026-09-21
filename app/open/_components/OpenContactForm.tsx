@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { trackEvent } from '@/app/lib/analytics/events';
 import { OPEN_LANDING_COPY } from '../../../lib/canonical-claims';
 
 /**
@@ -14,10 +15,9 @@ import { OPEN_LANDING_COPY } from '../../../lib/canonical-claims';
  */
 
 const CONTEXT_OPTIONS = [
-  { value: 'tier1', label: 'Tier 1 / clean-room partnership' },
-  { value: 'design-challenge', label: 'Design Challenge submission' },
-  { value: 'investor', label: 'Board of Investors (seed round)' },
-  { value: 'grant', label: 'Sovereign AI Grant' },
+  { value: 'design-partner', label: 'Design-partner diligence' },
+  { value: 'architecture-review', label: 'Architecture / security review' },
+  { value: 'sdk-embed', label: 'SDK / ingestion embed' },
   { value: 'general', label: 'General inquiry' },
 ] as const;
 
@@ -28,10 +28,17 @@ export default function OpenContactForm() {
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
-  const [context, setContext] = useState<ContextValue>('tier1');
+  const [context, setContext] = useState<ContextValue>('design-partner');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [formStarted, setFormStarted] = useState(false);
+
+  const markStarted = () => {
+    if (formStarted) return;
+    setFormStarted(true);
+    trackEvent('homepage_form_started');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,12 +48,19 @@ export default function OpenContactForm() {
       const res = await fetch('/api/open-portfolio/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, company, role, context, message }),
+        body: JSON.stringify({
+          email,
+          company,
+          role,
+          context,
+          message,
+        }),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error || 'Submission failed.');
       }
+      trackEvent('homepage_form_submitted', { context });
       setStatus('success');
       setEmail('');
       setCompany('');
@@ -77,7 +91,7 @@ export default function OpenContactForm() {
     fontWeight: 600,
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
-    color: 'var(--text-secondary)',
+    color: 'rgba(232, 236, 243, 0.72)',
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
     marginBottom: '6px',
     display: 'block',
@@ -133,7 +147,7 @@ export default function OpenContactForm() {
             <h3 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 8px 0' }}>
               {OPEN_LANDING_COPY.contact.successTitle}
             </h3>
-            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '15px' }}>
+            <p style={{ color: 'rgba(232, 236, 243, 0.82)', margin: 0, fontSize: '15px' }}>
               {OPEN_LANDING_COPY.contact.successBody}
             </p>
           </motion.div>
@@ -144,52 +158,20 @@ export default function OpenContactForm() {
             animate={{ opacity: 1 }}
             style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
           >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '16px',
-              }}
-            >
-              <div>
-                <label htmlFor="op-email" style={labelStyle}>
-                  Work email *
-                </label>
-                <input
-                  id="op-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="cto@example.com"
-                  style={inputStyle}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--accent-warm)';
-                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.18)';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.22)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                />
-              </div>
-              <div>
-                <label htmlFor="op-context" style={labelStyle}>
-                  I am here about
-                </label>
-                <select
-                  id="op-context"
-                  value={context}
-                  onChange={(e) => setContext(e.target.value as ContextValue)}
-                  style={{ ...inputStyle, appearance: 'auto' }}
-                >
-                  {CONTEXT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label htmlFor="op-email" style={labelStyle}>
+                Work email *
+              </label>
+              <input
+                id="op-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={markStarted}
+                placeholder="cto@example.com"
+                style={inputStyle}
+              />
             </div>
 
             <div
@@ -201,45 +183,69 @@ export default function OpenContactForm() {
             >
               <div>
                 <label htmlFor="op-company" style={labelStyle}>
-                  Company / org
+                  Company / organization *
                 </label>
                 <input
                   id="op-company"
                   type="text"
+                  required
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Optional"
+                  onFocus={markStarted}
+                  placeholder="Wealth platform / aggregator"
                   style={inputStyle}
                 />
               </div>
               <div>
                 <label htmlFor="op-role" style={labelStyle}>
-                  Role
+                  Role *
                 </label>
                 <input
                   id="op-role"
                   type="text"
+                  required
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  placeholder="CTO, Head of Platform, etc."
+                  onFocus={markStarted}
+                  placeholder="CTO, CISO, Head of Platform…"
                   style={inputStyle}
                 />
               </div>
             </div>
 
             <div>
+              <label htmlFor="op-context" style={labelStyle}>
+                I am here about
+              </label>
+              <select
+                id="op-context"
+                value={context}
+                onChange={(e) => setContext(e.target.value as ContextValue)}
+                onFocus={markStarted}
+                style={{ ...inputStyle, appearance: 'auto' }}
+              >
+                {CONTEXT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label htmlFor="op-message" style={labelStyle}>
-                The audit-perimeter problem you are solving *
+                {OPEN_LANDING_COPY.contact.perimeterLabel} *
               </label>
               <textarea
                 id="op-message"
                 required
-                rows={5}
+                rows={4}
                 minLength={8}
                 maxLength={4000}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Auditor, jurisdiction, data residency mandate, stack constraints — anything that helps us reply with substance."
+                onFocus={markStarted}
+                placeholder={OPEN_LANDING_COPY.contact.perimeterPlaceholder}
                 style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }}
               />
             </div>
@@ -273,13 +279,13 @@ export default function OpenContactForm() {
               <p
                 style={{
                   fontSize: '12px',
-                  color: 'var(--text-secondary)',
+                  color: 'rgba(232, 236, 243, 0.72)',
                   margin: 0,
                   maxWidth: '380px',
                 }}
               >
-                Submissions are stored privately on our infrastructure. No third-party form
-                provider or marketing pixel.
+                Submissions are stored privately on Open Portfolio infrastructure. No third-party
+                form provider or marketing pixel.
               </p>
               <motion.button
                 type="submit"

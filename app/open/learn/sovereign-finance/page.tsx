@@ -26,7 +26,7 @@ export default function OpenSovereignFinancePage() {
       body={[
         'Data gravity is an economics problem: every duplicated client ledger expands storage cost, ICT blast radius, and procurement friction. Open Portfolio’s BYOC boundary keeps approved stores with the buyer and sends only bounded aggregates across the inference hop.',
         'Ownership means portable artifacts and inspectable adapters — not locking institutions into a third-party SaaS vault branded as “local.” Pocket Portfolio demonstrates the harness under retail CSV load; Open packages the enterprise perimeter story.',
-        'Pair this brief with DORA / EU AI Act and Tier-1 design partnership when diligence requires board-ready language without zero-cloud theatre.',
+        'Pair this brief with DORA / EU AI Act and design-partner diligence when review requires board-ready language without zero-cloud theatre.',
       ]}
       ctaHref="/learn/dora-eu-ai-act-wealth"
       ctaLabel="DORA & EU AI Act brief"

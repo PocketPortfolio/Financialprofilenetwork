@@ -34,8 +34,8 @@ Our privacy policy is available at https://pocketportfolio.app/privacy. If you h
 - Local-first architecture means your data stays on your device
 - End-to-end encryption for all synced data
 - No cloud storage of sensitive financial information
-- Regular security audits and penetration testing
-- SOC 2 Type II certified (in progress)
+- Inspectable boundary architecture and regular security diligence
+- SOC 2 / ISO certification language is not claimed until held
 
 We use industry-standard encryption (AES-256) and follow security best practices. Your portfolio data is yours alone.`,
     confidence: 0.95,

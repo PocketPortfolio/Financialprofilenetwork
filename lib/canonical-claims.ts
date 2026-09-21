@@ -12,7 +12,7 @@
  *   tests/canonical-claims.spec.ts will fail in CI.
  */
 
-export const LAST_HUMAN_VERIFIED = '2026-07-27' as const;
+export const LAST_HUMAN_VERIFIED = '2026-09-21' as const;
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Positioning
@@ -185,7 +185,7 @@ export const SDK = {
   name: '@pocket-portfolio/importer', // SDK-01
   version: '1.1.4', // SDK-02 — keep in sync with packages/importer/package.json
   license: 'MIT', // SDK-03
-  /** SDK-04: 19+ broker adapters; floor anchored to in-repo registry test count. */
+  /** SDK-04: 19 dedicated broker adapters; floor anchored to in-repo registry. */
   brokerAdapterCount: 19,
   registry: 'https://www.npmjs.com',
   repo: 'https://github.com/PocketPortfolio/Financialprofilenetwork',
@@ -206,7 +206,7 @@ export const PACKAGES: ReadonlyArray<{
     name: '@pocket-portfolio/importer',
     category: 'core',
     description:
-      'Sovereign ingestion SDK: 19+ broker CSV/Excel adapters, local-first parsing, zero PII egress.',
+      'Sovereign ingestion SDK: 19 dedicated broker CSV/Excel adapters, local-first parsing, no raw-ledger warehouse on the inference path.',
   },
   {
     name: '@pocket-portfolio/fidelity-csv-export',
@@ -386,9 +386,9 @@ export const CANONICAL_ARTICLES: ReadonlyArray<CanonicalArticle> = [
     headline: 'Local-First',
     url: 'https://www.pocketportfolio.app/learn/local-first',
     description:
-      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
+      "Privacy is an engineering choice, not a legal promise. The 'Limited-Scope Processor' posture shrinks what a third party must hold — an inspectable control that supports diligence, not a certification claim. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
     articleBody:
-      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
+      "Privacy is an engineering choice, not a legal promise. The 'Limited-Scope Processor' posture shrinks what a third party must hold — an inspectable control that supports diligence, not a certification claim. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
     citation: 'Salford Seed Deck v4.1, Slide 11 (Regulatory Posture).',
     datePublished: '2026-04-27',
   },
@@ -510,14 +510,14 @@ export const DESIGN_CHALLENGE = {
 export const TIER1_DESIGN_PARTNER = {
   path: '/tier1designpartner',
   url: URLS.tier1DesignPartner,
-  eyebrow: 'Tier 1 Design Partnership Program',
-  headline: 'The Sovereign Design Partnership Program (Tier 1).',
+  eyebrow: 'Wealth-tech design partnership',
+  headline: 'The Open Portfolio design partnership for wealth-tech BYOC.',
   subheadline:
-    'A clean-room design partnership for Finance, Defense, and Healthcare — reduce audit perimeter by keeping customer data local, and prove value via stateless metering.',
+    'A clean-room design partnership for regulated wealth platforms — reduce audit perimeter by keeping client ledgers inside the buyer’s approved environment, and prove value via a bounded, stateless inference boundary.',
   ogImage: '/og/tier1designpartner.png',
   ogImageWidth: 1200,
   ogImageHeight: 627,
-  focusVerticals: ['Finance', 'Defense', 'Healthcare'] as const,
+  focusVerticals: ['Wealth platforms', 'IFAs & wealth managers', 'Aggregators', 'Enterprise SDK'] as const,
   /** Technical narrative anchors (used verbatim across the surface). */
   pillars: [
     'Audit perimeter reduction (GDPR / DORA posture via architecture)',
@@ -719,7 +719,7 @@ export const OPEN_AEO_PROCUREMENT_FAQS = [
   {
     question: 'How do I evaluate Open Portfolio for an enterprise design partnership?',
     answer:
-      'Tier-1 design partnership targets platforms embedding the BYOC boundary into regulated stacks. Start at https://www.openportfolio.co.uk/tier1designpartner and https://www.openportfolio.co.uk/learn/enterprise-design-partnership',
+      'Design-partner diligence targets wealth-tech platforms embedding the BYOC boundary into regulated stacks. Start at https://www.openportfolio.co.uk/tier1designpartner and https://www.openportfolio.co.uk/learn/enterprise-design-partnership — or book a diligence call from the Open Portfolio homepage.',
   },
 ] as const;
 
@@ -785,7 +785,7 @@ export const OPEN_LEARN_HUB_COPY = {
 export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; openUrl: string }> = [
   { path: '/architecture', title: 'Architecture', openUrl: OPEN_URLS.architecture },
   { path: '/designchallenge', title: 'Design Challenge', openUrl: OPEN_URLS.designChallenge },
-  { path: '/tier1designpartner', title: 'Tier 1 Design Partnership', openUrl: OPEN_URLS.tier1DesignPartner },
+  { path: '/tier1designpartner', title: 'Wealth-tech Design Partnership', openUrl: OPEN_URLS.tier1DesignPartner },
   { path: '/board-of-investors', title: 'Board of Investors (BIP)', openUrl: OPEN_URLS.boardOfInvestors },
   { path: '/sovereign-ai-grant', title: 'Sovereign AI Grant', openUrl: OPEN_URLS.sovereignAiGrant },
   { path: '/learn/sovereign-stack', title: 'Sovereign Stack', openUrl: OPEN_URLS.sovereignStack },
@@ -874,11 +874,11 @@ export interface SurfaceNavItem {
 }
 
 /**
- * Sparse header nav — technical/educational destinations only.
- * Institutional tracks (Design Challenge, Tier 1, BIP) live in footer pathways.
+ * Sparse header nav — technical destinations only.
+ * Pocket harness is a quieter SurfaceSwitcher link (not a competing primary offer).
+ * Design partnership / BIP live in footer pathways.
  */
 export const OPEN_NAV: ReadonlyArray<SurfaceNavItem> = [
-  { label: 'Learn', href: '/learn' },
   { label: 'Architecture', href: '/architecture' },
   { label: 'Blog', href: '/blog' },
 ] as const;
@@ -988,9 +988,9 @@ export type PocketBlogFilterId = (typeof POCKET_BLOG_FILTER_CHIPS)[number]['id']
 
 /** Github CTA shown in the trailing slot of the O. navbar. */
 export const OPEN_PRIMARY_CTA = {
-  label: 'GitHub',
-  href: 'https://github.com/PocketPortfolio/Financialprofilenetwork',
-  external: true,
+  label: 'Book a diligence call',
+  href: '/#contact',
+  external: false,
 } as const;
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -1028,94 +1028,219 @@ export const FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL = FOUNDER_CREDENTIALS_ABBA.high
 
 /** De-emphasized institutional pathways — footer only (not header or index CTAs). */
 export const OPEN_LANDING_FOOTER_PATHWAYS = [
-  { label: 'Tier 1 Design Partnership', href: '/tier1designpartner' },
-  { label: 'Design Challenge', href: '/designchallenge' },
+  { label: 'Design Partnership', href: '/tier1designpartner' },
+  { label: 'DORA & EU AI Act for Wealth', href: '/learn/dora-eu-ai-act-wealth' },
+  { label: 'Sovereign AI Architecture', href: '/learn/sovereign-ai-architecture' },
   { label: 'Board of Investors (BIP)', href: '/board-of-investors' },
-  { label: 'Sovereign AI Grant', href: '/sovereign-ai-grant' },
 ] as const;
 
+/**
+ * Homepage diligence lock (2026-09) — wealth-tech Stages 3–4 backstop.
+ * Claim gate: no Tier-1 CTA theatre, no SOC 2 / math guarantees, no new verticals.
+ */
 export const OPEN_LANDING_COPY = {
-  eyebrow: 'Open Portfolio — BYOC boundary infrastructure · regulated verticals forward',
-  heroTitle: 'The BYOC inference boundary for regulated finance.',
+  eyebrow: 'Open Portfolio · BYOC boundary infrastructure for wealth-tech',
+  heroTitle: 'Run AI over wealth data without building another client-ledger warehouse.',
   heroBody:
-    'Keep your IdP. Keep your approved storage. We supply the stateless edge plumbing so procurement can sign off on frontier AI — without another vendor-hosted ledger warehouse.',
-  heroCta: 'Book a Design Partner Call',
+    'Keep your identity provider and approved storage. Open Portfolio assembles bounded context at the edge and sends only that context to stateless inference.',
+  heroCta: 'Book a diligence call',
+  heroSecondaryCta: 'Read the architecture brief',
+  heroSecondaryHref: '/architecture',
+  proofStrip: {
+    eyebrow: 'Inspectable proof',
+    items: [
+      {
+        title: 'Buyer keeps IdP and approved storage',
+        body: 'Open Portfolio supplies the boundary, not another hosted vault.',
+      },
+      {
+        title: '{adapterCount} dedicated broker adapters',
+        body: 'MIT-licensed @pocket-portfolio/importer normalizes broker exports at the edge.',
+      },
+      {
+        title: 'Bounded stateless inference',
+        body: 'The inference hop receives approved aggregate context, not a raw client ledger warehouse.',
+      },
+      {
+        title: 'Pocket Portfolio is the live harness',
+        body: 'The consumer terminal stress-tests the same ingestion substrate under real export variability.',
+      },
+    ] as const,
+    architectureLinkLabel: 'Inspect the architecture →',
+    architectureHref: '/architecture',
+  },
   byoc: {
-    eyebrow: 'Bring Your Own Cloud',
+    eyebrow: 'Bring your own cloud',
     title: 'Plumbing fitting, not another vault.',
     body:
-      'Most vendors force regulated platforms to duplicate client ledgers inside a third-party SaaS cloud. Open Portfolio deploys inside your perimeter — an inspectable boundary SKU, not a hosted data lake.',
+      'Wealth platforms should not have to duplicate client ledgers inside a new vendor cloud just to add AI. Open Portfolio deploys the ingestion and inference boundary around the stores and identity controls the buyer already approves.',
     points: [
       {
-        title: 'You keep the vault keys',
-        body: 'Your identity providers and approved regulated storage stay uncompromised. We supply the boundary layer inside your perimeter.',
+        title: 'A second store creates a second perimeter',
+        body: 'New retention, access, subprocessor, and incident-response obligations enter the review.',
       },
       {
-        title: 'Edge ingestion',
-        body: 'MIT open-source adapters (@pocket-portfolio/importer) normalize broker data client-side. Raw ledger rows are not on the designed inference path.',
+        title: 'Raw records exceed the inference need',
+        body: 'Many advisory and portfolio interactions need bounded facts or aggregates, not the complete underlying ledger.',
       },
       {
-        title: 'Stateless inference perimeter',
-        body: 'Deterministic context engine → bounded aggregates → /api/ai/chat. No portfolio payload persistence on the inference path.',
+        title: 'Generic SaaS changes the procurement question',
+        body: 'The review becomes “Can this vendor hold our client book?” instead of “Can this processor operate over approved context?”',
       },
     ] as const,
     footnote:
-      'Pocket Portfolio is the live consumer harness on the same substrate. Enterprise BYOC pilots scope your stores — reference: tier-1-wealth-byoc-sandbox-pattern.',
-    architectureLinkLabel: 'BYOC reference architecture →',
-    architectureHref: '/blog/tier-1-wealth-byoc-sandbox-pattern',
+      'Pocket Portfolio is the live consumer harness on the same substrate. Enterprise BYOC pilots scope your stores — not a vendor-hosted ledger warehouse.',
+    architectureLinkLabel: 'Read the BYOC reference architecture →',
+    architectureHref: '/architecture',
   },
   proof: {
     eyebrow: 'Sanitization by construction',
     title: 'The architectural boundary, visualized.',
     body:
-      'Raw ledgers stay in browser memory. Only a bounded aggregate context crosses the wire for stateless inference — inspectable, auditable, and mathematically bounded.',
-    architectureLinkLabel: 'Full technical brief →',
+      'Broker and portfolio records are normalized at the edge. The buyer approves the aggregate context. Only that bounded context reaches the stateless inference hop — an inspectable, deterministic boundary.',
+    boundaryLabel: 'Raw client ledger does not cross this boundary',
+    diagramSteps: [
+      'Broker exports and approved stores',
+      'Edge ingestion',
+      'Buyer-controlled identity and storage',
+      'Bounded aggregate context',
+      'Stateless inference',
+      'Streamed response',
+    ] as const,
+    architectureLinkLabel: 'Open the procurement-grade architecture map →',
+  },
+  pocketHarness: {
+    eyebrow: 'Live substrate proof',
+    title: 'Pocket Portfolio proves the pipes. It is not the enterprise store.',
+    body:
+      'Pocket Portfolio is the consumer reference terminal on the same ingestion substrate. It stress-tests broker adapters under real export variability. Its browser-first state and optional consumer services are separate from Open Portfolio’s enterprise BYOC contract.',
+    points: [
+      'Real broker-export ingestion',
+      'Browser-first portfolio state',
+      'Adapter testing under varied CSV formats',
+      'Same bounded-inference substrate',
+    ] as const,
+    ctaLabel: 'View Pocket Portfolio',
+    ctaHref: 'https://www.pocketportfolio.app',
+  },
+  implementation: {
+    eyebrow: 'Implementation path',
+    title: 'Fit the boundary around the approved stack.',
+    body:
+      'A design partnership begins by mapping the buyer’s identity, approved stores, ingestion sources, bounded-context contract, and inference controls.',
+    points: [
+      {
+        title: 'Map the approved perimeter',
+        body: 'Confirm identity, storage, jurisdictions, operators, and existing data flows.',
+      },
+      {
+        title: 'Define bounded context',
+        body: 'Agree exactly which derived fields and aggregates may reach inference.',
+      },
+      {
+        title: 'Validate the pilot path',
+        body: 'Test ingestion, observability, persistence behavior, and procurement evidence inside a scoped environment.',
+      },
+    ] as const,
+    ctaLabel: 'Inspect the ingestion proof →',
+    ctaHref: '/openbrokercsv',
   },
   integration: {
     eyebrow: 'Developer experience',
-    title: 'Days to integrate, not months.',
+    title: 'Fit the boundary around the approved stack.',
     body:
-      'Drop in the sovereign SDK, connect broker adapters, and ship client-edge ingestion without refactoring your data warehouse.',
+      'Embed edge ingestion and a bounded inference hop without requiring a migration into a vendor-hosted client-ledger warehouse.',
     points: [
-      '{adapterCount}+ verified broker adapters',
+      '{adapterCount} dedicated broker adapters',
       'Open-source sovereign SDK (MIT)',
       'Stateful product UX · stateless AI boundary',
     ] as const,
   },
   moat: {
-    eyebrow: 'Board-level outcomes',
-    title: 'Why enterprise teams buy the boundary.',
+    eyebrow: 'Board and procurement outcomes',
+    title: 'Why regulated wealth platforms buy the boundary.',
     body:
-      'The warehouse-to-infer pipeline expands your subprocessor footprint, your DPA scope, and your cloud storage bill. Split-brain architecture removes what you never needed to warehouse.',
-    threatEyebrow: 'Regulatory exposure',
-    threatTitle: 'Three numbers your DPO already weighs.',
+      'The warehouse-to-infer pipeline expands your subprocessor footprint, your DPA scope, and your cloud storage bill. The boundary model removes what you never needed to warehouse.',
+    threatEyebrow: 'Regulatory context',
+    threatTitle: 'The data perimeter is a diligence decision.',
+    threatIntro:
+      'DORA, the EU AI Act, GDPR, and vendor-risk review make architecture and processor scope commercial issues, not back-office documentation.',
+    threatBriefLabel: 'Read the DORA and EU AI Act wealth brief →',
+    threatBriefHref: '/learn/dora-eu-ai-act-wealth',
     outcomes: [
       {
-        title: 'SOC 2 compliance acceleration',
-        body: 'A smaller data perimeter means fewer controls to evidence. Architecture answers replace policy PDF promises in vendor assessments.',
+        title: 'A smaller evidence surface',
+        body: 'Avoid introducing a mandatory vendor-hosted client-ledger store into the control set.',
       },
       {
-        title: 'Reduced cloud storage costs',
-        body: 'Stop paying to warehouse raw ledgers you only needed for a single inference call. Move compute to the edge, not the ledger to the cloud.',
+        title: 'A clearer vendor assessment',
+        body: 'Give security, legal, and procurement a concrete map of what crosses the boundary and what persists.',
       },
       {
-        title: 'DPA scope reduction',
-        body: 'When raw financial data never crosses your network perimeter, your subprocessors list stays short and your legal review stays fast.',
+        title: 'An operated path to bounded AI',
+        body: 'Move from open-ended AI experimentation to a scoped processor model with approved context.',
       },
     ] as const,
-    socialProofEyebrow: 'Design partnerships',
-    socialProofTitle: 'Regulated design partnerships · founder-built enterprise track record.',
-    socialProofBody: `Proven in wealth tech with live production traffic. Track record: ${FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL} (National Grid Ventures, 2023–2025). Open Portfolio applies those decision-platform patterns for regulated verticals where trust and perimeter matter most.`,
-    midCta: 'Book a Design Partner Call',
+    socialProofEyebrow: 'Design-partnership proof',
+    socialProofTitle: 'Built from live wealth-tech and enterprise decision-platform experience.',
+    socialProofBody: `Pocket Portfolio provides the live wealth-tech harness. Open Portfolio applies the same decision-platform discipline to enterprise BYOC pilots. Founder track record: ${FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL} (National Grid Ventures, 2023–2025) — prior role credential, not an Open Portfolio customer claim.`,
+    evidenceItems: [
+      'Live consumer harness',
+      'Public architecture map',
+      'Open ingestion proof',
+      'Bounded-context design',
+      'Founder enterprise track record',
+    ] as const,
+    midCta: 'Book a diligence call',
+  },
+  faq: {
+    eyebrow: 'Diligence FAQ',
+    title: 'Questions that unblock internal sharing.',
+    items: [
+      {
+        question: 'What is sovereign intelligence?',
+        answer:
+          'Sovereign intelligence is a BYOC boundary pattern: the enterprise keeps IdP and approved storage; inference runs over bounded aggregates assembled at the edge — not a vendor-hosted ledger warehouse. Open Portfolio supplies the fitting; the buyer keeps the vault keys.',
+      },
+      {
+        question: 'Does Open Portfolio store client portfolio data in its cloud?',
+        answer:
+          'Open Portfolio is BYOC boundary infrastructure — the enterprise buyer keeps IdP and approved storage; we supply edge ingestion and stateless inference, not another vendor vault. Pocket Portfolio is the live consumer harness on the same substrate, not Open’s default enterprise store.',
+      },
+      {
+        question: 'What reaches the inference provider?',
+        answer:
+          'Only a bounded, operator-approved aggregate context assembled at the edge — not the raw client ledger for open-ended retention on a vendor warehouse path. Final allowed context schema is agreed during architecture review.',
+      },
+      {
+        question: 'How is Pocket Portfolio different from the enterprise BYOC product?',
+        answer:
+          'Pocket Portfolio is the consumer reference terminal that stress-tests adapters under real CSV variability. Its browser-first state and optional consumer services are separate from Open Portfolio’s enterprise BYOC contract.',
+      },
+      {
+        question: 'When should a buyer use Open Portfolio instead of a portfolio-data API or Plaid?',
+        answer:
+          'Use Open Portfolio when the buyer needs a BYOC boundary layer — inspectable edge ingestion, MIT adapters, and stateless AI over aggregates inside their perimeter. Not when they need bank linking or payments rails. Not a Plaid replacement.',
+      },
+      {
+        question: 'What happens during a design partnership?',
+        answer:
+          'We map identity, approved storage, ingestion sources, bounded-context contract, and inference controls; then validate a scoped pilot path. Start at /tier1designpartner or book a diligence call from this page.',
+      },
+    ] as const,
   },
   contact: {
-    eyebrow: 'Speak with our command team',
-    title: 'Book a Design Partner Call.',
-    body: 'Policy, procurement, or engineering — tell us what success looks like. We reply within one working day.',
-    submitLabel: 'Book a Design Partner Call',
-    successTitle: 'Briefing request received.',
+    eyebrow: 'Design-partner diligence',
+    title: 'Book a diligence call.',
+    body:
+      'Bring your current identity, approved storage, ingestion sources, and AI use case. We will map the proposed boundary and determine whether a scoped pilot makes sense. We reply within one working day with the right technical owner and the questions needed for an architecture review.',
+    submitLabel: 'Request diligence call',
+    successTitle: 'Diligence request received.',
     successBody:
-      'We reply within one working day. Your submission is routed to the command team and visible in /admin/analytics.',
+      'Thanks. We will reply within one working day with the right technical owner and the questions needed for an architecture review. Your submission is stored privately on Open Portfolio infrastructure.',
+    perimeterLabel: 'What perimeter problem are you solving?',
+    perimeterPlaceholder:
+      'Claims of warehouse-to-infer scope, advisor desk AI, broker-export ingestion, residency constraints, or another controlled AI workflow.',
   },
 } as const;
 
@@ -1153,7 +1278,7 @@ export const OPEN_SOVEREIGN_INGESTION_COPY = {
   eyebrow: 'B2B · Sovereign ingestion substrate',
   title: 'Sovereign ingestion',
   heroBody:
-    'Broker statements are parsed on the device — not warehoused on ours. The MIT-licensed importer ships 19+ deterministic adapters plus Smart Mapping for everything else, with zero raw-row egress through your perimeter.',
+    'Broker statements are parsed on the device — not warehoused on ours. The MIT-licensed importer ships 19 dedicated adapters plus Smart Mapping for everything else, with no raw-row warehouse on the designed inference path.',
   formatTitle: 'OpenBrokerCSV — the interchange format',
   formatBody:
     'OpenBrokerCSV is the normalized ledger we emit after adapter detection. Third parties can target one schema instead of re-implementing every broker dialect.',
@@ -1167,16 +1292,16 @@ export const OPEN_SOVEREIGN_INGESTION_COPY = {
     'We do not blur B2B infrastructure with the consumer terminal. Procurement reads here; operators stress-test on Pocket.',
   openSurfaceLabel: 'Open Portfolio (this page)',
   openSurfaceBody:
-    'SDK packages, design partnership, Tier 1 programmes, and procurement narrative for regulated builders.',
+    'SDK packages, wealth-tech design partnership, and procurement narrative for regulated builders.',
   pocketSurfaceLabel: 'Pocket Portfolio — adversarial test harness',
   pocketSurfaceBody:
-    'Thousands of real CSVs, messy headers, and everyday edge cases run through the same parsers in production — before your audit.',
+    'Real broker CSVs, messy headers, and everyday edge cases run through the same parsers in production — before your audit.',
   pocketImportPath: '/import',
   cta: {
     npm: 'View on npm',
     github: 'View source',
     designChallenge: 'Design Challenge',
-    tier1: 'Tier 1 Design Partnership',
+    tier1: 'Design Partnership',
     sovereignStack: 'The Sovereign Stack',
   },
 } as const;

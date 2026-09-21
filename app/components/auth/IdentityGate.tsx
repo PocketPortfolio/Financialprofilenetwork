@@ -29,7 +29,7 @@ function gateCopy(action: GateAction): { title: string; body: string; cta: strin
   switch (action) {
     case 'tier1_brief':
       return {
-        title: 'Tier 1 brief access',
+        title: 'Design partner brief access',
         body: 'Enter an email routing key to verify institutional intent. We store attribution metadata only (no portfolio/trade payloads).',
         cta: 'Unlock brief →',
       };

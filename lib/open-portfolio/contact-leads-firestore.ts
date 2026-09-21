@@ -28,7 +28,15 @@ export interface OpenPortfolioLeadPayload {
   company?: string;
   role?: string;
   message: string;
-  context?: 'tier1' | 'design-challenge' | 'investor' | 'grant' | 'general';
+  context?:
+    | 'design-partner'
+    | 'architecture-review'
+    | 'sdk-embed'
+    | 'general'
+    | 'tier1'
+    | 'design-challenge'
+    | 'investor'
+    | 'grant';
   source?: string;
 }
 

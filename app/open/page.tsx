@@ -24,11 +24,11 @@ import {
  */
 
 export const metadata: Metadata = {
-  title: 'The BYOC Inference Boundary for Regulated Finance',
+  title: 'Run AI over wealth data without another client-ledger warehouse',
   description: OPEN_LANDING_COPY.heroBody,
   alternates: { canonical: OPEN_URLS.home },
   openGraph: {
-    title: 'Open Portfolio — The BYOC Inference Boundary for Regulated Finance',
+    title: 'Open Portfolio — BYOC boundary for wealth-tech',
     description: OPEN_LANDING_COPY.heroBody,
     url: OPEN_URLS.home,
     siteName: SURFACE_ORG.open.name,
@@ -63,16 +63,16 @@ export default function OpenPortfolioLandingPage() {
           context: 'Maximum administrative fine — what your DPO already weighs against every new data store.',
         },
         euAiAct: {
-          headline: 'EU AI Act Art. 99 · Tier 1',
+          headline: 'EU AI Act Art. 99',
           value: formatValue(euAiActFine?.value),
           citation: 'REG-03',
-          context: 'The legislation enterprises will be audited against from 2026 onward.',
+          context: 'The legislation enterprises will be audited against from 2026 onward — architecture and processor scope are diligence inputs, not automatic compliance.',
         },
         breach: {
           headline: 'Avg. financial-services breach · 2025',
           value: formatValue(breachCost?.value),
           citation: 'CODB-01',
-          context: 'IBM Cost-of-a-Data-Breach 2025. The cheque, not the headline.',
+          context: 'IBM Cost-of-a-Data-Breach 2025. Perimeter width is a commercial risk, not a slogan.',
         },
       }}
     />
