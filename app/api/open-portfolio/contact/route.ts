@@ -18,7 +18,17 @@ export const fetchCache = 'force-no-store';
  * an issue we can layer the existing rateLimit helper later.
  */
 
-const VALID_CONTEXTS = new Set(['tier1', 'design-challenge', 'investor', 'grant', 'general']);
+const VALID_CONTEXTS = new Set([
+  'design-partner',
+  'architecture-review',
+  'sdk-embed',
+  'general',
+  // Legacy values still accepted for in-flight clients
+  'tier1',
+  'design-challenge',
+  'investor',
+  'grant',
+]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function POST(request: NextRequest) {
@@ -44,9 +54,15 @@ export async function POST(request: NextRequest) {
   if (!email || !EMAIL_RE.test(email)) {
     return NextResponse.json({ error: 'A valid email is required' }, { status: 400 });
   }
+  if (!company) {
+    return NextResponse.json({ error: 'Company / organization is required.' }, { status: 400 });
+  }
+  if (!role) {
+    return NextResponse.json({ error: 'Role is required.' }, { status: 400 });
+  }
   if (!message || message.length < 8) {
     return NextResponse.json(
-      { error: 'Please describe your audit-perimeter or substrate question (min 8 chars).' },
+      { error: 'Please describe the perimeter problem you are solving (min 8 chars).' },
       { status: 400 },
     );
   }
@@ -62,10 +78,18 @@ export async function POST(request: NextRequest) {
 
   const leadPayload = {
       email,
-      company: company || undefined,
-      role: role || undefined,
+      company,
+      role,
       message,
-      context: context as 'tier1' | 'design-challenge' | 'investor' | 'grant' | 'general',
+      context: context as
+        | 'design-partner'
+        | 'architecture-review'
+        | 'sdk-embed'
+        | 'general'
+        | 'tier1'
+        | 'design-challenge'
+        | 'investor'
+        | 'grant',
       source,
     };
 

@@ -4,10 +4,10 @@ import Link from 'next/link';
 import IdentityGate from '@/app/components/auth/IdentityGate';
 
 const DILIGENCE_MAIL =
-  'mailto:ceo@pocketportfolio.app?subject=Open%20Portfolio%20Design%20Partnership%20Diligence&body=We%20reviewed%20openportfolio.co.uk%2Farchitecture%20and%20want%20to%20discuss%20a%20Tier-1%20design%20partnership.';
+  'mailto:ceo@pocketportfolio.app?subject=Open%20Portfolio%20Design%20Partnership%20Diligence&body=We%20reviewed%20openportfolio.co.uk%2Farchitecture%20and%20want%20to%20discuss%20a%20design-partner%20diligence%20call.';
 
 /**
- * Executive booking pathway for /architecture — Tier-1 brief gate + direct diligence email.
+ * Executive booking pathway for /architecture — design-partner brief gate + direct diligence email.
  */
 export default function ArchitectureBookingCta() {
   return (
@@ -35,11 +35,11 @@ export default function ArchitectureBookingCta() {
         Next step for CTOs / CISOs
       </p>
       <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text)' }}>
-        Book a Tier-1 design partnership diligence call
+        Book a diligence call
       </h2>
       <p style={{ margin: '0 0 16px', fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-        Architecture is the diligence map. Partnership is the commercial gate — clean-room embed of sovereign
-        ingestion without warehousing client ledgers.
+        Architecture is the diligence map. Partnership is the commercial gate — clean-room embed of
+        sovereign ingestion without warehousing client ledgers.
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
@@ -65,7 +65,7 @@ export default function ArchitectureBookingCta() {
                 cursor: 'pointer',
               }}
             >
-              {isUnlocked ? 'Continue to Tier-1 program →' : 'Request design partner brief →'}
+              {isUnlocked ? 'Continue to design partnership →' : 'Request design partner brief →'}
             </button>
           )}
         </IdentityGate>
@@ -95,7 +95,7 @@ export default function ArchitectureBookingCta() {
             textDecoration: 'none',
           }}
         >
-          Read Tier-1 program →
+          Read design partnership →
         </Link>
       </div>
     </section>

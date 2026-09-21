@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import { VerifiedReceiptsSection } from '@/app/components/landing/VerifiedReceiptsSection';
+import { trackEvent } from '@/app/lib/analytics/events';
 import OpenContactForm from './OpenContactForm';
 import OpenLandingProofVideo from './OpenLandingProofVideo';
 import OpenLandingVisual from './OpenLandingVisual';
@@ -40,16 +41,34 @@ export default function OpenLandingClient({
       }}
     >
       <Hero copy={copy} />
+      <ProofStrip copy={copy} adapterCount={sdk.brokerAdapterCount} />
       <ByocSection copy={copy} />
-      <VideoProofSection copy={copy} />
-      <IntegrationSection copy={copy} adapterCount={sdk.brokerAdapterCount} />
+      <ArchitectureBoundarySection copy={copy} />
+      <PocketHarnessSection copy={copy} />
+      <ImplementationSection copy={copy} />
       <BoardMoatSection copy={copy} threats={threats} />
+      <FaqSection copy={copy} />
       <ContactSection copy={copy} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: copy.faq.items.map((item) => ({
+              '@type': 'Question',
+              name: item.question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: item.answer,
+              },
+            })),
+          }),
+        }}
+      />
     </main>
   );
 }
-
-// ─── Reusable motion primitives ───────────────────────────────────────────────
 
 const fadeUp = {
   initial: { opacity: 0, y: 28 },
@@ -105,7 +124,22 @@ const primaryCtaStyle: React.CSSProperties = {
   letterSpacing: '0.01em',
 };
 
-// ─── Phase 1: Hook ────────────────────────────────────────────────────────────
+const secondaryCtaStyle: React.CSSProperties = {
+  display: 'inline-block',
+  padding: '14px 8px',
+  color: 'var(--accent-warm)',
+  textDecoration: 'none',
+  fontWeight: 600,
+  fontSize: '15px',
+};
+
+const bodySecondary: React.CSSProperties = {
+  fontSize: '17px',
+  lineHeight: 1.6,
+  color: 'rgba(232, 236, 243, 0.82)',
+  margin: '0 0 32px 0',
+  maxWidth: '720px',
+};
 
 function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
@@ -133,9 +167,9 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05 }}
             style={{
-              fontSize: 'clamp(36px, 5.5vw, 64px)',
+              fontSize: 'clamp(32px, 5.2vw, 58px)',
               fontWeight: 800,
-              lineHeight: 1.05,
+              lineHeight: 1.08,
               letterSpacing: '-0.03em',
               margin: '0 0 24px 0',
             }}
@@ -146,13 +180,7 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            style={{
-              fontSize: 'clamp(18px, 1.6vw, 22px)',
-              lineHeight: 1.55,
-              color: 'var(--text-secondary)',
-              margin: '0 0 32px 0',
-              maxWidth: '640px',
-            }}
+            style={{ ...bodySecondary, marginBottom: 28 }}
           >
             {copy.heroBody}
           </motion.p>
@@ -160,12 +188,25 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
+            style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}
           >
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Link href="#contact" scroll style={primaryCtaStyle}>
+              <Link
+                href="#contact"
+                scroll
+                style={primaryCtaStyle}
+                onClick={() => trackEvent('homepage_diligence_cta_clicked', { location: 'hero' })}
+              >
                 {copy.heroCta}
               </Link>
             </motion.div>
+            <Link
+              href={copy.heroSecondaryHref}
+              style={secondaryCtaStyle}
+              onClick={() => trackEvent('homepage_architecture_clicked', { location: 'hero' })}
+            >
+              {copy.heroSecondaryCta} →
+            </Link>
           </motion.div>
         </motion.div>
         <OpenLandingVisual visual={OPEN_LANDING_VISUALS.hero} priority />
@@ -174,9 +215,13 @@ function Hero({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   );
 }
 
-// ─── Phase 2: BYOC procurement block ──────────────────────────────────────────
-
-function ByocSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+function ProofStrip({
+  copy,
+  adapterCount,
+}: {
+  copy: typeof OPEN_LANDING_COPY;
+  adapterCount: number;
+}) {
   return (
     <section
       style={{
@@ -185,102 +230,63 @@ function ByocSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
         borderBottom: '1px solid var(--border-subtle)',
       }}
     >
-      <div style={sectionStyle}>
+      <div style={{ ...sectionStyle, paddingTop: 'clamp(36px, 5vw, 56px)', paddingBottom: 'clamp(36px, 5vw, 56px)' }}>
         <motion.div {...fadeUp}>
-          <span style={eyebrowStyle}>{copy.byoc.eyebrow}</span>
-          <h2
-            style={{
-              fontSize: 'clamp(28px, 3.5vw, 40px)',
-              fontWeight: 800,
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em',
-              margin: '0 0 16px 0',
-              maxWidth: '720px',
-            }}
-          >
-            {copy.byoc.title}
-          </h2>
-          <p
-            style={{
-              fontSize: '17px',
-              lineHeight: 1.6,
-              color: 'var(--text-secondary)',
-              margin: '0 0 32px 0',
-              maxWidth: '720px',
-            }}
-          >
-            {copy.byoc.body}
-          </p>
-          <motion.ol
+          <span style={{ ...eyebrowStyle, marginBottom: 20 }}>{copy.proofStrip.eyebrow}</span>
+          <motion.ul
             {...stagger}
             style={{
               listStyle: 'none',
               padding: 0,
-              margin: '0 0 28px 0',
+              margin: '0 0 20px 0',
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '16px',
-              counterReset: 'byoc-step',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '12px',
             }}
           >
-            {copy.byoc.points.map((point, index) => (
-              <motion.li
-                key={point.title}
-                variants={child}
-                style={{
-                  padding: '24px',
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: '10px',
-                }}
-              >
-                <div
+            {copy.proofStrip.items.map((item) => {
+              const title = item.title.replace('{adapterCount}', String(adapterCount));
+              return (
+                <motion.li
+                  key={title}
+                  variants={child}
                   style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: 'var(--accent-warm)',
-                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                    marginBottom: '10px',
+                    padding: '18px 20px',
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
                   }}
                 >
-                  {String(index + 1).padStart(2, '0')} · {point.title}
-                </div>
-                <p
-                  style={{
-                    fontSize: '15px',
-                    lineHeight: 1.55,
-                    color: 'var(--text-secondary)',
-                    margin: 0,
-                  }}
-                >
-                  {point.body}
-                </p>
-              </motion.li>
-            ))}
-          </motion.ol>
-          <p
-            style={{
-              fontSize: '14px',
-              lineHeight: 1.6,
-              color: 'var(--text-secondary)',
-              margin: '0 0 16px 0',
-              maxWidth: '720px',
-            }}
-          >
-            {copy.byoc.footnote}
-          </p>
+                  <div
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      marginBottom: 8,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {title}
+                  </div>
+                  <p
+                    style={{
+                      fontSize: '13px',
+                      lineHeight: 1.55,
+                      color: 'rgba(232, 236, 243, 0.78)',
+                      margin: 0,
+                    }}
+                  >
+                    {item.body}
+                  </p>
+                </motion.li>
+              );
+            })}
+          </motion.ul>
           <Link
-            href={copy.byoc.architectureHref}
-            style={{
-              color: 'var(--accent-warm)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '15px',
-            }}
+            href={copy.proofStrip.architectureHref}
+            style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}
+            onClick={() => trackEvent('homepage_architecture_clicked', { location: 'proof_strip' })}
           >
-            {copy.byoc.architectureLinkLabel}
+            {copy.proofStrip.architectureLinkLabel}
           </Link>
         </motion.div>
       </div>
@@ -288,22 +294,14 @@ function ByocSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   );
 }
 
-// ─── Phase 3: Proof (video) ───────────────────────────────────────────────────
-
-function VideoProofSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+function ByocSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
-    <section
-      style={{
-        ...sectionStyle,
-        paddingTop: 'clamp(32px, 4vw, 48px)',
-        paddingBottom: 'clamp(48px, 6vw, 80px)',
-      }}
-    >
+    <section style={sectionStyle}>
       <motion.div {...fadeUp}>
-        <span style={eyebrowStyle}>{copy.proof.eyebrow}</span>
+        <span style={eyebrowStyle}>{copy.byoc.eyebrow}</span>
         <h2
           style={{
-            fontSize: 'clamp(26px, 3.2vw, 38px)',
+            fontSize: 'clamp(28px, 3.5vw, 40px)',
             fontWeight: 800,
             lineHeight: 1.1,
             letterSpacing: '-0.02em',
@@ -311,66 +309,155 @@ function VideoProofSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
             maxWidth: '720px',
           }}
         >
-          {copy.proof.title}
+          {copy.byoc.title}
         </h2>
+        <p style={bodySecondary}>{copy.byoc.body}</p>
+        <motion.ol
+          {...stagger}
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: '0 0 28px 0',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+          }}
+        >
+          {copy.byoc.points.map((point, index) => (
+            <motion.li
+              key={point.title}
+              variants={child}
+              style={{
+                padding: '24px',
+                background: 'var(--surface)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '10px',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: 'var(--accent-warm)',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                  marginBottom: '10px',
+                }}
+              >
+                {String(index + 1).padStart(2, '0')} · {point.title}
+              </div>
+              <p
+                style={{
+                  fontSize: '15px',
+                  lineHeight: 1.55,
+                  color: 'rgba(232, 236, 243, 0.78)',
+                  margin: 0,
+                }}
+              >
+                {point.body}
+              </p>
+            </motion.li>
+          ))}
+        </motion.ol>
         <p
           style={{
-            fontSize: '17px',
+            fontSize: '14px',
             lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: '0 0 32px 0',
-            maxWidth: '640px',
+            color: 'rgba(232, 236, 243, 0.78)',
+            margin: '0 0 16px 0',
+            maxWidth: '720px',
           }}
         >
-          {copy.proof.body}
+          {copy.byoc.footnote}
         </p>
-
-        <div
-          style={{
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            background: 'var(--surface)',
-            boxShadow: '0 24px 64px rgba(0, 0, 0, 0.25)',
-          }}
+        <Link
+          href={copy.byoc.architectureHref}
+          style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}
+          onClick={() => trackEvent('homepage_architecture_clicked', { location: 'byoc' })}
         >
-          <OpenLandingProofVideo />
-        </div>
-
-        <motion.div
-          {...fadeUp}
-          style={{ marginTop: '20px' }}
-        >
-          <Link
-            href="/architecture"
-            style={{
-              color: 'var(--accent-warm)',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '15px',
-            }}
-          >
-            {copy.proof.architectureLinkLabel}
-          </Link>
-        </motion.div>
+          {copy.byoc.architectureLinkLabel}
+        </Link>
       </motion.div>
     </section>
   );
 }
 
-// ─── Phase 3: Integration path ────────────────────────────────────────────────
-
-function IntegrationSection({
-  copy,
-  adapterCount,
+function ArchitectureBoundaryDiagram({
+  steps,
+  boundaryLabel,
 }: {
-  copy: typeof OPEN_LANDING_COPY;
-  adapterCount: number;
+  steps: readonly string[];
+  boundaryLabel: string;
 }) {
-  const points = copy.integration.points.map((point) =>
-    point.replace('{adapterCount}', String(adapterCount)),
+  return (
+    <div
+      role="img"
+      aria-label={`Architecture flow: ${steps.join(' to ')}. ${boundaryLabel}`}
+      style={{
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '12px',
+        background: '#0b0d10',
+        padding: 'clamp(20px, 3vw, 32px)',
+        marginBottom: 24,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '10px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 20,
+        }}
+      >
+        {steps.map((step, index) => (
+          <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                padding: '10px 12px',
+                border: index === 3 ? '1px solid var(--accent-warm)' : '1px solid var(--border-subtle)',
+                borderRadius: 6,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                fontSize: 11,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                color: index >= 3 ? 'var(--accent-warm)' : 'rgba(232, 236, 243, 0.88)',
+                maxWidth: 160,
+                textAlign: 'center',
+                lineHeight: 1.35,
+              }}
+            >
+              {step}
+            </div>
+            {index < steps.length - 1 && (
+              <span aria-hidden style={{ color: 'var(--accent-warm)', fontWeight: 700 }}>
+                →
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          borderTop: '2px solid var(--accent-warm)',
+          paddingTop: 14,
+          textAlign: 'center',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+          fontSize: 12,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          color: 'var(--accent-warm)',
+        }}
+      >
+        {boundaryLabel}
+      </div>
+    </div>
   );
+}
 
+function ArchitectureBoundarySection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
     <section
       style={{
@@ -381,7 +468,133 @@ function IntegrationSection({
     >
       <div style={sectionStyle}>
         <motion.div {...fadeUp}>
-          <span style={eyebrowStyle}>{copy.integration.eyebrow}</span>
+          <span style={eyebrowStyle}>{copy.proof.eyebrow}</span>
+          <h2
+            style={{
+              fontSize: 'clamp(26px, 3.2vw, 38px)',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              margin: '0 0 16px 0',
+              maxWidth: '720px',
+            }}
+          >
+            {copy.proof.title}
+          </h2>
+          <p style={bodySecondary}>{copy.proof.body}</p>
+
+          <ArchitectureBoundaryDiagram
+            steps={copy.proof.diagramSteps}
+            boundaryLabel={copy.proof.boundaryLabel}
+          />
+
+          <div
+            style={{
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              background: 'var(--bg)',
+              boxShadow: '0 24px 64px rgba(0, 0, 0, 0.25)',
+              marginBottom: 20,
+            }}
+          >
+            <OpenLandingProofVideo />
+          </div>
+
+          <Link
+            href="/architecture"
+            style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: '15px' }}
+            onClick={() => trackEvent('homepage_architecture_clicked', { location: 'architecture_section' })}
+          >
+            {copy.proof.architectureLinkLabel}
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function PocketHarnessSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+  return (
+    <section style={sectionStyle}>
+      <motion.div
+        {...fadeUp}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: 'clamp(24px, 4vw, 40px)',
+          alignItems: 'start',
+        }}
+      >
+        <div>
+          <span style={eyebrowStyle}>{copy.pocketHarness.eyebrow}</span>
+          <h2
+            style={{
+              fontSize: 'clamp(26px, 3.2vw, 36px)',
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.02em',
+              margin: '0 0 16px 0',
+            }}
+          >
+            {copy.pocketHarness.title}
+          </h2>
+          <p style={{ ...bodySecondary, marginBottom: 20 }}>{copy.pocketHarness.body}</p>
+          <Link
+            href={copy.pocketHarness.ctaHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: 15 }}
+            onClick={() => trackEvent('homepage_pocket_harness_clicked')}
+          >
+            {copy.pocketHarness.ctaLabel} →
+          </Link>
+        </div>
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: 0,
+            display: 'grid',
+            gap: 10,
+          }}
+        >
+          {copy.pocketHarness.points.map((point) => (
+            <li
+              key={point}
+              style={{
+                padding: '14px 16px',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 8,
+                background: 'var(--surface)',
+                fontSize: 14,
+                fontWeight: 600,
+              }}
+            >
+              <span style={{ color: 'var(--accent-warm)', marginRight: 8 }} aria-hidden>
+                →
+              </span>
+              {point}
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    </section>
+  );
+}
+
+function ImplementationSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+  return (
+    <section
+      style={{
+        background: 'var(--surface)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
+    >
+      <div style={sectionStyle}>
+        <motion.div {...fadeUp}>
+          <span style={eyebrowStyle}>{copy.implementation.eyebrow}</span>
           <h2
             style={{
               fontSize: 'clamp(28px, 3.5vw, 40px)',
@@ -391,58 +604,50 @@ function IntegrationSection({
               margin: '0 0 16px 0',
             }}
           >
-            {copy.integration.title}
+            {copy.implementation.title}
           </h2>
-          <p
-            style={{
-              fontSize: '17px',
-              lineHeight: 1.6,
-              color: 'var(--text-secondary)',
-              margin: '0 0 32px 0',
-              maxWidth: '640px',
-            }}
-          >
-            {copy.integration.body}
-          </p>
+          <p style={bodySecondary}>{copy.implementation.body}</p>
           <motion.ul
             {...stagger}
             style={{
               listStyle: 'none',
               padding: 0,
-              margin: 0,
+              margin: '0 0 24px 0',
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
               gap: '16px',
             }}
           >
-            {points.map((point) => (
+            {copy.implementation.points.map((point) => (
               <motion.li
-                key={point}
+                key={point.title}
                 variants={child}
                 style={{
                   padding: '20px 24px',
                   background: 'var(--bg)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: '10px',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  lineHeight: 1.45,
                 }}
               >
-                <span style={{ color: 'var(--accent-warm)', marginRight: '8px' }} aria-hidden>
-                  →
-                </span>
-                {point}
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px 0' }}>{point.title}</h3>
+                <p style={{ fontSize: 14, lineHeight: 1.55, color: 'rgba(232, 236, 243, 0.78)', margin: 0 }}>
+                  {point.body}
+                </p>
               </motion.li>
             ))}
           </motion.ul>
+          <Link
+            href={copy.implementation.ctaHref}
+            style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: 15 }}
+            onClick={() => trackEvent('homepage_sdk_proof_clicked')}
+          >
+            {copy.implementation.ctaLabel}
+          </Link>
         </motion.div>
       </div>
     </section>
   );
 }
-
-// ─── Phase 4: Board moat ──────────────────────────────────────────────────────
 
 function ThreatCard({ threat }: { threat: Threat }) {
   return (
@@ -462,7 +667,7 @@ function ThreatCard({ threat }: { threat: Threat }) {
           fontSize: '11px',
           letterSpacing: '0.06em',
           textTransform: 'uppercase',
-          color: 'var(--text-secondary)',
+          color: 'rgba(232, 236, 243, 0.72)',
           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
           marginBottom: '12px',
         }}
@@ -486,7 +691,7 @@ function ThreatCard({ threat }: { threat: Threat }) {
         style={{
           fontSize: '13px',
           lineHeight: 1.55,
-          color: 'var(--text-secondary)',
+          color: 'rgba(232, 236, 243, 0.78)',
           margin: '0 0 12px 0',
         }}
       >
@@ -496,7 +701,7 @@ function ThreatCard({ threat }: { threat: Threat }) {
         style={{
           fontSize: '10px',
           letterSpacing: '0.06em',
-          color: 'var(--text-secondary)',
+          color: 'rgba(232, 236, 243, 0.65)',
           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
           paddingTop: '10px',
           borderTop: '1px solid var(--border-subtle)',
@@ -532,17 +737,7 @@ function BoardMoatSection({
         >
           {copy.moat.title}
         </h2>
-        <p
-          style={{
-            fontSize: '17px',
-            lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: 0,
-            maxWidth: '640px',
-          }}
-        >
-          {copy.moat.body}
-        </p>
+        <p style={{ ...bodySecondary, margin: 0 }}>{copy.moat.body}</p>
       </motion.div>
 
       <motion.div
@@ -565,14 +760,12 @@ function BoardMoatSection({
               borderRadius: '10px',
             }}
           >
-            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 10px 0' }}>
-              {outcome.title}
-            </h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 10px 0' }}>{outcome.title}</h3>
             <p
               style={{
                 fontSize: '14px',
                 lineHeight: 1.6,
-                color: 'var(--text-secondary)',
+                color: 'rgba(232, 236, 243, 0.78)',
                 margin: 0,
               }}
             >
@@ -590,23 +783,31 @@ function BoardMoatSection({
             fontWeight: 800,
             lineHeight: 1.15,
             letterSpacing: '-0.02em',
-            margin: '0 0 24px 0',
+            margin: '0 0 12px 0',
           }}
         >
           {copy.moat.threatTitle}
         </h3>
+        <p style={{ ...bodySecondary, marginBottom: 24 }}>{copy.moat.threatIntro}</p>
         <motion.div
           {...stagger}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
             gap: '16px',
+            marginBottom: 20,
           }}
         >
           {threatCards.map((threat) => (
             <ThreatCard key={threat.citation} threat={threat} />
           ))}
         </motion.div>
+        <Link
+          href={copy.moat.threatBriefHref}
+          style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}
+        >
+          {copy.moat.threatBriefLabel}
+        </Link>
       </motion.div>
 
       <motion.div
@@ -617,11 +818,10 @@ function BoardMoatSection({
           border: '1px solid var(--border-subtle)',
           borderRadius: '12px',
           borderLeft: '3px solid var(--accent-warm)',
+          marginBottom: 40,
         }}
       >
-        <span style={{ ...eyebrowStyle, marginBottom: '16px' }}>
-          {copy.moat.socialProofEyebrow}
-        </span>
+        <span style={{ ...eyebrowStyle, marginBottom: '16px' }}>{copy.moat.socialProofEyebrow}</span>
         <h3
           style={{
             fontSize: 'clamp(20px, 2.4vw, 26px)',
@@ -636,15 +836,48 @@ function BoardMoatSection({
           style={{
             fontSize: '15px',
             lineHeight: 1.6,
-            color: 'var(--text-secondary)',
-            margin: '0 0 24px 0',
+            color: 'rgba(232, 236, 243, 0.82)',
+            margin: '0 0 20px 0',
             maxWidth: '720px',
           }}
         >
           {copy.moat.socialProofBody}
         </p>
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            margin: '0 0 24px 0',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          {copy.moat.evidenceItems.map((item) => (
+            <li
+              key={item}
+              style={{
+                padding: '6px 10px',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 4,
+                fontSize: 12,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                color: 'rgba(232, 236, 243, 0.8)',
+              }}
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-          <Link href="#contact" scroll style={primaryCtaStyle}>
+          <Link
+            href="#contact"
+            scroll
+            style={primaryCtaStyle}
+            onClick={() => trackEvent('homepage_diligence_cta_clicked', { location: 'social_proof' })}
+          >
             {copy.moat.midCta}
           </Link>
         </motion.div>
@@ -659,14 +892,84 @@ function BoardMoatSection({
   );
 }
 
-// ─── Phase 5: Contact snare ───────────────────────────────────────────────────
+function FaqSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
+  return (
+    <section
+      style={{
+        background: 'var(--surface)',
+        borderTop: '1px solid var(--border-subtle)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
+    >
+      <div style={{ ...sectionStyle, maxWidth: 900 }}>
+        <motion.div {...fadeUp}>
+          <span style={eyebrowStyle}>{copy.faq.eyebrow}</span>
+          <h2
+            style={{
+              fontSize: 'clamp(26px, 3.2vw, 36px)',
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.02em',
+              margin: '0 0 28px 0',
+            }}
+          >
+            {copy.faq.title}
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {copy.faq.items.map((item, index) => (
+              <article
+                key={item.question}
+                style={{
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 8,
+                  background: 'var(--bg)',
+                  padding: '16px 18px',
+                }}
+                onFocus={() =>
+                  trackEvent('homepage_faq_opened', { question: item.question.slice(0, 80), index })
+                }
+                tabIndex={0}
+              >
+                <h3 style={{ fontWeight: 700, fontSize: 15, lineHeight: 1.4, margin: '0 0 10px 0' }}>
+                  <span style={{ color: 'var(--accent-warm)', marginRight: 8 }} aria-hidden>
+                    Q
+                  </span>
+                  {item.question}
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    color: 'rgba(232, 236, 243, 0.82)',
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {item.answer}
+                </p>
+              </article>
+            ))}
+          </div>
+          <div style={{ marginTop: 24 }}>
+            <Link
+              href="/architecture"
+              style={{ color: 'var(--accent-warm)', textDecoration: 'none', fontWeight: 600, fontSize: 15 }}
+              onClick={() => trackEvent('homepage_architecture_clicked', { location: 'faq' })}
+            >
+              Read the full architecture brief →
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
 function ContactSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
   return (
     <section
       id="contact"
       style={{
-        background: 'var(--surface)',
+        background: 'var(--bg)',
         borderTop: '1px solid var(--border-subtle)',
         scrollMarginTop: '80px',
       }}
@@ -689,7 +992,7 @@ function ContactSection({ copy }: { copy: typeof OPEN_LANDING_COPY }) {
             style={{
               fontSize: '17px',
               lineHeight: 1.55,
-              color: 'var(--text-secondary)',
+              color: 'rgba(232, 236, 243, 0.82)',
               margin: '0 0 28px 0',
             }}
           >

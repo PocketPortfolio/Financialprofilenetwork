@@ -6,7 +6,7 @@ import { MOAT_CLAIMS, ORG, TIER1_DESIGN_PARTNER, URLS } from '@/lib/canonical-cl
 import Tier1IntentGate from './Tier1IntentGate';
 
 export const metadata: Metadata = genMeta({
-  title: 'Tier 1 Design Partner',
+  title: 'Wealth-tech Design Partnership',
   description: `${TIER1_DESIGN_PARTNER.eyebrow} ${TIER1_DESIGN_PARTNER.subheadline}`,
   path: TIER1_DESIGN_PARTNER.path,
   image: `${ORG.url}${TIER1_DESIGN_PARTNER.ogImage}`,
@@ -86,9 +86,9 @@ export default function Tier1DesignPartnerPage() {
           </article>
 
           <article style={CARD}>
-            <h3 style={{ margin: '0 0 10px', fontSize: '16px', fontWeight: 800 }}>Regulated vertical focus</h3>
+            <h3 style={{ margin: '0 0 10px', fontSize: '16px', fontWeight: 800 }}>Wealth-tech focus</h3>
             <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: '14px' }}>
-              {TIER1_DESIGN_PARTNER.focusVerticals.join(' · ')}. The program is designed for environments where institutional trust and audit scope are the gating constraints.
+              {TIER1_DESIGN_PARTNER.focusVerticals.join(' · ')}. The program is designed for regulated wealth platforms where institutional trust and audit scope are the gating constraints.
             </p>
           </article>
 
@@ -112,7 +112,7 @@ export default function Tier1DesignPartnerPage() {
             Roadmap specification — not asserted as production metering shipped in this repository.
           </p>
           <p style={{ margin: '0 0 14px', color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: '14px' }}>
-            A Tier 1 partner needs billing, quotas, and governance without expanding audit scope. Target posture: meter capability usage without ingesting partner/customer PII.
+            A design partner needs billing, quotas, and governance without expanding audit scope. Target posture: meter capability usage without ingesting partner/customer PII.
           </p>
           <pre
             style={{
@@ -155,7 +155,7 @@ Output: counters for billing + governance (aggregate only)`}
               Escalation path
             </p>
             <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.7, fontSize: '14px' }}>
-              Start at the public challenge hub, then escalate to the seed governance board. Tier 1 engagement is verified without collecting portfolio/trade payloads.
+              Start at the architecture map, then escalate to a diligence call. Design-partner engagement is verified without collecting portfolio/trade payloads.
             </p>
           </div>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

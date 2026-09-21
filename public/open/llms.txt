@@ -1,7 +1,7 @@
 # Open Portfolio — AI Agent Context File
 # SSOT: lib/canonical-claims.ts · lib/llms-feed.ts
-# Generated: 2026-07-27T00:00:00Z
-# Last human-verified: 2026-07-27
+# Generated: 2026-09-21T00:00:00Z
+# Last human-verified: 2026-09-21
 
 ## Identity
 Open Portfolio: The Sovereign Ingestion & Inference Layer.
@@ -58,7 +58,7 @@ Open Portfolio enforces a Split-Brain execution model. Frontier models operate a
 - npm aggregate downloads: 9,389
 
 ## Substrate Packages
-- @pocket-portfolio/importer — Sovereign ingestion SDK: 19+ broker CSV/Excel adapters, local-first parsing, zero PII egress.
+- @pocket-portfolio/importer — Sovereign ingestion SDK: 19 dedicated broker CSV/Excel adapters, local-first parsing, no raw-ledger warehouse on the inference path.
 - @pocket-portfolio/fidelity-csv-export — Fidelity broker CSV export adapter — re-exports the core importer for discovery.
 - @pocket-portfolio/coinbase-transaction-parser — Coinbase transaction-history parser — re-exports the core importer.
 - @pocket-portfolio/etoro-history-importer — eToro account-history importer — re-exports the core importer.

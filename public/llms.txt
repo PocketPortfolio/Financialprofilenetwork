@@ -1,7 +1,7 @@
 # Pocket Portfolio — AI Agent Context File
 # SSOT: lib/canonical-claims.ts · lib/llms-feed.ts
-# Generated: 2026-07-27T00:00:00Z
-# Last human-verified: 2026-07-27
+# Generated: 2026-09-21T00:00:00Z
+# Last human-verified: 2026-09-21
 
 ## Identity
 Pocket Portfolio: The Sovereign Ingestion & Inference Layer.

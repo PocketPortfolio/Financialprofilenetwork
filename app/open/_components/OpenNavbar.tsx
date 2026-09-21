@@ -43,26 +43,32 @@ export default function OpenNavbar() {
     }
   };
 
-  const navLink = (item: (typeof OPEN_NAV)[number]) => (
-    <Link
-      key={item.href}
-      href={item.href}
-      style={{
-        color: isActive(item.href) ? 'var(--text)' : 'var(--text-secondary)',
-        textDecoration: 'none',
-        fontSize: isMobile ? '15px' : '13px',
-        fontWeight: isActive(item.href) ? 600 : 500,
-        letterSpacing: '0.01em',
-        padding: isMobile ? '12px 8px' : '8px 12px',
-        borderRadius: '6px',
-        borderBottom: isMobile ? '1px solid var(--border-subtle)' : undefined,
-        display: 'block',
-        boxShadow: !isMobile && isActive(item.href) ? 'inset 0 -2px 0 var(--accent-warm)' : undefined,
-      }}
-    >
-      {item.label}
-    </Link>
-  );
+  const navLink = (item: (typeof OPEN_NAV)[number]) => {
+    const linkProps = item.external
+      ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+      : {};
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        {...linkProps}
+        style={{
+          color: isActive(item.href) ? 'var(--text)' : 'var(--text-secondary)',
+          textDecoration: 'none',
+          fontSize: isMobile ? '15px' : '13px',
+          fontWeight: isActive(item.href) ? 600 : 500,
+          letterSpacing: '0.01em',
+          padding: isMobile ? '12px 8px' : '8px 12px',
+          borderRadius: '6px',
+          borderBottom: isMobile ? '1px solid var(--border-subtle)' : undefined,
+          display: 'block',
+          boxShadow: !isMobile && isActive(item.href) ? 'inset 0 -2px 0 var(--accent-warm)' : undefined,
+        }}
+      >
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <header
@@ -123,11 +129,12 @@ export default function OpenNavbar() {
             style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}
           >
             {OPEN_NAV.map(navLink)}
-            <SurfaceSwitcher target="pocket" label="Consumer" />
+            <SurfaceSwitcher target="pocket" label="Pocket Portfolio" />
             <motion.a
               href={OPEN_PRIMARY_CTA.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(OPEN_PRIMARY_CTA.external
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {})}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               style={{
@@ -173,11 +180,12 @@ export default function OpenNavbar() {
                   alignItems: 'center',
                 }}
               >
-                <SurfaceSwitcher target="pocket" label="Consumer" />
+                <SurfaceSwitcher target="pocket" label="Pocket Portfolio" />
                 <a
                   href={OPEN_PRIMARY_CTA.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  {...(OPEN_PRIMARY_CTA.external
+                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                    : {})}
                   style={{
                     padding: '10px 16px',
                     background: 'var(--accent-warm)',

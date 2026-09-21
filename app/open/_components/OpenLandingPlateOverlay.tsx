@@ -54,7 +54,7 @@ const bodyStyle: React.CSSProperties = {
 function ExposureOverlay() {
   const items = [
     { metric: 'GBP 4.45M', label: 'Average Breach Cost (Financial Services)' },
-    { metric: 'EUR 35M or 7%', label: 'EU AI Act (Art. 99 Tier-1 ceiling)' },
+    { metric: 'EUR 35M or 7%', label: 'EU AI Act (Art. 99 higher-tier ceiling)' },
     { metric: 'EUR 20M or 4%', label: 'GDPR (Art. 83(5) higher-tier ceiling)' },
   ];
 

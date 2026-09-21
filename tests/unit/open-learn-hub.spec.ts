@@ -26,8 +26,10 @@ describe('Open Learn hub (enterprise gateway)', () => {
     expect(OPEN_LEARN_HUB_COPY.ctaPrimaryHref).toBe('/tier1designpartner');
   });
 
-  it('Open nav includes Learn entry point', () => {
-    expect(OPEN_NAV.some((item) => item.href === '/learn')).toBe(true);
+  it('Open nav prioritizes Architecture and Blog; Pocket is a quieter switcher', () => {
+    expect(OPEN_NAV.some((item) => item.href === '/architecture')).toBe(true);
+    expect(OPEN_NAV.some((item) => item.href === '/blog')).toBe(true);
+    expect(OPEN_NAV.some((item) => item.label === 'Pocket Portfolio')).toBe(false);
   });
 
   it('Open learn page does not re-export Pocket glossary', () => {

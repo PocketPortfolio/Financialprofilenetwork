@@ -8,11 +8,11 @@ export default function LocalFirstPage() {
     '@type': 'Article',
     headline: 'Local-First (Pocket Portfolio)',
     description:
-      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
+      "Privacy is an engineering choice, not a legal promise. The 'Limited-Scope Processor' posture shrinks what a third party must hold — an inspectable control that supports diligence, not a certification claim. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.",
     url: 'https://www.pocketportfolio.app/learn/local-first',
     mainEntityOfPage: 'https://www.pocketportfolio.app/learn/local-first',
     articleBody:
-      "Privacy is an engineering choice, not a legal promise. By implementing the 'Limited-Scope Processor' posture, we reduce the SOC 2 audit perimeter and the UK DPA/GDPR burden. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.\n\nCitation: Salford Seed Deck v4.1, Slide 11 (Regulatory Posture).",
+      "Privacy is an engineering choice, not a legal promise. The 'Limited-Scope Processor' posture shrinks what a third party must hold — an inspectable control that supports diligence, not a certification claim. We provide the 'Stateless Floor' that standardizes data while remaining regulatory-agnostic.\n\nCitation: Salford Seed Deck v4.1, Slide 11 (Regulatory Posture).",
     publisher: {
       '@type': 'Organization',
       name: 'Pocket Portfolio',
@@ -94,7 +94,7 @@ export default function LocalFirstPage() {
               <strong>Privacy is an engineering choice:</strong> not a legal promise.
             </li>
             <li style={{ marginBottom: '12px' }}>
-              <strong>Limited-scope processor posture:</strong> reduces SOC 2 audit perimeter and UK DPA/GDPR burden.
+              <strong>Limited-scope processor posture:</strong> shrinks what a third party must hold — an inspectable diligence control, not a certification claim.
             </li>
             <li>
               <strong>Stateless Floor:</strong> standardizes data while remaining regulatory-agnostic.

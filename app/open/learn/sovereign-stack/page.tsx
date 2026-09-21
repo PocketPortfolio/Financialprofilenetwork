@@ -27,7 +27,7 @@ export default function OpenSovereignStackPage() {
       body={[
         'The Sovereign Stack separates ingestion (edge adapters), control plane (auth/quotas you scope), and inference (stateless bounded aggregates). Open Portfolio sells the boundary layer that embeds inside your perimeter.',
         'Do not confuse this with Pocket Portfolio’s optional Sovereign Sync (operator-owned Drive file on the consumer harness). Enterprise BYOC pilots scope your approved stores — Drive is one possible customer choice, not Open’s product default.',
-        'Deterministic @pocket-portfolio/importer adapters standardize messy broker CSVs at the edge before any model hop. Architecture and Tier-1 design partnership are the diligence path.',
+        'Deterministic @pocket-portfolio/importer adapters standardize messy broker CSVs at the edge before any model hop. Architecture and design-partner diligence are the evaluation path.',
       ]}
       ctaHref="/architecture"
       ctaLabel="Read the architecture"
