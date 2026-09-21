@@ -70,10 +70,15 @@ function priorityForRoute(path: string): number {
     case '/learn/sovereign-stack':
     case '/learn/sovereign-finance':
     case '/learn/local-first':
+    case '/learn/ai-in-wealth-management':
+    case '/learn/ai-for-financial-advisors':
     case '/learn/sovereign-ai-architecture':
     case '/learn/dora-eu-ai-act-wealth':
     case '/learn/stateless-edge-ingestion':
     case '/learn/enterprise-design-partnership':
+    case '/learn/edge-ingestion-vs-warehouse':
+    case '/learn/open-portfolio-vs-portfolio-data-api':
+    case '/learn/open-portfolio-vs-plaid':
       return 0.85;
     case '/learn/vendor-lock-in':
     case '/playbooks/sovereign-strike':

@@ -631,6 +631,11 @@ export const OPEN_URLS = {
   doraEuAiActWealth: 'https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth',
   statelessEdgeIngestion: 'https://www.openportfolio.co.uk/learn/stateless-edge-ingestion',
   enterpriseDesignPartnership: 'https://www.openportfolio.co.uk/learn/enterprise-design-partnership',
+  aiInWealthManagement: 'https://www.openportfolio.co.uk/learn/ai-in-wealth-management',
+  aiForFinancialAdvisors: 'https://www.openportfolio.co.uk/learn/ai-for-financial-advisors',
+  edgeVsWarehouse: 'https://www.openportfolio.co.uk/learn/edge-ingestion-vs-warehouse',
+  openVsPortfolioApi: 'https://www.openportfolio.co.uk/learn/open-portfolio-vs-portfolio-data-api',
+  openVsPlaid: 'https://www.openportfolio.co.uk/learn/open-portfolio-vs-plaid',
   sovereignStrike: 'https://www.openportfolio.co.uk/playbooks/sovereign-strike',
   openBrokerCsv: 'https://www.openportfolio.co.uk/openbrokercsv',
   etoroToOpenBrokerCsv: 'https://www.openportfolio.co.uk/static/csv-etoro-to-openbrokercsv',
@@ -649,6 +654,22 @@ export const OPEN_URLS = {
 
 /** Institutional architecture briefs — primary Open /learn hub (CTO/CISO-facing). */
 export const OPEN_INSTITUTIONAL_PILLARS = [
+  {
+    slug: 'ai-in-wealth-management',
+    title: 'AI in Wealth Management Without a Client Data Warehouse',
+    summary:
+      'How wealth platforms add generative AI over portfolio data without duplicating client ledgers into a vendor vault.',
+    category: 'Category',
+    url: OPEN_URLS.aiInWealthManagement,
+  },
+  {
+    slug: 'ai-for-financial-advisors',
+    title: 'AI for Financial Advisors Without a Central Client Warehouse',
+    summary:
+      'Bounded advisor AI over controlled portfolio context — design-partner path, not a full advisor SaaS suite claim.',
+    category: 'Advisors',
+    url: OPEN_URLS.aiForFinancialAdvisors,
+  },
   {
     slug: 'sovereign-ai-architecture',
     title: 'Sovereign AI Architecture & Data Perimeters',
@@ -672,6 +693,30 @@ export const OPEN_INSTITUTIONAL_PILLARS = [
       'Economics and liability of edge ingestion versus centralized wealth-tech data lakes.',
     category: 'Economics',
     url: OPEN_URLS.statelessEdgeIngestion,
+  },
+  {
+    slug: 'edge-ingestion-vs-warehouse',
+    title: 'Edge Ingestion vs Client-Ledger Warehouse',
+    summary:
+      'Honest comparison of architectural approaches for AI over wealth data — when the boundary fits and when a warehouse API still wins.',
+    category: 'Evaluation',
+    url: OPEN_URLS.edgeVsWarehouse,
+  },
+  {
+    slug: 'open-portfolio-vs-portfolio-data-api',
+    title: 'Open Portfolio vs a Portfolio-Data API',
+    summary:
+      'When a BYOC inference boundary fits versus when a hosted portfolio-data API is the right tool.',
+    category: 'Evaluation',
+    url: OPEN_URLS.openVsPortfolioApi,
+  },
+  {
+    slug: 'open-portfolio-vs-plaid',
+    title: 'Open Portfolio vs Plaid',
+    summary:
+      'Not a replacement: bank linking and payments rails versus inspectable edge ingestion and bounded inference.',
+    category: 'Evaluation',
+    url: OPEN_URLS.openVsPlaid,
   },
   {
     slug: 'enterprise-design-partnership',
@@ -812,6 +857,31 @@ export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; ope
     title: 'Enterprise Design Partnership',
     openUrl: OPEN_URLS.enterpriseDesignPartnership,
   },
+  {
+    path: '/learn/ai-in-wealth-management',
+    title: 'AI in Wealth Management',
+    openUrl: OPEN_URLS.aiInWealthManagement,
+  },
+  {
+    path: '/learn/ai-for-financial-advisors',
+    title: 'AI for Financial Advisors',
+    openUrl: OPEN_URLS.aiForFinancialAdvisors,
+  },
+  {
+    path: '/learn/edge-ingestion-vs-warehouse',
+    title: 'Edge Ingestion vs Warehouse',
+    openUrl: OPEN_URLS.edgeVsWarehouse,
+  },
+  {
+    path: '/learn/open-portfolio-vs-portfolio-data-api',
+    title: 'Open Portfolio vs Portfolio-Data API',
+    openUrl: OPEN_URLS.openVsPortfolioApi,
+  },
+  {
+    path: '/learn/open-portfolio-vs-plaid',
+    title: 'Open Portfolio vs Plaid',
+    openUrl: OPEN_URLS.openVsPlaid,
+  },
   { path: '/playbooks/sovereign-strike', title: 'Sovereign Strike Playbook', openUrl: OPEN_URLS.sovereignStrike },
   { path: '/openbrokercsv', title: 'Sovereign Ingestion', openUrl: OPEN_URLS.openBrokerCsv },
   {
@@ -935,13 +1005,21 @@ export function isOpenInternalEngineeringDiary(slug?: string): boolean {
   return (slug ?? '').toLowerCase().startsWith('sovereign-engineering-serial-');
 }
 
-/** Open post robots: farm + internal engineering diaries. */
+/** Dilution topics that must not compete with the wealth-tech AI custody graph. */
+export function isTopicDilutionBlogSlug(slug?: string): boolean {
+  const s = (slug ?? '').toLowerCase();
+  return s.includes('postgresql') || s.includes('postgres');
+}
+
+/** Open post robots: farm + internal engineering diaries + dilution topics. */
 export function shouldNoindexOpenBlogPost(
   category: string | undefined,
   slug?: string,
 ): boolean {
   return (
-    shouldNoindexOpenBlogFarm(category, slug) || isOpenInternalEngineeringDiary(slug)
+    shouldNoindexOpenBlogFarm(category, slug) ||
+    isOpenInternalEngineeringDiary(slug) ||
+    isTopicDilutionBlogSlug(slug)
   );
 }
 
@@ -953,7 +1031,8 @@ export function isOpenBlogListingCategory(
   return (
     isOpenBlogCategory(category) &&
     !shouldNoindexOpenBlogFarm(category, slug) &&
-    !isOpenInternalEngineeringDiary(slug)
+    !isOpenInternalEngineeringDiary(slug) &&
+    !isTopicDilutionBlogSlug(slug)
   );
 }
 
@@ -1029,6 +1108,8 @@ export const FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL = FOUNDER_CREDENTIALS_ABBA.high
 /** De-emphasized institutional pathways — footer only (not header or index CTAs). */
 export const OPEN_LANDING_FOOTER_PATHWAYS = [
   { label: 'Design Partnership', href: '/tier1designpartner' },
+  { label: 'AI in Wealth Management', href: '/learn/ai-in-wealth-management' },
+  { label: 'AI for Financial Advisors', href: '/learn/ai-for-financial-advisors' },
   { label: 'DORA & EU AI Act for Wealth', href: '/learn/dora-eu-ai-act-wealth' },
   { label: 'Sovereign AI Architecture', href: '/learn/sovereign-ai-architecture' },
   { label: 'Board of Investors (BIP)', href: '/board-of-investors' },

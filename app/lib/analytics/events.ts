@@ -553,6 +553,25 @@ export function trackEvent(
   }
 }
 
+/**
+ * CRM stage: qualified_opportunity (CCO-owned).
+ * Fire when company identified, tech/risk owner engaged, perimeter/AI use case stated,
+ * and architecture review or diligence call completed/booked with next step ≤14 days.
+ */
+export function trackQualifiedOpportunity(params: {
+  company: string;
+  attributionChannel: 'organic' | 'ai' | 'authority' | 'outbound' | 'unknown';
+  leadId?: string;
+  sourcePath?: string;
+}) {
+  trackEvent('qualified_opportunity', {
+    company: params.company.slice(0, 120),
+    attribution_channel: params.attributionChannel,
+    lead_id: params.leadId,
+    source_path: params.sourcePath,
+  });
+}
+
 // Feature Announcement tracking
 export function trackFeatureAnnouncementView() {
   if (typeof window !== 'undefined' && window.gtag) {

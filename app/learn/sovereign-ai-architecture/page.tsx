@@ -30,6 +30,19 @@ export default function SovereignAiArchitecturePage() {
       ctaHref="/architecture"
       ctaLabel="Read the architecture"
       procurementFaqIndices={[0, 4, 5]}
+      aeo={{
+        definition:
+          'Sovereign AI architecture for wealth-tech is a BYOC boundary pattern: edge ingestion, buyer-controlled IdP/storage, and stateless inference over bounded aggregate context — not a vendor-hosted client-ledger warehouse.',
+        limitation:
+          'Narrow wealth-tech scope only; does not compete as generic “sovereign AI” for government or hyperscaler SERPs; not a compliance certification.',
+        sourceReceipt: '/architecture · @pocket-portfolio/importer · /llms.txt',
+        lastReviewed: '2026-09-21',
+        siblingLinks: [
+          { href: '/learn/ai-in-wealth-management', label: 'AI in wealth management' },
+          { href: '/learn/dora-eu-ai-act-wealth', label: 'DORA & EU AI Act' },
+          { href: '/learn/stateless-edge-ingestion', label: 'Stateless edge ingestion' },
+        ],
+      }}
     />
   );
 }

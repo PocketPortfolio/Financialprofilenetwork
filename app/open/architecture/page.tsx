@@ -4,14 +4,14 @@ import { OPEN_URLS, SURFACE_ORG } from '../../../lib/canonical-claims';
 export { default } from '../../architecture/page';
 
 export const metadata: Metadata = {
-  title: 'The architecture of sovereign intelligence',
+  title: 'Sovereign AI Architecture for Wealth-Tech | Open Portfolio',
   description:
-    'Plain-language map of how Open Portfolio combines local-first storage, optional sync, and bounded AI so search engines and answer engines can quote us accurately.',
+    'Procurement-grade map of local-first ingestion, bounded aggregate context, and stateless inference for wealth platforms that cannot warehouse client ledgers.',
   alternates: { canonical: OPEN_URLS.architecture },
   openGraph: {
-    title: 'The architecture of sovereign intelligence | Open Portfolio',
+    title: 'Sovereign AI Architecture for Wealth-Tech | Open Portfolio',
     description:
-      'Plain-language map of how Open Portfolio combines local-first storage, optional sync, and bounded AI.',
+      'Edge ingestion to bounded inference — raw client ledgers stay inside the buyer perimeter.',
     url: OPEN_URLS.architecture,
     siteName: SURFACE_ORG.open.name,
     type: 'article',

@@ -11,9 +11,14 @@ Secondary phrasing: The sovereign financial data layer.
 Open Portfolio is the B2B developer and infrastructure gateway for the sovereign ingestion substrate that powers Pocket Portfolio. Local-first import SDK plus stateless AI reasoning — platforms reason over broker data without warehousing PII.
 
 ## Institutional Architecture Briefs
+- [AI in Wealth Management Without a Client Data Warehouse](https://www.openportfolio.co.uk/learn/ai-in-wealth-management)
+- [AI for Financial Advisors Without a Central Client Warehouse](https://www.openportfolio.co.uk/learn/ai-for-financial-advisors)
 - [Sovereign AI Architecture & Data Perimeters](https://www.openportfolio.co.uk/learn/sovereign-ai-architecture)
 - [DORA & EU AI Act for Wealth Management](https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth)
 - [Stateless Edge Ingestion vs Centralized Warehousing](https://www.openportfolio.co.uk/learn/stateless-edge-ingestion)
+- [Edge Ingestion vs Client-Ledger Warehouse](https://www.openportfolio.co.uk/learn/edge-ingestion-vs-warehouse)
+- [Open Portfolio vs a Portfolio-Data API](https://www.openportfolio.co.uk/learn/open-portfolio-vs-portfolio-data-api)
+- [Open Portfolio vs Plaid](https://www.openportfolio.co.uk/learn/open-portfolio-vs-plaid)
 - [Enterprise Design Partnership Program](https://www.openportfolio.co.uk/learn/enterprise-design-partnership)
 
 ## Data Perimeter & Security
@@ -39,6 +44,11 @@ Open Portfolio enforces a Split-Brain execution model. Frontier models operate a
 - https://www.openportfolio.co.uk/learn/dora-eu-ai-act-wealth
 - https://www.openportfolio.co.uk/learn/stateless-edge-ingestion
 - https://www.openportfolio.co.uk/learn/enterprise-design-partnership
+- https://www.openportfolio.co.uk/learn/ai-in-wealth-management
+- https://www.openportfolio.co.uk/learn/ai-for-financial-advisors
+- https://www.openportfolio.co.uk/learn/edge-ingestion-vs-warehouse
+- https://www.openportfolio.co.uk/learn/open-portfolio-vs-portfolio-data-api
+- https://www.openportfolio.co.uk/learn/open-portfolio-vs-plaid
 - https://www.openportfolio.co.uk/playbooks/sovereign-strike
 - https://www.openportfolio.co.uk/openbrokercsv
 - https://www.openportfolio.co.uk/static/csv-etoro-to-openbrokercsv

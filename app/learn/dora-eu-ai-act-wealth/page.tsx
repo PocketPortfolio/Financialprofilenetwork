@@ -27,9 +27,22 @@ export default function DoraEuAiActWealthPage() {
         'The EU AI Act raises the bar on transparency, risk classification, and human oversight for AI systems touching financial decisions. BYOC + stateless inference with minimized context is a structural control: less retained personal data outside the buyer perimeter, clearer processor boundaries, and auditable request/response scopes.',
         'Open Portfolio positions wealth operators to adopt AI assistance without converting every client CSV into a permanent training or warehousing surface. Pair this pillar with Architecture and Tier 1 Design Partnership for diligence-ready narratives.',
       ]}
-      ctaHref="/tier1designpartner"
-      ctaLabel="Explore Design Partnership"
+      ctaHref="/#contact"
+      ctaLabel="Book a diligence call"
       procurementFaqIndices={[1, 2, 5]}
+      aeo={{
+        definition:
+          'DORA and EU AI Act diligence for wealth AI maps operational resilience and AI governance to processor scope: minimize third-party ledger retention, bound inference context, and keep buyer accountability explicit.',
+        limitation:
+          'Architecture mapping is not a warranty of DORA or EU AI Act compliance; DPIA and firm-level obligations remain with the buyer.',
+        sourceReceipt: '/architecture · /learn/dora-eu-ai-act-wealth · /llms.txt',
+        lastReviewed: '2026-09-21',
+        siblingLinks: [
+          { href: '/learn/ai-in-wealth-management', label: 'AI in wealth management' },
+          { href: '/learn/sovereign-ai-architecture', label: 'Sovereign AI architecture' },
+          { href: '/learn/edge-ingestion-vs-warehouse', label: 'Edge vs warehouse' },
+        ],
+      }}
     />
   );
 }

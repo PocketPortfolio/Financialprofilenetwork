@@ -7,6 +7,7 @@ import {
   isOpenBlogListingCategory,
   isOpenInternalEngineeringDiary,
   isPocketBlogCategory,
+  isTopicDilutionBlogSlug,
   shouldNoindexOpenBlogFarm,
   shouldNoindexOpenBlogPost,
 } from '../../lib/canonical-claims';
@@ -54,6 +55,16 @@ describe('blog surface pillars', () => {
         'sovereign-engineering',
         'data-chasm-wealth-management-llms',
       ),
+    ).toBe(false);
+  });
+
+  test('postgres dilution topics are noindexed and excluded from Open listing', () => {
+    expect(isTopicDilutionBlogSlug('how-to-use-postgresql-full-text-search')).toBe(true);
+    expect(
+      shouldNoindexOpenBlogPost('how-to-in-tech', 'how-to-use-postgresql-jsonb-for-flexible-data'),
+    ).toBe(true);
+    expect(
+      isOpenBlogListingCategory('how-to-in-tech', 'how-to-use-postgresql-full-text-search'),
     ).toBe(false);
   });
 
