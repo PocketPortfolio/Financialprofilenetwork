@@ -38,6 +38,10 @@ export interface OpenPortfolioLeadPayload {
     | 'investor'
     | 'grant';
   source?: string;
+  /** CRM pipeline stage — default inquiry; CCO promotes to qualified_opportunity. */
+  pipelineStage?: 'inquiry' | 'qualified_opportunity' | 'won' | 'lost';
+  /** Attribution: organic | ai | authority | outbound | unknown */
+  attributionChannel?: 'organic' | 'ai' | 'authority' | 'outbound' | 'unknown';
 }
 
 /** Persist a single Open Portfolio contact-form submission. Best-effort. */
@@ -52,9 +56,32 @@ export async function recordOpenPortfolioContactLead(
     message: payload.message.trim(),
     context: payload.context ?? 'general',
     source: payload.source ?? 'open_portfolio_landing',
+    pipelineStage: payload.pipelineStage ?? 'inquiry',
+    attributionChannel: payload.attributionChannel ?? 'unknown',
     createdAt: Timestamp.now(),
     path: '/',
   });
+}
+
+/**
+ * CCO-owned promotion: mark a lead document as qualified_opportunity.
+ * Criteria: company identified; technical/risk owner engaged; perimeter/AI use case
+ * stated; architecture review or diligence call completed or booked with next step ≤14 days.
+ */
+export async function promoteLeadToQualifiedOpportunity(
+  leadId: string,
+  opts?: { attributionChannel?: OpenPortfolioLeadPayload['attributionChannel']; note?: string },
+): Promise<void> {
+  const db = getDb();
+  await db.collection(OPEN_PORTFOLIO_LEADS_COLLECTION).doc(leadId).set(
+    {
+      pipelineStage: 'qualified_opportunity',
+      qualifiedAt: Timestamp.now(),
+      ...(opts?.attributionChannel ? { attributionChannel: opts.attributionChannel } : {}),
+      ...(opts?.note ? { qualificationNote: opts.note } : {}),
+    },
+    { merge: true },
+  );
 }
 
 export type OpenPortfolioLeadRow = {

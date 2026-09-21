@@ -12,9 +12,9 @@ import {
 } from '@/lib/canonical-claims';
 
 export const metadata: Metadata = genMeta({
-  title: 'Sovereign Intelligence Architecture',
+  title: 'Sovereign AI Architecture for Wealth-Tech',
   description:
-    'Enterprise architecture for sovereign ingestion and stateless AI: local-first broker parsing, bounded inference context, DORA/EU AI Act posture. Open Portfolio B2B diligence page.',
+    'Procurement-grade map of local-first ingestion, bounded aggregate context, and stateless inference for wealth platforms that cannot warehouse client ledgers.',
   path: '/architecture',
 });
 
@@ -87,7 +87,7 @@ export default function ArchitecturePage() {
               marginBottom: '12px',
             }}
           >
-            The architecture of sovereign intelligence
+            Sovereign AI architecture for wealth-tech
           </h1>
           <p style={{ fontSize: '17px', color: 'var(--text-secondary)', margin: 0 }}>
             Procurement-grade map of local-first ingestion, optional sync, and bounded stateless AI — written so

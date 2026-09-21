@@ -29,6 +29,19 @@ export default function StatelessEdgeIngestionPage() {
       ]}
       ctaHref="/learn/sovereign-finance"
       ctaLabel="Economics of Stateless Inference"
+      aeo={{
+        definition:
+          'Stateless edge ingestion parses broker exports at the edge and sends only request-scoped, sanitized context into inference — avoiding a mandatory central client-ledger warehouse for AI value.',
+        limitation:
+          'Does not claim that all warehousing is always wrong; hosted lakes remain valid when already the governed system of record.',
+        sourceReceipt: '/architecture · @pocket-portfolio/importer · /learn/edge-ingestion-vs-warehouse',
+        lastReviewed: '2026-09-21',
+        siblingLinks: [
+          { href: '/learn/edge-ingestion-vs-warehouse', label: 'Edge vs warehouse' },
+          { href: '/learn/ai-in-wealth-management', label: 'AI in wealth management' },
+          { href: '/architecture', label: 'Architecture' },
+        ],
+      }}
     />
   );
 }

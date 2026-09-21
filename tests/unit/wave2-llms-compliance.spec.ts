@@ -6,7 +6,7 @@ import {
   buildPocketLlmsSummary,
   isOpenPortfolioHost,
 } from '@/lib/llms-feed';
-import { complianceBadgeForCountry } from '@/app/components/compliance/ComplianceBanner';
+import { complianceBadgeForCountry } from '@/app/components/compliance/complianceBadge';
 
 describe('llms-feed', () => {
   it('detects Open Portfolio hosts', () => {
@@ -25,6 +25,8 @@ describe('llms-feed', () => {
   it('includes institutional pillars in pocket and full docs', () => {
     expect(buildPocketLlmsSummary()).toContain('dora-eu-ai-act-wealth');
     expect(buildOpenLlmsSummary()).toContain('stateless-edge-ingestion');
+    expect(buildOpenLlmsSummary()).toContain('ai-in-wealth-management');
+    expect(buildOpenLlmsSummary()).toContain('ai-for-financial-advisors');
     expect(buildLlmsFullDocumentation()).toContain('stateless-edge-ingestion');
   });
 
@@ -47,6 +49,7 @@ describe('complianceBadgeForCountry', () => {
   });
 
   it('returns US default badge', () => {
-    expect(complianceBadgeForCountry('US').pill).toContain('SOC 2');
+    expect(complianceBadgeForCountry('US').pill).toContain('BYOC');
+    expect(complianceBadgeForCountry('US').text.toLowerCase()).not.toContain('soc 2');
   });
 });
