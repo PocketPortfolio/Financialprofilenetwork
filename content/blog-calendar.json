@@ -1516,7 +1516,7 @@
     "date": "2026-09-23",
     "title": "The API-First Approach: Programmatic Portfolio Management",
     "slug": "the-api-first-approach-programmatic-portfolio-management",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1526,7 +1526,8 @@
       "api-first"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-23T09:00:49.168Z"
   },
   {
     "id": "week-39-post-1",
