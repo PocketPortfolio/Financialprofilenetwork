@@ -278,6 +278,28 @@ describe('Dual-Surface Bifurcation SSOT (CEO mandate 2026-05-15)', () => {
     expect(paths).toContain('/learn/open-portfolio-vs-plaid');
   });
 
+  test('Pocket→Open 301 matrix matches OPEN_ALIAS_ROUTES except retained /press', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const {
+      OPEN_ALIAS_POCKET_TO_OPEN_PATHS,
+      OPEN_ALIAS_POCKET_RETAINED_PATHS,
+    } = require('../../lib/open-alias-pocket-to-open-paths.cjs') as {
+      OPEN_ALIAS_POCKET_TO_OPEN_PATHS: readonly string[];
+      OPEN_ALIAS_POCKET_RETAINED_PATHS: readonly string[];
+    };
+
+    expect(OPEN_ALIAS_POCKET_RETAINED_PATHS).toEqual(['/press']);
+    const expected = OPEN_ALIAS_ROUTES.map((r) => r.path).filter(
+      (p) => !OPEN_ALIAS_POCKET_RETAINED_PATHS.includes(p),
+    );
+    expect([...OPEN_ALIAS_POCKET_TO_OPEN_PATHS].sort()).toEqual([...expected].sort());
+    expect(OPEN_ALIAS_POCKET_TO_OPEN_PATHS).toContain('/learn/ai-in-wealth-management');
+    expect(OPEN_ALIAS_POCKET_TO_OPEN_PATHS).toContain('/learn/ai-for-financial-advisors');
+    expect(OPEN_ALIAS_POCKET_TO_OPEN_PATHS).toContain('/learn/edge-ingestion-vs-warehouse');
+    expect(OPEN_ALIAS_POCKET_TO_OPEN_PATHS).toContain('/learn/open-portfolio-vs-portfolio-data-api');
+    expect(OPEN_ALIAS_POCKET_TO_OPEN_PATHS).toContain('/learn/open-portfolio-vs-plaid');
+  });
+
   test('helpers return the correct surface block', () => {
     expect(getSurfaceOrg('pocket').name).toBe('Pocket Portfolio');
     expect(getSurfaceOrg('open').name).toBe('Open Portfolio');

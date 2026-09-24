@@ -824,8 +824,9 @@ export const OPEN_LEARN_HUB_COPY = {
 
 /**
  * Developer + institutional routes with thin-wrapper aliases on the O. surface.
- * Pocket→Open 301 matrix: `next.config.js` (`OPEN_ALIAS_POCKET_TO_OPEN_PATHS`) — same paths except `/press`
- * remains on Pocket for consumer media hub (growth audit Item 5).
+ * Pocket→Open 301 matrix: `lib/open-alias-pocket-to-open-paths.cjs` (wired in `next.config.js`).
+ * Same paths except `/press` remains on Pocket for the consumer media hub.
+ * Unit test fails if the redirect list drifts from this array.
  */
 export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; openUrl: string }> = [
   { path: '/architecture', title: 'Architecture', openUrl: OPEN_URLS.architecture },

@@ -1,34 +1,11 @@
 /**
- * B2B routes migrated off Pocket — 301 to www.openportfolio.co.uk (Slice 1).
- * Sync with lib/canonical-claims.ts OPEN_ALIAS_ROUTES.
- * Excludes `/press` only: consumer press hub stays on Pocket (growth audit Item 5).
+ * B2B routes migrated off Pocket — 301 to www.openportfolio.co.uk.
+ * Path list SSOT: lib/open-alias-pocket-to-open-paths.cjs (tested against OPEN_ALIAS_ROUTES).
+ * Excludes `/press` only: consumer press hub stays on Pocket.
  */
-const OPEN_ALIAS_POCKET_TO_OPEN_PATHS = [
-  '/architecture',
-  '/designchallenge',
-  '/tier1designpartner',
-  '/board-of-investors',
-  '/sovereign-ai-grant',
-  '/learn/sovereign-stack',
-  '/learn/sovereign-finance',
-  '/learn/local-first',
-  '/learn/vendor-lock-in',
-  '/learn/sovereign-ai-architecture',
-  '/learn/dora-eu-ai-act-wealth',
-  '/learn/stateless-edge-ingestion',
-  '/learn/enterprise-design-partnership',
-  '/playbooks/sovereign-strike',
-  '/openbrokercsv',
-  '/static/csv-etoro-to-openbrokercsv',
-  '/static/portfolio-tracker',
-  '/static/why-we-are-fast',
-  '/stack-reveal',
-  '/press/abba-lawal',
-  '/sponsor',
-  '/learn',
-  '/privacy',
-  '/terms',
-];
+const {
+  OPEN_ALIAS_POCKET_TO_OPEN_PATHS,
+} = require('./lib/open-alias-pocket-to-open-paths.cjs');
 
 const POCKET_HOSTS_CANONICAL_AND_APEX = ['www.pocketportfolio.app', 'pocketportfolio.app'];
 
