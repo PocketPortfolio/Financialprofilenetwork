@@ -14,25 +14,25 @@ import {
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const maxDuration = 300;
 
 function getDb() {
   if (!getApps().length) {
-    try {
-      initializeApp({
-        credential: cert({
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        }),
-      });
-    } catch (e) {
-      console.error('[marketing-drip] Firebase init error:', e);
-    }
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      }),
+    });
   }
   return getFirestore();
 }
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** Cap leads evaluated per run — unbounded scans OOMed / 500'd production. */
+const MAX_LEADS_SCAN = 500;
+const MAX_SENDS_PER_TIER = 100;
 
 /**
  * GET /api/cron/marketing-drip
@@ -69,55 +69,98 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'RESEND_API_KEY not set' }, { status: 503 });
   }
 
-  const db = getDb();
-  const now = Date.now();
-  const fortyEightHoursAgo = new Date(now - 48 * 60 * 60 * 1000);
-  const ninetySixHoursAgo = new Date(now - 96 * 60 * 60 * 1000);
-  const ts48 = Timestamp.fromDate(fortyEightHoursAgo);
-  const ts96 = Timestamp.fromDate(ninetySixHoursAgo);
+  try {
+    const db = getDb();
+    const now = Date.now();
+    const fortyEightHoursAgo = new Date(now - 48 * 60 * 60 * 1000);
+    const ninetySixHoursAgo = new Date(now - 96 * 60 * 60 * 1000);
+    const ts48 = Timestamp.fromDate(fortyEightHoursAgo);
+    const ts96 = Timestamp.fromDate(ninetySixHoursAgo);
 
-  let day2Sent = 0;
-  let day4Sent = 0;
+    let day2Sent = 0;
+    let day4Sent = 0;
+    let day2Skipped = 0;
+    let day4Skipped = 0;
 
-  const ref = db.collection('mobileLeads');
+    const ref = db.collection('mobileLeads');
 
-  // Day 2: createdAt <= 48h ago, day2EmailSent === false
-  const day2Snap = await ref.where('createdAt', '<=', ts48).get();
-  for (const doc of day2Snap.docs) {
-    const data = doc.data();
-    if (data?.day2EmailSent === true) continue;
-    const email = data?.email;
-    if (!email || typeof email !== 'string') continue;
-    const result = await sendStackRevealEmail(email, DAY2_SUBJECT, getDay2Html());
-    if (result.error) {
-      console.warn('[marketing-drip] Day 2 failed for', email, result.error);
-      continue;
+    // Prefer unsent leads first; fall back to createdAt scan with hard caps.
+    const day2Snap = await ref
+      .where('day2EmailSent', '==', false)
+      .limit(MAX_LEADS_SCAN)
+      .get()
+      .catch(async () => ref.where('createdAt', '<=', ts48).limit(MAX_LEADS_SCAN).get());
+
+    for (const doc of day2Snap.docs) {
+      if (day2Sent >= MAX_SENDS_PER_TIER) break;
+      const data = doc.data();
+      if (data?.day2EmailSent === true) {
+        day2Skipped++;
+        continue;
+      }
+      const created = data?.createdAt?.toMillis?.() ?? 0;
+      if (created && created > fortyEightHoursAgo.getTime()) {
+        day2Skipped++;
+        continue;
+      }
+      const email = data?.email;
+      if (!email || typeof email !== 'string') {
+        day2Skipped++;
+        continue;
+      }
+      const result = await sendStackRevealEmail(email, DAY2_SUBJECT, getDay2Html());
+      if (result.error) {
+        console.warn('[marketing-drip] Day 2 failed for', email, result.error);
+        continue;
+      }
+      await doc.ref.update({ day2EmailSent: true });
+      day2Sent++;
+      await delay(600);
     }
-    await doc.ref.update({ day2EmailSent: true });
-    day2Sent++;
-    await delay(600);
-  }
 
-  // Day 4: createdAt <= 96h ago, day4EmailSent === false
-  const day4Snap = await ref.where('createdAt', '<=', ts96).get();
-  for (const doc of day4Snap.docs) {
-    const data = doc.data();
-    if (data?.day4EmailSent === true) continue;
-    const email = data?.email;
-    if (!email || typeof email !== 'string') continue;
-    const result = await sendStackRevealEmail(email, DAY4_SUBJECT, getDay4Html());
-    if (result.error) {
-      console.warn('[marketing-drip] Day 4 failed for', email, result.error);
-      continue;
+    const day4Snap = await ref
+      .where('day4EmailSent', '==', false)
+      .limit(MAX_LEADS_SCAN)
+      .get()
+      .catch(async () => ref.where('createdAt', '<=', ts96).limit(MAX_LEADS_SCAN).get());
+
+    for (const doc of day4Snap.docs) {
+      if (day4Sent >= MAX_SENDS_PER_TIER) break;
+      const data = doc.data();
+      if (data?.day4EmailSent === true) {
+        day4Skipped++;
+        continue;
+      }
+      const created = data?.createdAt?.toMillis?.() ?? 0;
+      if (created && created > ninetySixHoursAgo.getTime()) {
+        day4Skipped++;
+        continue;
+      }
+      const email = data?.email;
+      if (!email || typeof email !== 'string') {
+        day4Skipped++;
+        continue;
+      }
+      const result = await sendStackRevealEmail(email, DAY4_SUBJECT, getDay4Html());
+      if (result.error) {
+        console.warn('[marketing-drip] Day 4 failed for', email, result.error);
+        continue;
+      }
+      await doc.ref.update({ day4EmailSent: true });
+      day4Sent++;
+      await delay(600);
     }
-    await doc.ref.update({ day4EmailSent: true });
-    day4Sent++;
-    await delay(600);
-  }
 
-  return NextResponse.json({
-    day2Sent,
-    day4Sent,
-    summary: `Day 2: ${day2Sent}, Day 4: ${day4Sent}`,
-  });
+    return NextResponse.json({
+      day2Sent,
+      day4Sent,
+      day2Skipped,
+      day4Skipped,
+      summary: `Day 2: ${day2Sent}, Day 4: ${day4Sent}`,
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[marketing-drip]', message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
