@@ -430,11 +430,27 @@ export class OneDriveService {
       // leave as-is for binary uploads
     }
 
-    const response = await fetch(url, { ...init, headers });
+    let response: Response;
+    try {
+      response = await fetch(url, { ...init, headers });
+    } catch (err) {
+      const raw = err instanceof Error ? err.message : String(err);
+      if (/failed to fetch|networkerror|load failed/i.test(raw)) {
+        throw new Error(
+          'OneDrive network blocked (CSP/CORS). Reconnect OneDrive or hard-refresh after deploy.'
+        );
+      }
+      throw err instanceof Error ? err : new Error(raw);
+    }
 
     if (response.status === 401 && retryCount < 1) {
       this.accessToken = null;
-      await this.requestAccess();
+      // Never start a full-page redirect mid-sync — silent re-auth only
+      try {
+        await this.requestAccess({ interactive: false });
+      } catch {
+        throw new Error('OneDrive session expired. Click Connect OneDrive again.');
+      }
       return this.graphFetch(path, init, retryCount + 1);
     }
 
@@ -561,6 +577,33 @@ export class OneDriveService {
   }
 
   async downloadPortfolioFile(fileId: string): Promise<PortfolioData> {
+    // Prefer @microsoft.graph.downloadUrl — avoids Graph 302 → SharePoint CDN
+    // with Authorization stripped (classic SPA "Failed to fetch").
+    const metaRes = await this.graphFetch(
+      `/me/drive/items/${fileId}?$select=id,@microsoft.graph.downloadUrl`
+    );
+    if (metaRes.ok) {
+      const meta = await metaRes.json();
+      const downloadUrl = meta['@microsoft.graph.downloadUrl'] as string | undefined;
+      if (downloadUrl) {
+        let fileRes: Response;
+        try {
+          fileRes = await fetch(downloadUrl);
+        } catch (err) {
+          const raw = err instanceof Error ? err.message : String(err);
+          throw new Error(
+            /failed to fetch/i.test(raw)
+              ? 'OneDrive file host blocked by CSP. Hard-refresh after deploy, then Pull again.'
+              : raw
+          );
+        }
+        if (!fileRes.ok) {
+          throw new Error(`Failed to download OneDrive portfolio file: ${fileRes.statusText}`);
+        }
+        return fileRes.json();
+      }
+    }
+
     const response = await this.graphFetch(`/me/drive/items/${fileId}/content`);
     if (!response.ok) {
       throw new Error(`Failed to download OneDrive portfolio file: ${response.statusText}`);
