@@ -9,13 +9,21 @@ Execution lock: `docs/command/microsoft-sovereign-sync-execution-lock-2026-09-26
    - Add **Web** redirect: `https://<FIREBASE_AUTH_DOMAIN>/__/auth/handler` (Firebase Microsoft provider).
    - Add **SPA** redirect URIs (exact, no trailing slash):
      - Local: `http://localhost:3001`
-     - Production: `https://pocketportfolio.app` (and any preview host you use for OneDrive MSAL, e.g. `https://<preview>.vercel.app`)
-     - Optional forwarder only if `NEXT_PUBLIC_MICROSOFT_REDIRECT_URI` is set to that exact URL.
+     - Production: `https://pocketportfolio.app` (**required** — MSAL uses origin only, never `/settings`)
+     - Emergency only if an old client still sends path: `https://pocketportfolio.app/settings` (remove after redeploy)
+     - Optional forwarder only if `NEXT_PUBLIC_MICROSOFT_REDIRECT_URI` points at `onedrive-auth.html`
 3. API permissions (delegated only): `openid`, `email`, `profile`, `User.Read`, `Files.ReadWrite.AppFolder`.
 4. Do **not** add Mail, Sites, or application (app-only) permissions.
 5. Copy the **Application (client) ID** → `NEXT_PUBLIC_MICROSOFT_CLIENT_ID` in Vercel (Production / Preview / Development) and `.env.local`.
+   - Production also set `NEXT_PUBLIC_MICROSOFT_REDIRECT_URI=https://pocketportfolio.app` (origin only).
    - Optional reference only: `NEXT_PUBLIC_MICROSOFT_TENANT_ID` (runtime MSAL uses `/common`).
    - Never put the Azure client secret in `NEXT_PUBLIC_*` — Firebase Console only.
+
+## Seat gate (product)
+
+- Microsoft **sign-in** is free (Firebase identity).
+- OneDrive **Sovereign Sync** is Corporate / Founders only — same gate as Google Drive.
+- Free seats must see upgrade UI only; Connect must not start MSAL.
 
 ## Firebase
 

@@ -30,6 +30,34 @@ import {
   onActiveSyncCloudChange,
   requestExclusiveSyncCloud,
 } from '../lib/sync/sovereignSyncProvider';
+import { getSyncEntitlements, type Tier } from '../lib/utils/syncEntitlements';
+
+function readCachedSyncTier(): Tier {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('pocket-portfolio-tier');
+    if (
+      raw === 'corporateSponsor' ||
+      raw === 'foundersClub' ||
+      raw === 'codeSupporter' ||
+      raw === 'featureVoter'
+    ) {
+      return raw;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+/** Hard gate — free Microsoft identity must never start MSAL AppFolder consent. */
+function assertOneDriveSyncEntitled(): void {
+  if (!getSyncEntitlements(readCachedSyncTier()).allowed) {
+    throw new Error(
+      'OneDrive Sovereign Sync requires Corporate Ecosystem or Founder\'s Club.'
+    );
+  }
+}
 
 const FILE_ID_KEY = 'onedrive_file_id';
 const EXCEL_ID_KEY = 'onedrive_excel_file_id';
@@ -369,6 +397,7 @@ export function useOneDrive() {
 
   const connect = useCallback(
     async (trades?: Trade[], syncExcel = true): Promise<void> => {
+      assertOneDriveSyncEntitled();
       if (!oneDriveService.isConfigured()) {
         throw new Error(
           'OneDrive is not configured. Set NEXT_PUBLIC_MICROSOFT_CLIENT_ID (Platform Phase 0).'
@@ -501,6 +530,7 @@ export function useOneDrive() {
 
         if (pending) {
           try {
+            assertOneDriveSyncEntitled();
             // interactive:false — never start another Microsoft redirect from resume
             await oneDriveService.requestAccess({ interactive: false });
             try {
@@ -523,10 +553,14 @@ export function useOneDrive() {
               setSyncState((prev) => ({
                 ...prev,
                 isSyncing: false,
-                error: msg,
+                error: msg.includes('requires Corporate') ? null : msg,
               }));
             }
           }
+          return;
+        }
+
+        if (!getSyncEntitlements(readCachedSyncTier()).allowed) {
           return;
         }
 

@@ -1,38 +1,60 @@
 /**
- * OneDrive Sovereign Sync settings — paid seats only.
+ * OneDrive Sovereign Sync settings — paid seats only (Corporate / Founders).
  * Claim-safe copy: optional OneDrive copy in a folder you own.
  */
 
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useOneDrive } from '../hooks/useOneDrive';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useTrades } from '../hooks/useTrades';
-import { getSyncEntitlements } from '../lib/utils/syncEntitlements';
+import {
+  getSyncEntitlements,
+  type Tier,
+} from '../lib/utils/syncEntitlements';
 import InfrastructureUpgradeModal from './InfrastructureUpgradeModal';
-import { getActiveSyncCloud } from '../lib/sync/sovereignSyncProvider';
 
 interface OneDriveSyncSettingsProps {
   onConnect?: () => void;
   onDisconnect?: () => void;
   /** When Google Drive is connected, show exclusivity notice */
   googleDriveConnected?: boolean;
+  /**
+   * Prefer settings-page seat tier (API) over theme cache so free Microsoft
+   * sign-ins cannot inherit a stale Founders/Corporate localStorage tier.
+   */
+  seatTier?: Tier | string | null;
+}
+
+function asSyncTier(value: Tier | string | null | undefined): Tier {
+  if (
+    value === 'corporateSponsor' ||
+    value === 'foundersClub' ||
+    value === 'codeSupporter' ||
+    value === 'featureVoter'
+  ) {
+    return value;
+  }
+  return null;
 }
 
 export default function OneDriveSyncSettings({
   onConnect,
   onDisconnect,
   googleDriveConnected = false,
+  seatTier = null,
 }: OneDriveSyncSettingsProps) {
   const { syncState, connect, disconnect, syncFromOneDrive, isConfigured } = useOneDrive();
-  const { tier } = usePremiumTheme();
+  const { tier: themeTier, isLoading: tierLoading } = usePremiumTheme();
   const { trades } = useTrades();
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  const entitlements = getSyncEntitlements(tier);
+  const effectiveTier = asSyncTier(seatTier) ?? asSyncTier(themeTier);
+  const entitlements = getSyncEntitlements(effectiveTier);
   const hasSyncAccess = entitlements.allowed;
   const seatsUsed = syncState.isConnected || googleDriveConnected ? 1 : 0;
 
@@ -78,12 +100,11 @@ export default function OneDriveSyncSettings({
     try {
       await syncFromOneDrive();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Pull failed');
+      setError(err instanceof Error ? err.message : 'Failed to pull from OneDrive');
     }
   };
 
-  const otherCloudActive =
-    !syncState.isConnected && (googleDriveConnected || getActiveSyncCloud() === 'google');
+  const otherCloudActive = googleDriveConnected && !syncState.isConnected;
 
   return (
     <>
@@ -195,12 +216,6 @@ export default function OneDriveSyncSettings({
                         textDecoration: 'none',
                         fontWeight: 500,
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.textDecoration = 'underline';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.textDecoration = 'none';
-                      }}
                     >
                       {syncState.folderName || 'Pocket Portfolio'}
                     </a>
@@ -217,16 +232,7 @@ export default function OneDriveSyncSettings({
                 </div>
                 {(syncState.jsonFileMetadata?.webUrl ||
                   syncState.excelFileMetadata?.webUrl) && (
-                  <div
-                    style={{
-                      marginTop: 8,
-                      fontSize: '0.75rem',
-                      color: 'var(--text-secondary)',
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: '8px 12px',
-                    }}
-                  >
+                  <div style={{ fontSize: '0.875rem', marginTop: 6, display: 'flex', gap: 12 }}>
                     {syncState.jsonFileMetadata?.webUrl && (
                       <a
                         href={syncState.jsonFileMetadata.webUrl}
@@ -330,6 +336,46 @@ export default function OneDriveSyncSettings({
           </div>
         ) : (
           <div>
+            {!hasSyncAccess && (
+              <div
+                style={{
+                  padding: '12px',
+                  background: 'var(--warm-bg)',
+                  border: '1px solid var(--border-warm)',
+                  borderRadius: '8px',
+                  marginBottom: '1rem',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontWeight: 600,
+                    color: 'var(--text-warm)',
+                    marginBottom: 4,
+                  }}
+                >
+                  <span>Premium Feature</span>
+                </div>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
+                  Microsoft sign-in is free. OneDrive Sovereign Sync is paid — upgrade to{' '}
+                  <strong>Corporate Ecosystem</strong> or <strong>Founder&apos;s Club</strong>.
+                </div>
+                <Link
+                  href="/sponsor"
+                  style={{
+                    fontSize: '0.875rem',
+                    color: 'var(--accent-warm)',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                  }}
+                >
+                  View plans →
+                </Link>
+              </div>
+            )}
+
             {(error || syncState.error) && (
               <div
                 style={{
@@ -347,7 +393,7 @@ export default function OneDriveSyncSettings({
             <button
               type="button"
               onClick={() => void handleConnect()}
-              disabled={isConnecting || syncState.isSyncing}
+              disabled={isConnecting || syncState.isSyncing || tierLoading || !hasSyncAccess}
               className="brand-button"
               style={{
                 padding: 'var(--space-3) var(--space-5)',
@@ -355,16 +401,26 @@ export default function OneDriveSyncSettings({
                 fontWeight: 'var(--font-medium)',
                 background: 'var(--accent-warm)',
                 color: '#0a0a0a',
-                opacity: isConnecting ? 0.6 : 1,
-                cursor: isConnecting ? 'not-allowed' : 'pointer',
+                opacity: isConnecting || tierLoading || !hasSyncAccess ? 0.6 : 1,
+                cursor:
+                  isConnecting || tierLoading || !hasSyncAccess ? 'not-allowed' : 'pointer',
               }}
+              title={
+                !hasSyncAccess
+                  ? 'Upgrade to Corporate or Founder to unlock OneDrive Sovereign Sync'
+                  : undefined
+              }
             >
-              {isConnecting ? 'Connecting…' : hasSyncAccess ? 'Connect OneDrive' : 'Unlock Sovereign Sync'}
+              {isConnecting
+                ? 'Connecting…'
+                : hasSyncAccess
+                  ? 'Connect OneDrive'
+                  : 'Unlock Sovereign Sync'}
             </button>
             {!hasSyncAccess && (
               <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                OneDrive Sovereign Sync is included with Corporate Ecosystem and Founder&apos;s
-                Club.
+                Free Microsoft identity does not unlock OneDrive sync. Same seat gate as
+                Google Drive.
               </p>
             )}
           </div>

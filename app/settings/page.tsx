@@ -604,7 +604,10 @@ export default function SettingsPage() {
         <DriveSyncSettings />
 
         {/* Sovereign Sync — OneDrive (paid; one active cloud) */}
-        <OneDriveSyncSettings googleDriveConnected={syncState.isConnected} />
+        <OneDriveSyncSettings
+          googleDriveConnected={syncState.isConnected}
+          seatTier={seatTierForUi}
+        />
 
         {/* Sovereign Team Access - Corporate & Founders Club only */}
         {(seatTierForUi === 'corporateSponsor' || seatTierForUi === 'foundersClub') && (

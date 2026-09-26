@@ -28,6 +28,29 @@ export const MSAL_EXPECT_REDIRECT_KEY = 'pp-msal-expect-redirect';
 /** Set before OneDrive redirect so /settings can finish folder/file setup after return. */
 export const ONEDRIVE_CONNECT_PENDING_KEY = 'pp-onedrive-connect-pending';
 
+/**
+ * Azure SPA redirect must match EXACTLY. Always use origin (no /settings path).
+ * Optional env: full URL; path stripped unless it is the onedrive-auth.html forwarder.
+ */
+export function resolveMsalRedirectUri(): string {
+  const fromEnv = (process.env.NEXT_PUBLIC_MICROSOFT_REDIRECT_URI || '').trim();
+  if (fromEnv) {
+    try {
+      const u = new URL(fromEnv);
+      if (u.pathname.includes('onedrive-auth.html')) {
+        return `${u.origin}${u.pathname}`.replace(/\/$/, '');
+      }
+      return u.origin;
+    } catch {
+      /* fall through */
+    }
+  }
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  return 'https://pocketportfolio.app';
+}
+
 let msalInstance: PublicClientApplication | null = null;
 let msalInitPromise: Promise<PublicClientApplication> | null = null;
 /** Prevents Strict Mode / double-click from starting two redirects (corrupts MSAL state). */
@@ -54,9 +77,7 @@ function getMsalConfig(): Configuration {
       'NEXT_PUBLIC_MICROSOFT_CLIENT_ID is missing. Add the Azure public client ID and restart the app.'
     );
   }
-  // Must match Azure SPA redirect EXACTLY. Default = origin (http://localhost:3001).
-  const redirectUri =
-    process.env.NEXT_PUBLIC_MICROSOFT_REDIRECT_URI || window.location.origin;
+  const redirectUri = resolveMsalRedirectUri();
   return {
     auth: {
       clientId: CLIENT_ID,
@@ -172,9 +193,11 @@ export class OneDriveService {
   async requestAccess(options?: { interactive?: boolean }): Promise<string> {
     const interactive = options?.interactive !== false;
     const pca = await getMsal();
+    const redirectUri = resolveMsalRedirectUri();
     const loginRequest = {
       scopes: [...ONEDRIVE_SCOPES],
       prompt: 'select_account' as const,
+      redirectUri,
     };
     const authResponse = hasMsalAuthResponse();
 
@@ -215,6 +238,7 @@ export class OneDriveService {
                 const silent = await pca.acquireTokenSilent({
                   account: accountsAfter[0],
                   scopes: [...ONEDRIVE_SCOPES],
+                  redirectUri,
                 });
                 this.accessToken = silent.accessToken;
                 return silent.accessToken;
@@ -245,6 +269,7 @@ export class OneDriveService {
           const silent = await pca.acquireTokenSilent({
             account: accounts[0],
             scopes: [...ONEDRIVE_SCOPES],
+            redirectUri,
           });
           this.accessToken = silent.accessToken;
           return silent.accessToken;
@@ -278,7 +303,10 @@ export class OneDriveService {
           /* ignore */
         }
         try {
-          await pca.acquireTokenRedirect(loginRequest);
+          await pca.acquireTokenRedirect({
+            ...loginRequest,
+            redirectUri,
+          });
         } catch (e) {
           redirectInFlight = false;
           throw e;
@@ -329,6 +357,7 @@ export class OneDriveService {
       const result = await pca.acquireTokenSilent({
         account: accounts[0],
         scopes: [...ONEDRIVE_SCOPES],
+        redirectUri: resolveMsalRedirectUri(),
       });
       this.accessToken = result.accessToken;
       return result.accessToken;
