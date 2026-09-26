@@ -162,7 +162,7 @@ export default function SovereignStackPage() {
               lineHeight: '1.8',
               paddingLeft: '20px'
             }}>
-              <li>User stores data in Google Drive (their own storage)</li>
+              <li>User stores a replica in Google Drive or OneDrive (their own storage)</li>
               <li>Browser fetches data via API (read-only)</li>
               <li>Browser calculates analytics locally</li>
               <li>Results never leave the browser</li>
@@ -174,7 +174,7 @@ export default function SovereignStackPage() {
               fontStyle: 'italic',
               fontWeight: '600'
             }}>
-              ✅ Platform never sees your Net Worth. Data stays in your Google Drive.
+              ✅ Platform never sees your Net Worth. Data stays in your Google Drive or OneDrive.
             </p>
           </div>
         </section>
@@ -201,7 +201,7 @@ export default function SovereignStackPage() {
             lineHeight: '1.6',
             marginBottom: '20px'
           }}>
-            Our <strong>Sovereign Sync</strong> feature turns your Google Drive into your personal database. All calculations happen in your browser. We never see your portfolio value, your holdings, or your trades.
+            Our <strong>Sovereign Sync</strong> feature writes an optional JSON replica to your Google Drive or OneDrive. All calculations happen in your browser. We never see your portfolio value, your holdings, or your trades.
           </p>
           <MarketingLink
             href="/features/google-drive-sync"
@@ -249,7 +249,7 @@ export default function SovereignStackPage() {
               <strong>Client-side analysis = true privacy.</strong> If the math happens in your browser, we can't see it.
             </li>
             <li style={{ marginBottom: '12px' }}>
-              <strong>Your data, your storage.</strong> Google Drive is your database, not ours.
+              <strong>Your data, your storage.</strong> Google Drive or OneDrive is your replica folder, not our warehouse.
             </li>
             <li style={{ marginBottom: '12px' }}>
               <strong>No vendor lock-in.</strong> Export your JSON files anytime. Own your data completely.

@@ -1,6 +1,6 @@
 /**
  * Sync Entitlements Utility
- * Determines Google Drive "Sovereign Sync" access based on subscription tier
+ * Determines Sovereign Sync (Google Drive or OneDrive) access based on subscription tier
  */
 
 export type Tier = 'codeSupporter' | 'featureVoter' | 'corporateSponsor' | 'foundersClub' | null;

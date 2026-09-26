@@ -16,6 +16,7 @@ import TabBar from './components/nav/TabBar';
 import LandingPageTracker from './components/LandingPageTracker';
 import ReferralCapture from './components/ReferralCapture';
 import ReferralPendingNotice from './components/ReferralPendingNotice';
+import MsalRedirectBootstrap from './components/auth/MsalRedirectBootstrap';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import PremiumThemeProvider from './components/PremiumThemeProvider';
 import { PremiumTierProvider } from './contexts/PremiumTierContext';
@@ -227,6 +228,7 @@ export default async function RootLayout({
             <LandingPageTracker />
             <ReferralCapture />
             <ReferralPendingNotice />
+            <MsalRedirectBootstrap />
             <div className="safe-area-all" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
               {/* flex-1 + minHeight 0 keeps bottom TabBar/footer in view when pages use full viewport height */}
               <div

@@ -67,7 +67,7 @@ const SyncStatusIndicator: React.FC = () => {
           e.currentTarget.style.color = 'var(--text-secondary)';
           e.currentTarget.style.background = 'transparent';
         }}
-        aria-label="Google Drive Sync: Locked (Corporate/Founder Only)"
+        aria-label="Sovereign Sync: Locked (Corporate/Founder Only)"
       >
         <svg
           width="20"
@@ -110,7 +110,7 @@ const SyncStatusIndicator: React.FC = () => {
             lineHeight: 'var(--line-relaxed)',
           }}
         >
-          Google Drive Sync: Locked (Corporate/Founder Only)
+          Sovereign Sync: Locked (Corporate/Founder Only)
           {/* Arrow */}
           <div
             style={{

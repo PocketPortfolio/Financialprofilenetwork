@@ -36,9 +36,10 @@ You are transparent, professional, and data-driven. You NEVER pretend to be huma
       targetAudience: 'Fintech companies, engineering teams building wealth APIs',
       keyFeatures: [
         'Local-first architecture (data sovereignty)',
-        'Google Drive as database (no vendor lock-in)',
+        'Optional Google Drive or OneDrive Sovereign Sync (no vendor lock-in)',
+        'Sign in with Google or Microsoft',
         'Free JSON API for developers',
-        'Privacy-absolute (data never leaves your device)',
+        'Privacy-absolute for the local working set (browser / your cloud replica)',
         'Zero monthly fees for core functionality',
       ],
       activeProducts: products.map(p => ({

@@ -32,7 +32,7 @@ export default function StatusPage() {
     {
       name: 'Sovereign Sync',
       status: 'operational',
-      description: 'Google Drive bidirectional sync',
+      description: 'Google Drive or OneDrive Sovereign Sync',
     },
   ];
 

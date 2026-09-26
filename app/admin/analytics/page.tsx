@@ -154,12 +154,32 @@ interface AnalyticsData {
     total: number;
     last7Days: number;
     cohortSinceOct2025: number;
+    byProvider?: Record<string, number>;
     signups: Array<{
       email: string;
       uid: string;
       displayName: string | null;
       firstName: string | null;
       createdAt: string;
+      provider?: string;
+      providers?: string[];
+    }>;
+    error?: string;
+  };
+  /** Alias of googleSignups — Google + Microsoft Auth signups */
+  appSignups?: {
+    total: number;
+    last7Days: number;
+    cohortSinceOct2025: number;
+    byProvider?: Record<string, number>;
+    signups: Array<{
+      email: string;
+      uid: string;
+      displayName: string | null;
+      firstName: string | null;
+      createdAt: string;
+      provider?: string;
+      providers?: string[];
     }>;
     error?: string;
   };
@@ -2049,7 +2069,7 @@ export default function AdminAnalyticsPage() {
             )}
           </section>
 
-          {/* App signups (Google) - always show section when dashboard loaded so it never looks "removed" */}
+          {/* App signups (Google + Microsoft) */}
           <section style={{
             background: 'var(--surface)',
             border: '1px solid var(--border)',
@@ -2063,9 +2083,12 @@ export default function AdminAnalyticsPage() {
               marginBottom: 'var(--space-4)',
               color: 'var(--text)'
             }}>
-              🔐 App Signups (Google)
+              🔐 App Signups (Google &amp; Microsoft)
             </h2>
-            {!analyticsData.googleSignups ? (
+            {(() => {
+              const cohort = analyticsData.appSignups || analyticsData.googleSignups;
+              if (!cohort) {
+                return (
               <div style={{
                 padding: 'var(--space-3)',
                 background: 'rgba(245, 158, 11, 0.1)',
@@ -2075,7 +2098,10 @@ export default function AdminAnalyticsPage() {
               }}>
                 Not available — analytics API may be from an older deployment. Redeploy from main to enable.
               </div>
-            ) : analyticsData.googleSignups.error ? (
+                );
+              }
+              if (cohort.error) {
+                return (
               <div style={{
                 padding: 'var(--space-3)',
                 background: 'rgba(239, 68, 68, 0.1)',
@@ -2083,13 +2109,16 @@ export default function AdminAnalyticsPage() {
                 color: '#ef4444',
                 fontSize: '14px'
               }}>
-                {analyticsData.googleSignups.error}
+                {cohort.error}
               </div>
-            ) : (
+                );
+              }
+              const byProvider = cohort.byProvider || {};
+              return (
               <>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                   gap: 'var(--space-4)',
                   marginBottom: 'var(--space-4)'
                 }}>
@@ -2100,7 +2129,7 @@ export default function AdminAnalyticsPage() {
                     border: '1px solid var(--border)'
                   }}>
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--signal)', marginBottom: '4px' }}>
-                      {analyticsData.googleSignups.total}
+                      {cohort.total}
                     </div>
                     <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Total (cohort ≥ Oct 27, 2025)</div>
                   </div>
@@ -2111,7 +2140,7 @@ export default function AdminAnalyticsPage() {
                     border: '1px solid var(--border)'
                   }}>
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-warm)', marginBottom: '4px' }}>
-                      {analyticsData.googleSignups.last7Days}
+                      {cohort.last7Days}
                     </div>
                     <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Last 7 Days</div>
                   </div>
@@ -2122,12 +2151,34 @@ export default function AdminAnalyticsPage() {
                     border: '1px solid var(--border)'
                   }}>
                     <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--brand)', marginBottom: '4px' }}>
-                      {analyticsData.googleSignups.cohortSinceOct2025}
+                      {byProvider['google.com'] ?? 0}
                     </div>
-                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Cohort ≥ Oct 27, 2025</div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Google only</div>
+                  </div>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--brand)', marginBottom: '4px' }}>
+                      {byProvider['microsoft.com'] ?? 0}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Microsoft only</div>
+                  </div>
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-4)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text)', marginBottom: '4px' }}>
+                      {byProvider['google.com+microsoft.com'] ?? 0}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Linked (both)</div>
                   </div>
                 </div>
-                {analyticsData.googleSignups.signups.length > 0 && (
+                {cohort.signups.length > 0 && (
                   <div>
                     <h3 style={{
                       fontSize: '16px',
@@ -2154,11 +2205,12 @@ export default function AdminAnalyticsPage() {
                           <tr>
                             <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Email</th>
                             <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Name</th>
+                            <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Provider</th>
                             <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: '600' }}>Signed up</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {analyticsData.googleSignups.signups.map((s) => (
+                          {cohort.signups.map((s) => (
                             <tr
                               key={s.uid}
                               style={{
@@ -2171,6 +2223,15 @@ export default function AdminAnalyticsPage() {
                                 {s.displayName || s.firstName || '—'}
                               </td>
                               <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontSize: '13px' }}>
+                                {s.provider === 'microsoft.com'
+                                  ? 'Microsoft'
+                                  : s.provider === 'google.com+microsoft.com'
+                                    ? 'Google + Microsoft'
+                                    : s.provider === 'google.com'
+                                      ? 'Google'
+                                      : s.provider || '—'}
+                              </td>
+                              <td style={{ padding: '10px 12px', color: 'var(--text-secondary)', fontSize: '13px' }}>
                                 {new Date(s.createdAt).toLocaleString()}
                               </td>
                             </tr>
@@ -2181,7 +2242,8 @@ export default function AdminAnalyticsPage() {
                   </div>
                 )}
               </>
-            )}
+              );
+            })()}
           </section>
 
           {/* Referral (Viral Loop) Section */}

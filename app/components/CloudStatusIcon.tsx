@@ -1,21 +1,35 @@
 /**
- * Cloud Status Icon Component
- * Displays sync status in dashboard header
+ * Cloud Status Icon — shows Sovereign Sync when Drive or OneDrive is connected.
  */
 
 'use client';
 
 import React from 'react';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { useOneDrive } from '../hooks/useOneDrive';
 
 interface CloudStatusIconProps {
   className?: string;
 }
 
 export default function CloudStatusIcon({ className = '' }: CloudStatusIconProps) {
-  const { syncState } = useGoogleDrive();
+  const { syncState: drive } = useGoogleDrive();
+  const { syncState: oneDrive } = useOneDrive();
 
-  if (!syncState.isConnected) {
+  const connected = drive.isConnected || oneDrive.isConnected;
+  const syncing = drive.isSyncing || oneDrive.isSyncing;
+  const lastSync = drive.isConnected
+    ? drive.lastSyncTime
+    : oneDrive.isConnected
+      ? oneDrive.lastSyncTime
+      : null;
+  const label = drive.isConnected
+    ? 'Google Drive'
+    : oneDrive.isConnected
+      ? 'OneDrive'
+      : null;
+
+  if (!connected) {
     return (
       <div
         className={className}
@@ -55,7 +69,7 @@ export default function CloudStatusIcon({ className = '' }: CloudStatusIconProps
   return (
     <div
       className={className}
-      title={`Sovereign Sync Active. Last synced: ${syncState.lastSyncTime ? new Date(syncState.lastSyncTime).toLocaleString() : 'Never'}`}
+      title={`Sovereign Sync Active (${label}). Last synced: ${lastSync ? new Date(lastSync).toLocaleString() : 'Never'}`}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -75,47 +89,16 @@ export default function CloudStatusIcon({ className = '' }: CloudStatusIconProps
           fill="currentColor"
         />
       </svg>
-      {syncState.isSyncing && (
+      {syncing && (
         <div
           style={{
-            width: '8px',
-            height: '8px',
+            width: 6,
+            height: 6,
             borderRadius: '50%',
-            backgroundColor: 'var(--signal)',
-            animation: 'pulse 2s ease-in-out infinite',
+            background: 'var(--accent-warm)',
           }}
         />
       )}
-      {!syncState.isSyncing && syncState.lastSyncTime && (
-        <div
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--signal)',
-          }}
-        />
-      )}
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.5;
-            transform: scale(1.2);
-          }
-        }
-      `}</style>
     </div>
   );
 }
-
-
-
-
-
-
-
-

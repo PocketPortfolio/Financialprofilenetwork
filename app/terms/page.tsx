@@ -103,7 +103,7 @@ export default function TermsPage() {
               <ul style={{ fontSize: '16px', color: 'var(--text-secondary)', marginLeft: '24px', marginBottom: '12px' }}>
                 <li>Financial losses resulting from data entry errors</li>
                 <li>Data loss due to browser storage limitations or user error</li>
-                <li>Third-party service outages (Google Drive, Stripe, etc.)</li>
+                <li>Third-party service outages (Google Drive, OneDrive, Stripe, etc.)</li>
                 <li>Investment decisions made using this tool</li>
               </ul>
             </section>

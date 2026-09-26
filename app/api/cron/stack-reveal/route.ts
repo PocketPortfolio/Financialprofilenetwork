@@ -58,7 +58,8 @@ export async function GET(request: Request) {
       displayName: string | null;
       firstName: string | null;
       createdAt: string;
-      isGoogle: boolean;
+      authProvider: string;
+      useNamedGreeting: boolean;
     }> = [];
 
     do {
@@ -67,8 +68,16 @@ export async function GET(request: Request) {
       for (const user of listResult.users) {
         const creationTime = user.metadata.creationTime ? new Date(user.metadata.creationTime) : null;
         if (!creationTime || creationTime < COHORT_DATE) continue;
-        const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com');
-        if (!isGoogle) continue;
+        const providers = (user.providerData || []).map((p) => p.providerId).filter(Boolean);
+        const hasG = providers.includes('google.com');
+        const hasM = providers.includes('microsoft.com');
+        if (!hasG && !hasM) continue;
+        const authProvider =
+          hasG && hasM
+            ? 'google.com+microsoft.com'
+            : hasM
+              ? 'microsoft.com'
+              : 'google.com';
         const displayName = user.displayName || null;
         const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
         toProcess.push({
@@ -77,7 +86,8 @@ export async function GET(request: Request) {
           displayName,
           firstName,
           createdAt: user.metadata.creationTime || '',
-          isGoogle: true,
+          authProvider,
+          useNamedGreeting: true,
         });
       }
     } while (nextPageToken);
@@ -126,7 +136,7 @@ export async function GET(request: Request) {
           createdAt: Timestamp.fromDate(new Date(u.createdAt)),
           marketingOptIn: true,
           stackRevealWeek: 0,
-          authProvider: 'google.com',
+          authProvider: u.authProvider,
         });
       }
 
@@ -136,12 +146,13 @@ export async function GET(request: Request) {
       }
 
       const nextWeek = (stackRevealWeek + 1) as StackRevealWeek;
-      const greeting = getGreeting(u.displayName, u.firstName, u.isGoogle);
+      const greeting = getGreeting(u.displayName, u.firstName, u.useNamedGreeting);
       const html = buildHtmlForWeek(nextWeek, {
         greeting,
         uid: u.uid,
         hasUploadedCsv: false,
-        isGoogleUser: u.isGoogle,
+        authProvider: u.authProvider,
+        isGoogleUser: u.authProvider.includes('google.com'),
       });
       const subject = getSubject(nextWeek);
       const to = u.email;
@@ -154,6 +165,7 @@ export async function GET(request: Request) {
       await docRef.update({
         stackRevealWeek: nextWeek,
         lastStackRevealSentAt: Timestamp.now(),
+        authProvider: u.authProvider,
       });
       sent++;
     }

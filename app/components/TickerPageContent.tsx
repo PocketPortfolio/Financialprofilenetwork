@@ -58,7 +58,7 @@ export default function TickerPageContent({
               price: '100.00',
               priceCurrency: 'GBP',
               availability: 'https://schema.org/LimitedAvailability',
-              description: '£12/mo or £100/yr. Sovereign Sync (Google Drive), unlimited API access, priority support, and permanent Founder badge. Cancel anytime.',
+              description: '£12/mo or £100/yr. Sovereign Sync (Google Drive or OneDrive), unlimited API access, priority support, and permanent Founder badge. Cancel anytime.',
               url: 'https://www.pocketportfolio.app/sponsor',
               priceValidUntil: '2026-12-31'
             }

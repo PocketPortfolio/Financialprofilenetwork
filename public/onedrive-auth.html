@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>OneDrive sign-in</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        background: #0b0b0b;
+        color: #e8e4dc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      p {
+        opacity: 0.7;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Completing OneDrive connection…</p>
+    <script>
+      (function () {
+        // Forward auth response to Settings without booting the Next.js app
+        // (full SPA on `/` was racing MSAL handleRedirectPromise).
+        var q = window.location.search || '';
+        var h = window.location.hash || '';
+        try {
+          sessionStorage.setItem(
+            'pp-msal-auth-forward',
+            JSON.stringify({ q: q.slice(0, 80), h: h.slice(0, 80), t: Date.now() })
+          );
+        } catch (e) {}
+        window.location.replace('/settings' + q + h);
+      })();
+    </script>
+  </body>
+</html>

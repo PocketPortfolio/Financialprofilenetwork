@@ -26,5 +26,6 @@ export interface WeekContent {
     ctaText: string;
     hasUploadedCsv?: boolean;
     isGoogleUser?: boolean;
+    authProvider?: string;
   }) => string;
 }

@@ -41,6 +41,7 @@ import { PortfolioNotesPanel } from '../components/portfolio/PortfolioNotesPanel
 import PricePipelineHealth from '../components/PricePipelineHealth';
 import CloudStatusIcon from '../components/CloudStatusIcon';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { useOneDrive, recentlySyncedFromOneDrive } from '../hooks/useOneDrive';
 import SEOHead from '../components/SEOHead';
 import StructuredData, { webAppData } from '../components/StructuredData';
 import { useQuotes, useNews, useMarketData } from '../hooks/useDataFetching';
@@ -131,6 +132,7 @@ export default function Dashboard() {
   const { trades, addTrade, deleteTrade, importTrades, migrateTrades, deleteAllTrades, totalInvested: useTradesTotalInvested, totalTrades: useTradesTotalTrades, totalPositions: useTradesTotalPositions, refreshTrades } = useTrades();
   const portfolioNotes = usePortfolioNotes();
   const { syncState, syncToDrive, checkForUpdates, recentlySyncedFromDrive, markDriveSyncComplete, markCsvImportStart, clearCsvImportFlag, markDeletionStart } = useGoogleDrive();
+  const { syncState: oneDriveSyncState, syncToOneDrive } = useOneDrive();
   const { tier, isLoading: tierLoading } = usePremiumTheme();
   const { setPortfolioContext, setTier } = usePocketAnalyst();
 
@@ -1602,14 +1604,18 @@ export default function Dashboard() {
     };
 
     window.addEventListener('drive-sync-complete', handleDriveSync);
+    window.addEventListener('onedrive-sync-complete', handleDriveSync);
     return () => {
       window.removeEventListener('drive-sync-complete', handleDriveSync);
+      window.removeEventListener('onedrive-sync-complete', handleDriveSync);
     };
   }, [refreshTrades, isAuthenticated, user]);
 
-  // Auto-sync to Drive when trades change (but not when syncing FROM Drive)
+  // Auto-sync to active Sovereign Sync cloud when trades change
   useEffect(() => {
-    if (isAuthenticated && user && syncState.isConnected && syncState.fileId) {
+    const driveActive = syncState.isConnected && !!syncState.fileId;
+    const oneDriveActive = oneDriveSyncState.isConnected && !!oneDriveSyncState.fileId;
+    if (isAuthenticated && user && (driveActive || oneDriveActive)) {
       // CRITICAL: Skip auto-sync if trades were updated from a remote source (Drive)
       // This prevents the "write-back loop" where Drive edits trigger immediate auto-save
       if (isRemoteUpdateRef.current) {
@@ -1626,7 +1632,7 @@ export default function Dashboard() {
       // But skip if we just synced from Drive to prevent overwriting Drive edits
       
       // Skip auto-sync if we're currently syncing
-      if (syncState.isSyncing) {
+      if (syncState.isSyncing || oneDriveSyncState.isSyncing) {
         return;
       }
       
@@ -1640,8 +1646,13 @@ export default function Dashboard() {
       // Check if we recently synced from Drive (within last 5 seconds)
       // This prevents immediate overwrite of Drive edits, but allows syncing after a short delay
       // This makes the sync collaborative - we respect Drive edits but can still sync our changes
-      if (recentlySyncedFromDrive()) {
+      if (driveActive && recentlySyncedFromDrive()) {
         console.log('⏸️ Skipping auto-sync - recently synced from Drive (respecting Drive edits, will retry shortly)');
+        return;
+      }
+      if (oneDriveActive && recentlySyncedFromOneDrive()) {
+        console.log('⏸️ Skipping auto-sync - recently pulled from OneDrive');
+        lastSyncedTradesContentRef.current = JSON.stringify(trades);
         return;
       }
       
@@ -1658,12 +1669,24 @@ export default function Dashboard() {
         return;
       }
       
-      // Debounce changes to trades before pushing to Drive
+      // Debounce changes to trades before pushing to active cloud
       const handler = setTimeout(() => {
         
+        if (oneDriveActive && !oneDriveSyncState.isSyncing && !recentlySyncedFromOneDrive()) {
+          console.log('🔄 Trades changed, syncing to OneDrive...', trades.length, 'trades');
+          syncToOneDrive(undefined, trades)
+            .then(() => {
+              lastSyncedTradesContentRef.current = JSON.stringify(trades);
+            })
+            .catch((error) => {
+              console.error('OneDrive auto-sync failed:', error);
+            });
+          return;
+        }
+
         // Double-check we're not syncing and didn't just sync from Drive
         // CRITICAL: Also check if we're deleting - don't auto-sync during deletion
-        if (!syncState.isSyncing && !recentlySyncedFromDrive() && !isDeleting) {
+        if (driveActive && !syncState.isSyncing && !recentlySyncedFromDrive() && !isDeleting) {
           console.log('🔄 Trades changed, syncing to Drive...', trades.length, 'trades');
           
           syncToDrive(undefined, trades).then(() => {
@@ -1678,7 +1701,7 @@ export default function Dashboard() {
 
       return () => clearTimeout(handler);
     }
-  }, [trades, isAuthenticated, user, syncState.isConnected, syncState.fileId, syncState.isSyncing, syncToDrive, recentlySyncedFromDrive]);
+  }, [trades, isAuthenticated, user, syncState.isConnected, syncState.fileId, syncState.isSyncing, syncToDrive, recentlySyncedFromDrive, oneDriveSyncState.isConnected, oneDriveSyncState.fileId, oneDriveSyncState.isSyncing, syncToOneDrive]);
 
   const handleAddTrade = async () => {
     if (!newTrade.symbol || !newTrade.quantity || !newTrade.price) {

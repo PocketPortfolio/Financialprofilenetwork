@@ -222,12 +222,14 @@ export async function GET(request: NextRequest) {
       const displayName = user.displayName || null;
       const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
       const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com') ?? false;
+      const isMicrosoft =
+        user.providerData?.some((p) => p.providerId === 'microsoft.com') ?? false;
       toProcess.push({
         uid: user.uid,
         email: user.email,
         displayName,
         firstName,
-        isGoogle,
+        isGoogle: isGoogle || isMicrosoft, // named greeting for OAuth identity providers
       });
     }
 

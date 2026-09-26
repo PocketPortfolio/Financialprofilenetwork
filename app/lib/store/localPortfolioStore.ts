@@ -189,8 +189,8 @@ export function archiveAllTradeNotesFromTrades(trades: Pick<Trade, 'id' | 'ticke
   }
 }
 
-/** `drive-pull` / `tab-sync` skip Drive upload handlers; `user` is default. */
-export type PortfolioNotesChangeSource = 'user' | 'drive-pull' | 'tab-sync';
+/** `drive-pull` / `onedrive-pull` / `tab-sync` skip cloud upload handlers; `user` is default. */
+export type PortfolioNotesChangeSource = 'user' | 'drive-pull' | 'onedrive-pull' | 'tab-sync';
 
 export function notifyPortfolioNotesChanged(detail?: { source?: PortfolioNotesChangeSource }): void {
   if (typeof window !== 'undefined') {

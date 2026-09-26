@@ -30,7 +30,7 @@ const PILLARS = [
         id: '1.1',
         icon: HardDrive,
         title: 'Data boundary at the edge',
-        body: "Portfolio data lives in the user's browser (IndexedDB) and optional Google Drive. We do not operate a database of user financial data.",
+        body: "Portfolio data lives in the user's browser (IndexedDB/localStorage) with optional Google Drive or OneDrive Sovereign Sync. We do not operate a warehouse of user financial ledgers.",
       },
       {
         id: '1.2',

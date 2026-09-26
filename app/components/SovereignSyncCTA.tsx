@@ -32,7 +32,7 @@ export default function SovereignSyncCTA({ brokerName }: SovereignSyncCTAProps) 
         maxWidth: '600px',
         margin: '0 auto 24px'
       }}>
-        Stop manual exports. Sync your <strong>{brokerName}</strong> data directly to Google Drive with Sovereign Sync.
+        Stop manual exports. Keep a Sovereign Sync replica of your <strong>{brokerName}</strong> portfolio in Google Drive or OneDrive — a folder you own.
       </p>
       <div style={{
         display: 'flex',

@@ -11,15 +11,19 @@ import { clearLocalPortfolio, exportLocalPortfolio } from '../lib/store/localPor
 import ConfirmationModal from '../components/modals/ConfirmationModal';
 import AlertModal from '../components/modals/AlertModal';
 import DriveSyncSettings from '../components/DriveSyncSettings';
+import OneDriveSyncSettings from '../components/OneDriveSyncSettings';
+import SignInOptions from '../components/auth/SignInOptions';
 import { NotificationSettings } from '../components/NotificationSettings';
 import SeatManager, { type SeatAllocation } from '../components/SeatManager';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 
 export default function SettingsPage() {
-  const { isAuthenticated, user, signInWithGoogle, logout } = useAuth();
+  const { isAuthenticated, user, signInWithGoogle, signInWithMicrosoft, logout, authProviderIds } =
+    useAuth();
   const { syncState } = useGoogleDrive();
   const { tier, unlockedTheme, hasFounderTheme, hasCorporateTheme } = usePremiumTheme();
+  const [authBusy, setAuthBusy] = useState(false);
 
   // Map tier to data-tier attribute for CSS targeting
   const getTierForDataAttribute = (tier: string | null): 'free' | 'founder' | 'corporate' => {
@@ -457,22 +461,34 @@ export default function SettingsPage() {
             <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
               Manage your account settings and preferences
             </p>
-            <button
-              onClick={signInWithGoogle}
-              style={{
-                background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)`,
-                color: 'hsl(var(--primary-foreground))',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px 24px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Sign in with Google
-            </button>
+            <div style={{ maxWidth: 320, margin: '0 auto' }}>
+              <SignInOptions
+                busy={authBusy}
+                emphasizeGoogle
+                layout="stack"
+                onGoogle={async () => {
+                  setAuthBusy(true);
+                  try {
+                    await signInWithGoogle();
+                  } finally {
+                    setAuthBusy(false);
+                  }
+                }}
+                onMicrosoft={async () => {
+                  setAuthBusy(true);
+                  try {
+                    await signInWithMicrosoft();
+                  } catch (e) {
+                    const msg = e instanceof Error ? e.message : String(e);
+                    if (!msg.includes('popup-blocked')) {
+                      alert(msg || 'Microsoft sign-in failed');
+                    }
+                  } finally {
+                    setAuthBusy(false);
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
       </>
@@ -559,7 +575,12 @@ export default function SettingsPage() {
                 {user?.email || 'User'}
               </div>
               <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
-                Signed in with Google
+                Signed in
+                {authProviderIds.includes('microsoft.com') && authProviderIds.includes('google.com')
+                  ? ' with Google and Microsoft'
+                  : authProviderIds.includes('microsoft.com')
+                    ? ' with Microsoft'
+                    : ' with Google'}
               </div>
             </div>
           </div>
@@ -575,12 +596,15 @@ export default function SettingsPage() {
               cursor: 'pointer'
             }}
           >
-            Sign out from Google
+            Sign out
           </button>
         </div>
 
-        {/* Drive Sync Section */}
+        {/* Sovereign Sync — Google Drive */}
         <DriveSyncSettings />
+
+        {/* Sovereign Sync — OneDrive (paid; one active cloud) */}
+        <OneDriveSyncSettings googleDriveConnected={syncState.isConnected} />
 
         {/* Sovereign Team Access - Corporate & Founders Club only */}
         {(seatTierForUi === 'corporateSponsor' || seatTierForUi === 'foundersClub') && (

@@ -1,49 +1,83 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  User, 
-  signInWithPopup, 
+import {
+  User,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  GoogleAuthProvider, 
-  signOut, 
-  onAuthStateChanged 
+  GoogleAuthProvider,
+  OAuthProvider,
+  linkWithPopup,
+  signOut,
+  onAuthStateChanged,
 } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { terminate, clearIndexedDbPersistence } from 'firebase/firestore';
-import { trackGoogleSignIn, getLandingPage, getStoredUTMParameters } from '../lib/analytics/events';
+import {
+  trackGoogleSignIn,
+  trackMicrosoftSignIn,
+  getLandingPage,
+  getStoredUTMParameters,
+} from '../lib/analytics/events';
 import { trackFunnelStage, trackConversion } from '../lib/analytics/conversion';
 import { getSEOPageAttribution, trackSEOSignupConversion } from '../lib/analytics/seo';
+
+const POST_AUTH_REDIRECT_KEY = 'pp-post-auth-redirect-done';
+
+function createMicrosoftProvider(): OAuthProvider {
+  const provider = new OAuthProvider('microsoft.com');
+  // Identity plane only — no Files.* (OneDrive is a separate MSAL consent)
+  provider.addScope('openid');
+  provider.addScope('email');
+  provider.addScope('profile');
+  provider.setCustomParameters({
+    tenant: 'common',
+    prompt: 'select_account',
+  });
+  return provider;
+}
+
+function createGoogleProvider(): GoogleAuthProvider {
+  const provider = new GoogleAuthProvider();
+  provider.addScope('email');
+  provider.addScope('profile');
+  provider.setCustomParameters({ prompt: 'select_account' });
+  return provider;
+}
+
+function afterAuthRedirectHome() {
+  if (typeof window !== 'undefined' && window.location.pathname === '/') {
+    try {
+      sessionStorage.setItem(POST_AUTH_REDIRECT_KEY, '1');
+    } catch {
+      /* ignore */
+    }
+    window.location.replace('/dashboard');
+    return true;
+  }
+  return false;
+}
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Track previous auth state to detect signups
   const previousUserRef = useRef<User | null>(null);
-  // Ensure we only trigger welcome-email API once per session (avoids duplicate when onAuthStateChanged fires twice)
   const welcomeEmailTriggeredRef = useRef(false);
 
-  // Use stable callback to prevent infinite loops
-  const handleAuthStateChange = useCallback((user: User | null) => {
-    // Detect new signup: user was null, now has a user
-    if (!previousUserRef.current && user) {
-      // User just signed up - check for SEO page attribution
+  const handleAuthStateChange = useCallback((next: User | null) => {
+    if (!previousUserRef.current && next) {
       const attribution = getSEOPageAttribution();
       if (attribution) {
-        // Track conversion from SEO page
-        trackSEOSignupConversion(attribution.path).catch(err => {
+        trackSEOSignupConversion(attribution.path).catch((err) => {
           console.error('Failed to track SEO signup conversion:', err);
         });
       }
-      // Trigger Welcome Email (Week 0) at most once per session (sync guard so double onAuthStateChange doesn't double-send)
       if (!welcomeEmailTriggeredRef.current) {
         welcomeEmailTriggeredRef.current = true;
-        // In development, avoid spamming Resend/Firestore and triggering Fast Refresh reload loops.
-        // Important: do NOT return early here; it would prevent `setUser` / `setLoading(false)` below.
         if (process.env.NODE_ENV !== 'development') {
-          user
+          next
             .getIdToken()
             .then((token) => {
               fetch('/api/welcome-email', {
@@ -56,13 +90,12 @@ export function useAuth() {
       }
     }
 
-    previousUserRef.current = user;
-    setUser(user);
+    previousUserRef.current = next;
+    setUser(next);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    // Check if auth is available before using it
     if (!auth) {
       console.warn('Firebase auth is not available, running in offline mode');
       setLoading(false);
@@ -70,55 +103,81 @@ export function useAuth() {
     }
 
     const unsubscribe = onAuthStateChanged(auth, handleAuthStateChange);
-    
-    // Check for redirect result on mount
-    const POST_AUTH_REDIRECT_KEY = 'pp-post-auth-redirect-done';
-    getRedirectResult(auth).then((result) => {
-      if (result) {
+
+    getRedirectResult(auth)
+      .then((result) => {
+        if (!result) return;
         console.log('Redirect authentication successful');
-        if (typeof window !== 'undefined' && window.location.pathname === '/') {
-          try { sessionStorage.setItem(POST_AUTH_REDIRECT_KEY, '1'); } catch (_) {}
-          window.location.replace('/dashboard');
-          return;
-        }
-        // Track successful Google Sign-In after redirect
+        if (afterAuthRedirectHome()) return;
+
         const landingPage = getLandingPage();
         const utmParams = getStoredUTMParameters();
-        
-        trackGoogleSignIn({
-          landingPage: landingPage || undefined,
-          utmSource: utmParams?.utmSource,
-          utmMedium: utmParams?.utmMedium,
-          utmCampaign: utmParams?.utmCampaign,
-          utmContent: utmParams?.utmContent,
-        });
-        
-        // Track funnel progression
+        const providerId = result.providerId || '';
+        const isMicrosoft = providerId.includes('microsoft');
+
+        if (isMicrosoft) {
+          trackMicrosoftSignIn({
+            landingPage: landingPage || undefined,
+            utmSource: utmParams?.utmSource,
+            utmMedium: utmParams?.utmMedium,
+            utmCampaign: utmParams?.utmCampaign,
+            utmContent: utmParams?.utmContent,
+          });
+        } else {
+          trackGoogleSignIn({
+            landingPage: landingPage || undefined,
+            utmSource: utmParams?.utmSource,
+            utmMedium: utmParams?.utmMedium,
+            utmCampaign: utmParams?.utmCampaign,
+            utmContent: utmParams?.utmContent,
+          });
+        }
+
         trackFunnelStage('signup_complete', 'user_onboarding', {
-          method: 'redirect',
-          landingPage: landingPage || undefined
+          method: isMicrosoft ? 'microsoft_redirect' : 'redirect',
+          landingPage: landingPage || undefined,
         });
-        
-        // Track conversion
         trackConversion('signup_complete', 1, 'USD', {
-          method: 'google_redirect',
-          landingPage: landingPage || undefined
+          method: isMicrosoft ? 'microsoft_redirect' : 'google_redirect',
+          landingPage: landingPage || undefined,
         });
-        
-        // Track SEO page conversion if applicable
+
         const attribution = getSEOPageAttribution();
         if (attribution) {
-          trackSEOSignupConversion(attribution.path).catch(err => {
+          trackSEOSignupConversion(attribution.path).catch((err) => {
             console.error('Failed to track SEO signup conversion:', err);
           });
         }
-      }
-    }).catch((error) => {
-      console.log('No redirect result or error:', error);
-    });
+      })
+      .catch((error) => {
+        console.log('No redirect result or error:', error);
+      });
 
     return () => unsubscribe();
   }, [handleAuthStateChange]);
+
+  const trackSuccess = (method: 'google' | 'microsoft', via: 'popup' | 'redirect') => {
+    const landingPage = getLandingPage();
+    const utmParams = getStoredUTMParameters();
+    const payload = {
+      landingPage: landingPage || undefined,
+      utmSource: utmParams?.utmSource,
+      utmMedium: utmParams?.utmMedium,
+      utmCampaign: utmParams?.utmCampaign,
+      utmContent: utmParams?.utmContent,
+    };
+    if (method === 'microsoft') trackMicrosoftSignIn(payload);
+    else trackGoogleSignIn(payload);
+
+    trackFunnelStage('signup_start', 'user_onboarding', {
+      method: `${method}_${via}`,
+      landingPage: landingPage || undefined,
+    });
+    trackConversion('signup_complete', 1, 'USD', {
+      method: `${method}_${via}`,
+      landingPage: landingPage || undefined,
+    });
+  };
 
   const signInWithGoogle = async () => {
     if (!auth) {
@@ -126,63 +185,86 @@ export function useAuth() {
       return null;
     }
 
-    const provider = new GoogleAuthProvider();
-    // Add additional scopes if needed
-    provider.addScope('email');
-    provider.addScope('profile');
-    // Set custom parameters
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
-    
+    const provider = createGoogleProvider();
+
     try {
-      // Try popup first
       const result = await signInWithPopup(auth, provider);
-      
-      // Track funnel stage: signup start
-      trackFunnelStage('signup_start', 'user_onboarding', {
-        method: 'popup',
-        landingPage: getLandingPage() || undefined
-      });
-      
-      // Track successful Google Sign-In with attribution
-      const landingPage = getLandingPage();
-      const utmParams = getStoredUTMParameters();
-      
-      trackGoogleSignIn({
-        landingPage: landingPage || undefined,
-        utmSource: utmParams?.utmSource,
-        utmMedium: utmParams?.utmMedium,
-        utmCampaign: utmParams?.utmCampaign,
-        utmContent: utmParams?.utmContent,
-      });
-      if (typeof window !== 'undefined' && window.location.pathname === '/') {
-        try { sessionStorage.setItem('pp-post-auth-redirect-done', '1'); } catch (_) {}
-        window.location.replace('/dashboard');
-        return null;
-      }
+      trackSuccess('google', 'popup');
+      if (afterAuthRedirectHome()) return null;
       return result.user;
     } catch (error: any) {
       console.log('Popup failed, trying redirect:', error);
-      
-      // Check if it's a popup-related error
-      if (error.code === 'auth/popup-closed-by-user' || 
-          error.code === 'auth/cancelled-popup-request' ||
-          error.message?.includes('Cross-Origin-Opener-Policy')) {
-        try {
-          // Fallback to redirect if popup fails
-          await signInWithRedirect(auth, provider);
-          // Note: User will be redirected, so we don't return here
-          return null;
-        } catch (redirectError: any) {
-          console.error('Error with redirect authentication:', redirectError);
-          throw redirectError;
-        }
-      } else {
-        // Re-throw other errors
-        throw error;
+      if (
+        error.code === 'auth/popup-closed-by-user' ||
+        error.code === 'auth/cancelled-popup-request' ||
+        error.code === 'auth/popup-blocked' ||
+        error.message?.includes('Cross-Origin-Opener-Policy') ||
+        error.message?.includes('popup-blocked')
+      ) {
+        await signInWithRedirect(auth, provider);
+        return null;
       }
+      throw error;
     }
+  };
+
+  /**
+   * Sign in with Microsoft (anyone). Identity scopes only.
+   * Popup-first: Firebase redirect often returns no credential in Incognito
+   * (pending redirect state is dropped). Runtime logs: beforeRedirect then
+   * remount with getRedirectResult hasResult=false / hasUser=false.
+   */
+  const signInWithMicrosoft = async () => {
+    if (!auth) {
+      console.warn('Firebase auth is not available');
+      return null;
+    }
+
+    const provider = createMicrosoftProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      trackSuccess('microsoft', 'popup');
+      if (afterAuthRedirectHome()) return null;
+      return result.user;
+    } catch (error: any) {
+
+      // Do NOT open a second Google popup here — browsers block it (no user gesture).
+      // Runtime proof: popupCatch account-exists → header catch auth/popup-blocked.
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        throw new Error(
+          'This email is already signed up with Google. Use Sign in with Google with the same email.'
+        );
+      }
+
+      if (
+        error.code === 'auth/popup-blocked' ||
+        error.message?.includes('popup-blocked')
+      ) {
+        throw new Error(
+          'Popups are blocked. Allow popups for localhost:3001 (icon in the address bar), or use a normal browser window (not Incognito).'
+        );
+      }
+
+      if (
+        error.code === 'auth/popup-closed-by-user' ||
+        error.code === 'auth/cancelled-popup-request'
+      ) {
+        return null;
+      }
+
+      throw error;
+    }
+  };
+
+  /** Link Microsoft to the currently signed-in Firebase user (same UID). */
+  const linkMicrosoftAccount = async () => {
+    if (!auth?.currentUser) {
+      throw new Error('Sign in first to link a Microsoft account');
+    }
+    const provider = createMicrosoftProvider();
+    const result = await linkWithPopup(auth.currentUser, provider);
+    return result.user;
   };
 
   const logout = async () => {
@@ -190,45 +272,32 @@ export function useAuth() {
       console.warn('Firebase auth is not available');
       return;
     }
-    
+
     try {
-      // 1. Sign out from Auth
       await signOut(auth);
-      
-      // 2. CRITICAL: Nuke the Local Cache to prevent "Ghost Trades"
+
       if (db) {
         try {
-          // Try to clear IndexedDB persistence first (requires no active connections)
-          // If this fails, terminate() and reload will still clear everything
           try {
             await clearIndexedDbPersistence(db);
             console.log('🧹 Local Firestore cache cleared');
-            
           } catch (clearError: any) {
-            // clearIndexedDbPersistence may fail if there are active connections
-            // This is expected, we'll terminate and reload which will clear everything
             if (clearError.code !== 'failed-precondition') {
               console.warn('⚠️ Could not clear IndexedDB persistence (will clear on reload):', clearError);
             }
-            
           }
-          
-          // Terminate all Firestore connections (closes all active connections)
           await terminate(db);
           console.log('🧹 Firestore connections terminated');
-          
-          
         } catch (cacheError) {
           console.error('❌ Failed to clear local Firestore cache:', cacheError);
-          
-          // Don't throw - cache clearing is best effort, auth signout succeeded
-          // Reload will clear everything anyway
         }
       }
-      
-      // 3. Clear post-auth redirect flag so next sign-in can redirect to dashboard again
-      try { sessionStorage.removeItem('pp-post-auth-redirect-done'); } catch (_) {}
-      // 4. Force Reload to reset SDK state and clear any remaining cache
+
+      try {
+        sessionStorage.removeItem(POST_AUTH_REDIRECT_KEY);
+      } catch {
+        /* ignore */
+      }
       window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);
@@ -236,11 +305,17 @@ export function useAuth() {
     }
   };
 
+  const authProviderIds =
+    user?.providerData?.map((p) => p.providerId).filter(Boolean) ?? [];
+
   return {
     user,
     loading,
     signInWithGoogle,
+    signInWithMicrosoft,
+    linkMicrosoftAccount,
     logout,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    authProviderIds,
   };
 }

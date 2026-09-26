@@ -59,7 +59,7 @@ export default function LandingFooter() {
           onMouseEnter={(e) => e.currentTarget.style.color = '#D97706'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
           >
-            Google Drive Sync
+            Sovereign Sync
           </Link>
           <Link href="/tools/google-sheets-formula" style={{ 
             color: 'var(--text)',

@@ -252,17 +252,31 @@ export async function GET(request: NextRequest) {
     console.log('[Analytics API] 👥 Fetching leads data...');
         const leadsData = await getLeadsData(startDate);
         
-    // Fetch app signups (Google) — listUsers is heavy; skip entirely when Firestore is degraded
-    let googleSignups: Awaited<ReturnType<typeof getGoogleSignupsData>>;
+    // Fetch app signups (Google + Microsoft Auth) — listUsers is heavy; skip when degraded
+    let googleSignups: Awaited<ReturnType<typeof getAppSignupsData>>;
     if (firestoreDegraded) {
-            googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: 'skipped_firestore_degraded' };
+            googleSignups = {
+              total: 0,
+              last7Days: 0,
+              cohortSinceOct2025: 0,
+              byProvider: { 'google.com': 0, 'microsoft.com': 0, 'google.com+microsoft.com': 0 },
+              signups: [],
+              error: 'skipped_firestore_degraded',
+            };
     } else {
       try {
-        console.log('[Analytics API] 🔐 Fetching Google signups...');
-                googleSignups = await getGoogleSignupsData(startDate);
+        console.log('[Analytics API] 🔐 Fetching app signups (Google + Microsoft)...');
+                googleSignups = await getAppSignupsData(startDate);
               } catch (e: any) {
-        console.error('[Analytics API] 🔐 Google signups failed:', e?.message);
-        googleSignups = { total: 0, last7Days: 0, cohortSinceOct2025: 0, signups: [], error: e?.message };
+        console.error('[Analytics API] 🔐 App signups failed:', e?.message);
+        googleSignups = {
+          total: 0,
+          last7Days: 0,
+          cohortSinceOct2025: 0,
+          byProvider: { 'google.com': 0, 'microsoft.com': 0, 'google.com+microsoft.com': 0 },
+          signups: [],
+          error: e?.message,
+        };
               }
     }
 
@@ -511,7 +525,10 @@ export async function GET(request: NextRequest) {
       npm: npmData,
       blogPosts,
       leads: leadsData,
+      /** @deprecated key name — payload is Google + Microsoft app Auth signups */
       googleSignups,
+      /** Canonical: Google + Microsoft Firebase Auth signups (cohort ≥ Oct 27 2025) */
+      appSignups: googleSignups,
       referral,
       viralMomentEmailBlast,
       conversionFunnel,
@@ -1909,7 +1926,36 @@ async function getLeadsData(startDate: Date) {
 /** Cohort date for "new users" (e.g. Stack Reveal): signups on or after this date. Always used for App Signups so the list is not limited by dashboard time range. */
 const COHORT_DATE_2025_10_27 = new Date('2025-10-27T00:00:00Z');
 
-async function getGoogleSignupsData(_startDate: Date) {
+const APP_AUTH_PROVIDERS = new Set(['google.com', 'microsoft.com']);
+
+function authProviderIdsFromUser(user: {
+  providerData?: Array<{ providerId: string }> | null;
+}): string[] {
+  return (user.providerData || [])
+    .map((p) => p.providerId)
+    .filter((id): id is string => !!id);
+}
+
+function isAppOAuthUser(user: {
+  providerData?: Array<{ providerId: string }> | null;
+}): boolean {
+  return authProviderIdsFromUser(user).some((id) => APP_AUTH_PROVIDERS.has(id));
+}
+
+/** Stable primary label for tables: linked accounts listed as google.com+microsoft.com */
+function primaryAuthProviderLabel(user: {
+  providerData?: Array<{ providerId: string }> | null;
+}): string {
+  const ids = authProviderIdsFromUser(user);
+  const hasG = ids.includes('google.com');
+  const hasM = ids.includes('microsoft.com');
+  if (hasG && hasM) return 'google.com+microsoft.com';
+  if (hasM) return 'microsoft.com';
+  if (hasG) return 'google.com';
+  return ids[0] || 'unknown';
+}
+
+async function getAppSignupsData(_startDate: Date) {
   try {
     getDb(); // Ensure Firebase Admin is initialized
     const auth = getAuth();
@@ -1919,11 +1965,18 @@ async function getGoogleSignupsData(_startDate: Date) {
       displayName: string | null;
       firstName: string | null;
       createdAt: string;
+      provider: string;
+      providers: string[];
     }> = [];
     let nextPageToken: string | undefined;
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const byProvider: Record<string, number> = {
+      'google.com': 0,
+      'microsoft.com': 0,
+      'google.com+microsoft.com': 0,
+    };
 
-    // Always use cohort date so we show full cohort (57+), not filtered by dashboard 7d/30d/90d
+    // Always use cohort date so we show full cohort, not filtered by dashboard 7d/30d/90d
     const cohortStart = COHORT_DATE_2025_10_27;
 
     do {
@@ -1931,14 +1984,22 @@ async function getGoogleSignupsData(_startDate: Date) {
       nextPageToken = listResult.pageToken;
 
       for (const user of listResult.users) {
-        const creationTime = user.metadata.creationTime ? new Date(user.metadata.creationTime) : null;
+        const creationTime = user.metadata.creationTime
+          ? new Date(user.metadata.creationTime)
+          : null;
         if (!creationTime || creationTime < cohortStart) continue;
+        if (!isAppOAuthUser(user)) continue;
 
-        const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com');
-        if (!isGoogle) continue;
+        const providers = authProviderIdsFromUser(user).filter((id) =>
+          APP_AUTH_PROVIDERS.has(id)
+        );
+        const provider = primaryAuthProviderLabel(user);
+        byProvider[provider] = (byProvider[provider] || 0) + 1;
 
         const displayName = user.displayName || null;
-        const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
+        const firstName = displayName?.trim()
+          ? displayName.trim().split(/\s+/)[0] || null
+          : null;
 
         signups.push({
           email: user.email || '',
@@ -1946,30 +2007,45 @@ async function getGoogleSignupsData(_startDate: Date) {
           displayName,
           firstName,
           createdAt: user.metadata.creationTime || '',
+          provider,
+          providers,
         });
       }
     } while (nextPageToken);
 
     // Sort by createdAt descending (most recent first)
-    signups.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    signups.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
-    const last7Days = signups.filter((s) => new Date(s.createdAt) >= sevenDaysAgo).length;
+    const last7Days = signups.filter(
+      (s) => new Date(s.createdAt) >= sevenDaysAgo
+    ).length;
 
     return {
       total: signups.length,
       last7Days,
-      cohortSinceOct2025: signups.length, // Same as total when using cohort start
-      signups: signups.slice(0, 100), // Show full cohort (all since Oct 27 2025)
+      cohortSinceOct2025: signups.length,
+      byProvider,
+      signups: signups.slice(0, 100),
     };
   } catch (error: any) {
-    console.error('Google signups fetch error:', error);
+    console.error('App signups fetch error:', error);
     return {
       total: 0,
       last7Days: 0,
       cohortSinceOct2025: 0,
+      byProvider: {
+        'google.com': 0,
+        'microsoft.com': 0,
+        'google.com+microsoft.com': 0,
+      },
       signups: [],
       error: error?.message,
     };
   }
 }
+
+/** @deprecated name — use getAppSignupsData (Google + Microsoft). Kept as alias for call sites. */
+const getGoogleSignupsData = getAppSignupsData;
 

@@ -3,23 +3,36 @@
 
 import { getFirstTouchAttribution } from './attribution';
 
-// Google Sign-In tracking
-export function trackGoogleSignIn(params?: string | { landingPage?: string; utmSource?: any; utmMedium?: any; utmCampaign?: any; utmContent?: any }) {
+type SignInTrackParams =
+  | string
+  | { landingPage?: string; utmSource?: any; utmMedium?: any; utmCampaign?: any; utmContent?: any };
+
+function trackAuthSignIn(eventName: string, params?: SignInTrackParams) {
   if (typeof window !== 'undefined' && window.gtag) {
     const landingPage = typeof params === 'string' ? params : params?.landingPage || 'unknown';
     const utmSource = typeof params === 'object' ? params?.utmSource : undefined;
     const utmMedium = typeof params === 'object' ? params?.utmMedium : undefined;
     const utmCampaign = typeof params === 'object' ? params?.utmCampaign : undefined;
-    
-    window.gtag('event', 'auth_google_sign_in', {
+
+    window.gtag('event', eventName, {
       event_category: 'Authentication',
       event_label: landingPage,
       utm_source: utmSource || 'direct',
       utm_medium: utmMedium || 'organic',
       utm_campaign: utmCampaign || 'none',
-      value: 1
+      value: 1,
     });
   }
+}
+
+// Google Sign-In tracking
+export function trackGoogleSignIn(params?: SignInTrackParams) {
+  trackAuthSignIn('auth_google_sign_in', params);
+}
+
+// Microsoft Sign-In tracking (identity plane — not OneDrive)
+export function trackMicrosoftSignIn(params?: SignInTrackParams) {
+  trackAuthSignIn('auth_microsoft_sign_in', params);
 }
 
 // Landing page tracking

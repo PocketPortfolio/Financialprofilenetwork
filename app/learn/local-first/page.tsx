@@ -155,7 +155,7 @@ export default function LocalFirstPage() {
               <li><strong>Your portfolio data:</strong> Stored in your browser (localStorage/IndexedDB)</li>
               <li><strong>CSV parsing:</strong> Done entirely client-side (no server uploads)</li>
               <li><strong>Price data:</strong> Fetched via API but analyzed locally</li>
-              <li><strong>Optional sync:</strong> Google Drive sync available, but not required</li>
+              <li><strong>Optional sync:</strong> Google Drive or OneDrive Sovereign Sync available on paid seats — not required</li>
             </ul>
             <p style={{
               fontSize: '14px',

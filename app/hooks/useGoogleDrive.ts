@@ -21,6 +21,11 @@ import { generateExcelFromPortfolio } from '../lib/google-drive/excelExport';
 import type { Trade } from '../services/tradeService';
 import { useAuth } from './useAuth';
 import { TradeService } from '../services/tradeService';
+import {
+  clearActiveSyncCloudIf,
+  onActiveSyncCloudChange,
+  requestExclusiveSyncCloud,
+} from '../lib/sync/sovereignSyncProvider';
 
 const PORTFOLIO_FILE_NAME = 'pocket_portfolio_db.json';
 const EXCEL_FILE_NAME = 'pocket_view.xlsx';
@@ -193,6 +198,8 @@ export function useGoogleDrive() {
   ): Promise<void> => {
     try {
       setSyncState(prev => ({ ...prev, isSyncing: true, error: null }));
+      // One active Sovereign Sync cloud — connecting Drive releases OneDrive auto-sync
+      requestExclusiveSyncCloud('google');
       
       const token = await driveService.requestAccess();
       driveService.setAccessToken(token);
@@ -401,6 +408,7 @@ export function useGoogleDrive() {
       localStorage.removeItem('google_drive_file_id');
       localStorage.removeItem('google_drive_excel_file_id');
       // Keep folder ID for next connection
+      clearActiveSyncCloudIf('google');
       
       setSyncState({
         isConnected: false,
@@ -427,6 +435,15 @@ export function useGoogleDrive() {
       }));
     }
   }, [syncState.folderId]);
+
+  // Peer exclusivity: OneDrive claimed → drop Drive auto-sync
+  useEffect(() => {
+    return onActiveSyncCloudChange((cloud) => {
+      if (cloud === 'microsoft' && syncStateRef.current.isConnected) {
+        void disconnect();
+      }
+    });
+  }, [disconnect]);
 
   /**
    * Sync portfolio data to Drive (debounced)
@@ -915,7 +932,7 @@ export function useGoogleDrive() {
     let timeout: ReturnType<typeof setTimeout> | null = null;
     const onNotesChanged = (e: Event) => {
       const source = (e as CustomEvent<{ source?: string }>).detail?.source ?? 'user';
-      if (source === 'drive-pull' || source === 'tab-sync') return;
+      if (source === 'drive-pull' || source === 'onedrive-pull' || source === 'tab-sync') return;
 
       const state = syncStateRef.current;
       if (!state.isConnected || !state.fileId) return;

@@ -1,29 +1,35 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ShieldAlert, Lock, WifiOff } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useTrades } from '../hooks/useTrades';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { useGoogleDrive } from '../hooks/useGoogleDrive';
+import { useOneDrive } from '../hooks/useOneDrive';
+import SignInOptions from './auth/SignInOptions';
 
 interface SyncUpgradeCTAProps {
   className?: string;
 }
 
 export default function SyncUpgradeCTA({ className = '' }: SyncUpgradeCTAProps) {
-  const { isAuthenticated, user, signInWithGoogle } = useAuth();
+  const { isAuthenticated, user, signInWithGoogle, signInWithMicrosoft } = useAuth();
   const { trades } = useTrades();
   const { tier } = usePremiumTheme();
   const { syncState } = useGoogleDrive();
+  const { syncState: oneDriveState } = useOneDrive();
+  const [authBusy, setAuthBusy] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
   
   // Show if:
   // 1. Unauthenticated user with local trades, OR
   // 2. Authenticated free tier user without sync connected
   const hasLocalTrades = !isAuthenticated && trades.length > 0;
+  const syncConnected = syncState.isConnected || oneDriveState.isConnected;
   const isFreeTierWithoutSync = isAuthenticated && 
     (tier === null || tier === 'codeSupporter' || tier === 'featureVoter') && 
-    !syncState.isConnected;
+    !syncConnected;
   
   if (!hasLocalTrades && !isFreeTierWithoutSync) {
     return null;
@@ -31,15 +37,10 @@ export default function SyncUpgradeCTA({ className = '' }: SyncUpgradeCTAProps) 
 
   const handleUpgrade = async () => {
     if (!isAuthenticated) {
-      try {
-        await signInWithGoogle();
-      } catch (error) {
-        console.error('Error signing up:', error);
-      }
-    } else {
-      // Navigate to sponsor page for premium upgrade
-      window.location.href = '/sponsor?utm_source=dashboard_sync_alert&utm_medium=system_alert';
+      setShowSignIn(true);
+      return;
     }
+    window.location.href = '/sponsor?utm_source=dashboard_sync_alert&utm_medium=system_alert';
   };
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -192,6 +193,39 @@ export default function SyncUpgradeCTA({ className = '' }: SyncUpgradeCTAProps) 
             alignItems: 'center'
           }}
         >
+          {!isAuthenticated && showSignIn ? (
+            <div style={{ width: isMobile ? '100%' : 280 }}>
+              <SignInOptions
+                busy={authBusy}
+                emphasizeGoogle
+                layout="stack"
+                onGoogle={async () => {
+                  setAuthBusy(true);
+                  try {
+                    await signInWithGoogle();
+                  } catch (error) {
+                    console.error('Error signing up:', error);
+                  } finally {
+                    setAuthBusy(false);
+                  }
+                }}
+                onMicrosoft={async () => {
+                  setAuthBusy(true);
+                  try {
+                    await signInWithMicrosoft();
+                  } catch (error) {
+                    console.error('Error signing in with Microsoft:', error);
+                    const msg = error instanceof Error ? error.message : String(error);
+                    if (!msg.includes('popup-blocked')) {
+                      alert(msg || 'Microsoft sign-in failed');
+                    }
+                  } finally {
+                    setAuthBusy(false);
+                  }
+                }}
+              />
+            </div>
+          ) : (
           <button
             onClick={handleUpgrade}
             style={{
@@ -233,6 +267,7 @@ export default function SyncUpgradeCTA({ className = '' }: SyncUpgradeCTAProps) 
             <Lock size={16} />
             {!isAuthenticated ? 'Initialize Sync' : 'Upgrade to Sync'}
           </button>
+          )}
           
           {/* Trust Badge / Secondary Info - Hidden on mobile */}
           {!isMobile && (

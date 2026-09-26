@@ -8,7 +8,7 @@ export const siteConfig = {
   /** Our brand only. Do not claim PocketFolio / Pocket Folio — those are other products. */
   title: 'Pocket Portfolio | Local-First Tracker & Sign In',
   description:
-    'Sign in to Pocket Portfolio and import broker CSVs (IBKR, Ghostfolio, Trading 212) in-browser. Not Pocketfolio.com and not PocketFolios. No central warehouse of your raw ledger. Optional Google Drive sync you control.',
+    'Sign in with Google or Microsoft. Import broker CSVs (IBKR, Ghostfolio, Trading 212) in-browser. Not Pocketfolio.com and not PocketFolios. No central warehouse of your raw ledger. Optional Google Drive or OneDrive Sovereign Sync you control.',
   url: 'https://www.pocketportfolio.app',
   ogImage:
     'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Local-First%20Portfolio%20Tracker%20(100%25%20Private)&v=7',
@@ -43,10 +43,13 @@ export const siteConfig = {
     'dev.to portfolio',
     'developer community finance',
     'google drive portfolio',
+    'onedrive portfolio',
+    'microsoft sign in portfolio',
     'json stock tracker',
     'self-hosted portfolio',
     'excel trading journal',
     'google drive database',
+    'onedrive sync',
     'sovereign sync',
     'bidirectional sync',
     'data ownership',

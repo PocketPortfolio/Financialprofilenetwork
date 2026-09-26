@@ -1,14 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
+import SignInOptions from '@/app/components/auth/SignInOptions';
 
 /**
- * Canonical login URL for Pocket Portfolio. Not Pocketfolio.com and not PocketFolios.
- * Auth is Google popup; successful sessions continue to /dashboard.
+ * Canonical login URL for Pocket Portfolio.
+ * Auth: Google or Microsoft (identity). Drive / OneDrive sync is a separate paid consent.
  */
 export default function LoginPage() {
-  const { isAuthenticated, signInWithGoogle, user, loading } = useAuth();
+  const { isAuthenticated, signInWithGoogle, signInWithMicrosoft, user, loading } = useAuth();
+  const [busy, setBusy] = useState(false);
 
   return (
     <main
@@ -46,8 +49,8 @@ export default function LoginPage() {
           Private local-first dashboard
         </h1>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28 }}>
-          Sign in to sync preferences and unlock Drive sync. Your raw ledger stays on-device — local CSV
-          import works without an account.
+          Sign in with Google or Microsoft. Optional Sovereign Sync to a cloud folder you own is
+          available on paid seats — identity consent stays separate from file access.
         </p>
 
         {loading ? (
@@ -71,21 +74,34 @@ export default function LoginPage() {
             </Link>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => signInWithGoogle()}
-            style={{
-              padding: '12px 24px',
-              background: 'var(--accent-warm)',
-              color: '#0a0a0a',
-              fontWeight: 700,
-              border: '1px solid rgba(245, 158, 11, 0.55)',
-              cursor: 'pointer',
-              fontSize: 15,
-            }}
-          >
-            Sign in with Google
-          </button>
+          <div style={{ maxWidth: 320, margin: '0 auto' }}>
+            <SignInOptions
+              busy={busy}
+              emphasizeGoogle
+              layout="stack"
+              onGoogle={async () => {
+                setBusy(true);
+                try {
+                  await signInWithGoogle();
+                } finally {
+                  setBusy(false);
+                }
+              }}
+              onMicrosoft={async () => {
+                setBusy(true);
+                try {
+                  await signInWithMicrosoft();
+                } catch (e) {
+                  const msg = e instanceof Error ? e.message : String(e);
+                  if (!msg.includes('popup-blocked')) {
+                    alert(msg || 'Microsoft sign-in failed');
+                  }
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            />
+          </div>
         )}
 
         <p style={{ marginTop: 24, fontSize: 13, color: 'var(--text-secondary)' }}>

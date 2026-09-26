@@ -8,11 +8,14 @@ export default function GoogleDriveSyncFeaturePage() {
   return (
     <>
       <SEOHead
-        title="Sovereign Sync: Google Drive as Stock Database"
-        description="Learn how to use Google Drive as your personal stock database with Pocket Portfolio. Bidirectional sync, JSON data ownership, and zero vendor lock-in. Edit trades in JSON."
+        title="Sovereign Sync: Google Drive or OneDrive Portfolio Replica"
+        description="Optional Sovereign Sync to Google Drive or OneDrive — a JSON replica in a folder you own. Sign in with Google or Microsoft. Bidirectional sync, data ownership, zero vendor lock-in. Paid Corporate / Founders seats."
         keywords={[
           'google drive portfolio tracker',
+          'onedrive portfolio tracker',
+          'microsoft sign in portfolio',
           'google drive stock database',
+          'onedrive stock database',
           'sovereign sync',
           'json portfolio manager',
           'bidirectional sync',
@@ -20,6 +23,7 @@ export default function GoogleDriveSyncFeaturePage() {
           'self-hosted portfolio',
           'excel trading journal',
           'google drive sync',
+          'onedrive sync',
         ]}
         canonical="https://www.pocketportfolio.app/features/google-drive-sync"
         ogType="website"
@@ -34,15 +38,15 @@ export default function GoogleDriveSyncFeaturePage() {
             '@type': 'SoftwareApplication',
             name: 'Pocket Portfolio - Sovereign Sync',
             applicationCategory: 'FinanceApplication',
-            featureList: 'Google Drive Bidirectional Sync, JSON Data Ownership, Zero Knowledge Privacy',
+            featureList: 'Google Drive Sovereign Sync, OneDrive Sovereign Sync, Sign in with Google or Microsoft, JSON Data Ownership',
             operatingSystem: 'Web, PWA',
             offers: {
               '@type': 'Offer',
               price: '0',
               priceCurrency: 'USD',
-              description: 'Free tier available. Enterprise Sync for Corporate Sponsors.'
+              description: 'Free tier available. Sovereign Sync for Corporate Ecosystem and Founders Club.'
             },
-            description: 'Use Google Drive as your personal stock database. Bidirectional sync, JSON data ownership, and zero vendor lock-in.',
+            description: 'Optional Google Drive or OneDrive Sovereign Sync — a JSON replica in a folder you own. Bidirectional sync and zero vendor lock-in.',
             url: 'https://www.pocketportfolio.app/features/google-drive-sync',
           }),
         }}
@@ -78,7 +82,7 @@ export default function GoogleDriveSyncFeaturePage() {
               overflowWrap: 'break-word',
             }}
           >
-            How to Use Google Drive as a Stock Database
+            Sovereign Sync: Your Cloud, Your Folder
           </h1>
           <p
             style={{
@@ -90,7 +94,9 @@ export default function GoogleDriveSyncFeaturePage() {
               padding: '0 clamp(8px, 2vw, 16px)',
             }}
           >
-            Pocket Portfolio's <strong>Sovereign Sync</strong> turns your Google Drive into a personal database for your portfolio. Own your data, sync bidirectionally, and edit trades in JSON—all with zero vendor lock-in.
+            Pocket Portfolio&apos;s <strong>Sovereign Sync</strong> writes an optional JSON replica to{' '}
+            <strong>Google Drive</strong> or <strong>OneDrive</strong> — a folder you own. Sign in with Google or
+            Microsoft. Sync bidirectionally. Edit trades in JSON. Zero vendor lock-in.
           </p>
         </div>
 
@@ -108,7 +114,10 @@ export default function GoogleDriveSyncFeaturePage() {
             What is Sovereign Sync?
           </h2>
           <p style={{ fontSize: 'clamp(15px, 2.5vw, 16px)', lineHeight: '1.7', color: 'var(--text-secondary)', marginBottom: 'clamp(20px, 4vw, 24px)' }}>
-            <strong>Sovereign Sync</strong> is Pocket Portfolio's bidirectional Google Drive integration that gives you complete control over your financial data. Instead of storing your portfolio in a proprietary database, your trades live in a JSON file on your Google Drive—making it your database.
+            <strong>Sovereign Sync</strong> is Pocket Portfolio&apos;s paid cloud-replica plane for Corporate Ecosystem
+            and Founders Club. Connect <strong>Google Drive</strong> or <strong>OneDrive</strong> (one active cloud at
+            a time). Your trades live in <code style={{ fontSize: '0.875em', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px' }}>pocket_portfolio_db.json</code> in a folder you own — not in our warehouse. Identity
+            (Sign in with Google / Microsoft) is separate from file consent.
           </p>
 
           <div
@@ -132,19 +141,19 @@ export default function GoogleDriveSyncFeaturePage() {
             </h3>
             <ul style={{ margin: 0, paddingLeft: 'clamp(20px, 4vw, 24px)', lineHeight: '1.8' }}>
               <li style={{ marginBottom: 'clamp(10px, 2.5vw, 12px)', color: 'var(--text-secondary)', fontSize: 'clamp(14px, 2.5vw, 16px)' }}>
-                <strong>Bidirectional Sync:</strong> Changes in Pocket Portfolio sync to Drive, and edits in Drive sync back to the app—in real-time.
+                <strong>Google Drive or OneDrive:</strong> Choose your Sovereign Sync cloud. One active at a time.
+              </li>
+              <li style={{ marginBottom: 'clamp(10px, 2.5vw, 12px)', color: 'var(--text-secondary)', fontSize: 'clamp(14px, 2.5vw, 16px)' }}>
+                <strong>Bidirectional Sync:</strong> Changes in Pocket Portfolio sync to your cloud, and edits in the cloud sync back to the app.
               </li>
               <li style={{ marginBottom: 'clamp(10px, 2.5vw, 12px)', color: 'var(--text-secondary)', fontSize: 'clamp(14px, 2.5vw, 16px)' }}>
                 <strong>JSON Data Ownership:</strong> Your portfolio is stored as <code style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px' }}>pocket_portfolio_db.json</code>—a human-readable, developer-friendly format.
               </li>
               <li style={{ marginBottom: 'clamp(10px, 2.5vw, 12px)', color: 'var(--text-secondary)', fontSize: 'clamp(14px, 2.5vw, 16px)' }}>
-                <strong>Zero Vendor Lock-in:</strong> Your data lives in your Drive. Export, edit, or migrate anytime—no proprietary formats.
+                <strong>Dual-plane OAuth:</strong> Sign in with Google or Microsoft for identity. Connect Drive or OneDrive separately for file consent.
               </li>
               <li style={{ marginBottom: 'clamp(10px, 2.5vw, 12px)', color: 'var(--text-secondary)', fontSize: 'clamp(14px, 2.5vw, 16px)' }}>
-                <strong>Developer-Friendly:</strong> Edit trades programmatically, use version control, or integrate with other tools.
-              </li>
-              <li style={{ marginBottom: 'clamp(10px, 2.5vw, 12px)', color: 'var(--text-secondary)', fontSize: 'clamp(14px, 2.5vw, 16px)' }}>
-                <strong>Privacy-First:</strong> We only access files created by Pocket Portfolio. Your data remains private.
+                <strong>Privacy-First:</strong> We only access the app folder / files created by Pocket Portfolio. Your data remains private.
               </li>
             </ul>
           </div>
@@ -217,16 +226,20 @@ export default function GoogleDriveSyncFeaturePage() {
           </h2>
           <ol style={{ margin: 0, paddingLeft: 'clamp(20px, 4vw, 24px)', lineHeight: '1.8' }}>
             <li style={{ marginBottom: 'clamp(12px, 3vw, 16px)', color: 'var(--text-secondary)', fontSize: 'clamp(15px, 2.5vw, 16px)' }}>
-              <strong>Connect Google Drive:</strong> In Settings, click "Connect Google Drive" and authorize Pocket Portfolio to create a folder in your Drive.
+              <strong>Sign in:</strong> Use Google or Microsoft for identity (available to everyone).
             </li>
             <li style={{ marginBottom: 'clamp(12px, 3vw, 16px)', color: 'var(--text-secondary)', fontSize: 'clamp(15px, 2.5vw, 16px)' }}>
-              <strong>Automatic Sync:</strong> Your portfolio data is stored in <code style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px' }}>pocket_portfolio_db.json</code>. Changes sync every 5 seconds.
+              <strong>Connect a cloud (paid):</strong> In Settings, choose <strong>Connect Google Drive</strong> or{' '}
+              <strong>Connect OneDrive</strong> — one active Sovereign Sync cloud at a time.
             </li>
             <li style={{ marginBottom: 'clamp(12px, 3vw, 16px)', color: 'var(--text-secondary)', fontSize: 'clamp(15px, 2.5vw, 16px)' }}>
-              <strong>Edit Anywhere:</strong> Open the JSON file in VS Code, Notepad++, or any text editor. Make changes, save, and they sync back to Pocket Portfolio.
+              <strong>Automatic Sync:</strong> Your portfolio data is stored in <code style={{ fontSize: 'clamp(0.75rem, 2vw, 0.875rem)', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px' }}>pocket_portfolio_db.json</code> in a folder you own.
             </li>
             <li style={{ marginBottom: 'clamp(12px, 3vw, 16px)', color: 'var(--text-secondary)', fontSize: 'clamp(15px, 2.5vw, 16px)' }}>
-              <strong>Multi-Device Access:</strong> Open Pocket Portfolio on another device, and it automatically pulls the latest data from Drive.
+              <strong>Edit Anywhere:</strong> Open the JSON file in VS Code, Notepad++, or any text editor. Make changes, save, and pull them back into Pocket Portfolio.
+            </li>
+            <li style={{ marginBottom: 'clamp(12px, 3vw, 16px)', color: 'var(--text-secondary)', fontSize: 'clamp(15px, 2.5vw, 16px)' }}>
+              <strong>Multi-Device Access:</strong> Open Pocket Portfolio on another device and sync from your cloud replica.
             </li>
           </ol>
 
@@ -323,7 +336,7 @@ export default function GoogleDriveSyncFeaturePage() {
                 🔐 Data Sovereignty
               </h3>
               <p style={{ fontSize: 'clamp(13px, 2.5vw, 14px)', lineHeight: '1.6', color: 'var(--text-secondary)', margin: 0 }}>
-                Your data lives in your Google Drive. No vendor lock-in, no proprietary formats—complete ownership.
+                Your data lives in your Google Drive or OneDrive. No vendor lock-in, no proprietary formats—complete ownership.
               </p>
             </div>
           </div>
@@ -442,7 +455,7 @@ export default function GoogleDriveSyncFeaturePage() {
                 Is my data secure?
               </h3>
               <p style={{ fontSize: 'clamp(13px, 2.5vw, 14px)', lineHeight: '1.6', color: 'var(--text-secondary)', margin: 0, wordWrap: 'break-word' }}>
-                Yes. Pocket Portfolio only accesses files it creates in your Google Drive. Your data remains private and is stored in your own Drive account. We never see your portfolio data.
+                Yes. Pocket Portfolio only accesses the app folder / files it creates in your Google Drive or OneDrive. Your replica remains in your cloud account. We do not warehouse your ledger.
               </p>
             </div>
             <div>
@@ -450,7 +463,7 @@ export default function GoogleDriveSyncFeaturePage() {
                 How do I get started?
               </h3>
               <p style={{ fontSize: 'clamp(13px, 2.5vw, 14px)', lineHeight: '1.6', color: 'var(--text-secondary)', margin: 0, wordWrap: 'break-word' }}>
-                Upgrade to Corporate Sponsor or Founders Club, then go to Settings → Data Sovereignty & Sync → Connect Google Drive. The setup takes less than a minute.
+                Upgrade to Corporate Ecosystem or Founders Club, then go to Settings → Data Sovereignty & Sync → Connect Google Drive or Connect OneDrive. Setup takes less than a minute.
               </p>
             </div>
           </div>

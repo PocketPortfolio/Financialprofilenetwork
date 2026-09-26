@@ -64,9 +64,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             description: 'Free tier available. Enterprise Sync for Corporate Sponsors.'
           },
           featureList: [
-            'Google Drive Bidirectional Sync',
+            'Google Drive Sovereign Sync',
+            'OneDrive Sovereign Sync',
+            'Sign in with Google or Microsoft',
             'JSON Data Ownership',
-            'Zero Knowledge Privacy',
             'Portfolio Tracking',
             'Live Price Updates',
             'CSV Import',
@@ -197,9 +198,10 @@ export const webAppData = {
     description: 'Free tier available. Enterprise Sync for Corporate Sponsors.'
   },
   featureList: [
-    'Google Drive Bidirectional Sync',
+    'Google Drive Sovereign Sync',
+    'OneDrive Sovereign Sync',
+    'Sign in with Google or Microsoft',
     'JSON Data Ownership',
-    'Zero Knowledge Privacy',
     'Portfolio Tracking',
     'Live Price Updates',
     'CSV Import',

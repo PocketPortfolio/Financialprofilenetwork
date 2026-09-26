@@ -458,7 +458,7 @@ export default function SponsorDeck({
         }}
       >
         <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--accent-warm)', marginBottom: '8px' }}>
-          ✅ <strong>Sovereign Sync:</strong> Google Drive as Database (1 Seat)
+          ✅ <strong>Sovereign Sync:</strong> Google Drive or OneDrive replica (1 Seat)
         </div>
         <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginLeft: '20px' }}>
           Need more? Add seats for <strong>£50/mo</strong>.
@@ -732,7 +732,7 @@ export default function SponsorDeck({
           />
         </FeatureBlock>
 
-        <FeatureBlock title={<>✅ <strong>Sovereign Sync:</strong> Google Drive as Database (2 Seats)</>}>
+        <FeatureBlock title={<>✅ <strong>Sovereign Sync:</strong> Google Drive or OneDrive replica (2 Seats)</>}>
           <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginLeft: '20px' }}>
             Need more? Add seats for <strong>$50/mo</strong>.
           </div>

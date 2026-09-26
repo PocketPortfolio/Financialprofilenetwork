@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
   let uid: string;
   let email: string;
   let displayName: string | null;
+  let authProvider = 'unknown';
+  let useNamedGreeting = false;
   try {
     initializeFirebaseAdmin();
     const auth = getAuth();
@@ -62,6 +64,25 @@ export async function POST(request: NextRequest) {
     uid = decoded.uid;
     email = decoded.email || '';
     displayName = (decoded.name as string) || null;
+
+    try {
+      const userRecord = await auth.getUser(uid);
+      const providers = (userRecord.providerData || [])
+        .map((p) => p.providerId)
+        .filter(Boolean);
+      const hasG = providers.includes('google.com');
+      const hasM = providers.includes('microsoft.com');
+      if (hasG && hasM) authProvider = 'google.com+microsoft.com';
+      else if (hasM) authProvider = 'microsoft.com';
+      else if (hasG) authProvider = 'google.com';
+      else if (providers[0]) authProvider = providers[0];
+      useNamedGreeting = hasG || hasM;
+      if (!displayName && userRecord.displayName) {
+        displayName = userRecord.displayName;
+      }
+    } catch (providerErr) {
+      console.warn('[Welcome Email] Could not load Auth providers:', providerErr);
+    }
   } catch (e) {
     console.error('[Welcome Email] Invalid token:', e);
     return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
@@ -92,7 +113,7 @@ export async function POST(request: NextRequest) {
         createdAt: snap.exists ? undefined : Timestamp.now(),
         marketingOptIn: true,
         stackRevealWeek: 0,
-        authProvider: 'google.com',
+        authProvider,
       }, { merge: true });
       claimed = true;
     });
@@ -116,7 +137,7 @@ export async function POST(request: NextRequest) {
   }
 
   const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
-  const greeting = getGreeting(displayName, firstName, true);
+  const greeting = getGreeting(displayName, firstName, useNamedGreeting);
   const unsubscribeUrl = getUnsubscribeUrl(uid);
   const html = buildWelcomeEmailHtml({ greeting, unsubscribeUrl });
 

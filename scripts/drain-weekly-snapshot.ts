@@ -115,8 +115,10 @@ async function main() {
       const data = getSnapshotData(snapshots);
       const displayName = user.displayName || null;
       const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
-      const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com') ?? false;
-      const greeting = getGreeting(displayName, firstName, isGoogle);
+      const useNamedGreeting =
+        (user.providerData?.some((p) => p.providerId === 'google.com') ?? false) ||
+        (user.providerData?.some((p) => p.providerId === 'microsoft.com') ?? false);
+      const greeting = getGreeting(displayName, firstName, useNamedGreeting);
       const referralLink = getReferralLinkServer(
         generateReferralCode(user.uid),
         'weekly_snapshot',

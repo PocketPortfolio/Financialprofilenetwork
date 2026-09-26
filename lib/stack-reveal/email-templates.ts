@@ -132,13 +132,21 @@ export function buildWeek2Html(opts: {
 export function buildWeek3Html(opts: {
   greeting: string;
   isGoogleUser?: boolean;
+  /** google.com | microsoft.com | google.com+microsoft.com — preferred over isGoogleUser */
+  authProvider?: string;
   unsubscribeUrl: string;
 }): string {
-  const googleLine = opts.isGoogleUser
-    ? '<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Since you signed up with Google, you already know the value of one account that just works.</p>'
-    : '';
+  const provider = opts.authProvider || (opts.isGoogleUser ? 'google.com' : '');
+  const identityLine =
+    provider === 'google.com+microsoft.com'
+      ? '<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Since you signed up with Google and Microsoft, you already know the value of an account that just works.</p>'
+      : provider === 'microsoft.com'
+        ? '<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Since you signed up with Microsoft, you already know the value of one account that just works.</p>'
+        : provider === 'google.com'
+          ? '<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Since you signed up with Google, you already know the value of one account that just works.</p>'
+          : '';
   const inner = `
-    ${googleLine}
+    ${identityLine}
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Subscriptions add up. <strong>Founder's Club</strong> is different: one membership that funds the mission and unlocks the full stack (Universal Import, themes, API, Sovereign Sync)—without selling your data.</p>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">It's the sovereign choice: own your tooling, stop renting. We've capped spots so it stays meaningful.</p>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#374151;">Details and the full story are in the <a href="${PORTAL_URL}" style="color:${BRAND_LINK};text-decoration:underline;">Stack Reveal portal</a>.</p>
@@ -167,13 +175,19 @@ export function buildHtmlForWeek(
     uid: string;
     hasUploadedCsv?: boolean;
     isGoogleUser?: boolean;
+    authProvider?: string;
   }
 ): string {
   const unsubscribeUrl = `${EMAIL_ASSET_ORIGIN}/api/unsubscribe?token=${createUnsubscribeToken(opts.uid)}`;
   switch (week) {
     case 1: return buildWeek1Html({ greeting: opts.greeting, hasUploadedCsv: opts.hasUploadedCsv, unsubscribeUrl });
     case 2: return buildWeek2Html({ greeting: opts.greeting, unsubscribeUrl });
-    case 3: return buildWeek3Html({ greeting: opts.greeting, isGoogleUser: opts.isGoogleUser, unsubscribeUrl });
+    case 3: return buildWeek3Html({
+      greeting: opts.greeting,
+      isGoogleUser: opts.isGoogleUser,
+      authProvider: opts.authProvider,
+      unsubscribeUrl,
+    });
     case 4: return buildWeek4Html({ greeting: opts.greeting, unsubscribeUrl });
     default: return buildWeek1Html({ greeting: opts.greeting, unsubscribeUrl });
   }

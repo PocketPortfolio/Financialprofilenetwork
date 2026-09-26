@@ -47,7 +47,7 @@ const PORTAL_CARDS = [
   {
     visualId: 'portalStorage' as const,
     title: 'Sovereign Storage',
-    body: 'Encrypted sync to your Google Drive. Standard JSON/CSV formats. No vendor lock-in. Total data portability.',
+    body: 'Optional Sovereign Sync to Google Drive or OneDrive — a JSON replica in a folder you own. Sign in with Google or Microsoft. Standard JSON/CSV. No vendor lock-in.',
     cta: (
       <Link
         href="/features/google-drive-sync"

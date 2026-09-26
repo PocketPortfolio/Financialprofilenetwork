@@ -5,25 +5,41 @@ import Link from 'next/link';
 import { usePremiumTheme } from '../hooks/usePremiumTheme';
 import { getFoundersClubSpotsRemaining } from '../lib/utils/foundersClub';
 
+export type SovereignSyncCloudHint = 'google' | 'onedrive' | 'any';
+
 interface InfrastructureUpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   spotsRemaining?: number;
+  /** Which cloud the user was unlocking — keeps marketing copy accurate. */
+  cloud?: SovereignSyncCloudHint;
+}
+
+function syncBodyCopy(cloud: SovereignSyncCloudHint): string {
+  switch (cloud) {
+    case 'onedrive':
+      return 'Browser storage is limited. Sovereign Sync turns your OneDrive into an optional folder you own — a browser-to-cloud replica with identity consent kept separate.';
+    case 'google':
+      return 'Browser storage is limited. Sovereign Sync turns your Google Drive into an optional folder you own — a browser-to-cloud replica with identity consent kept separate.';
+    default:
+      return 'Browser storage is limited. Sovereign Sync adds an optional Google Drive or OneDrive replica in a folder you own — paid Corporate / Founders seats only.';
+  }
 }
 
 /**
  * "Infrastructure Upgrade" modal for Sovereign Sync gate
  * Shows when user tries to enable Sovereign Sync or import large CSV
  */
-export default function InfrastructureUpgradeModal({ 
-  isOpen, 
+export default function InfrastructureUpgradeModal({
+  isOpen,
   onClose,
-  spotsRemaining 
+  spotsRemaining,
+  cloud = 'any',
 }: InfrastructureUpgradeModalProps) {
   const { tier } = usePremiumTheme();
   // Use provided spotsRemaining or get from single source of truth
   const currentSpotsRemaining = spotsRemaining ?? getFoundersClubSpotsRemaining();
-  
+
   if (!isOpen) return null;
 
   // Don't show if user already has access
@@ -61,7 +77,6 @@ export default function InfrastructureUpgradeModal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <h2
           style={{
             fontSize: '28px',
@@ -71,10 +86,9 @@ export default function InfrastructureUpgradeModal({
             lineHeight: '1.2',
           }}
         >
-          Unlock Infinite Data Sovereignty
+          Unlock Sovereign Sync
         </h2>
 
-        {/* Body */}
         <p
           style={{
             fontSize: '16px',
@@ -83,10 +97,9 @@ export default function InfrastructureUpgradeModal({
             marginBottom: '24px',
           }}
         >
-          Browser storage is limited. Sovereign Sync turns your Google Drive into an unlimited, encrypted database.
+          {syncBodyCopy(cloud)}
         </p>
 
-        {/* Benefits List */}
         <ul
           style={{
             listStyle: 'none',
@@ -122,9 +135,9 @@ export default function InfrastructureUpgradeModal({
           >
             <span style={{ fontSize: '20px', flexShrink: 0 }}>✅</span>
             <div>
-              <strong style={{ color: 'var(--text)' }}>Programmatic API:</strong>
+              <strong style={{ color: 'var(--text)' }}>Your Cloud, Your Folder:</strong>
               <span style={{ color: 'var(--text-secondary)', marginLeft: '8px' }}>
-                Connect your own scripts and agents.
+                Choose Google Drive or OneDrive — one active Sovereign Sync cloud.
               </span>
             </div>
           </li>
@@ -146,7 +159,6 @@ export default function InfrastructureUpgradeModal({
           </li>
         </ul>
 
-        {/* Urgency Message */}
         <div
           style={{
             background: 'linear-gradient(135deg, var(--accent-warm) 0%, #f59e0b 100%)',
@@ -165,11 +177,11 @@ export default function InfrastructureUpgradeModal({
               margin: 0,
             }}
           >
-            Included with UK Founders Club (£12/mo or £100/yr). {currentSpotsRemaining} spots remaining.
+            Included with UK Founders Club (£12/mo or £100/yr). {currentSpotsRemaining} spots
+            remaining.
           </p>
         </div>
 
-        {/* CTA Buttons */}
         <div
           style={{
             display: 'flex',
@@ -232,4 +244,3 @@ export default function InfrastructureUpgradeModal({
     </div>
   );
 }
-

@@ -101,8 +101,9 @@ export default function DriveSyncSettings({ onConnect, onDisconnect }: DriveSync
                 lineHeight: '1.6',
               }}
             >
-              Connect your Google Drive to enable automatic sync across devices. Your portfolio data
-              will be stored in your personal Drive, maintaining full control and privacy.
+              Connect your Google Drive for optional Sovereign Sync to a folder you own (paid).
+              Your portfolio replica stays in your Drive. Identity consent is separate from this
+              file access. Only one cloud (Drive or OneDrive) can auto-sync at a time.
             </p>
 
             {!syncState.isConnected && (
@@ -698,6 +699,7 @@ export default function DriveSyncSettings({ onConnect, onDisconnect }: DriveSync
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         spotsRemaining={getFoundersClubSpotsRemaining()}
+        cloud="google"
       />
     </>
   );

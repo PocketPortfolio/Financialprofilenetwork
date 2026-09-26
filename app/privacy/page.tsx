@@ -53,7 +53,7 @@ export default function PrivacyPage() {
               <p style={{ fontSize: '16px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
                 Pocket Portfolio is built on a <strong>local-first architecture</strong>. Your portfolio data is stored
                 locally in your browser by default. We do not have access to your financial data unless you explicitly
-                enable <strong>Sovereign Sync</strong> (Google Drive integration).
+                enable <strong>Sovereign Sync</strong> (Google Drive or OneDrive).
               </p>
             </section>
 
@@ -66,9 +66,9 @@ export default function PrivacyPage() {
                 product. No personal financial data is transmitted to our servers.
               </p>
               <p style={{ fontSize: '16px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                <strong>Sovereign Sync (Premium):</strong> If you enable Google Drive sync, your portfolio data is stored
-                in your personal Google Drive account. We access it only for bidirectional synchronization. We do not
-                store copies on our servers.
+                <strong>Sovereign Sync (Premium):</strong> If you enable Google Drive or OneDrive sync, your portfolio
+                replica is stored in your personal cloud account. We access it only for bidirectional synchronization.
+                We do not store copies of that replica on our servers.
               </p>
             </section>
 
@@ -81,13 +81,19 @@ export default function PrivacyPage() {
               </p>
               <ul style={{ fontSize: '16px', color: 'var(--text-secondary)', marginLeft: '24px', marginBottom: '12px' }}>
                 <li>
-                  <strong>Google Analytics:</strong> Anonymous usage statistics (can be disabled via browser settings)
+                  <strong>Google:</strong> Optional Sign in with Google; optional Google Drive Sovereign Sync (user-owned folder)
+                </li>
+                <li>
+                  <strong>Microsoft:</strong> Optional Sign in with Microsoft; optional OneDrive Sovereign Sync (user-owned app folder)
                 </li>
                 <li>
                   <strong>Stripe:</strong> Payment processing for premium features (payment data handled by Stripe)
                 </li>
                 <li>
                   <strong>Vercel:</strong> Hosting infrastructure (static site generation, no data storage)
+                </li>
+                <li>
+                  <strong>Google Analytics:</strong> Anonymous usage statistics (can be disabled via browser settings)
                 </li>
               </ul>
             </section>
@@ -101,7 +107,7 @@ export default function PrivacyPage() {
               </p>
               <ul style={{ fontSize: '16px', color: 'var(--text-secondary)', marginLeft: '24px', marginBottom: '12px' }}>
                 <li>Access your data (export via JSON download)</li>
-                <li>Delete your data (clear browser storage or disconnect Google Drive)</li>
+                <li>Delete your data (clear browser storage or disconnect Google Drive / OneDrive)</li>
                 <li>Data portability (all data is in standard JSON format)</li>
                 <li>Opt-out of analytics (disable via browser settings)</li>
               </ul>
