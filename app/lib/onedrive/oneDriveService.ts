@@ -29,26 +29,40 @@ export const MSAL_EXPECT_REDIRECT_KEY = 'pp-msal-expect-redirect';
 export const ONEDRIVE_CONNECT_PENDING_KEY = 'pp-onedrive-connect-pending';
 
 /**
- * Azure SPA redirect must match EXACTLY. Always use origin (no /settings path).
- * Optional env: full URL; path stripped unless it is the onedrive-auth.html forwarder.
+ * Azure SPA redirect must match EXACTLY and must be the same origin the user
+ * is browsing. Pocket canonical host is www (apex 301 → www); baking apex
+ * breaks PKCE because sessionStorage is origin-scoped.
  */
 export function resolveMsalRedirectUri(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    // Prefer live origin so www vs localhost always matches sessionStorage.
+    const origin = window.location.origin;
+    const fromEnv = (process.env.NEXT_PUBLIC_MICROSOFT_REDIRECT_URI || '').trim();
+    // Only honour env when it matches this origin (optional forwarder path OK).
+    if (fromEnv) {
+      try {
+        const u = new URL(fromEnv, origin);
+        if (u.origin === origin) {
+          if (u.pathname.includes('onedrive-auth.html')) {
+            return `${u.origin}${u.pathname}`.replace(/\/$/, '');
+          }
+          return u.origin;
+        }
+      } catch {
+        /* ignore mismatched env */
+      }
+    }
+    return origin;
+  }
   const fromEnv = (process.env.NEXT_PUBLIC_MICROSOFT_REDIRECT_URI || '').trim();
   if (fromEnv) {
     try {
-      const u = new URL(fromEnv);
-      if (u.pathname.includes('onedrive-auth.html')) {
-        return `${u.origin}${u.pathname}`.replace(/\/$/, '');
-      }
-      return u.origin;
+      return new URL(fromEnv).origin;
     } catch {
       /* fall through */
     }
   }
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin;
-  }
-  return 'https://pocketportfolio.app';
+  return 'https://www.pocketportfolio.app';
 }
 
 let msalInstance: PublicClientApplication | null = null;
