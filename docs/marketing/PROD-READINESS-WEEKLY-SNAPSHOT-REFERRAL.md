@@ -22,7 +22,7 @@ Same as existing Stack Reveal / cron setup. No new secrets.
 ## 2. Vercel Cron
 
 - **Path:** `/api/cron/weekly-snapshot`
-- **Schedule:** `0 21 * * 5` (Friday 21:00 UTC)
+- **Schedule:** Fri `0 21,22,23 * * 5` + Sat `0 9,12 * * 6` (batched Auth pages — see incident lock)
 - **Config:** Already in `vercel.json`. No change needed after deploy.
 
 ---

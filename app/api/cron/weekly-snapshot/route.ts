@@ -1,6 +1,11 @@
 /**
- * Weekly Snapshot cron: send value-first email (portfolio % change or "Markets this week") with referral CTA.
- * Runs weekly (e.g. Sunday 09:00 UTC). Auth: CRON_SECRET or x-vercel-cron.
+ * Weekly Snapshot cron: value-first email (portfolio % change or "Markets this week") + referral CTA.
+ *
+ * Auth listUsers is quota-sensitive (Identity Toolkit RESOURCE_EXHAUSTED). This route NEVER
+ * sweeps the full user base in one invocation — one Auth page per run, cursor in Firestore,
+ * Vercel crons drain Fri evening + Sat morning.
+ *
+ * Auth: CRON_SECRET or x-vercel-cron.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -23,8 +28,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
+/** Fluid / Pro: enough for one Auth page + Resend pacing. */
+export const maxDuration = 300;
 
 const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000;
+/** Identity Toolkit listUsers page size — keep modest to avoid RESOURCE_EXHAUSTED. */
+const AUTH_PAGE_SIZE = 200;
+/** Soft cap on Resend sends per invocation (600ms pacing ≈ 2 min for 200). */
+const MAX_SENDS_PER_RUN = 200;
+const CRON_STATE_DOC = 'cron_state/weekly_snapshot';
 
 function getDb() {
   if (!getApps().length) {
@@ -37,6 +49,16 @@ function getDb() {
     });
   }
   return getFirestore();
+}
+
+function weekKeyUtc(d = new Date()): string {
+  // ISO week-ish key: YYYY-Www (UTC) so Friday + Saturday drain share one cohort
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
 function getSnapshotData(
@@ -80,6 +102,16 @@ function getSnapshotData(
   };
 }
 
+function isResourceExhausted(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  const code = typeof err === 'object' && err && 'code' in err ? String((err as { code: unknown }).code) : '';
+  return (
+    code === '8' ||
+    /RESOURCE_EXHAUSTED/i.test(msg) ||
+    /Quota exceeded/i.test(msg)
+  );
+}
+
 export async function GET(request: NextRequest) {
   const auth = verifyVercelCron(request);
   if (!auth.ok) {
@@ -103,33 +135,7 @@ export async function GET(request: NextRequest) {
     const firebaseAuth = getAuth();
     const usersRef = db.collection('users');
     const snapshotsRef = db.collection('portfolio_snapshots');
-
-    let toProcess: Array<{
-      uid: string;
-      email: string;
-      displayName: string | null;
-      firstName: string | null;
-      isGoogle: boolean;
-    }> = [];
-    let nextPageToken: string | undefined;
-
-    do {
-      const listResult = await firebaseAuth.listUsers(1000, nextPageToken);
-      nextPageToken = listResult.pageToken;
-      for (const user of listResult.users) {
-        const displayName = user.displayName || null;
-        const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
-        const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com');
-        if (!user.email) continue;
-        toProcess.push({
-          uid: user.uid,
-          email: user.email,
-          displayName,
-          firstName,
-          isGoogle,
-        });
-      }
-    } while (nextPageToken);
+    const stateRef = db.doc(CRON_STATE_DOC);
 
     let sent = 0;
     let skipped = 0;
@@ -169,9 +175,67 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const now = Date.now();
+    const currentWeek = weekKeyUtc();
+    const stateSnap = await stateRef.get();
+    const state = stateSnap.data() || {};
+    let pageToken: string | undefined =
+      state.weekKey === currentWeek && typeof state.pageToken === 'string'
+        ? state.pageToken
+        : undefined;
+    // Fresh week → start from beginning (undefined token)
+    if (state.weekKey !== currentWeek) {
+      pageToken = undefined;
+    }
 
-    for (const u of toProcess) {
+    let listResult;
+    try {
+      listResult = await firebaseAuth.listUsers(AUTH_PAGE_SIZE, pageToken);
+    } catch (err: unknown) {
+      if (isResourceExhausted(err)) {
+        console.error('[Weekly Snapshot Cron] Auth quota exhausted on listUsers', err);
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'RESOURCE_EXHAUSTED',
+            message:
+              'Firebase Auth listUsers quota exceeded. Cursor preserved; next drain slot will retry.',
+            weekKey: currentWeek,
+            pageToken: pageToken ?? null,
+            timestamp: new Date().toISOString(),
+          },
+          { status: 503 },
+        );
+      }
+      throw err;
+    }
+
+    const toProcess: Array<{
+      uid: string;
+      email: string;
+      displayName: string | null;
+      firstName: string | null;
+      isGoogle: boolean;
+    }> = [];
+
+    for (const user of listResult.users) {
+      if (!user.email) continue;
+      const displayName = user.displayName || null;
+      const firstName = displayName?.trim() ? displayName.trim().split(/\s+/)[0] || null : null;
+      const isGoogle = user.providerData?.some((p) => p.providerId === 'google.com') ?? false;
+      toProcess.push({
+        uid: user.uid,
+        email: user.email,
+        displayName,
+        firstName,
+        isGoogle,
+      });
+    }
+
+    const now = Date.now();
+    const sendBudget = Math.min(MAX_SENDS_PER_RUN, toProcess.length);
+
+    for (let i = 0; i < toProcess.length && sent < sendBudget; i++) {
+      const u = toProcess[i];
       const docRef = usersRef.doc(u.uid);
       const userSnap = await docRef.get();
       const userData = userSnap.data();
@@ -186,7 +250,11 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      let snapshots: Array<{ date: string; totalValue: number; positions?: Array<{ ticker: string; value: number }> }> = [];
+      let snapshots: Array<{
+        date: string;
+        totalValue: number;
+        positions?: Array<{ ticker: string; value: number }>;
+      }> = [];
       try {
         const snapQuery = await snapshotsRef
           .where('userId', '==', u.uid)
@@ -201,7 +269,7 @@ export async function GET(request: NextRequest) {
             positions: dta.positions,
           });
         });
-      } catch (e) {
+      } catch {
         // No index or error: proceed with no data (Markets this week)
       }
 
@@ -235,18 +303,38 @@ export async function GET(request: NextRequest) {
       await new Promise((r) => setTimeout(r, 600));
     }
 
+    const nextToken = listResult.pageToken || null;
+    const complete = !nextToken;
+    await stateRef.set(
+      {
+        weekKey: currentWeek,
+        pageToken: nextToken,
+        complete,
+        lastRunAt: Timestamp.now(),
+        lastSent: sent,
+        lastSkipped: skipped,
+        updatedAt: Timestamp.now(),
+      },
+      { merge: true }
+    );
+
     return NextResponse.json({
       success: true,
       sent,
       skipped,
+      evaluated: toProcess.length,
+      weekKey: currentWeek,
+      complete,
+      nextPageToken: nextToken,
       errors: errors.length ? errors : undefined,
       timestamp: new Date().toISOString(),
     });
   } catch (err: unknown) {
     console.error('[Weekly Snapshot Cron]', err);
+    const exhausted = isResourceExhausted(err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Cron failed' },
-      { status: 500 }
+      { status: exhausted ? 503 : 500 }
     );
   }
 }

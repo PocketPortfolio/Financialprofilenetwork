@@ -48,9 +48,11 @@ New users (Google signups in cohort ≥ Oct 27, 2025) receive a **Welcome (Week 
 
 ## Weekly Snapshot (separate cadence)
 
-- **When:** Friday 21:00 UTC (market close). Bookends Monday Stack Reveal to avoid two emails in 24h.
+- **When:** Friday **21 / 22 / 23 UTC** drain slots + Saturday **09 / 12 UTC** catch-up (Auth pagination — one page per invocation). Bookends Monday Stack Reveal.
 - **Eligibility:** `weekly_snapshot_enabled !== false` on `users/{uid}`; at most one per user per week.
+- **Ops:** Cursor in Firestore `cron_state/weekly_snapshot`. Do not full-sweep `listUsers` in one run (Identity Toolkit quota).
 - **Test:** `npm run weekly-snapshot:send-test -- <email>`
+- **Incident SSOT:** `docs/command/weekly-snapshot-quota-incident-2026-09-26.md`
 - **Spec:** [docs/marketing/WEEKLY-SNAPSHOT-EMAIL.md](marketing/WEEKLY-SNAPSHOT-EMAIL.md)
 
 ---
