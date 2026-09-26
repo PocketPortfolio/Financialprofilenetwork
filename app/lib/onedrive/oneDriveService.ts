@@ -577,45 +577,51 @@ export class OneDriveService {
   }
 
   async downloadPortfolioFile(fileId: string): Promise<PortfolioData> {
-    // Prefer @microsoft.graph.downloadUrl — avoids Graph 302 → SharePoint CDN
-    // with Authorization stripped (classic SPA "Failed to fetch").
-    const metaRes = await this.graphFetch(
-      `/me/drive/items/${fileId}?$select=id,@microsoft.graph.downloadUrl`
-    );
+    // @microsoft.graph.downloadUrl is an instance annotation — it is OMITTED when
+    // $select is used. Always GET the item without $select first.
+    const metaRes = await this.graphFetch(`/me/drive/items/${fileId}`);
     if (!metaRes.ok) {
       const text = await metaRes.text().catch(() => '');
       throw new Error(
-        `Failed to resolve OneDrive download URL: ${text || metaRes.statusText}`
+        `Failed to resolve OneDrive item: ${text || metaRes.statusText}`
       );
     }
     const meta = await metaRes.json();
     const downloadUrl = meta['@microsoft.graph.downloadUrl'] as string | undefined;
-    if (!downloadUrl) {
-      throw new Error(
-        'OneDrive did not return a download URL. Disconnect and Connect OneDrive again.'
-      );
-    }
-    let fileRes: Response;
-    try {
-      fileRes = await fetch(downloadUrl);
-    } catch (err) {
-      let host = 'file CDN';
+
+    if (downloadUrl) {
+      let fileRes: Response;
       try {
-        host = new URL(downloadUrl).host;
-      } catch {
-        /* ignore */
+        fileRes = await fetch(downloadUrl);
+      } catch (err) {
+        let host = 'file CDN';
+        try {
+          host = new URL(downloadUrl).host;
+        } catch {
+          /* ignore */
+        }
+        const raw = err instanceof Error ? err.message : String(err);
+        throw new Error(
+          /failed to fetch/i.test(raw)
+            ? `OneDrive file host blocked by CSP (${host}). Hard-refresh after deploy, then Pull again.`
+            : raw
+        );
       }
-      const raw = err instanceof Error ? err.message : String(err);
+      if (!fileRes.ok) {
+        throw new Error(`Failed to download OneDrive portfolio file: ${fileRes.statusText}`);
+      }
+      return fileRes.json();
+    }
+
+    // Fallback: /content (Graph may 302 to CDN; CSP must allow SharePoint/1drv hosts)
+    const response = await this.graphFetch(`/me/drive/items/${fileId}/content`);
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
       throw new Error(
-        /failed to fetch/i.test(raw)
-          ? `OneDrive file host blocked by CSP (${host}). Hard-refresh after deploy, then Pull again.`
-          : raw
+        `Failed to download OneDrive portfolio file: ${text || response.statusText}`
       );
     }
-    if (!fileRes.ok) {
-      throw new Error(`Failed to download OneDrive portfolio file: ${fileRes.statusText}`);
-    }
-    return fileRes.json();
+    return response.json();
   }
 
   async uploadExcelFile(
