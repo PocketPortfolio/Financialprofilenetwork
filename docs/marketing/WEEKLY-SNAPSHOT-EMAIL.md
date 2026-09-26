@@ -17,7 +17,7 @@ The **Weekly Portfolio Snapshot** is the "Trojan Horse" for Mode 2 (Referral & V
 
 ## Cadence and trigger
 
-- **Schedule:** Vercel cron `GET /api/cron/weekly-snapshot` runs **Friday 21:00 UTC** (market close). This bookends the Monday Stack Reveal (education) with a Friday results touchpoint, spacing touchpoints by ~4 days to avoid spam fatigue (see `vercel.json`).
+- **Schedule:** Vercel cron `GET /api/cron/weekly-snapshot` runs a **Friday evening drain** (21/22/23 UTC) plus **Saturday catch-up** (09/12 UTC). Each invocation processes **one** Firebase Auth `listUsers` page (cursor in `cron_state/weekly_snapshot`) so Identity Toolkit quota is not blown in a single sweep. See `docs/command/weekly-snapshot-quota-incident-2026-09-26.md`.
 - **Eligibility:** Users with `weekly_snapshot_enabled !== false` on `users/{uid}` (default true). Idempotency: at most one send per user per week (`lastWeeklySnapshotSentAt`).
 
 ---
