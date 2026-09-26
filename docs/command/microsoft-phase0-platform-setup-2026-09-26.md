@@ -39,9 +39,9 @@ NEXT_PUBLIC_MICROSOFT_CLIENT_ID=<azure-application-client-id>
 
 ## CSP
 
-`middleware.ts` allows Microsoft auth + Graph + OneDrive/SharePoint download hosts:
-`login.microsoftonline.com`, `login.live.com`, `graph.microsoft.com`, `*.sharepoint.com`,
-`*.onedrive.com`, `onedrive.live.com`, `*.livefilestore.com` (file content CDN after Graph).
+`middleware.ts` allows Microsoft auth + Graph + OneDrive/SharePoint download hosts, including
+`*.files.1drv.com`, `*.microsoftpersonalcontent.com`, `*.blob.core.windows.net`,
+`*.msauth.net` / `*.msftauth.net` (MSAL), and SharePoint/OneDrive CDNs.
 
 ## Verify
 

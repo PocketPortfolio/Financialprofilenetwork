@@ -582,33 +582,40 @@ export class OneDriveService {
     const metaRes = await this.graphFetch(
       `/me/drive/items/${fileId}?$select=id,@microsoft.graph.downloadUrl`
     );
-    if (metaRes.ok) {
-      const meta = await metaRes.json();
-      const downloadUrl = meta['@microsoft.graph.downloadUrl'] as string | undefined;
-      if (downloadUrl) {
-        let fileRes: Response;
-        try {
-          fileRes = await fetch(downloadUrl);
-        } catch (err) {
-          const raw = err instanceof Error ? err.message : String(err);
-          throw new Error(
-            /failed to fetch/i.test(raw)
-              ? 'OneDrive file host blocked by CSP. Hard-refresh after deploy, then Pull again.'
-              : raw
-          );
-        }
-        if (!fileRes.ok) {
-          throw new Error(`Failed to download OneDrive portfolio file: ${fileRes.statusText}`);
-        }
-        return fileRes.json();
+    if (!metaRes.ok) {
+      const text = await metaRes.text().catch(() => '');
+      throw new Error(
+        `Failed to resolve OneDrive download URL: ${text || metaRes.statusText}`
+      );
+    }
+    const meta = await metaRes.json();
+    const downloadUrl = meta['@microsoft.graph.downloadUrl'] as string | undefined;
+    if (!downloadUrl) {
+      throw new Error(
+        'OneDrive did not return a download URL. Disconnect and Connect OneDrive again.'
+      );
+    }
+    let fileRes: Response;
+    try {
+      fileRes = await fetch(downloadUrl);
+    } catch (err) {
+      let host = 'file CDN';
+      try {
+        host = new URL(downloadUrl).host;
+      } catch {
+        /* ignore */
       }
+      const raw = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        /failed to fetch/i.test(raw)
+          ? `OneDrive file host blocked by CSP (${host}). Hard-refresh after deploy, then Pull again.`
+          : raw
+      );
     }
-
-    const response = await this.graphFetch(`/me/drive/items/${fileId}/content`);
-    if (!response.ok) {
-      throw new Error(`Failed to download OneDrive portfolio file: ${response.statusText}`);
+    if (!fileRes.ok) {
+      throw new Error(`Failed to download OneDrive portfolio file: ${fileRes.statusText}`);
     }
-    return response.json();
+    return fileRes.json();
   }
 
   async uploadExcelFile(
