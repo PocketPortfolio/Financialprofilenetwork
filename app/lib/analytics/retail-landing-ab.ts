@@ -1,17 +1,18 @@
 import type { ABTestConfig } from './ab-testing';
 
 /**
- * Retail landing IA test — control (sovereign/infrastructure) vs retail (single-CTA funnel).
- * Active: 50/50 split on `/` via middleware cookie. Force override: ?variant=retail|control.
+ * Retail landing IA test — frozen 2026-09-27.
+ * Standing face is retail. `?variant=control` still opens the control page.
+ * testId stays so historical events still attach. Do not mint a new test.
  */
 export const RETAIL_LANDING_IA_TEST: ABTestConfig = {
   testId: 'landing_retail_ia_2026',
   testName: 'Retail Landing IA — Single CTA Funnel',
   description:
-    'Educational B2C variant: outcome copy, CSV-first hero, no dev substrate bleed. Measures Founders Club snare conversion.',
+    'Frozen. Retail is the standing consumer face. Control remains in the repo, out of rotation.',
   trafficSplit: 100,
   startDate: new Date('2026-06-10'),
-  isActive: true,
+  isActive: false,
   conversionEvents: [
     'landing_hero_demo_csv_drop',
     'landing_hero_sanitization_complete',

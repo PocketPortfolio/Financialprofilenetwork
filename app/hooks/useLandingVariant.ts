@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
+  LANDING_AB_IS_ACTIVE,
   LANDING_VARIANT_COOKIE,
   LANDING_VARIANT_TEST_ID,
   type LandingPageVariant,
@@ -19,8 +20,9 @@ function readVariantCookie(): LandingPageVariant | null {
 }
 
 /**
- * Resolves landing variant: URL param > cookie > A/B assignment > control.
- * Middleware sets cookie when ?variant=retail|control is present.
+ * Resolves landing variant: URL param > cookie > A/B assignment > retail.
+ * The A/B is frozen. Server render uses retail so control does not flash.
+ * `?variant=control` still opens the control page.
  */
 export function useLandingVariant(): LandingPageVariant {
   const searchParams = useSearchParams();
@@ -33,6 +35,7 @@ export function useLandingVariant(): LandingPageVariant {
   }, [paramVariant]);
 
   useEffect(() => {
+    if (!LANDING_AB_IS_ACTIVE) return;
     if (paramVariant) return;
     if (readVariantCookie()) return;
     const assigned = initializeABTest(RETAIL_LANDING_IA_TEST);
@@ -44,7 +47,7 @@ export function useLandingVariant(): LandingPageVariant {
     if (paramVariant) return paramVariant;
     if (cookieVariant) return cookieVariant;
     if (abVariant) return abVariant;
-    return 'control';
+    return 'retail';
   }, [paramVariant, cookieVariant, abVariant]);
 }
 

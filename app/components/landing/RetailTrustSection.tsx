@@ -1,6 +1,5 @@
 'use client';
 
-import DynamicDownloadCount from '@/app/components/DynamicDownloadCount';
 import { RETAIL_LANDING_COPY } from '@/lib/landing-retail-copy';
 
 export default function RetailTrustSection() {
@@ -18,21 +17,6 @@ export default function RetailTrustSection() {
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
-        <h2
-          style={{
-            fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-            fontWeight: 'bold',
-            marginBottom: '32px',
-            color: 'var(--text-warm)',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {copy.headline}{' '}
-          <span style={{ color: 'var(--accent-warm)' }}>
-            <DynamicDownloadCount />
-          </span>
-        </h2>
-
         <div
           style={{
             display: 'flex',
@@ -40,7 +24,6 @@ export default function RetailTrustSection() {
             gap: 'clamp(16px, 3vw, 24px)',
             justifyContent: 'center',
             alignItems: 'center',
-            marginBottom: '16px',
           }}
         >
           {copy.badges.map((label) => (
@@ -66,19 +49,6 @@ export default function RetailTrustSection() {
             </div>
           ))}
         </div>
-
-        <p
-          style={{
-            fontSize: 'clamp(14px, 2vw, 16px)',
-            color: 'var(--text-secondary)',
-            marginTop: '16px',
-            maxWidth: '560px',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        >
-          {copy.subcopy}
-        </p>
       </div>
     </section>
   );

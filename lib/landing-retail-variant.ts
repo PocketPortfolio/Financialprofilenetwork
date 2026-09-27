@@ -26,8 +26,11 @@ export const LANDING_VARIANT_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
 export const LANDING_VISITOR_COOKIE = 'pp_visitor_id';
 
-/** Command Team activated 2026-06-10 — 50/50 control vs retail on `/`. */
-export const LANDING_AB_IS_ACTIVE = true;
+/**
+ * Frozen 2026-09-27. Retail is the standing face.
+ * `?variant=control` still opens ControlLandingPage for inspection.
+ */
+export const LANDING_AB_IS_ACTIVE = false;
 
 /** Percent of un-cookied `/` traffic enrolled in the experiment (100 = everyone split 50/50). */
 export const LANDING_AB_TRAFFIC_SPLIT_PERCENT = 100;
@@ -47,7 +50,22 @@ function hashSeed(seed: string): number {
   return Math.abs(hash);
 }
 
-/** Stable 50/50 assignment from visitor seed (middleware + edge-safe). */
+/**
+ * Cookie to set on `/` and `/landing`.
+ * Frozen: retail, unless the query is `variant=control`.
+ * Active test: honor an explicit query, otherwise let the 50/50 assigner run.
+ */
+export function landingVariantCookieForRequest(
+  queryVariant: LandingPageVariant | null,
+): LandingPageVariant | 'assign' {
+  if (!LANDING_AB_IS_ACTIVE) {
+    return queryVariant === 'control' ? 'control' : 'retail';
+  }
+  if (queryVariant) return queryVariant;
+  return 'assign';
+}
+
+/** Stable 50/50 assignment from visitor seed. Not used while LANDING_AB_IS_ACTIVE is false. */
 export function assignLandingVariantFromSeed(seed: string): LandingPageVariant {
   return hashSeed(seed) % 2 === 0 ? 'retail' : 'control';
 }

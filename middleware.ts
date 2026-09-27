@@ -19,6 +19,7 @@ import {
   assignLandingVariantFromSeed,
   isLandingAbPath,
   landingAbEnrollmentBucket,
+  landingVariantCookieForRequest,
   parseLandingVariantParam,
 } from '@/lib/landing-retail-variant';
 
@@ -237,7 +238,7 @@ export async function middleware(request: NextRequest) {
   return applySecurityHeaders(request, res);
 }
 
-/** 50/50 cohort cookie on `/` — canonical URL unchanged (no ?variant= in HTML). */
+/** Standing retail cookie on `/`. `?variant=control` is the inspection hatch. */
 function applyLandingAbAssignment(request: NextRequest, response: NextResponse): void {
   const pathname = request.nextUrl.pathname;
   if (!isLandingAbPath(pathname)) return;
@@ -249,8 +250,9 @@ function applyLandingAbAssignment(request: NextRequest, response: NextResponse):
     sameSite: 'lax' as const,
   };
 
-  if (variantParam) {
-    response.cookies.set(LANDING_VARIANT_COOKIE, variantParam, cookieOpts);
+  const locked = landingVariantCookieForRequest(variantParam);
+  if (locked !== 'assign') {
+    response.cookies.set(LANDING_VARIANT_COOKIE, locked, cookieOpts);
     return;
   }
 

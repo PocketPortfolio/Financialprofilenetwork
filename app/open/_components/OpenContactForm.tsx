@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getFirstTouchAttribution } from '@/app/lib/analytics/attribution';
 import { trackEvent } from '@/app/lib/analytics/events';
 import { OPEN_LANDING_COPY } from '../../../lib/canonical-claims';
+import { mapFirstTouchToAttributionChannel } from '../../../lib/open-portfolio/attribution-channel';
 
 /**
  * OpenContactForm — top-of-funnel B2B capture for the Open Portfolio landing.
@@ -45,6 +47,12 @@ export default function OpenContactForm() {
     setStatus('submitting');
     setErrorMsg(null);
     try {
+      const firstTouch = getFirstTouchAttribution();
+      const attributionChannel = mapFirstTouchToAttributionChannel({
+        utm_source: firstTouch?.utm_source,
+        utm_medium: firstTouch?.utm_medium,
+        referrer: firstTouch?.referrer,
+      });
       const res = await fetch('/api/open-portfolio/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,6 +62,7 @@ export default function OpenContactForm() {
           role,
           context,
           message,
+          attributionChannel,
         }),
       });
       if (!res.ok) {

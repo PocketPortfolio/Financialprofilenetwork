@@ -3,7 +3,7 @@ id: OP-CLAIMS-CALIBRATION-2026-05-20
 title: Ecosystem Positioning & Codebase Reality Alignment Ledger
 status: EVALUATION_RECORD
 deployment: NOT_CLEARED_FOR_PRODUCTION
-last_updated: 2026-07-29
+last_updated: 2026-09-27
 roles: [Engineering, Growth, FounderOps, Procurement-facing copy]
 ---
 
@@ -49,6 +49,11 @@ Do **not** imply two separate production codebases. It is **one monorepo**, **on
 - **Stateless inference handler** for portfolio text: request payload used only to build the prompt and stream the response; see `app/api/ai/chat/route.ts` header comment and `docs/IP-TECHNICAL-MECHANISMS.md`.
 - **CSV-first codec** / format-agnostic semantic core (`NormalizedTrade` / OpenBroker Ledger) — CSV and Excel are the first wire formats, not the only ones. See `docs/command/format-agnostic-sovereign-ingestion-roadmap.md`.
 - **Normalize at the edge** (client or partner perimeter) for Tier 1 audit-perimeter reduction.
+- **Bank-grade privacy. Zero inference warehousing.** Approved external line (CEO, 27 Sep 2026). Say it. The public monorepo is the evidence.
+
+  **Bank-grade privacy** means the data-handling posture a reader can verify on GitHub: ingestion and the working portfolio stay on the client or in a store the buyer already approves; Ask AI receives a bounded aggregate from `buildPortfolioContext`; the inference handler does not retain that payload. It is a description of how the system behaves. It is not a claim that we hold SOC 2, ISO 27001, or a bank charter.
+
+  **Zero inference warehousing** means the portfolio text sent to Ask AI is not written into a client-ledger warehouse. Receipts: `app/api/ai/chat/route.ts` (payload used to build the prompt and stream the response; no database write or cache of that payload; quota and analytics metadata only) and `docs/IP-TECHNICAL-MECHANISMS.md` (context, message, and attachments are not stored). `app/lib/ai/contextBuilder.ts` sends totals and top holdings, not the raw ledger.
 
 ### Prohibited / red-team phrases (external)
 
@@ -63,6 +68,7 @@ Do **not** use without legal + engineering sign-off:
 | “Bloomberg replacement” / “AI-native Bloomberg” | Competitor + capability implication; UX gravity not proven by infra alone. |
 | “Sovereign AI OS” / vague “sovereignty” without technical noun | Reads ideological; procurement red flag. |
 | “CSV-only platform” / “we only do CSV” | Contradicts format-agnostic roadmap; CSV is v1 codec, not the architecture. |
+| “Bank-grade privacy” used to mean “SOC 2 certified” or “we are a bank” | The approved line is the data-handling posture above. Named certifications stay forbidden until held. |
 
 ---
 
@@ -120,6 +126,8 @@ Prevent **strategic drift** into production: no campaign should hard-launch **ne
 | OpenBroker Ledger | Format-agnostic interchange name for the same semantic row set. See `docs/command/format-agnostic-sovereign-ingestion-roadmap.md`. |
 | CSV-first codec | Approved: first wire format + Pocket harness. Not “CSV-only forever.” |
 | Process-local / Sovereign Local (Ask AI) | Allowed when describing **Ollama (or similar) host-node** inference on the user’s machine with the same `buildPortfolioContext` payload. Not WASM-in-browser. See `docs/architecture/sovereign-ai-harness-plan-2026-08-04.md`. |
+| Bank-grade privacy | Allowed as the public data-handling posture: client-side working set, bounded Ask AI context, no inference warehouse of that payload. Cite this ledger. Not a SOC 2 / ISO / charter claim. |
+| Zero inference warehousing | Allowed. The Ask AI payload is not persisted as a client ledger. Receipts: `app/api/ai/chat/route.ts`, `docs/IP-TECHNICAL-MECHANISMS.md`. |
 
 **Future formalisation:** consider splitting this section into `docs/command/approved-claims-dictionary.md` if marketing surface area grows; until then, **this file is the SSOT**.
 
@@ -134,6 +142,7 @@ Prevent **strategic drift** into production: no campaign should hard-launch **ne
 | Model-agnostic routing of **bounded** context to cloud APIs or an **OP-hosted sovereign inference node** (`OLLAMA_BASE_URL`) | “In-browser WASM LLM” (unshipped) |
 | Sovereign mode keeps inference off Gemini/OpenAI for that request (still via OP `/api/ai/chat` → OP node) | “Zero bytes leave the device” while Cloud Auto **or hosted Sovereign** is active |
 | Adversarial harness compares sovereign vs cloud on the same edge payload | “Local 8B matches GPT-4”; claiming **all** prod users run process-local on their laptop |
+| **Bank-grade privacy. Zero inference warehousing.** | Using that line to assert SOC 2, ISO 27001, “zero bytes leave the device,” or “AI never sees your data” |
 
 ## 7. Content pipeline handoff (Consultant 1 → Consultant 2)
 
@@ -148,6 +157,7 @@ Prevent **strategic drift** into production: no campaign should hard-launch **ne
 
 | Date | Change |
 |------|--------|
+| 2026-09-27 | Approved external line: **Bank-grade privacy. Zero inference warehousing.** Posture is readable in the public repo. The line does not assert SOC 2, ISO, or a bank charter. |
 | 2026-08-04 | §6b: Aug 10 prod = OP-hosted sovereign node via `/api/ai/chat`; forbid device-local claims for all users. |
 | 2026-07-29 | Format-agnostic doctrine: approved “CSV-first codec”; prohibit “CSV-only platform”; link roadmap SSOT. |
 | 2026-05-25 | Linked calibrated Open Portfolio seed package (`docs/seed/open-portfolio-seed-investor-package.md`). |

@@ -1,15 +1,14 @@
 /**
- * Pocket Portfolio B2C landing — retail A/B variant copy SSOT.
- * Command Team approved 2026-06-10. No absolute privacy claims; no dev substrate language.
+ * Pocket Portfolio B2C landing — standing retail face (A/B frozen 2026-09-27).
+ * Privacy band is the claim-gate allow-list line. Analyst body may name the shipped Ask AI route.
  */
 
 export const RETAIL_LANDING_COPY = {
   hero: {
-    headline: 'Master your wealth across every broker, in one secure place.',
+    headline: 'Master your wealth across your brokers, in one secure place.',
     subhead:
       'See your entire wealth in one place. Drag, drop, and understand your risk.',
-    privacyBand:
-      'Your statements stay on your device. We analyze the big picture. Your financial privacy is enforced by design.',
+    privacyBand: 'Bank-grade privacy. Zero inference warehousing.',
     primaryCta: 'Import your portfolio (Free)',
     secondaryCta: "Explore Founder's Club",
     dropzoneHint: 'Drop your broker CSV here — parsed locally in your browser for this demo.',
@@ -27,7 +26,7 @@ export const RETAIL_LANDING_COPY = {
       'Annualized return and volatility help you see whether your risk matches your goals.',
   },
   analyst: {
-    eyebrow: 'New: Sovereign routing',
+    eyebrow: 'Pocket Analyst',
     headline: 'Your intelligent portfolio sounding board.',
     body: 'Ask questions about allocations, risk, and performance. Get clear answers grounded in your portfolio summary — not your raw statements. Switch Cloud Auto or OP-Hosted Sovereign in Ask AI.',
     privacy:
@@ -36,9 +35,7 @@ export const RETAIL_LANDING_COPY = {
     watchCta: 'Watch Demo',
   },
   trust: {
-    headline: 'Trusted by investors and wealth professionals',
-    subcopy: 'Bank-level encryption. No data sold. Secure edge processing.',
-    badges: ['Bank-level encryption', 'No data sold', 'Secure edge processing'] as const,
+    badges: ['No data sold', 'Secure edge processing'] as const,
   },
 } as const;
 

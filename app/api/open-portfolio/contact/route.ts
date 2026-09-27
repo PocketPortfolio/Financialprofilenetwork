@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { recordOpenPortfolioContactLead } from '@/lib/open-portfolio/contact-leads-firestore';
 import { notifyEnterpriseLeadSlack } from '@/lib/open-portfolio/enterprise-lead-slack';
+import { parseAttributionChannel } from '@/lib/open-portfolio/attribution-channel';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
         | 'investor'
         | 'grant',
       source,
+      attributionChannel: parseAttributionChannel(b.attributionChannel),
     };
 
   try {

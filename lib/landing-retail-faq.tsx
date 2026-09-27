@@ -33,8 +33,8 @@ export const RETAIL_LANDING_FAQ: { question: string; answer: React.ReactNode }[]
     question: 'Is my portfolio data secure?',
     answer: (
       <p style={{ color: 'var(--muted)', lineHeight: '1.6', margin: 0 }}>
-        Yes. Bank-level encryption, no data sold, and secure edge processing. Your financial privacy is enforced by
-        design.
+        Bank-grade privacy. Zero inference warehousing. Broker statements are parsed on your device. Ask AI uses a
+        bounded portfolio summary — not your raw statements.
       </p>
     ),
   },
