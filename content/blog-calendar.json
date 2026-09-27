@@ -1534,7 +1534,7 @@
     "date": "2026-09-27",
     "title": "The Momentum Factor: Persistence or Persistence Bias?",
     "slug": "the-momentum-factor-persistence-or-persistence-bias",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1544,7 +1544,8 @@
       "momentum"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-27T09:00:35.724Z"
   },
   {
     "id": "week-39-post-2",
