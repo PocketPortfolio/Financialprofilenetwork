@@ -25,7 +25,7 @@ const PORTAL_CARDS = [
   {
     visualId: 'portalTerminal' as const,
     title: 'The Terminal',
-    body: 'Track net worth across 50+ brokers. Autonomous research by Pulitzer AI. 800+ weekly briefs. Human-verified.',
+    body: 'Track net worth from 19 dedicated broker adapters, plus Smart Import. Autonomous research by Pulitzer AI. 800+ weekly briefs. Human-verified.',
     cta: (
       <DashboardLaunchLink
         style={{

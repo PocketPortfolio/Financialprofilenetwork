@@ -111,6 +111,48 @@ export default function RetailLandingHero({ isMobile, heroVideoSrc, csvDemo }: R
 
         <div
           style={{
+            width: '100%',
+            maxWidth: '720px',
+            marginBottom: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+            textAlign: 'left',
+          }}
+        >
+          {copy.rails.map((row, index) => {
+            const lead = index === 0;
+            return (
+            <p
+              key={row.label}
+              style={{
+                margin: 0,
+                fontSize: lead
+                  ? 'clamp(0.9375rem, 1.5vw, 1.0625rem)'
+                  : 'clamp(0.8125rem, 1.3vw, 0.9375rem)',
+                lineHeight: lead ? 1.45 : 1.4,
+                fontWeight: lead ? 500 : 400,
+                color: 'var(--text)',
+              }}
+            >
+              <span
+                style={{
+                  color: 'var(--accent-warm)',
+                  fontWeight: 700,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {row.label}.{' '}
+              </span>
+              {row.body}
+            </p>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
             display: 'flex',
             flexWrap: 'wrap',
             gap: '12px',

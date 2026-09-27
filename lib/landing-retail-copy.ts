@@ -9,6 +9,20 @@ export const RETAIL_LANDING_COPY = {
     subhead:
       'See your entire wealth in one place. Drag, drop, and understand your risk.',
     privacyBand: 'Bank-grade privacy. Zero inference warehousing.',
+    rails: [
+      {
+        label: 'Brokers',
+        body: '19 dedicated adapters, including Trading 212, Interactive Brokers, Freetrade, Charles Schwab, and Ghostfolio. Other CSVs use Smart Import.',
+      },
+      {
+        label: 'Sign-in',
+        body: 'Google or Microsoft. Optional Drive or OneDrive folder you own.',
+      },
+      {
+        label: 'Models',
+        body: 'Cloud Auto (Gemini, then OpenAI) or OP-Hosted Sovereign.',
+      },
+    ] as const,
     primaryCta: 'Import your portfolio (Free)',
     secondaryCta: "Explore Founder's Club",
     dropzoneHint: 'Drop your broker CSV here — parsed locally in your browser for this demo.',

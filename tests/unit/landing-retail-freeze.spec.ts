@@ -28,6 +28,19 @@ describe('landing retail freeze', () => {
       'Master your wealth across your brokers, in one secure place.',
     );
     expect(RETAIL_LANDING_COPY.hero.privacyBand).toBe(APPROVED_PRIVACY);
+    expect(RETAIL_LANDING_COPY.hero.rails.map((row) => row.label)).toEqual([
+      'Brokers',
+      'Sign-in',
+      'Models',
+    ]);
+    expect(RETAIL_LANDING_COPY.hero.rails[0].body).toContain('19 dedicated adapters');
+    expect(RETAIL_LANDING_COPY.hero.rails[0].body).toContain('Smart Import');
+    expect(RETAIL_LANDING_COPY.hero.rails[1].body).toBe(
+      'Google or Microsoft. Optional Drive or OneDrive folder you own.',
+    );
+    expect(RETAIL_LANDING_COPY.hero.rails[2].body).toBe(
+      'Cloud Auto (Gemini, then OpenAI) or OP-Hosted Sovereign.',
+    );
     expect(RETAIL_LANDING_COPY.analyst.eyebrow).toBe('Pocket Analyst');
     expect(RETAIL_LANDING_COPY.analyst.body).toContain('OP-Hosted Sovereign');
     expect(RETAIL_LANDING_COPY.trust.badges).toEqual(['No data sold', 'Secure edge processing']);
