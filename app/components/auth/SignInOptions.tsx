@@ -7,7 +7,7 @@ type SignInOptionsProps = {
   onMicrosoft: () => void | Promise<void>;
   busy?: boolean;
   layout?: 'stack' | 'row';
-  /** When true, Google uses amber brand CTA; Microsoft uses surface border (Creative lock). */
+  /** When true, Google is the amber CTA. Microsoft stays elevated surface with a warm border. */
   emphasizeGoogle?: boolean;
 };
 
@@ -55,6 +55,16 @@ export default function SignInOptions({
   layout = 'stack',
   emphasizeGoogle = true,
 }: SignInOptionsProps) {
+  const secondaryChrome: React.CSSProperties = {
+    background: 'var(--surface-elevated)',
+    color: 'var(--text)',
+    border: '1px solid var(--border-warm)',
+    borderRadius: 4,
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    boxSizing: 'border-box',
+  };
+
   const googleStyle: React.CSSProperties = emphasizeGoogle
     ? {
         padding: '12px 20px',
@@ -71,13 +81,13 @@ export default function SignInOptions({
         gap: 8,
         opacity: busy ? 0.6 : 1,
         width: layout === 'stack' ? '100%' : undefined,
+        appearance: 'none',
+        WebkitAppearance: 'none',
+        boxSizing: 'border-box',
       }
     : {
+        ...secondaryChrome,
         padding: '10px 16px',
-        background: 'var(--surface)',
-        color: 'var(--text)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 4,
         fontSize: 14,
         cursor: busy ? 'not-allowed' : 'pointer',
         display: 'flex',
@@ -88,11 +98,8 @@ export default function SignInOptions({
       };
 
   const microsoftStyle: React.CSSProperties = {
+    ...secondaryChrome,
     padding: emphasizeGoogle ? '12px 20px' : '10px 16px',
-    background: 'var(--surface)',
-    color: 'var(--text)',
-    border: '1px solid var(--border-subtle)',
-    borderRadius: 4,
     fontSize: 14,
     fontWeight: emphasizeGoogle ? 600 : 500,
     cursor: busy ? 'not-allowed' : 'pointer',
