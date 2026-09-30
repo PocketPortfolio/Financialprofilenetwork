@@ -1552,7 +1552,7 @@
     "date": "2026-09-30",
     "title": "The Open Standard Advantage: Why JSON Wins",
     "slug": "the-open-standard-advantage-why-json-wins",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1562,7 +1562,8 @@
       "standard"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-09-30T09:00:34.598Z"
   },
   {
     "id": "week-40-post-1",
