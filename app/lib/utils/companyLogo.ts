@@ -4,9 +4,6 @@
  * Ensures logos always display by trying multiple sources
  */
 
-// Polygon.io (now Massive) API key
-const POLYGON_API_KEY = process.env.NEXT_PUBLIC_POLYGON_API_KEY || 'rhT5t2nUFEdemIUpKfr070c4qNGVK235';
-
 // Popular ticker to domain mapping for Clearbit
 const TICKER_DOMAIN_MAP: Record<string, string> = {
   'AAPL': 'apple.com',
