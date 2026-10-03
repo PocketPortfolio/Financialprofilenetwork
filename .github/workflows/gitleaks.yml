@@ -5,6 +5,8 @@ name: Secret scan (Gitleaks)
 on:
   pull_request:
     branches: [ main, develop ]
+  push:
+    branches: [ main ]
 
 # Concurrency control - prevent queue buildup from multiple commits
 concurrency:

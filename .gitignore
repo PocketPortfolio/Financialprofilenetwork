@@ -38,6 +38,11 @@ temp_api_key.txt
 *.key
 .vercel
 .env*.local
+tmp-*
+tmp-*.json
+tmp-*.mjs
+qwen-test-demo.txt
+scripts/.wave2-fw-tmp.json
 
 # Seed decks / binaries (keep repo text-first)
 docs/seed/*.pptx
