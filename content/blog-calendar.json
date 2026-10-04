@@ -1570,7 +1570,7 @@
     "date": "2026-10-04",
     "title": "Sovereign Sync: The End of Vendor Lock-in",
     "slug": "sovereign-sync-the-end-of-vendor-lock-in",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1580,7 +1580,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-04T09:00:40.200Z"
   },
   {
     "id": "week-40-post-2",
