@@ -1588,7 +1588,7 @@
     "date": "2026-10-07",
     "title": "Schema Design for Financial Data: Building Robust JSON Structures",
     "slug": "schema-design-for-financial-data-building-robust-json-struct",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1598,7 +1598,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-07T09:00:41.745Z"
   },
   {
     "id": "week-41-post-1",
