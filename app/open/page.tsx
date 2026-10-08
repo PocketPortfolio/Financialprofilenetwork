@@ -24,14 +24,14 @@ import {
  */
 
 export const metadata: Metadata = {
-  title: 'BYOC AI Infrastructure for Wealth-Tech | Open Portfolio',
+  title: 'AI over wealth data — without another client-ledger warehouse | Open Portfolio',
   description:
-    'Run AI over wealth data without warehousing client ledgers. Keep your IdP and approved storage with Open Portfolio’s bounded inference boundary.',
+    'You keep your login and client data. Open Portfolio builds a small approved summary for the AI model — so wealth platforms do not have to copy the book into another vendor cloud.',
   alternates: { canonical: OPEN_URLS.home },
   openGraph: {
-    title: 'BYOC AI Infrastructure for Wealth-Tech | Open Portfolio',
+    title: 'AI over wealth data — without another client-ledger warehouse | Open Portfolio',
     description:
-      'Run AI over wealth data without warehousing client ledgers. Keep your IdP and approved storage with Open Portfolio’s bounded inference boundary.',
+      'You keep your login and client data. Open Portfolio builds a small approved summary for the AI model — so wealth platforms do not have to copy the book into another vendor cloud.',
     url: OPEN_URLS.home,
     siteName: SURFACE_ORG.open.name,
     type: 'website',

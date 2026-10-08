@@ -135,9 +135,9 @@ export default function OpenLandingSovereignGrid() {
           borderRadius: '0 4px 4px 0',
         }}
       >
-        Regulated verticals · frontier AI
+        Wealth-tech · clear data boundaries
         <br />
-        <span style={{ color: 'rgba(228,228,231,0.75)' }}>Systematic perimeter alignment</span>
+        <span style={{ color: 'rgba(228,228,231,0.75)' }}>AI sees a summary, not the ledger</span>
       </div>
     </div>
   );

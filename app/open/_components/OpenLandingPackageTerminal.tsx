@@ -56,7 +56,7 @@ export default function OpenLandingPackageTerminal() {
             color: ACCENT,
           }}
         >
-          OSS substrate · npm org
+          Open-source packages · npm
         </p>
         <p
           style={{

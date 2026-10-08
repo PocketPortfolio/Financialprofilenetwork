@@ -49,7 +49,8 @@ describe('complianceBadgeForCountry', () => {
   });
 
   it('returns US default badge', () => {
-    expect(complianceBadgeForCountry('US').pill).toContain('BYOC');
+    expect(complianceBadgeForCountry('US').pill.toLowerCase()).toContain('store');
+    expect(complianceBadgeForCountry('US').text.toLowerCase()).toContain('summary');
     expect(complianceBadgeForCountry('US').text.toLowerCase()).not.toContain('soc 2');
   });
 });

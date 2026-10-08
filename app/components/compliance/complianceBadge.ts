@@ -25,15 +25,15 @@ export function complianceBadgeForCountry(countryCode: string): ComplianceBadge 
 
   if (['US', 'CA', 'AU'].includes(code)) {
     return {
-      title: 'Sovereign Data Perimeter',
-      text: 'Inspectable BYOC boundary — buyer keeps IdP and approved storage; inference runs over bounded aggregate context.',
-      pill: 'BYOC / Inspectable',
+      title: 'You keep the store',
+      text: 'You keep login and approved storage. AI only sees a small approved summary — not a copy of the client ledger.',
+      pill: 'You keep the store',
     };
   }
 
   return {
-    title: 'Sovereign Data Perimeter',
-    text: 'Local-first ingestion with stateless inference — raw ledgers stay at the edge.',
-    pill: 'Sovereign / BYOC',
+    title: 'You keep the store',
+    text: 'Import stays close to the user. The model sees an approved summary — not the raw ledger as a vendor warehouse.',
+    pill: 'Summary, not the ledger',
   };
 }
