@@ -1606,7 +1606,7 @@
     "date": "2026-10-11",
     "title": "Why Cloud Portfolios are Traps: The Hidden Cost of Convenience",
     "slug": "why-cloud-portfolios-are-traps-the-hidden-cost-of-convenienc",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1616,7 +1616,8 @@
       "cloud"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-11T09:00:38.630Z"
   },
   {
     "id": "week-41-post-2",
