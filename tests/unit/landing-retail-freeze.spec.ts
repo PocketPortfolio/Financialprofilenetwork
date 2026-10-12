@@ -75,6 +75,25 @@ describe('open attribution channel', () => {
       }),
     ).toBe('unknown');
     expect(mapFirstTouchToAttributionChannel({ utm_medium: 'referral' })).toBe('authority');
+    expect(
+      mapFirstTouchToAttributionChannel({
+        utm_source: 'linkedin',
+        utm_medium: 'social',
+        utm_campaign: 'oi_intro',
+      }),
+    ).toBe('authority');
+    expect(
+      mapFirstTouchToAttributionChannel({
+        utm_source: 'youtube',
+        utm_medium: 'video',
+        utm_campaign: 'oi_s1',
+      }),
+    ).toBe('authority');
+    expect(
+      mapFirstTouchToAttributionChannel({
+        referrer: 'https://www.linkedin.com/feed/',
+      }),
+    ).toBe('authority');
     expect(mapFirstTouchToAttributionChannel({})).toBe('unknown');
   });
 

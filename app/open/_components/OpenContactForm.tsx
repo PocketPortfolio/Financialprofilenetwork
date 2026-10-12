@@ -51,6 +51,7 @@ export default function OpenContactForm() {
       const attributionChannel = mapFirstTouchToAttributionChannel({
         utm_source: firstTouch?.utm_source,
         utm_medium: firstTouch?.utm_medium,
+        utm_campaign: firstTouch?.utm_campaign,
         referrer: firstTouch?.referrer,
       });
       const res = await fetch('/api/open-portfolio/contact', {
@@ -69,7 +70,11 @@ export default function OpenContactForm() {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error || 'Submission failed.');
       }
-      trackEvent('homepage_form_submitted', { context });
+      trackEvent('homepage_form_submitted', {
+        context,
+        attribution_channel: attributionChannel,
+        utm_campaign: firstTouch?.utm_campaign || undefined,
+      });
       setStatus('success');
       setEmail('');
       setCompany('');

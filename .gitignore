@@ -21,6 +21,8 @@ coverage/
 *.tsbuildinfo
 test-results/
 ui-audit/
+playwright-report/
+exports/
 
 # Local npm auth at repo root (use NPM_TOKEN in env; packages/*/ may ship a tokenless stub)
 /.npmrc
@@ -29,6 +31,7 @@ ui-audit/
 .DS_Store
 Thumbs.db
 *.log
+*.bak
 
 # stray files from earlier SSH tests
 1234567890*
@@ -43,14 +46,94 @@ tmp-*.json
 tmp-*.mjs
 qwen-test-demo.txt
 scripts/.wave2-fw-tmp.json
+dependabot-alerts.json
+npm-audit*.json
+npm-audit-*.json
 
-# Seed decks / binaries (keep repo text-first)
-docs/seed/*.pptx
+# --- Ship surface boundary (2026-10-12) ---
+# Product git/Vercel = runtime only. Ops / business / document assets stay local or Drive.
+# SSOT: docs/command/ship-surface-boundary-2026-10-12.md
 
-# Marketing binaries + caches (keep repo text-first)
+# Local Command / org / ops packs (Drive / private). Already-tracked files stay tracked;
+# new untracked Command assets must not enter product PRs.
+docs/command/**
+!docs/command/
+!docs/command/ship-surface-boundary-2026-10-12.md
+docs/architecture/_harness-runs/
+
+# Outreach / commercial leave-behinds
+docs/outreach/
+
+# Seed / investor document assets
+docs/seed/
+
+# Media working packages + raw footage (Google Drive)
+docs/media/
+
+# Marketing paste locks, comps, tmp (text-first product repo)
 docs/marketing/*.pptx
 docs/marketing/*.pdf
 docs/marketing/~$*
-docs/outreach/~$*
 docs/marketing/_freetrade-deck-cache/
 docs/marketing/_plaid-deck-cache/
+docs/marketing/_tmp*
+docs/marketing/LINKEDIN-*
+docs/marketing/oi-*
+docs/marketing/linkedin-*/
+
+# Heavy / non-runtime public marketing binaries (already-tracked stay tracked)
+public/marketing/**/*.mp4
+public/marketing/**/*.gif
+public/marketing/**/*.png
+public/marketing/**/*.jpg
+public/marketing/**/*.jpeg
+public/marketing/**/*.webp
+public/marketing/_open-enterprise-gtm-tmp/
+public/dashboard-demo*
+
+# Ops scripts + deck/PDF generators (not product runtime)
+scripts/ops-*
+scripts/generate-*-brief*
+scripts/generate-*-pptx*
+scripts/generate-*-pdf*
+scripts/generate-oi-*
+scripts/generate-open-intelligence*
+scripts/generate-open-portfolio-seed*
+scripts/generate-salford*
+scripts/generate-venture*
+scripts/generate-barclays*
+scripts/generate-brewin*
+scripts/generate-camilla*
+scripts/generate-crediflow*
+scripts/generate-dish*
+scripts/generate-ent-*
+scripts/generate-fca*
+scripts/generate-fintech*
+scripts/generate-gocardless*
+scripts/generate-generator*
+scripts/generate-nextwave*
+scripts/build-assume-ai*
+scripts/deskew-*
+scripts/encode-sovereign*
+scripts/fix-sovereign*
+scripts/measure-assume-ai*
+scripts/patch-salford*
+scripts/extract-cmd*
+scripts/lib/*deck*
+scripts/lib/*brief*
+scripts/lib/*visuals*
+scripts/lib/open-portfolio-seed*
+scripts/__pycache__/
+
+# Cursor local agent / plans
+.cursor/plans/
+.cursor/rules/
+AGENTS.md
+
+# Stray root screen recordings (root only — public/ site videos stay tracked)
+/*.mp4
+/*.mov
+/*.mkv
+/*.webm
+/*.wav
+/*.mogrt

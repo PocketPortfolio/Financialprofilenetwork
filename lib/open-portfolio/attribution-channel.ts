@@ -51,13 +51,33 @@ function isAiHost(host: string): boolean {
   return AI_HOSTS.some((name) => host === name || host.endsWith(`.${name}`));
 }
 
+const AUTHORITY_SOURCES = [
+  'linkedin',
+  'youtube',
+  'open_intelligence',
+  'open-intelligence',
+  'oi',
+] as const;
+
+const AUTHORITY_HOSTS = ['linkedin.com', 'lnkd.in', 'youtube.com', 'youtu.be'] as const;
+
+function isAuthorityHost(host: string): boolean {
+  return AUTHORITY_HOSTS.some((name) => host === name || host.endsWith(`.${name}`));
+}
+
+function isOiCampaign(campaign: string): boolean {
+  return campaign.startsWith('oi_') || campaign.includes('open_intelligence') || campaign.includes('open-intelligence');
+}
+
 export function mapFirstTouchToAttributionChannel(input: {
   utm_source?: string | null;
   utm_medium?: string | null;
+  utm_campaign?: string | null;
   referrer?: string | null;
 }): AttributionChannel {
   const source = norm(input.utm_source);
   const medium = norm(input.utm_medium);
+  const campaign = norm(input.utm_campaign);
   const host = referrerHost(input.referrer);
 
   if (medium === 'outbound' || medium === 'sales' || medium === 'room' || source === 'outbound' || source === 'sales' || source === 'room') {
@@ -74,7 +94,20 @@ export function mapFirstTouchToAttributionChannel(input: {
   const paid = medium === 'cpc' || medium === 'ppc' || medium === 'paid';
   if (isSearchHost(host) && !paid) return 'organic';
 
-  if (medium === 'referral') return 'authority';
+  // Open Intelligence / founder social → authority (GEO digital sources)
+  const authoritySource = AUTHORITY_SOURCES.some(
+    (token) => source === token || source.includes(token),
+  );
+  if (
+    medium === 'referral' ||
+    medium === 'social' ||
+    medium === 'video' ||
+    authoritySource ||
+    isOiCampaign(campaign) ||
+    isAuthorityHost(host)
+  ) {
+    return 'authority';
+  }
 
   return 'unknown';
 }
