@@ -1624,7 +1624,7 @@
     "date": "2026-10-14",
     "title": "The Behavioral Economics of Portfolio Management",
     "slug": "the-behavioral-economics-of-portfolio-management",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1634,7 +1634,8 @@
       "behavioral"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-14T09:00:37.048Z"
   },
   {
     "id": "week-42-post-1",
