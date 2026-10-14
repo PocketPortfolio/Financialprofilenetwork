@@ -47,7 +47,8 @@ export default function ArchitectureBookingCta() {
           action="tier1_brief"
           contextId="architecture_booking"
           onContinue={() => {
-            window.location.href = '/tier1designpartner';
+            // Keep buyers on the diligence path — Tier-1 page currently bounces (~0s eng).
+            window.location.href = DILIGENCE_MAIL;
           }}
         >
           {({ request, isUnlocked }) => (
@@ -65,7 +66,7 @@ export default function ArchitectureBookingCta() {
                 cursor: 'pointer',
               }}
             >
-              {isUnlocked ? 'Continue to design partnership →' : 'Request design partner brief →'}
+              {isUnlocked ? 'Email diligence now →' : 'Book diligence call →'}
             </button>
           )}
         </IdentityGate>
@@ -95,7 +96,7 @@ export default function ArchitectureBookingCta() {
             textDecoration: 'none',
           }}
         >
-          Read design partnership →
+          Design partnership brief →
         </Link>
       </div>
     </section>

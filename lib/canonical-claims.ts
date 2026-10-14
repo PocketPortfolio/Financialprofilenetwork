@@ -658,7 +658,7 @@ export const OPEN_INSTITUTIONAL_PILLARS = [
     slug: 'ai-in-wealth-management',
     title: 'AI in Wealth Management Without a Client Data Warehouse',
     summary:
-      'How wealth platforms add generative AI over portfolio data without duplicating client ledgers into a vendor vault.',
+      'AI in wealth management without warehousing client ledgers — BYOC inference boundary; book architecture diligence.',
     category: 'Category',
     url: OPEN_URLS.aiInWealthManagement,
   },

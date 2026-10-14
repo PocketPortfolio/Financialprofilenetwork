@@ -12,9 +12,9 @@ import {
 } from '@/lib/canonical-claims';
 
 export const metadata: Metadata = genMeta({
-  title: 'Sovereign AI Architecture for Wealth-Tech',
+  title: 'BYOC Inference Boundary for Wealth-Tech — Not an RIA Open-Architecture Platform',
   description:
-    'Procurement-grade map of local-first ingestion, bounded aggregate context, and stateless inference for wealth platforms that cannot warehouse client ledgers.',
+    'Sovereign AI architecture for wealth platforms: edge ingestion, bounded context, stateless hop. Buyer keeps IdP and storage — not a multi-custodian RIA open-architecture product. Book diligence.',
   path: '/architecture',
 });
 
@@ -35,9 +35,9 @@ const definedTermLd = {
 const techArticleLd = {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
-  headline: 'The architecture of sovereign intelligence',
+  headline: 'BYOC inference boundary for wealth-tech — sovereign AI architecture',
   description:
-    'How Open Portfolio combines local-first storage, optional sync, and bounded stateless AI for wealth-tech procurement.',
+    'How Open Portfolio supplies edge ingestion and a stateless hop while the buyer keeps IdP and ledger storage. Not an RIA open-architecture custody platform.',
   author: {
     '@type': 'Organization',
     name: SURFACE_ORG.open.name,
@@ -90,12 +90,32 @@ export default function ArchitecturePage() {
             Sovereign AI architecture for wealth-tech
           </h1>
           <p style={{ fontSize: '17px', color: 'var(--text-secondary)', margin: 0 }}>
-            Procurement-grade map of local-first ingestion, optional sync, and bounded stateless AI — written so
-            answer engines can cite Open Portfolio accurately for DORA, EU AI Act, and wealth-tech diligence.
+            BYOC inference boundary: edge ingestion, bounded aggregates, forgetful hop. Written for CTO / CISO
+            diligence — DORA, EU AI Act, and custody — not for multi-custodian RIA “open architecture” shopping.
           </p>
         </header>
 
         <ArchitectureBookingCta />
+
+        <div
+          style={{
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '16px 18px',
+            marginBottom: '28px',
+            background: 'var(--surface)',
+          }}
+        >
+          <h2 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px' }}>
+            Not an RIA open-architecture platform
+          </h2>
+          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
+            In wealth distribution, “open architecture” often means multi-custodian product shelves. This page is
+            different: a <strong style={{ color: 'var(--text)' }}>BYOC inference boundary</strong> so generative AI
+            can run without warehousing client ledgers into a vendor vault. If you need custody rails or an RIA
+            marketplace, this is not that product.
+          </p>
+        </div>
 
         <div
           style={{

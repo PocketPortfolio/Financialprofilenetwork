@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { generateMetadata as genMeta } from '@/app/lib/seo/meta';
 import ProductionNavbar from '@/app/components/marketing/ProductionNavbar';
-import { MOAT_CLAIMS, ORG, TIER1_DESIGN_PARTNER, URLS } from '@/lib/canonical-claims';
+import ArchitectureBookingCta from '@/app/components/open/ArchitectureBookingCta';
+import { MOAT_CLAIMS, ORG, TIER1_DESIGN_PARTNER } from '@/lib/canonical-claims';
 import Tier1IntentGate from './Tier1IntentGate';
 
 export const metadata: Metadata = genMeta({
@@ -62,6 +63,8 @@ export default function Tier1DesignPartnerPage() {
             {TIER1_DESIGN_PARTNER.subheadline}
           </p>
         </header>
+
+        <ArchitectureBookingCta />
 
         <section style={{ ...CALLOUT, marginBottom: 'clamp(20px, 4vw, 32px)' }}>
           <p style={{ ...MONO, margin: 0, fontSize: '12px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--accent-warm)' }}>
@@ -160,7 +163,7 @@ Output: counters for billing + governance (aggregate only)`}
           </div>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <Link
-              href="/designchallenge"
+              href="/architecture"
               style={{
                 background: 'var(--accent-warm)',
                 color: '#1a1208',
@@ -171,12 +174,10 @@ Output: counters for billing + governance (aggregate only)`}
                 fontSize: '14px',
               }}
             >
-              Review /designchallenge →
+              Start at architecture →
             </Link>
-            <a
-              href={URLS.architecture}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/designchallenge"
               style={{
                 border: '2px solid var(--accent-warm)',
                 color: 'var(--accent-warm)',
@@ -188,13 +189,13 @@ Output: counters for billing + governance (aggregate only)`}
                 background: 'transparent',
               }}
             >
-              Architecture →
-            </a>
+              Design challenge →
+            </Link>
             <Link
               href="/board-of-investors"
               style={{
-                border: '2px solid var(--accent-warm)',
-                color: 'var(--accent-warm)',
+                border: '2px solid var(--border-subtle)',
+                color: 'var(--text-secondary)',
                 fontWeight: 800,
                 padding: '12px 16px',
                 borderRadius: '10px',
@@ -203,7 +204,7 @@ Output: counters for billing + governance (aggregate only)`}
                 background: 'transparent',
               }}
             >
-              Apply for Board of Investors →
+              Board of Investors →
             </Link>
           </div>
         </section>
