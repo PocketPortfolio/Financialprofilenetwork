@@ -29,7 +29,8 @@
   /* Human-centered design additions for dark theme */
   --warm-bg: #2d2a1a; /* Dark warm background with better contrast */
   --accent-warm: #f59e0b; /* Warm accent color */
-  --text-warm: #fbbf24; /* Bright warm text for dark theme */
+  --text-warm: #fbbf24; /* Bright warm text for dark theme — NEVER use on accent-warm fills */
+  --on-accent: #0b0d10; /* Ink on amber CTAs — Creative/CPO contrast lock */
   --border-warm: #f59e0b; /* Warm border color */
 
   /* Foreground on dark landing plate artwork (HUD overlays) */
@@ -178,7 +179,8 @@
         /* Human-centered design additions */
         --warm-bg: #fde68a; /* Much more visible warm background */
         --accent-warm: #f59e0b; /* More vibrant warm accent color */
-        --text-warm: #92400e; /* More visible warm text color */
+        --text-warm: #92400e; /* More visible warm text color — NEVER use on accent-warm fills */
+        --on-accent: #0b0d10; /* Ink on amber CTAs */
         --border-warm: #f59e0b; /* Much more visible warm border */
 
         /* Plates stay dark — HUD keeps dark-theme contrast in light mode */
@@ -220,7 +222,8 @@
         /* Human-centered design additions */
         --warm-bg: #fde68a; /* Much more visible warm background */
         --accent-warm: #f59e0b; /* More vibrant warm accent color */
-        --text-warm: #92400e; /* More visible warm text color */
+        --text-warm: #92400e; /* More visible warm text color — NEVER use on accent-warm fills */
+        --on-accent: #0b0d10; /* Ink on amber CTAs */
         --border-warm: #f59e0b; /* Much more visible warm border */
 
   /* Plates stay dark — HUD keeps dark-theme contrast in light mode */
@@ -254,7 +257,8 @@
   /* Human-centered design additions for dark theme */
   --warm-bg: #2d2a1a; /* Dark warm background with better contrast */
   --accent-warm: #f59e0b; /* Keep warm accent color */
-  --text-warm: #fbbf24; /* Bright warm text for dark theme */
+  --text-warm: #fbbf24; /* Bright warm text for dark theme — NEVER use on accent-warm fills */
+  --on-accent: #0b0d10; /* Ink on amber CTAs */
   --border-warm: #f59e0b; /* Keep warm border color */
 
   --on-plate-surface: color-mix(in srgb, var(--surface) 88%, transparent);
@@ -283,6 +287,8 @@
   --danger-muted: #991b1b;
   --info: #38bdf8;
   --info-muted: #0c4a6e;
+  --accent-warm: #f59e0b;
+  --on-accent: #000000; /* max contrast on amber CTAs */
 }
 
 /* Print Styles */

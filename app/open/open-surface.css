@@ -11,6 +11,18 @@
   display: none;
 }
 
+/* Filled amber CTAs: ink on amber — never --text-warm (#fbbf24 on #f59e0b fails WCAG) */
+.open-surface a.open-btn-primary,
+.open-surface button.open-btn-primary {
+  box-sizing: border-box;
+  background: var(--accent-warm) !important;
+  color: var(--on-accent, #0b0d10) !important;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
 .open-surface a.open-btn-secondary {
   box-sizing: border-box;
   color: var(--text) !important;

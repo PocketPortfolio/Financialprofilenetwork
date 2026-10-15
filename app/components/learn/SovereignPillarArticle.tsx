@@ -257,7 +257,7 @@ export default function SovereignPillarArticle(props: SovereignPillarProps) {
               display: 'inline-block',
               padding: '12px 22px',
               background: 'var(--accent-warm)',
-              color: 'var(--text-warm)',
+              color: 'var(--on-accent)',
               borderRadius: 8,
               textDecoration: 'none',
               fontWeight: 600,

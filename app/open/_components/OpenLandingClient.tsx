@@ -116,7 +116,7 @@ const primaryCtaStyle: React.CSSProperties = {
   display: 'inline-block',
   padding: '14px 24px',
   background: 'var(--accent-warm)',
-  color: '#0b0d10',
+  color: 'var(--on-accent)',
   textDecoration: 'none',
   fontWeight: 700,
   borderRadius: '6px',

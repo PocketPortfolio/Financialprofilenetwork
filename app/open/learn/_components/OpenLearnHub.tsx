@@ -196,6 +196,65 @@ export default function OpenLearnHub() {
       </section>
 
       <section
+        aria-labelledby="oi-series-heading"
+        style={{
+          border: '1px solid var(--border-subtle)',
+          borderRadius: '12px',
+          padding: '28px',
+          background: 'var(--surface)',
+          marginBottom: '48px',
+        }}
+      >
+        <h2
+          id="oi-series-heading"
+          style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--accent-warm)',
+            marginBottom: '12px',
+          }}
+        >
+          {OPEN_LEARN_HUB_COPY.seriesHeading}
+        </h2>
+        <h3
+          style={{
+            fontSize: '22px',
+            fontWeight: 700,
+            margin: '0 0 10px',
+            color: 'var(--text)',
+            lineHeight: 1.3,
+          }}
+        >
+          {OPEN_LEARN_HUB_COPY.seriesTitle}
+        </h3>
+        <p
+          style={{
+            fontSize: '15px',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.65,
+            margin: '0 0 18px',
+            maxWidth: '640px',
+          }}
+        >
+          {OPEN_LEARN_HUB_COPY.seriesBody}
+        </p>
+        <Link
+          href={OPEN_LEARN_HUB_COPY.seriesCtaHref}
+          style={{
+            display: 'inline-block',
+            fontSize: '14px',
+            fontWeight: 700,
+            color: 'var(--accent-warm)',
+            textDecoration: 'none',
+          }}
+        >
+          {OPEN_LEARN_HUB_COPY.seriesCtaLabel}
+        </Link>
+      </section>
+
+      <section
         style={{
           border: '1px solid color-mix(in srgb, var(--accent-warm) 35%, transparent)',
           borderRadius: '12px',
@@ -226,7 +285,7 @@ export default function OpenLearnHub() {
             style={{
               display: 'inline-block',
               background: 'var(--accent-warm)',
-              color: 'var(--text-warm, #1a1208)',
+              color: 'var(--on-accent)',
               padding: '12px 22px',
               borderRadius: '8px',
               fontSize: '15px',

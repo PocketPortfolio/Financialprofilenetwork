@@ -34,6 +34,7 @@ describe('isOpenSurfaceRoute', () => {
   it('allows B2B alias paths and blog', () => {
     expect(isOpenSurfaceRoute('/')).toBe(true);
     expect(isOpenSurfaceRoute('/architecture')).toBe(true);
+    expect(isOpenSurfaceRoute('/open-intelligence')).toBe(true);
     expect(isOpenSurfaceRoute('/blog')).toBe(true);
     expect(isOpenSurfaceRoute('/blog/sovereign-engineering-example')).toBe(true);
   });

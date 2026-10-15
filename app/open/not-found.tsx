@@ -47,7 +47,7 @@ export default function OpenNotFound() {
           display: 'inline-block',
           padding: '12px 22px',
           background: 'var(--accent-warm)',
-          color: '#0b0d10',
+          color: 'var(--on-accent)',
           textDecoration: 'none',
           fontWeight: 700,
           borderRadius: '6px',

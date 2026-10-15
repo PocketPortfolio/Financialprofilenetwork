@@ -37,6 +37,8 @@ const openOrgJsonLd = {
   sameAs: [
     'https://github.com/PocketPortfolio/Financialprofilenetwork',
     'https://www.npmjs.com/org/pocket-portfolio',
+    'https://www.youtube.com/@OpenIntelligenceUK',
+    'https://www.linkedin.com/company/open-portfolio-infrastructure/',
   ],
 };
 

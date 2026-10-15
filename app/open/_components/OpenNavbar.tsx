@@ -140,7 +140,7 @@ export default function OpenNavbar() {
               style={{
                 padding: '8px 16px',
                 background: 'var(--accent-warm)',
-                color: '#0b0d10',
+                color: 'var(--on-accent)',
                 textDecoration: 'none',
                 fontSize: '13px',
                 fontWeight: 700,
@@ -189,7 +189,7 @@ export default function OpenNavbar() {
                   style={{
                     padding: '10px 16px',
                     background: 'var(--accent-warm)',
-                    color: '#0b0d10',
+                    color: 'var(--on-accent)',
                     textDecoration: 'none',
                     fontSize: '13px',
                     fontWeight: 700,

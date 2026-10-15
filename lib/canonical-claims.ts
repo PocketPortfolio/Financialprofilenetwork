@@ -646,10 +646,28 @@ export const OPEN_URLS = {
   personAbba: 'https://www.openportfolio.co.uk/press/abba-lawal',
   sponsor: 'https://www.openportfolio.co.uk/sponsor',
   learnHub: 'https://www.openportfolio.co.uk/learn',
+  openIntelligence: 'https://www.openportfolio.co.uk/open-intelligence',
   privacy: 'https://www.openportfolio.co.uk/privacy',
   terms: 'https://www.openportfolio.co.uk/terms',
   llmsTxt: 'https://www.openportfolio.co.uk/llms.txt',
   sitemap: 'https://www.openportfolio.co.uk/sitemap.xml',
+} as const;
+
+/**
+ * Open Intelligence — education-led briefing series (GEO / authority TOFU).
+ * Claim gate §6b: architecture + governance only; no certification theatre.
+ */
+export const OPEN_INTELLIGENCE = {
+  name: 'Open Intelligence',
+  tagline: 'Executive and technical briefings on sovereign infrastructure, policy, and regulatory risk in enterprise AI.',
+  summary:
+    'Not vendor theatre. Architecture and governance: the questions that decide whether AI actually ships inside real institutions — with CISOs, risk officers, DPOs, and operators on the line.',
+  youtubeWatch: 'https://youtu.be/TNWNvyW67wc',
+  youtubeChannel: 'https://www.youtube.com/@OpenIntelligenceUK',
+  linkedInCompany: 'https://www.linkedin.com/company/open-portfolio-infrastructure/',
+  nextBriefing: 'The Client-Ledger Warehouse Problem',
+  architectureHref: '/architecture',
+  learnWarehouseHref: '/learn/edge-ingestion-vs-warehouse',
 } as const;
 
 /** Institutional architecture briefs — primary Open /learn hub (CTO/CISO-facing). */
@@ -813,6 +831,12 @@ export const OPEN_LEARN_HUB_COPY = {
   subtitle:
     'Published doctrine for CTOs, CISOs, and platform operators evaluating sovereign ingestion and stateless inference.',
   philosophyHeading: 'Foundational concepts',
+  seriesHeading: 'Open Intelligence',
+  seriesTitle: 'Briefing series — architecture and governance on camera',
+  seriesBody:
+    'Executive and technical briefings on sovereign infrastructure, policy, and regulatory risk. Watch the intro, then read the warehouse-fork brief.',
+  seriesCtaLabel: 'Open Intelligence →',
+  seriesCtaHref: '/open-intelligence',
   ctaTitle: 'Ready for a diligence conversation?',
   ctaBody:
     'Start with the Tier 1 design brief or contact the team with your audit-perimeter requirements.',
@@ -905,6 +929,7 @@ export const OPEN_ALIAS_ROUTES: ReadonlyArray<{ path: string; title: string; ope
   { path: '/press/abba-lawal', title: 'Founder Profile', openUrl: OPEN_URLS.personAbba },
   { path: '/sponsor', title: 'Founders Club', openUrl: OPEN_URLS.sponsor },
   { path: '/learn', title: 'Learn', openUrl: OPEN_URLS.learnHub },
+  { path: '/open-intelligence', title: 'Open Intelligence', openUrl: OPEN_URLS.openIntelligence },
   { path: '/privacy', title: 'Privacy', openUrl: OPEN_URLS.privacy },
   { path: '/terms', title: 'Terms', openUrl: OPEN_URLS.terms },
 ] as const;
@@ -951,6 +976,7 @@ export interface SurfaceNavItem {
  */
 export const OPEN_NAV: ReadonlyArray<SurfaceNavItem> = [
   { label: 'Architecture', href: '/architecture' },
+  { label: 'Open Intelligence', href: '/open-intelligence' },
   { label: 'Blog', href: '/blog' },
 ] as const;
 
@@ -1108,6 +1134,7 @@ export const FOUNDER_ENERGY_PORTFOLIO_CREDENTIAL = FOUNDER_CREDENTIALS_ABBA.high
 
 /** De-emphasized institutional pathways — footer only (not header or index CTAs). */
 export const OPEN_LANDING_FOOTER_PATHWAYS = [
+  { label: 'Open Intelligence', href: '/open-intelligence' },
   { label: 'Design Partnership', href: '/tier1designpartner' },
   { label: 'AI in Wealth Management', href: '/learn/ai-in-wealth-management' },
   { label: 'AI for Financial Advisors', href: '/learn/ai-for-financial-advisors' },

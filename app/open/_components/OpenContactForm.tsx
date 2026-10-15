@@ -309,7 +309,7 @@ export default function OpenContactForm() {
                 style={{
                   padding: '12px 22px',
                   background: 'var(--accent-warm)',
-                  color: '#0b0d10',
+                  color: 'var(--on-accent)',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',

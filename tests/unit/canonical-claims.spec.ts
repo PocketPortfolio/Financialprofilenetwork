@@ -251,7 +251,7 @@ describe('Dual-Surface Bifurcation SSOT (CEO mandate 2026-05-15)', () => {
   });
 
   test('OPEN_ALIAS_ROUTES lists B2B surfaces (CEO mandate + Wave 1 Sovereign pillars)', () => {
-    expect(OPEN_ALIAS_ROUTES).toHaveLength(30);
+    expect(OPEN_ALIAS_ROUTES).toHaveLength(31);
     const paths = OPEN_ALIAS_ROUTES.map((r) => r.path);
     expect(new Set(paths).size).toBe(paths.length);
   });
@@ -276,6 +276,7 @@ describe('Dual-Surface Bifurcation SSOT (CEO mandate 2026-05-15)', () => {
     expect(paths).toContain('/learn/edge-ingestion-vs-warehouse');
     expect(paths).toContain('/learn/open-portfolio-vs-portfolio-data-api');
     expect(paths).toContain('/learn/open-portfolio-vs-plaid');
+    expect(paths).toContain('/open-intelligence');
   });
 
   test('Pocket→Open 301 matrix matches OPEN_ALIAS_ROUTES except retained /press', () => {

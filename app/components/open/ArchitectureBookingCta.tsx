@@ -58,7 +58,7 @@ export default function ArchitectureBookingCta() {
               style={{
                 border: 'none',
                 background: 'var(--accent-warm)',
-                color: '#0b0d10',
+                color: 'var(--on-accent)',
                 fontWeight: 800,
                 padding: '12px 18px',
                 borderRadius: 8,
