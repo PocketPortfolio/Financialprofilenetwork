@@ -10,7 +10,7 @@
 - ✅ War Mode content generation working
 - ✅ Research Drop content generation working
 - ✅ Tweet posting successful
-- ✅ Test tweet posted: https://x.com/P0cketP0rtf0li0/status/2010323402028912701
+- ✅ Test tweet posted: https://x.com/OIntelligenceUK/status/2010323402028912701
 
 ---
 
@@ -52,7 +52,7 @@ After Vercel auto-deploys:
 
 2. **Monitor at 12:30 UTC** (12:30 UK today)
    - Check Vercel Function Logs
-   - Check Twitter @P0cketP0rtf0li0 for the test tweet
+   - Check Twitter @OIntelligenceUK for the test tweet
 
 3. **Verify Test Tweet**
    - Should post automatically at 12:30 UTC
@@ -90,7 +90,7 @@ Once the 12:30 test tweet works, you can:
 
 ✅ Test tweet posts at 12:30 UK today  
 ✅ No errors in Vercel Function Logs  
-✅ Tweet appears on @P0cketP0rtf0li0  
+✅ Tweet appears on @OIntelligenceUK  
 ✅ Content is correct (Day X, pages, downloads)  
 
 ---

@@ -282,7 +282,7 @@ export default function ToolFooter() {
               Blog & News
             </Link>
             <a
-              href="https://x.com/P0cketP0rtf0li0"
+              href="https://x.com/OIntelligenceUK"
               target="_blank"
               rel="noopener noreferrer"
               style={{

@@ -164,12 +164,12 @@ export default function StatusPage() {
               <strong>Status Page Updates:</strong> This page is manually maintained. For real-time incident
               notifications, follow{' '}
               <a
-                href="https://x.com/P0cketP0rtf0li0"
+                href="https://x.com/OIntelligenceUK"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: 'var(--accent-warm)', textDecoration: 'none' }}
               >
-                @P0cketP0rtf0li0
+                @OIntelligenceUK
               </a>{' '}
               on X.
             </p>

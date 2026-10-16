@@ -33,7 +33,7 @@ export function getHomePageSchema(): HomePageSchemaGraph {
         },
         sameAs: [
           'https://github.com/PocketPortfolio/Financialprofilenetwork',
-          'https://twitter.com/pocketportfolio',
+          'https://x.com/OIntelligenceUK',
           'https://discord.gg/Ch9PpjRzwe',
           'https://dev.to/pocketportfolioapp',
         ],

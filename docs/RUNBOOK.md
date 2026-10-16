@@ -59,7 +59,7 @@ This runbook provides operational procedures for Pocket Portfolio production env
 ### Communication Channels
 
 - **Status Page**: Update at https://status.pocketportfolio.app (if available)
-- **Twitter/X**: Post updates @pocketportfolio
+- **Twitter/X**: Post updates @OIntelligenceUK
 - **Discord**: Pin message in #incidents channel
 
 ## Common Issues

@@ -135,7 +135,7 @@ export class SocialScheduler {
       console.log(`[METRONOME] ✅ Research drop posted: ${result.id}`);
       console.log(`[METRONOME] Text length: ${text.length} chars`);
       console.log(`[METRONOME] Link: ${extractedLink}`);
-      console.log(`[METRONOME] View at: https://x.com/P0cketP0rtf0li0/status/${result.id}`);
+      console.log(`[METRONOME] View at: https://x.com/OIntelligenceUK/status/${result.id}`);
 
       return {
         success: true,

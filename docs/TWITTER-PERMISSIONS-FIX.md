@@ -9,7 +9,7 @@
 
 1. **Go to Twitter Developer Portal:**
    - https://developer.twitter.com/en/portal/dashboard
-   - Sign in with @P0cketP0rtf0li0 account
+   - Sign in with @OIntelligenceUK account
 
 2. **Navigate to Your App:**
    - Go to "Projects & Apps" → Your Project → Your App

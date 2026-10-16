@@ -12,7 +12,7 @@ export const siteConfig = {
   url: 'https://www.pocketportfolio.app',
   ogImage:
     'https://www.pocketportfolio.app/api/og?title=Pocket%20Portfolio&description=Local-First%20Portfolio%20Tracker%20(100%25%20Private)&v=7',
-  twitter: '@PocketPortApp',
+  twitter: '@OIntelligenceUK',
   /** Ours only. Do not add PocketFolio or Pocket Folio. */
   alternateNames: ['Pocket Portfolio App'] as const,
   keywords: [

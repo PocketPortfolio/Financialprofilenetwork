@@ -33,7 +33,7 @@ async function postCurrentResearch() {
     if (response.ok && data.success) {
       console.log('✅ Research post tweeted successfully!');
       console.log(`   Tweet ID: ${data.tweetId}`);
-      console.log(`   View at: https://x.com/P0cketP0rtf0li0/status/${data.tweetId}`);
+      console.log(`   View at: https://x.com/OIntelligenceUK/status/${data.tweetId}`);
       console.log(`   Timestamp: ${data.timestamp}`);
     } else {
       console.error('❌ Failed to post research tweet');

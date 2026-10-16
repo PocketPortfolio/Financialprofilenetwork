@@ -79,6 +79,8 @@ export const metadata: Metadata = brandEnabled
       },
       twitter: {
         card: 'summary_large_image',
+        site: siteConfig.twitter,
+        creator: siteConfig.twitter,
         title: siteConfig.title,
         description: siteConfig.description,
         images: [siteConfig.ogImage],

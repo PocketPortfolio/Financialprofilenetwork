@@ -96,7 +96,7 @@ After deployment, monitor:
    - Verify success/failure status
 
 2. **Twitter Account:**
-   - Check @P0cketP0rtf0li0 at 09:00 and 18:00 UK
+   - Check @OIntelligenceUK at 09:00 and 18:00 UK
    - Verify tweets are posted correctly
 
 3. **Vercel Dashboard:**

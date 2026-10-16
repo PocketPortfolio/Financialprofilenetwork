@@ -111,7 +111,7 @@ async function testPostTweet(dryRun: boolean = true) {
     if (result.success) {
       console.log(`✅ Test tweet posted successfully!`);
       console.log(`   Tweet ID: ${result.tweetId}`);
-      console.log(`   View at: https://x.com/P0cketP0rtf0li0/status/${result.tweetId}`);
+      console.log(`   View at: https://x.com/OIntelligenceUK/status/${result.tweetId}`);
       return true;
     } else {
       console.error(`❌ Failed to post tweet: ${result.error}`);

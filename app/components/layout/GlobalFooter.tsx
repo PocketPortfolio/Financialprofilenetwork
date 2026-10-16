@@ -337,7 +337,7 @@ export default function GlobalFooter() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <li>
                 <a
-                  href="https://x.com/P0cketP0rtf0li0"
+                  href="https://x.com/OIntelligenceUK"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{

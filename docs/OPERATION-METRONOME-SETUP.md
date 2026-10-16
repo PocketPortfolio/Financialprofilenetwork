@@ -22,7 +22,7 @@ All code has been implemented:
 
 1. **Go to Twitter Developer Portal:**
    - Visit: https://developer.twitter.com/en/portal/dashboard
-   - Sign in with your X.com account (@P0cketP0rtf0li0)
+   - Sign in with your X.com account (@OIntelligenceUK)
 
 2. **Apply for Developer Access:**
    - Click "Sign up" or "Apply" for a developer account

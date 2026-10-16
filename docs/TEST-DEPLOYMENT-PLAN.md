@@ -78,7 +78,7 @@ npm run test-metronome:post
 
 4. **Monitor:**
    - Check Vercel Function Logs at 12:30 UTC
-   - Check Twitter @P0cketP0rtf0li0 for the tweet
+   - Check Twitter @OIntelligenceUK for the tweet
 
 ---
 
@@ -112,7 +112,7 @@ Or use Postman/Insomnia with:
 ### After Deployment:
 - [ ] Verify cron jobs appear in Vercel Dashboard
 - [ ] Check Vercel Function Logs at 12:30 UTC
-- [ ] Verify tweet appears on @P0cketP0rtf0li0
+- [ ] Verify tweet appears on @OIntelligenceUK
 - [ ] Check tweet content is correct
 
 ---

@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       error: result.error,
       timestamp: new Date().toISOString(),
       message: 'Manual test tweet posted',
-      tweetUrl: result.tweetId ? `https://x.com/P0cketP0rtf0li0/status/${result.tweetId}` : null,
+      tweetUrl: result.tweetId ? `https://x.com/OIntelligenceUK/status/${result.tweetId}` : null,
     });
   } catch (error: any) {
     console.error('[CRON] Manual test error:', error);

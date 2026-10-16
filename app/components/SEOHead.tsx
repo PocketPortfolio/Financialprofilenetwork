@@ -97,8 +97,8 @@ export default function SEOHead({
     updateMetaTag('twitter:description', fullDescription);
     updateMetaTag('twitter:image', absoluteOgImage);
     updateMetaTag('twitter:image:alt', `Pocket Portfolio - ${title}`);
-    updateMetaTag('twitter:site', '@pocketportfolio');
-    updateMetaTag('twitter:creator', '@pocketportfolio');
+    updateMetaTag('twitter:site', '@OIntelligenceUK');
+    updateMetaTag('twitter:creator', '@OIntelligenceUK');
     
     // Update additional SEO tags
     updateMetaTag('theme-color', '#6366f1');

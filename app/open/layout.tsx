@@ -37,6 +37,7 @@ const openOrgJsonLd = {
   sameAs: [
     'https://github.com/PocketPortfolio/Financialprofilenetwork',
     'https://www.npmjs.com/org/pocket-portfolio',
+    'https://x.com/OIntelligenceUK',
     'https://www.youtube.com/@OpenIntelligenceUK',
     'https://www.linkedin.com/company/open-portfolio-infrastructure/',
   ],
@@ -79,6 +80,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@OIntelligenceUK',
+    creator: '@OIntelligenceUK',
     title: 'Open Portfolio — The Sovereign Ingestion & Inference Layer',
     description: SURFACE_POSITIONING.open.primary,
     images: [OPEN_OG_IMAGE],

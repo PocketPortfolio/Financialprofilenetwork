@@ -63,7 +63,7 @@ async function testToken() {
       const tweet = await client.v2.tweet(testText);
       console.log('✅ Write permission: WORKING');
       console.log(`   Tweet ID: ${tweet.data.id}`);
-      console.log(`   View: https://x.com/P0cketP0rtf0li0/status/${tweet.data.id}`);
+      console.log(`   View: https://x.com/OIntelligenceUK/status/${tweet.data.id}`);
     } catch (error: any) {
       console.log('❌ Write permission: FAILED');
       console.log(`   Error: ${error.message}`);
