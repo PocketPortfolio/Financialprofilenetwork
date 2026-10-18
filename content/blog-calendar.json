@@ -1642,7 +1642,7 @@
     "date": "2026-10-18",
     "title": "Building a Bidirectional Sync Engine: Technical Deep Dive",
     "slug": "building-a-bidirectional-sync-engine-technical-deep-dive",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1652,7 +1652,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-18T09:00:39.575Z"
   },
   {
     "id": "week-42-post-2",
