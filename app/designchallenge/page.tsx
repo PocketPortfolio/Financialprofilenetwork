@@ -102,8 +102,8 @@ function snapshotFallback(): LiveSignal {
     totalDownloads:
       typeof SNAPSHOT_AGGREGATE_ROW?.value === 'number'
         ? (SNAPSHOT_AGGREGATE_ROW.value as number)
-        : 9389,
-    lastUpdated: SNAPSHOT_AGGREGATE_ROW?.asOf ?? '2026-04-20',
+        : 16142,
+    lastUpdated: SNAPSHOT_AGGREGATE_ROW?.asOf ?? '2026-10-20',
     source: 'snapshot',
   };
 }

@@ -4,9 +4,8 @@
  * Server-rendered. Embeds six canonical JSON-LD blocks (WebPage,
  * BreadcrumbList, Organization, Person, SoftwareApplication[], Article[])
  * sourced from lib/canonical-claims.ts. Pulls the live npm aggregate at
- * request time so answer engines see a fresh dateModified — but always falls
- * back to the frozen NUMBERS_SNAPSHOT value if the live read fails or returns
- * zero.
+ * request time so the hero and TRAC-01/TRAC-02 receipts stay aligned — falls
+ * back to NUMBERS_SNAPSHOT if the live read fails or returns zero.
  *
  * Single source of truth: ../../lib/canonical-claims.ts.
  * JSON-LD builders: ./jsonld.ts (so they can be unit-tested).
@@ -36,6 +35,7 @@ import {
   buildBreadcrumbLd,
   type LiveSignal,
 } from './jsonld';
+import { withLiveNpmReceipts } from '@/lib/npm-live-receipts';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -53,13 +53,17 @@ export const metadata: Metadata = genMeta({
 
 const SNAPSHOT_AGGREGATE_ROW = NUMBERS_SNAPSHOT.find((r) => r.numbersPackRowId === 'TRAC-01');
 
+const SNAPSHOT_30D_ROW = NUMBERS_SNAPSHOT.find((r) => r.numbersPackRowId === 'TRAC-02');
+
 function snapshotFallback(): LiveSignal {
   return {
     totalDownloads:
       typeof SNAPSHOT_AGGREGATE_ROW?.value === 'number'
         ? (SNAPSHOT_AGGREGATE_ROW.value as number)
-        : 9389,
-    lastUpdated: SNAPSHOT_AGGREGATE_ROW?.asOf ?? '2026-04-20',
+        : 16142,
+    last30DaysDownloads:
+      typeof SNAPSHOT_30D_ROW?.value === 'number' ? (SNAPSHOT_30D_ROW.value as number) : undefined,
+    lastUpdated: SNAPSHOT_AGGREGATE_ROW?.asOf ?? '2026-10-20',
     source: 'snapshot',
   };
 }
@@ -87,10 +91,18 @@ async function readLiveAggregate(): Promise<LiveSignal> {
     const url = await resolveNpmStatsUrl();
     const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) return fallback;
-    const data = (await res.json()) as { totalDownloads?: number; lastUpdated?: string };
+    const data = (await res.json()) as {
+      totalDownloads?: number;
+      last30DaysDownloads?: number;
+      lastUpdated?: string;
+    };
     if (!data.totalDownloads || data.totalDownloads <= 0) return fallback;
     return {
       totalDownloads: data.totalDownloads,
+      last30DaysDownloads:
+        typeof data.last30DaysDownloads === 'number' && data.last30DaysDownloads > 0
+          ? data.last30DaysDownloads
+          : undefined,
       lastUpdated: data.lastUpdated ?? new Date().toISOString().slice(0, 10),
       source: 'live',
     };
@@ -115,6 +127,7 @@ function LdBlock({ data, id }: { data: unknown; id: string }) {
 
 export default async function PressPage() {
   const live = await readLiveAggregate();
+  const receiptRows = withLiveNpmReceipts(NUMBERS_SNAPSHOT, live);
 
   const webPageLd = buildWebPageLd({
     dateModified: live.lastUpdated,
@@ -320,6 +333,8 @@ export default async function PressPage() {
           <p style={{ margin: '0 0 12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
             Every row carries an internal evidence ID that resolves back to a primary artifact
             (regulator text, IBM cost-of-breach report, GA4 dashboard, npm Downloads API, etc.).
+            TRAC-01 / TRAC-02 track the live npm Downloads API when available so they match the
+            distribution signal above; other rows remain dated artifact receipts.
           </p>
           <div
             style={{
@@ -338,7 +353,8 @@ export default async function PressPage() {
               }}
             >
               <caption style={{ position: 'absolute', left: '-9999px' }}>
-                Frozen numeric receipts. Each row tags the artifact it resolves to.
+                Numeric receipts. npm download rows use the live API when available; other rows
+                are dated artifact receipts.
               </caption>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--accent-warm)', background: 'var(--background)' }}>
@@ -349,7 +365,7 @@ export default async function PressPage() {
                 </tr>
               </thead>
               <tbody>
-                {NUMBERS_SNAPSHOT.map((row) => (
+                {receiptRows.map((row) => (
                   <tr key={row.numbersPackRowId} style={{ borderBottom: '1px solid var(--accent-warm)' }}>
                     <td style={{ padding: '10px 14px' }}>{row.label}</td>
                     <td

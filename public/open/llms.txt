@@ -75,7 +75,7 @@ Open Portfolio enforces a Split-Brain execution model. Frontier models operate a
 ## Reference Terminal
 - Pocket Portfolio (live consumer reference): https://www.pocketportfolio.app
 - GA4 MAU (28-day): 4,669
-- npm aggregate downloads: 9,389
+- npm aggregate downloads: 16,142
 
 ## Substrate Packages
 - @pocket-portfolio/importer — Sovereign ingestion SDK: 19 dedicated broker CSV/Excel adapters, local-first parsing, no raw-ledger warehouse on the inference path.

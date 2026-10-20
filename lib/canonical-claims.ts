@@ -281,15 +281,16 @@ export interface SnapshotRow {
 export const NUMBERS_SNAPSHOT: ReadonlyArray<SnapshotRow> = [
   {
     label: 'Aggregate all-time downloads · 11 @pocket-portfolio/* packages',
-    value: 9389,
+    // Fallback floor only — /press overlays live /api/npm-stats via withLiveNpmReceipts.
+    value: 16142,
     numbersPackRowId: 'TRAC-01',
-    asOf: '2026-04-20',
+    asOf: '2026-10-20',
   },
   {
     label: 'Aggregate last-30-day downloads',
-    value: 484,
+    value: 245,
     numbersPackRowId: 'TRAC-02',
-    asOf: '2026-04-20',
+    asOf: '2026-10-20',
   },
   {
     label: 'GA4 Monthly Active Users · 28-day window',

@@ -49,8 +49,8 @@ import { parseBrokerCsv } from '@pocket-portfolio/importer';
 - Local-First — https://www.pocketportfolio.app/learn/local-first (2026-04-27)
 
 ## Numbers (artifact-backed)
-- Aggregate all-time downloads · 11 @pocket-portfolio/* packages: 9,389 (TRAC-01, as of 2026-04-20)
-- Aggregate last-30-day downloads: 484 (TRAC-02, as of 2026-04-20)
+- Aggregate all-time downloads · 11 @pocket-portfolio/* packages: 16,142 (TRAC-01, as of 2026-10-20)
+- Aggregate last-30-day downloads: 245 (TRAC-02, as of 2026-10-20)
 - GA4 Monthly Active Users · 28-day window: 4,669 (TRAC-07, as of 2026-04-20)
 - Google Search Console impressions · 3-month window: 176,000 (TRAC-09, as of 2026-04-20)
 - Orchestrated content-engine entries · 3 calendars · 246 published / 576 queued: 822 (TRAC-12, as of 2026-04-24)

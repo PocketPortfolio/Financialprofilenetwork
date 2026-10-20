@@ -19,6 +19,8 @@ export const PRESS_URL = URLS.press;
 
 export interface LiveSignal {
   totalDownloads: number;
+  /** Present when /api/npm-stats returns a last-month aggregate. */
+  last30DaysDownloads?: number;
   lastUpdated: string;
   source: 'live' | 'snapshot';
 }
