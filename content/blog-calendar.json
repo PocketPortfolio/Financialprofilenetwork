@@ -1660,7 +1660,7 @@
     "date": "2026-10-21",
     "title": "How Sovereign Sync Works: A Technical Overview",
     "slug": "how-sovereign-sync-works-a-technical-overview",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1670,7 +1670,8 @@
       "sovereign"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-21T09:00:39.349Z"
   },
   {
     "id": "week-43-post-1",
