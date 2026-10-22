@@ -36,6 +36,8 @@
     "generate:oi-s1-part2-animatic": "node scripts/generate-oi-s1-part2-animatic.mjs",
     "generate:oi-s1-part2-loop": "node scripts/generate-oi-s1-part2-loop.mjs",
     "generate:oi-s1-part2-loops": "node scripts/generate-oi-s1-part2-loops.mjs",
+    "generate:oi-s2-part2-animatic": "node scripts/generate-oi-s2-part2-animatic.mjs",
+    "generate:oi-s2-part2-loops": "node scripts/generate-oi-s2-part2-loops.mjs",
     "generate:barclays-brief": "node scripts/generate-barclays-brief-pdf.mjs",
     "generate:barclays-brief-pptx": "ts-node --project scripts/tsconfig.json scripts/generate-barclays-brief-pptx.ts",
     "generate:dish-pitch": "ts-node --project scripts/tsconfig.json scripts/generate-dish-pitch-pptx.ts",
@@ -204,7 +206,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.0",
     "lucide-react": "^0.562.0",
-    "next": "15.5.24",
+    "next": "15.5.27",
     "papaparse": "^5.4.1",
     "plaid": "^41.0.0",
     "postcss": "^8.5.18",
@@ -293,7 +295,9 @@
     },
     "qs": ">=6.16.0",
     "fflate": ">=0.8.3",
-    "dompurify": ">=3.4.16"
+    "dompurify": ">=3.4.16",
+    "vite": ">=8.3.3",
+    "follow-redirects": ">=1.16.1"
   },
   "engines": {
     "node": ">=20.0.0",
