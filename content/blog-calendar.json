@@ -1678,7 +1678,7 @@
     "date": "2026-10-26",
     "title": "Tax-Loss Harvesting: The Strategy That Actually Works",
     "slug": "tax-loss-harvesting-the-strategy-that-actually-works",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1688,7 +1688,8 @@
       "tax-loss"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-26T09:00:36.943Z"
   },
   {
     "id": "week-43-post-2",
