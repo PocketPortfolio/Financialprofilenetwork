@@ -4,14 +4,14 @@ import { OPEN_URLS, SURFACE_ORG } from '../../../lib/canonical-claims';
 export { default } from '../../architecture/page';
 
 export const metadata: Metadata = {
-  title: 'BYOC Inference Boundary for Wealth-Tech — Not an RIA Open-Architecture Platform | Open Portfolio',
+  title: 'Run AI on Wealth Data Without a Client-Ledger Warehouse | Open Portfolio',
   description:
-    'Sovereign AI architecture: edge ingestion, bounded context, stateless hop. Buyer keeps IdP and storage — not a multi-custodian RIA open-architecture product. Book diligence.',
+    'Keep login and client storage. Edge ingestion builds a small approved summary for the model — book a 30-minute architecture review.',
   alternates: { canonical: OPEN_URLS.architecture },
   openGraph: {
-    title: 'BYOC Inference Boundary for Wealth-Tech | Open Portfolio',
+    title: 'Run AI on Wealth Data Without a Client-Ledger Warehouse | Open Portfolio',
     description:
-      'Edge ingestion to bounded inference — not an RIA open-architecture custody platform. Raw client ledgers stay inside the buyer perimeter.',
+      'Keep IdP and ledger storage. Edge ingestion to bounded inference — book a 30-minute architecture review.',
     url: OPEN_URLS.architecture,
     siteName: SURFACE_ORG.open.name,
     type: 'article',

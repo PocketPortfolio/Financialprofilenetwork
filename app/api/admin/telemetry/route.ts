@@ -11,6 +11,7 @@ import {
   gscPocketSiteUrl,
 } from '@/lib/telemetry/gsc-client';
 import { fetchStripePaidKeysPin } from '@/lib/telemetry/stripe-paid-keys';
+import { getOpenPortfolioConversionFunnel } from '@/lib/open-portfolio/contact-leads-firestore';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -74,6 +75,31 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const funnelStart = new Date(Date.now() - 28 * 24 * 60 * 60 * 1000);
+  const conversionFunnel = await getOpenPortfolioConversionFunnel(funnelStart).catch((e: Error) => {
+    warnings.push(`Open leads funnel: ${e.message}`);
+    return {
+      inquiries: 0,
+      qualifiedOpportunities: 0,
+      won: 0,
+      lost: 0,
+      byChannel: {},
+      last7DaysQualified: 0,
+      error: e.message,
+    };
+  });
+  if (conversionFunnel.error) warnings.push(`Open leads funnel: ${conversionFunnel.error}`);
+
+  const gaEvents = (ga4 as { conversionEvents?: Array<{ eventName: string; eventCount: number }> } | null)
+    ?.conversionEvents;
+  const gaFormStarted =
+    gaEvents?.find((e) => e.eventName === 'homepage_form_started')?.eventCount ?? 0;
+  const gaFormSubmitted =
+    gaEvents?.find((e) => e.eventName === 'homepage_form_submitted')?.eventCount ?? 0;
+  const gaQualified =
+    gaEvents?.find((e) => e.eventName === 'qualified_opportunity')?.eventCount ?? 0;
+  const openPillarClicks = gscOpen?.totals?.clicks ?? 0;
+
   const body = {
     generatedAt: new Date().toISOString(),
     windowDays: 28,
@@ -84,6 +110,20 @@ export async function GET(request: NextRequest) {
     pageMix,
     openPageMix,
     ga4,
+    conversionFunnel: {
+      ...conversionFunnel,
+      openSerpClicks: openPillarClicks,
+      gaFormStarted,
+      gaFormSubmitted,
+      gaQualified,
+      scoreboard: {
+        targetPillarClicks14d: 20,
+        targetTaggedSubmits14d: 5,
+        targetQualifiedOpps14d: 2,
+        targetPaidKeys: 1,
+        note: '14d scoreboard targets from conversion plan; HUD window is 28d',
+      },
+    },
     gscSites: { pocket: gscPocketSiteUrl(), open: gscOpenSiteUrl() },
     warnings,
   };

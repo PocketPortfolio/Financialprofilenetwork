@@ -219,6 +219,12 @@ const nextConfig = {
           },
         ],
       },
+      // Tier-1 page bounces (~0s eng) — send diligence traffic to architecture catch
+      {
+        source: '/tier1designpartner',
+        destination: '/architecture',
+        permanent: false,
+      },
       // Legacy route redirects
       {
         source: '/portfolio-tracker',

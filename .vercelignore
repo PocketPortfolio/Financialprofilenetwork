@@ -1,0 +1,19 @@
+# Local media / archives — gitignored but present on disk; exceed Vercel 2 GiB upload limit
+docs/media/
+docs/command/
+*.mp4
+*.MP4
+*.mov
+*.MOV
+
+# Build / deps (Vercel installs fresh)
+node_modules/
+.next/
+.git/
+coverage/
+dist/
+tmp/
+.tmp/
+*.log
+_tmp_*
+scripts/count-email-leads-yc.ts

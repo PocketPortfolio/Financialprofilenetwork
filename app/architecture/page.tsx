@@ -12,9 +12,9 @@ import {
 } from '@/lib/canonical-claims';
 
 export const metadata: Metadata = genMeta({
-  title: 'BYOC Inference Boundary for Wealth-Tech — Not an RIA Open-Architecture Platform',
+  title: 'Run AI on Wealth Data Without a Client-Ledger Warehouse',
   description:
-    'Sovereign AI architecture for wealth platforms: edge ingestion, bounded context, stateless hop. Buyer keeps IdP and storage — not a multi-custodian RIA open-architecture product. Book diligence.',
+    'Keep login and client storage. Edge ingestion builds a small approved summary for the model — book a 30-minute architecture review with Open Portfolio.',
   path: '/architecture',
 });
 
@@ -35,9 +35,9 @@ const definedTermLd = {
 const techArticleLd = {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
-  headline: 'BYOC inference boundary for wealth-tech — sovereign AI architecture',
+  headline: 'Run AI on wealth data without a client-ledger warehouse',
   description:
-    'How Open Portfolio supplies edge ingestion and a stateless hop while the buyer keeps IdP and ledger storage. Not an RIA open-architecture custody platform.',
+    'How Open Portfolio supplies edge ingestion and a stateless hop while the buyer keeps IdP and ledger storage. Book a 30-minute architecture review.',
   author: {
     '@type': 'Organization',
     name: SURFACE_ORG.open.name,
@@ -87,11 +87,11 @@ export default function ArchitecturePage() {
               marginBottom: '12px',
             }}
           >
-            Sovereign AI architecture for wealth-tech
+            Run AI on wealth data without a client-ledger warehouse
           </h1>
           <p style={{ fontSize: '17px', color: 'var(--text-secondary)', margin: 0 }}>
-            BYOC inference boundary: edge ingestion, bounded aggregates, forgetful hop. Written for CTO / CISO
-            diligence — DORA, EU AI Act, and custody — not for multi-custodian RIA “open architecture” shopping.
+            Keep login and client storage. Edge ingestion builds a small approved summary for the model.
+            Written for CTO / CISO diligence — not multi-custodian RIA “open architecture” shopping.
           </p>
         </header>
 

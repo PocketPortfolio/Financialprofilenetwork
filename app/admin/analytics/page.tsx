@@ -139,6 +139,7 @@ interface AnalyticsData {
     total: number;
     last7Days: number;
     byContext: Record<string, number>;
+    byPipelineStage?: Record<string, number>;
     signups: Array<{
       id: string;
       email: string;
@@ -147,6 +148,9 @@ interface AnalyticsData {
       message: string;
       context?: string;
       createdAt: string;
+      pipelineStage?: 'inquiry' | 'qualified_opportunity' | 'won' | 'lost';
+      attributionChannel?: 'organic' | 'ai' | 'authority' | 'outbound' | 'unknown';
+      qualifiedAt?: string;
     }>;
     error?: string;
   };
@@ -258,6 +262,47 @@ export default function AdminAnalyticsPage() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [curateBusyId, setCurateBusyId] = useState<string | null>(null);
+  const [promotingLeadId, setPromotingLeadId] = useState<string | null>(null);
+  const [promoteError, setPromoteError] = useState<string | null>(null);
+
+  const promoteOpenLead = useCallback(
+    async (leadId: string, attributionChannel?: string, company?: string) => {
+      if (!user) return;
+      setPromotingLeadId(leadId);
+      setPromoteError(null);
+      try {
+        const token = await user.getIdToken(true);
+        const res = await fetch(`/api/admin/open-leads/${leadId}/promote`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            attributionChannel: attributionChannel || 'unknown',
+            note: 'Promoted from /admin/analytics',
+          }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Promote failed');
+        const { trackQualifiedOpportunity } = await import('@/app/lib/analytics/events');
+        trackQualifiedOpportunity({
+          company: (company || json.company || json.email || 'unknown').slice(0, 120),
+          attributionChannel: (json.attributionChannel ||
+            attributionChannel ||
+            'unknown') as 'organic' | 'ai' | 'authority' | 'outbound' | 'unknown',
+          leadId,
+          sourcePath: '/admin/analytics',
+        });
+        setManualRefresh((n) => n + 1);
+      } catch (e: unknown) {
+        setPromoteError(e instanceof Error ? e.message : 'Promote failed');
+      } finally {
+        setPromotingLeadId(null);
+      }
+    },
+    [user],
+  );
 
   // Check admin status
   useEffect(() => {
@@ -2700,7 +2745,14 @@ export default function AdminAnalyticsPage() {
                 openportfolio.co.uk
               </Link>{' '}
               (Firestore: <code style={{ fontSize: '12px' }}>open_portfolio_contact_leads</code>).
+              CCO: promote inquiry → qualified_opportunity when company, owner, perimeter, and
+              diligence ≤14d are met.
             </p>
+            {promoteError && (
+              <p style={{ color: 'var(--destructive, #ef4444)', fontSize: '14px', marginBottom: 12 }}>
+                {promoteError}
+              </p>
+            )}
             {!analyticsData.openPortfolioContactLeads ? (
               <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 Data not in API response — redeploy to enable Open Portfolio funnel analytics.
@@ -2761,6 +2813,29 @@ export default function AdminAnalyticsPage() {
                       In last 7 days (within range)
                     </div>
                   </div>
+                  <div
+                    style={{
+                      background: 'var(--bg)',
+                      padding: 'var(--space-4)',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: 'var(--accent-warm)',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {analyticsData.openPortfolioContactLeads.byPipelineStage?.qualified_opportunity ??
+                        0}
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                      Qualified opportunities (range)
+                    </div>
+                  </div>
                 </div>
                 {analyticsData.openPortfolioContactLeads.signups.length > 0 ? (
                   <div>
@@ -2793,6 +2868,7 @@ export default function AdminAnalyticsPage() {
                               flexWrap: 'wrap',
                               gap: '8px',
                               marginBottom: '8px',
+                              alignItems: 'center',
                             }}
                           >
                             <a
@@ -2802,6 +2878,7 @@ export default function AdminAnalyticsPage() {
                               {row.email}
                             </a>
                             <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                              {row.pipelineStage ?? 'inquiry'} · {row.attributionChannel ?? 'unknown'} ·{' '}
                               {row.context ?? 'general'} ·{' '}
                               {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
                             </span>
@@ -2811,9 +2888,32 @@ export default function AdminAnalyticsPage() {
                               {[row.company, row.role].filter(Boolean).join(' · ')}
                             </p>
                           )}
-                          <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                          <p style={{ margin: '0 0 10px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                             {row.message}
                           </p>
+                          {(row.pipelineStage ?? 'inquiry') === 'inquiry' && (
+                            <button
+                              type="button"
+                              disabled={promotingLeadId === row.id}
+                              onClick={() =>
+                                void promoteOpenLead(row.id, row.attributionChannel, row.company)
+                              }
+                              style={{
+                                padding: '8px 12px',
+                                borderRadius: 6,
+                                border: '1px solid var(--accent-warm)',
+                                background: 'rgba(245, 158, 11, 0.12)',
+                                color: 'var(--accent-warm)',
+                                fontWeight: 700,
+                                fontSize: 12,
+                                cursor: promotingLeadId === row.id ? 'wait' : 'pointer',
+                              }}
+                            >
+                              {promotingLeadId === row.id
+                                ? 'Promoting…'
+                                : 'Promote to qualified opportunity'}
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>

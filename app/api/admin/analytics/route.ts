@@ -439,6 +439,7 @@ export async function GET(request: NextRequest) {
         total: 0,
         last7Days: 0,
         byContext: {},
+        byPipelineStage: {},
         signups: [],
         error: 'skipped_firestore_degraded',
       };
@@ -451,6 +452,7 @@ export async function GET(request: NextRequest) {
           total: 0,
           last7Days: 0,
           byContext: {},
+          byPipelineStage: {},
           signups: [],
           error: e?.message,
         };

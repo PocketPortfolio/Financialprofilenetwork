@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import SovereignPillarArticle from '@/app/components/learn/SovereignPillarArticle';
 
 export const metadata: Metadata = {
-  title: 'AI in Wealth Management Without a Client Data Warehouse',
+  title: 'AI in Wealth Management Without Copying the Client Ledger',
   description:
-    'AI in wealth management without warehousing client ledgers: BYOC inference boundary, edge ingestion, bounded context. Book architecture diligence with Open Portfolio.',
+    'Run AI over portfolio data without a vendor ledger vault. Keep your IdP and storage — book a 30-minute architecture review.',
   alternates: { canonical: 'https://www.openportfolio.co.uk/learn/ai-in-wealth-management' },
   openGraph: {
-    title: 'AI in Wealth Management Without a Client Data Warehouse | Open Portfolio',
+    title: 'AI in Wealth Management Without Copying the Client Ledger | Open Portfolio',
     description:
-      'AI in wealth management without a vendor ledger vault — edge ingestion to bounded inference. Book architecture diligence.',
+      'Run AI over portfolio data without a vendor ledger vault. Book a 30-minute architecture review.',
     url: 'https://www.openportfolio.co.uk/learn/ai-in-wealth-management',
     type: 'article',
   },
@@ -20,16 +20,16 @@ export default function AiInWealthManagementPage() {
     <SovereignPillarArticle
       articleSlug="ai-in-wealth-management"
       breadcrumbLabel="AI in Wealth Management"
-      title="AI in Wealth Management Without a Client Data Warehouse"
-      subtitle="AI in wealth management without duplicating client ledgers into a vendor vault — BYOC boundary, then architecture diligence."
+      title="AI in Wealth Management Without Copying the Client Ledger"
+      subtitle="Run AI over portfolio data without a vendor ledger vault — then book a 30-minute architecture review."
       body={[
         'Wealth-tech buyers do not ask “can we add a chatbot?” They ask whether generative AI can sit on portfolio and CRM context without creating a second warehouse of client ledgers. That is the data chasm: useful models want context; regulated operators cannot casually duplicate PII into a vendor cloud.',
         'Open Portfolio’s answer is a BYOC inference boundary. Broker exports and approved aggregates are normalized at the edge; the enterprise keeps IdP and storage; inference receives a bounded, request-scoped context — not an open-ended retention of raw financial DNA. Pocket Portfolio is the live harness proving adapters under CSV chaos, not Open’s default enterprise store.',
         'CTO and CISO diligence should separate three questions: (1) what is ingested and where, (2) what crosses the inference hop, and (3) what is retained after the response. Architecture pages and design-partner briefs exist so those answers are inspectable — not promised as certification theatre.',
         'Use this pillar when evaluating generative use cases for portfolio commentary, exception triage, or operator assistants. Pair it with DORA / EU AI Act framing and the edge-vs-warehouse comparison before booking a diligence call.',
       ]}
-      ctaHref="/architecture"
-      ctaLabel="Book architecture diligence"
+      ctaHref="/#contact"
+      ctaLabel="Book a 30-minute architecture review"
       procurementFaqIndices={[0, 1, 5]}
       aeo={{
         definition:

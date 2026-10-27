@@ -1,18 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import IdentityGate from '@/app/components/auth/IdentityGate';
+import { trackEvent } from '@/app/lib/analytics/events';
 
 const DILIGENCE_MAIL =
-  'mailto:ceo@pocketportfolio.app?subject=Open%20Portfolio%20Design%20Partnership%20Diligence&body=We%20reviewed%20openportfolio.co.uk%2Farchitecture%20and%20want%20to%20discuss%20a%20design-partner%20diligence%20call.';
+  'mailto:ceo@pocketportfolio.app?subject=Open%20Portfolio%20Architecture%20Review&body=We%20reviewed%20openportfolio.co.uk%2Farchitecture%20and%20want%20to%20book%20a%2030-minute%20architecture%20review.';
 
 /**
- * Executive booking pathway for /architecture — design-partner brief gate + direct diligence email.
+ * Above-fold conversion CTA for /architecture — one primary path to the contact form.
+ * Discovery → conversion: SERP/AI land here, then book the review.
  */
 export default function ArchitectureBookingCta() {
   return (
     <section
-      aria-label="Design partnership booking"
+      id="contact"
+      aria-label="Book architecture review"
       style={{
         marginBottom: 28,
         padding: '20px 22px',
@@ -35,44 +37,45 @@ export default function ArchitectureBookingCta() {
         Next step for CTOs / CISOs
       </p>
       <h2 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800, color: 'var(--text)' }}>
-        Book a diligence call
+        Book a 30-minute architecture review
       </h2>
       <p style={{ margin: '0 0 16px', fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-        Architecture is the diligence map. Partnership is the commercial gate — clean-room embed of
-        sovereign ingestion without warehousing client ledgers.
+        Tell us where client data lives today and what AI should do. We map the BYOC boundary —
+        edge ingestion, bounded summary, forgetful hop — and whether a design partnership fits.
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-        <IdentityGate
-          action="tier1_brief"
-          contextId="architecture_booking"
-          onContinue={() => {
-            // Keep buyers on the diligence path — Tier-1 page currently bounces (~0s eng).
-            window.location.href = DILIGENCE_MAIL;
+        <Link
+          href="/#contact"
+          onClick={() =>
+            trackEvent('architecture_cta_click', {
+              cta: 'book_review',
+              source_path: '/architecture',
+            })
+          }
+          style={{
+            display: 'inline-block',
+            border: 'none',
+            background: 'var(--accent-warm)',
+            color: 'var(--on-accent)',
+            fontWeight: 800,
+            padding: '12px 18px',
+            borderRadius: 8,
+            fontSize: 14,
+            textDecoration: 'none',
           }}
         >
-          {({ request, isUnlocked }) => (
-            <button
-              type="button"
-              onClick={request}
-              style={{
-                border: 'none',
-                background: 'var(--accent-warm)',
-                color: 'var(--on-accent)',
-                fontWeight: 800,
-                padding: '12px 18px',
-                borderRadius: 8,
-                fontSize: 14,
-                cursor: 'pointer',
-              }}
-            >
-              {isUnlocked ? 'Email diligence now →' : 'Book diligence call →'}
-            </button>
-          )}
-        </IdentityGate>
+          Book a 30-minute architecture review →
+        </Link>
 
         <a
           href={DILIGENCE_MAIL}
+          onClick={() =>
+            trackEvent('architecture_cta_click', {
+              cta: 'email_ceo',
+              source_path: '/architecture',
+            })
+          }
           style={{
             display: 'inline-block',
             padding: '12px 18px',
@@ -84,20 +87,8 @@ export default function ArchitectureBookingCta() {
             textDecoration: 'none',
           }}
         >
-          Email ceo@pocketportfolio.app
+          Or email ceo@pocketportfolio.app
         </a>
-
-        <Link
-          href="/tier1designpartner"
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--accent-warm)',
-            textDecoration: 'none',
-          }}
-        >
-          Design partnership brief →
-        </Link>
       </div>
     </section>
   );

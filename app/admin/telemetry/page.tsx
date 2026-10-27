@@ -36,6 +36,26 @@ interface TelemetryPayload {
     conversionEvents: Array<{ eventName: string; eventCount: number }>;
     enterpriseLandings: Array<{ landingPage: string; sessions: number; avgEngagementSec: number }>;
   } | null;
+  conversionFunnel?: {
+    inquiries: number;
+    qualifiedOpportunities: number;
+    won: number;
+    lost: number;
+    byChannel: Record<string, number>;
+    last7DaysQualified: number;
+    openSerpClicks: number;
+    gaFormStarted: number;
+    gaFormSubmitted: number;
+    gaQualified: number;
+    scoreboard?: {
+      targetPillarClicks14d: number;
+      targetTaggedSubmits14d: number;
+      targetQualifiedOpps14d: number;
+      targetPaidKeys: number;
+      note: string;
+    };
+    error?: string;
+  };
   warnings: string[];
 }
 
@@ -252,6 +272,111 @@ export default function AdminGrowthTelemetryPage() {
             hint="B2B architecture / learn / tier1"
             pass={openMix ? openMix.pillarPageShare >= 0.05 : undefined}
           />
+        </section>
+
+        <section style={{ marginBottom: 32 }}>
+          <h2
+            style={{
+              fontSize: 13,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--accent-warm)',
+              fontFamily: 'ui-monospace, monospace',
+              marginBottom: 12,
+            }}
+          >
+            Open conversion funnel · SERP → form → qualified → key
+          </h2>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: 12,
+              marginBottom: 12,
+            }}
+          >
+            <PinCard
+              label="Open SERP clicks"
+              value={data?.conversionFunnel ? String(data.conversionFunnel.openSerpClicks) : '—'}
+              hint={`Scoreboard ≥${data?.conversionFunnel?.scoreboard?.targetPillarClicks14d ?? 20} (14d)`}
+              pass={
+                data?.conversionFunnel
+                  ? data.conversionFunnel.openSerpClicks >=
+                    (data.conversionFunnel.scoreboard?.targetPillarClicks14d ?? 20)
+                  : undefined
+              }
+            />
+            <PinCard
+              label="Form started (GA4)"
+              value={data?.conversionFunnel ? String(data.conversionFunnel.gaFormStarted) : '—'}
+              hint="homepage_form_started"
+            />
+            <PinCard
+              label="Form submitted"
+              value={
+                data?.conversionFunnel
+                  ? String(
+                      Math.max(
+                        data.conversionFunnel.gaFormSubmitted,
+                        data.conversionFunnel.inquiries +
+                          data.conversionFunnel.qualifiedOpportunities +
+                          data.conversionFunnel.won +
+                          data.conversionFunnel.lost,
+                      ),
+                    )
+                  : '—'
+              }
+              hint={`Firestore ≥${data?.conversionFunnel?.scoreboard?.targetTaggedSubmits14d ?? 5}`}
+              pass={
+                data?.conversionFunnel
+                  ? data.conversionFunnel.inquiries +
+                      data.conversionFunnel.qualifiedOpportunities >=
+                    (data.conversionFunnel.scoreboard?.targetTaggedSubmits14d ?? 5)
+                  : undefined
+              }
+            />
+            <PinCard
+              label="Qualified opps"
+              value={
+                data?.conversionFunnel
+                  ? String(data.conversionFunnel.qualifiedOpportunities)
+                  : '—'
+              }
+              hint={`Last 7d promote: ${data?.conversionFunnel?.last7DaysQualified ?? 0} · target ≥${data?.conversionFunnel?.scoreboard?.targetQualifiedOpps14d ?? 2}`}
+              pass={
+                data?.conversionFunnel
+                  ? data.conversionFunnel.qualifiedOpportunities >=
+                    (data.conversionFunnel.scoreboard?.targetQualifiedOpps14d ?? 2)
+                  : undefined
+              }
+            />
+            <PinCard
+              label="Paid keys"
+              value={pin ? String(pin.paidKeys) : '—'}
+              hint="North star · day-28"
+              pass={Boolean(pin?.day28Pass)}
+            />
+          </div>
+          {data?.conversionFunnel?.byChannel &&
+          Object.keys(data.conversionFunnel.byChannel).length > 0 ? (
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'ui-monospace, monospace' }}>
+              By channel:{' '}
+              {Object.entries(data.conversionFunnel.byChannel)
+                .map(([k, v]) => `${k}=${v}`)
+                .join(' · ')}
+              {' · '}
+              <Link href="/admin/analytics" style={{ color: 'var(--accent-warm)' }}>
+                Promote leads in analytics →
+              </Link>
+            </p>
+          ) : (
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', fontFamily: 'ui-monospace, monospace' }}>
+              No Open contact leads in window yet.{' '}
+              <Link href="/admin/analytics" style={{ color: 'var(--accent-warm)' }}>
+                /admin/analytics
+              </Link>
+            </p>
+          )}
         </section>
 
         <section style={{ marginBottom: 24 }}>
