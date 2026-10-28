@@ -22,14 +22,13 @@ const PLATE_MAP = [
   // Replaces generic deck crops with high-signal product visuals per CEO mandate.
   {
     dest: 'web-portal-terminal.png',
-    // CMD-RETAIL-TERMINAL-HD-2026-10-28 — real Pocket Portfolio HD harness UI (Creative polish TBD).
-    // Supersedes graphic retail-v3 terminal plate.
+    // CMD-RETAIL-TERMINAL-HD-2026-10-28 — real Pocket Portfolio HD harness UI.
     // FINAL v7 — pre-authored 3840×2160 optical master (header+alert, uniform scale).
-    // Do not re-bake from 3:2 still here — stretch/letterbox/cover-crop all fail Creative review.
+    // Seed master is gitignored (docs/seed/). Never sharp-resize — copy or preserve only.
     src: 'pocket-portal-terminal-master-final-v6.png',
-    full: true,
-    fit: 'cover',
-    position: 'centre',
+    passthrough: true,
+    // If seed absent on Vercel, keep tracked public/…/web-portal-terminal.png (deploy SSOT).
+    preserveCommittedIfMissingSrc: true,
     label: 'portalTerminal — FINAL v7 · $30k optical 16:9 · header+alert · no stretch',
   },
   {
@@ -119,12 +118,34 @@ async function main() {
   for (const row of PLATE_MAP) {
     const srcPath = path.join(deckDir, row.src);
     const destPath = path.join(OUT_DIR, row.dest);
-    if (!fs.existsSync(srcPath)) {
+    const srcMissing = !fs.existsSync(srcPath);
+    if (srcMissing) {
+      if (row.preserveCommittedIfMissingSrc && fs.existsSync(destPath)) {
+        const hash = await fileHashPrefix(destPath);
+        if (hashes.has(hash)) {
+          console.error(`DUPLICATE FRAME: ${row.dest} matches ${hashes.get(hash)} (${hash})`);
+          process.exitCode = 1;
+        } else {
+          hashes.set(hash, row.dest);
+        }
+        manifest.push({
+          dest: row.dest,
+          src: `${row.src} (preserved committed)`,
+          hash,
+          label: row.label,
+          region: row.region ?? 'full',
+        });
+        console.log(`  ✓ ${row.dest} ← preserved committed public plate (${hash})`);
+        continue;
+      }
       console.error(`Missing deck plate: ${srcPath}`);
       process.exitCode = 1;
       continue;
     }
-    if (row.full) {
+    if (row.passthrough) {
+      // Already 3840×2160 Creative master — byte-copy; do not re-encode via sharp.
+      fs.copyFileSync(srcPath, destPath);
+    } else if (row.full) {
       await bakeFullPlate16x9(srcPath, destPath, {
         fit: row.fit === 'contain' ? 'contain' : 'cover',
         position: row.position || 'centre',
