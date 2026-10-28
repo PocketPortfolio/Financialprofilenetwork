@@ -1,7 +1,7 @@
 # Open Portfolio — AI Agent Context File
 # SSOT: lib/canonical-claims.ts · lib/llms-feed.ts
-# Generated: 2026-09-21T00:00:00Z
-# Last human-verified: 2026-09-21
+# Generated: 2026-10-28T00:00:00Z
+# Last human-verified: 2026-10-28
 
 ## Identity
 Open Portfolio: The Sovereign Ingestion & Inference Layer.

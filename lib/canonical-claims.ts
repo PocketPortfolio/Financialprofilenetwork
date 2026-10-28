@@ -12,7 +12,7 @@
  *   tests/canonical-claims.spec.ts will fail in CI.
  */
 
-export const LAST_HUMAN_VERIFIED = '2026-09-21' as const;
+export const LAST_HUMAN_VERIFIED = '2026-10-28' as const;
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Positioning

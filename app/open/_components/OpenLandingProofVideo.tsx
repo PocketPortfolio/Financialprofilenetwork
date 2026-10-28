@@ -1,21 +1,38 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { OPEN_LANDING_VIDEO } from '../../../lib/canonical-claims';
 
 /**
  * Phase 2 proof player — poster + prominent play affordance until first interaction.
  * Native timeline/controls appear only after the audience presses play (Civo-style).
+ *
+ * Uses matchMedia for src (not <source media>) — browsers often ignore media on
+ * video <source> children, and a competing `src` attribute would override them.
  */
 export default function OpenLandingProofVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const [src, setSrc] = useState<string>(OPEN_LANDING_VIDEO.src);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const apply = () => {
+      setSrc(mq.matches ? OPEN_LANDING_VIDEO.srcMobile : OPEN_LANDING_VIDEO.src);
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
 
   const handlePlay = async () => {
     const video = videoRef.current;
     if (!video) return;
     try {
+      if (video.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+        video.load();
+      }
       await video.play();
       setHasStarted(true);
     } catch {
@@ -40,11 +57,11 @@ export default function OpenLandingProofVideo() {
         controls={hasStarted}
         playsInline
         muted
-        preload="none"
+        preload="metadata"
         poster={OPEN_LANDING_VIDEO.poster}
         aria-label={OPEN_LANDING_VIDEO.alt}
         onEnded={handleEnded}
-        src={OPEN_LANDING_VIDEO.srcMobile}
+        src={src}
         style={{
           display: 'block',
           width: '100%',
@@ -53,12 +70,7 @@ export default function OpenLandingProofVideo() {
           background: '#0b0d10',
         }}
       >
-        <source
-          media="(max-width: 768px)"
-          src={OPEN_LANDING_VIDEO.srcMobile}
-          type="video/mp4"
-        />
-        <source src={OPEN_LANDING_VIDEO.src} type="video/mp4" />
+        Your browser does not support the video tag.
       </video>
 
       {!hasStarted && (

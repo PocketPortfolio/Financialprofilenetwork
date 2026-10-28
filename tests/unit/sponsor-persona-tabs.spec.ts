@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSponsorPersonaTab } from '@/app/components/sponsor/SponsorDeck';
+import { resolveSponsorPersonaTab } from '@/app/components/sponsor/resolveSponsorPersonaTab';
 
 describe('resolveSponsorPersonaTab', () => {
   it('defaults unknown tiers to null (caller uses investors)', () => {

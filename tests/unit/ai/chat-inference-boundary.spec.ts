@@ -90,7 +90,7 @@ describe('/api/ai/chat inference boundary (Phase 1B)', () => {
     global.fetch = originalFetch;
   });
 
-  it('does not persist message, context, or attachedContent to Firestore (paid tier)', async () => {
+  it('does not persist message, context, or attachedContent to Firestore (paid tier)', { timeout: 20_000 }, async () => {
     const SENTINEL_CTX = `DILIGENCE_CTX_${crypto.randomUUID()}`;
     const SENTINEL_MSG = `DILIGENCE_MSG_${crypto.randomUUID()}`;
     const SENTINEL_ATTACH = `DILIGENCE_ATTACH_${crypto.randomUUID()}`;

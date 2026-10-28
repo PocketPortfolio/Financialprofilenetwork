@@ -9,13 +9,18 @@ import {
 } from '@/lib/canonical-claims';
 
 describe('Open Learn hub (enterprise gateway)', () => {
-  it('defines four institutional pillars as SSOT', () => {
-    expect(OPEN_INSTITUTIONAL_PILLARS).toHaveLength(4);
+  it('defines institutional pillars as SSOT (category + advisor + architecture briefs)', () => {
+    expect(OPEN_INSTITUTIONAL_PILLARS.length).toBeGreaterThanOrEqual(4);
     const slugs = OPEN_INSTITUTIONAL_PILLARS.map((p) => p.slug);
     expect(slugs).toEqual([
+      'ai-in-wealth-management',
+      'ai-for-financial-advisors',
       'sovereign-ai-architecture',
       'dora-eu-ai-act-wealth',
       'stateless-edge-ingestion',
+      'edge-ingestion-vs-warehouse',
+      'open-portfolio-vs-portfolio-data-api',
+      'open-portfolio-vs-plaid',
       'enterprise-design-partnership',
     ]);
   });

@@ -5,6 +5,10 @@ docs/command/
 *.MP4
 *.mov
 *.MOV
+# Product-surface MP4s under public/ must ship (Open landing proof, retail fallbacks).
+# Blanket *.mp4 above excludes disk noise; these negations re-include deployable assets.
+!public/**/*.mp4
+!public/**/*.MP4
 
 # Build / deps (Vercel installs fresh)
 node_modules/

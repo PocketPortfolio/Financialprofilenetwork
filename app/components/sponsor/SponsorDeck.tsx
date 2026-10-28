@@ -1,31 +1,20 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import Link from 'next/link';
+import {
+  resolveSponsorPersonaTab,
+  type SponsorPersonaTab,
+} from '@/app/components/sponsor/resolveSponsorPersonaTab';
 
-export type SponsorPersonaTab = 'investors' | 'developers' | 'institutions';
+export type { SponsorPersonaTab };
+export { resolveSponsorPersonaTab };
 
 const PERSONA_TABS: { id: SponsorPersonaTab; label: string }[] = [
   { id: 'investors', label: 'For investors' },
   { id: 'developers', label: 'For developers' },
   { id: 'institutions', label: 'For institutions' },
 ];
-
-/** Map legacy `?tier=` deep links to persona panes (Stripe objects unchanged). */
-export function resolveSponsorPersonaTab(tier: string | null): SponsorPersonaTab | null {
-  if (!tier) return null;
-  switch (tier) {
-    case 'founder':
-      return 'investors';
-    case 'code-supporter':
-    case 'developer-utility':
-      return 'developers';
-    case 'corporate':
-      return 'institutions';
-    default:
-      return null;
-  }
-}
 
 export type FoundersClubScarcity = {
   count: number;
@@ -67,7 +56,7 @@ function isPriceLoading(
   return loading === priceId.monthly || loading === priceId.annual;
 }
 
-function FeatureBlock({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
+function FeatureBlock({ title, children }: { title: ReactNode; children: ReactNode }) {
   return (
     <div
       style={{
