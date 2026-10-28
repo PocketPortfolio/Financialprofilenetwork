@@ -864,8 +864,9 @@ export async function GET(request: NextRequest) {
     logDividendDebug(` Ticker extracted: ${ticker}`);
 
   console.log(`[Dividend API] Request received for ${ticker}`);
-  console.log(`[Dividend API] EODHD_API_KEY configured: ${EODHD_API_KEY ? 'YES (' + EODHD_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
-  console.log(`[Dividend API] ALPHA_VANTAGE_API_KEY configured: ${ALPHA_VANTAGE_API_KEY ? 'YES (' + ALPHA_VANTAGE_API_KEY.substring(0, 8) + '...)' : 'NO'}`);
+  // Never log key material — presence only (CodeQL js/clear-text-logging)
+  console.log(`[Dividend API] EODHD_API_KEY configured: ${EODHD_API_KEY ? 'YES' : 'NO'}`);
+  console.log(`[Dividend API] ALPHA_VANTAGE_API_KEY configured: ${ALPHA_VANTAGE_API_KEY ? 'YES' : 'NO'}`);
   
   // Production-safe diagnostic header (survives removeConsole)
   const diagnosticHeaders = {

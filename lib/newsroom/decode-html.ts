@@ -15,7 +15,9 @@ const NAMED_ENTITIES: Record<string, string> = {
 export function decodeHtmlEntities(text: string): string {
   if (!text) return '';
 
-  let s = text.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, '');
+  // Strip CDATA/tags then neutralize any leftover angle brackets so multi-char
+  // sanitization cannot reintroduce markup (CodeQL js/incomplete-multi-character-sanitization).
+  let s = text.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]*>/g, '').replace(/[<>]/g, '');
 
   s = s.replace(/&#(\d+);/g, (_, digits: string) => {
     const code = Number.parseInt(digits, 10);
