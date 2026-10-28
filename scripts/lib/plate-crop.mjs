@@ -41,9 +41,10 @@ export async function bakePlate16x9({ srcPath, destPath, region }) {
 export async function bakeFullPlate16x9(srcPath, destPath, opts = {}) {
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
   const fit = opts.fit ?? 'cover';
+  const position = opts.position ?? 'centre';
   const background = opts.background ?? { r: 9, g: 9, b: 11, alpha: 1 };
   await sharp(srcPath)
-    .resize(OUT_W, OUT_H, { fit, position: 'centre', background })
+    .resize(OUT_W, OUT_H, { fit, position, background })
     .png({ compressionLevel: 6 })
     .toFile(destPath);
 }

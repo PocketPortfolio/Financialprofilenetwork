@@ -51,7 +51,7 @@ export const POCKET_LANDING_VISUALS: Record<PocketLandingVisualId, PocketLanding
   portalTerminal: {
     id: 'portalTerminal',
     plateFile: 'web-portal-terminal.png',
-    alt: 'Pocket Portfolio wealth terminal — candlestick chart, portfolio matrix, and populated Pocket Analyst console',
+    alt: 'Pocket Portfolio terminal — $30k total value, risk matrix, Pocket Analyst brief, local-storage sync alert, and full app chrome',
     overlay: 'none',
     portalKey: 'terminal',
     aspectRatio: '16 / 9',

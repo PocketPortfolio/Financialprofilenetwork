@@ -22,11 +22,15 @@ const PLATE_MAP = [
   // Replaces generic deck crops with high-signal product visuals per CEO mandate.
   {
     dest: 'web-portal-terminal.png',
-    // CMD-RETAIL-TERMINAL-PLATE-2026-07-29 — flat retail-grade UI (replaces tilted v2 CGI).
-    src: 'pocket-portal-terminal-retail-v3.png',
+    // CMD-RETAIL-TERMINAL-HD-2026-10-28 — real Pocket Portfolio HD harness UI (Creative polish TBD).
+    // Supersedes graphic retail-v3 terminal plate.
+    // FINAL v7 — pre-authored 3840×2160 optical master (header+alert, uniform scale).
+    // Do not re-bake from 3:2 still here — stretch/letterbox/cover-crop all fail Creative review.
+    src: 'pocket-portal-terminal-master-final-v6.png',
     full: true,
-    fit: 'contain',
-    label: 'portalTerminal — flat chart + portfolio + populated analyst console (retail grade)',
+    fit: 'cover',
+    position: 'centre',
+    label: 'portalTerminal — FINAL v7 · $30k optical 16:9 · header+alert · no stretch',
   },
   {
     dest: 'web-portal-storage.png',
@@ -123,6 +127,7 @@ async function main() {
     if (row.full) {
       await bakeFullPlate16x9(srcPath, destPath, {
         fit: row.fit === 'contain' ? 'contain' : 'cover',
+        position: row.position || 'centre',
       });
     } else {
       await bakePlate16x9({ srcPath, destPath, region: row.region });
