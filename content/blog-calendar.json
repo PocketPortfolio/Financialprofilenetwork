@@ -1696,7 +1696,7 @@
     "date": "2026-10-29",
     "title": "The Local-First Manifesto: Why Your Portfolio Belongs on Your Drive",
     "slug": "the-local-first-manifesto-why-your-portfolio-belongs-on-your",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1706,7 +1706,8 @@
       "local-first"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-10-29T09:00:36.980Z"
   },
   {
     "id": "week-44-post-1",
