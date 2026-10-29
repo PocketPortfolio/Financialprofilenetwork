@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-FINAL retail terminal plate v7 — Creative Studios optical 16:9:
-- Exact $30k UI (header + sidebar + SYSTEM ALERT + Initialize Sync)
+FINAL retail terminal plate v7.3 — Creative Studios optical 16:9:
+- Exact $30k UI (header + full sidebar nav + SYSTEM ALERT + Initialize Sync)
 - True 3840×2160, uniform scale only (no anamorphic stretch, no letterbox)
-- Band composite: keep header + alert, drop ~100px of mid gap between brief and alert
+- Column-aware: gutter skips apply to MAIN only — sidebar keeps full menu
 """
 from __future__ import annotations
 
@@ -31,8 +31,75 @@ OUT_W, OUT_H = 3840, 2160
 
 # Source landmarks (1882×1255 full chrome $30k)
 HEADER_END_SRC = 70  # below top nav
-ALERT_START_SRC = 1088  # SYSTEM ALERT banner
+SIDEBAR_END_SRC = 321  # inclusive hairline at x=320
+ALERT_START_SRC = 1084  # SYSTEM ALERT chrome
 ALERT_END_SRC = 1168  # below alert, before FAB/footer clutter
+# Preferred dark gutters to delete (src Y) — MAIN column only
+GUTTER_SKIPS_SRC: list[tuple[int, int]] = [
+    (505, 580),  # between portfolio block and risk matrix
+    (745, 804),  # between risk matrix and client brief
+    (1000, 1084),  # below brief SOURCE line, above alert
+]
+
+
+def _consume_gutters(
+    h_end: int, a0: int, skip_needed: int, scale: float
+) -> list[tuple[int, int]]:
+    """Return scaled keep-segments covering [h_end, a0) with skip_needed rows removed."""
+    if skip_needed <= 0:
+        return [(h_end, a0)]
+
+    # Map preferred gutters into scaled coords, clipped to (h_end, a0)
+    gutters: list[tuple[int, int]] = []
+    for s0, s1 in GUTTER_SKIPS_SRC:
+        g0 = max(h_end, int(round(s0 * scale)))
+        g1 = min(a0, int(round(s1 * scale)))
+        if g1 > g0:
+            gutters.append((g0, g1))
+
+    remove_ranges: list[tuple[int, int]] = []
+    left = skip_needed
+    for g0, g1 in gutters:
+        if left <= 0:
+            break
+        take = min(left, g1 - g0)
+        # Prefer removing from the middle of each gutter
+        mid = (g0 + g1) // 2
+        r0 = max(g0, mid - take // 2)
+        r1 = r0 + take
+        if r1 > g1:
+            r1 = g1
+            r0 = r1 - take
+        remove_ranges.append((r0, r1))
+        left -= take
+
+    if left > 0:
+        # Last resort: trim just above alert (still below brief body)
+        r1 = a0
+        r0 = a0 - left
+        if r0 < h_end:
+            raise SystemExit(f"cannot fit skip={skip_needed} into mid span")
+        remove_ranges.append((r0, r1))
+        left = 0
+
+    remove_ranges.sort()
+    # Merge overlaps
+    merged: list[tuple[int, int]] = []
+    for r0, r1 in remove_ranges:
+        if not merged or r0 > merged[-1][1]:
+            merged.append((r0, r1))
+        else:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], r1))
+
+    keeps: list[tuple[int, int]] = []
+    cursor = h_end
+    for r0, r1 in merged:
+        if cursor < r0:
+            keeps.append((cursor, r0))
+        cursor = max(cursor, r1)
+    if cursor < a0:
+        keeps.append((cursor, a0))
+    return keeps
 
 
 def compose_optical_16x9(src: Path) -> Image.Image:
@@ -45,42 +112,70 @@ def compose_optical_16x9(src: Path) -> Image.Image:
     arr = np.asarray(scaled)
 
     h_end = int(round(HEADER_END_SRC * scale))
+    sb_w = int(round(SIDEBAR_END_SRC * scale))
     a0 = int(round(ALERT_START_SRC * scale))
     a1 = int(round(ALERT_END_SRC * scale))
     alert_h = a1 - a0
-    mid_h = OUT_H - h_end - alert_h
+    body_h = OUT_H - h_end
+    mid_h = body_h - alert_h
     if mid_h < 100:
         raise SystemExit(f"mid band too small: {mid_h}")
 
-    # Mid band: contiguous rows immediately under header, length mid_h
-    # (skips the gap that would otherwise force letterbox/stretch)
-    mid0 = h_end
-    mid1 = mid0 + mid_h
-    if mid1 > a0:
-        # Prefer keeping content just above alert if header+mid overshoots
-        mid1 = a0
-        mid0 = mid1 - mid_h
-        if mid0 < h_end:
-            mid0 = h_end
-            mid1 = mid0 + mid_h
+    # MAIN column: gutter-skip to fit alert without brief overlap
+    avail = a0 - h_end
+    skip_needed = avail - mid_h
+    keeps = _consume_gutters(h_end, a0, skip_needed, scale)
+    main_parts = [arr[u:v, sb_w:] for u, v in keeps if v > u]
+    main_mid = (
+        np.concatenate(main_parts, axis=0) if main_parts else arr[h_end:a0, sb_w:]
+    )
+    if main_mid.shape[0] > mid_h:
+        main_mid = main_mid[:mid_h]
+    elif main_mid.shape[0] < mid_h:
+        raise SystemExit(f"main mid short: {main_mid.shape[0]} < {mid_h}")
+    main_alert = arr[a0:a1, sb_w:]
+    main = np.concatenate([main_mid, main_alert], axis=0)
+    if main.shape[0] != body_h:
+        raise SystemExit(f"main body_h {main.shape[0]} != {body_h}")
+
+    # SIDEBAR: continuous strip — never apply gutter skips (keeps full menu)
+    sb_avail = arr.shape[0] - h_end
+    if sb_avail >= body_h:
+        sidebar = arr[h_end : h_end + body_h, :sb_w]
+    else:
+        pad = body_h - sb_avail
+        fill = np.broadcast_to(arr[-1:, :sb_w], (pad, sb_w, 3)).copy()
+        sidebar = np.concatenate([arr[h_end:, :sb_w], fill], axis=0)
+
+    body = np.concatenate([sidebar, main], axis=1)
+    if body.shape[1] != OUT_W:
+        # rounding drift on sb_w
+        if body.shape[1] > OUT_W:
+            body = body[:, :OUT_W]
+        else:
+            pad_w = OUT_W - body.shape[1]
+            body = np.concatenate(
+                [body, np.broadcast_to(body[:, -1:, :], (body_h, pad_w, 3)).copy()],
+                axis=1,
+            )
 
     header = arr[0:h_end]
-    mid = arr[mid0:mid1]
-    alert = arr[a0:a1]
-
-    if header.shape[0] + mid.shape[0] + alert.shape[0] != OUT_H:
-        # Fix rounding drift
-        need = OUT_H - header.shape[0] - alert.shape[0]
-        if mid.shape[0] > need:
-            mid = mid[:need]
-        elif mid.shape[0] < need:
-            pad = need - mid.shape[0]
-            mid = np.concatenate([mid, arr[mid1 : mid1 + pad]], axis=0)
-
-    out = np.concatenate([header, mid, alert], axis=0)
+    if header.shape[1] != body.shape[1]:
+        header = header[:, : body.shape[1]]
+    out = np.concatenate([header, body], axis=0)
     if out.shape[0] != OUT_H or out.shape[1] != OUT_W:
         raise SystemExit(f"bad compose shape {out.shape}, want {(OUT_H, OUT_W, 3)}")
 
+    print(
+        "compose keeps",
+        [(u, v) for u, v in keeps],
+        "skip",
+        skip_needed,
+        "sb_w",
+        sb_w,
+        "main",
+        main.shape[0],
+    )
     im = Image.fromarray(out, "RGB")
     return im.filter(ImageFilter.UnsharpMask(radius=1.2, percent=120, threshold=2))
 
@@ -173,7 +268,7 @@ def main() -> None:
                     row["src"] = "pocket-portal-terminal-master-final-v6.png"
                     row["hash"] = digest
                     row["label"] = (
-                        "portalTerminal — FINAL v7 · optical 16:9 · header+alert · no stretch"
+                        "portalTerminal — FINAL v7.3 · optical 16:9 · full sidebar · clean alert"
                     )
             man.write_text(json.dumps(data, indent=2), encoding="utf-8")
         except Exception as e:
@@ -187,6 +282,11 @@ def main() -> None:
     final.crop((0, OUT_H - 200, OUT_W, OUT_H)).resize(
         (960, 50), Image.Resampling.LANCZOS
     ).save(SEED / "_qc_v7_bot.png")
+    # Seam: last mid rows + first alert rows
+    seam_y = OUT_H - int(round((ALERT_END_SRC - ALERT_START_SRC) * (OUT_W / 1882)))
+    final.crop((0, max(0, seam_y - 80), OUT_W, min(OUT_H, seam_y + 120))).resize(
+        (960, 60), Image.Resampling.LANCZOS
+    ).save(SEED / "_qc_v71_seam.png")
 
     m = qc_metrics(final)
     print("size", final.size)

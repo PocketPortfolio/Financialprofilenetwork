@@ -29,7 +29,7 @@ const PLATE_MAP = [
     passthrough: true,
     // If seed absent on Vercel, keep tracked public/…/web-portal-terminal.png (deploy SSOT).
     preserveCommittedIfMissingSrc: true,
-    label: 'portalTerminal — FINAL v7 · $30k optical 16:9 · header+alert · no stretch',
+    label: 'portalTerminal — FINAL v7.3 · $30k optical 16:9 · full sidebar · clean alert',
   },
   {
     dest: 'web-portal-storage.png',
