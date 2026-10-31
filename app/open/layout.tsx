@@ -8,7 +8,7 @@ import OpenNavbar from './_components/OpenNavbar';
 import OpenFooter from './_components/OpenFooter';
 import { ComplianceBannerServer } from '../components/compliance/ComplianceBanner';
 import { OPEN_URLS, SURFACE_ORG, SURFACE_POSITIONING } from '../../lib/canonical-claims';
-import { openOgImage, openTwitterImage } from './shared-metadata';
+import { openPageSocial } from './shared-metadata';
 
 /**
  * app/open/layout.tsx
@@ -57,23 +57,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: OPEN_URLS.home,
   },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Open Portfolio — The Sovereign Ingestion & Inference Layer',
     description: SURFACE_POSITIONING.open.primary,
     url: OPEN_URLS.home,
-    siteName: SURFACE_ORG.open.name,
     type: 'website',
-    locale: 'en_GB',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@OIntelligenceUK',
-    creator: '@OIntelligenceUK',
-    title: 'Open Portfolio — The Sovereign Ingestion & Inference Layer',
-    description: SURFACE_POSITIONING.open.primary,
-    ...openTwitterImage,
-  },
+  }),
   robots: 'index,follow,max-image-preview:large',
   icons: {
     icon: [

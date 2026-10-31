@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../../lib/canonical-claims';
-import { openOgImage } from '../../shared-metadata';
+import { openPageSocial } from '../../shared-metadata';
 
 export { default } from '../../../learn/open-portfolio-vs-plaid/page';
 
@@ -9,12 +9,10 @@ export const metadata: Metadata = {
   description:
     'Bank linking rails versus inspectable edge ingestion and bounded inference. Not a Plaid replacement.',
   alternates: { canonical: OPEN_URLS.openVsPlaid },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Open Portfolio vs Plaid | Open Portfolio',
     description: 'Complementary categories — connectivity vs BYOC inference boundary.',
     url: OPEN_URLS.openVsPlaid,
-    siteName: SURFACE_ORG.open.name,
     type: 'article',
-  },
+  }),
 };

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../../lib/canonical-claims';
-import { openOgImage } from '../../shared-metadata';
+import { openPageSocial } from '../../shared-metadata';
 
 export { default } from '../../../learn/open-portfolio-vs-portfolio-data-api/page';
 
@@ -9,12 +9,10 @@ export const metadata: Metadata = {
   description:
     'When a BYOC inference boundary fits versus when a hosted portfolio-data API is the right tool.',
   alternates: { canonical: OPEN_URLS.openVsPortfolioApi },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Open Portfolio vs Portfolio-Data API | Open Portfolio',
     description: 'Boundary infrastructure versus hosted holdings API.',
     url: OPEN_URLS.openVsPortfolioApi,
-    siteName: SURFACE_ORG.open.name,
     type: 'article',
-  },
+  }),
 };

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../../lib/canonical-claims';
-import { openOgImage } from '../../shared-metadata';
+import { openPageSocial } from '../../shared-metadata';
 
 export { default } from '../../../static/portfolio-tracker/page';
 
@@ -9,12 +9,10 @@ export const metadata: Metadata = {
   description:
     'Import broker CSVs, track live prices and performance. Open Portfolio documents the local-first ingestion path for developers and compliance teams.',
   alternates: { canonical: OPEN_URLS.portfolioTracker },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Portfolio Tracker | Open Portfolio',
     description: 'Broker CSV import and portfolio tracking on the sovereign substrate.',
     url: OPEN_URLS.portfolioTracker,
-    siteName: SURFACE_ORG.open.name,
     type: 'website',
-  },
+  }),
 };

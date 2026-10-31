@@ -7,7 +7,7 @@ import {
   SDK,
   SURFACE_ORG,
 } from '../../lib/canonical-claims';
-import { openOgImage } from './shared-metadata';
+import { openPageSocial } from './shared-metadata';
 
 /**
  * app/open/page.tsx — Open Portfolio (O.) landing
@@ -29,15 +29,12 @@ export const metadata: Metadata = {
   description:
     'You keep your login and client data. Open Portfolio builds a small approved summary for the AI model — so wealth platforms do not have to copy the book into another vendor cloud.',
   alternates: { canonical: OPEN_URLS.home },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'AI over wealth data — without another client-ledger warehouse | Open Portfolio',
-    description:
-      'You keep your login and client data. Open Portfolio builds a small approved summary for the AI model — so wealth platforms do not have to copy the book into another vendor cloud.',
+    description: 'You keep your login and client data. Open Portfolio builds a small approved summary for the AI model — so wealth platforms do not have to copy the book into another vendor cloud.',
     url: OPEN_URLS.home,
-    siteName: SURFACE_ORG.open.name,
     type: 'website',
-  },
+  }),
 };
 
 function findSnapshot(numbersPackRowId: string) {

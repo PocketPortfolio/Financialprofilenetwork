@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../lib/canonical-claims';
-import { openOgImage } from '../shared-metadata';
+import { openPageSocial } from '../shared-metadata';
 
 export { default } from '../../architecture/page';
 
@@ -9,13 +9,10 @@ export const metadata: Metadata = {
   description:
     'Keep login and client storage. Edge ingestion builds a small approved summary for the model — book a 30-minute architecture review.',
   alternates: { canonical: OPEN_URLS.architecture },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Run AI on Wealth Data Without a Client-Ledger Warehouse | Open Portfolio',
-    description:
-      'Keep IdP and ledger storage. Edge ingestion to bounded inference — book a 30-minute architecture review.',
+    description: 'Keep IdP and ledger storage. Edge ingestion to bounded inference — book a 30-minute architecture review.',
     url: OPEN_URLS.architecture,
-    siteName: SURFACE_ORG.open.name,
     type: 'article',
-  },
+  }),
 };

@@ -1,22 +1,19 @@
 import type { Metadata } from 'next';
 import SovereignPillarArticle from '@/app/components/learn/SovereignPillarArticle';
 import { OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
-import { openOgImage } from '../../shared-metadata';
+import { openPageSocial } from '../../shared-metadata';
 
 export const metadata: Metadata = {
   title: 'Local-First — Privacy as an Engineering Choice',
   description:
     'BYOC local-first posture for regulated platforms: edge ingestion and buyer-controlled stores — not a vendor-hosted ledger warehouse. Open Portfolio architecture brief.',
   alternates: { canonical: OPEN_URLS.localFirst },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Local-First | Open Portfolio',
-    description:
-      'Limited-Scope Processor posture. Audit-perimeter reduction by architecture — BYOC, not another vault.',
+    description: 'Limited-Scope Processor posture. Audit-perimeter reduction by architecture — BYOC, not another vault.',
     url: OPEN_URLS.localFirst,
-    siteName: SURFACE_ORG.open.name,
     type: 'article',
-  },
+  }),
 };
 
 export default function OpenLocalFirstPage() {

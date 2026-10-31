@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../../lib/canonical-claims';
-import { openOgImage } from '../../shared-metadata';
+import { openPageSocial } from '../../shared-metadata';
 
 export { default } from '../../../static/why-we-are-fast/page';
 
@@ -9,13 +9,10 @@ export const metadata: Metadata = {
   description:
     'Latency, API behaviour, and engineering transparency for the sovereign ingestion substrate — oriented to procurement and technical diligence.',
   alternates: { canonical: OPEN_URLS.whyWeAreFast },
-  openGraph: {
-    ...openOgImage,
+  ...openPageSocial({
     title: 'Why We Are Fast | Open Portfolio',
-    description:
-      'Performance engineering and technical transparency on the Open Portfolio developer surface.',
+    description: 'Performance engineering and technical transparency on the Open Portfolio developer surface.',
     url: OPEN_URLS.whyWeAreFast,
-    siteName: SURFACE_ORG.open.name,
     type: 'website',
-  },
+  }),
 };

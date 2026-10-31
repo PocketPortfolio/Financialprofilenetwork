@@ -7,6 +7,13 @@ Allow: /learn/
 Disallow: /api/
 Disallow: /admin/
 
+# Social preview crawlers — must fetch HTML + /open/og/* for cards
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
 # LLM citation crawlers — invite institutional pillars; block raw API firehose
 User-agent: OAI-SearchBot
 Allow: /
