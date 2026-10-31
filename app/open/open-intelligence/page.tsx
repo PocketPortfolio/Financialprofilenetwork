@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { OPEN_INTELLIGENCE, OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import { openOgImage } from '../shared-metadata';
 
 export const metadata: Metadata = {
   title: 'Open Intelligence — Sovereign AI Briefings | Open Portfolio',
   description: OPEN_INTELLIGENCE.tagline,
   alternates: { canonical: OPEN_URLS.openIntelligence },
   openGraph: {
+    ...openOgImage,
     title: 'Open Intelligence | Open Portfolio',
     description: OPEN_INTELLIGENCE.tagline,
     url: OPEN_URLS.openIntelligence,

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SovereignPillarArticle from '@/app/components/learn/SovereignPillarArticle';
 import { OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import { openOgImage } from '../../shared-metadata';
 
 export const metadata: Metadata = {
   title: 'Local-First — Privacy as an Engineering Choice',
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
     'BYOC local-first posture for regulated platforms: edge ingestion and buyer-controlled stores — not a vendor-hosted ledger warehouse. Open Portfolio architecture brief.',
   alternates: { canonical: OPEN_URLS.localFirst },
   openGraph: {
+    ...openOgImage,
     title: 'Local-First | Open Portfolio',
     description:
       'Limited-Scope Processor posture. Audit-perimeter reduction by architecture — BYOC, not another vault.',

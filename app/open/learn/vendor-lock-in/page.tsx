@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SovereignPillarArticle from '@/app/components/learn/SovereignPillarArticle';
 import { OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import { openOgImage } from '../../shared-metadata';
 
 export const metadata: Metadata = {
   title: 'Vendor Lock-In and the Sovereign Substrate',
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
     'Why proprietary custody models expand switching cost — and how BYOC open ingestion boundaries prevent capture. Open Portfolio architecture brief.',
   alternates: { canonical: OPEN_URLS.vendorLockIn },
   openGraph: {
+    ...openOgImage,
     title: 'Vendor Lock-In | Open Portfolio',
     description:
       'Open adapters and BYOC perimeters vs vendor-hosted ledger warehouses.',

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG, BOARD_OF_INVESTORS } from '../../../lib/canonical-claims';
+import { openOgImage } from '../shared-metadata';
 
 export { default } from '../../board-of-investors/page';
 
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
   description: BOARD_OF_INVESTORS.subheadline,
   alternates: { canonical: OPEN_URLS.boardOfInvestors },
   openGraph: {
+    ...openOgImage,
     title: `${BOARD_OF_INVESTORS.headline} | Open Portfolio`,
     description: BOARD_OF_INVESTORS.subheadline,
     url: OPEN_URLS.boardOfInvestors,

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../../lib/canonical-claims';
+import { openOgImage } from '../../shared-metadata';
 
 export { default } from '../../../learn/enterprise-design-partnership/page';
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
     'Architecture-level design partnership for sovereign ingestion and inference in regulated wealth-tech.',
   alternates: { canonical: OPEN_URLS.enterpriseDesignPartnership },
   openGraph: {
+    ...openOgImage,
     title: 'Enterprise Design Partnership Program | Open Portfolio',
     description:
       'Limited-capacity design partnership for sovereign AI architecture in wealth-tech stacks.',

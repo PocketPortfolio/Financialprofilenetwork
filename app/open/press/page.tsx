@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, PERSON_ABBA, SURFACE_ORG } from '../../../lib/canonical-claims';
+import { openOgImage } from '../shared-metadata';
 
 export { default } from '../../press/page';
 
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
   description: `Canonical, machine-readable facts about ${SURFACE_ORG.open.name}: positioning, founder (${PERSON_ABBA.name}), SDK, packages, and live distribution signal.`,
   alternates: { canonical: OPEN_URLS.press },
   openGraph: {
+    ...openOgImage,
     title: `Press Kit | ${SURFACE_ORG.open.name}`,
     description: SURFACE_ORG.open.description,
     url: OPEN_URLS.press,

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { OPEN_URLS, SURFACE_ORG } from '../../../lib/canonical-claims';
+import { openOgImage } from '../shared-metadata';
 
 export { default } from '../../architecture/page';
 
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
     'Keep login and client storage. Edge ingestion builds a small approved summary for the model — book a 30-minute architecture review.',
   alternates: { canonical: OPEN_URLS.architecture },
   openGraph: {
+    ...openOgImage,
     title: 'Run AI on Wealth Data Without a Client-Ledger Warehouse | Open Portfolio',
     description:
       'Keep IdP and ledger storage. Edge ingestion to bounded inference — book a 30-minute architecture review.',

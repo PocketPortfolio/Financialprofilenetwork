@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SovereignPillarArticle from '@/app/components/learn/SovereignPillarArticle';
 import { OPEN_URLS, SURFACE_ORG } from '@/lib/canonical-claims';
+import { openOgImage } from '../../shared-metadata';
 
 export const metadata: Metadata = {
   title: 'Sovereign Finance — The Economics of Stateless Inference',
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
     'Economics of BYOC + stateless inference for regulated wealth-tech — reduce data gravity without a vendor-hosted ledger warehouse.',
   alternates: { canonical: OPEN_URLS.sovereignFinance },
   openGraph: {
+    ...openOgImage,
     title: 'Sovereign Finance | Open Portfolio',
     description: 'BYOC economics of stateless inference for regulated platforms.',
     url: OPEN_URLS.sovereignFinance,
