@@ -8,6 +8,9 @@ export const RETAIL_LANDING_COPY = {
     headline: 'Master your wealth across your brokers, in one secure place.',
     subhead:
       'See your entire wealth in one place. Drag, drop, and understand your risk.',
+    /** Visible SERP collision disambiguation — do not reclaim PocketFolio / Pocket Folio names. */
+    brandDisambiguation:
+      'Pocket Portfolio — not PocketFolio, not Pocket Folio, not Pocketfolio.com.',
     privacyBand: 'Bank-grade privacy. Zero inference warehousing.',
     rails: [
       {

@@ -48,9 +48,20 @@ export default function LoginPage() {
         >
           Private local-first dashboard
         </h1>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28 }}>
+        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 12 }}>
           Sign in with Google or Microsoft. Optional Sovereign Sync to a cloud folder you own is
           available on paid seats — identity consent stays separate from file access.
+        </p>
+        <p
+          style={{
+            color: 'var(--text-muted)',
+            fontSize: 13,
+            lineHeight: 1.5,
+            marginBottom: 28,
+            fontFamily: 'ui-monospace, Menlo, monospace',
+          }}
+        >
+          Pocket Portfolio — not PocketFolio, not Pocket Folio, not Pocketfolio.com.
         </p>
 
         {loading ? (

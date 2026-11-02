@@ -6,14 +6,19 @@ import { trackEvent } from '@/app/lib/analytics/events';
 const DILIGENCE_MAIL =
   'mailto:ceo@pocketportfolio.app?subject=Open%20Portfolio%20Architecture%20Review&body=We%20reviewed%20openportfolio.co.uk%2Farchitecture%20and%20want%20to%20book%20a%2030-minute%20architecture%20review.';
 
+type Props = {
+  /** Only the first instance on the page should own #contact. */
+  anchorId?: string;
+};
+
 /**
  * Above-fold conversion CTA for /architecture — one primary path to the contact form.
  * Discovery → conversion: SERP/AI land here, then book the review.
  */
-export default function ArchitectureBookingCta() {
+export default function ArchitectureBookingCta({ anchorId = 'contact' }: Props) {
   return (
     <section
-      id="contact"
+      id={anchorId || undefined}
       aria-label="Book architecture review"
       style={{
         marginBottom: 28,

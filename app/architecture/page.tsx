@@ -106,147 +106,86 @@ export default function ArchitecturePage() {
             background: 'var(--surface)',
           }}
         >
-          <h2 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 8px' }}>
-            Not an RIA open-architecture platform
-          </h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-            In wealth distribution, “open architecture” often means multi-custodian product shelves. This page is
-            different: a <strong style={{ color: 'var(--text)' }}>BYOC inference boundary</strong> so generative AI
-            can run without warehousing client ledgers into a vendor vault. If you need custody rails or an RIA
-            marketplace, this is not that product.
+            Not an RIA multi-custodian shelf. This is a{' '}
+            <strong style={{ color: 'var(--text)' }}>BYOC inference boundary</strong>: edge ingestion, bounded
+            summary, forgetful hop — buyer keeps IdP and ledger storage.{' '}
+            <Link href="/openbrokercsv" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+              SDK →
+            </Link>
+            {' · '}
+            <Link href="/#contact" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
+              Book review →
+            </Link>
           </p>
         </div>
 
         <div
           style={{
-            border: '1px solid var(--border-warm)',
-            borderRadius: '12px',
-            padding: '20px',
-            marginBottom: '28px',
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, transparent 55%)',
+            contentVisibility: 'auto',
+            containIntrinsicSize: '1200px',
           }}
         >
-          <h2 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 10px' }}>What is sovereign intelligence?</h2>
-          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '15px' }}>
-            <strong style={{ color: 'var(--text)' }}>Sovereign intelligence</strong> is a BYOC boundary pattern: the
-            enterprise keeps IdP and approved storage; inference runs over bounded aggregates assembled at the edge —
-            not a vendor-hosted ledger warehouse. Open Portfolio supplies the fitting; the buyer keeps the vault keys.
-          </p>
-          <p style={{ margin: '12px 0 0', fontSize: '14px' }}>
-            <Link href="/openbrokercsv" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
-              Sovereign ingestion SDK →
-            </Link>
-            {' · '}
-            <Link href="/tier1designpartner" style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
-              Tier-1 design partnership →
-            </Link>
-          </p>
+          {section(
+            <>
+              <h2 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '10px' }}>
+                BYOC foundation (buyer keeps the store)
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
+                Broker exports normalize at the edge via{' '}
+                <code style={{ fontSize: 13 }}>@pocket-portfolio/importer</code>. Enterprise pilots scope{' '}
+                <strong style={{ color: 'var(--text)' }}>your</strong> stores and IdP — not a vendor ledger vault.
+                Briefs:{' '}
+                <Link href="/learn/stateless-edge-ingestion" style={{ color: 'var(--accent-warm)' }}>
+                  edge ingestion
+                </Link>
+                {' · '}
+                <Link href="/learn/dora-eu-ai-act-wealth" style={{ color: 'var(--accent-warm)' }}>
+                  DORA / EU AI Act
+                </Link>
+                {' · '}
+                <Link href="/learn/sovereign-ai-architecture" style={{ color: 'var(--accent-warm)' }}>
+                  sovereign AI
+                </Link>
+                .
+              </p>
+            </>
+          )}
+
+          {section(
+            <>
+              <h2 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '10px' }}>
+                Pocket = live harness (not Open&apos;s store)
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
+                Pocket Portfolio stress-tests adapters under CSV chaos. Those consumer details are not Open&apos;s
+                enterprise BYOC contract — Open sells the operated boundary for procurement.
+              </p>
+            </>
+          )}
+
+          <section style={{ marginBottom: 28 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>Institutional briefs</h2>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {OPEN_INSTITUTIONAL_PILLARS.slice(0, 5).map((pillar) => (
+                <li key={pillar.slug}>
+                  <Link
+                    href={`/learn/${pillar.slug}`}
+                    style={{ color: 'var(--accent-warm)', fontWeight: 600, textDecoration: 'none', fontSize: 14 }}
+                  >
+                    {pillar.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
 
-        {section(
-          <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>BYOC foundation (buyer keeps the store)</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Open Portfolio does not ask regulated platforms to re-home client ledgers in our cloud. Broker exports are
-              normalized at the edge via <code style={{ fontSize: 13 }}>@pocket-portfolio/importer</code>; enterprise
-              pilots scope <strong style={{ color: 'var(--text)' }}>your</strong> approved stores and identity providers.
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
-              More vocabulary:{' '}
-              <Link href="/learn/local-first" style={{ color: 'var(--accent-warm)' }}>
-                local-first architecture brief
-              </Link>
-              ,{' '}
-              <Link href="/learn/stateless-edge-ingestion" style={{ color: 'var(--accent-warm)' }}>
-                stateless edge ingestion
-              </Link>
-              ,{' '}
-              <Link href="/blog/tier-1-wealth-byoc-sandbox-pattern" style={{ color: 'var(--accent-warm)' }}>
-                BYOC sandbox pattern
-              </Link>
-              .
-            </p>
-          </>
-        )}
+        <ArchitectureBookingCta anchorId="" />
 
-        {section(
-          <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>
-              Pocket Portfolio = live harness (not the Open store)
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Pocket Portfolio is the consumer reference terminal on the same substrate — browser-first state,
-              optional Firebase auth/tiers, optional operator-owned Drive sync. It exists to stress-test adapters under
-              real CSV chaos. Those Pocket implementation details are <strong style={{ color: 'var(--text)' }}>not</strong>{' '}
-              Open Portfolio&apos;s enterprise BYOC contract.
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
-              Compliance framing:{' '}
-              <Link href="/learn/dora-eu-ai-act-wealth" style={{ color: 'var(--accent-warm)' }}>
-                DORA & EU AI Act for wealth management
-              </Link>
-              .
-            </p>
-          </>
-        )}
-
-        {section(
-          <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Bounding the LLM (stateless AI)</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Inference receives a bounded, user- or operator-approved aggregate assembled at the edge (
-              <code style={{ fontSize: '13px', color: 'var(--text)' }}>contextBuilder</code>
-              ) — not raw financial DNA for open-ended retention on a vendor warehouse path.
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
-              Deep dive:{' '}
-              <Link href="/learn/sovereign-ai-architecture" style={{ color: 'var(--accent-warm)' }}>
-                sovereign AI architecture & data perimeters
-              </Link>
-              .
-            </p>
-          </>
-        )}
-
-        {section(
-          <>
-            <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '12px' }}>Open source versus BYOC product</h2>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '12px' }}>
-              Open source proves the pipes; Open Portfolio sells the operated boundary — consent, perimeter placement,
-              and inspectable architecture for procurement — not another hosted analytics vault.
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
-              Related:{' '}
-              <Link href="/learn/sovereign-finance" style={{ color: 'var(--accent-warm)' }}>
-                sovereign finance
-              </Link>
-              ,{' '}
-              <Link href="/learn/sovereign-stack" style={{ color: 'var(--accent-warm)' }}>
-                sovereign stack
-              </Link>
-              .
-            </p>
-          </>
-        )}
-
-        <section style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 14 }}>Institutional architecture briefs</h2>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {OPEN_INSTITUTIONAL_PILLARS.map((pillar) => (
-              <li key={pillar.slug}>
-                <Link
-                  href={`/learn/${pillar.slug}`}
-                  style={{ color: 'var(--accent-warm)', fontWeight: 600, textDecoration: 'none' }}
-                >
-                  {pillar.title}
-                </Link>
-                <span style={{ color: 'var(--text-secondary)', fontSize: 14 }}> — {pillar.summary}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <OpenProcurementFaq pageUrl={OPEN_URLS.architecture} />
+        <div style={{ contentVisibility: 'auto', containIntrinsicSize: '800px' }}>
+          <OpenProcurementFaq pageUrl={OPEN_URLS.architecture} />
+        </div>
 
         <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginTop: 24 }}>
           Machine-readable identity:{' '}

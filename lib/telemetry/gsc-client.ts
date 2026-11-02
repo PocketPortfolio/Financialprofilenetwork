@@ -4,7 +4,9 @@ import {
   classifyOpenGscPage,
   clickShareByBucket,
   openPageClickShare,
+  totalsFromRows,
   type GscQueryBucket,
+  type GscTotals,
 } from './classify-gsc-query';
 import { getGrowthGoogleAccessToken } from './google-sa-token';
 
@@ -21,9 +23,15 @@ export interface GscTelemetry {
   siteUrl: string;
   startDate: string;
   endDate: string;
-  totals: { clicks: number; impressions: number; ctr: number; position: number };
+  /** Raw blended totals — do NOT use for board growth CTR. */
+  totals: GscTotals;
+  /** Growth CTR — excludes brand_collision (pocketfolio / pocket folio*). */
+  cleanTotals: GscTotals;
+  /** Collision line only — footnote on HUD, never a success gate. */
+  collisionTotals: GscTotals & { impressionShare: number };
   topQueries: GscQueryRow[];
   signalQueries: GscQueryRow[];
+  /** Click share on clean rows only (collision excluded). */
   clickShare: ReturnType<typeof clickShareByBucket>;
 }
 
@@ -126,14 +134,25 @@ export async function fetchGscTelemetryForSite(siteUrl: string, days = 28): Prom
     } satisfies GscQueryRow;
   });
 
-  const totalsClicks = classified.reduce((s, r) => s + r.clicks, 0);
-  const totalsImpr = classified.reduce((s, r) => s + r.impressions, 0);
-  const weightedPos =
-    totalsImpr > 0 ? classified.reduce((s, r) => s + r.position * r.impressions, 0) / totalsImpr : 0;
+  const totals = totalsFromRows(classified);
+  const cleanRows = classified.filter((r) => r.bucket !== 'brand_collision');
+  const collisionRows = classified.filter((r) => r.bucket === 'brand_collision');
+  const cleanTotals = totalsFromRows(cleanRows);
+  const collisionBase = totalsFromRows(collisionRows);
+  const collisionTotals = {
+    ...collisionBase,
+    impressionShare: totals.impressions > 0 ? collisionBase.impressions / totals.impressions : 0,
+  };
 
   const byClicks = [...classified].sort((a, b) => b.clicks - a.clicks);
-  const signalQueries = classified
-    .filter((r) => r.bucket === 'import' || r.bucket === 'enterprise' || r.bucket === 'wm_advisor' || r.bucket === 'brand')
+  const signalQueries = cleanRows
+    .filter(
+      (r) =>
+        r.bucket === 'import' ||
+        r.bucket === 'enterprise' ||
+        r.bucket === 'wm_advisor' ||
+        r.bucket === 'brand',
+    )
     .sort((a, b) => b.clicks - a.clicks || b.ctr - a.ctr)
     .slice(0, 10);
 
@@ -141,15 +160,12 @@ export async function fetchGscTelemetryForSite(siteUrl: string, days = 28): Prom
     siteUrl,
     startDate,
     endDate,
-    totals: {
-      clicks: totalsClicks,
-      impressions: totalsImpr,
-      ctr: totalsImpr > 0 ? totalsClicks / totalsImpr : 0,
-      position: weightedPos,
-    },
+    totals,
+    cleanTotals,
+    collisionTotals,
     topQueries: byClicks.slice(0, 10),
     signalQueries,
-    clickShare: clickShareByBucket(classified),
+    clickShare: clickShareByBucket(classified, { excludeCollision: true }),
   };
 }
 

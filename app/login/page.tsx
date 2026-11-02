@@ -4,7 +4,7 @@ import LoginClient from './LoginClient';
 export const metadata: Metadata = {
   title: 'Pocket Portfolio Login | Private Local-First Dashboard',
   description:
-    'Sign in to Pocket Portfolio. Not Pocketfolio.com and not PocketFolios. Private local-first dashboard — Google sign-in, on-device ledger, optional Drive sync.',
+    'Sign in to Pocket Portfolio — not PocketFolio, not Pocket Folio, not Pocketfolio.com. Private local-first dashboard — Google sign-in, on-device ledger, optional Drive sync.',
   keywords: [
     'pocket portfolio login',
     'pocket portfolio sign in',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pocket Portfolio Login | Private Local-First Dashboard',
     description:
-      'Sign in to Pocket Portfolio. Not Pocketfolio.com and not PocketFolios. Private local-first dashboard — your ledger stays on your device.',
+      'Sign in to Pocket Portfolio — not PocketFolio, not Pocket Folio, not Pocketfolio.com. Private local-first dashboard — your ledger stays on your device.',
     url: 'https://www.pocketportfolio.app/login',
     type: 'website',
   },

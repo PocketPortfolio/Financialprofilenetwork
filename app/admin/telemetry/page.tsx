@@ -6,7 +6,16 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { SovereignHeader } from '@/app/components/dashboard/SovereignHeader';
 import { useGoogleDrive } from '@/app/hooks/useGoogleDrive';
 
-type Bucket = 'farm' | 'import' | 'brand' | 'enterprise' | 'wm_advisor' | 'other';
+type Bucket =
+  | 'farm'
+  | 'import'
+  | 'brand'
+  | 'brand_collision'
+  | 'enterprise'
+  | 'wm_advisor'
+  | 'other';
+
+type GscTotals = { clicks: number; impressions: number; ctr: number; position: number };
 
 interface TelemetryPayload {
   generatedAt: string;
@@ -17,8 +26,17 @@ interface TelemetryPayload {
     siteUrl: string;
     startDate: string;
     endDate: string;
-    totals: { clicks: number; impressions: number; ctr: number; position: number };
-    topQueries: Array<{ query: string; clicks: number; impressions: number; ctr: number; position: number; bucket: Bucket }>;
+    totals: GscTotals;
+    cleanTotals: GscTotals;
+    collisionTotals: GscTotals & { impressionShare: number };
+    topQueries: Array<{
+      query: string;
+      clicks: number;
+      impressions: number;
+      ctr: number;
+      position: number;
+      bucket: Bucket;
+    }>;
     signalQueries: Array<{ query: string; clicks: number; ctr: number; bucket: Bucket }>;
     clickShare: Record<Bucket, { clicks: number; share: number }>;
   } | null;
@@ -73,10 +91,13 @@ const BUCKET_COLOR: Record<Bucket, string> = {
   farm: 'rgba(239, 68, 68, 0.15)',
   import: 'rgba(245, 158, 11, 0.18)',
   brand: 'rgba(245, 158, 11, 0.1)',
+  brand_collision: 'rgba(239, 68, 68, 0.22)',
   enterprise: 'rgba(16, 185, 129, 0.15)',
   wm_advisor: 'rgba(245, 158, 11, 0.22)',
   other: 'transparent',
 };
+
+const CLEAN_CTR_TARGET = 0.02; // 28d gate ≥ 2.0%
 
 export default function AdminGrowthTelemetryPage() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -168,6 +189,12 @@ export default function AdminGrowthTelemetryPage() {
   const mix = data?.gsc?.clickShare;
   const openMix = data?.openPageMix;
   const openGsc = data?.gscOpen;
+  const gaCsvImports =
+    data?.ga4?.conversionEvents?.find((e) => e.eventName === 'csv_import_success')?.eventCount ??
+    null;
+  const gaDuConversions =
+    data?.ga4?.conversionEvents?.find((e) => e.eventName === 'developer_utility_conversion')
+      ?.eventCount ?? null;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background)', color: 'var(--text)' }}>
@@ -193,8 +220,13 @@ export default function AdminGrowthTelemetryPage() {
             </p>
             <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em' }}>Growth Telemetry</h1>
             <p style={{ color: 'var(--text-muted)', marginTop: 8, maxWidth: 640 }}>
-              Dual-surface GSC (Pocket + Open) + GA4 overlay. North star remains Board Triad — paid Stripe keys, not waitlist volume.
-              Cached 2 minutes. Does not replace <Link href="/admin/analytics" style={{ color: 'var(--accent-warm)' }}>/admin/analytics</Link>.
+              Board gates: paid Stripe keys → <strong style={{ color: 'var(--text)' }}>Clean CTR</strong> (ex
+              pocketfolio / pocket folio collision) → import share → Open pillar clicks. Blended site CTR is
+              deprecated for board briefs. Cached 2 minutes. Does not replace{' '}
+              <Link href="/admin/analytics" style={{ color: 'var(--accent-warm)' }}>
+                /admin/analytics
+              </Link>
+              .
             </p>
           </div>
           <button
@@ -249,16 +281,57 @@ export default function AdminGrowthTelemetryPage() {
             hint="Stripe first-party · not GA4 MP"
           />
           <PinCard
+            label="Clean CTR (ex-collision)"
+            value={
+              data?.gsc?.cleanTotals
+                ? `${(data.gsc.cleanTotals.ctr * 100).toFixed(2)}%`
+                : '—'
+            }
+            hint={
+              data?.gsc?.cleanTotals
+                ? `${data.gsc.cleanTotals.clicks} clk / ${data.gsc.cleanTotals.impressions} impr · gate ≥ ${(CLEAN_CTR_TARGET * 100).toFixed(0)}%`
+                : 'Growth CTR — collision excluded'
+            }
+            pass={
+              data?.gsc?.cleanTotals ? data.gsc.cleanTotals.ctr >= CLEAN_CTR_TARGET : undefined
+            }
+          />
+          <PinCard
+            label="Collision (excluded)"
+            value={
+              data?.gsc?.collisionTotals
+                ? `${Math.round(data.gsc.collisionTotals.impressionShare * 100)}% impr`
+                : '—'
+            }
+            hint={
+              data?.gsc?.collisionTotals
+                ? `CTR ${(data.gsc.collisionTotals.ctr * 100).toFixed(2)}% · never a success gate · do not reclaim`
+                : 'pocketfolio / pocket folio*'
+            }
+            pass={false}
+          />
+          <PinCard
             label="Farm query click share"
             value={mix ? `${Math.round(mix.farm.share * 100)}%` : '—'}
-            hint="Target trending under 50%"
+            hint="Clean clicks only · target under 50%"
             pass={mix ? mix.farm.share < 0.5 : undefined}
           />
           <PinCard
             label="Import query click share"
             value={mix ? `${Math.round(mix.import.share * 100)}%` : '—'}
-            hint="Target toward 15%"
+            hint="Clean clicks only · target ≥ 10% → 15%"
             pass={mix ? mix.import.share >= 0.1 : undefined}
+          />
+          <PinCard
+            label="csv_import_success (GA4)"
+            value={gaCsvImports != null ? String(gaCsvImports) : '—'}
+            hint="Product signal → DU close path"
+          />
+          <PinCard
+            label="DU conversions (GA4)"
+            value={gaDuConversions != null ? String(gaDuConversions) : '—'}
+            hint="Checkout MP — not a substitute for Stripe paid keys"
+            pass={gaDuConversions != null ? gaDuConversions >= 1 : undefined}
           />
           <PinCard
             label="Open · blog farm page share"

@@ -1,12 +1,16 @@
 /**
  * GSC query / page signal classification for the live growth HUD.
  * Farm heuristics match Day-14 calibration — do not train on volume.
+ *
+ * Option A (locked): pocketfolio / pocket folio* are brand_collision —
+ * excluded from growth CTR and from click-share gates. Never reclaim in SERP copy.
  */
 
 export type GscQueryBucket =
   | 'farm'
   | 'import'
   | 'brand'
+  | 'brand_collision'
   | 'enterprise'
   | 'wm_advisor'
   | 'other';
@@ -17,8 +21,12 @@ const FARM_EMBEDDED = /\b(xinxx|xvlxx|[a-z]{1,4}xx)\b/i;
 const IMPORT_RE =
   /\b(ghostfolio|trading\s*212|t212|interactive\s*brokers|ibkr|trade\s*republic|moomoo|etoro|e-?toro|revolut|freetrade|wealthsimple|openbrokercsv|import)\b/i;
 
-const BRAND_RE =
-  /\bpocket\s*(port?folio|folio)\b|\bpocketfolio\b|\bpocketportfolio\b|\bopen\s*portfolio\b|\bopenportfolio\b/i;
+/** Other products — quarantine from growth CTR (never reclaim in titles/schema). */
+const BRAND_COLLISION_RE = /\bpocketfolio\b|\bpocket\s*folio\b/i;
+
+/** Our navigational brand (+ Open). Checked after collision so "pocket folio" never lands in brand. */
+const OUR_BRAND_RE =
+  /\bpocket\s*portfolio\b|\bpocketportfolio\b|\bopen\s*portfolio\b|\bopenportfolio\b/i;
 
 const ENTERPRISE_RE =
   /\b(sovereign\s*ai|design\s*partner|databricks|dora|eu ai act|wealth-?tech|local-first|stateless\s*(edge|inference)|open\s*portfolio)\b/i;
@@ -26,12 +34,18 @@ const ENTERPRISE_RE =
 const WM_RE =
   /\b(wealth\s*manager|ifa|financial\s*advisor|adviser|portfolio\s*report|white.?label)\b/i;
 
+export function isBrandCollisionQuery(query: string): boolean {
+  return BRAND_COLLISION_RE.test(query.trim());
+}
+
 export function classifyGscQuery(query: string): GscQueryBucket {
   const q = query.trim();
   if (!q) return 'other';
   if (FARM_TOKEN.test(q) || FARM_EMBEDDED.test(q)) return 'farm';
   if (IMPORT_RE.test(q)) return 'import';
-  if (BRAND_RE.test(q)) return 'brand';
+  // Collision before our brand — "pocket folio" must never count as brand.
+  if (BRAND_COLLISION_RE.test(q)) return 'brand_collision';
+  if (OUR_BRAND_RE.test(q)) return 'brand';
   if (ENTERPRISE_RE.test(q)) return 'enterprise';
   if (WM_RE.test(q)) return 'wm_advisor';
   return 'other';
@@ -95,17 +109,54 @@ export interface ClickShareRow {
   bucket: GscQueryBucket;
 }
 
-export function clickShareByBucket(rows: ClickShareRow[]): Record<GscQueryBucket, { clicks: number; share: number }> {
+export type GscTotals = {
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+};
+
+export function emptyGscTotals(): GscTotals {
+  return { clicks: 0, impressions: 0, ctr: 0, position: 0 };
+}
+
+/** Weighted totals from classified query rows. */
+export function totalsFromRows(
+  rows: Array<{ clicks: number; impressions: number; position: number }>,
+): GscTotals {
+  const clicks = rows.reduce((s, r) => s + r.clicks, 0);
+  const impressions = rows.reduce((s, r) => s + r.impressions, 0);
+  const position =
+    impressions > 0 ? rows.reduce((s, r) => s + r.position * r.impressions, 0) / impressions : 0;
+  return {
+    clicks,
+    impressions,
+    ctr: impressions > 0 ? clicks / impressions : 0,
+    position,
+  };
+}
+
+/**
+ * Growth click-share gates — collision excluded from denominator.
+ * brand_collision is reported as 0 share here (tracked via collisionTotals).
+ */
+export function clickShareByBucket(
+  rows: ClickShareRow[],
+  opts?: { excludeCollision?: boolean },
+): Record<GscQueryBucket, { clicks: number; share: number }> {
+  const excludeCollision = opts?.excludeCollision ?? true;
   const totals: Record<GscQueryBucket, number> = {
     farm: 0,
     import: 0,
     brand: 0,
+    brand_collision: 0,
     enterprise: 0,
     wm_advisor: 0,
     other: 0,
   };
   let all = 0;
   for (const row of rows) {
+    if (excludeCollision && row.bucket === 'brand_collision') continue;
     totals[row.bucket] += row.clicks;
     all += row.clicks;
   }

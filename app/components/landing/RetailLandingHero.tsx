@@ -82,12 +82,26 @@ export default function RetailLandingHero({ isMobile, heroVideoSrc, csvDemo }: R
           style={{
             fontSize: 'clamp(1.125rem, 2vw, 1.35rem)',
             lineHeight: '1.6',
-            marginBottom: '20px',
+            marginBottom: '12px',
             maxWidth: '720px',
             color: 'var(--text-secondary)',
           }}
         >
           {copy.subhead}
+        </p>
+
+        <p
+          style={{
+            margin: '0 0 20px',
+            maxWidth: '720px',
+            fontSize: 'clamp(0.8125rem, 1.4vw, 0.9375rem)',
+            lineHeight: 1.5,
+            color: 'var(--text-muted)',
+            fontFamily: 'ui-monospace, Menlo, monospace',
+            letterSpacing: '0.02em',
+          }}
+        >
+          {copy.brandDisambiguation}
         </p>
 
         <div

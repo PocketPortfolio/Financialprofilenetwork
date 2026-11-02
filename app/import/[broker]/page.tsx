@@ -4,6 +4,7 @@ import { BROKER_CONFIG, SUPPORTED_BROKERS } from '@/app/lib/brokers/config';
 import SovereignSyncCTA from '@/app/components/SovereignSyncCTA';
 import BridgeToTerminalCTA from '@/app/components/BridgeToTerminalCTA';
 import ImportLanderDropzone from '@/app/components/ImportLanderDropzone';
+import ImportOffenseCtaBar from '@/app/components/ImportOffenseCtaBar';
 import IbkrFlexQuickStart from '@/app/components/IbkrFlexQuickStart';
 
 /** US retail CSV-export intent pages — dedicated title/meta/H1 + export copy */
@@ -31,6 +32,11 @@ const META_TEST_BROKERS = new Set([
 ]);
 
 const HIGH_CTR_IMPORT_TITLES: Record<string, { title: string; description: string }> = {
+  ghostfolio: {
+    title: 'Ghostfolio CSV Import — Move to Local-First in Minutes | Pocket Portfolio',
+    description:
+      'Import Ghostfolio CSV in your browser. No uploads. Keep your ledger local, then unlock Developer Utility for API and sync.',
+  },
   'trade-republic': {
     title: 'Trade Republic CSV Export → Import | Local-First Portfolio Tracker',
     description:
@@ -512,6 +518,8 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
 
         {isIbkr ? <IbkrFlexQuickStart /> : null}
 
+        <ImportOffenseCtaBar brokerSlug={broker} brokerDisplayName={config.displayName} />
+
         <ImportLanderDropzone brokerSlug={broker} brokerDisplayName={config.displayName} />
 
         {(() => {
@@ -530,8 +538,8 @@ export default async function BrokerImportPage({ params }: { params: Promise<{ b
               subtitle={subtitle}
               href={`/dashboard?utm_source=import_page&utm_medium=bridge_cta&utm_campaign=activation&utm_content=${encodeURIComponent(broker)}`}
               primaryLabel={primaryLabel}
-              secondaryHref="/learn/local-first"
-              secondaryLabel="How local-first works"
+              secondaryHref={`/sponsor?tier=developer-utility&utm_source=import_page&utm_medium=bridge_secondary&utm_campaign=paid_key&utm_content=${encodeURIComponent(broker)}`}
+              secondaryLabel="Developer Utility"
               analytics={{ source: 'import_page', contextId: broker }}
             />
           );

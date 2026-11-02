@@ -19,10 +19,31 @@ describe('GSC signal vs noise classifier', () => {
     expect(classifyGscQuery('interactive brokers portfolio')).toBe('import');
   });
 
-  it('labels brand and enterprise', () => {
+  it('labels our brand vs brand_collision (Option A quarantine)', () => {
     expect(classifyGscQuery('pocket portfolio')).toBe('brand');
+    expect(classifyGscQuery('pocketportfolio')).toBe('brand');
+    expect(classifyGscQuery('pocket portfolio login')).toBe('brand');
+    expect(classifyGscQuery('pocketfolio')).toBe('brand_collision');
+    expect(classifyGscQuery('pocket folio')).toBe('brand_collision');
+    expect(classifyGscQuery('pocket folio login')).toBe('brand_collision');
+    expect(classifyGscQuery('pocketfolio login')).toBe('brand_collision');
+  });
+
+  it('labels enterprise and WM', () => {
     expect(classifyGscQuery('sovereign ai wealth')).toBe('enterprise');
     expect(classifyGscQuery('ifa white label report')).toBe('wm_advisor');
+  });
+
+  it('excludes collision from growth click-share denominator', () => {
+    const share = clickShareByBucket([
+      { clicks: 12, impressions: 3000, bucket: 'brand_collision' },
+      { clicks: 10, impressions: 200, bucket: 'brand' },
+      { clicks: 10, impressions: 100, bucket: 'import' },
+    ]);
+    expect(share.brand.share).toBe(0.5);
+    expect(share.import.share).toBe(0.5);
+    expect(share.brand_collision.clicks).toBe(0);
+    expect(share.brand_collision.share).toBe(0);
   });
 
   it('classifies pages for click-share mix', () => {
