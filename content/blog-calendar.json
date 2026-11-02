@@ -1714,7 +1714,7 @@
     "date": "2026-11-02",
     "title": "Why JSON? The Design Decision That Changed Everything",
     "slug": "why-json-the-design-decision-that-changed-everything",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1724,7 +1724,8 @@
       "json?"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-02T09:00:38.746Z"
   },
   {
     "id": "week-44-post-2",
