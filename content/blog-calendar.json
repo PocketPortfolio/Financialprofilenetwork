@@ -1732,7 +1732,7 @@
     "date": "2026-11-05",
     "title": "Error Handling in Financial Data: Building Resilient Parsers",
     "slug": "error-handling-in-financial-data-building-resilient-parsers",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1742,7 +1742,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-05T09:00:38.793Z"
   },
   {
     "id": "week-45-post-1",
