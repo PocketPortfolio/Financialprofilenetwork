@@ -1750,7 +1750,7 @@
     "date": "2026-11-09",
     "title": "Vendor Lock-in is Theft: The Economic Case for Data Sovereignty",
     "slug": "vendor-lock-in-is-theft-the-economic-case-for-data-sovereign",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1760,7 +1760,8 @@
       "vendor"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-09T09:00:39.327Z"
   },
   {
     "id": "week-45-post-2",
