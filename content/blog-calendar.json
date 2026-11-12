@@ -1768,7 +1768,7 @@
     "date": "2026-11-12",
     "title": "The Impact of Fees on Long-Term Returns",
     "slug": "the-impact-of-fees-on-long-term-returns",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1778,7 +1778,8 @@
       "impact"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-12T09:00:41.413Z"
   },
   {
     "id": "week-46-post-1",
