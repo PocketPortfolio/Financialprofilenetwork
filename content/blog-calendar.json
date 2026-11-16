@@ -1786,7 +1786,7 @@
     "date": "2026-11-16",
     "title": "The JSON API: Building Programmatic Access to Your Portfolio",
     "slug": "the-json-api-building-programmatic-access-to-your-portfolio",
-    "status": "pending",
+    "status": "published",
     "pillar": "technical",
     "keywords": [
       "json",
@@ -1796,7 +1796,8 @@
       "developer tools"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-16T09:00:37.665Z"
   },
   {
     "id": "week-46-post-2",
