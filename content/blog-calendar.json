@@ -1804,7 +1804,7 @@
     "date": "2026-11-19",
     "title": "The Benefits of Bidirectional Sync: Real User Stories",
     "slug": "the-benefits-of-bidirectional-sync-real-user-stories",
-    "status": "pending",
+    "status": "published",
     "pillar": "product",
     "keywords": [
       "sovereign sync",
@@ -1814,7 +1814,8 @@
       "benefits"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-19T09:00:45.711Z"
   },
   {
     "id": "week-47-post-1",
