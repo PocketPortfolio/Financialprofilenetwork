@@ -1822,7 +1822,7 @@
     "date": "2026-11-23",
     "title": "Market Crashes: Patterns and Predictions from History",
     "slug": "market-crashes-patterns-and-predictions-from-history",
-    "status": "pending",
+    "status": "published",
     "pillar": "market",
     "keywords": [
       "investment strategy",
@@ -1832,7 +1832,8 @@
       "market"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-23T09:00:39.700Z"
   },
   {
     "id": "week-47-post-2",
