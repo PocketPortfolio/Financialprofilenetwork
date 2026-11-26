@@ -1840,7 +1840,7 @@
     "date": "2026-11-26",
     "title": "The JSON Revolution: How Raw Data Changes Everything",
     "slug": "the-json-revolution-how-raw-data-changes-everything",
-    "status": "pending",
+    "status": "published",
     "pillar": "philosophy",
     "keywords": [
       "data sovereignty",
@@ -1850,7 +1850,8 @@
       "revolution:"
     ],
     "category": "deep-dive",
-    "scheduledTime": "09:00"
+    "scheduledTime": "09:00",
+    "publishedAt": "2026-11-26T09:00:39.234Z"
   },
   {
     "id": "week-48-post-1",
